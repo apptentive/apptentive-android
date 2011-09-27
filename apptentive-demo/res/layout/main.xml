@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:id="@+id/app_root">
+	<Button android:id="@+id/button_reset"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Reinstall"/>
+	<Button android:id="@+id/button_event"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Trigger Event"/>
+	<Button android:id="@+id/button_day"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Subtract a Day"/>
+	<Button android:id="@+id/button_choice"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Force Choice"/>
+	<Button android:id="@+id/button_ratings"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Force Rating"/>
+	<Button android:id="@+id/button_feedback"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0px"
+	        android:layout_weight="1"
+	        android:text="Force Feedback"/>
+</LinearLayout>
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ ratings.xml
+  ~
+  ~ Created by skelsey on 2011-09-17.
+  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:padding="10dip"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:background="#FFFFFF">
+	<LinearLayout android:orientation="horizontal"
+	              android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:background="#FFFFFF">
+		<Button android:id="@+id/apptentive_choice_no"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="No"/>
+		<Button android:id="@+id/apptentive_choice_yes"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="Yes"/>
+	</LinearLayout>
+</LinearLayout>

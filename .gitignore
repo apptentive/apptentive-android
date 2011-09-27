@@ -1,0 +1,11 @@
+
+# Androd intermediate buid artifacts 
+apptentive-android-sdk/gen/*
+apptentive-android-sdk/out/*
+apptentive-demo/gen/*
+apptentive-demo/out/*
+
+# IntelliJ noise
+*.ipr
+*.iml
+*.iws

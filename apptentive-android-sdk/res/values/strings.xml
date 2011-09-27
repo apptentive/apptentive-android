@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="apptentive_app_name">Apptentive</string>
+	<string name="apptentive_activity_name">Apptentive</string>
+
+	<string name="apptentive_button_cancel_text">Cancel</string>
+	<string name="apptentive_header_one_text">Give Feedback</string>
+	<string name="apptentive_button_next_text"> Next </string>
+	<string name="apptentive_edittext_name_text">Name</string>
+	<string name="apptentive_edittext_feedback_text">Unhappy with this app?\nWe\'d love to hear why so we can make it better.</string>
+
+	<string name="apptentive_button_back_text">Back</string>
+	<string name="apptentive_header_two_text">Info</string>
+	<string name="apptentive_button_send_text">Send</string>
+	<string name="apptentive_edittext_email_text">Email Address</string>
+	<string name="apptentive_edittext_phone_text">Phone Number</string>
+
+	<string name="apptentive_branding_text">Feedback Powered By Apptentive</string>
+	<string name="apptentive_header_button_about_okay_text">Okay</string>
+
+	<string name="apptentive_rating_message">If you enjoy %s we\'d really appreciate you taking the time to rate the app.</string>
+	<string name="apptentive_rating_rate">Rate %s</string>
+	<string name="apptentive_rating_remind">Remind me Later</string>
+	<string name="apptentive_rating_no">No Thanks</string>
+	<string name="apptentive_rating_no_market">Android Market was not found. Please install Android Market before rating this app.</string>
+</resources>
