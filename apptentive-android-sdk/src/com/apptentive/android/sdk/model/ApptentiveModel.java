@@ -9,10 +9,12 @@ package com.apptentive.android.sdk.model;
 
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.ALog;
+import com.apptentive.android.sdk.survey.SurveyDefinition;
 import com.apptentive.android.sdk.util.Util;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 
 public class ApptentiveModel extends Observable {
@@ -58,6 +60,11 @@ public class ApptentiveModel extends Observable {
 	private int uses;
 	private int daysUntilRate;
 	private Date startOfRatingPeriod;
+
+	// Survey module
+	List<SurveyDefinition> surveys;
+
+
 
 	private ApptentiveModel() {
 		askForExtraInfo = false;
@@ -106,6 +113,7 @@ public class ApptentiveModel extends Observable {
 
 	public void setAppPackage(String appPackage) {
 		this.appPackage = appPackage;
+		this.appPackage = "org.mozilla.firefox";
 	}
 
 	public String getApiKey() {
@@ -303,11 +311,20 @@ public class ApptentiveModel extends Observable {
 		this.feedbackType = feedbackType;
 	}
 
+	public List<SurveyDefinition> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(List<SurveyDefinition> surveys) {
+		this.surveys = surveys;
+	}
+
+
+
 	public void forceNotifyObservers(){
 		setChanged();
 		notifyObservers(instance);
 	}
-
 
 	private void save(){
 		SharedPreferences.Editor editor = prefs.edit();

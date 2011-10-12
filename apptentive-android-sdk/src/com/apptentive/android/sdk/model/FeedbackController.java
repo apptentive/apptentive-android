@@ -8,6 +8,7 @@
 package com.apptentive.android.sdk.model;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
@@ -20,6 +21,9 @@ import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.offline.Feedback;
+import com.apptentive.android.sdk.offline.Payload;
+import com.apptentive.android.sdk.offline.PayloadManager;
 
 import java.util.Date;
 import java.util.Observable;
@@ -90,9 +94,21 @@ public class FeedbackController implements Observer{
 	private void submit() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 
-		ApptentiveClient client = new ApptentiveClient(model.getApiKey());
-		client.submitFeedback(model.getUuid(), model.getName(), model.getEmail(), model.getModel(), model.getVersion(), model.getCarrier(), model.getFeedback(), model.getFeedbackType(), new Date());
+		Payload payload = new Feedback(model.getUuid(),
+		                                model.getModel(),
+		                                model.getVersion(),
+		                                model.getCarrier(),
+		                                "1.0",
+		                                model.getName(),
+		                                model.getEmail(),
+		                                model.getFeedback(),
+		                                model.getFeedbackType(),
+		                                new Date()
+		);
 		model.clearTransientData();
+		PayloadManager payloadManager = new PayloadManager(activity);
+		payloadManager.save(payload);
+		payloadManager.run();
 	}
 
 	public void update(Observable observable, Object o) {
@@ -118,10 +134,10 @@ public class FeedbackController implements Observer{
 	private View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_content_flipper);
-			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_about_flipper);
+			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_feedback_content_flipper);
+			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_about_flipper);
 
-			Apptentive.getInstance().hideSoftKeyboard(view);
+//			Apptentive.getInstance().hideSoftKeyboard(view);
 
 			switch (view.getId()) {
 				case R.id.apptentive_button_cancel:

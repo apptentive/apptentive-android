@@ -6,7 +6,6 @@
   -->
 
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-        android:src="@drawable/apptentive_header_background_50px"
+        android:src="@drawable/apptentive_pinstripe"
         android:tileMode="repeat"
-        android:gravity="fill_horizontal"
         android:dither="true"/>

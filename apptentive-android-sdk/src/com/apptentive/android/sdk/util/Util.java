@@ -1,13 +1,14 @@
 /*
  * Util.java
  *
- * Created by skelsey on 2011-09-16.
+ * Created by Sky Kelsey on 2011-09-16.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
 package com.apptentive.android.sdk.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -74,4 +75,10 @@ public class Util {
 		}
 		return false;
 	}
+
+	public static int dipsToPixels(Context context, int dp){
+		final float scale = context.getResources().getDisplayMetrics().density;
+		return ((int) (dp * scale + 0.5f));
+	}
+
 }

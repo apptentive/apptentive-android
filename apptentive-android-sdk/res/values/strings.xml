@@ -9,6 +9,8 @@
 	<string name="apptentive_edittext_name_text">Name</string>
 	<string name="apptentive_edittext_feedback_text">Unhappy with this app?\nWe\'d love to hear why so we can make it better.</string>
 
+	<string name="apptentive_survey_button_send_text">Send</string>
+
 	<string name="apptentive_button_back_text">Back</string>
 	<string name="apptentive_header_two_text">Info</string>
 	<string name="apptentive_button_send_text">Send</string>

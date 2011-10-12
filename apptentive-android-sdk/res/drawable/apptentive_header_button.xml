@@ -3,51 +3,30 @@
 <!--
   ~ apptentive_header_button.xml
   ~
-  ~ Created by skelsey on 2011-09-21.
+  ~ Created by Sky Kelsey on 2011-09-21.
   ~ Copyright 2011 Apptentive, Inc. All rights reserved.
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:state_pressed="true">
 		<shape>
-			<gradient
-				android:startColor="#EE2244FF"
-				android:endColor="#EE2244FF"
-				android:type="linear"
-				android:angle="270"/>
+
+			<solid android:color="@color/apptentive_grey"/>
 			<stroke
 				android:width="0.5dp"
 				android:color="#EE222222"/>
 			<corners
-				android:radius="3dp"/>
-		</shape>
-	</item>
-	<item android:state_enabled="false">
-		<shape>
-			<gradient
-				android:startColor="#222244FF"
-				android:endColor="#222244FF"
-				android:type="linear"
-				android:angle="270"/>
-			<stroke
-				android:width="0.5dp"
-				android:color="#EE222222"/>
-			<corners
-				android:radius="3dp"/>
+				android:radius="6dp"/>
 		</shape>
 	</item>
 	<item>
 		<shape>
-			<gradient
-				android:startColor="#EE4488FF"
-				android:endColor="#EE2244FF"
-				android:type="linear"
-				android:angle="270"/>
+			<solid android:color="@color/apptentive_blue"/>
 			<stroke
 				android:width="0.5dp"
 				android:color="#EE444444"/>
 			<corners
-				android:radius="3dp"/>
+				android:radius="6dp"/>
 		</shape>
 	</item>
 </selector>

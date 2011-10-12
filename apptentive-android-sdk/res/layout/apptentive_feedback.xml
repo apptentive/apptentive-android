@@ -11,8 +11,8 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:background="@drawable/apptentive_feedback_background">
-	<ViewFlipper android:id="@+id/apptentive_about_flipper"
+              android:background="@drawable/apptentive_pinstripe_background">
+	<ViewFlipper android:id="@+id/apptentive_activity_about_flipper"
 	             android:layout_width="fill_parent"
 	             android:layout_height="fill_parent">
 		<LinearLayout android:id="@+id/blahblah"
@@ -158,8 +158,7 @@
 		<LinearLayout android:id="@+id/apptentive_about_view"
 		              android:orientation="vertical"
 		              android:layout_width="fill_parent"
-		              android:layout_height="fill_parent"
-		              android:background="@drawable/apptentive_feedback_background">
+		              android:layout_height="fill_parent">
 			<RelativeLayout android:orientation="horizontal"
 			                android:layout_width="fill_parent"
 			                android:layout_height="wrap_content"
@@ -187,7 +186,7 @@
 				        android:background="@drawable/apptentive_header_button"
 				        android:text="@string/apptentive_header_button_about_okay_text"/>
 			</RelativeLayout>
-			<ImageView android:layout_width="wrap_content"
+			<ImageView android:layout_width="fill_parent"
 			           android:layout_height="wrap_content"
 			           android:maxHeight="10dp"
 			           android:layout_gravity="center_horizontal"

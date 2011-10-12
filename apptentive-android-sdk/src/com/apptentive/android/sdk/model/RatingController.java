@@ -1,7 +1,7 @@
 /*
  * RatingController.java
  *
- * Created by skelsey on 2011-09-17.
+ * Created by Sky Kelsey on 2011-09-17.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 

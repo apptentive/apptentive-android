@@ -1,7 +1,7 @@
 /*
  * Payload.java
  *
- * Created by skelsey on 2011-09-25.
+ * Created by Sky Kelsey on 2011-09-25.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
@@ -28,6 +28,10 @@ public class Payload {
 		payloadName = Util.dateToString(new Date(), Util.STRINGSAFE_DATE_FORMAT);
 	}
 
+	//
+	// Public methods
+	//
+
 	public List<BasicNameValuePair> getParams(){
 		List<BasicNameValuePair> retParams = new ArrayList<BasicNameValuePair>();
 		for(String key : params.keySet()){
@@ -36,7 +40,64 @@ public class Payload {
 		return retParams;
 	}
 
-	public void store(SharedPreferences prefs){
+	public static void store(SharedPreferences prefs, Payload payload){
+		payload.store(prefs);
+	}
+
+	public static Payload retrieveOldest(SharedPreferences prefs){
+		List<String> payloadNames = Arrays.asList(prefs.getString(PAYLOAD_INDEX_NAME, "").split(";"));
+		if(payloadNames.size() > 0){
+			Collections.sort(payloadNames);
+			for(String payloadName : payloadNames){
+				if(!payloadName.equals("")){
+					Payload payload = new Payload();
+					payload.setPayloadName(payloadName);
+					payload.retrieve(prefs, payloadName);
+					return payload;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Removes all the properties of this payload, as well as the manifest, and removes its name from the index of payloads.
+	 * @param prefs
+	 */
+	public void delete(SharedPreferences prefs){
+		SharedPreferences.Editor editor = prefs.edit();
+		String manifestKey = PAYLOAD_MANIFEST_NAME + payloadName;
+		List<String> entryNames = Arrays.asList(prefs.getString(PAYLOAD_MANIFEST_NAME + payloadName, "").split(";"));
+		for(String entryName : entryNames){
+			editor.remove(entryName);
+		}
+		editor.remove(manifestKey);
+		String newIndex = "";
+		String index = prefs.getString(PAYLOAD_INDEX_NAME, "");
+		List<String> payloadNames = Arrays.asList(index.split(";"));
+		for(String currentPayloadName : payloadNames){
+			if(!currentPayloadName.equals(payloadName)){
+				newIndex = (newIndex.equals("") ? "" : newIndex + ";") + currentPayloadName;
+			}
+		}
+		editor.putString(PAYLOAD_INDEX_NAME, newIndex);
+		editor.commit();
+	}
+
+	//
+	// Private methods
+	//
+
+	private void retrieve(SharedPreferences prefs, String payloadNameToGet){
+		List<String> entryNames = Arrays.asList(prefs.getString(PAYLOAD_MANIFEST_NAME + payloadNameToGet, "").split(";"));
+		for(String entryName : entryNames){
+			String key = entryName.substring((PAYLOAD_ENTRY_PREFIX+payloadNameToGet).length()+1);
+			String value = prefs.getString(entryName, "");
+			params.put(key, value);
+		}
+	}
+
+	private void store(SharedPreferences prefs){
 		SharedPreferences.Editor editor = prefs.edit();
 		addToIndex(prefs);
 		storeManifest(editor);
@@ -46,25 +107,6 @@ public class Payload {
 		prefs.edit().commit();
 	}
 
-	public void retrieveOldest(SharedPreferences prefs){
-		List<String> payloadNames = Arrays.asList(prefs.getString(PAYLOAD_INDEX_NAME, "").split(";"));
-		Collections.sort(payloadNames);
-		for(String payloadName : payloadNames){
-			if(!payloadName.equals("")){
-				retrieve(prefs, payloadName);
-				return;
-			}
-		}
-	}
-
-	public void retrieve(SharedPreferences prefs, String payloadNameToGet){
-		List<String> entryNames = Arrays.asList(prefs.getString(PAYLOAD_MANIFEST_NAME + payloadNameToGet, "").split(";"));
-		for(String entryName : entryNames){
-			String key = entryName.substring((PAYLOAD_ENTRY_PREFIX+payloadNameToGet).length()+1);
-			String value = prefs.getString(entryName, "");
-			params.put(key, value);
-		}
-	}
 
 	private void addToIndex(SharedPreferences prefs){
 		String index = prefs.getString(PAYLOAD_INDEX_NAME, "");
@@ -89,6 +131,10 @@ public class Payload {
 	private String getPayloadName(){
 		return payloadName;
 	}
+	private void setPayloadName(String payloadName){
+		this.payloadName = payloadName;
+	}
+
 	private String getPayloadEntryName(String key){
 		return PAYLOAD_ENTRY_PREFIX+payloadName+"_"+key;
 	}

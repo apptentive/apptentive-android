@@ -3,7 +3,7 @@
 <!--
   ~ apptentive_test.xml
   ~
-  ~ Created by skelsey on 2011-09-18.
+  ~ Created by Sky Kelsey on 2011-09-18.
   ~ Copyright 2011 Apptentive, Inc. All rights reserved.
   -->
 
@@ -23,5 +23,7 @@
 		        android:layout_height="wrap_content"
 		        android:text="Right"/>
 	</LinearLayout>
+	<EditText android:layout_width="fill_parent"
+	          android:layout_height="fill_parent"/>
 
 </LinearLayout>
