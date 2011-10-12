@@ -8,10 +8,21 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_enabled="false">
+		<shape>
+
+			<solid android:color="@color/apptentive_light_grey"/>
+			<stroke
+				android:width="0.5dp"
+				android:color="#EE222222"/>
+			<corners
+				android:radius="6dp"/>
+		</shape>
+	</item>
 	<item android:state_pressed="true">
 		<shape>
 
-			<solid android:color="@color/apptentive_grey"/>
+			<solid android:color="@color/apptentive_dark_blue"/>
 			<stroke
 				android:width="0.5dp"
 				android:color="#EE222222"/>

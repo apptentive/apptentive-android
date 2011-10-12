@@ -37,7 +37,7 @@
 		        android:paddingRight="10dp"
 		        android:paddingBottom="6dp"
 		        android:textColor="#EEEEEE"
-		        android:textSize="14sp"
+		        android:textSize="18sp"
 		        android:textStyle="bold"
 		        android:background="@drawable/apptentive_header_button"
 		        android:text="Send"/>
