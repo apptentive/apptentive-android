@@ -35,12 +35,10 @@ public class SurveyController {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		List<SurveyDefinition> surveys = model.getSurveys();
 		if(surveys != null && surveys.size() > 0){
-			log.e("Found survey");
 			definition = surveys.get(0);
 		}
 		this.result = new Survey(definition);
 		setupForm();
-		log.e("Done");
 	}
 
 	private void setupForm() {
@@ -58,8 +56,8 @@ public class SurveyController {
 			}
 		});
 
-		//TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
-		//surveyTitle.setText(survey.getName());
+		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
+		surveyTitle.setText(definition.getName());
 		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
 
 		for(QuestionDefinition question : definition.getQuestions()){
@@ -106,15 +104,18 @@ public class SurveyController {
 		}
 	}
 
-		private void send(JSONPayload payload) {
+	private void send(JSONPayload payload) {
 		PayloadManager payloadManager = new PayloadManager(activity);
 		payloadManager.save(payload);
 		payloadManager.run();
 	}
+
 	void setAnswer(int questionIndex, String answer){
-		log.e("For question: " + questionIndex +", setting answer to: " + answer);
 		result.setAnswer(questionIndex, answer);
 	}
+
+
+	// Listener classes
 
 	private class DropdownListener implements AdapterView.OnItemSelectedListener {
 		int listItem;
@@ -125,7 +126,6 @@ public class SurveyController {
 
 		@Override
 		public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-			log.e("Item selected: " + view.toString() + ", for item: " + listItem);
 			TextView selected = (TextView) view;
 			String answer = selected.getText().toString();
 			setAnswer(listItem, answer);
@@ -133,7 +133,6 @@ public class SurveyController {
 
 		@Override
 		public void onNothingSelected(AdapterView<?> adapterView) {
-			log.e("Nothing selected.");
 		}
 	}
 

@@ -24,7 +24,7 @@ public class SurveyDefinition {
 		this.id = survey.getString("id");
 		this.name = survey.getString("name");
 		//this.description = survey.getString("description");
-		this.description = "Description Goes Here";
+		this.description = "Please help us improve this app!";
 		this.questions = new ArrayList<QuestionDefinition>();
 		JSONArray questions = survey.getJSONArray("questions");
 		for(int i = 0; i < questions.length(); i++){

@@ -90,26 +90,13 @@ public class Apptentive {
 	 * Asynchronously download surveys and put them in the model.
 	 */
 	private void getSurveys(){
-		log.e("Getting surveys...");
 		// Upload any payloads that were created while the device was offline.
 		new Thread(){
 			@Override
 			public void run() {
-				log.e("Running Thread...");
 				ApptentiveModel model = ApptentiveModel.getInstance();
-
-/* FOR TESTING
-				try{
-					List<SurveyDefinition> surveys = SurveyManager.parseSurveys("[\n" + "{\n" + "\"id\": \"4e909ab2a902915fbc000001\",\n" + "\"name\":\"Blip.me Survey\",\n" + "\"description\":\"Please help us make Blip.me better!\",\n" + "\"questions\":[\n" + "{\n" + "\"id\": \"4e909bc4a902915fbc000011\",\n" + "\"answer_choices\":[\n" + "{\"id\": \"4e909bdba902915fbc000004\", \"value\": \"Chocolate\"},\n" + "{\"id\": \"4e909be0a902915fbc000005\", \"value\": \"Vanilla\"},\n" + "{\"id\": \"4e909be6a902915fbc000006\", \"value\": \"Strawberry\"}\n" + "],\n" + "\"value\": \"ONE What's your favorite ice cream? Is it Chocolate, or is it something else entirely? Maybe it's Vanilla? Strawberry?\",\n" + "\"type\": \"multichoice\"\n" + "},\n" + "{\n" + "\"id\": \"4e909c39a902915fbc000002\",\n" + "\"value\": \"TWO\",\n" + "\"type\": \"singleline\"\n" + "},\n" + "{\n" + "\"id\": \"4e909bc4a902915fbc000033\",\n" + "\"answer_choices\":[\n" + "{\"id\": \"4e909bdba902915fbc000100\", \"value\": \"Chocolate\"},\n" + "{\"id\": \"4e909be0a902915fbc000200\", \"value\": \"Vanilla\"},\n" + "{\"id\": \"4e909be6a902915fbc000300\", \"value\": \"Strawberry\"}\n" + "],\n" + "\"value\": \"THREE\",\n" + "\"type\": \"multichoice\"\n" + "},\n" + "{\n" + "\"id\": \"4e909c39a902915fbc000004\",\n" + "\"value\": \"FOUR\",\n" + "\"type\": \"singleline\"\n" + "},\n" + "{\n" + "\"id\": \"4e909bc4a902915fbc000055\",\n" + "\"answer_choices\":[\n" + "{\"id\": \"4e909bdba902915fbc000100\", \"value\": \"Chocolate\"},\n" + "{\"id\": \"4e909be0a902915fbc000200\", \"value\": \"Vanilla\"},\n" + "{\"id\": \"4e909be6a902915fbc000300\", \"value\": \"Strawberry\"}\n" + "],\n" + "\"value\": \"FIVE\",\n" + "\"type\": \"multichoice\"\n" + "},\n" + "{\n" + "\"id\": \"4e909c39a902915fbc000006\",\n" + "\"value\": \"SIX\",\n" + "\"type\": \"singleline\"\n" + "},\n" + "{\n" + "\"id\": \"4e909bc4a902915fbc000077\",\n" + "\"answer_choices\":[\n" + "{\"id\": \"4e909bdba902915fbc000100\", \"value\": \"Chocolate\"},\n" + "{\"id\": \"4e909be0a902915fbc000200\", \"value\": \"Vanilla\"},\n" + "{\"id\": \"4e909be6a902915fbc000300\", \"value\": \"Strawberry\"}\n" + "],\n" + "\"value\": \"SEVEN\",\n" + "\"type\": \"multichoice\"\n" + "},\n" + "{\n" + "\"id\": \"4e909c39a902915fbc000008\",\n" + "\"value\": \"EIGHT\",\n" + "\"type\": \"singleline\"\n" + "},\n" + "{\n" + "\"id\": \"4e909bc4a902915fbc000099\",\n" + "\"answer_choices\":[\n" + "{\"id\": \"4e909bdba902915fbc000100\", \"value\": \"Chocolate\"},\n" + "{\"id\": \"4e909be0a902915fbc000200\", \"value\": \"Vanilla\"},\n" + "{\"id\": \"4e909be6a902915fbc000300\", \"value\": \"Strawberry\"}\n" + "],\n" + "\"value\": \"NINE\",\n" + "\"type\": \"multichoice\"\n" + "},\n" + "{\n" + "\"id\": \"4e909c39a902915fbc000010\",\n" + "\"value\": \"TEN\",\n" + "\"type\": \"singleline\"\n" + "}\n" + "]\n" + "}\n" + "]");
-					model.setSurveys(surveys);
-				}catch(JSONException e){
-					log.e("JSONExceptionException.", e);
-				}
-*/
-
 				ApptentiveClient client = new ApptentiveClient(model.getApiKey());
 				model.setSurveys(client.getSurveys());
-				log.e("Done...");
 			}
 		}.start();
 	}

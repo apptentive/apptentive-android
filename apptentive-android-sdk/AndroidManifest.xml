@@ -5,7 +5,9 @@
           android:versionName="1.0">
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<application android:label="@string/apptentive_app_name">
-		<activity android:name=".ApptentiveActivity" android:label="@string/apptentive_activity_name">
+		<activity android:name=".ApptentiveActivity"
+		          android:label="@string/apptentive_activity_name"
+		          android:windowSoftInputMode="adjustResize">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>

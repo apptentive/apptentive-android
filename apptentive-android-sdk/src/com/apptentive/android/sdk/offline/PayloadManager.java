@@ -29,7 +29,7 @@ public class PayloadManager{
 
 
 
-	/////
+	///// JSON Payload
 
 	public void save(JSONPayload payload){
 		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
@@ -99,7 +99,6 @@ public class PayloadManager{
 		private SharedPreferences prefs;
 
 		public PayloadUploader(SharedPreferences prefs){
-			log.e("Uploading payloads...");
 			this.prefs = prefs;
 		}
 
@@ -110,16 +109,13 @@ public class PayloadManager{
 			String json;
 			json  = payloadManager.getFirstPayloadInPayloadList();
 			while(json != null && !json.equals("")){
-				log.e("JSON: " + json);
+				log.i("JSON: " + json);
 				ApptentiveClient client = new ApptentiveClient(ApptentiveModel.getInstance().getApiKey());
 				boolean success = client.postJSON(json);
-/* FOR TESTING
-				boolean success = true;
-*/
-				log.e("Payload upload " + (success ? "succeeded!" : "failed!"));
 				if(success){
 					payloadManager.deleteFirstPayloadInPayloadList();
 				}else{
+					log.e("Unable to uploader JSONPayload");
 					break;
 				}
 				json = payloadManager.getFirstPayloadInPayloadList();
@@ -127,13 +123,12 @@ public class PayloadManager{
 
 			Payload payload;
 			while((payload  = Payload.retrieveOldest(prefs)) != null){
-				log.e("Initiating payload upload for: " + payload.payloadName);
 				ApptentiveClient client = new ApptentiveClient(ApptentiveModel.getInstance().getApiKey());
 				boolean success = client.postFeedback(payload.getParams());
-				log.e("Payload upload " + (success ? "succeeded!" : "failed!"));
 				if(success){
 					payload.delete(prefs);
 				}else{
+					log.e("Unable to uploader Payload");
 					break;
 				}
 			}

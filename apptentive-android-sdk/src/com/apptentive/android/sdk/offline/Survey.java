@@ -52,11 +52,6 @@ public class Survey extends JSONPayload{
 		}
 	}
 
-	public String getAnswer(int questionIndex){
-		QuestionDefinition question = definition.getQuestions().get(questionIndex);
-		return answers.get(question.getId());
-	}
-
 	private void initializeResult(){
 		for(QuestionDefinition question : definition.getQuestions()){
 			switch(question.getType()){
@@ -72,24 +67,6 @@ public class Survey extends JSONPayload{
 
 	/**
 	 * Return Object with array of Objects that are themselves a single key/value pair.
-	 * <pre>
-	 * Example:
-	 * {
-	 *   "record":{
-	 *     "survey":{
-	 *       "id":"4e909ab2a902915fbc000001",
-	 *       "questions":[
-	 *         {
-	 *           "4e909bc4a902915fbc000011":"4e909be0a902915fbc000005"
-	 *         },
-	 *         {
-	 *           "4e909c39a902915fbc000002":"two"
-	 *         }
-	 *       ]
-	 *     }
-	 *   }
-	 * }
-	 * </pre>
 	 * @return JSON String
 	 */
 	@Override
@@ -118,54 +95,4 @@ public class Survey extends JSONPayload{
 		return null;
 	}
 
-	/*
-{
-    "record": {
-        "survey": {
-            "id": "4e90b16ccb7ca90006000001",
-            "responses": [
-                {
-                    "value": "4e90b16ccb7ca90006000005",
-                    "question_id": "4e90b16ccb7ca90006000002"
-                },
-                {
-                    "value": "good",
-                    "question_id": "4e90b16ccb7ca90006000006"
-                }
-            ]
-        }
-    }
-}{
-    "record": {
-        "survey": {
-            "id": "4e909ab2a902915fbc000001",
-            "responses": [
-                {
-                    "question_id": "4e909bc4a902915fbc000003",
-                    "value": "4e909be6a902915fbc000006"
-                },
-                {
-                    "question_id": "4e909c39a902915fbc000007",
-                    "value": "two"
-                }
-            ]
-        }
-    }
-}
-{
-	"record":{
-		"survey":{
-			"id":"4e909ab2a902915fbc000001",
-			"questions":[
-				{
-					"4e909bc4a902915fbc000011":"4e909be0a902915fbc000005"
-				},
-				{
-					"4e909c39a902915fbc000002":"two"
-				}
-			]
-		}
-	}
-}
-	 */
 }

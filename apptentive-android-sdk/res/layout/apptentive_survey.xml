@@ -25,7 +25,7 @@
 		          android:textStyle="bold"
 		          android:textSize="20sp"
 		          android:textColor="#FFFFFF"
-		          android:text="Survey Title"/>
+		          android:text="Survey"/>
 		<Button android:id="@+id/apptentive_survey_button_send"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
@@ -71,22 +71,4 @@
 			</LinearLayout>
 		</LinearLayout>
 	</ScrollView>
-
-	<!--
-	 <FrameLayout android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_gravity="center_horizontal"
-								android:background="@drawable/green_button"
-								android:paddingLeft="10dp"
-								android:paddingTop="3dp"
-								android:paddingRight="10dp"
-								android:paddingBottom="3dp">
-		 <TextView android:layout_width="wrap_content"
-							 android:layout_height="wrap_content"
-							 android:textStyle="bold"
-							 android:textColor="#FFFFFF"
-							 android:textSize="30sp"
-							 android:text="Send"/>
-	 </FrameLayout>
- -->
 </LinearLayout>

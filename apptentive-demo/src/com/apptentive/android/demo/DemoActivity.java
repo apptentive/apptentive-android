@@ -11,7 +11,8 @@ public class DemoActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", /*TODO: Specify your API Key here: */ "YOUR_API_KEY", 5, 10, 5, 4);
+		//final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "0d7c775a973b30ed6a8ca2cf6469af3168a8c5e38ccd26755d1fdaa3387c6454", 5, 10, 5, 4); // api.apptentive.com
+		final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "7a9974bf16d7b2c354f2eb2fca612c25fdab62aebeeb3f80767c70e53b35cbd9", 5, 10, 5, 4);   //api.apptentive-beta.com
 
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
@@ -31,6 +32,12 @@ public class DemoActivity extends Activity {
 				apptentive.day();
 			}
 		});
+		Button choiceButton = (Button) findViewById(R.id.button_choice);
+		choiceButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				apptentive.choice();
+			}
+		});
 		Button ratingsButton = (Button) findViewById(R.id.button_ratings);
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -43,10 +50,10 @@ public class DemoActivity extends Activity {
 				apptentive.feedback(true);
 			}
 		});
-		Button choiceButton = (Button) findViewById(R.id.button_choice);
-		choiceButton.setOnClickListener(new View.OnClickListener() {
+		Button surveyButton = (Button) findViewById(R.id.button_survey);
+		surveyButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				apptentive.choice();
+				apptentive.survey();
 			}
 		});
 	}

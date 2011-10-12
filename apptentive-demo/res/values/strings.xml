@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="demo_app_name">Demo App Name</string>
+	<string name="demo_app_name">Apptentive Demo App</string>
 	<string name="demo_activity_name">Apptentive Demo</string>
 	<string name="demo_app_message">Demo App Message</string>
 	<string name="demo_button_feedback_text">Feedback</string>
