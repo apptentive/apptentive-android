@@ -9,3 +9,6 @@ apptentive-demo/out/*
 *.ipr
 *.iml
 *.iws
+
+# My local stuff
+todo.txt

@@ -97,6 +97,9 @@ public class Survey extends JSONPayload{
 				if(value.equals(QuestionDefinition.DEFAULT)){
 					value = "";
 				}
+				if(value.equals("")){
+					continue;
+				}
 				JSONObject answer = new JSONObject();
 				answer.put("question_id", key);
 				answer.put("value", value);
