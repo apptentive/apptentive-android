@@ -29,6 +29,7 @@ public class SurveyController {
 	private Activity activity;
 	private SurveyDefinition definition;
 	private Survey result;
+	private boolean answered = false;
 
 	public SurveyController(Activity activity) {
 		this.activity = activity;
@@ -51,13 +52,18 @@ public class SurveyController {
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				send(result);
+				if(answered){
+					send(result);
+				}
 				activity.finish();
 			}
 		});
 
 		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
+		surveyTitle.setFocusable(true);
+		surveyTitle.setFocusableInTouchMode(true);
 		surveyTitle.setText(definition.getName());
+
 		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
 
 		for(QuestionDefinition question : definition.getQuestions()){
@@ -81,9 +87,9 @@ public class SurveyController {
 					break;
 				case multichoice:
 					List<String> optionNames = new ArrayList<String>();
-
 					int selected = 0;
 					List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
+					optionNames.add(QuestionDefinition.DEFAULT);
 					for(int i = 0; i < answerDefinitions.size(); i++){
 						optionNames.add(answerDefinitions.get(i).getValue());
 					}
@@ -102,6 +108,8 @@ public class SurveyController {
 			}
 			questionList.addView(questionRow);
 		}
+		// Force the top of the survey to be shown first.
+		surveyTitle.requestFocus();
 	}
 
 	private void send(JSONPayload payload) {
@@ -112,8 +120,22 @@ public class SurveyController {
 
 	void setAnswer(int questionIndex, String answer){
 		result.setAnswer(questionIndex, answer);
+		setAnswered(result.hasBeenAnswered());
 	}
 
+	/**
+	 * This is used to change what the send button says and does.
+	 * @param answered
+	 */
+	void setAnswered(boolean answered){
+		Button skipSend = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
+		this.answered = answered;
+		if(this.answered){
+			skipSend.setText(R.string.apptentive_send);
+		}else{
+			skipSend.setText(R.string.apptentive_skip);
+		}
+	}
 
 	// Listener classes
 

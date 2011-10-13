@@ -99,7 +99,7 @@
 				        android:textSize="7pt"
 				        android:textStyle="bold"
 				        android:background="@drawable/apptentive_header_button"
-				        android:text="@string/apptentive_button_back_text"/>
+				        android:text="@string/apptentive_back"/>
 				<TextView android:layout_width="wrap_content"
 				          android:layout_height="wrap_content"
 				          android:layout_centerInParent="true"
@@ -121,7 +121,7 @@
 				        android:textSize="7pt"
 				        android:textStyle="bold"
 				        android:background="@drawable/apptentive_header_button"
-				        android:text="@string/apptentive_button_send_text"/>
+				        android:text="@string/apptentive_send"/>
 			</RelativeLayout>
 			<EditText android:id="@+id/apptentive_feedback_user_name"
 			          android:layout_width="fill_parent"

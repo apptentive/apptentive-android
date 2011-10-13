@@ -15,8 +15,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 public class Survey extends JSONPayload{
@@ -52,6 +54,19 @@ public class Survey extends JSONPayload{
 		}
 	}
 
+	/**
+	 * For multi choice, 
+	 * @return
+	 */
+	public boolean hasBeenAnswered(){
+		for(String key : answers.keySet()){
+			if(!answers.get(key).equals("")){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void initializeResult(){
 		for(QuestionDefinition question : definition.getQuestions()){
 			switch(question.getType()){
@@ -59,7 +74,7 @@ public class Survey extends JSONPayload{
 					answers.put(question.getId(), "");
 					break;
 				case multichoice:
-					answers.put(question.getId(), question.getAnswerChoices().get(0).getId());
+					answers.put(question.getId(), "");
 					break;
 			}
 		}
@@ -78,8 +93,10 @@ public class Survey extends JSONPayload{
 			survey.put("id", definition.getId());
 			JSONArray answers = new JSONArray();
 			for(String key : this.answers.keySet()){
-
 				String value = this.answers.get(key);
+				if(value.equals(QuestionDefinition.DEFAULT)){
+					value = "";
+				}
 				JSONObject answer = new JSONObject();
 				answer.put("question_id", key);
 				answer.put("value", value);

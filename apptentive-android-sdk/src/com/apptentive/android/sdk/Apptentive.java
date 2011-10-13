@@ -95,8 +95,11 @@ public class Apptentive {
 			@Override
 			public void run() {
 				ApptentiveModel model = ApptentiveModel.getInstance();
+
+				List<SurveyDefinition> surveys;
 				ApptentiveClient client = new ApptentiveClient(model.getApiKey());
-				model.setSurveys(client.getSurveys());
+				surveys = client.getSurveys();
+				model.setSurveys(surveys);
 			}
 		}.start();
 	}
