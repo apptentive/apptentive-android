@@ -10,19 +10,15 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import android.view.*;
-import android.view.inputmethod.InputMethodManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.survey.SurveyDefinition;
-import com.apptentive.android.sdk.survey.SurveyManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
@@ -33,11 +29,8 @@ public class Apptentive {
 
 	private ALog log;
 
-	private Activity activity = null;
-
 	private static Apptentive instance = null;
-	private Apptentive(Activity activity) {
-		this.activity = activity;
+	private Apptentive() {
 		log = new ALog(Apptentive.class);
 		printDebugInfo();
 	}
@@ -61,7 +54,7 @@ public class Apptentive {
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
 	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt){
-		instance = new Apptentive(activity);
+		instance = new Apptentive();
 		ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		TelephonyManager manager = (TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE));
@@ -82,8 +75,12 @@ public class Apptentive {
 		}
 
 		instance.getSurveys();
-		instance.uploadPendingPayloads();
+		instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 		return instance;
+	}
+
+	public void cleanUp(){
+		Apptentive.instance = null;
 	}
 
 	/**
@@ -104,16 +101,16 @@ public class Apptentive {
 		}.start();
 	}
 
-	private void uploadPendingPayloads(){
+	private void uploadPendingPayloads(SharedPreferences prefs){
 		// Upload any payloads that were created while the device was offline.
-		PayloadManager payloadManager = new PayloadManager(activity);
+		PayloadManager payloadManager = new PayloadManager(prefs);
 		payloadManager.run();
 	}
 
 	/**
 	 * Call this in your activity's onResume() method. If the rating flow is able to run, it will.
 	 */
-	public void runIfNeeded(){
+	public void runIfNeeded(Context context){
 
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		ApptentiveState state = model.getState();
@@ -121,12 +118,12 @@ public class Apptentive {
 		switch(state){
 			case START :
 				if(ratingPeriodElapsed() || eventThresholdReached() || usesThresholdReached()){
-					choice();
+					choice(context);
 				}
 				break;
 			case REMIND :
 				if(ratingPeriodElapsed()){
-					rating();
+					rating(context);
 				}
 				break;
 			case DONE :
@@ -139,37 +136,37 @@ public class Apptentive {
 	/**
 	 * Short circuit the rating flow to the "Feedback" screen.
 	 */
-	public void feedback(boolean forced){
+	public void feedback(Context context, boolean forced){
 		Intent intent = new Intent();
 		intent.putExtra("forced", forced);
 		intent.putExtra("module", ApptentiveActivity.Module.FEEDBACK.toString());
-		intent.setClass(activity, ApptentiveActivity.class);
-		activity.startActivity(intent);
+		intent.setClass(context, ApptentiveActivity.class);
+		context.startActivity(intent);
 	}
 
 	/**
 	 * Show a survey, if available.
 	 */
-	public void survey(){
+	public void survey(Context context){
 		Intent intent = new Intent();
 		intent.putExtra("module", ApptentiveActivity.Module.SURVEY.toString());
-		intent.setClass(activity, ApptentiveActivity.class);
-		activity.startActivity(intent);
+		intent.setClass(context, ApptentiveActivity.class);
+		context.startActivity(intent);
 	}
 
 	/**
 	 * Short circuit the rating flow to the "Would you like to rate?" dialog.
 	 */
-	public void rating(){
-		RatingController controller = new RatingController(activity);
+	public void rating(Context context){
+		RatingController controller = new RatingController(context);
 		controller.show();
 	}
 
 	/**
 	 * Short circuit the rating flow to the "Do you like this app?" dialog.
 	 */
-	public void choice(){
-		ChoiceController controller = new ChoiceController(activity);
+	public void choice(Context context){
+		ChoiceController controller = new ChoiceController(context);
 		controller.show();
 	}
 
@@ -226,16 +223,6 @@ public class Apptentive {
 		model.setState(ApptentiveState.DONE);
 	}
 
-	/**
-	 * Internal use only.
-	 */
-	public void hideSoftKeyboard(View view) {
-		if (view != null) {
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-		}
-	}
-
 /*
 	public void showSoftKeyboard(View target) {
 		if (activity.getCurrentFocus() != null) {
@@ -245,9 +232,9 @@ public class Apptentive {
 	}
 */
 
-	private static String getUserEmail(Activity activity){
-		if(Util.packageHasPermission(activity, "android.permission.GET_ACCOUNTS")){
-			String email = EmailUtil.getEmail(activity);
+	private static String getUserEmail(Context context){
+		if(Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")){
+			String email = EmailUtil.getEmail(context);
 			if(email != null){
 				return email;
 			}

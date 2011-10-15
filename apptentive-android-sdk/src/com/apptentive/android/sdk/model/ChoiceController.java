@@ -18,17 +18,17 @@ import com.apptentive.android.sdk.R;
 
 public class ChoiceController{
 
-	private Activity activity;
+	private Context context;
 	private Dialog dialog;
 
-	public ChoiceController(Activity activity) {
-		this.activity = activity;
+	public ChoiceController(Context context) {
+		this.context = context;
 	}
 
 	public void show(){
-		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View content = inflater.inflate(R.layout.apptentive_choice, null, false);
-		dialog = new Dialog(activity);
+		dialog = new Dialog(context);
 
 		dialog.setContentView(content);
 		setupForm();
@@ -51,12 +51,12 @@ public class ChoiceController{
 				case R.id.apptentive_choice_no:
 				{
 					ApptentiveModel.getInstance().setState(ApptentiveState.DONE);
-					Apptentive.getInstance().feedback(false);
+					Apptentive.getInstance().feedback(context, false);
 					break;
 				}
 				case R.id.apptentive_choice_yes:
 				{
-					RatingController controller = new RatingController(activity);
+					RatingController controller = new RatingController(context);
 					controller.show();
 					break;
 				}

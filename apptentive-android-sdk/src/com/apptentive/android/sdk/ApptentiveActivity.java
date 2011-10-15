@@ -12,15 +12,22 @@ import android.view.Window;
 import com.apptentive.android.sdk.activity.BaseActivity;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.FeedbackController;
+import com.apptentive.android.sdk.model.ViewController;
 import com.apptentive.android.sdk.survey.SurveyController;
+import com.apptentive.android.sdk.util.Util;
 
 public class ApptentiveActivity  extends BaseActivity {
 
+	private ALog log = new ALog(this.getClass());
+
 	private Module activeModule;
+
+	private ViewController controller;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeModule = Module.valueOf(getIntent().getStringExtra("module"));
 
@@ -28,7 +35,7 @@ public class ApptentiveActivity  extends BaseActivity {
 		switch(activeModule){
 			case FEEDBACK:
 				setContentView(R.layout.apptentive_feedback);
-				new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
+				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
 				break;
 			case SURVEY:
 				ApptentiveModel model = ApptentiveModel.getInstance();
@@ -37,12 +44,19 @@ public class ApptentiveActivity  extends BaseActivity {
 					return;
 				}
 				setContentView(R.layout.apptentive_survey);
-				new SurveyController(this);
+				controller = new SurveyController(this);
 				break;
 			default:
-				new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
+				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
 				break;
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		controller.cleanup();
+		controller = null;
+		super.onDestroy();
 	}
 
 	public static enum Module{

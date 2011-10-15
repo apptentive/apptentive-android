@@ -13,7 +13,6 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name="com.apptentive.android.sdk.ApptentiveActivity">
-		</activity>
+		<activity android:name="com.apptentive.android.sdk.ApptentiveActivity"/>
 	</application>
 </manifest> 

@@ -12,7 +12,9 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,17 +55,17 @@ public class Util {
 		return new Date().after(addDaysToDate(start, days));
 	}
 
-	private static List<PackageInfo> getPermissions(Activity activity){
-		return activity.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
+	private static List<PackageInfo> getPermissions(Context context){
+		return context.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
 	}
 
-	public static boolean packageHasPermission(Activity activity, String permission){
-		String packageName = activity.getApplicationContext().getPackageName();
-		return packageHasPermission(activity, packageName, permission);
+	public static boolean packageHasPermission(Context context, String permission){
+		String packageName = context.getApplicationContext().getPackageName();
+		return packageHasPermission(context, packageName, permission);
 	}
 
-	public static boolean packageHasPermission(Activity activity, String packageName, String permission){
-		List<PackageInfo> packageInfos = getPermissions(activity);
+	public static boolean packageHasPermission(Context context, String packageName, String permission){
+		List<PackageInfo> packageInfos = getPermissions(context);
 		for(PackageInfo packageInfo : packageInfos){
 			if(packageInfo.packageName.equals(packageName)){
 				for(String permissionName : packageInfo.requestedPermissions){
@@ -81,4 +83,13 @@ public class Util {
 		return ((int) (dp * scale + 0.5f));
 	}
 
+	/**
+	 * Internal use only.
+	 */
+	public static void hideSoftKeyboard(Activity activity, View view) {
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
 }

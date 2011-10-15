@@ -19,7 +19,7 @@
 		              android:orientation="vertical"
 		              android:layout_width="fill_parent"
 		              android:layout_height="fill_parent">
-			<ViewFlipper android:id="@+id/apptentive_content_flipper"
+			<ViewFlipper android:id="@+id/apptentive_activity_content_flipper"
 			             android:layout_width="fill_parent"
 			             android:layout_height="0dp"
 			             android:layout_weight="1">

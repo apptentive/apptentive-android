@@ -20,10 +20,10 @@ public class PayloadManager{
 
 	private static final String PAYLOAD_INDEX_NAME = "apptentive-payloads-json";
 
-	private Activity activity;
+	private SharedPreferences prefs;
 
-	public PayloadManager(Activity activity){
-		this.activity = activity;
+	public PayloadManager(SharedPreferences prefs){
+		this.prefs = prefs;
 	}
 
 
@@ -32,24 +32,22 @@ public class PayloadManager{
 	///// JSON Payload
 
 	public void save(JSONPayload payload){
-		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		String uuid = UUID.randomUUID().toString();
-		storePayload(prefs, uuid, payload);
-		addToPayloadList(prefs, uuid);
+		storePayload(uuid, payload);
+		addToPayloadList(uuid);
 	}
 
-	private void storePayload(SharedPreferences prefs, String name, JSONPayload payload){
+	private void storePayload(String name, JSONPayload payload){
 		prefs.edit().putString(name, payload.getAsJSON()).commit();
 	}
 
-	private void addToPayloadList(SharedPreferences prefs, String name){
+	private void addToPayloadList(String name){
 		String payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "");
 		payloadNames = (payloadNames.length() == 0 ? name : payloadNames + ";" + name);
 		prefs.edit().putString(PAYLOAD_INDEX_NAME, payloadNames).commit();
 	}
 
 	public String getFirstPayloadInPayloadList(){
-		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		String[] payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "").split(";");
 		if(payloadNames.length > 0){
 			return prefs.getString(payloadNames[0], "");
@@ -57,18 +55,17 @@ public class PayloadManager{
 		return null;
 	}
 
-	private void deletePayload(SharedPreferences prefs, String name){
+	private void deletePayload(String name){
 		prefs.edit().remove(name).commit();
 	}
 
 	public void deleteFirstPayloadInPayloadList(){
-		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		String[] payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "").split(";");
 		String newPayloadList = "";
 		for (int i = 0; i < payloadNames.length; i++) {
 			String payloadName = payloadNames[i];
 			if(i == 0){
-				deletePayload(prefs, payloadName);
+				deletePayload(payloadName);
 			}else{
 				newPayloadList = (newPayloadList.equals("") ? payloadName : newPayloadList + ";" + payloadName);
 			}
@@ -83,12 +80,10 @@ public class PayloadManager{
 
 
 	public void save(Payload payload){
-		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		Payload.store(prefs, payload);
 	}
 
 	public void run(){
-		SharedPreferences prefs = activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		PayloadUploader uploader = new PayloadUploader(prefs);
 		uploader.start();
 	}
@@ -105,7 +100,7 @@ public class PayloadManager{
 		@Override
 		public void run() {
 
-			PayloadManager payloadManager = new PayloadManager(activity);
+			PayloadManager payloadManager = new PayloadManager(this.prefs);
 			String json;
 			json  = payloadManager.getFirstPayloadInPayloadList();
 			while(json != null && !json.equals("")){

@@ -8,6 +8,7 @@
 package com.apptentive.android.sdk.survey;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.*;
 import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ApptentiveModel;
+import com.apptentive.android.sdk.model.ViewController;
 import com.apptentive.android.sdk.offline.JSONPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.Survey;
@@ -23,7 +25,7 @@ import com.apptentive.android.sdk.util.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SurveyController {
+public class SurveyController implements ViewController {
 
 	private final ALog log = new ALog(this.getClass());
 	private Activity activity;
@@ -112,8 +114,12 @@ public class SurveyController {
 		surveyTitle.requestFocus();
 	}
 
+	public void cleanup(){
+		
+	}
+
 	private void send(JSONPayload payload) {
-		PayloadManager payloadManager = new PayloadManager(activity);
+		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 		payloadManager.save(payload);
 		payloadManager.run();
 	}

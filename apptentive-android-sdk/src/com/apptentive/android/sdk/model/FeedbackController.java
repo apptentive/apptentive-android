@@ -18,23 +18,22 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import com.apptentive.android.sdk.ALog;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.offline.Feedback;
 import com.apptentive.android.sdk.offline.Payload;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
-public class FeedbackController implements Observer{
+public class FeedbackController implements Observer, ViewController{
 
-	static final int SCREEN_ANIMATION_DURATION = 300;
-	static final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
+	private final int SCREEN_ANIMATION_DURATION = 300;
+	private final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
 
-	private static ALog log = new ALog(FeedbackController.class);
+	private ALog log = new ALog(FeedbackController.class);
 
 	private Activity activity;
 	private boolean forced;
@@ -89,6 +88,12 @@ public class FeedbackController implements Observer{
 		model.addObserver(this);
 		model.forceNotifyObservers();
 
+/*
+		back.requestFocus();
+		Util.hideSoftKeyboard(activity, feedback);
+		Util.hideSoftKeyboard(activity, email);
+		back.requestFocus();
+*/
 	}
 
 	private void submit() {
@@ -106,7 +111,7 @@ public class FeedbackController implements Observer{
 		                                new Date()
 		);
 		model.clearTransientData();
-		PayloadManager payloadManager = new PayloadManager(activity);
+		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 		payloadManager.save(payload);
 		payloadManager.run();
 	}
@@ -134,10 +139,10 @@ public class FeedbackController implements Observer{
 	private View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_feedback_content_flipper);
+			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_content_flipper);
 			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_about_flipper);
 
-//			Apptentive.getInstance().hideSoftKeyboard(view);
+			Util.hideSoftKeyboard(activity, view);
 
 			switch (view.getId()) {
 				case R.id.apptentive_button_cancel:
@@ -178,6 +183,11 @@ public class FeedbackController implements Observer{
 			}
 		}
 	};
+
+	public void cleanup(){
+		ApptentiveModel model = ApptentiveModel.getInstance();
+		model.deleteObserver(this);
+	}
 
 	private class GenericTextWatcher implements TextWatcher{
 
@@ -265,5 +275,4 @@ public class FeedbackController implements Observer{
 		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
 		return animation;
 	}
-
 }

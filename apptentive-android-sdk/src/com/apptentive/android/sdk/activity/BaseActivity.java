@@ -93,5 +93,4 @@ public abstract class BaseActivity extends Activity {
 		} catch (Exception e) {
 		}
 	}
-
 }
