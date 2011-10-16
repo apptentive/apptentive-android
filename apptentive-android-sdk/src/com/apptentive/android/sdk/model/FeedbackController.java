@@ -22,6 +22,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.offline.Feedback;
 import com.apptentive.android.sdk.offline.Payload;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
@@ -29,9 +30,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class FeedbackController implements Observer, ViewController{
-
-	private final int SCREEN_ANIMATION_DURATION = 300;
-	private final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
 
 	private ALog log = new ALog(FeedbackController.class);
 
@@ -79,21 +77,18 @@ public class FeedbackController implements Observer, ViewController{
 
 		Button back = (Button) activity.findViewById(R.id.apptentive_button_back);
 		back.setOnClickListener(clickListener);
+
 		Button submit = (Button) activity.findViewById(R.id.apptentive_button_submit);
 		submit.setOnClickListener(clickListener);
+
 		View branding = activity.findViewById(R.id.apptentive_branding_view);
 		branding.setOnClickListener(clickListener);
+
 		Button okay = (Button) activity.findViewById(R.id.apptentive_button_about_okay);
 		okay.setOnClickListener(clickListener);
+
 		model.addObserver(this);
 		model.forceNotifyObservers();
-
-/*
-		back.requestFocus();
-		Util.hideSoftKeyboard(activity, feedback);
-		Util.hideSoftKeyboard(activity, email);
-		back.requestFocus();
-*/
 	}
 
 	private void submit() {
@@ -139,8 +134,9 @@ public class FeedbackController implements Observer, ViewController{
 	private View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_content_flipper);
+
 			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_about_flipper);
+			ViewFlipper flipper = (ViewFlipper) activity.findViewById(R.id.apptentive_feedback_content_flipper);
 
 			Util.hideSoftKeyboard(activity, view);
 
@@ -149,8 +145,8 @@ public class FeedbackController implements Observer, ViewController{
 					activity.finish();
 					break;
 				case R.id.apptentive_button_next:
-					flipper.setInAnimation(inFromRightAnimation());
-					flipper.setOutAnimation(outToLeftAnimation());
+					flipper.setInAnimation(Constants.inFromRightAnimation());
+					flipper.setOutAnimation(Constants.outToLeftAnimation());
 					if (ApptentiveModel.getInstance().isAskForExtraInfo()) {
 						flipper.showNext();
 					} else {
@@ -159,23 +155,22 @@ public class FeedbackController implements Observer, ViewController{
 					}
 					break;
 				case R.id.apptentive_button_back:
-					flipper.setInAnimation(inFromLeftAnimation());
-					flipper.setOutAnimation(outToRightAnimation());
+					flipper.setInAnimation(Constants.inFromLeftAnimation());
+					flipper.setOutAnimation(Constants.outToRightAnimation());
 					flipper.showPrevious();
 					break;
 				case R.id.apptentive_button_submit:
 					submit();
 					activity.finish();
 					break;
-
 				case R.id.apptentive_branding_view:
-					aboutFlipper.setInAnimation(inFromBottomAnimation());
-					aboutFlipper.setOutAnimation(outToTopAnimation());
+					aboutFlipper.setInAnimation(Constants.inFromBottomAnimation());
+					aboutFlipper.setOutAnimation(Constants.outToTopAnimation());
 					aboutFlipper.showNext();
 					break;
 				case R.id.apptentive_button_about_okay:
-					aboutFlipper.setInAnimation(inFromTopAnimation());
-					aboutFlipper.setOutAnimation(outToBottomAnimation());
+					aboutFlipper.setInAnimation(Constants.inFromTopAnimation());
+					aboutFlipper.setOutAnimation(Constants.outToBottomAnimation());
 					aboutFlipper.showPrevious();
 					break;
 				default:
@@ -218,61 +213,5 @@ public class FeedbackController implements Observer, ViewController{
 					break;
 			}
 		}
-	}
-
-	private Animation inFromRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation outToLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation inFromLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation outToRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation inFromBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation outToTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation inFromTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	private Animation outToBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
 	}
 }

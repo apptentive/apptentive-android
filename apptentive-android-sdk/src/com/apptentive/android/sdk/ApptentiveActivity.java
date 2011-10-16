@@ -8,7 +8,11 @@
 package com.apptentive.android.sdk;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.LinearLayout;
 import com.apptentive.android.sdk.activity.BaseActivity;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.FeedbackController;
@@ -31,10 +35,15 @@ public class ApptentiveActivity  extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeModule = Module.valueOf(getIntent().getStringExtra("module"));
 
+		setContentView(R.layout.apptentive_activity);
+		LayoutInflater inflater = getLayoutInflater();
+		ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);
+		contentView.removeAllViews();
+
 		// Inflate the wrapper view, and then inflate the content view into it
 		switch(activeModule){
 			case FEEDBACK:
-				setContentView(R.layout.apptentive_feedback);
+				inflater.inflate(R.layout.apptentive_feedback, contentView);
 				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
 				break;
 			case SURVEY:
@@ -43,10 +52,11 @@ public class ApptentiveActivity  extends BaseActivity {
 					finish();
 					return;
 				}
-				setContentView(R.layout.apptentive_survey);
+				inflater.inflate(R.layout.apptentive_survey, contentView);
 				controller = new SurveyController(this);
 				break;
 			default:
+				inflater.inflate(R.layout.apptentive_feedback, contentView);
 				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
 				break;
 		}

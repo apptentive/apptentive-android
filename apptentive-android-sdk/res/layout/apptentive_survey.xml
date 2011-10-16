@@ -71,4 +71,5 @@
 			</LinearLayout>
 		</LinearLayout>
 	</ScrollView>
+	<include layout="@layout/apptentive_branding"/>
 </LinearLayout>

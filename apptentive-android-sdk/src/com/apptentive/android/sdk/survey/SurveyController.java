@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.survey;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.apptentive.android.sdk.offline.JSONPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.Survey;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class SurveyController implements ViewController {
 		this.activity = activity;
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		List<SurveyDefinition> surveys = model.getSurveys();
-		if(surveys != null && surveys.size() > 0){
+		if (surveys != null && surveys.size() > 0) {
 			definition = surveys.get(0);
 		}
 		this.result = new Survey(definition);
@@ -51,15 +53,13 @@ public class SurveyController implements ViewController {
 		description.setText(definition.getDescription());
 
 		Button send = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
-		send.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if(answered){
-					send(result);
-				}
-				activity.finish();
-			}
-		});
+		send.setOnClickListener(clickListener);
+
+		View branding = activity.findViewById(R.id.apptentive_branding_view);
+		branding.setOnClickListener(clickListener);
+
+		Button okay = (Button) activity.findViewById(R.id.apptentive_button_about_okay);
+		okay.setOnClickListener(clickListener);
 
 		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
 		surveyTitle.setFocusable(true);
@@ -68,7 +68,7 @@ public class SurveyController implements ViewController {
 
 		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
 
-		for(QuestionDefinition question : definition.getQuestions()){
+		for (QuestionDefinition question : definition.getQuestions()) {
 			int index = definition.getQuestions().indexOf(question);
 
 			View questionRow = activity.getLayoutInflater().inflate(R.layout.apptentive_question, null);
@@ -77,10 +77,10 @@ public class SurveyController implements ViewController {
 			TextView questionValue = (TextView) questionRow.findViewById(R.id.apptentive_question_value);
 			LinearLayout answerView = (LinearLayout) questionRow.findViewById(R.id.apptentive_question_answer_view);
 
-			questionNumber.setText(index+1+"");
+			questionNumber.setText(index + 1 + "");
 			questionValue.setText(question.getValue());
 
-			switch(question.getType()){
+			switch (question.getType()) {
 				case singleline:
 					EditText editText = new EditText(activity);
 					editText.setLayoutParams(Constants.rowLayout);
@@ -92,7 +92,7 @@ public class SurveyController implements ViewController {
 					int selected = 0;
 					List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 					optionNames.add(QuestionDefinition.DEFAULT);
-					for(int i = 0; i < answerDefinitions.size(); i++){
+					for (int i = 0; i < answerDefinitions.size(); i++) {
 						optionNames.add(answerDefinitions.get(i).getValue());
 					}
 					ArrayAdapter adapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_item, optionNames);
@@ -114,8 +114,8 @@ public class SurveyController implements ViewController {
 		surveyTitle.requestFocus();
 	}
 
-	public void cleanup(){
-		
+	public void cleanup() {
+
 	}
 
 	private void send(JSONPayload payload) {
@@ -124,31 +124,62 @@ public class SurveyController implements ViewController {
 		payloadManager.run();
 	}
 
-	void setAnswer(int questionIndex, String answer){
+	void setAnswer(int questionIndex, String answer) {
 		result.setAnswer(questionIndex, answer);
 		setAnswered(result.hasBeenAnswered());
 	}
 
 	/**
 	 * This is used to change what the send button says and does.
+	 *
 	 * @param answered
 	 */
-	void setAnswered(boolean answered){
+	void setAnswered(boolean answered) {
 		Button skipSend = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
 		this.answered = answered;
-		if(this.answered){
+		if (this.answered) {
 			skipSend.setText(R.string.apptentive_send);
-		}else{
+		} else {
 			skipSend.setText(R.string.apptentive_skip);
 		}
 	}
 
 	// Listener classes
 
+	private View.OnClickListener clickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View view) {
+			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_about_flipper);
+
+			Util.hideSoftKeyboard(activity, view);
+
+			switch (view.getId()) {
+				case R.id.apptentive_survey_button_send:
+					if (answered) {
+						send(result);
+					}
+					activity.finish();
+					break;
+				case R.id.apptentive_branding_view:
+					aboutFlipper.setInAnimation(Constants.inFromBottomAnimation());
+					aboutFlipper.setOutAnimation(Constants.outToTopAnimation());
+					aboutFlipper.showNext();
+					break;
+				case R.id.apptentive_button_about_okay:
+					aboutFlipper.setInAnimation(Constants.inFromTopAnimation());
+					aboutFlipper.setOutAnimation(Constants.outToBottomAnimation());
+					aboutFlipper.showPrevious();
+					break;
+				default:
+					break;
+			}
+		}
+	};
+
 	private class DropdownListener implements AdapterView.OnItemSelectedListener {
 		int listItem;
 
-		public DropdownListener(int listItem){
+		public DropdownListener(int listItem) {
 			this.listItem = listItem;
 		}
 
@@ -171,8 +202,11 @@ public class SurveyController implements ViewController {
 			this.listItem = listItem;
 		}
 
-		public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-		public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+		public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+		}
+
+		public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+		}
 
 		public void afterTextChanged(Editable editable) {
 			String answer = editable.toString();

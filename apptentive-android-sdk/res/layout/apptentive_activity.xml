@@ -22,15 +22,8 @@
 			              android:layout_width="fill_parent"
 			              android:layout_height="fill_parent">
 				<!-- This layout will hold whatever view we want to show -->
-			</LinearLayout>
-			<LinearLayout android:id="@+id/apptentive_branding_view"
-			              android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:clickable="true">
-				<TextView android:text="@string/apptentive_branding_text"
-				          android:layout_width="wrap_content"
-				          android:layout_height="wrap_content"
-				          android:textColor="#888888"/>
+
+				<!-- This layout will hold whatever view we want to show -->
 			</LinearLayout>
 		</LinearLayout>
 		<include layout="@layout/apptentive_about"/>
