@@ -31,6 +31,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_BASE     = "http://api.apptentive-beta.com";
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	private static final String ENDPOINT_SURVEYS  = ENDPOINT_BASE + "/surveys";
+	private static final String ENDPOINT_SURVEYS_ACTIVE  = ENDPOINT_SURVEYS + "/active";
 
 	private final ALog log = new ALog(ApptentiveClient.class);
 
@@ -112,10 +113,10 @@ public class ApptentiveClient {
 		return false;
 	}
 
-	public List<SurveyDefinition> getSurveys(){
+	public SurveyDefinition getSurvey(){
 		InputStream is = null;
 		try{
-			String uri = ENDPOINT_SURVEYS;
+			String uri = ENDPOINT_SURVEYS_ACTIVE;
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpGet get = new HttpGet();
 
@@ -130,7 +131,7 @@ public class ApptentiveClient {
 			if(code >= 200 && code < 300){
 				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
 				log.e("Response: " + content);
-				return SurveyManager.parseSurveys(content);
+				return SurveyManager.parseSurvey(content);
 			}
 		}catch(URISyntaxException e){
 			log.e("Error fetching contact information.", e);

@@ -74,7 +74,7 @@ public class Apptentive {
 			model.setEmail(getUserEmail(activity));
 		}
 
-		instance.getSurveys();
+		instance.getSurvey();
 		instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 		return instance;
 	}
@@ -86,17 +86,15 @@ public class Apptentive {
 	/**
 	 * Asynchronously download surveys and put them in the model.
 	 */
-	private void getSurveys(){
+	private void getSurvey(){
 		// Upload any payloads that were created while the device was offline.
 		new Thread(){
 			@Override
 			public void run() {
 				ApptentiveModel model = ApptentiveModel.getInstance();
 
-				List<SurveyDefinition> surveys;
 				ApptentiveClient client = new ApptentiveClient(model.getApiKey());
-				surveys = client.getSurveys();
-				model.setSurveys(surveys);
+				model.setSurvey(client.getSurvey());
 			}
 		}.start();
 	}

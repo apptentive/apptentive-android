@@ -16,12 +16,8 @@ import java.util.List;
 
 public class SurveyManager {
 
-	public static List<SurveyDefinition> parseSurveys(String json) throws JSONException {
-		List<SurveyDefinition> surveys = new ArrayList<SurveyDefinition>();
-		JSONArray surveyArray = new JSONArray(json);
-		for(int i = 0; i < surveyArray.length(); i++){
-			surveys.add(new SurveyDefinition((JSONObject)surveyArray.get(i)));
-		}
-		return surveys;
+	public static SurveyDefinition parseSurvey(String json) throws JSONException {
+		JSONObject survey = new JSONObject(json);
+		return new SurveyDefinition(survey);
 	}
 }

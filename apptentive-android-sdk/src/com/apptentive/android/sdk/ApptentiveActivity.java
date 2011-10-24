@@ -9,16 +9,13 @@ package com.apptentive.android.sdk;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.LinearLayout;
 import com.apptentive.android.sdk.activity.BaseActivity;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.FeedbackController;
 import com.apptentive.android.sdk.model.ViewController;
 import com.apptentive.android.sdk.survey.SurveyController;
-import com.apptentive.android.sdk.util.Util;
 
 public class ApptentiveActivity  extends BaseActivity {
 
@@ -48,7 +45,7 @@ public class ApptentiveActivity  extends BaseActivity {
 				break;
 			case SURVEY:
 				ApptentiveModel model = ApptentiveModel.getInstance();
-				if(model.getSurveys() == null || model.getSurveys().size() == 0){
+				if(model.getSurvey() == null){
 					finish();
 					return;
 				}

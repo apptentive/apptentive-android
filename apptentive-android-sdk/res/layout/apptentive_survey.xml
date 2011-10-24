@@ -52,7 +52,8 @@
 		              android:paddingTop="10dp"
 		              android:paddingRight="10dp"
 		              android:paddingBottom="10dp">
-			<FrameLayout android:layout_width="wrap_content"
+			<FrameLayout android:id="@+id/apptentive_survey_description_box"
+			             android:layout_width="wrap_content"
 			             android:layout_height="wrap_content"
 			             android:padding="10dp"
 			             android:background="@drawable/apptentive_question_header"

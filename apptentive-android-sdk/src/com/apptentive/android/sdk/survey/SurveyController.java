@@ -9,10 +9,10 @@ package com.apptentive.android.sdk.survey;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.R;
@@ -38,10 +38,7 @@ public class SurveyController implements ViewController {
 	public SurveyController(Activity activity) {
 		this.activity = activity;
 		ApptentiveModel model = ApptentiveModel.getInstance();
-		List<SurveyDefinition> surveys = model.getSurveys();
-		if (surveys != null && surveys.size() > 0) {
-			definition = surveys.get(0);
-		}
+		definition = model.getSurvey();
 		this.result = new Survey(definition);
 		setupForm();
 	}
@@ -49,8 +46,15 @@ public class SurveyController implements ViewController {
 	private void setupForm() {
 		TextView name = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
 		name.setText(definition.getName());
-		TextView description = (TextView) activity.findViewById(R.id.apptentive_survey_description_text);
-		description.setText(definition.getDescription());
+
+		View descriptionBox = activity.findViewById(R.id.apptentive_survey_description_box);
+
+		if(definition.getDescription() != null){
+			TextView description = (TextView) activity.findViewById(R.id.apptentive_survey_description_text);
+			description.setText(definition.getDescription());
+		}else{
+			((ViewGroup)descriptionBox.getParent()).removeView(descriptionBox);
+		}
 
 		Button send = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
 		send.setOnClickListener(clickListener);

@@ -62,7 +62,7 @@ public class ApptentiveModel extends Observable {
 	private Date startOfRatingPeriod;
 
 	// Survey module
-	List<SurveyDefinition> surveys;
+	SurveyDefinition survey;
 
 
 
@@ -311,12 +311,12 @@ public class ApptentiveModel extends Observable {
 		this.feedbackType = feedbackType;
 	}
 
-	public List<SurveyDefinition> getSurveys() {
-		return surveys;
+	public SurveyDefinition getSurvey() {
+		return survey;
 	}
 
-	public void setSurveys(List<SurveyDefinition> surveys) {
-		this.surveys = surveys;
+	public void setSurvey(SurveyDefinition survey) {
+		this.survey = survey;
 	}
 
 
