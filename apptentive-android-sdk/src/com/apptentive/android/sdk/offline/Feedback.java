@@ -36,6 +36,6 @@ public class Feedback extends Payload{
 		params.put("record[user][email]", email);
 		params.put("record[feedback][feedback]", feedback);
 		params.put("record[feedback][type]", feedbackType);
-		params.put("record[date]", Util.dateToString(feedbackDate, Util.STRINGSAFE_DATE_FORMAT));
+		params.put("record[date]", Util.dateToString(feedbackDate));
 	}
 }
