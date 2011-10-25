@@ -38,7 +38,6 @@
 			          android:gravity="left"
 			          android:textColor="#000000"
 			          android:singleLine="false"
-			          android:maxLines="4"
 			          android:inputType="textMultiLine"
 			          android:text="Question Title"/>
 		</LinearLayout>
