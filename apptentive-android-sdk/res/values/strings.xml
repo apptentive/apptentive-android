@@ -18,7 +18,8 @@
 	<string name="apptentive_edittext_phone_text">Phone Number</string>
 
 	<string name="apptentive_branding_text">Feedback Powered By Apptentive</string>
-	<string name="apptentive_header_button_about_okay_text">Okay</string>
+	<string name="apptentive_about_title">About Apptentive</string>
+	<string name="apptentive_about_header_button_okay_text">Okay</string>
 
 	<string name="apptentive_rating_message">If you enjoy %s we\'d really appreciate you taking the time to rate the app.</string>
 	<string name="apptentive_rating_rate">Rate %s</string>

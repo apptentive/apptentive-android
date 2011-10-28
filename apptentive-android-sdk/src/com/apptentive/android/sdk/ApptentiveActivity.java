@@ -61,8 +61,10 @@ public class ApptentiveActivity  extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
-		controller.cleanup();
-		controller = null;
+		if(controller != null){
+			controller.cleanup();
+			controller = null;
+		}
 		super.onDestroy();
 	}
 

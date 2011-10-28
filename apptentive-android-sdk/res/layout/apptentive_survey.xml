@@ -40,7 +40,7 @@
 		        android:textSize="18sp"
 		        android:textStyle="bold"
 		        android:background="@drawable/apptentive_header_button"
-		        android:text="Send"/>
+		        android:text="@string/apptentive_send"/>
 	</RelativeLayout>
 	<ScrollView android:layout_width="fill_parent"
 	            android:layout_height="0dp"
