@@ -87,7 +87,6 @@ public class Survey extends JSONPayload{
 	@Override
 	public String getAsJSON() {
 		try{
-			JSONObject root = new JSONObject();
 			JSONObject record = new JSONObject();
 			JSONObject survey = new JSONObject();
 			survey.put("id", definition.getId());
@@ -108,7 +107,7 @@ public class Survey extends JSONPayload{
 			survey.put("responses", answers);
 			record.put("survey", survey);
 			root.put("record", record);
-			return root.toString();
+			return super.getAsJSON();
 		}catch(JSONException e){
 			log.e("Error encoding survey JSON.", e);
 		}

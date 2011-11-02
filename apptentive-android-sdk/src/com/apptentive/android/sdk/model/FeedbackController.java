@@ -19,11 +19,10 @@ import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.offline.Feedback;
-import com.apptentive.android.sdk.offline.Payload;
-import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.offline.*;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
 
 import java.util.Date;
 import java.util.Observable;
@@ -94,21 +93,29 @@ public class FeedbackController implements Observer, ViewController{
 	private void submit() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 
-		Payload payload = new Feedback(model.getUuid(),
-		                                model.getModel(),
-		                                model.getVersion(),
-		                                model.getCarrier(),
-		                                "1.0",
-		                                model.getName(),
-		                                model.getEmail(),
-		                                model.getFeedback(),
-		                                model.getFeedbackType(),
-		                                new Date()
-		);
+
+		JSONPayload payload = null;
+		try{
+			 payload = new JSONFeedback(model.getUuid(),
+			                                model.getModel(),
+			                                model.getVersion(),
+			                                model.getCarrier(),
+			                                "1.0",
+			                                model.getName(),
+			                                model.getEmail(),
+			                                model.getFeedback(),
+			                                model.getFeedbackType(),
+			                                new Date()
+			);
+		}catch(JSONException e){
+			log.e("Exception creating feedback JSON", e);
+		}
 		model.clearTransientData();
-		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-		payloadManager.save(payload);
-		payloadManager.run();
+		if(payload != null){
+			PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+			payloadManager.save(payload);
+			payloadManager.run();
+		}
 	}
 
 	public void update(Observable observable, Object o) {

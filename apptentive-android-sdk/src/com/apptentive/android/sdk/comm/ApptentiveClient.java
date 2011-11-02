@@ -77,42 +77,6 @@ public class ApptentiveClient {
 		return false;
 	}
 
-	public boolean postFeedback(List<? extends NameValuePair> params){
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpPost post = new HttpPost(ENDPOINT_RECORDS);
-
-		post.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
-		post.setHeader("Content-Type", "application/x-www-form-urlencoded");
-		post.setHeader("Accept", "application/json");
-
-		StringBuilder content = new StringBuilder();
-		InputStream is = null;
-		try{
-			post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-			HttpResponse response = httpClient.execute(post);
-			is = response.getEntity().getContent();
-			byte[] line = new byte[1024];
-			int size;
-			while((size = is.read(line)) != -1){
-				content.append(new String(line, 0, size));
-			}
-			log.e(response.getStatusLine().toString());
-			//log.e(content.toString());
-
-			return (200 <= response.getStatusLine().getStatusCode()) &&
-			       (300 > response.getStatusLine().getStatusCode());
-		}catch(IOException e){
-			log.w("Error submitting feedback.", e);
-		}finally{
-			if(is != null){
-				try{
-					is.close();
-				}catch(Exception e){}
-			}
-		}
-		return false;
-	}
-
 	public SurveyDefinition getSurvey(){
 		InputStream is = null;
 		try{

@@ -26,11 +26,6 @@ public class PayloadManager{
 		this.prefs = prefs;
 	}
 
-
-
-
-	///// JSON Payload
-
 	public void save(JSONPayload payload){
 		String uuid = UUID.randomUUID().toString();
 		storePayload(uuid, payload);
@@ -72,16 +67,6 @@ public class PayloadManager{
 		}
 		prefs.edit().putString(PAYLOAD_INDEX_NAME, newPayloadList).commit();
 	}
-	//////
-
-
-
-
-
-
-	public void save(Payload payload){
-		Payload.store(prefs, payload);
-	}
 
 	public void run(){
 		PayloadUploader uploader = new PayloadUploader(prefs);
@@ -114,18 +99,6 @@ public class PayloadManager{
 					break;
 				}
 				json = payloadManager.getFirstPayloadInPayloadList();
-			}
-
-			Payload payload;
-			while((payload  = Payload.retrieveOldest(prefs)) != null){
-				ApptentiveClient client = new ApptentiveClient(ApptentiveModel.getInstance().getApiKey());
-				boolean success = client.postFeedback(payload.getParams());
-				if(success){
-					payload.delete(prefs);
-				}else{
-					log.e("Unable to uploader Payload");
-					break;
-				}
 			}
 		}
 	}
