@@ -32,6 +32,7 @@ public class Apptentive {
 	private static Apptentive instance = null;
 	private Apptentive() {
 		log = new ALog(Apptentive.class);
+		log.e("INITIALIZE");
 		printDebugInfo();
 	}
 
@@ -54,28 +55,30 @@ public class Apptentive {
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
 	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt){
-		instance = new Apptentive();
-		ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
-		ApptentiveModel model = ApptentiveModel.getInstance();
-		TelephonyManager manager = (TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE));
-		model.setModel(Build.MODEL);
-		model.setVersion(String.format("Android %s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL));
-		model.setCarrier(manager.getNetworkOperatorName());
-		String androidId = android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		model.setUuid(androidId);
-		model.setFeedbackType("feedback");
-		model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-		model.setAppDisplayName(appDisplayName);
-		model.setAppPackage(activity.getApplicationContext().getPackageName());
-		model.setApiKey(apiKey);
-		model.setAskForExtraInfo(false);
-		model.incrementUses();
-		if(model.getEmail().equals("")){
-			model.setEmail(getUserEmail(activity));
-		}
+		if(instance == null){
+			instance = new Apptentive();
+			ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
+			ApptentiveModel model = ApptentiveModel.getInstance();
+			TelephonyManager manager = (TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE));
+			model.setModel(Build.MODEL);
+			model.setVersion(String.format("Android %s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL));
+			model.setCarrier(manager.getNetworkOperatorName());
+			String androidId = android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+			model.setUuid(androidId);
+			model.setFeedbackType("feedback");
+			model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+			model.setAppDisplayName(appDisplayName);
+			model.setAppPackage(activity.getApplicationContext().getPackageName());
+			model.setApiKey(apiKey);
+			model.setAskForExtraInfo(false);
+			model.incrementUses();
+			if(model.getEmail().equals("")){
+				model.setEmail(getUserEmail(activity));
+			}
 
-		instance.getSurvey();
-		instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+			instance.getSurvey();
+			instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+		}
 		return instance;
 	}
 
