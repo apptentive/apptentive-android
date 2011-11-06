@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.drawable;
+package com.apptentive.android.sdk.view;
 
 import android.content.Context;
 import android.graphics.*;

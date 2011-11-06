@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.survey;
+package com.apptentive.android.sdk.module.survey;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,14 +14,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ApptentiveModel;
-import com.apptentive.android.sdk.model.ViewController;
+import com.apptentive.android.sdk.module.ViewController;
 import com.apptentive.android.sdk.offline.Payload;
 import com.apptentive.android.sdk.offline.PayloadManager;
-import com.apptentive.android.sdk.offline.Survey;
+import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -30,17 +29,16 @@ import java.util.List;
 
 public class SurveyController implements ViewController {
 
-	private final ALog log = new ALog(this.getClass());
 	private Activity activity;
 	private SurveyDefinition definition;
-	private Survey result;
+	private SurveyPayload result;
 	private boolean answered = false;
 
 	public SurveyController(Activity activity) {
 		this.activity = activity;
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		definition = model.getSurvey();
-		this.result = new Survey(definition);
+		this.result = new SurveyPayload(definition);
 		setupForm();
 	}
 

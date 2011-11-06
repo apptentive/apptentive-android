@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module;
 
 public interface ViewController {
 	public void cleanup();

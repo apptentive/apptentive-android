@@ -5,36 +5,33 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk;
+package com.apptentive.android.sdk.activity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import com.apptentive.android.sdk.about.AboutController;
-import com.apptentive.android.sdk.activity.BaseActivity;
+import android.view.Window;
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.about.AboutController;
 import com.apptentive.android.sdk.model.ApptentiveModel;
-import com.apptentive.android.sdk.model.ViewController;
-import com.apptentive.android.sdk.survey.SurveyController;
+import com.apptentive.android.sdk.module.ViewController;
+import com.apptentive.android.sdk.module.survey.SurveyController;
 
 public class ApptentiveActivity  extends BaseActivity {
 
-	private ALog log = new ALog(this.getClass());
-
 	private Module activeModule;
-
 	private ViewController controller;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeModule = Module.valueOf(getIntent().getStringExtra("module"));
 
-		// Inflate the wrapper view, and then inflate the content view into it
 		switch(activeModule){
 			case ABOUT:
-				//inflater.inflate(R.layout.apptentive_feedback_new, contentView);
 				controller = new AboutController(this);
 				break;
 			case SURVEY:
@@ -52,7 +49,7 @@ public class ApptentiveActivity  extends BaseActivity {
 				controller = new SurveyController(this);
 				break;
 			default:
-				log.w("No Activity specified. Finishing...");
+				Log.w("No Activity specified. Finishing...");
 				finish();
 				break;
 		}

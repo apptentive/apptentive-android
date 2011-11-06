@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.feedback;
+package com.apptentive.android.sdk.offline;
 
 import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.offline.Payload;
@@ -14,11 +14,11 @@ import org.json.JSONException;
 
 import java.util.Date;
 
-public class Feedback extends Payload {
+public class FeedbackPayload extends Payload {
 	private String email;
 	private String feedback;
 
-	public Feedback(String feedbackType){
+	public FeedbackPayload(String feedbackType){
 		try{
 			setString(GlobalInfo.manufacturer, "record", "device", "manufacturer");
 			setString(GlobalInfo.model, "record", "device", "model");

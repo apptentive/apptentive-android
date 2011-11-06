@@ -8,7 +8,7 @@
 package com.apptentive.android.sdk.offline;
 
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.ALog;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.model.GlobalInfo;
 
@@ -73,7 +73,6 @@ public class PayloadManager{
 
 
 	private class PayloadUploader extends Thread{
-		private ALog log = new ALog(PayloadUploader.class);
 		private SharedPreferences prefs;
 
 		public PayloadUploader(SharedPreferences prefs){
@@ -87,13 +86,13 @@ public class PayloadManager{
 			String json;
 			json  = payloadManager.getFirstPayloadInPayloadList();
 			while(json != null && !json.equals("")){
-				log.i("JSON: " + json);
+				Log.i("JSON: " + json);
 				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				boolean success = client.postJSON(json);
 				if(success){
 					payloadManager.deleteFirstPayloadInPayloadList();
 				}else{
-					log.e("Unable to upload Payload");
+					Log.e("Unable to upload Payload");
 					break;
 				}
 				json = payloadManager.getFirstPayloadInPayloadList();

@@ -5,12 +5,12 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.about;
+package com.apptentive.android.sdk.module.about;
 
 import android.app.Activity;
 import android.view.View;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.ViewController;
+import com.apptentive.android.sdk.module.ViewController;
 
 public class AboutController implements ViewController {
 

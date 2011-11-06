@@ -7,10 +7,11 @@
 
 package com.apptentive.android.sdk.offline;
 
-import com.apptentive.android.sdk.ALog;
-import com.apptentive.android.sdk.survey.AnswerDefinition;
-import com.apptentive.android.sdk.survey.QuestionDefinition;
-import com.apptentive.android.sdk.survey.SurveyDefinition;
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.survey.AnswerDefinition;
+import com.apptentive.android.sdk.module.survey.QuestionDefinition;
+import com.apptentive.android.sdk.module.survey.SurveyDefinition;
+import com.apptentive.android.sdk.offline.Payload;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,14 +20,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
-public class Survey extends Payload {
-
-	private final ALog log = new ALog(this.getClass());
+public class SurveyPayload extends Payload {
 
 	private SurveyDefinition definition;
 	private Map<String, String> answers;
 
-	public Survey(SurveyDefinition definition) {
+	public SurveyPayload(SurveyDefinition definition) {
 		super();
 		this.definition = definition;
 		answers = new LinkedHashMap<String, String>(definition.getQuestions().size());
@@ -107,7 +106,7 @@ public class Survey extends Payload {
 			root.put("record", record);
 			return super.getAsJSON();
 		}catch(JSONException e){
-			log.e("Error encoding survey JSON.", e);
+			Log.e("Error encoding survey JSON.", e);
 		}
 		return null;
 	}

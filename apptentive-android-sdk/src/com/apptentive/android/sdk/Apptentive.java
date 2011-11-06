@@ -13,10 +13,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+import com.apptentive.android.sdk.activity.ApptentiveActivity;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.feedback.FeedbackController;
+import com.apptentive.android.sdk.module.choice.ChoiceController;
+import com.apptentive.android.sdk.module.feedback.FeedbackController;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.module.rating.RatingController;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -26,13 +29,12 @@ public class Apptentive {
 
 	public static final String APPTENTIVE_API_VERSION = "0.1";
 
-	private ALog log;
+	private Log log;
 
 	private static Apptentive instance = null;
 
 	private Apptentive() {
-		log = new ALog(Apptentive.class);
-		log.e("INITIALIZE");
+		Log.e("INITIALIZE");
 		printDebugInfo();
 	}
 
@@ -270,25 +272,25 @@ public class Apptentive {
 	}
 
 	private void printDebugInfo() {
-		log.w("Build.BRAND:               %s", Build.BRAND);
-		log.w("Build.DEVICE:              %s", Build.DEVICE);
-		log.w("Build.MANUFACTURER:        %s", Build.MANUFACTURER);
-		log.w("Build.MODEL:               %s", Build.MODEL);
-		log.w("Build.PRODUCT:             %s", Build.PRODUCT);
-		log.w("Build.TYPE:                %s", Build.TYPE);
-		log.w("Build.USER:                %s", Build.USER);
-		log.w("Build.VERSION.SDK:         %s", Build.VERSION.SDK);
-		log.w("Build.VERSION.SDK_INT:     %s", Build.VERSION.SDK_INT);
-		log.w("Build.VERSION.CODENAME:    %s", Build.VERSION.CODENAME);
-		log.w("Build.VERSION.INCREMENTAL: %s", Build.VERSION.INCREMENTAL);
-		log.w("Build.VERSION.RELEASE:     %s", Build.VERSION.RELEASE);
-		log.w("Build.BOARD:               %s", Build.BOARD);
-		log.w("Build.CPU_AIB:             %s", Build.CPU_ABI);
-		log.w("Build.DISPLAY:             %s", Build.DISPLAY);
-		log.w("Build.FINGERPRINT:         %s", Build.FINGERPRINT);
-		log.w("Build.HOST:                %s", Build.HOST);
-		log.w("Build.ID:                  %s", Build.ID);
-		log.w("Build.TAGS:                %s", Build.TAGS);
-		log.w("Build.TIME:                %s", Build.TIME);
+		Log.w("Build.BRAND:               %s", Build.BRAND);
+		Log.w("Build.DEVICE:              %s", Build.DEVICE);
+		Log.w("Build.MANUFACTURER:        %s", Build.MANUFACTURER);
+		Log.w("Build.MODEL:               %s", Build.MODEL);
+		Log.w("Build.PRODUCT:             %s", Build.PRODUCT);
+		Log.w("Build.TYPE:                %s", Build.TYPE);
+		Log.w("Build.USER:                %s", Build.USER);
+		Log.w("Build.VERSION.SDK:         %s", Build.VERSION.SDK);
+		Log.w("Build.VERSION.SDK_INT:     %s", Build.VERSION.SDK_INT);
+		Log.w("Build.VERSION.CODENAME:    %s", Build.VERSION.CODENAME);
+		Log.w("Build.VERSION.INCREMENTAL: %s", Build.VERSION.INCREMENTAL);
+		Log.w("Build.VERSION.RELEASE:     %s", Build.VERSION.RELEASE);
+		Log.w("Build.BOARD:               %s", Build.BOARD);
+		Log.w("Build.CPU_AIB:             %s", Build.CPU_ABI);
+		Log.w("Build.DISPLAY:             %s", Build.DISPLAY);
+		Log.w("Build.FINGERPRINT:         %s", Build.FINGERPRINT);
+		Log.w("Build.HOST:                %s", Build.HOST);
+		Log.w("Build.ID:                  %s", Build.ID);
+		Log.w("Build.TAGS:                %s", Build.TAGS);
+		Log.w("Build.TIME:                %s", Build.TIME);
 	}
 }

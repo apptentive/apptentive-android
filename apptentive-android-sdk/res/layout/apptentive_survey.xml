@@ -25,6 +25,10 @@
 		          android:textStyle="bold"
 		          android:textSize="20sp"
 		          android:textColor="#FFFFFF"
+		          android:shadowColor="#000000"
+		          android:shadowDx="0"
+		          android:shadowDy="-1"
+		          android:shadowRadius="1"
 		          android:text="Survey"/>
 		<Button android:id="@+id/apptentive_survey_button_send"
 		        android:layout_width="wrap_content"

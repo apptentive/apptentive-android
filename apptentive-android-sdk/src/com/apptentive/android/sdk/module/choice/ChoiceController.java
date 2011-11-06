@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.choice;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -15,6 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.ApptentiveModel;
+import com.apptentive.android.sdk.model.ApptentiveState;
+import com.apptentive.android.sdk.model.GlobalInfo;
+import com.apptentive.android.sdk.module.rating.RatingController;
 
 public class ChoiceController{
 

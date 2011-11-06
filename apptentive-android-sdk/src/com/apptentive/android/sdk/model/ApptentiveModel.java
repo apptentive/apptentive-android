@@ -8,13 +8,11 @@
 package com.apptentive.android.sdk.model;
 
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.ALog;
-import com.apptentive.android.sdk.survey.SurveyDefinition;
+import com.apptentive.android.sdk.module.survey.SurveyDefinition;
 import com.apptentive.android.sdk.util.Util;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
 import java.util.Observable;
 
 public class ApptentiveModel extends Observable {
@@ -26,8 +24,6 @@ public class ApptentiveModel extends Observable {
 	private static int RATING_DEFAULT_USES_BEFORE_PROMPT = 5;
 	private static int RATING_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
 	private static int RATING_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
-
-	private ALog log = new ALog(ApptentiveModel.class);
 
 	// Configuration variables
 	private SharedPreferences prefs;

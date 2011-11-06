@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.feedback;
+package com.apptentive.android.sdk.module.feedback;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -14,24 +14,22 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.GlobalInfo;
-import com.apptentive.android.sdk.model.ViewController;
+import com.apptentive.android.sdk.module.ViewController;
+import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 
 public class FeedbackController implements ViewController {
 
-	private ALog log;
 	private Dialog dialog;
 	private Activity activity;
-	private Feedback feedback;
+	private FeedbackPayload feedback;
 
 	public FeedbackController(Activity activity, boolean forced) {
 		this.activity = activity;
-		this.feedback = new Feedback("feedback");
-		log = new ALog(this.getClass());
+		this.feedback = new FeedbackPayload("feedback");
 		dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
 		dialog.setContentView(R.layout.apptentive_feedback);
 		dialog.findViewById(R.id.apptentive_button_cancel).setOnClickListener(clickListener);

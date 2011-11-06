@@ -17,8 +17,8 @@
 	<FrameLayout android:id="@+id/apptentive_paper_frame"
 	             android:layout_width="fill_parent"
 	             android:layout_height="fill_parent">
-		<com.apptentive.android.sdk.drawable.PaperBackground android:layout_width="fill_parent"
-		                                                     android:layout_height="fill_parent"/>
+		<com.apptentive.android.sdk.view.PaperBackground android:layout_width="fill_parent"
+		                                                 android:layout_height="fill_parent"/>
 		<LinearLayout android:layout_width="fill_parent"
 		              android:layout_height="fill_parent"
 		              android:orientation="vertical">
@@ -90,14 +90,11 @@
 			          android:paddingTop="2dp"
 			          android:paddingLeft="7dp"
 			          android:gravity="top"
+			          android:minLines="6"
+			          android:maxLines="6"
 			          android:background="#00000000"
 			          android:inputType="textMultiLine"/>
-			<FrameLayout android:layout_width="fill_parent"
-			             android:layout_height="wrap_content"
-			             android:paddingLeft="10dp"
-			             android:paddingBottom="7dp">
-				<include layout="@layout/apptentive_branding"/>
-			</FrameLayout>
+			<include layout="@layout/apptentive_branding"/>
 		</LinearLayout>
 	</FrameLayout>
 	<ScrollView android:layout_width="fill_parent"

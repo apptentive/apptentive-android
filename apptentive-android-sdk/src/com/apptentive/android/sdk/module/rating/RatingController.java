@@ -5,9 +5,8 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.rating;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -20,13 +19,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
-import com.apptentive.android.sdk.ALog;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.GlobalInfo;
 
 public class RatingController {
-
-	private ALog log = new ALog(RatingController.class);
 
 	private Context context;
 	private Dialog dialog;

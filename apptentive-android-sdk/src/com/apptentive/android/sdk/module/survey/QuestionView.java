@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.survey;
+package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 import android.widget.*;
