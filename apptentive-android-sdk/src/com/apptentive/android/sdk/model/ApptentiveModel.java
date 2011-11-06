@@ -31,31 +31,14 @@ public class ApptentiveModel extends Observable {
 
 	// Configuration variables
 	private SharedPreferences prefs;
-	private String appDisplayName;
-	private String appPackage;
-	private String apiKey;
-	private boolean askForExtraInfo;
 
 	private int ratingDaysBeforePrompt;
 	private int ratingUsesBeforePrompt;
 	private int ratingSignificantEventsBeforePrompt;
 	private int ratingDaysBeforeReprompt;
 
-	// Data variables
-	private String name;
-	private String feedback;
-	private String email;
-	private String phone;
-
-	private String model;
-	private String version;
-	private String carrier;
-	private String uuid;
-	private String feedbackType;
-
 	// State variables
 	private ApptentiveState state;
-
 	private int events;
 	private int uses;
 	private int daysUntilRate;
@@ -67,8 +50,6 @@ public class ApptentiveModel extends Observable {
 
 
 	private ApptentiveModel() {
-		askForExtraInfo = false;
-		clearTransientData();
 	}
 
 	public static void setDefaults(Integer ratingFlowDaysBeforePrompt, Integer ratingFlowDaysBeforeReprompt, Integer ratingFlowSignificantEventsBeforePrompt, Integer ratingFlowUsesBeforePrompt){
@@ -97,39 +78,6 @@ public class ApptentiveModel extends Observable {
 	public void setPrefs(SharedPreferences prefs) {
 		this.prefs = prefs;
 		retrieve();
-	}
-
-	public String getAppDisplayName() {
-		return appDisplayName;
-	}
-
-	public void setAppDisplayName(String appDisplayName) {
-		this.appDisplayName = appDisplayName;
-	}
-
-	public String getAppPackage() {
-		return appPackage;
-	}
-
-	public void setAppPackage(String appPackage) {
-		this.appPackage = appPackage;
-		this.appPackage = "org.mozilla.firefox";
-	}
-
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-
-	public boolean isAskForExtraInfo() {
-		return askForExtraInfo;
-	}
-
-	public void setAskForExtraInfo(boolean askForExtraInfo) {
-		this.askForExtraInfo = askForExtraInfo;
 	}
 
 	public int getRatingDaysBeforePrompt() {
@@ -171,47 +119,6 @@ public class ApptentiveModel extends Observable {
 	public void useRatingDaysBeforeReprompt(){
 		this.daysUntilRate = ratingDaysBeforeReprompt;
 		save();
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-		save();
-		setChanged();
-		notifyObservers(instance);
-	}
-
-	public String getFeedback() {
-		return feedback;
-	}
-
-	public void setFeedback(String feedback) {
-		this.feedback = feedback;
-		setChanged();
-		notifyObservers(instance);
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-		save();
-		setChanged();
-		notifyObservers(instance);
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-		setChanged();
-		notifyObservers(instance);
 	}
 
 	public ApptentiveState getState() {
@@ -271,59 +178,12 @@ public class ApptentiveModel extends Observable {
 		save();
 	}
 
-	public String getModel() {
-		return model;
-	}
-
-	public void setModel(String model) {
-		this.model = model;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public String getCarrier() {
-		return carrier;
-	}
-
-	public void setCarrier(String carrier) {
-		this.carrier = carrier;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getFeedbackType() {
-		return feedbackType;
-	}
-
-	public void setFeedbackType(String feedbackType) {
-		this.feedbackType = feedbackType;
-	}
-
 	public SurveyDefinition getSurvey() {
 		return survey;
 	}
 
 	public void setSurvey(SurveyDefinition survey) {
 		this.survey = survey;
-	}
-
-
-
-	public void forceNotifyObservers(){
-		setChanged();
-		notifyObservers(instance);
 	}
 
 	private void save(){
@@ -333,8 +193,6 @@ public class ApptentiveModel extends Observable {
 		editor.putInt("ratingSignificantEventsBeforePrompt", ratingSignificantEventsBeforePrompt);
 		editor.putInt("ratingDaysBeforeReprompt", ratingDaysBeforeReprompt);
 
-		editor.putString("name", name);
-		editor.putString("email", email);
 		editor.putString("state", state.name());
 		editor.putInt("uses", uses);
 		editor.putInt("events", events);
@@ -349,8 +207,6 @@ public class ApptentiveModel extends Observable {
 		ratingSignificantEventsBeforePrompt = prefs.getInt("ratingSignificantEventsBeforePrompt", RATING_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
 		ratingDaysBeforeReprompt            = prefs.getInt("ratingDaysBeforeReprompt",            RATING_DEFAULT_DAYS_BEFORE_REPROMPTING);
 
-		name  = prefs.getString("name", "");
-		email = prefs.getString("email", "");
 		state = ApptentiveState.valueOf(prefs.getString("state", "START"));
 		uses = prefs.getInt("uses", 0);
 		events = prefs.getInt("events", 0);
@@ -360,20 +216,5 @@ public class ApptentiveModel extends Observable {
 		}catch(ParseException e){
 			startOfRatingPeriod = new Date();
 		}
-	}
-
-	public void clearTransientData(){
-		feedback = "";
-		phone = "";
-		model = "";
-		version = "";
-		carrier = "";
-		uuid = "";
-		feedbackType = "";
-	}
-
-	@Override
-	public String toString() {
-		return "ApptentiveModel{prefs=" + prefs + ", appDisplayName='" + appDisplayName + '\'' + ", appPackage='" + appPackage + '\'' + ", apiKey='" + apiKey + '\'' + ", askForExtraInfo=" + askForExtraInfo + ", ratingDaysBeforePrompt=" + ratingDaysBeforePrompt + ", ratingUsesBeforePrompt=" + ratingUsesBeforePrompt + ", ratingSignificantEventsBeforePrompt=" + ratingSignificantEventsBeforePrompt + ", ratingDaysBeforeReprompt=" + ratingDaysBeforeReprompt + ", name='" + name + '\'' + ", feedback='" + feedback + '\'' + ", email='" + email + '\'' + ", phone='" + phone + '\'' + ", model='" + model + '\'' + ", version='" + version + '\'' + ", carrier='" + carrier + '\'' + ", uuid='" + uuid + '\'' + ", feedbackType='" + feedbackType + '\'' + ", state=" + state + ", events=" + events + ", uses=" + uses + ", daysUntilRate=" + daysUntilRate + ", startOfRatingPeriod=" + startOfRatingPeriod + '}';
 	}
 }

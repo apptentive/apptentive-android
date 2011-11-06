@@ -14,14 +14,13 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.feedback.FeedbackController;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
-import com.apptentive.android.sdk.survey.SurveyDefinition;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
-import java.util.List;
 
 public class Apptentive {
 
@@ -30,14 +29,15 @@ public class Apptentive {
 	private ALog log;
 
 	private static Apptentive instance = null;
+
 	private Apptentive() {
 		log = new ALog(Apptentive.class);
 		log.e("INITIALIZE");
 		printDebugInfo();
 	}
 
-	public static Apptentive getInstance(){
-		if(instance == null){
+	public static Apptentive getInstance() {
+		if (instance == null) {
 			throw new ExceptionInInitializerError("Apptentive not initialized.");
 		}
 		return instance;
@@ -45,36 +45,40 @@ public class Apptentive {
 
 	/**
 	 * Initializes the Apptentive SDK. You must call this before performing any other interaction with the SDK.
-	 * @param activity The activity from which this method is called.
+	 *
+	 * @param activity       The activity from which this method is called.
 	 * @param appDisplayName The displayable name of your app.
-	 * @param apiKey The Apptentive API key for this app.
-	 * @param ratingFlowDefaultDaysBeforePrompt The number of days to wait before initially starting the rating flow. Leave null for default of 30.
-	 * @param ratingFlowDefaultDaysBeforeReprompt The number of days to wait before asking the user to rate the app if they have already chosen "Remind me later". Leave null for default of 5.
-	 * @param ratingFlowDefaultSignificantEventsBeforePrompt The number of significant events to wait for before initially starting the rating flow. Leave null for default of 10.
-	 * @param ratingFlowDefaultUsesBeforePrompt The number of app uses to wait for before initially starting the rating flow. Leave null for default of 5.
+	 * @param apiKey         The Apptentive API key for this app.
+	 * @param ratingFlowDefaultDaysBeforePrompt
+	 *                       The number of days to wait before initially starting the rating flow. Leave null for default of 30.
+	 * @param ratingFlowDefaultDaysBeforeReprompt
+	 *                       The number of days to wait before asking the user to rate the app if they have already chosen "Remind me later". Leave null for default of 5.
+	 * @param ratingFlowDefaultSignificantEventsBeforePrompt
+	 *                       The number of significant events to wait for before initially starting the rating flow. Leave null for default of 10.
+	 * @param ratingFlowDefaultUsesBeforePrompt
+	 *                       The number of app uses to wait for before initially starting the rating flow. Leave null for default of 5.
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
-	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt){
-		if(instance == null){
+	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt) {
+		if (instance == null) {
 			instance = new Apptentive();
 			ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
+
+			GlobalInfo.manufacturer = Build.MANUFACTURER;
+			GlobalInfo.model = Build.MODEL;
+			GlobalInfo.version = String.format("%s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL);
+			GlobalInfo.carrier = ((TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE))).getNetworkOperatorName();
+
+			GlobalInfo.androidId = android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+			GlobalInfo.appDisplayName = appDisplayName;
+			GlobalInfo.appPackage = activity.getApplicationContext().getPackageName();
+			GlobalInfo.apiKey = apiKey;
+
+			GlobalInfo.userEmail = getUserEmail(activity);
+
 			ApptentiveModel model = ApptentiveModel.getInstance();
-			TelephonyManager manager = (TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE));
-			model.setModel(Build.MODEL);
-			model.setVersion(String.format("Android %s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL));
-			model.setCarrier(manager.getNetworkOperatorName());
-			String androidId = android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-			model.setUuid(androidId);
-			model.setFeedbackType("feedback");
 			model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-			model.setAppDisplayName(appDisplayName);
-			model.setAppPackage(activity.getApplicationContext().getPackageName());
-			model.setApiKey(apiKey);
-			model.setAskForExtraInfo(false);
-			model.incrementUses();
-			if(model.getEmail().equals("")){
-				model.setEmail(getUserEmail(activity));
-			}
 
 			instance.getSurvey();
 			instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
@@ -82,27 +86,27 @@ public class Apptentive {
 		return instance;
 	}
 
-	public void cleanUp(){
+	public void cleanUp() {
 		Apptentive.instance = null;
 	}
 
 	/**
 	 * Asynchronously download surveys and put them in the model.
 	 */
-	private void getSurvey(){
+	private void getSurvey() {
 		// Upload any payloads that were created while the device was offline.
-		new Thread(){
+		new Thread() {
 			@Override
 			public void run() {
 				ApptentiveModel model = ApptentiveModel.getInstance();
 
-				ApptentiveClient client = new ApptentiveClient(model.getApiKey());
+				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				model.setSurvey(client.getSurvey());
 			}
 		}.start();
 	}
 
-	private void uploadPendingPayloads(SharedPreferences prefs){
+	private void uploadPendingPayloads(SharedPreferences prefs) {
 		// Upload any payloads that were created while the device was offline.
 		PayloadManager payloadManager = new PayloadManager(prefs);
 		payloadManager.run();
@@ -111,25 +115,25 @@ public class Apptentive {
 	/**
 	 * Call this in your activity's onResume() method. If the rating flow is able to run, it will.
 	 */
-	public void runIfNeeded(Context context){
+	public void runIfNeeded(Activity activity) {
 
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		ApptentiveState state = model.getState();
 
-		switch(state){
-			case START :
-				if(ratingPeriodElapsed() || eventThresholdReached() || usesThresholdReached()){
-					choice(context);
+		switch (state) {
+			case START:
+				if (ratingPeriodElapsed() || eventThresholdReached() || usesThresholdReached()) {
+					choice(activity);
 				}
 				break;
-			case REMIND :
-				if(ratingPeriodElapsed()){
-					rating(context);
+			case REMIND:
+				if (ratingPeriodElapsed()) {
+					rating(activity);
 				}
 				break;
-			case DONE :
+			case DONE:
 				break;
-			default :
+			default:
 				break;
 		}
 	}
@@ -137,10 +141,17 @@ public class Apptentive {
 	/**
 	 * Short circuit the rating flow to the "Feedback" screen.
 	 */
-	public void feedback(Context context, boolean forced){
+	public void feedback(Activity activity, boolean forced) {
+		new FeedbackController(activity, forced);
+	}
+
+	/**
+	 * Show about dialog
+	 */
+	public void about(Context context) {
 		Intent intent = new Intent();
-		intent.putExtra("forced", forced);
-		intent.putExtra("module", ApptentiveActivity.Module.FEEDBACK.toString());
+		intent.putExtra("module", ApptentiveActivity.Module.ABOUT.toString());
+		//intent.addFlags(Intent.FLAG_ACTIVITY_);
 		intent.setClass(context, ApptentiveActivity.class);
 		context.startActivity(intent);
 	}
@@ -148,7 +159,7 @@ public class Apptentive {
 	/**
 	 * Show a survey, if available.
 	 */
-	public void survey(Context context){
+	public void survey(Context context) {
 		Intent intent = new Intent();
 		intent.putExtra("module", ApptentiveActivity.Module.SURVEY.toString());
 		intent.setClass(context, ApptentiveActivity.class);
@@ -158,7 +169,7 @@ public class Apptentive {
 	/**
 	 * Short circuit the rating flow to the "Would you like to rate?" dialog.
 	 */
-	public void rating(Context context){
+	public void rating(Context context) {
 		RatingController controller = new RatingController(context);
 		controller.show();
 	}
@@ -166,15 +177,15 @@ public class Apptentive {
 	/**
 	 * Short circuit the rating flow to the "Do you like this app?" dialog.
 	 */
-	public void choice(Context context){
-		ChoiceController controller = new ChoiceController(context);
+	public void choice(Activity activity) {
+		ChoiceController controller = new ChoiceController(activity);
 		controller.show();
 	}
 
 	/**
 	 * Call this when the user accomplishes a significant event.
 	 */
-	public void event(){
+	public void event() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.incrementEvents();
 	}
@@ -182,7 +193,7 @@ public class Apptentive {
 	/**
 	 * This method is only for testing. It will move the "first run" date one day into the past.
 	 */
-	public void day(){
+	public void day() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setStartOfRatingPeriod(Util.addDaysToDate(model.getStartOfRatingPeriod(), -1));
 	}
@@ -190,7 +201,7 @@ public class Apptentive {
 	/**
 	 * This method should be called when a new version of the app is installed, or you want to start the rating/feedback flow over again.
 	 */
-	public void reset(){
+	public void reset() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setState(ApptentiveState.START);
 		model.setStartOfRatingPeriod(new Date());
@@ -201,7 +212,7 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public void ratingRemind(){
+	public void ratingRemind() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setState(ApptentiveState.REMIND);
 		model.setStartOfRatingPeriod(new Date());
@@ -211,7 +222,7 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public void ratingYes(){
+	public void ratingYes() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setState(ApptentiveState.DONE);
 	}
@@ -219,7 +230,7 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public void ratingNo(){
+	public void ratingNo() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setState(ApptentiveState.DONE);
 	}
@@ -233,30 +244,32 @@ public class Apptentive {
 	}
 */
 
-	private static String getUserEmail(Context context){
-		if(Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")){
+	private static String getUserEmail(Context context) {
+		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
 			String email = EmailUtil.getEmail(context);
-			if(email != null){
+			if (email != null) {
 				return email;
 			}
 		}
 		return "";
 	}
 
-	private boolean ratingPeriodElapsed(){
+	private boolean ratingPeriodElapsed() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		return Util.timeHasElapsed(model.getStartOfRatingPeriod(), model.getDaysUntilRate());
 	}
-	private boolean eventThresholdReached(){
+
+	private boolean eventThresholdReached() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		return model.getEvents() >= model.getRatingSignificantEventsBeforePrompt();
 	}
-	private boolean usesThresholdReached(){
+
+	private boolean usesThresholdReached() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		return model.getUses() >= model.getRatingUsesBeforePrompt();
 	}
 
-	private void printDebugInfo(){
+	private void printDebugInfo() {
 		log.w("Build.BRAND:               %s", Build.BRAND);
 		log.w("Build.DEVICE:              %s", Build.DEVICE);
 		log.w("Build.MANUFACTURER:        %s", Build.MANUFACTURER);

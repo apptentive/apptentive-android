@@ -10,7 +10,7 @@ package com.apptentive.android.sdk.offline;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class JSONPayload {
+public abstract class Payload {
 
 	protected JSONObject root = new JSONObject();
 
@@ -18,7 +18,7 @@ public abstract class JSONPayload {
 		return root.toString();
 	}
 
-	public void addString(String value, String... keys) throws JSONException {
+	public void setString(String value, String... keys) throws JSONException {
 		JSONObject parent = root;
 		for(int i = 0; i < keys.length; i++){
 			String key = keys[i];

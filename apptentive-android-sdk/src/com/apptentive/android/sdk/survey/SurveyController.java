@@ -15,10 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.apptentive.android.sdk.ALog;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.ViewController;
-import com.apptentive.android.sdk.offline.JSONPayload;
+import com.apptentive.android.sdk.offline.Payload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.Survey;
 import com.apptentive.android.sdk.util.Constants;
@@ -122,7 +123,7 @@ public class SurveyController implements ViewController {
 
 	}
 
-	private void send(JSONPayload payload) {
+	private void send(Payload payload) {
 		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 		payloadManager.save(payload);
 		payloadManager.run();
@@ -165,14 +166,7 @@ public class SurveyController implements ViewController {
 					activity.finish();
 					break;
 				case R.id.apptentive_branding_view:
-					aboutFlipper.setInAnimation(Constants.inFromBottomAnimation());
-					aboutFlipper.setOutAnimation(Constants.outToTopAnimation());
-					aboutFlipper.showNext();
-					break;
-				case R.id.apptentive_button_about_okay:
-					aboutFlipper.setInAnimation(Constants.inFromTopAnimation());
-					aboutFlipper.setOutAnimation(Constants.outToBottomAnimation());
-					aboutFlipper.showPrevious();
+					Apptentive.getInstance().about(activity);
 					break;
 				default:
 					break;

@@ -7,12 +7,10 @@
 
 package com.apptentive.android.sdk.offline;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.ALog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.model.ApptentiveModel;
+import com.apptentive.android.sdk.model.GlobalInfo;
 
 import java.util.UUID;
 
@@ -26,13 +24,13 @@ public class PayloadManager{
 		this.prefs = prefs;
 	}
 
-	public void save(JSONPayload payload){
+	public void save(Payload payload){
 		String uuid = UUID.randomUUID().toString();
 		storePayload(uuid, payload);
 		addToPayloadList(uuid);
 	}
 
-	private void storePayload(String name, JSONPayload payload){
+	private void storePayload(String name, Payload payload){
 		prefs.edit().putString(name, payload.getAsJSON()).commit();
 	}
 
@@ -90,12 +88,12 @@ public class PayloadManager{
 			json  = payloadManager.getFirstPayloadInPayloadList();
 			while(json != null && !json.equals("")){
 				log.i("JSON: " + json);
-				ApptentiveClient client = new ApptentiveClient(ApptentiveModel.getInstance().getApiKey());
+				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				boolean success = client.postJSON(json);
 				if(success){
 					payloadManager.deleteFirstPayloadInPayloadList();
 				}else{
-					log.e("Unable to uploader JSONPayload");
+					log.e("Unable to upload Payload");
 					break;
 				}
 				json = payloadManager.getFirstPayloadInPayloadList();

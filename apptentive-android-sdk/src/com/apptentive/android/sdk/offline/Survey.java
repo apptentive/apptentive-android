@@ -15,13 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 
-public class Survey extends JSONPayload{
+public class Survey extends Payload {
 
 	private final ALog log = new ALog(this.getClass());
 

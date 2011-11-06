@@ -11,9 +11,18 @@
               android:id="@+id/apptentive_branding_view"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              android:gravity="center_vertical"
               android:clickable="true">
+	<ImageView android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:src="@drawable/apptentive_icon_small_layout"/>
 	<TextView android:text="@string/apptentive_branding_text"
 	          android:layout_width="wrap_content"
 	          android:layout_height="wrap_content"
-	          android:textColor="#888888"/>
+	          android:paddingLeft="4dp"
+	          android:textColor="#888888"
+	          android:shadowColor="#FFFFFF"
+	          android:shadowDx="0"
+	          android:shadowDy="1"
+	          android:shadowRadius="1"/>
 </LinearLayout>

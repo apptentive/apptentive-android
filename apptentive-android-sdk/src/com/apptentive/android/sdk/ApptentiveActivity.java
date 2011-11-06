@@ -10,10 +10,9 @@ package com.apptentive.android.sdk;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.view.Window;
+import com.apptentive.android.sdk.about.AboutController;
 import com.apptentive.android.sdk.activity.BaseActivity;
 import com.apptentive.android.sdk.model.ApptentiveModel;
-import com.apptentive.android.sdk.model.FeedbackController;
 import com.apptentive.android.sdk.model.ViewController;
 import com.apptentive.android.sdk.survey.SurveyController;
 
@@ -29,21 +28,21 @@ public class ApptentiveActivity  extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeModule = Module.valueOf(getIntent().getStringExtra("module"));
-
-		setContentView(R.layout.apptentive_activity);
-		LayoutInflater inflater = getLayoutInflater();
-		ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);
-		contentView.removeAllViews();
 
 		// Inflate the wrapper view, and then inflate the content view into it
 		switch(activeModule){
-			case FEEDBACK:
-				inflater.inflate(R.layout.apptentive_feedback, contentView);
-				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
+			case ABOUT:
+				//inflater.inflate(R.layout.apptentive_feedback_new, contentView);
+				controller = new AboutController(this);
 				break;
 			case SURVEY:
+//				super.setTheme(android.R.style.Theme_Translucent_NoTitleBar);
+				setContentView(R.layout.apptentive_activity);
+				LayoutInflater inflater = getLayoutInflater();
+				ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);
+				contentView.removeAllViews();
 				ApptentiveModel model = ApptentiveModel.getInstance();
 				if(model.getSurvey() == null){
 					finish();
@@ -53,8 +52,8 @@ public class ApptentiveActivity  extends BaseActivity {
 				controller = new SurveyController(this);
 				break;
 			default:
-				inflater.inflate(R.layout.apptentive_feedback, contentView);
-				controller = new FeedbackController(this, getIntent().getBooleanExtra("forced", false));
+				log.w("No Activity specified. Finishing...");
+				finish();
 				break;
 		}
 	}
@@ -69,7 +68,7 @@ public class ApptentiveActivity  extends BaseActivity {
 	}
 
 	public static enum Module{
-		FEEDBACK,
+		ABOUT,
 		SURVEY
 	}
 }

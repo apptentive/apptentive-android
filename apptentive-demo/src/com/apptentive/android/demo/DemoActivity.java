@@ -10,6 +10,7 @@ import com.apptentive.android.sdk.Apptentive;
 public class DemoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.e("DEMO", "onCreate()");
 		setContentView(R.layout.main);
 
 		//final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "0d7c775a973b30ed6a8ca2cf6469af3168a8c5e38ccd26755d1fdaa3387c6454", 5, 10, 5, 4); // api.apptentive.com
@@ -62,6 +63,13 @@ public class DemoActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.e("DEMO", "onResume()");
 		Apptentive.getInstance().runIfNeeded(DemoActivity.this);
+	}
+
+	@Override
+	protected void onDestroy() {
+		Log.e("DEMO", "onDestroy()");
+		super.onDestroy();
 	}
 }
