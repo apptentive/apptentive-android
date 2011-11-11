@@ -18,10 +18,9 @@ public class DemoActivity extends Activity {
 		final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "<YOUR_API_KEY>", 5, 10, 5, 4);
 
 		// Add custom data fields to feedback this way:
-		HashMap<String, String> customFeedbackFields = new HashMap<String, String>();
-		customFeedbackFields.put("aqua_pet_version", "1.0.2");
-		customFeedbackFields.put("aqua_pet_id", "0123456789ABCDEF");
-		apptentive.addFeedbackDataFields(customFeedbackFields);
+		//HashMap<String, String> customFeedbackFields = new HashMap<String, String>();
+		//customFeedbackFields.put("foo", "bar");
+		//apptentive.addFeedbackDataFields(customFeedbackFields);
 
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
