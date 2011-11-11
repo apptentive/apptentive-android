@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ apptentive.xml
+  ~
+  ~ Created by Sky Kelsey on 2011-10-11.
+  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  -->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:color="#66AAAAAA"/>
+</selector>

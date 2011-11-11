@@ -3,7 +3,7 @@
 <!--
   ~ ratings.xml
   ~
-  ~ Created by skelsey on 2011-09-11.
+  ~ Created by Sky Kelsey on 2011-09-11.
   ~ Copyright 2011 Apptentive, Inc. All rights reserved.
   -->
 
@@ -33,5 +33,4 @@
 	          android:layout_width="fill_parent"
 	          android:layout_height="wrap_content"
 	          android:text="@string/apptentive_rating_no"/>
-
 </LinearLayout>

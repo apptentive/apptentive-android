@@ -1,11 +1,11 @@
 /*
  * ChoiceController.java
  *
- * Created by skelsey on 2011-09-17.
+ * Created by Sky Kelsey on 2011-09-17.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.choice;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -15,6 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.ApptentiveModel;
+import com.apptentive.android.sdk.model.ApptentiveState;
+import com.apptentive.android.sdk.model.GlobalInfo;
+import com.apptentive.android.sdk.module.rating.RatingController;
 
 public class ChoiceController{
 
@@ -36,7 +40,7 @@ public class ChoiceController{
 	}
 
 	private void setupForm(){
-		dialog.setTitle("Are you enjoying " + ApptentiveModel.getInstance().getAppDisplayName() + "?");
+		dialog.setTitle("Are you enjoying " + GlobalInfo.appDisplayName + "?");
 		Button yes = (Button) dialog.findViewById(R.id.apptentive_choice_yes);
 		yes.setOnClickListener(clickListener);
 		Button no = (Button) dialog.findViewById(R.id.apptentive_choice_no);
@@ -51,7 +55,7 @@ public class ChoiceController{
 				case R.id.apptentive_choice_no:
 				{
 					ApptentiveModel.getInstance().setState(ApptentiveState.DONE);
-					Apptentive.getInstance().feedback(false);
+					Apptentive.getInstance().feedback(activity, false);
 					break;
 				}
 				case R.id.apptentive_choice_yes:

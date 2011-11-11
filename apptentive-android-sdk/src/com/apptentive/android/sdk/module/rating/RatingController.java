@@ -1,13 +1,12 @@
 /*
  * RatingController.java
  *
- * Created by skelsey on 2011-09-17.
+ * Created by Sky Kelsey on 2011-09-17.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.rating;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -18,48 +17,44 @@ import android.net.Uri;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.*;
-import com.apptentive.android.sdk.ALog;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.GlobalInfo;
 
 public class RatingController {
 
-	private static ALog log = new ALog(FeedbackController.class);
-
-	private Activity activity;
+	private Context context;
 	private Dialog dialog;
 
-	public RatingController(Activity activity) {
-		this.activity = activity;
+	public RatingController(Context context) {
+		this.context = context;
 	}
 
-	private void setupForm() {
-		dialog.setTitle("Rate " + ApptentiveModel.getInstance().getAppDisplayName() + "?");
+	public void show() {
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View content = inflater.inflate(R.layout.apptentive_rating, null, false);
+		dialog = new Dialog(context);
 
-		ApptentiveModel model = ApptentiveModel.getInstance();
-		Display display = activity.getWindowManager().getDefaultDisplay();
+		dialog.setContentView(content);
+		dialog.setTitle("Rate " + GlobalInfo.appDisplayName + "?");
+
+		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
 		int width = new Float(display.getWidth() * 0.8f).intValue();
 
 		TextView message = (TextView) dialog.findViewById(R.id.apptentive_rating_message);
 		message.setWidth(width);
-		message.setText(String.format(activity.getString(R.string.apptentive_rating_message), model.getAppDisplayName()));
+		message.setText(String.format(context.getString(R.string.apptentive_rating_message), GlobalInfo.appDisplayName));
 		Button rate = (Button) dialog.findViewById(R.id.apptentive_rating_rate);
 		rate.setOnClickListener(clickListener);
-		rate.setText(String.format(activity.getString(R.string.apptentive_rating_rate), model.getAppDisplayName()));
+		rate.setText(String.format(context.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
 		Button later = (Button) dialog.findViewById(R.id.apptentive_rating_later);
 		later.setOnClickListener(clickListener);
 		Button no = (Button) dialog.findViewById(R.id.apptentive_rating_no);
 		no.setOnClickListener(clickListener);
-	}
-
-	public void show() {
-		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View content = inflater.inflate(R.layout.apptentive_rating, null, false);
-		dialog = new Dialog(activity);
-
-		dialog.setContentView(content);
-		setupForm();
 		dialog.show();
 	}
 
@@ -70,12 +65,12 @@ public class RatingController {
 			switch (view.getId()) {
 				case R.id.apptentive_rating_rate:
 					try{
-						activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + ApptentiveModel.getInstance().getAppPackage())));
+						context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
 						Apptentive.getInstance().ratingYes();
 					}catch(ActivityNotFoundException e) {
-						final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+						final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
 						alertDialog.setTitle("Oops!");
-						alertDialog.setMessage(activity.getString(R.string.apptentive_rating_no_market));
+						alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
 						alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialogInterface, int i) {

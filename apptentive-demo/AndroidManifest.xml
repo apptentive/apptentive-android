@@ -7,13 +7,13 @@
 	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 	<application android:label="@string/demo_app_name" android:icon="@drawable/icon">
 		<activity android:name=".DemoActivity"
-		          android:label="@string/demo_activity_name">
+		          android:label="@string/demo_activity_name"
+		          android:configChanges="orientation|keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name="com.apptentive.android.sdk.ApptentiveActivity">
-		</activity>
+		<activity android:name="com.apptentive.android.sdk.activity.ApptentiveActivity"/>
 	</application>
-</manifest> 
+</manifest>
