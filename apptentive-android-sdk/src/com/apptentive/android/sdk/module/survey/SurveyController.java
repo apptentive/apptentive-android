@@ -152,10 +152,7 @@ public class SurveyController implements ViewController {
 	private View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			ViewFlipper aboutFlipper = (ViewFlipper) activity.findViewById(R.id.apptentive_activity_about_flipper);
-
 			Util.hideSoftKeyboard(activity, view);
-
 			switch (view.getId()) {
 				case R.id.apptentive_survey_button_send:
 					if (answered) {

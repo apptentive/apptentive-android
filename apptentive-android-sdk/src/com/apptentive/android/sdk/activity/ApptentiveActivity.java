@@ -35,7 +35,6 @@ public class ApptentiveActivity  extends BaseActivity {
 				controller = new AboutController(this);
 				break;
 			case SURVEY:
-//				super.setTheme(android.R.style.Theme_Translucent_NoTitleBar);
 				setContentView(R.layout.apptentive_activity);
 				LayoutInflater inflater = getLayoutInflater();
 				ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);

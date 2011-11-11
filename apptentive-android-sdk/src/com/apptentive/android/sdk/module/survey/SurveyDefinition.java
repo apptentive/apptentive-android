@@ -23,7 +23,6 @@ public class SurveyDefinition {
 	public SurveyDefinition(JSONObject survey) throws JSONException{
 		this.id = survey.getString("id");
 		this.name = survey.getString("name");
-		//this.description = survey.getString("description");
 		this.description = survey.has("description") ? survey.getString("description") : null;
 		this.questions = new ArrayList<QuestionDefinition>();
 		JSONArray questions = survey.getJSONArray("questions");

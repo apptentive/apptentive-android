@@ -54,7 +54,7 @@ public class ApptentiveClient {
 			while((size = is.read(line)) != -1){
 				content.append(new String(line, 0, size));
 			}
-			Log.e(response.getStatusLine().toString());
+			//Log.i(response.getStatusLine().toString());
 			//Log.e(content.toString());
 
 			return (200 <= response.getStatusLine().getStatusCode()) &&
@@ -88,7 +88,7 @@ public class ApptentiveClient {
 
 			if(code >= 200 && code < 300){
 				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-				Log.e("Response: " + content);
+				Log.i("Response: " + content);
 				return SurveyManager.parseSurvey(content);
 			}
 		}catch(URISyntaxException e){

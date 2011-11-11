@@ -31,8 +31,6 @@ public class FeedbackController implements ViewController {
 	private Activity activity;
 	private FeedbackPayload feedback;
 
-	private Log log = new Log();
-
 	public FeedbackController(Activity activity, boolean forced) {
 		this.activity = activity;
 		this.feedback = new FeedbackPayload("feedback");
@@ -120,7 +118,7 @@ public class FeedbackController implements ViewController {
 			try{
 				feedback.setString(pairs.get(key), "record", "data", key);
 			}catch(Exception e){
-				log.e("Error setting developer defined custom feedback field", e);
+				Log.e("Error setting developer defined custom feedback field", e);
 			}
 		}
 		payloadManager.save(feedback);

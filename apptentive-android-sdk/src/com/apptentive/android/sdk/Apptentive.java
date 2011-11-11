@@ -35,10 +35,7 @@ public class Apptentive {
 
 	private static Apptentive instance = null;
 
-	private Apptentive() {
-		Log.e("INITIALIZE");
-		printDebugInfo();
-	}
+	private Apptentive() {}
 
 	public static Apptentive getInstance() {
 		if (instance == null) {
@@ -103,7 +100,6 @@ public class Apptentive {
 			@Override
 			public void run() {
 				ApptentiveModel model = ApptentiveModel.getInstance();
-
 				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				model.setSurvey(client.getSurvey());
 			}
@@ -118,6 +114,7 @@ public class Apptentive {
 
 	/**
 	 * Call this in your activity's onResume() method. If the rating flow is able to run, it will.
+	 * @param activity The activity you are calling this method from.
 	 */
 	public void runIfNeeded(Activity activity) {
 
@@ -153,6 +150,8 @@ public class Apptentive {
 
 	/**
 	 * Short circuit the rating flow to the "Feedback" screen.
+	 * @param activity The activity from which to launch the dialog.
+	 * @param forced True if the feedback dialog was launched from a click handler. False if launched after elapsed time or events.
 	 */
 	public void feedback(Activity activity, boolean forced) {
 		new FeedbackController(activity, forced);
@@ -160,6 +159,7 @@ public class Apptentive {
 
 	/**
 	 * Show about dialog
+	 * @param context The context from which to launch the dialog.
 	 */
 	public void about(Context context) {
 		Intent intent = new Intent();
@@ -171,6 +171,7 @@ public class Apptentive {
 
 	/**
 	 * Show a survey, if available.
+	 * @param context The context from which to launch the dialog.
 	 */
 	public void survey(Context context) {
 		Intent intent = new Intent();
@@ -181,6 +182,7 @@ public class Apptentive {
 
 	/**
 	 * Short circuit the rating flow to the "Would you like to rate?" dialog.
+	 * @param context The context from which to launch the dialog.
 	 */
 	public void rating(Context context) {
 		RatingController controller = new RatingController(context);
@@ -189,6 +191,7 @@ public class Apptentive {
 
 	/**
 	 * Short circuit the rating flow to the "Do you like this app?" dialog.
+	 * @param activity The context from which to launch the dialog.
 	 */
 	public void choice(Activity activity) {
 		ChoiceController controller = new ChoiceController(activity);
@@ -247,15 +250,6 @@ public class Apptentive {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		model.setState(ApptentiveState.DONE);
 	}
-
-/*
-	public void showSoftKeyboard(View target) {
-		if (activity.getCurrentFocus() != null) {
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(target, 0);
-		}
-	}
-*/
 
 	private static String getUserEmail(Context context) {
 		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {

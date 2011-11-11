@@ -86,13 +86,12 @@ public class PayloadManager{
 			String json;
 			json  = payloadManager.getFirstPayloadInPayloadList();
 			while(json != null && !json.equals("")){
-				Log.i("JSON: " + json);
 				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				boolean success = client.postJSON(json);
 				if(success){
 					payloadManager.deleteFirstPayloadInPayloadList();
 				}else{
-					Log.e("Unable to upload Payload");
+					Log.w("Unable to upload Payload");
 					break;
 				}
 				json = payloadManager.getFirstPayloadInPayloadList();

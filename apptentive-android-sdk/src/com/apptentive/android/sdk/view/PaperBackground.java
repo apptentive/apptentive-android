@@ -35,7 +35,7 @@ public class PaperBackground extends View {
 		xferPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
 
 
-		// Use clipping
+		// Or use clipping... decided to use masking instead because clipping doesn't antialias edges.
 /*
 		Path clip = new Path();
 		clip.addRoundRect(sizef, 10.0f, 10.0f, Path.Direction.CW);

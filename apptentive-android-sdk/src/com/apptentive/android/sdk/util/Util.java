@@ -92,4 +92,14 @@ public class Util {
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
+
+/*
+	public void showSoftKeyboard(Activity activity, View target) {
+		if (activity.getCurrentFocus() != null) {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(target, 0);
+		}
+	}
+*/
+
 }
