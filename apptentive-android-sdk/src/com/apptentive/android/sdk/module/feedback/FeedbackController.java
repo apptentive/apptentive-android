@@ -114,13 +114,16 @@ public class FeedbackController implements ViewController {
 
 		// Add in the key.value pairs that the developer passed in as "record[data][KEY] = VALUE"
 		Map<String, String> pairs = ApptentiveModel.getInstance().getCustomDataFields();
-		for(String key : pairs.keySet()){
-			try{
-				feedback.setString(pairs.get(key), "record", "data", key);
-			}catch(Exception e){
-				Log.e("Error setting developer defined custom feedback field", e);
+		if(pairs != null){
+			for(String key : pairs.keySet()){
+				try{
+					feedback.setString(pairs.get(key), "record", "data", key);
+				}catch(Exception e){
+					Log.e("Error setting developer defined custom feedback field", e);
+				}
 			}
 		}
+
 		payloadManager.save(feedback);
 		payloadManager.run();
 	}
