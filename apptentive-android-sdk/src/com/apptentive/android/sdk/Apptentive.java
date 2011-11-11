@@ -24,6 +24,8 @@ import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Apptentive {
 
@@ -138,6 +140,15 @@ public class Apptentive {
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * This method allows you to pass in a map of key/value pairs, which can then be sent along with subsequently submitted feedback.
+	 * @param pairs A Map of keys to values.
+	 */
+	public void addFeedbackDataFields(Map<String, String> pairs){
+		ApptentiveModel model = ApptentiveModel.getInstance();
+		model.setCustomDataFields(pairs);
 	}
 
 	/**

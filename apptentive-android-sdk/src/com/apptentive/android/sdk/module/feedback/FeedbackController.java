@@ -15,17 +15,23 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.module.ViewController;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
+
+import java.util.Map;
 
 public class FeedbackController implements ViewController {
 
 	private Dialog dialog;
 	private Activity activity;
 	private FeedbackPayload feedback;
+
+	private Log log = new Log();
 
 	public FeedbackController(Activity activity, boolean forced) {
 		this.activity = activity;
@@ -107,6 +113,16 @@ public class FeedbackController implements ViewController {
 	private void submit() {
 
 		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+
+		// Add in the key.value pairs that the developer passed in as "record[data][KEY] = VALUE"
+		Map<String, String> pairs = ApptentiveModel.getInstance().getCustomDataFields();
+		for(String key : pairs.keySet()){
+			try{
+				feedback.setString(pairs.get(key), "record", "data", key);
+			}catch(Exception e){
+				log.e("Error setting developer defined custom feedback field", e);
+			}
+		}
 		payloadManager.save(feedback);
 		payloadManager.run();
 	}

@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Observable;
 
 public class ApptentiveModel extends Observable {
@@ -42,6 +43,9 @@ public class ApptentiveModel extends Observable {
 
 	// Survey module
 	SurveyDefinition survey;
+
+	// Feedback module
+	Map<String, String> customDataFields;
 
 
 
@@ -180,6 +184,14 @@ public class ApptentiveModel extends Observable {
 
 	public void setSurvey(SurveyDefinition survey) {
 		this.survey = survey;
+	}
+
+	public Map<String, String> getCustomDataFields() {
+		return customDataFields;
+	}
+
+	public void setCustomDataFields(Map<String, String> customDataFields) {
+		this.customDataFields = customDataFields;
 	}
 
 	private void save(){
