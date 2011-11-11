@@ -3,9 +3,12 @@
 apptentive-android-sdk/gen/*
 apptentive-android-sdk/out/*
 apptentive-demo/gen/*
-apptentive-demo/out/*
+out/*
 
 # IntelliJ noise
 *.ipr
 *.iml
 *.iws
+
+# My local stuff
+todo.txt

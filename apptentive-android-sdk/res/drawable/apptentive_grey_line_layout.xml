@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ apptentive_grey_line_layout.xml
+  ~
+  ~ Created by Sky Kelsey on 2011-11-04.
+  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  -->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<item>
+	<bitmap android:src="@drawable/apptentive_grey_line"
+	        android:tileMode="repeat"
+	        android:antialias="false"
+	        android:dither="false"/>
+</item>
+</selector>

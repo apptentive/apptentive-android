@@ -1,7 +1,7 @@
 /*
  * EmailUtil.java
  *
- * Created by skelsey on 2011-09-23.
+ * Created by Sky Kelsey on 2011-09-23.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
