@@ -97,7 +97,6 @@ public class Apptentive {
 	private void getSurvey() {
 		// Upload any payloads that were created while the device was offline.
 		new Thread() {
-			@Override
 			public void run() {
 				ApptentiveModel model = ApptentiveModel.getInstance();
 				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
