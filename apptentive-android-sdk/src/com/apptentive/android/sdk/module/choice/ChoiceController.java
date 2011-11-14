@@ -48,7 +48,6 @@ public class ChoiceController{
 	}
 
 	private View.OnClickListener clickListener = new View.OnClickListener() {
-		@Override
 		public void onClick(View view) {
 			dialog.dismiss();
 			int id = view.getId();

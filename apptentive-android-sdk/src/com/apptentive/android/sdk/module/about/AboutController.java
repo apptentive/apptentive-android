@@ -23,7 +23,6 @@ public class AboutController implements ViewController {
 	}
 
 	View.OnClickListener clickListener = new View.OnClickListener() {
-		@Override
 		public void onClick(View view) {
 			int id = view.getId();
 			if(id == R.id.apptentive_button_about_okay){
@@ -31,7 +30,7 @@ public class AboutController implements ViewController {
 			}
 		}
 	};
-	@Override
+
 	public void cleanup() {
 	}
 }

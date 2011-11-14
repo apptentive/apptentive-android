@@ -59,7 +59,6 @@ public class RatingController {
 	}
 
 	private View.OnClickListener clickListener = new View.OnClickListener() {
-		@Override
 		public void onClick(View view) {
 			dialog.dismiss();
 			int id = view.getId();
@@ -72,7 +71,6 @@ public class RatingController {
 					alertDialog.setTitle("Oops!");
 					alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
 					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-						@Override
 						public void onClick(DialogInterface dialogInterface, int i) {
 							alertDialog.dismiss();
 						}
