@@ -51,21 +51,13 @@ public class ChoiceController{
 		@Override
 		public void onClick(View view) {
 			dialog.dismiss();
-			switch (view.getId()) {
-				case R.id.apptentive_choice_no:
-				{
-					ApptentiveModel.getInstance().setState(ApptentiveState.DONE);
-					Apptentive.getInstance().feedback(activity, false);
-					break;
-				}
-				case R.id.apptentive_choice_yes:
-				{
-					RatingController controller = new RatingController(activity);
-					controller.show();
-					break;
-				}
-				default:
-					break;
+			int id = view.getId();
+			if(id == R.id.apptentive_choice_no){
+				ApptentiveModel.getInstance().setState(ApptentiveState.DONE);
+				Apptentive.getInstance().feedback(activity, false);
+			}else if(id == R.id.apptentive_choice_yes){
+				RatingController controller = new RatingController(activity);
+				controller.show();
 			}
 		}
 	};

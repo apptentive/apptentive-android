@@ -25,12 +25,9 @@ public class AboutController implements ViewController {
 	View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			switch(view.getId()){
-				case R.id.apptentive_button_about_okay:
+			int id = view.getId();
+			if(id == R.id.apptentive_button_about_okay){
 					activity.finish();
-					break;
-				default:
-					break;
 			}
 		}
 	};

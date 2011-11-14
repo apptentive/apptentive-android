@@ -62,34 +62,29 @@ public class RatingController {
 		@Override
 		public void onClick(View view) {
 			dialog.dismiss();
-			switch (view.getId()) {
-				case R.id.apptentive_rating_rate:
-					try{
-						context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
-						Apptentive.getInstance().ratingYes();
-					}catch(ActivityNotFoundException e) {
-						final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-						alertDialog.setTitle("Oops!");
-						alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
-						alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialogInterface, int i) {
-								alertDialog.dismiss();
-							}
-						});
-						alertDialog.show();
-					}finally{
-						dialog.dismiss();
-					}
-					break;
-				case R.id.apptentive_rating_later:
-					Apptentive.getInstance().ratingRemind();
-					break;
-				case R.id.apptentive_rating_no:
-					Apptentive.getInstance().ratingNo();
-					break;
-				default:
-					break;
+			int id = view.getId();
+			if(id == R.id.apptentive_rating_rate){
+				try{
+					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
+					Apptentive.getInstance().ratingYes();
+				}catch(ActivityNotFoundException e) {
+					final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+					alertDialog.setTitle("Oops!");
+					alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
+					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							alertDialog.dismiss();
+						}
+					});
+					alertDialog.show();
+				}finally{
+					dialog.dismiss();
+				}
+			}else if(id == R.id.apptentive_rating_later){
+				Apptentive.getInstance().ratingRemind();
+			}else if(id == R.id.apptentive_rating_no){
+				Apptentive.getInstance().ratingNo();
 			}
 		}
 	};
