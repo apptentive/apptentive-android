@@ -153,18 +153,14 @@ public class SurveyController implements ViewController {
 		@Override
 		public void onClick(View view) {
 			Util.hideSoftKeyboard(activity, view);
-			switch (view.getId()) {
-				case R.id.apptentive_survey_button_send:
-					if (answered) {
-						send(result);
-					}
-					activity.finish();
-					break;
-				case R.id.apptentive_branding_view:
-					Apptentive.getInstance().about(activity);
-					break;
-				default:
-					break;
+			int id = view.getId();
+			if(id == R.id.apptentive_survey_button_send){
+				if (answered) {
+					send(result);
+				}
+				activity.finish();
+			}else if(id == R.id.apptentive_branding_view){
+				Apptentive.getInstance().about(activity);
 			}
 		}
 	};
