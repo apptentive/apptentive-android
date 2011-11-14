@@ -63,19 +63,14 @@ public class FeedbackController implements ViewController {
 	private View.OnClickListener clickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			switch (view.getId()) {
-				case R.id.apptentive_button_cancel:
-					dialog.dismiss();
-					break;
-				case R.id.apptentive_button_send:
-					submit();
-					dialog.dismiss();
-					break;
-				case R.id.apptentive_branding_view:
-					Apptentive.getInstance().about(activity);
-					break;
-				default:
-					break;
+			int id = view.getId();
+			if(id == R.id.apptentive_button_cancel){
+				dialog.dismiss();
+			}else if(id == R.id.apptentive_button_send){
+				submit();
+				dialog.dismiss();
+			}else if(id == R.id.apptentive_branding_view){
+				Apptentive.getInstance().about(activity);
 			}
 		}
 	};
@@ -96,14 +91,11 @@ public class FeedbackController implements ViewController {
 
 		public void afterTextChanged(Editable editable) {
 			String text = editable.toString();
-
-			switch (view.getId()) {
-				case R.id.apptentive_feedback_user_email:
-					feedback.setEmail(text);
-					break;
-				case R.id.apptentive_feedback_text:
-					feedback.setFeedback(text);
-					break;
+			int id = view.getId();
+			if(id == R.id.apptentive_feedback_user_email){
+				feedback.setEmail(text);
+			}else if(id == R.id.apptentive_feedback_text){
+				feedback.setFeedback(text);
 			}
 		}
 	}
