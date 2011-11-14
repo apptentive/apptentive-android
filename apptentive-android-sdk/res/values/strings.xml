@@ -8,7 +8,7 @@
 	<string name="apptentive_back">Back</string>
 	<string name="apptentive_send">Send</string>
 
-	<string name="apptentive_feedback_title">Give Feedback</string>
+	<string name="apptentive_feedback_title">Feedback</string>
 	<string name="apptentive_edittext_feedback_text_forced">Feedback (required)</string>
 	<string name="apptentive_edittext_feedback_text_unhappy">Unhappy with this app?\nWe\'d love to hear why so we can make it better.</string>
 
