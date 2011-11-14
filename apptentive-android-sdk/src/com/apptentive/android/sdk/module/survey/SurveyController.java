@@ -150,7 +150,6 @@ public class SurveyController implements ViewController {
 	// Listener classes
 
 	private View.OnClickListener clickListener = new View.OnClickListener() {
-		@Override
 		public void onClick(View view) {
 			Util.hideSoftKeyboard(activity, view);
 			int id = view.getId();
@@ -172,14 +171,12 @@ public class SurveyController implements ViewController {
 			this.listItem = listItem;
 		}
 
-		@Override
 		public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 			TextView selected = (TextView) view;
 			String answer = selected.getText().toString();
 			setAnswer(listItem, answer);
 		}
 
-		@Override
 		public void onNothingSelected(AdapterView<?> adapterView) {
 		}
 	}

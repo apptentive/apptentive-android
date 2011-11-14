@@ -56,12 +56,10 @@ public class FeedbackController implements ViewController {
 		dialog.show();
 	}
 
-	@Override
 	public void cleanup() {
 	}
 
 	private View.OnClickListener clickListener = new View.OnClickListener() {
-		@Override
 		public void onClick(View view) {
 			int id = view.getId();
 			if(id == R.id.apptentive_button_cancel){
