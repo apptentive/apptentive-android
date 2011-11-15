@@ -47,29 +47,31 @@ public class ApptentiveModel extends Observable {
 	// Feedback module
 	Map<String, String> customDataFields;
 
+	// Metrics Module
+	private boolean enableMetrics;
 
 
 	private ApptentiveModel() {
 	}
 
-	public static void setDefaults(Integer ratingFlowDaysBeforePrompt, Integer ratingFlowDaysBeforeReprompt, Integer ratingFlowSignificantEventsBeforePrompt, Integer ratingFlowUsesBeforePrompt){
-		if(ratingFlowDaysBeforePrompt != null){
+	public static void setDefaults(Integer ratingFlowDaysBeforePrompt, Integer ratingFlowDaysBeforeReprompt, Integer ratingFlowSignificantEventsBeforePrompt, Integer ratingFlowUsesBeforePrompt) {
+		if (ratingFlowDaysBeforePrompt != null) {
 			ApptentiveModel.RATING_DEFAULT_DAYS_BEFORE_PROMPT = ratingFlowDaysBeforePrompt;
 		}
-		if(ratingFlowDaysBeforeReprompt != null){
+		if (ratingFlowDaysBeforeReprompt != null) {
 			ApptentiveModel.RATING_DEFAULT_DAYS_BEFORE_REPROMPTING = ratingFlowDaysBeforeReprompt;
 		}
-		if(ratingFlowSignificantEventsBeforePrompt != null){
+		if (ratingFlowSignificantEventsBeforePrompt != null) {
 			ApptentiveModel.RATING_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = ratingFlowSignificantEventsBeforePrompt;
 		}
-		if(ratingFlowUsesBeforePrompt != null){
+		if (ratingFlowUsesBeforePrompt != null) {
 			ApptentiveModel.RATING_DEFAULT_USES_BEFORE_PROMPT = ratingFlowUsesBeforePrompt;
 		}
 
 	}
 
-	public static ApptentiveModel getInstance(){
-		if(instance == null){
+	public static ApptentiveModel getInstance() {
+		if (instance == null) {
 			instance = new ApptentiveModel();
 		}
 		return instance;
@@ -116,7 +118,7 @@ public class ApptentiveModel extends Observable {
 		save();
 	}
 
-	public void useRatingDaysBeforeReprompt(){
+	public void useRatingDaysBeforeReprompt() {
 		this.daysUntilRate = ratingDaysBeforeReprompt;
 		save();
 	}
@@ -194,7 +196,16 @@ public class ApptentiveModel extends Observable {
 		this.customDataFields = customDataFields;
 	}
 
-	private void save(){
+	public void setEnableMetrics(boolean enableMetrics){
+		this.enableMetrics = enableMetrics;
+	}
+
+	public boolean isEnableMetrics(){
+		return enableMetrics;
+	}
+
+
+	private void save() {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt("ratingDaysBeforePrompt", ratingDaysBeforePrompt);
 		editor.putInt("ratingUsesBeforePrompt", ratingUsesBeforePrompt);
@@ -209,19 +220,19 @@ public class ApptentiveModel extends Observable {
 		editor.commit();
 	}
 
-	private void retrieve(){
-		ratingDaysBeforePrompt              = prefs.getInt("ratingDaysBeforePrompt",              RATING_DEFAULT_DAYS_BEFORE_PROMPT);
-		ratingUsesBeforePrompt              = prefs.getInt("ratingUsesBeforePrompt",              RATING_DEFAULT_USES_BEFORE_PROMPT);
+	private void retrieve() {
+		ratingDaysBeforePrompt = prefs.getInt("ratingDaysBeforePrompt", RATING_DEFAULT_DAYS_BEFORE_PROMPT);
+		ratingUsesBeforePrompt = prefs.getInt("ratingUsesBeforePrompt", RATING_DEFAULT_USES_BEFORE_PROMPT);
 		ratingSignificantEventsBeforePrompt = prefs.getInt("ratingSignificantEventsBeforePrompt", RATING_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
-		ratingDaysBeforeReprompt            = prefs.getInt("ratingDaysBeforeReprompt",            RATING_DEFAULT_DAYS_BEFORE_REPROMPTING);
+		ratingDaysBeforeReprompt = prefs.getInt("ratingDaysBeforeReprompt", RATING_DEFAULT_DAYS_BEFORE_REPROMPTING);
 
 		state = ApptentiveState.valueOf(prefs.getString("state", "START"));
 		uses = prefs.getInt("uses", 0);
 		events = prefs.getInt("events", 0);
 		daysUntilRate = prefs.getInt("daysUntilRate", ratingDaysBeforePrompt);
-		try{
+		try {
 			startOfRatingPeriod = Util.stringToDate(prefs.getString("startOfRatingPeriod", ""));
-		}catch(ParseException e){
+		} catch (ParseException e) {
 			startOfRatingPeriod = new Date();
 		}
 	}

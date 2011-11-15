@@ -1,5 +1,5 @@
 /*
- * Feedback.java
+ * FeedbackPayload.java
  *
  * Created by Sky Kelsey on 2011-11-05.
  * Copyright 2011 Apptentive, Inc. All rights reserved.

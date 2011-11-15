@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.module.ViewController;
+import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 
