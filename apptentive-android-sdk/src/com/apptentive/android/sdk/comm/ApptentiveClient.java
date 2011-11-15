@@ -46,6 +46,7 @@ public class ApptentiveClient {
 		StringBuilder content = new StringBuilder();
 		InputStream is = null;
 		try{
+			//Log.i("Posting JSON: " + json);
 			post.setEntity(new StringEntity(json, "UTF-8"));
 			HttpResponse response = httpClient.execute(post);
 			is = response.getEntity().getContent();
@@ -55,7 +56,7 @@ public class ApptentiveClient {
 				content.append(new String(line, 0, size));
 			}
 			//Log.i(response.getStatusLine().toString());
-			//Log.e(content.toString());
+			//Log.i(content.toString());
 
 			return (200 <= response.getStatusLine().getStatusCode()) &&
 			       (300 > response.getStatusLine().getStatusCode());
@@ -84,11 +85,11 @@ public class ApptentiveClient {
 
 			HttpResponse response = httpClient.execute(get);
 			int code = response.getStatusLine().getStatusCode();
-			Log.i("HTTP response status line: " + response.getStatusLine().toString());
+			//Log.i("HTTP response status line: " + response.getStatusLine().toString());
 
 			if(code >= 200 && code < 300){
 				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-				Log.i("Response: " + content);
+				//Log.i("Response: " + content);
 				return SurveyManager.parseSurvey(content);
 			}
 		}catch(URISyntaxException e){

@@ -15,7 +15,7 @@ public class DemoActivity extends Activity {
 		Log.e("DEMO", "onCreate()");
 		setContentView(R.layout.main);
 
-		final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "<YOUR_API_KEY>", 5, 10, 5, 4);
+		final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "<YOUR_API_KEY>", 5, 10, 5, 4, false);
 
 		// Add custom data fields to feedback this way:
 		//HashMap<String, String> customFeedbackFields = new HashMap<String, String>();
