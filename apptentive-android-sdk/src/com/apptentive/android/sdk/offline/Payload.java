@@ -1,5 +1,5 @@
 /*
- * JSONPayload.java
+ * Payload.java
  *
  * Created by Sky Kelsey on 2011-10-09.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
