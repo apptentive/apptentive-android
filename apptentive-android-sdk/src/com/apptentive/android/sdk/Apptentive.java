@@ -58,11 +58,9 @@ public class Apptentive {
 	 *                       The number of significant events to wait for before initially starting the rating flow. Leave null for default of 10.
 	 * @param ratingFlowDefaultUsesBeforePrompt
 	 *                       The number of app uses to wait for before initially starting the rating flow. Leave null for default of 5.
-	 * @param enableMetrics  Set to true if you want to include usage data.
-	 *
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
-	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt, boolean enableMetrics) {
+	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt) {
 		if (instance == null) {
 			instance = new Apptentive();
 			ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
@@ -82,7 +80,6 @@ public class Apptentive {
 
 			ApptentiveModel model = ApptentiveModel.getInstance();
 			model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-			model.setEnableMetrics(enableMetrics);
 
 			instance.getSurvey();
 			instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));

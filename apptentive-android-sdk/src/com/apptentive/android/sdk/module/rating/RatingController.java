@@ -67,12 +67,10 @@ public class RatingController {
 			if(id == R.id.apptentive_rating_rate){
 				try{
 					// Send a metric
-					if(ApptentiveModel.getInstance().isEnableMetrics()){
-						MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_provided_rating);
-						PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-						payloadManager.save(metric);
-						payloadManager.run();
-					}
+					MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_provided_rating);
+					PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+					payloadManager.save(metric);
+					payloadManager.run();
 					// Send user to app rating page
 					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
 					Apptentive.getInstance().ratingYes();
@@ -90,22 +88,17 @@ public class RatingController {
 					dialog.dismiss();
 				}
 			}else if(id == R.id.apptentive_rating_later){
-				// Send a metric
-				if(ApptentiveModel.getInstance().isEnableMetrics()){
-					MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_postponed_rating);
-					PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-					payloadManager.save(metric);
-					payloadManager.run();
-				}
+				MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_postponed_rating);
+				PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+				payloadManager.save(metric);
+				payloadManager.run();
 				Apptentive.getInstance().ratingRemind();
 			}else if(id == R.id.apptentive_rating_no){
 				// Send a metric
-				if(ApptentiveModel.getInstance().isEnableMetrics()){
-					MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_declined_rating);
-					PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-					payloadManager.save(metric);
-					payloadManager.run();
-				}
+				MetricPayload metric = new MetricPayload(MetricPayload.Event.ratings_declined_rating);
+				PayloadManager payloadManager = new PayloadManager(context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+				payloadManager.save(metric);
+				payloadManager.run();
 				Apptentive.getInstance().ratingNo();
 			}
 		}
