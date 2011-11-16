@@ -47,9 +47,6 @@ public class ApptentiveModel extends Observable {
 	// Feedback module
 	Map<String, String> customDataFields;
 
-	// Metrics Module
-	private boolean enableMetrics;
-
 
 	private ApptentiveModel() {
 	}
@@ -194,14 +191,6 @@ public class ApptentiveModel extends Observable {
 
 	public void setCustomDataFields(Map<String, String> customDataFields) {
 		this.customDataFields = customDataFields;
-	}
-
-	public void setEnableMetrics(boolean enableMetrics){
-		this.enableMetrics = enableMetrics;
-	}
-
-	public boolean isEnableMetrics(){
-		return enableMetrics;
 	}
 
 
