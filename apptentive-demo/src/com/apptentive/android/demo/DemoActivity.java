@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import com.apptentive.android.sdk.Apptentive;
 
-import java.util.HashMap;
-
 public class DemoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,7 +41,7 @@ public class DemoActivity extends Activity {
 		Button choiceButton = (Button) findViewById(R.id.button_choice);
 		choiceButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				apptentive.choice(DemoActivity.this);
+				apptentive.enjoyment(DemoActivity.this);
 			}
 		});
 		Button ratingsButton = (Button) findViewById(R.id.button_ratings);

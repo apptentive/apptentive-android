@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.module.feedback;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -20,6 +19,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ApptentiveModel;
 import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.module.ViewController;
+import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 
@@ -31,7 +31,12 @@ public class FeedbackController implements ViewController {
 	private Activity activity;
 	private FeedbackPayload feedback;
 
-	public FeedbackController(Activity activity, boolean forced) {
+	public enum Trigger{
+		rating,
+		forced
+	}
+
+	public FeedbackController(Activity activity, Trigger reason) {
 		this.activity = activity;
 		this.feedback = new FeedbackPayload("feedback");
 		dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
@@ -41,10 +46,15 @@ public class FeedbackController implements ViewController {
 
 		EditText feedback = (EditText) dialog.findViewById(R.id.apptentive_feedback_text);
 		feedback.addTextChangedListener(new GenericTextWatcher(feedback));
-		if (forced) {
-			feedback.setHint(R.string.apptentive_edittext_feedback_text_forced);
-		} else {
-			feedback.setHint(R.string.apptentive_edittext_feedback_text_unhappy);
+		switch(reason){
+			case forced:
+				feedback.setHint(R.string.apptentive_edittext_feedback_text_forced);
+				break;
+			case rating:
+				feedback.setHint(R.string.apptentive_edittext_feedback_text_unhappy);
+				break;
+			default:
+				break;
 		}
 		EditText email = (EditText) dialog.findViewById(R.id.apptentive_feedback_user_email);
 		this.feedback.setEmail(GlobalInfo.userEmail);
@@ -52,6 +62,11 @@ public class FeedbackController implements ViewController {
 		email.addTextChangedListener(new GenericTextWatcher(email));
 
 		dialog.findViewById(R.id.apptentive_branding_view).setOnClickListener(clickListener);
+
+		// Instrumentation
+		MetricPayload metric = new MetricPayload(MetricPayload.Event.feedback_dialog__launch);
+		metric.putData("trigger", reason.name());
+		PayloadManager.getInstance().putPayload(metric);
 
 		dialog.show();
 	}
@@ -63,6 +78,9 @@ public class FeedbackController implements ViewController {
 		public void onClick(View view) {
 			int id = view.getId();
 			if(id == R.id.apptentive_button_cancel){
+				// Instrumentation
+				MetricPayload metric = new MetricPayload(MetricPayload.Event.feedback_dialog__cancel);
+				PayloadManager.getInstance().putPayload(metric);
 				dialog.dismiss();
 			}else if(id == R.id.apptentive_button_send){
 				submit();
@@ -100,8 +118,6 @@ public class FeedbackController implements ViewController {
 
 	private void submit() {
 
-		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-
 		// Add in the key.value pairs that the developer passed in as "record[data][KEY] = VALUE"
 		Map<String, String> pairs = ApptentiveModel.getInstance().getCustomDataFields();
 		if(pairs != null){
@@ -113,8 +129,6 @@ public class FeedbackController implements ViewController {
 				}
 			}
 		}
-
-		payloadManager.save(feedback);
-		payloadManager.run();
+		PayloadManager.getInstance().putPayload(feedback);
 	}
 }
