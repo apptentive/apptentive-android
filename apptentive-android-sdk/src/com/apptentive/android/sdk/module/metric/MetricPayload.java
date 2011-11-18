@@ -42,11 +42,26 @@ public class MetricPayload extends Payload {
 	}
 
 	public static enum Event {
-		ratings_provided_rating,
-		ratings_postponed_rating,
-		ratings_declined_rating,
-		feedback_form_triggered,
-		app_launch,
-		app_exit
+		enjoyment_dialog__launch("enjoyment_dialog.launch"),
+		enjoyment_dialog__yes("enjoyment_dialog.yes"),
+		enjoyment_dialog__no("enjoyment_dialog.no"),
+		rating_dialog__launch("rating_dialog.launch"),
+		rating_dialog__rate("rating_dialog.rate"),
+		rating_dialog__remind("rating_dialog.remind"),
+		rating_dialog__decline("rating_dialog.decline"),
+		feedback_dialog__launch("feedback_dialog.launch"),
+		feedback_dialog__cancel("feedback_dialog.cancel"),
+		app__launch("app.launch"),
+		app__exit("app.exit");
+
+		private final String recordName;
+
+		Event(String recordName){
+			this.recordName = recordName;
+		}
+
+		public String getRecordName() {
+			return recordName;
+		}
 	}
 }

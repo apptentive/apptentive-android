@@ -16,6 +16,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 
@@ -36,7 +39,10 @@ public class ApptentiveClient {
 	}
 
 	public boolean postJSON(String json){
-		HttpClient httpClient = new DefaultHttpClient();
+		final HttpParams httpParams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+		HttpConnectionParams.setSoTimeout(httpParams, 30000);
+		HttpClient httpClient = new DefaultHttpClient(httpParams);
 		HttpPost post = new HttpPost(ENDPOINT_RECORDS);
 
 		post.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);

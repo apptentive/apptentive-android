@@ -10,21 +10,19 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.activity.ApptentiveActivity;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.module.choice.ChoiceController;
+import com.apptentive.android.sdk.module.enjoyment.EnjoymentController;
 import com.apptentive.android.sdk.module.feedback.FeedbackController;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.module.rating.RatingController;
+import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Apptentive {
@@ -61,8 +59,10 @@ public class Apptentive {
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
 	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt) {
+		Context appContext = activity.getApplicationContext();
 		if (instance == null) {
 			instance = new Apptentive();
+
 			ApptentiveModel.setDefaults(ratingFlowDefaultDaysBeforePrompt, ratingFlowDefaultDaysBeforeReprompt, ratingFlowDefaultSignificantEventsBeforePrompt, ratingFlowDefaultUsesBeforePrompt);
 
 			GlobalInfo.manufacturer = Build.MANUFACTURER;
@@ -82,8 +82,9 @@ public class Apptentive {
 			model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
 
 			instance.getSurvey();
-			instance.uploadPendingPayloads(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
+
 		}
+		PayloadManager.initialize(appContext);
 		return instance;
 	}
 
@@ -105,12 +106,6 @@ public class Apptentive {
 		}.start();
 	}
 
-	private void uploadPendingPayloads(SharedPreferences prefs) {
-		// Upload any payloads that were created while the device was offline.
-		PayloadManager payloadManager = new PayloadManager(prefs);
-		payloadManager.run();
-	}
-
 	/**
 	 * Call this in your activity's onResume() method. If the rating flow is able to run, it will.
 	 * @param activity The activity you are calling this method from.
@@ -123,8 +118,12 @@ public class Apptentive {
 
 		switch (state) {
 			case START:
-				if (ratingPeriodElapsed() || eventThresholdReached() || usesThresholdReached()) {
-					choice(activity);
+				if (ratingPeriodElapsed()){
+					enjoyment(activity, EnjoymentController.Trigger.days);
+				}else if(eventThresholdReached()){
+					enjoyment(activity, EnjoymentController.Trigger.events);
+				}else if(usesThresholdReached()){
+					enjoyment(activity, EnjoymentController.Trigger.uses);
 				}
 				break;
 			case REMIND:
@@ -154,7 +153,11 @@ public class Apptentive {
 	 * @param forced True if the feedback dialog was launched from a click handler. False if launched after elapsed time or events.
 	 */
 	public void feedback(Activity activity, boolean forced) {
-		new FeedbackController(activity, forced);
+		if(forced){
+			new FeedbackController(activity, FeedbackController.Trigger.forced);
+		}else{
+			new FeedbackController(activity, FeedbackController.Trigger.rating);
+		}
 	}
 
 	/**
@@ -193,8 +196,12 @@ public class Apptentive {
 	 * Short circuit the rating flow to the "Do you like this app?" dialog.
 	 * @param activity The context from which to launch the dialog.
 	 */
-	public void choice(Activity activity) {
-		ChoiceController controller = new ChoiceController(activity);
+	public void enjoyment(Activity activity) {
+		enjoyment(activity, EnjoymentController.Trigger.forced);
+	}
+
+	private void enjoyment(Activity activity, EnjoymentController.Trigger reason) {
+		EnjoymentController controller = new EnjoymentController(activity, reason);
 		controller.show();
 	}
 
