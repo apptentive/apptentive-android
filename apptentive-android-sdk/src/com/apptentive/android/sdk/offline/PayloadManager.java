@@ -1,3 +1,8 @@
+/*
+ * Created by Sky Kelsey on 2011-10-06.
+ * Copyright 2011 Apptentive, Inc. All rights reserved.
+ */
+
 package com.apptentive.android.sdk.offline;
 
 import android.content.Context;
