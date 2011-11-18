@@ -8,7 +8,6 @@
 package com.apptentive.android.sdk.module.survey;
 
 import android.app.Activity;
-import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -122,9 +121,7 @@ public class SurveyController implements ViewController {
 	}
 
 	private void send(Payload payload) {
-		PayloadManager payloadManager = new PayloadManager(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
-		payloadManager.save(payload);
-		payloadManager.run();
+		PayloadManager.getInstance().putPayload(payload);
 	}
 
 	void setAnswer(int questionIndex, String answer) {

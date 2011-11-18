@@ -1,101 +1,135 @@
 /*
- * PayloadUploader.java
- *
  * Created by Sky Kelsey on 2011-10-06.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
 package com.apptentive.android.sdk.offline;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.model.GlobalInfo;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class PayloadManager{
+/**
+ * @author Sky Kelsey.
+ */
+public class PayloadManager implements Runnable {
 
-	private static final String PAYLOAD_INDEX_NAME = "apptentive-payloads-json";
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Static
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	private static final String PAYLOAD_KEY_PREFIX = "payload-";
 
+	private static PayloadManager instance;
+	private static boolean running;
+
+	public static void initialize(Context context){
+		if(instance == null){
+			instance = new PayloadManager(context);
+			running = false;
+		}
+
+		// When the app starts, clear out the queue and fill it back up. This ensures all payloads get sent
+		// upon startup if the network is available.
+		instance.queue.clear();
+		instance.initQueue();
+		instance.ensureRunning();
+	}
+
+	public static PayloadManager getInstance(){
+		return instance;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Instance
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private LinkedBlockingQueue<String> queue;
 	private SharedPreferences prefs;
 
-	public PayloadManager(SharedPreferences prefs){
-		this.prefs = prefs;
+	private PayloadManager(Context context){
+		this.queue = new LinkedBlockingQueue<String>();
+		this.prefs = 	context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 	}
 
-	public void save(Payload payload){
-		String uuid = UUID.randomUUID().toString();
-		storePayload(uuid, payload);
-		addToPayloadList(uuid);
-	}
-
-	private void storePayload(String name, Payload payload){
-		prefs.edit().putString(name, payload.getAsJSON()).commit();
-	}
-
-	private void addToPayloadList(String name){
-		String payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "");
-		payloadNames = (payloadNames.length() == 0 ? name : payloadNames + ";" + name);
-		prefs.edit().putString(PAYLOAD_INDEX_NAME, payloadNames).commit();
-	}
-
-	public String getFirstPayloadInPayloadList(){
-		String[] payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "").split(";");
-		if(payloadNames.length > 0){
-			return prefs.getString(payloadNames[0], "");
+	public synchronized void ensureRunning(){
+		if(!running){
+			running = true;
+			new Thread(this).start();
 		}
-		return null;
 	}
 
-	private void deletePayload(String name){
-		prefs.edit().remove(name).commit();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// LinkedBlockingQueue
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	public void putPayload(Payload payload) {
+		String name = PAYLOAD_KEY_PREFIX + UUID.randomUUID().toString();
+		prefs.edit().putString(name, payload.getAsJSON()).commit();
+		queue.offer(name);
+		ensureRunning();
 	}
 
-	public void deleteFirstPayloadInPayloadList(){
-		String[] payloadNames = prefs.getString(PAYLOAD_INDEX_NAME, "").split(";");
-		String newPayloadList = "";
-		for (int i = 0; i < payloadNames.length; i++) {
-			String payloadName = payloadNames[i];
-			if(i == 0){
-				deletePayload(payloadName);
-			}else{
-				newPayloadList = (newPayloadList.equals("") ? payloadName : newPayloadList + ";" + payloadName);
+	private synchronized void initQueue(){
+		Set<String> keys = prefs.getAll().keySet();
+		for(String key : keys){
+			if(key.startsWith(PAYLOAD_KEY_PREFIX)){
+				queue.offer(key);
 			}
 		}
-		prefs.edit().putString(PAYLOAD_INDEX_NAME, newPayloadList).commit();
 	}
 
-	public void run(){
-		PayloadUploader uploader = new PayloadUploader(prefs);
-		uploader.start();
-	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Runnable
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-	private class PayloadUploader extends Thread{
-		private SharedPreferences prefs;
-
-		public PayloadUploader(SharedPreferences prefs){
-			this.prefs = prefs;
-		}
-
-		@Override
-		public void run() {
-
-			PayloadManager payloadManager = new PayloadManager(this.prefs);
-			String json;
-			json  = payloadManager.getFirstPayloadInPayloadList();
-			while(json != null && !json.equals("")){
+	/**
+	 * Blocks on the payload queue until a payload becomes available.
+	 * If any error occurs, exit thread.
+	 * If the json is bad, delete it.
+	 * If the json was sent successfully, delete it.
+	 */
+	public void run() {
+		try{
+			while(true){
+				String name;
+				try{
+					name = queue.take();
+				}catch(InterruptedException e){
+					break;
+				}
+				if(name == null){
+					// Can this even happen?
+					break;
+				}
+				Log.d("Got a payload to send: " + name);
+				String json = prefs.getString(name, null);
+				if(json == null){
+					prefs.edit().remove(name).commit();
+					continue;
+				}
 				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 				boolean success = client.postJSON(json);
 				if(success){
-					payloadManager.deleteFirstPayloadInPayloadList();
+					prefs.edit().remove(name).commit();
 				}else{
-					Log.w("Unable to upload Payload");
+					Log.d("Unable to send JSON. Stopping upload thread.");
 					break;
 				}
-				json = payloadManager.getFirstPayloadInPayloadList();
 			}
+		}finally{
+			running = false;
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
