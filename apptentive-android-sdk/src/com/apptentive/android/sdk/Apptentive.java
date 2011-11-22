@@ -23,7 +23,6 @@ import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.Date;
-import java.util.Map;
 
 public class Apptentive {
 
@@ -111,7 +110,6 @@ public class Apptentive {
 	 * @param activity The activity you are calling this method from.
 	 */
 	public void runIfNeeded(Activity activity) {
-
 		// TODO: Check to see if a data connection exists first. We don't want to prompt to rate unless one exists.
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		ApptentiveState state = model.getState();
@@ -139,12 +137,13 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method allows you to pass in a map of key/value pairs, which can then be sent along with subsequently submitted feedback.
-	 * @param pairs A Map of keys to values.
+	 * This method allows you to pass in key/value pairs, which can then be sent along with subsequently submitted feedback.
+	 * @param key A key String
+	 * @param value A value String
 	 */
-	public void addFeedbackDataFields(Map<String, String> pairs){
+	public void addFeedbackDataField(String key, String value){
 		ApptentiveModel model = ApptentiveModel.getInstance();
-		model.setCustomDataFields(pairs);
+		model.setCustomDataField(key, value);
 	}
 
 	/**
