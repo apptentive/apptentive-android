@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 
@@ -49,6 +50,7 @@ public class ApptentiveModel extends Observable {
 
 
 	private ApptentiveModel() {
+		customDataFields = new HashMap<String, String>();
 	}
 
 	public static void setDefaults(Integer ratingFlowDaysBeforePrompt, Integer ratingFlowDaysBeforeReprompt, Integer ratingFlowSignificantEventsBeforePrompt, Integer ratingFlowUsesBeforePrompt) {
@@ -189,8 +191,8 @@ public class ApptentiveModel extends Observable {
 		return customDataFields;
 	}
 
-	public void setCustomDataFields(Map<String, String> customDataFields) {
-		this.customDataFields = customDataFields;
+	public void setCustomDataField(String key, String value) {
+		this.customDataFields.put(key, value);
 	}
 
 
