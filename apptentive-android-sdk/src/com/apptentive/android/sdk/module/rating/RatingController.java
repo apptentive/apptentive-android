@@ -40,7 +40,7 @@ public class RatingController {
 		dialog = new Dialog(context);
 
 		dialog.setContentView(content);
-		dialog.setTitle("Rate " + GlobalInfo.appDisplayName + "?");
+		dialog.setTitle(context.getString(R.string.apptentive_rating_title));
 
 		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
@@ -48,7 +48,7 @@ public class RatingController {
 
 		TextView message = (TextView) dialog.findViewById(R.id.apptentive_rating_message);
 		message.setWidth(width);
-		message.setText(String.format(context.getString(R.string.apptentive_rating_message), GlobalInfo.appDisplayName));
+		message.setText(String.format(context.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
 		Button rate = (Button) dialog.findViewById(R.id.apptentive_rating_rate);
 		rate.setOnClickListener(clickListener);
 		rate.setText(String.format(context.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
@@ -78,9 +78,9 @@ public class RatingController {
 					Apptentive.getInstance().ratingYes();
 				}catch(ActivityNotFoundException e) {
 					final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-					alertDialog.setTitle("Oops!");
+					alertDialog.setTitle(context.getString(R.string.apptentive_oops));
 					alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
-					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							alertDialog.dismiss();
 						}
