@@ -1,34 +1,40 @@
 /*
  * Apptentive.java
  *
- * Created by SkyÂ Kelsey on 2011-05-30.
+ * Created by Sky Kelsey on 2011-05-30.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Edited by Dr. Cocktor on 2011-11-29.
+ * 		+ Removed incorrect dynamic access on the 'Context' object
+ * 		+ Removed dead code
+ * 		+ Fixed a typo in the file header
+ * 		+ Changes Copyright 2011 MiKandi, LLC. All right reserved.
  */
 
 package com.apptentive.android.sdk;
+
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+
 import com.apptentive.android.sdk.activity.ApptentiveActivity;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.model.ApptentiveModel;
+import com.apptentive.android.sdk.model.ApptentiveState;
+import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.module.enjoyment.EnjoymentController;
 import com.apptentive.android.sdk.module.feedback.FeedbackController;
-import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.rating.RatingController;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
-import java.util.Date;
-
 public class Apptentive {
 
 	public static final String APPTENTIVE_API_VERSION = "0.1";
-
-	private Log log;
 
 	private static Apptentive instance = null;
 
@@ -67,7 +73,7 @@ public class Apptentive {
 			GlobalInfo.manufacturer = Build.MANUFACTURER;
 			GlobalInfo.model = Build.MODEL;
 			GlobalInfo.version = String.format("%s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL);
-			GlobalInfo.carrier = ((TelephonyManager) (activity.getSystemService(activity.TELEPHONY_SERVICE))).getNetworkOperatorName();
+			GlobalInfo.carrier = ((TelephonyManager) (activity.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
 
 			GlobalInfo.androidId = android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
@@ -280,28 +286,5 @@ public class Apptentive {
 	private boolean usesThresholdReached() {
 		ApptentiveModel model = ApptentiveModel.getInstance();
 		return model.getUses() >= model.getRatingUsesBeforePrompt();
-	}
-
-	private void printDebugInfo() {
-		Log.w("Build.BRAND:               %s", Build.BRAND);
-		Log.w("Build.DEVICE:              %s", Build.DEVICE);
-		Log.w("Build.MANUFACTURER:        %s", Build.MANUFACTURER);
-		Log.w("Build.MODEL:               %s", Build.MODEL);
-		Log.w("Build.PRODUCT:             %s", Build.PRODUCT);
-		Log.w("Build.TYPE:                %s", Build.TYPE);
-		Log.w("Build.USER:                %s", Build.USER);
-		Log.w("Build.VERSION.SDK:         %s", Build.VERSION.SDK);
-		Log.w("Build.VERSION.SDK_INT:     %s", Build.VERSION.SDK_INT);
-		Log.w("Build.VERSION.CODENAME:    %s", Build.VERSION.CODENAME);
-		Log.w("Build.VERSION.INCREMENTAL: %s", Build.VERSION.INCREMENTAL);
-		Log.w("Build.VERSION.RELEASE:     %s", Build.VERSION.RELEASE);
-		Log.w("Build.BOARD:               %s", Build.BOARD);
-		Log.w("Build.CPU_AIB:             %s", Build.CPU_ABI);
-		Log.w("Build.DISPLAY:             %s", Build.DISPLAY);
-		Log.w("Build.FINGERPRINT:         %s", Build.FINGERPRINT);
-		Log.w("Build.HOST:                %s", Build.HOST);
-		Log.w("Build.ID:                  %s", Build.ID);
-		Log.w("Build.TAGS:                %s", Build.TAGS);
-		Log.w("Build.TIME:                %s", Build.TIME);
 	}
 }
