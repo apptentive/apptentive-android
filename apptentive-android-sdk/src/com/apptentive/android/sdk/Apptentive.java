@@ -8,11 +8,16 @@
  * 		+ Removed dead code
  * 		+ Fixed a typo in the file header
  * 		+ Changes Copyright 2011 MiKandi, LLC. All right reserved.
+ * Edited by Dr. Cocktor on 2011-11-29.
+ * 		+ Updated to support pluggable ratings
+ * 		+ Changes Copyright 2011 MiKandi, LLC. All right reserved.
  */
 
 package com.apptentive.android.sdk;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,7 +32,9 @@ import com.apptentive.android.sdk.model.ApptentiveState;
 import com.apptentive.android.sdk.model.GlobalInfo;
 import com.apptentive.android.sdk.module.enjoyment.EnjoymentController;
 import com.apptentive.android.sdk.module.feedback.FeedbackController;
+import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.RatingController;
+import com.apptentive.android.sdk.module.rating.impl.GoogleMarketRating;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -61,9 +68,11 @@ public class Apptentive {
 	 *                       The number of significant events to wait for before initially starting the rating flow. Leave null for default of 10.
 	 * @param ratingFlowDefaultUsesBeforePrompt
 	 *                       The number of app uses to wait for before initially starting the rating flow. Leave null for default of 5.
+	 * @param ratingProvider The rating provider to use when providing ratings.
+	 * @param ratingArgs	 Arguments for the rating provider.
 	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
 	 */
-	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt) {
+	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt, Class<? extends IRatingProvider> ratingProvider, Map<String,String> ratingArgs) {
 		Context appContext = activity.getApplicationContext();
 		if (instance == null) {
 			instance = new Apptentive();
@@ -82,6 +91,9 @@ public class Apptentive {
 			GlobalInfo.apiKey = apiKey;
 
 			GlobalInfo.userEmail = getUserEmail(activity);
+			
+			GlobalInfo.ratingProvider = ratingProvider;
+			GlobalInfo.ratingArgs = ratingArgs == null ? new HashMap<String,String>(1) : ratingArgs;
 
 			ApptentiveModel model = ApptentiveModel.getInstance();
 			model.setPrefs(activity.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE));
@@ -91,6 +103,27 @@ public class Apptentive {
 		}
 		PayloadManager.initialize(appContext);
 		return instance;
+	}
+	
+	/**
+	 * Initializes the Apptentive SDK. You must call this before performing any other interaction with the SDK.
+	 * Uses the defult {@link GoogleMarketRating} provider for app ratings.
+	 *
+	 * @param activity       The activity from which this method is called.
+	 * @param appDisplayName The displayable name of your app.
+	 * @param apiKey         The Apptentive API key for this app.
+	 * @param ratingFlowDefaultDaysBeforePrompt
+	 *                       The number of days to wait before initially starting the rating flow. Leave null for default of 30.
+	 * @param ratingFlowDefaultDaysBeforeReprompt
+	 *                       The number of days to wait before asking the user to rate the app if they have already chosen "Remind me later". Leave null for default of 5.
+	 * @param ratingFlowDefaultSignificantEventsBeforePrompt
+	 *                       The number of significant events to wait for before initially starting the rating flow. Leave null for default of 10.
+	 * @param ratingFlowDefaultUsesBeforePrompt
+	 *                       The number of app uses to wait for before initially starting the rating flow. Leave null for default of 5.
+	 * @return Apptentive - The initialized SDK instance, who's public methods can be called during user interaction.
+	 */
+	public static Apptentive initialize(Activity activity, String appDisplayName, String apiKey, Integer ratingFlowDefaultDaysBeforePrompt, Integer ratingFlowDefaultDaysBeforeReprompt, Integer ratingFlowDefaultSignificantEventsBeforePrompt, Integer ratingFlowDefaultUsesBeforePrompt) {
+		return initialize(activity,appDisplayName,apiKey,ratingFlowDefaultDaysBeforePrompt,ratingFlowDefaultDaysBeforeReprompt,ratingFlowDefaultSignificantEventsBeforePrompt,ratingFlowDefaultUsesBeforePrompt, GoogleMarketRating.class, null);
 	}
 
 	public void cleanUp() {

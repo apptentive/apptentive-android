@@ -3,6 +3,9 @@
  *
  * Created by Sky Kelsey on 2011-09-17.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Edited by Dr. Cocktor on 2011-11-29.
+ * 		+ Updated to support pluggable ratings
+ * 		+ Changes Copyright 2011 MiKandi, LLC. All right reserved.
  */
 
 package com.apptentive.android.sdk.module.rating;
@@ -12,13 +15,13 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.TextView;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.GlobalInfo;
@@ -73,19 +76,28 @@ public class RatingController {
 					// Instrumentation
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
 					PayloadManager.getInstance().putPayload(metric);
+					// Add some default info to the rating provider page
+					if(!GlobalInfo.ratingArgs.containsKey("package")) {
+						GlobalInfo.ratingArgs.put("package", GlobalInfo.appPackage);
+					}
+					if(!GlobalInfo.ratingArgs.containsKey("name")) {
+						GlobalInfo.ratingArgs.put("name", GlobalInfo.appDisplayName);
+					}
 					// Send user to app rating page
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
+					IRatingProvider ratingProvider = GlobalInfo.ratingProvider.newInstance();
+					ratingProvider.startRating(context, GlobalInfo.ratingArgs);
 					Apptentive.getInstance().ratingYes();
 				}catch(ActivityNotFoundException e) {
-					final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-					alertDialog.setTitle("Oops!");
-					alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
-					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialogInterface, int i) {
-							alertDialog.dismiss();
-						}
-					});
-					alertDialog.show();
+					displayError();
+				}catch (IllegalAccessException e) {
+					displayError();
+				}catch (InstantiationException e) {
+					displayError();
+				} catch (InsufficientRatingArgumentsException e) {
+					// TODO: Log a message to apptentive to let the
+					// developer know that their custom rating provider
+					// puked?
+					displayError();
 				}finally{
 					dialog.dismiss();
 				}
@@ -102,4 +114,16 @@ public class RatingController {
 			}
 		}
 	};
+	
+	private void displayError() {
+		final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+		alertDialog.setTitle("Oops!");
+		alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialogInterface, int i) {
+				alertDialog.dismiss();
+			}
+		});
+		alertDialog.show();
+	}
 }
