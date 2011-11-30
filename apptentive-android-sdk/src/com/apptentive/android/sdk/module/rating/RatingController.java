@@ -72,6 +72,7 @@ public class RatingController {
 			dialog.dismiss();
 			int id = view.getId();
 			if(id == R.id.apptentive_rating_rate){
+				String errorMessage = context.getString(R.string.apptentive_rating_error);
 				try{
 					// Instrumentation
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
@@ -85,19 +86,20 @@ public class RatingController {
 					}
 					// Send user to app rating page
 					IRatingProvider ratingProvider = GlobalInfo.ratingProvider.newInstance();
+					errorMessage = ratingProvider.activityNotFoundMessage(context);
 					ratingProvider.startRating(context, GlobalInfo.ratingArgs);
 					Apptentive.getInstance().ratingYes();
 				}catch(ActivityNotFoundException e) {
-					displayError();
+					displayError(errorMessage);
 				}catch (IllegalAccessException e) {
-					displayError();
+					displayError(context.getString(R.string.apptentive_rating_error));
 				}catch (InstantiationException e) {
-					displayError();
+					displayError(context.getString(R.string.apptentive_rating_error));
 				} catch (InsufficientRatingArgumentsException e) {
 					// TODO: Log a message to apptentive to let the
 					// developer know that their custom rating provider
 					// puked?
-					displayError();
+					displayError(context.getString(R.string.apptentive_rating_error));
 				}finally{
 					dialog.dismiss();
 				}
@@ -115,10 +117,10 @@ public class RatingController {
 		}
 	};
 	
-	private void displayError() {
+	private void displayError(final String message) {
 		final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
 		alertDialog.setTitle("Oops!");
-		alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
+		alertDialog.setMessage(message);
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				alertDialog.dismiss();

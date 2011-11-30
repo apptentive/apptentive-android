@@ -30,4 +30,11 @@ public interface IRatingProvider {
 	 * @throws InsufficientRatingArgumentsException
 	 */
 	public void startRating(Context ctx, Map<String,String> args) throws InsufficientRatingArgumentsException;
+	
+	/**
+	 * Called if the startRating process does not successfully finish launching an activity.
+	 * @param The current context
+	 * @return The error message to display to users.
+	 */
+	public String activityNotFoundMessage(Context ctx);
 }

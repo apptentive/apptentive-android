@@ -12,6 +12,7 @@ import java.util.Map;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 
@@ -25,6 +26,11 @@ public class MiKandiMarketRating implements IRatingProvider {
 	@Override
 	public void startRating(Context ctx, Map<String, String> args) throws InsufficientRatingArgumentsException {
 		Toast.makeText(ctx, "MiKandi Ratings are not yet availale. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
+	}
+
+	@Override
+	public String activityNotFoundMessage(Context ctx) {
+		return ctx.getString(R.string.apptentive_rating_no_kandi);
 	}
 
 }

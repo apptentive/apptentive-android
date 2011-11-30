@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 
@@ -24,6 +25,11 @@ public class GoogleMarketRating implements IRatingProvider {
 			throw new InsufficientRatingArgumentsException("Missing required argument 'package'");
 		}
 		ctx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + args.get("package"))));
+	}
+
+	@Override
+	public String activityNotFoundMessage(Context ctx) {
+		return ctx.getString(R.string.apptentive_rating_no_market);
 	}
 
 }
