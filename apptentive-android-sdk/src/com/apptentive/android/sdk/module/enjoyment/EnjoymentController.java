@@ -59,7 +59,8 @@ public class EnjoymentController {
 	}
 
 	private void setupForm(){
-		dialog.setTitle("Are you enjoying " + GlobalInfo.appDisplayName + "?");
+		String title = String.format(activity.getString(R.string.apptentive_enjoyment_message_fs), GlobalInfo.appDisplayName);
+		dialog.setTitle(title);
 		Button yes = (Button) dialog.findViewById(R.id.apptentive_choice_yes);
 		yes.setOnClickListener(clickListener);
 		Button no = (Button) dialog.findViewById(R.id.apptentive_choice_no);

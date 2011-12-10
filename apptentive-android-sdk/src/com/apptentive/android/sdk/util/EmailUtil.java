@@ -11,6 +11,9 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 
+/**
+ * This class requires Android API level 5 (2.0), as it depends on the android.accounts.* API.
+ */
 public class EmailUtil{
 
 	public static String getEmail(Context context){
