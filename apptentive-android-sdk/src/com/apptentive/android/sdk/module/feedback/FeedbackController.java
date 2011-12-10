@@ -48,10 +48,10 @@ public class FeedbackController implements ViewController {
 		feedback.addTextChangedListener(new GenericTextWatcher(feedback));
 		switch(reason){
 			case forced:
-				feedback.setHint(R.string.apptentive_edittext_feedback_text_forced);
+				feedback.setHint(R.string.apptentive_edittext_feedback_message_forced);
 				break;
 			case rating:
-				feedback.setHint(R.string.apptentive_edittext_feedback_text_unhappy);
+				feedback.setHint(R.string.apptentive_edittext_feedback_message);
 				break;
 			default:
 				break;
