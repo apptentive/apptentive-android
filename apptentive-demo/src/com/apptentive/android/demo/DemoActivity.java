@@ -18,18 +18,13 @@ import com.apptentive.android.sdk.RatingModule;
 public class DemoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.e("DEMO", "onCreate()");
 		setContentView(R.layout.main);
-
-		//final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "<YOUR_API_KEY>", 5, 10, 5, 4);
-		//final Apptentive apptentive = Apptentive.initialize(this, "Demo Activity", "9a66690e4ae6200daa325ef1c6ce7d53711f5956af2ee046a80f938dd2376c05", 5, 10, 5, 4);
-
 
 		// BEGIN APPTENTIVE INITIALIZATION
 
 		final Apptentive apptentive = Apptentive.getInstance();
 		apptentive.setActivity(this);
-		apptentive.setApiKey("9a66690e4ae6200daa325ef1c6ce7d53711f5956af2ee046a80f938dd2376c05");
+		apptentive.setApiKey("<YOUR_API_KEY>");
 		apptentive.setAppDisplayName("Demo Activity");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
@@ -98,17 +93,5 @@ public class DemoActivity extends Activity {
 		if (hasFocus) {
 			Apptentive.getInstance().getRatingModule().run(DemoActivity.this);
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		Log.e("DEMO", "onResume()");
-		super.onResume();
-	}
-
-	@Override
-	protected void onDestroy() {
-		Log.e("DEMO", "onDestroy()");
-		super.onDestroy();
 	}
 }
