@@ -7,9 +7,9 @@ package com.apptentive.android.sdk.offline;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.model.GlobalInfo;
 
 import java.util.Set;
 import java.util.UUID;
@@ -20,41 +20,44 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class PayloadManager implements Runnable {
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Static
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// *************************************************************************************************
+	// ********************************************* Static ********************************************
+	// *************************************************************************************************
+
 	private static final String PAYLOAD_KEY_PREFIX = "payload-";
 
 	private static PayloadManager instance;
 	private static boolean running;
 
-	public static void initialize(Context context){
+	public static PayloadManager getInstance(){
 		if(instance == null){
-			instance = new PayloadManager(context);
-			running = false;
+			instance = new PayloadManager();
 		}
+		return instance;
+	}
 
+
+	// *************************************************************************************************
+	// ********************************************* Private *******************************************
+	// *************************************************************************************************
+
+	private LinkedBlockingQueue<String> queue;
+	private SharedPreferences prefs;
+
+	private PayloadManager(){
+		this.queue = new LinkedBlockingQueue<String>();
+	}
+
+	public void setContext(Context context){
+		prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+	}
+
+	public void start(){
 		// When the app starts, clear out the queue and fill it back up. This ensures all payloads get sent
 		// upon startup if the network is available.
 		instance.queue.clear();
 		instance.initQueue();
 		instance.ensureRunning();
-	}
-
-	public static PayloadManager getInstance(){
-		return instance;
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Instance
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private LinkedBlockingQueue<String> queue;
-	private SharedPreferences prefs;
-
-	private PayloadManager(Context context){
-		this.queue = new LinkedBlockingQueue<String>();
-		this.prefs = 	context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 	}
 
 	public synchronized void ensureRunning(){
@@ -64,10 +67,10 @@ public class PayloadManager implements Runnable {
 		}
 	}
 
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// LinkedBlockingQueue
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 	public void putPayload(Payload payload) {
 		String name = PAYLOAD_KEY_PREFIX + UUID.randomUUID().toString();
@@ -84,6 +87,7 @@ public class PayloadManager implements Runnable {
 			}
 		}
 	}
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Runnable
