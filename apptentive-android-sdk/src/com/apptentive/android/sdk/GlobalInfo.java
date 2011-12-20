@@ -5,7 +5,7 @@
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk;
 
 public class GlobalInfo {
 	public static final String APPTENTIVE_API_VERSION = "1.0";

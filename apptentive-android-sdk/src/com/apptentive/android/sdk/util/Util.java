@@ -1,6 +1,4 @@
 /*
- * Util.java
- *
  * Created by Sky Kelsey on 2011-09-16.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */

@@ -1,6 +1,4 @@
 /*
- * ALog.java
- *
  * Created by Sky Kelsey on 2011-05-14.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
@@ -9,6 +7,7 @@ package com.apptentive.android.sdk;
 
 import java.util.IllegalFormatException;
 
+// TODO: Make package private
 public class Log {
 
 	public static final int VERBOSE = 2;

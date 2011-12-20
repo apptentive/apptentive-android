@@ -22,6 +22,8 @@
 	<string name="apptentive_branding_text">Feedback Powered By Apptentive</string>
 	<string name="apptentive_about_title">About Apptentive</string>
 	<string name="apptentive_about_header_button_okay_text">Okay</string>
+	<string name="apptentive_about_message_1">This application is using Apptentive in-app feedback service in order to listen to you more effectively.</string>
+	<string name="apptentive_about_message_2">Your feedback is hosted by Apptentive and is subject to Apptentive\'s privacy policy and your developer\'s privacy policy.</string>
 
 	<string name="apptentive_rating_title">Thank You</string>
 	<string name="apptentive_rating_message_fs">We\'re so happy to hear that you love %s. It\'d be really helpful if you rated us in the Market. Thanks so much for spending some time with us.</string>
@@ -31,4 +33,5 @@
 	<string name="apptentive_rating_no_market">Android Market was not found. Please install Android Market before rating this app.</string>
 
 	<string name="apptentive_enjoyment_message_fs">Do you love %s?</string>
+
 </resources>
