@@ -1,14 +1,12 @@
 /*
- * FeedbackPayload.java
- *
  * Created by Sky Kelsey on 2011-11-05.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
 
 package com.apptentive.android.sdk.offline;
 
-import com.apptentive.android.sdk.model.GlobalInfo;
-import com.apptentive.android.sdk.offline.Payload;
+import android.os.Build;
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -20,9 +18,9 @@ public class FeedbackPayload extends Payload {
 
 	public FeedbackPayload(String feedbackType){
 		try{
-			setString(GlobalInfo.manufacturer, "record", "device", "manufacturer");
-			setString(GlobalInfo.model, "record", "device", "model");
-			setString(GlobalInfo.version, "record", "device", "os_version");
+			setString(Build.MANUFACTURER, "record", "device", "manufacturer");
+			setString(Build.MODEL, "record", "device", "model");
+			setString(String.format("%s.%s", Build.VERSION.RELEASE, Build.VERSION.INCREMENTAL), "record", "device", "os_version");
 			setString(GlobalInfo.androidId, "record", "device", "uuid");
 			setString(GlobalInfo.carrier, "record", "device", "carrier");
 			setString(GlobalInfo.APPTENTIVE_API_VERSION, "record", "client", "version");

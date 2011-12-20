@@ -1,6 +1,4 @@
 /*
- * MetricPayload.java
- *
  * Created by Sky Kelsey on 2011-11-14.
  * Copyright 2011 Apptentive, Inc. All rights reserved.
  */
@@ -56,7 +54,7 @@ public class MetricPayload extends Payload {
 
 		private final String recordName;
 
-		Event(String recordName){
+		Event(String recordName) {
 			this.recordName = recordName;
 		}
 

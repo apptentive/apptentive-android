@@ -27,7 +27,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ApptentiveClient {
-	private static final String ENDPOINT_BASE     = "https://api.apptentive.com";
+	//private static final String ENDPOINT_BASE     = "https://api.apptentive.com";
+	private static final String ENDPOINT_BASE     = "http://api.apptentive-beta.com";
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	private static final String ENDPOINT_SURVEYS  = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE  = ENDPOINT_SURVEYS + "/active";
@@ -39,6 +40,10 @@ public class ApptentiveClient {
 	}
 
 	public boolean postJSON(String json){
+		if(true){
+			return true;
+		}
+
 		final HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
 		HttpConnectionParams.setSoTimeout(httpParams, 30000);
