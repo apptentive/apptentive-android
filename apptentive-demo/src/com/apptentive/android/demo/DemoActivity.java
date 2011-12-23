@@ -24,8 +24,7 @@ public class DemoActivity extends Activity {
 
 		final Apptentive apptentive = Apptentive.getInstance();
 		apptentive.setActivity(this);
-		apptentive.setApiKey("0d7c775a973b30ed6a8ca2cf6469af3168a8c5e38ccd26755d1fdaa3387c6454");
-		//apptentive.setApiKey("<YOUR_API_KEY>");
+		apptentive.setApiKey("<YOUR_API_KEY>");
 		apptentive.setAppDisplayName("Demo Activity");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
