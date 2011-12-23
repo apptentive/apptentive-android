@@ -39,10 +39,6 @@ public class ApptentiveClient {
 	}
 
 	public boolean postJSON(String json){
-		if(true){
-			return true;
-		}
-
 		final HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
 		HttpConnectionParams.setSoTimeout(httpParams, 30000);
