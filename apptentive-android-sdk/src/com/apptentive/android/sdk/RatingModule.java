@@ -5,6 +5,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.*;
@@ -22,6 +23,9 @@ import com.apptentive.android.sdk.util.Util;
 import java.text.ParseException;
 import java.util.Date;
 
+/**
+ * This module is responsible for determining when to show, and showing the rating flow of dialogs.
+ */
 public class RatingModule {
 
 	// *************************************************************************************************
@@ -121,50 +125,82 @@ public class RatingModule {
 		this.prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 	}
 
+	/**
+	 * Sets the number of days after installation to wait before showing the rating flow.
+	 * @param daysBeforePrompt The number of days after installation to wait before showing the rating flow.
+	 */
 	public void setDaysBeforePrompt(int daysBeforePrompt) {
 		this.daysBeforePrompt = daysBeforePrompt;
 	}
 
+	/**
+	 * Sets the number of uses after installation to occur before showing the rating flow.
+	 * @param usesBeforePrompt The number of uses after installation to occur before showing the rating flow.
+	 */
 	public void setUsesBeforePrompt(int usesBeforePrompt) {
 		this.usesBeforePrompt = usesBeforePrompt;
 	}
 
+	/**
+	 * Sets the number of significant events after installation to occur before showint the rating flow.
+	 * @param significantEventsBeforePrompt The number of significant events after installation to occur before showint the rating flow.
+	 */
 	public void setSignificantEventsBeforePrompt(int significantEventsBeforePrompt) {
 		this.significantEventsBeforePrompt = significantEventsBeforePrompt;
 	}
 
+	/**
+	 * Sets the number of days after postponing rating to wait before showing the rating flow again.
+	 * @param daysBeforeReprompting The number of days after postponing rating to wait before showing the rating flow again.
+	 */
 	public void setDaysBeforeReprompting(int daysBeforeReprompting) {
 		this.daysBeforeReprompting = daysBeforeReprompting;
 	}
 
-	public void forceShowEnjoymentDialog(Context context) {
-		showEnjoymentDialog(context, Trigger.forced);
+	/**
+	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
+	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
+	 * @param activity The activity from which this method was called.
+	 */
+	public void forceShowEnjoymentDialog(Activity activity) {
+		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
-	void showEnjoymentDialog(Context context, Trigger reason) {
-		this.new EnjoymentDialog(context).show(reason);
+	void showEnjoymentDialog(Activity activity, Trigger reason) {
+		this.new EnjoymentDialog(activity).show(reason);
 	}
 
-	public void showRatingDialog(Context context) {
-		this.new RatingDialog(context).show();
+	/**
+	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
+	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
+	 * @param activity The acvitity from which this method was called.
+	 */
+	public void showRatingDialog(Activity activity) {
+		this.new RatingDialog(activity).show();
 	}
 
-	public void run(Context context) {
+	/**
+	 * Start the rating flow dialogs if any of the usage conditions have been met. Call this method if it is
+	 * appropriate to show a popup dialog. Generally, you would want to call this method in your Activity's
+	 * <strong>onWindowFocusChanged(boolean hasFocus)</strong> method if hasFocus is true.
+	 * @param activity The activity from which this method was called.
+	 */
+	public void run(Activity activity) {
 		// TODO: Check to see if a data connection exists first. We don't want to prompt to rate unless one exists.
 
 		switch (getState()) {
 			case START:
 				if (ratingPeriodElapsed()) {
-					showEnjoymentDialog(context, Trigger.days);
+					showEnjoymentDialog(activity, Trigger.days);
 				} else if (eventThresholdReached()) {
-					showEnjoymentDialog(context, Trigger.events);
+					showEnjoymentDialog(activity, Trigger.events);
 				} else if (usesThresholdReached()) {
-					showEnjoymentDialog(context, Trigger.uses);
+					showEnjoymentDialog(activity, Trigger.uses);
 				}
 				break;
 			case REMIND:
 				if (ratingPeriodElapsed()) {
-					showRatingDialog(context);
+					showRatingDialog(activity);
 				}
 				break;
 			case DONE:
@@ -174,6 +210,10 @@ public class RatingModule {
 		}
 	}
 
+	/**
+	 * Resets the Rating Module metrics such as significant events, start of rating period, and number of uses.
+	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
+	 */
 	public void reset() {
 		setState(RatingState.START);
 		setStartOfRatingPeriod(new Date());
@@ -181,19 +221,26 @@ public class RatingModule {
 		setUses(0);
 	}
 
-	public void event() {
+	/**
+	 * Increments the number of "significant events" the app's user has achieved. What you condider to be a significant
+	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
+	 * is time to run the rating flow.
+	 */
+	public void logEvent() {
 		setEvents(getEvents() + 1);
 	}
 
 	/**
-	 * Increment the uses.
+	 * Increments the number of times this app has been used. This method should be called each time your app
+	 * starts. The number of uses is used be the Rating Module to determine if it is time to run the rating flow.
 	 */
-	public void use() {
+	public void logUse() {
 		setUses(getUses() + 1);
 	}
 
 	/**
 	 * This method is for debugging purposes only. It will move the rating start date one day into the past.
+	 * @deprecated
 	 */
 	public void day() {
 		setStartOfRatingPeriod(Util.addDaysToDate(getStartOfRatingPeriod(), -1));
@@ -219,20 +266,20 @@ public class RatingModule {
 
 	private final class EnjoymentDialog extends Dialog {
 
-		private Context context;
+		private Activity activity;
 
-		public EnjoymentDialog(Context context) {
-			super(context);
-			this.context = context;
+		public EnjoymentDialog(Activity activity) {
+			super(activity);
+			this.activity = activity;
 		}
 
 		public void show(Trigger reason) {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View content = inflater.inflate(R.layout.apptentive_choice, null, false);
 
 			setContentView(content);
 
-			String title = String.format(context.getString(R.string.apptentive_enjoyment_message_fs), GlobalInfo.appDisplayName);
+			String title = String.format(activity.getString(R.string.apptentive_enjoyment_message_fs), GlobalInfo.appDisplayName);
 			setTitle(title);
 			Button yes = (Button) findViewById(R.id.apptentive_choice_yes);
 			yes.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +288,7 @@ public class RatingModule {
 					// Instrumentation
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__yes);
 					PayloadManager.getInstance().putPayload(metric);
-					Apptentive.getInstance().getRatingModule().showRatingDialog(context);
+					Apptentive.getInstance().getRatingModule().showRatingDialog(activity);
 					dismiss();
 				}
 			});
@@ -252,7 +299,7 @@ public class RatingModule {
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__no);
 					PayloadManager.getInstance().putPayload(metric);
 					setState(RatingState.DONE);
-					FeedbackModule.getInstance().showFeedbackDialog(context, FeedbackModule.Trigger.rating);
+					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
 					dismiss();
 				}
 			});
@@ -272,29 +319,29 @@ public class RatingModule {
 
 	private final class RatingDialog extends Dialog {
 
-		private Context context;
+		private Context activity;
 
-		public RatingDialog(Context context) {
-			super(context);
-			this.context = context;
+		public RatingDialog(Activity activity) {
+			super(activity);
+			this.activity = activity;
 		}
 
 		public void show() {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View content = inflater.inflate(R.layout.apptentive_rating, null, false);
 
 			setContentView(content);
-			setTitle(context.getString(R.string.apptentive_rating_title));
+			setTitle(activity.getString(R.string.apptentive_rating_title));
 
-			Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
 			int width = new Float(display.getWidth() * 0.8f).intValue();
 
 			TextView message = (TextView) findViewById(R.id.apptentive_rating_message);
 			message.setWidth(width);
-			message.setText(String.format(context.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
+			message.setText(String.format(activity.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
 			Button rate = (Button) findViewById(R.id.apptentive_rating_rate);
-			rate.setText(String.format(context.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
+			rate.setText(String.format(activity.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
 			Button later = (Button) findViewById(R.id.apptentive_rating_later);
 			Button no = (Button) findViewById(R.id.apptentive_rating_no);
 
@@ -307,13 +354,13 @@ public class RatingModule {
 								MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
 								PayloadManager.getInstance().putPayload(metric);
 								// Send user to app rating page
-								context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
+								activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
 								setState(RatingState.DONE);
 							} catch (ActivityNotFoundException e) {
-								final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-								alertDialog.setTitle(context.getString(R.string.apptentive_oops));
-								alertDialog.setMessage(context.getString(R.string.apptentive_rating_no_market));
-								alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
+								final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+								alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
+								alertDialog.setMessage(activity.getString(R.string.apptentive_rating_no_market));
+								alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogInterface, int i) {
 										alertDialog.dismiss();
 									}

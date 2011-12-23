@@ -14,7 +14,9 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
-
+/**
+ * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
+ */
 public class Apptentive {
 
 	public static final String APPTENTIVE_API_VERSION = "0.1";
@@ -26,6 +28,10 @@ public class Apptentive {
 	private Apptentive() {
 	}
 
+	/**
+	 * Gets the Apptentive singleton instance.
+	 * @return The Apptentive singleton instance.
+	 */
 	public static Apptentive getInstance() {
 		if (instance == null) {
 			instance = new Apptentive();
@@ -33,6 +39,10 @@ public class Apptentive {
 		return instance;
 	}
 
+	/**
+	 * Passes your application's Activity to Apptentive so we can initialize.
+	 * @param activity The activity from which you are calling this method.
+	 */
 	public void setActivity(Activity activity) {
 		this.application = activity.getApplication();
 		Context appContext = activity.getApplicationContext();
@@ -49,23 +59,46 @@ public class Apptentive {
 		RatingModule.getInstance().setContext(application.getApplicationContext());
 	}
 
+	/**
+	 * Sets your Apptentive API key.<br/><br/>
+	 * This will be a long base64 token like:<br/>
+	 * <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
+	 * @param apiKey The API key.
+	 */
 	public void setApiKey(String apiKey) {
 		GlobalInfo.apiKey = apiKey;
 	}
 
+	/**
+	 * Sets your app's display name.<br/><br/>
+	 * Should be something like "My App Name".
+	 * @param name The display name of your app.
+	 */
 	public void setAppDisplayName(String name) {
 		GlobalInfo.appDisplayName = name;
 	}
 
 
+	/**
+	 * Gets the Apptentive Rating Module.
+	 * @return The Apptentive Rating Module.
+	 */
 	public RatingModule getRatingModule() {
 		return RatingModule.getInstance();
 	}
 
+	/**
+	 * Gets the Apptentive Feedback Module.
+	 * @return The Apptentive Feedback Module.
+	 */
 	public FeedbackModule getFeedbackModule() {
 		return FeedbackModule.getInstance();
 	}
 
+	/**
+	 * Gets the Apptentive Survey Module.
+	 * @return The Apptentive Survey Module.
+	 */
 	public SurveyModule getSurveyModule() {
 		return SurveyModule.getInstance();
 	}

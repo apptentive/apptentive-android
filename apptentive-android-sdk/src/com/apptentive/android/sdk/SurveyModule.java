@@ -24,6 +24,9 @@ import com.apptentive.android.sdk.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
+ */
 public class SurveyModule {
 
 	// *************************************************************************************************
