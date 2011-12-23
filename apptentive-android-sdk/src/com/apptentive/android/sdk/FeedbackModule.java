@@ -5,6 +5,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.Editable;
@@ -18,6 +19,9 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This module is responsible for showing the feedback dialog, and sending feedback payloads to the Apptentive server.
+ */
 public class FeedbackModule {
 
 	// *************************************************************************************************
@@ -70,10 +74,19 @@ public class FeedbackModule {
 		new FeedbackDialog(context).show(reason);
 	}
 
-	public void forceShowFeedbackDialog(Context context) {
-		showFeedbackDialog(context, Trigger.forced);
+	/**
+	 * Shows the feedback dialog.
+	 * @param activity The activity from which this method was called.
+	 */
+	public void forceShowFeedbackDialog(Activity activity) {
+		showFeedbackDialog(activity, Trigger.forced);
 	}
 
+	/**
+	 * Adds a data field to subsequent feedback payloads.
+	 * @param key The name of the data to send.
+	 * @param value The value of the data to send.
+	 */
 	public void addDataField(String key, String value){
 		dataFields.put(key, value);
 	}
