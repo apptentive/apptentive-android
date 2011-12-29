@@ -1,6 +1,7 @@
 /*
- * Created by Sky Kelsey on 2011-05-30.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
@@ -16,6 +17,7 @@ import com.apptentive.android.sdk.util.Util;
 
 /**
  * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
+ * @author Sky Kelsey
  */
 public class Apptentive {
 
