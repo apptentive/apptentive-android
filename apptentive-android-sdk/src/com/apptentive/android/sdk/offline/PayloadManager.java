@@ -1,6 +1,7 @@
 /*
- * Created by Sky Kelsey on 2011-10-06.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.offline;
@@ -16,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @author Sky Kelsey.
+ * @author Sky Kelsey
  */
 public class PayloadManager implements Runnable {
 

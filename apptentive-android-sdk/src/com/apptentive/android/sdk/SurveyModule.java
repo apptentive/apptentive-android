@@ -1,7 +1,9 @@
 /*
- * Created by Sky Kelsey on 2011-12-15.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
+
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
@@ -26,6 +28,7 @@ import java.util.List;
 
 /**
  * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
+ * @author Sky Kelsey
  */
 public class SurveyModule {
 

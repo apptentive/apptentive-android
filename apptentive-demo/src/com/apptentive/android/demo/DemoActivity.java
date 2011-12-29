@@ -1,12 +1,12 @@
 /*
- * Created by Sky Kelsey on 2011-05-30.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.demo;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +15,9 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.FeedbackModule;
 import com.apptentive.android.sdk.RatingModule;
 
+/**
+ * @author Sky Kelsey
+ */
 public class DemoActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

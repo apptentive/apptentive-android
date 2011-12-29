@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ ratings.xml
-  ~
-  ~ Created by Sky Kelsey on 2011-09-11.
-  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,15 +21,15 @@
 	          android:paddingRight="1dp"
 	          android:paddingBottom="5dp"
 	          android:textColor="#111111"/>
-	<Button   android:id="@+id/apptentive_rating_rate"
-	          android:layout_width="fill_parent"
-	          android:layout_height="wrap_content"/>
-	<Button   android:id="@+id/apptentive_rating_later"
-	          android:layout_width="fill_parent"
-	          android:layout_height="wrap_content"
-	          android:text="@string/apptentive_rating_remind"/>
-	<Button   android:id="@+id/apptentive_rating_no"
-	          android:layout_width="fill_parent"
-	          android:layout_height="wrap_content"
-	          android:text="@string/apptentive_rating_no"/>
+	<Button android:id="@+id/apptentive_rating_rate"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"/>
+	<Button android:id="@+id/apptentive_rating_later"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/apptentive_rating_remind"/>
+	<Button android:id="@+id/apptentive_rating_no"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/apptentive_rating_no"/>
 </LinearLayout>

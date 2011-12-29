@@ -1,6 +1,7 @@
 /*
- * Created by Sky Kelsey on 2011-11-14.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.metric;
@@ -13,6 +14,9 @@ import org.json.JSONException;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * @author Sky Kelsey
+ */
 public class MetricPayload extends Payload {
 
 

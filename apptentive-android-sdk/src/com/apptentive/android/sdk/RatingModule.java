@@ -1,6 +1,7 @@
 /*
- * Created by Sky Kelsey on 2011-09-17.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
@@ -25,6 +26,7 @@ import java.util.Date;
 
 /**
  * This module is responsible for determining when to show, and showing the rating flow of dialogs.
+ * @author Sky Kelsey
  */
 public class RatingModule {
 
