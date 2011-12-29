@@ -1,8 +1,7 @@
 /*
- * ApptentiveClient.java
- *
- * Created by Sky Kelsey on 2011-05-30.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.comm;
@@ -26,6 +25,9 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * @author Sky Kelsey
+ */
 public class ApptentiveClient {
 	private static final String ENDPOINT_BASE     = "https://api.apptentive.com";
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";

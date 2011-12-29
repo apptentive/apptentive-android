@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ apptentive_branding.xml
-  ~
-  ~ Created by Sky Kelsey on 2011-10-16.
-  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content">
-	<LinearLayout
-			android:id="@+id/apptentive_branding_view"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:paddingTop="14dp"
-			android:paddingLeft="10dp"
-			android:paddingBottom="7dp"
-			android:gravity="center_vertical"
-			android:clickable="true">
+	<LinearLayout android:id="@+id/apptentive_branding_view"
+	              android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:paddingTop="14dp"
+	              android:paddingLeft="10dp"
+	              android:paddingBottom="7dp"
+	              android:gravity="center_vertical"
+	              android:clickable="true">
 		<ImageView android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		           android:src="@drawable/apptentive_icon_small_layout"/>

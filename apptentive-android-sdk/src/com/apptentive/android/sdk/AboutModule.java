@@ -1,16 +1,19 @@
 /*
- * Created by Sky Kelsey on 2011-12-18.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
+
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 
+/**
+ * @author Sky Kelsey
+ */
 public class AboutModule {
 
 	// *************************************************************************************************

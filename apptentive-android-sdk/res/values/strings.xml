@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
 <resources>
 	<string name="apptentive_app_name">Apptentive</string>
 	<string name="apptentive_activity_name">Apptentive</string>

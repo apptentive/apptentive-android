@@ -1,12 +1,14 @@
 /*
- * PhoneInfo.java
- *
- * Created by Sky Kelsey on 2011-11-05.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
+/**
+ * @author Sky Kelsey
+ */
 public class GlobalInfo {
 	public static final String APPTENTIVE_API_VERSION = "1.0";
 
