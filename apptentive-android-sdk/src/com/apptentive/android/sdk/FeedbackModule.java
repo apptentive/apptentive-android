@@ -9,6 +9,7 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +46,10 @@ public class FeedbackModule {
 	// ********************************************* Private *******************************************
 	// *************************************************************************************************
 
+	private SharedPreferences prefs;
 	private FeedbackPayload feedback;
 	private Map<String, String> dataFields;
+	private String startingEmail;
 
 	private FeedbackModule() {
 		dataFields = new HashMap<String, String>();
@@ -64,6 +68,10 @@ public class FeedbackModule {
 				}
 			}
 		}
+		// If the email was changed, then save it for future use.
+		if(!startingEmail.equals(feedback.getEmail())){
+			prefs.edit().putString("userEnteredEmail", feedback.getEmail()).commit();
+		}
 		PayloadManager.getInstance().putPayload(feedback);
 	}
 
@@ -71,6 +79,10 @@ public class FeedbackModule {
 	// *************************************************************************************************
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
+
+	void setContext(Context context) {
+		this.prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+	}
 
 	void showFeedbackDialog(Context context, Trigger reason) {
 		new FeedbackDialog(context).show(reason);
@@ -114,6 +126,12 @@ public class FeedbackModule {
 		}
 
 		void show(FeedbackModule.Trigger reason) {
+			// Load the use entered email, if it exists. Otherwise, load the default email.
+			startingEmail = prefs.getString("userEnteredEmail", null);
+			if(startingEmail == null){
+				startingEmail = GlobalInfo.userEmail;
+			}
+
 			setContentView(R.layout.apptentive_feedback);
 
 			EditText feedback = (EditText) findViewById(R.id.apptentive_feedback_text);
@@ -129,8 +147,8 @@ public class FeedbackModule {
 					break;
 			}
 			EditText email = (EditText) findViewById(R.id.apptentive_feedback_user_email);
-			FeedbackModule.this.feedback.setEmail(GlobalInfo.userEmail);
-			email.setText(GlobalInfo.userEmail);
+			FeedbackModule.this.feedback.setEmail(startingEmail);
+			email.setText(startingEmail);
 			email.addTextChangedListener(new GenericTextWatcher(email));
 
 			findViewById(R.id.apptentive_button_cancel).setOnClickListener(new View.OnClickListener() {

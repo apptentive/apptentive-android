@@ -59,6 +59,7 @@ public class Apptentive {
 
 		// Initialize modules.
 		RatingModule.getInstance().setContext(application.getApplicationContext());
+		FeedbackModule.getInstance().setContext(application.getApplicationContext());
 	}
 
 	/**
@@ -78,6 +79,16 @@ public class Apptentive {
 	 */
 	public void setAppDisplayName(String name) {
 		GlobalInfo.appDisplayName = name;
+	}
+
+	/**
+	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
+	 * This method will override the email address that Apptentive looks for programmatically, but will not override
+	 * an email address that the user has previously entered in an Apptentive dialog.
+	 * @param email The user's email address.
+	 */
+	public void setUserEmail(String email) {
+		GlobalInfo.userEmail = email;
 	}
 
 
