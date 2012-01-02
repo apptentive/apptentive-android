@@ -29,6 +29,7 @@ public class DemoActivity extends Activity {
 		apptentive.setActivity(this);
 		apptentive.setApiKey("<YOUR_API_KEY>");
 		apptentive.setAppDisplayName("Demo Activity");
+		apptentive.setUserEmail("user_email@example.com");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
 		ratingModule.setDaysBeforePrompt(5);
