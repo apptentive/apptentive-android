@@ -48,6 +48,9 @@ public class FeedbackPayload extends Payload {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	public String getEmail() {
+		return email;
+	}
 
 	public void setFeedback(String feedback) {
 		this.feedback = feedback;
