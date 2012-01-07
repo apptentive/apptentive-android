@@ -12,10 +12,10 @@ package com.apptentive.android.sdk;
 public class GlobalInfo {
 	public static final String APPTENTIVE_API_VERSION = "1.0";
 
-	public static String manufacturer;
-	public static String model;
 	public static String version;
 	public static String carrier;
+	public static String currentCarrier;
+	public static int    networkType;
 
 	public static String androidId;
 	public static String appDisplayName;
