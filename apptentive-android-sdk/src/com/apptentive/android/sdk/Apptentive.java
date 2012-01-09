@@ -11,6 +11,7 @@ import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -25,7 +26,6 @@ public class Apptentive {
 
 	private static Apptentive instance = null;
 	private Application application;
-
 
 	private Apptentive() {
 	}
@@ -62,6 +62,10 @@ public class Apptentive {
 		// Initialize modules.
 		RatingModule.getInstance().setContext(application.getApplicationContext());
 		FeedbackModule.getInstance().setContext(application.getApplicationContext());
+
+		// Instrumentation
+		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__launch);
+		PayloadManager.getInstance().putPayload(metric);
 	}
 
 	/**
