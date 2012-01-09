@@ -68,6 +68,12 @@ public class Apptentive {
 		PayloadManager.getInstance().putPayload(metric);
 	}
 
+	public void onDestroy(){
+		// Instrumentation
+		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__exit);
+		PayloadManager.getInstance().putPayload(metric);
+	}
+
 	/**
 	 * Sets your Apptentive API key.<br/><br/>
 	 * This will be a long base64 token like:<br/>
