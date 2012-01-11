@@ -11,6 +11,7 @@ import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -25,7 +26,6 @@ public class Apptentive {
 
 	private static Apptentive instance = null;
 	private Application application;
-
 
 	private Apptentive() {
 	}
@@ -49,7 +49,9 @@ public class Apptentive {
 		this.application = activity.getApplication();
 		Context appContext = activity.getApplicationContext();
 
-		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getNetworkOperatorName();
+		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getSimOperatorName();
+		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getNetworkOperatorName();
+		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getNetworkType();
 		GlobalInfo.appPackage = activity.getApplicationContext().getPackageName();
 		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = getUserEmail(application.getApplicationContext());
@@ -60,6 +62,19 @@ public class Apptentive {
 		// Initialize modules.
 		RatingModule.getInstance().setContext(application.getApplicationContext());
 		FeedbackModule.getInstance().setContext(application.getApplicationContext());
+
+		// Instrumentation
+		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__launch);
+		PayloadManager.getInstance().putPayload(metric);
+	}
+
+	/**
+	 * Call this from your main Activity's onDestroy() method, so we can clean up.
+	 */
+	public void onDestroy(){
+		// Instrumentation
+		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__exit);
+		PayloadManager.getInstance().putPayload(metric);
 	}
 
 	/**

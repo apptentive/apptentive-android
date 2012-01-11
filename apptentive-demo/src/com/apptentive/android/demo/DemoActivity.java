@@ -98,4 +98,10 @@ public class DemoActivity extends Activity {
 			Apptentive.getInstance().getRatingModule().run(DemoActivity.this);
 		}
 	}
+
+	@Override
+	protected void onDestroy() {
+		Apptentive.getInstance().onDestroy();
+		super.onDestroy();
+	}
 }

@@ -22,7 +22,7 @@ public class MetricPayload extends Payload {
 
 	public MetricPayload(Event type) {
 		try {
-			setString(type.name(), "record", "metric", "event");
+			setString(type.getRecordName(), "record", "metric", "event");
 			setString(Util.dateToString(new Date()), "record", "date");
 		} catch (JSONException e) {
 			Log.e("Exception generating metric JSON.", e);
