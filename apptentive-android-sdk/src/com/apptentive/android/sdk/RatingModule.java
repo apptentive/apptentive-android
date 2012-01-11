@@ -212,7 +212,9 @@ public class RatingModule {
 					showRatingDialog(activity);
 				}
 				break;
-			case DONE:
+			case POSTPONE:
+				break;
+			case RATED:
 				break;
 			default:
 				break;
@@ -224,10 +226,12 @@ public class RatingModule {
 	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
 	 */
 	public void reset() {
-		setState(RatingState.START);
-		setStartOfRatingPeriod(new Date());
-		setEvents(0);
-		setUses(0);
+		if(RatingState.RATED != getState()){
+			setState(RatingState.START);
+			setStartOfRatingPeriod(new Date());
+			setEvents(0);
+			setUses(0);
+		}
 	}
 
 	/**
@@ -261,9 +265,22 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	enum RatingState {
+		/**
+		 * Initial state after first install.
+		 */
 		START,
+		/**
+		 * The user likes the app, but would like us to remind them to rate it.
+		 */
 		REMIND,
-		DONE
+		/**
+		 * The user didn't like this version, or doesn't want to rate it. Ask again only after app upgrade/reset.
+		 */
+		POSTPONE,
+		/**
+		 * The user has rated the app. No further action will occur.
+		 */
+		RATED
 	}
 
 	enum Trigger {
@@ -307,7 +324,7 @@ public class RatingModule {
 					// Instrumentation
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__no);
 					PayloadManager.getInstance().putPayload(metric);
-					setState(RatingState.DONE);
+					setState(RatingState.POSTPONE);
 					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
 					dismiss();
 				}
@@ -364,7 +381,7 @@ public class RatingModule {
 								PayloadManager.getInstance().putPayload(metric);
 								// Send user to app rating page
 								activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
-								setState(RatingState.DONE);
+								setState(RatingState.RATED);
 							} catch (ActivityNotFoundException e) {
 								final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
 								alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
@@ -404,7 +421,7 @@ public class RatingModule {
 							MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__decline);
 							PayloadManager.getInstance().putPayload(metric);
 
-							setState(RatingState.DONE);
+							setState(RatingState.POSTPONE);
 						}
 					}
 			);
