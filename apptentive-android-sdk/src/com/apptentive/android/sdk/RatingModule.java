@@ -26,6 +26,7 @@ import java.util.Date;
 
 /**
  * This module is responsible for determining when to show, and showing the rating flow of dialogs.
+ *
  * @author Sky Kelsey
  */
 public class RatingModule {
@@ -111,8 +112,7 @@ public class RatingModule {
 	}
 
 	private int getUses() {
-		int uses = prefs.getInt("uses", 0);
-		return uses;
+		return prefs.getInt("uses", 0);
 	}
 
 	private void setUses(int uses) {
@@ -129,6 +129,7 @@ public class RatingModule {
 
 	/**
 	 * Sets the number of days after installation to wait before showing the rating flow.
+	 *
 	 * @param daysBeforePrompt The number of days after installation to wait before showing the rating flow.
 	 */
 	public void setDaysBeforePrompt(int daysBeforePrompt) {
@@ -137,6 +138,7 @@ public class RatingModule {
 
 	/**
 	 * Sets the number of uses after installation to occur before showing the rating flow.
+	 *
 	 * @param usesBeforePrompt The number of uses after installation to occur before showing the rating flow.
 	 */
 	public void setUsesBeforePrompt(int usesBeforePrompt) {
@@ -145,6 +147,7 @@ public class RatingModule {
 
 	/**
 	 * Sets the number of significant events after installation to occur before showint the rating flow.
+	 *
 	 * @param significantEventsBeforePrompt The number of significant events after installation to occur before showint the rating flow.
 	 */
 	public void setSignificantEventsBeforePrompt(int significantEventsBeforePrompt) {
@@ -153,6 +156,7 @@ public class RatingModule {
 
 	/**
 	 * Sets the number of days after postponing rating to wait before showing the rating flow again.
+	 *
 	 * @param daysBeforeReprompting The number of days after postponing rating to wait before showing the rating flow again.
 	 */
 	public void setDaysBeforeReprompting(int daysBeforeReprompting) {
@@ -162,6 +166,7 @@ public class RatingModule {
 	/**
 	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
 	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
+	 *
 	 * @param activity The activity from which this method was called.
 	 */
 	public void forceShowEnjoymentDialog(Activity activity) {
@@ -175,6 +180,7 @@ public class RatingModule {
 	/**
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
 	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
+	 *
 	 * @param activity The acvitity from which this method was called.
 	 */
 	public void showRatingDialog(Activity activity) {
@@ -185,6 +191,7 @@ public class RatingModule {
 	 * Start the rating flow dialogs if any of the usage conditions have been met. Call this method if it is
 	 * appropriate to show a popup dialog. Generally, you would want to call this method in your Activity's
 	 * <strong>onWindowFocusChanged(boolean hasFocus)</strong> method if hasFocus is true.
+	 *
 	 * @param activity The activity from which this method was called.
 	 */
 	public void run(Activity activity) {
@@ -193,11 +200,11 @@ public class RatingModule {
 		switch (getState()) {
 			case START:
 				if (ratingPeriodElapsed()) {
-					showEnjoymentDialog(activity, Trigger.days);
-				} else if (eventThresholdReached()) {
-					showEnjoymentDialog(activity, Trigger.events);
-				} else if (usesThresholdReached()) {
-					showEnjoymentDialog(activity, Trigger.uses);
+					if (eventThresholdReached()) {
+						showEnjoymentDialog(activity, Trigger.events);
+					} else if (usesThresholdReached()) {
+						showEnjoymentDialog(activity, Trigger.uses);
+					}
 				}
 				break;
 			case REMIND:
@@ -205,7 +212,9 @@ public class RatingModule {
 					showRatingDialog(activity);
 				}
 				break;
-			case DONE:
+			case POSTPONE:
+				break;
+			case RATED:
 				break;
 			default:
 				break;
@@ -217,10 +226,12 @@ public class RatingModule {
 	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
 	 */
 	public void reset() {
-		setState(RatingState.START);
-		setStartOfRatingPeriod(new Date());
-		setEvents(0);
-		setUses(0);
+		if(RatingState.RATED != getState()){
+			setState(RatingState.START);
+			setStartOfRatingPeriod(new Date());
+			setEvents(0);
+			setUses(0);
+		}
 	}
 
 	/**
@@ -242,6 +253,7 @@ public class RatingModule {
 
 	/**
 	 * This method is for debugging purposes only. It will move the rating start date one day into the past.
+	 *
 	 * @deprecated
 	 */
 	public void day() {
@@ -253,13 +265,25 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	enum RatingState {
+		/**
+		 * Initial state after first install.
+		 */
 		START,
+		/**
+		 * The user likes the app, but would like us to remind them to rate it.
+		 */
 		REMIND,
-		DONE
+		/**
+		 * The user didn't like this version, or doesn't want to rate it. Ask again only after app upgrade/reset.
+		 */
+		POSTPONE,
+		/**
+		 * The user has rated the app. No further action will occur.
+		 */
+		RATED
 	}
 
 	enum Trigger {
-		days,
 		uses,
 		events,
 		forced
@@ -300,7 +324,7 @@ public class RatingModule {
 					// Instrumentation
 					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__no);
 					PayloadManager.getInstance().putPayload(metric);
-					setState(RatingState.DONE);
+					setState(RatingState.POSTPONE);
 					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
 					dismiss();
 				}
@@ -357,7 +381,7 @@ public class RatingModule {
 								PayloadManager.getInstance().putPayload(metric);
 								// Send user to app rating page
 								activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
-								setState(RatingState.DONE);
+								setState(RatingState.RATED);
 							} catch (ActivityNotFoundException e) {
 								final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
 								alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
@@ -397,7 +421,7 @@ public class RatingModule {
 							MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__decline);
 							PayloadManager.getInstance().putPayload(metric);
 
-							setState(RatingState.DONE);
+							setState(RatingState.POSTPONE);
 						}
 					}
 			);
