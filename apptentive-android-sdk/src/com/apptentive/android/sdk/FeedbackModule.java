@@ -17,7 +17,6 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
-import com.apptentive.android.sdk.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;

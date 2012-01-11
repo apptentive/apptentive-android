@@ -68,6 +68,9 @@ public class Apptentive {
 		PayloadManager.getInstance().putPayload(metric);
 	}
 
+	/**
+	 * Call this from your main Activity's onDestroy() method, so we can clean up.
+	 */
 	public void onDestroy(){
 		// Instrumentation
 		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__exit);
