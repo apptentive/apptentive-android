@@ -11,9 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.FeedbackModule;
-import com.apptentive.android.sdk.RatingModule;
+import com.apptentive.android.sdk.*;
 
 /**
  * @author Sky Kelsey
@@ -32,6 +30,7 @@ public class DemoActivity extends Activity {
 		apptentive.setUserEmail("user_email@example.com");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
+		ratingModule.setRatingProvider(RatingModule.RatingProvider.ANDROID_MARKET);
 		ratingModule.setDaysBeforePrompt(5);
 		ratingModule.setUsesBeforePrompt(4);
 		ratingModule.setSignificantEventsBeforePrompt(5);
