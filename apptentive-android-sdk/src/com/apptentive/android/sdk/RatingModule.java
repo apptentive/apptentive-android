@@ -17,12 +17,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.Util;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This module is responsible for determining when to show, and showing the rating flow of dialogs.
@@ -56,13 +59,20 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	private SharedPreferences prefs;
+	private RatingProvider selectedRatingProvider;
 
 	private int daysBeforePrompt = DEFAULT_DAYS_BEFORE_PROMPT;
 	private int usesBeforePrompt = DEFAULT_USES_BEFORE_PROMPT;
 	private int significantEventsBeforePrompt = DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT;
 	private int daysBeforeReprompting = DEFAULT_DAYS_BEFORE_REPROMPTING;
 
+	private Map<String, String> ratingProviderArgs;
+
 	private RatingModule() {
+		selectedRatingProvider = RatingProvider.ANDROID_MARKET; // Default
+		ratingProviderArgs = new HashMap<String, String>();
+		ratingProviderArgs.put("name", GlobalInfo.appDisplayName);
+		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
 	private boolean ratingPeriodElapsed() {
@@ -128,6 +138,27 @@ public class RatingModule {
 	}
 
 	/**
+	 * Ues this to choose where to send the user when they are prompted to rate the app. This should be the same place
+	 * that the app was downloaded from.
+	 *
+	 * @param ratingProvider A {@link RatingProvider} value.
+	 */
+	public void setRatingProvider(RatingProvider ratingProvider) {
+		this.selectedRatingProvider = ratingProvider;
+	}
+
+	/**
+	 * If there are any pieces of data your {@link IRatingProvider} needs, add them here.
+	 * Default keys already included are: [name, package].
+	 * 
+	 * @param key The argument name the the chosen {@link IRatingProvider} needs.
+	 * @param value The value of the argument.
+ 	 */
+	public void putRatingProviderArg(String key, String value) {
+		this.ratingProviderArgs.put(key, value);
+	}
+
+	/**
 	 * Sets the number of days after installation to wait before showing the rating flow.
 	 *
 	 * @param daysBeforePrompt The number of days after installation to wait before showing the rating flow.
@@ -167,7 +198,7 @@ public class RatingModule {
 	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
 	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
 	 *
-	 * @param activity The activity from which this method was called.
+	 * @param activity The activityContext from which this method was called.
 	 */
 	public void forceShowEnjoymentDialog(Activity activity) {
 		showEnjoymentDialog(activity, Trigger.forced);
@@ -192,7 +223,7 @@ public class RatingModule {
 	 * appropriate to show a popup dialog. Generally, you would want to call this method in your Activity's
 	 * <strong>onWindowFocusChanged(boolean hasFocus)</strong> method if hasFocus is true.
 	 *
-	 * @param activity The activity from which this method was called.
+	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
 		// TODO: Check to see if a data connection exists first. We don't want to prompt to rate unless one exists.
@@ -226,7 +257,7 @@ public class RatingModule {
 	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
 	 */
 	public void reset() {
-		if(RatingState.RATED != getState()){
+		if (RatingState.RATED != getState()) {
 			setState(RatingState.START);
 			setStartOfRatingPeriod(new Date());
 			setEvents(0);
@@ -263,6 +294,14 @@ public class RatingModule {
 	// *************************************************************************************************
 	// ***************************************** Inner Classes *****************************************
 	// *************************************************************************************************
+
+	/**
+	 * An enum used to define which app store to go to for rating the app.
+	 */
+	public enum RatingProvider {
+		ANDROID_MARKET,
+		MIKANDI_MARKET
+	}
 
 	enum RatingState {
 		/**
@@ -345,29 +384,29 @@ public class RatingModule {
 
 	private final class RatingDialog extends Dialog {
 
-		private Context activity;
+		private Context activityContext;
 
 		public RatingDialog(Activity activity) {
 			super(activity);
-			this.activity = activity;
+			this.activityContext = activity;
 		}
 
 		public void show() {
-			LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater inflater = (LayoutInflater) activityContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View content = inflater.inflate(R.layout.apptentive_rating, null, false);
 
 			setContentView(content);
-			setTitle(activity.getString(R.string.apptentive_rating_title));
+			setTitle(activityContext.getString(R.string.apptentive_rating_title));
 
-			Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			Display display = ((WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
 			int width = new Float(display.getWidth() * 0.8f).intValue();
 
 			TextView message = (TextView) findViewById(R.id.apptentive_rating_message);
 			message.setWidth(width);
-			message.setText(String.format(activity.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
+			message.setText(String.format(activityContext.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
 			Button rate = (Button) findViewById(R.id.apptentive_rating_rate);
-			rate.setText(String.format(activity.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
+			rate.setText(String.format(activityContext.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
 			Button later = (Button) findViewById(R.id.apptentive_rating_later);
 			Button no = (Button) findViewById(R.id.apptentive_rating_no);
 
@@ -375,26 +414,47 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
+							String errorMessage = activityContext.getString(R.string.apptentive_rating_error);
 							try {
 								// Instrumentation
 								MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
 								PayloadManager.getInstance().putPayload(metric);
 								// Send user to app rating page
-								activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + GlobalInfo.appPackage)));
+								IRatingProvider ratingProvider;
+								switch (selectedRatingProvider) {
+									case ANDROID_MARKET:
+										ratingProvider = new AndroidMarketRatingProvider();
+										break;
+									case MIKANDI_MARKET:
+										ratingProvider = new MiKandiMarketRatingProvider();
+										break;
+									default:
+										ratingProvider = new AndroidMarketRatingProvider();
+										break;
+								}
+								errorMessage = ratingProvider.activityNotFoundMessage(activityContext);
+								ratingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
 								setState(RatingState.RATED);
 							} catch (ActivityNotFoundException e) {
-								final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-								alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
-								alertDialog.setMessage(activity.getString(R.string.apptentive_rating_no_market));
-								alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialogInterface, int i) {
-										alertDialog.dismiss();
-									}
-								});
-								alertDialog.show();
+								displayError(errorMessage);
+							} catch (InsufficientRatingArgumentsException e) {
+								// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
+								displayError(activityContext.getString(R.string.apptentive_rating_error));
 							} finally {
 								dismiss();
 							}
+						}
+
+						private void displayError(String message) {
+							final AlertDialog alertDialog = new AlertDialog.Builder(activityContext).create();
+							alertDialog.setTitle(activityContext.getString(R.string.apptentive_oops));
+							alertDialog.setMessage(message);
+							alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activityContext.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogInterface, int i) {
+									alertDialog.dismiss();
+								}
+							});
+							alertDialog.show();
 						}
 					}
 			);
@@ -433,5 +493,67 @@ public class RatingModule {
 			setCancelable(false);
 			super.show();
 		}
+	}
+
+	private interface IRatingProvider {
+		/**
+		 * Starts the rating process. Implementations should gracefully
+		 * handle cases where not all required arguments are provided.
+		 *
+		 * @param args    A list of keys and values which may have been
+		 *                provided at app initialization to allow the ratings provider
+		 *                access to additional information. The hash will, at a minimum,
+		 *                contain the 'name' of the app as passed to apptentive and the
+		 *                'package' identifier of the app.
+		 * @param context An Android {@link Context} used to launch the rating
+		 *                or provide dialogs or notifications.
+		 * @throws InsufficientRatingArgumentsException Thrown when the implementation needs an argument that isn't provided.
+		 *
+		 */
+		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException;
+
+		/**
+		 * Called if the startRating process does not successfully finish launching an activityContext.
+		 *
+		 * @param context The current Activity Context
+		 * @return The error message to display to users.
+		 */
+		public String activityNotFoundMessage(Context context);
+	}
+
+	private class AndroidMarketRatingProvider implements IRatingProvider {
+		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
+			if (!args.containsKey("package")) {
+				throw new InsufficientRatingArgumentsException("Missing required argument 'package'");
+			}
+			context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + args.get("package"))));
+		}
+
+		public String activityNotFoundMessage(Context ctx) {
+			return ctx.getString(R.string.apptentive_rating_provider_no_android_market);
+		}
+	}
+
+	private class MiKandiMarketRatingProvider implements IRatingProvider {
+		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
+			Toast.makeText(context, "MiKandi Ratings are not yet available. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
+		}
+
+		public String activityNotFoundMessage(Context ctx) {
+			return ctx.getString(R.string.apptentive_rating_provider_no_mikandi);
+		}
+	}
+
+	/**
+	 * Indicates that a implementation of {@link IRatingProvider} was not
+	 * provided necessary and/or sufficient arguments to successfully kick
+	 * off a rating workflow.
+	 */
+	private class InsufficientRatingArgumentsException extends Exception {
+		public InsufficientRatingArgumentsException(String message) {
+			super(message);
+		}
+
+		private static final long serialVersionUID = -4592353045389664388L;
 	}
 }
