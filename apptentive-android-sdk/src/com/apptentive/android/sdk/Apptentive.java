@@ -49,9 +49,9 @@ public class Apptentive {
 		this.application = activity.getApplication();
 		Context appContext = activity.getApplicationContext();
 
-		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getSimOperatorName();
-		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getNetworkOperatorName();
-		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Application.TELEPHONY_SERVICE))).getNetworkType();
+		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
+		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
+		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
 		GlobalInfo.appPackage = activity.getApplicationContext().getPackageName();
 		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = getUserEmail(application.getApplicationContext());
