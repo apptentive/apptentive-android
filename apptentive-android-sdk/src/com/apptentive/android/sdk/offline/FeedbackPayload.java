@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.offline;
 import android.os.Build;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.util.Reflection;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -40,7 +41,16 @@ public class FeedbackPayload extends Payload {
 			setString(GlobalInfo.networkType +"", "record", "device", "network_type");
 			setString(Build.TYPE,                 "record", "device", "type");
 			setString(Build.ID,                   "record", "device", "id");
-			//setString(Build.VERSION.SDK,          "record", "device", "version", "os_sdk");
+
+			// Use reflection to load info from classes not available at API level 7.
+			String bootloaderVersion = Reflection.getBootloaderVersion();
+			if(bootloaderVersion != null){
+				setString(bootloaderVersion,        "record", "device", "bootloader_version");
+			}
+			String radioVersion = Reflection.getRadioVersion();
+			if(radioVersion != null){
+				setString(radioVersion,             "record", "device", "radio_version");
+			}
 
 			// Add common Apptentive info
 			setString(GlobalInfo.APPTENTIVE_API_VERSION, "record", "client", "version");
