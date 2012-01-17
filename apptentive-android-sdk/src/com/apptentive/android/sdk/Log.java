@@ -24,12 +24,6 @@ public class Log {
 	private static final String TAG = "Apptentive";
 
 	private static void doLog(int level, Throwable throwable, String message, Object... args){
-		if(throwable != null){
-			if(throwable.getMessage() != null){
-				android.util.Log.println(level, TAG, throwable.getMessage());
-			}
-			android.util.Log.println(level, TAG, android.util.Log.getStackTraceString(throwable));
-		}
 		if(message != null){
 			if(args.length > 0){
 				try{
@@ -40,6 +34,12 @@ public class Log {
 				}
 			}
 			android.util.Log.println(level, TAG, message);
+			if(throwable != null){
+				if(throwable.getMessage() != null){
+					android.util.Log.println(level, TAG, throwable.getMessage());
+				}
+				android.util.Log.println(level, TAG, android.util.Log.getStackTraceString(throwable));
+			}
 		}
 	}
 
