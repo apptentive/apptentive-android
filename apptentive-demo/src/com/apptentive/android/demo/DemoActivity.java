@@ -84,7 +84,12 @@ public class DemoActivity extends Activity {
 		Button surveyButton = (Button) findViewById(R.id.button_survey);
 		surveyButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				apptentive.getSurveyModule().show(DemoActivity.this);
+				SurveyModule surveyModule = apptentive.getSurveyModule();
+				if(!surveyModule.hasSurvey()){
+					surveyModule.fetchSurvey();
+				} else {
+					surveyModule.show(DemoActivity.this);
+				}
 			}
 		});
 	}
