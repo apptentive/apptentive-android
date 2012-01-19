@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.offline;
 import android.os.Build;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -38,7 +39,9 @@ public class FeedbackPayload extends Payload {
 			setString(GlobalInfo.androidId,       "record", "device", "uuid");
 			setString(GlobalInfo.carrier,         "record", "device", "carrier");
 			setString(GlobalInfo.currentCarrier,  "record", "device", "current_carrier");
-			setString(GlobalInfo.networkType +"", "record", "device", "network_type");
+			String networkType = Constants.networkTypeAsString(GlobalInfo.networkType);
+			Log.e("Network Type: " + networkType + " = " + GlobalInfo.networkType);
+			setString(networkType,                "record", "device", "network_type");
 			setString(Build.TYPE,                 "record", "device", "type");
 			setString(Build.ID,                   "record", "device", "id");
 
