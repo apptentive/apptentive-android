@@ -52,7 +52,6 @@ public class FeedbackModule {
 
 	private FeedbackModule() {
 		dataFields = new HashMap<String, String>();
-		feedback = new FeedbackPayload("feedback");
 	}
 
 
@@ -84,6 +83,7 @@ public class FeedbackModule {
 	}
 
 	void showFeedbackDialog(Context context, Trigger reason) {
+		feedback = new FeedbackPayload("feedback");
 		new FeedbackDialog(context).show(reason);
 	}
 
