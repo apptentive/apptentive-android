@@ -26,7 +26,7 @@ public class EmailUtil{
 		}
 	}
 
-	// TODO: Change this method to use a delegate of some kind, and Apptentive will run in Android 1.6
+	// TODO: Use reflection to load this so we can drop 2.1 API requirement.
 	private static Account getAccount(AccountManager accountManager){
 		Account[] accounts = accountManager.getAccountsByType("com.google");
 		Account account;
