@@ -23,7 +23,4 @@ public class GlobalInfo {
 	public static String apiKey;
 
 	public static String userEmail;
-	
-	public static Class<? extends IRatingProvider> ratingProvider;
-	public static Map<String, String> ratingArgs;
 }
