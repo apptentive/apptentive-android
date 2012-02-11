@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.util;
 
 import android.os.Build;
-import com.apptentive.android.sdk.Log;
 
 /**
  * This class is used to allow access of fields, methods, and classes that are not available in the targeted API level.
