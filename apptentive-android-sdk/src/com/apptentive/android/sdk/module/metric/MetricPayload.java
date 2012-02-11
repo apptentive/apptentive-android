@@ -1,8 +1,7 @@
 /*
- * MetricPayload.java
- *
- * Created by Sky Kelsey on 2011-11-14.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.metric;
@@ -15,12 +14,15 @@ import org.json.JSONException;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * @author Sky Kelsey
+ */
 public class MetricPayload extends Payload {
 
 
 	public MetricPayload(Event type) {
 		try {
-			setString(type.name(), "record", "metric", "event");
+			setString(type.getRecordName(), "record", "metric", "event");
 			setString(Util.dateToString(new Date()), "record", "date");
 		} catch (JSONException e) {
 			Log.e("Exception generating metric JSON.", e);
@@ -56,7 +58,7 @@ public class MetricPayload extends Payload {
 
 		private final String recordName;
 
-		Event(String recordName){
+		Event(String recordName) {
 			this.recordName = recordName;
 		}
 

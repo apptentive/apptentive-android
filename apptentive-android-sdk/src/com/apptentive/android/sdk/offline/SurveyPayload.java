@@ -1,8 +1,7 @@
 /*
- * Survey.java
- *
- * Created by Sky Kelsey on 2011-10-09.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.offline;
@@ -11,7 +10,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.survey.QuestionDefinition;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
-import com.apptentive.android.sdk.offline.Payload;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +17,9 @@ import org.json.JSONObject;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
+/**
+ * @author Sky Kelsey
+ */
 public class SurveyPayload extends Payload {
 
 	private SurveyDefinition definition;
@@ -53,7 +53,7 @@ public class SurveyPayload extends Payload {
 
 	/**
 	 * For multi choice, 
-	 * @return
+	 * @return True if the survey has been answered. It has been answered of at least one question has been answered.
 	 */
 	public boolean hasBeenAnswered(){
 		for(String key : answers.keySet()){

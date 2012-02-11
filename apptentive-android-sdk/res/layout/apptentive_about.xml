@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!--
-  ~ apptentive_about.xml
-  ~
-  ~ Created by Sky Kelsey on 2011-10-08.
-  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -51,7 +52,7 @@
 	          android:paddingRight="30dp"
 	          android:textSize="7pt"
 	          android:textColor="#000000"
-	          android:text="Apptentive is an in-app feedback mechanism which allows app developers to quickly get feedback from customers."/>
+	          android:text="@string/apptentive_about_message_1"/>
 	<TextView android:layout_width="fill_parent"
 	          android:layout_height="wrap_content"
 	          android:paddingTop="10dp"
@@ -61,7 +62,7 @@
 	          android:textColor="#004444"
 	          android:textSize="6pt"
 	          android:textStyle="bold"
-	          android:text="Find out more at apptentive.com"/>
+	          android:text="@string/apptentive_about_message_2"/>
 	<TextView android:layout_width="fill_parent"
 	          android:layout_height="wrap_content"
 	          android:layout_gravity="left"

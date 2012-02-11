@@ -1,14 +1,17 @@
 /*
- * ALog.java
- *
- * Created by Sky Kelsey on 2011-05-14.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
 import java.util.IllegalFormatException;
 
+// TODO: Make package private
+/**
+ * @author Sky Kelsey
+ */
 public class Log {
 
 	public static final int VERBOSE = 2;
@@ -21,12 +24,6 @@ public class Log {
 	private static final String TAG = "Apptentive";
 
 	private static void doLog(int level, Throwable throwable, String message, Object... args){
-		if(throwable != null){
-			if(throwable.getMessage() != null){
-				android.util.Log.println(level, TAG, throwable.getMessage());
-			}
-			android.util.Log.println(level, TAG, android.util.Log.getStackTraceString(throwable));
-		}
 		if(message != null){
 			if(args.length > 0){
 				try{
@@ -37,6 +34,12 @@ public class Log {
 				}
 			}
 			android.util.Log.println(level, TAG, message);
+			if(throwable != null){
+				if(throwable.getMessage() != null){
+					android.util.Log.println(level, TAG, throwable.getMessage());
+				}
+				android.util.Log.println(level, TAG, android.util.Log.getStackTraceString(throwable));
+			}
 		}
 	}
 

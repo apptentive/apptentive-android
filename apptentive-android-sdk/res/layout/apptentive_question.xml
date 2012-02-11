@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ apptentive_question.xml
-  ~
-  ~ Created by Sky Kelsey on 2011-10-09.
-  ~ Copyright 2011 Apptentive, Inc. All rights reserved.
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

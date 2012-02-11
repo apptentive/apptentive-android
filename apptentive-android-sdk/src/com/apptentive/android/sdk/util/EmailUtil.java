@@ -1,8 +1,7 @@
 /*
- * EmailUtil.java
- *
- * Created by Sky Kelsey on 2011-09-23.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.util;
@@ -11,6 +10,10 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 
+/**
+ * This class requires Android API level 5 (2.0), as it depends on the android.accounts.* API.
+ * @author Sky Kelsey
+ */
 public class EmailUtil{
 
 	public static String getEmail(Context context){
@@ -22,8 +25,8 @@ public class EmailUtil{
 			return account.name;
 		}
 	}
-	// TODO: Change this method to use a delegate of some kind,
-	// and Apptentive will run in Android 1.6
+
+	// TODO: Use reflection to load this so we can drop 2.1 API requirement.
 	private static Account getAccount(AccountManager accountManager){
 		Account[] accounts = accountManager.getAccountsByType("com.google");
 		Account account;

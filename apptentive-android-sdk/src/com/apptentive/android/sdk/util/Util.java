@@ -1,8 +1,7 @@
 /*
- * Util.java
- *
- * Created by Sky Kelsey on 2011-09-16.
- * Copyright 2011 Apptentive, Inc. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.util;
@@ -20,8 +19,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * @author Sky Kelsey
+ */
 public class Util {
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mmZ"); // 2011-01-01 11:59-0700
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ"); // 2011-01-01 11:59:59-0800
 	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); // 2011-01-01_11-59-59
 
 	public static String dateToString(Date date){
