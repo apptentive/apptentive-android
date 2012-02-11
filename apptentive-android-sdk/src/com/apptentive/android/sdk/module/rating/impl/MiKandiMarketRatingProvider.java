@@ -1,8 +1,7 @@
 /*
- * MiKandiMarketRating.java
- *
- * Created by Dr. Cocktor on 2011-11-29.
- * Copyright 2011 MiKandi, LLC. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.rating.impl;
@@ -21,16 +20,12 @@ import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsExcep
  * placeholder while changes are made to mikandi to allow a direct inward link
  * to a ratings dialog.
  */
-public class MiKandiMarketRating implements IRatingProvider {
-
-	@Override
-	public void startRating(Context ctx, Map<String, String> args) throws InsufficientRatingArgumentsException {
-		Toast.makeText(ctx, "MiKandi Ratings are not yet availale. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
+public class MiKandiMarketRatingProvider implements IRatingProvider {
+	public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
+		Toast.makeText(context, "MiKandi Ratings are not yet available. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
 	}
 
-	@Override
 	public String activityNotFoundMessage(Context ctx) {
-		return ctx.getString(R.string.apptentive_rating_no_kandi);
+		return ctx.getString(R.string.apptentive_rating_provider_no_mikandi);
 	}
-
 }
