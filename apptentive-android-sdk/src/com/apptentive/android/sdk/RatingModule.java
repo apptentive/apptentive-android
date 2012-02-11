@@ -6,26 +6,31 @@
 
 package com.apptentive.android.sdk;
 
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.*;
-import android.net.Uri;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.apptentive.android.sdk.module.metric.MetricPayload;
+import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
+import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.Util;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This module is responsible for determining when to show, and showing the rating flow of dialogs.
@@ -59,7 +64,7 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	private SharedPreferences prefs;
-	private RatingProvider selectedRatingProvider;
+	private IRatingProvider selectedRatingProvider = null;
 
 	private int daysBeforePrompt = DEFAULT_DAYS_BEFORE_PROMPT;
 	private int usesBeforePrompt = DEFAULT_USES_BEFORE_PROMPT;
@@ -69,7 +74,6 @@ public class RatingModule {
 	private Map<String, String> ratingProviderArgs;
 
 	private RatingModule() {
-		selectedRatingProvider = RatingProvider.ANDROID_MARKET; // Default
 		ratingProviderArgs = new HashMap<String, String>();
 		ratingProviderArgs.put("name", GlobalInfo.appDisplayName);
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
@@ -143,7 +147,7 @@ public class RatingModule {
 	 *
 	 * @param ratingProvider A {@link RatingProvider} value.
 	 */
-	public void setRatingProvider(RatingProvider ratingProvider) {
+	public void setRatingProvider(IRatingProvider ratingProvider) {
 		this.selectedRatingProvider = ratingProvider;
 	}
 
@@ -295,14 +299,6 @@ public class RatingModule {
 	// ***************************************** Inner Classes *****************************************
 	// *************************************************************************************************
 
-	/**
-	 * An enum used to define which app store to go to for rating the app.
-	 */
-	public enum RatingProvider {
-		ANDROID_MARKET,
-		MIKANDI_MARKET
-	}
-
 	enum RatingState {
 		/**
 		 * Initial state after first install.
@@ -420,20 +416,12 @@ public class RatingModule {
 								MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
 								PayloadManager.getInstance().putPayload(metric);
 								// Send user to app rating page
-								IRatingProvider ratingProvider;
-								switch (selectedRatingProvider) {
-									case ANDROID_MARKET:
-										ratingProvider = new AndroidMarketRatingProvider();
-										break;
-									case MIKANDI_MARKET:
-										ratingProvider = new MiKandiMarketRatingProvider();
-										break;
-									default:
-										ratingProvider = new AndroidMarketRatingProvider();
-										break;
+								if (RatingModule.this.selectedRatingProvider == null) {
+									// Default to the Android Market provider, if none has been specified
+									RatingModule.this.selectedRatingProvider = new AndroidMarketRatingProvider();
 								}
-								errorMessage = ratingProvider.activityNotFoundMessage(activityContext);
-								ratingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
+								errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activityContext);
+								RatingModule.this.selectedRatingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
 								setState(RatingState.RATED);
 							} catch (ActivityNotFoundException e) {
 								displayError(errorMessage);
@@ -493,67 +481,5 @@ public class RatingModule {
 			setCancelable(false);
 			super.show();
 		}
-	}
-
-	private interface IRatingProvider {
-		/**
-		 * Starts the rating process. Implementations should gracefully
-		 * handle cases where not all required arguments are provided.
-		 *
-		 * @param args    A list of keys and values which may have been
-		 *                provided at app initialization to allow the ratings provider
-		 *                access to additional information. The hash will, at a minimum,
-		 *                contain the 'name' of the app as passed to apptentive and the
-		 *                'package' identifier of the app.
-		 * @param context An Android {@link Context} used to launch the rating
-		 *                or provide dialogs or notifications.
-		 * @throws InsufficientRatingArgumentsException Thrown when the implementation needs an argument that isn't provided.
-		 *
-		 */
-		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException;
-
-		/**
-		 * Called if the startRating process does not successfully finish launching an activityContext.
-		 *
-		 * @param context The current Activity Context
-		 * @return The error message to display to users.
-		 */
-		public String activityNotFoundMessage(Context context);
-	}
-
-	private class AndroidMarketRatingProvider implements IRatingProvider {
-		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
-			if (!args.containsKey("package")) {
-				throw new InsufficientRatingArgumentsException("Missing required argument 'package'");
-			}
-			context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + args.get("package"))));
-		}
-
-		public String activityNotFoundMessage(Context ctx) {
-			return ctx.getString(R.string.apptentive_rating_provider_no_android_market);
-		}
-	}
-
-	private class MiKandiMarketRatingProvider implements IRatingProvider {
-		public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
-			Toast.makeText(context, "MiKandi Ratings are not yet available. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
-		}
-
-		public String activityNotFoundMessage(Context ctx) {
-			return ctx.getString(R.string.apptentive_rating_provider_no_mikandi);
-		}
-	}
-
-	/**
-	 * Indicates that a implementation of {@link IRatingProvider} was not
-	 * provided necessary and/or sufficient arguments to successfully kick
-	 * off a rating workflow.
-	 */
-	private class InsufficientRatingArgumentsException extends Exception {
-		public InsufficientRatingArgumentsException(String message) {
-			super(message);
-		}
-
-		private static final long serialVersionUID = -4592353045389664388L;
 	}
 }

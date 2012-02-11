@@ -1,8 +1,7 @@
 /*
- * InsufficientRatingArgumentsException.java
- *
- * Created by Dr. Cocktor on 2011-11-29.
- * Copyright 2011 MiKandi, LLC. All rights reserved.
+ * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
  */
 
 
@@ -17,5 +16,6 @@ public class InsufficientRatingArgumentsException extends Exception {
 	public InsufficientRatingArgumentsException(String message) {
 		super(message);
 	}
+
 	private static final long serialVersionUID = -4592353045389664388L;
 }
