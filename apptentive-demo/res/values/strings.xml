@@ -8,7 +8,7 @@
 
 <resources>
 	<string name="demo_app_name">Apptentive Demo App</string>
-	<string name="demo_activity_name">Apptentive Demo</string>
+	<string name="demo_activity_name">Apptentive</string>
 	<string name="demo_app_message">Demo App Message</string>
 	<string name="demo_button_feedback_text">Feedback</string>
 	<string name="demo_button_ratings_text">Rating</string>

@@ -10,7 +10,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.survey.QuestionDefinition;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,7 +86,7 @@ public class SurveyPayload extends Payload {
 			JSONObject record = new JSONObject();
 			JSONObject survey = new JSONObject();
 			survey.put("id", definition.getId());
-			JSONArray answers = new JSONArray();
+			JSONObject answers = new JSONObject();
 			for(String key : this.answers.keySet()){
 				String value = this.answers.get(key);
 				if(value.equals(QuestionDefinition.DEFAULT)){
@@ -96,10 +95,7 @@ public class SurveyPayload extends Payload {
 				if(value.equals("")){
 					continue;
 				}
-				JSONObject answer = new JSONObject();
-				answer.put("question_id", key);
-				answer.put("value", value);
-				answers.put(answer);
+				answers.put(key, value);
 			}
 			survey.put("responses", answers);
 			record.put("survey", survey);
