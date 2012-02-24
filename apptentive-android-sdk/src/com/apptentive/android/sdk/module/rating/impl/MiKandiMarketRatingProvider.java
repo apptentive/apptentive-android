@@ -9,7 +9,8 @@ package com.apptentive.android.sdk.module.rating.impl;
 import java.util.Map;
 
 import android.content.Context;
-import android.widget.Toast;
+import android.content.Intent;
+import android.net.Uri;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -21,8 +22,18 @@ import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsExcep
  * to a ratings dialog.
  */
 public class MiKandiMarketRatingProvider implements IRatingProvider {
+	
+	private int mAppId;
+	
+	public MiKandiMarketRatingProvider(int AppId) {
+		this.mAppId = AppId;
+	}
+	
 	public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
-		Toast.makeText(context, "MiKandi Ratings are not yet available. Please visit the MiKandi Market", Toast.LENGTH_LONG).show();
+		final Uri launch = Uri.parse("mikandi://link.mikandi.com/app?app_id=" + this.mAppId + "&referrer=apptentive");
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(launch);
+		context.startActivity(i);
 	}
 
 	public String activityNotFoundMessage(Context ctx) {

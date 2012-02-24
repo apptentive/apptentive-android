@@ -81,6 +81,7 @@ public class RatingModule {
 
 	private boolean ratingPeriodElapsed() {
 		RatingState state = getState();
+		Log.i("Rating periond " + (Util.timeHasElapsed(getStartOfRatingPeriod(), daysBeforePrompt) ? "has" : "not") + " elapsed");
 		switch (state) {
 			case REMIND:
 				return Util.timeHasElapsed(getStartOfRatingPeriod(), daysBeforeReprompting);
@@ -234,7 +235,9 @@ public class RatingModule {
 
 		switch (getState()) {
 			case START:
+				//Log.i("Checking Rating");
 				if (ratingPeriodElapsed()) {
+					//Log.i("Event threshold " + (this.eventThresholdReached() ? "is" : "not") + " reached");
 					if (eventThresholdReached()) {
 						showEnjoymentDialog(activity, Trigger.events);
 					} else if (usesThresholdReached()) {
@@ -373,6 +376,7 @@ public class RatingModule {
 			PayloadManager.getInstance().putPayload(metric);
 
 			setCancelable(false);
+			//Log.i("EnjoymentDialog", "Showing the enjoyment dialog");
 			super.show();
 		}
 	}
