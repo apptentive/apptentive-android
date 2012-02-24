@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.metric;
 
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.offline.Payload;
 import com.apptentive.android.sdk.util.Util;
@@ -24,6 +25,7 @@ public class MetricPayload extends Payload {
 		try {
 			setString(type.getRecordName(), "record", "metric", "event");
 			setString(Util.dateToString(new Date()), "record", "date");
+			setString(GlobalInfo.androidId, "record", "device", "uuid");
 		} catch (JSONException e) {
 			Log.e("Exception generating metric JSON.", e);
 		}
