@@ -42,17 +42,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * Passes your application's Activity to Apptentive so we can initialize.
-	 * @param activity The activity from which you are calling this method.
+	 * Sets the application context for Apptentive
+	 * @param app The top level application instance.
 	 */
-	public void setActivity(Activity activity) {
-		this.application = activity.getApplication();
-		Context appContext = activity.getApplicationContext();
+	public void setApplication(Application app) {
+		this.application = app;
+		Context appContext = app.getApplicationContext();
 
 		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
 		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
 		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
-		GlobalInfo.appPackage = activity.getApplicationContext().getPackageName();
+		GlobalInfo.appPackage = appContext.getPackageName();
 		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = getUserEmail(application.getApplicationContext());
 
@@ -66,6 +66,14 @@ public class Apptentive {
 		// Instrumentation
 		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__launch);
 		PayloadManager.getInstance().putPayload(metric);
+	}
+
+	/**
+	 * Passes your application's Activity to Apptentive so we can initialize.
+	 * @param activity The activity from which you are calling this method.
+	 */
+	public void setActivity(Activity activity) {
+		this.setApplication(activity.getApplication());
 	}
 
 	/**
