@@ -40,7 +40,6 @@ public class FeedbackPayload extends Payload {
 			setString(GlobalInfo.carrier,         "record", "device", "carrier");
 			setString(GlobalInfo.currentCarrier,  "record", "device", "current_carrier");
 			String networkType = Constants.networkTypeAsString(GlobalInfo.networkType);
-			Log.e("Network Type: " + networkType + " = " + GlobalInfo.networkType);
 			setString(networkType,                "record", "device", "network_type");
 			setString(Build.TYPE,                 "record", "device", "type");
 			setString(Build.ID,                   "record", "device", "id");

@@ -24,8 +24,12 @@ import org.json.JSONException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
+ * TODO: Make a generic get, post method, etc.
+ * TODO: Catch HttpHostConnectException, which occurs when data connection is not there
+ * TODO: Don't communicate when there is no connection present.
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
@@ -33,6 +37,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	private static final String ENDPOINT_SURVEYS  = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE  = ENDPOINT_SURVEYS + "/active";
+	private static final String ENDPOINT_CONFIGURATION  = ENDPOINT_BASE+ "/devices/%s/configuration";
 
 	private final String APPTENTIVE_API_KEY;
 
@@ -54,7 +59,7 @@ public class ApptentiveClient {
 		StringBuilder content = new StringBuilder();
 		InputStream is = null;
 		try{
-			//Log.i("Posting JSON: " + json);
+			Log.d("Posting JSON: " + json);
 			post.setEntity(new StringEntity(json, "UTF-8"));
 			HttpResponse response = httpClient.execute(post);
 			is = response.getEntity().getContent();
@@ -63,8 +68,8 @@ public class ApptentiveClient {
 			while((size = is.read(line)) != -1){
 				content.append(new String(line, 0, size));
 			}
-			//Log.i(response.getStatusLine().toString());
-			//Log.i(content.toString());
+			Log.d(response.getStatusLine().toString());
+			Log.v(content.toString());
 
 			return (200 <= response.getStatusLine().getStatusCode()) &&
 			       (300 > response.getStatusLine().getStatusCode());
@@ -93,11 +98,11 @@ public class ApptentiveClient {
 
 			HttpResponse response = httpClient.execute(get);
 			int code = response.getStatusLine().getStatusCode();
-			//Log.i("HTTP response status line: " + response.getStatusLine().toString());
+			Log.d("Survey: HTTP response status line: " + response.getStatusLine().toString());
 
 			if(code >= 200 && code < 300){
 				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-				//Log.i("Response: " + content);
+				Log.v("Survey: " + content);
 				return SurveyManager.parseSurvey(content);
 			}
 		}catch(URISyntaxException e){
@@ -114,5 +119,39 @@ public class ApptentiveClient {
 			}
 		}
 		return null;
+	}
+
+	public Properties getAppConfiguration(String deviceId){
+		Properties propers = new Properties();
+		InputStream is = null;
+		try{
+			String uri = String.format(ENDPOINT_CONFIGURATION, deviceId);
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpGet get = new HttpGet();
+
+			get.setURI(new URI(uri));
+			get.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
+			get.setHeader("Accept", "application/json");
+
+			HttpResponse response = httpClient.execute(get);
+			int code = response.getStatusLine().getStatusCode();
+			Log.d("Configuration: HTTP response status line: " + response.getStatusLine().toString());
+
+			if(code >= 200 && code < 300){
+				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
+				Log.v("Configuration: " + content);
+			}
+		}catch(URISyntaxException e){
+			Log.e("Error fetching contact information.", e);
+		}catch(IOException e){
+			Log.e("Error fetching contact information.", e);
+		}finally{
+			if(is != null){
+				try{
+					is.close();
+				}catch(Exception e){}
+			}
+		}
+		return propers;
 	}
 }

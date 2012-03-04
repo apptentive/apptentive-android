@@ -24,23 +24,18 @@ public class DemoActivity extends Activity {
 		// BEGIN APPTENTIVE INITIALIZATION
 
 		final Apptentive apptentive = Apptentive.getInstance();
-		apptentive.setActivity(this);
-		apptentive.setApiKey("<YOUR_API_KEY>");
-		apptentive.setAppDisplayName("Demo Activity");
-		apptentive.setUserEmail("user_email@example.com");
+		apptentive.initialize(this, "<YOUR_API_KEY>");
+		apptentive.setAppDisplayName("Apptentive Demo");
+		//apptentive.setUserEmail("user_email@example.com");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
 		ratingModule.setRatingProvider(RatingModule.RatingProvider.ANDROID_MARKET);
-		ratingModule.setDaysBeforePrompt(5);
-		ratingModule.setUsesBeforePrompt(4);
-		ratingModule.setSignificantEventsBeforePrompt(5);
-		ratingModule.setDaysBeforeReprompting(10);
 		// Bump uses each time the app starts.
 		ratingModule.logUse();
 
 		// Add custom data fields to feedback this way:
 		final FeedbackModule feedbackModule = apptentive.getFeedbackModule();
-		feedbackModule.addDataField("boo", "far");
+		feedbackModule.addDataField("foo", "bar");
 
 		// END APPTENTIVE INITIALIZATION
 
