@@ -11,7 +11,6 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
-import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 import java.util.Date;
@@ -59,7 +58,6 @@ public class FeedbackPayload extends Payload {
 
 			// Other feedback fields.
 			setString(feedbackType,               "record", "feedback", "type");
-			setString(Util.dateToString(new Date()), "record", "date");
 		}catch(JSONException e){
 			Log.w("Exception creating Feedback Payload.", e);
 		}
