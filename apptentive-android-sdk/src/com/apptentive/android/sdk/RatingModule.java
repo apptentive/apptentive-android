@@ -21,6 +21,9 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -52,6 +55,7 @@ public class RatingModule {
 	public static int DEFAULT_USES_BEFORE_PROMPT = 5;
 	public static int DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
 	public static int DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
+	public static String DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 
 
 	// *************************************************************************************************
@@ -61,10 +65,7 @@ public class RatingModule {
 	private SharedPreferences prefs;
 	private RatingProvider selectedRatingProvider;
 
-	private int daysBeforePrompt = DEFAULT_DAYS_BEFORE_PROMPT;
-	private int usesBeforePrompt = DEFAULT_USES_BEFORE_PROMPT;
-	private int significantEventsBeforePrompt = DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT;
-	private int daysBeforeReprompting = DEFAULT_DAYS_BEFORE_REPROMPTING;
+	private String ratingsPromptLogic;
 
 	private Map<String, String> ratingProviderArgs;
 
@@ -77,19 +78,25 @@ public class RatingModule {
 
 	private boolean ratingPeriodElapsed() {
 		RatingState state = getState();
+		boolean elapsed;
 		switch (state) {
 			case REMIND:
-				return Util.timeHasElapsed(getStartOfRatingPeriod(), daysBeforeReprompting);
+				elapsed = Util.timeHasElapsed(getStartOfRatingPeriod(), prefs.getInt("appConfiguration.ratings_days_between_prompts", DEFAULT_DAYS_BEFORE_REPROMPTING));
+				break;
 			default:
-				return Util.timeHasElapsed(getStartOfRatingPeriod(), daysBeforePrompt);
+				elapsed = Util.timeHasElapsed(getStartOfRatingPeriod(), prefs.getInt("appConfiguration.ratings_days_before_prompt", DEFAULT_DAYS_BEFORE_PROMPT));
+				break;
 		}
+		return elapsed;
 	}
 
 	private boolean eventThresholdReached() {
+		int significantEventsBeforePrompt = prefs.getInt("appConfiguration.ratings_events_before_prompt", DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
 		return getEvents() >= significantEventsBeforePrompt;
 	}
 
 	private boolean usesThresholdReached() {
+		int usesBeforePrompt = prefs.getInt("appConfiguration.ratings_uses_before_prompt", DEFAULT_USES_BEFORE_PROMPT);
 		return getUses() >= usesBeforePrompt;
 	}
 
@@ -150,48 +157,12 @@ public class RatingModule {
 	/**
 	 * If there are any pieces of data your {@link IRatingProvider} needs, add them here.
 	 * Default keys already included are: [name, package].
-	 * 
+	 *
 	 * @param key The argument name the the chosen {@link IRatingProvider} needs.
 	 * @param value The value of the argument.
  	 */
 	public void putRatingProviderArg(String key, String value) {
 		this.ratingProviderArgs.put(key, value);
-	}
-
-	/**
-	 * Sets the number of days after installation to wait before showing the rating flow.
-	 *
-	 * @param daysBeforePrompt The number of days after installation to wait before showing the rating flow.
-	 */
-	public void setDaysBeforePrompt(int daysBeforePrompt) {
-		this.daysBeforePrompt = daysBeforePrompt;
-	}
-
-	/**
-	 * Sets the number of uses after installation to occur before showing the rating flow.
-	 *
-	 * @param usesBeforePrompt The number of uses after installation to occur before showing the rating flow.
-	 */
-	public void setUsesBeforePrompt(int usesBeforePrompt) {
-		this.usesBeforePrompt = usesBeforePrompt;
-	}
-
-	/**
-	 * Sets the number of significant events after installation to occur before showint the rating flow.
-	 *
-	 * @param significantEventsBeforePrompt The number of significant events after installation to occur before showint the rating flow.
-	 */
-	public void setSignificantEventsBeforePrompt(int significantEventsBeforePrompt) {
-		this.significantEventsBeforePrompt = significantEventsBeforePrompt;
-	}
-
-	/**
-	 * Sets the number of days after postponing rating to wait before showing the rating flow again.
-	 *
-	 * @param daysBeforeReprompting The number of days after postponing rating to wait before showing the rating flow again.
-	 */
-	public void setDaysBeforeReprompting(int daysBeforeReprompting) {
-		this.daysBeforeReprompting = daysBeforeReprompting;
 	}
 
 	/**
@@ -230,12 +201,10 @@ public class RatingModule {
 
 		switch (getState()) {
 			case START:
-				if (ratingPeriodElapsed()) {
-					if (eventThresholdReached()) {
-						showEnjoymentDialog(activity, Trigger.events);
-					} else if (usesThresholdReached()) {
-						showEnjoymentDialog(activity, Trigger.uses);
-					}
+				boolean canShow = canShowRatingFlow();
+				if(canShow) {
+					// TODO: Trigger no longer makes sense with boolean logic expressions. Axe it.
+					showEnjoymentDialog(activity, Trigger.events);
 				}
 				break;
 			case REMIND:
@@ -250,6 +219,55 @@ public class RatingModule {
 			default:
 				break;
 		}
+	}
+
+	private boolean canShowRatingFlow(){
+		ratingsPromptLogic = prefs.getString("appConfiguration.ratings_prompt_logic", DEFAULT_RATING_PROMPT_LOGIC);
+		try{
+			return logic(new JSONObject(ratingsPromptLogic));
+		}catch(JSONException e){
+			// Fall back to old logic.
+			return ratingPeriodElapsed() && (eventThresholdReached() || usesThresholdReached());
+		}
+	}
+
+	/**
+	 * Apply the rules from the logic expression.
+	 * @param obj
+	 * @return True it the logic expression is true.
+	 * @throws JSONException
+	 */
+	private boolean logic(Object obj) throws JSONException {
+		boolean ret = false;
+		if (obj instanceof JSONObject) {
+			JSONObject jsonObject = (JSONObject) obj;
+			String key = (String)jsonObject.keys().next(); // Should be one array per logic statement.
+			if ("and".equals(key)) {
+				JSONArray and = jsonObject.getJSONArray("and");
+				ret = true;
+				for (int i = 0; i < and.length(); i++) {
+					ret = ret && logic(and.get(i));
+				}
+			} else if ("or".equals(key)) {
+				JSONArray or = jsonObject.getJSONArray("or");
+				for (int i = 0; i < or.length(); i++) {
+					ret = ret || logic(or.get(i));
+				}
+			} else {
+				return logic(key);
+			}
+		} else if(obj instanceof String){
+			if("uses".equals(obj)) {
+				return usesThresholdReached();
+			} else if("days".equals(obj)) {
+				return ratingPeriodElapsed();
+			} else if("events".equals(obj)) {
+				return eventThresholdReached();
+			}
+		} else {
+			Log.w("Unknown logic token: " + obj);
+		}
+		return ret;
 	}
 
 	/**

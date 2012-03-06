@@ -6,13 +6,25 @@
 
 package com.apptentive.android.sdk.offline;
 
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Date;
 
 /**
  * @author Sky Kelsey
  */
 public abstract class Payload {
+
+	public Payload() {
+		try {
+			setString(Util.dateToString(new Date()), "record", "date");
+		} catch (JSONException e) {
+			Log.e("Exception setting date.", e);
+		}
+	}
 
 	protected JSONObject root = new JSONObject();
 

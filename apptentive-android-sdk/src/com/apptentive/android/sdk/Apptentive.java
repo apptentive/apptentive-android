@@ -9,12 +9,17 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
+
+import java.util.Properties;
 
 /**
  * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
@@ -25,9 +30,24 @@ public class Apptentive {
 	public static final String APPTENTIVE_API_VERSION = "0.1";
 
 	private static Apptentive instance = null;
-	private Application application;
+	private Application application = null;
 
 	private Apptentive() {
+	}
+
+	/**
+	 * TODO: Where should this go?
+	 * @param context
+	 * @param apiKey
+	 */
+	private void getAppConfiguration(Context context, String apiKey){
+		Log.e("getAppConfiguration()");
+		ApptentiveClient client = new ApptentiveClient(apiKey);
+		Properties propers = client.getAppConfiguration(GlobalInfo.androidId);
+		SharedPreferences prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		for(Object key : propers.keySet()){
+			prefs.edit().putString("appConfiguration."+key, propers.getProperty((String)key)).commit();
+		}
 	}
 
 	/**
@@ -42,12 +62,26 @@ public class Apptentive {
 	}
 
 	/**
-	 * Passes your application's Activity to Apptentive so we can initialize.
+	 * Initializes the Apptentive Passes your application's Activity to Apptentive so we can initialize.
 	 * @param activity The activity from which you are calling this method.
+	 * @param apiKey The API key. This will be a long base64 token like:<br/>
+	 * <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
+
 	 */
-	public void setActivity(Activity activity) {
+	public void initialize(Activity activity, String apiKey) {
 		this.application = activity.getApplication();
-		Context appContext = activity.getApplicationContext();
+		GlobalInfo.apiKey = apiKey;
+
+		final Context appContext = activity.getApplicationContext();
+
+		// Retrieve device/app configuration.
+		new AsyncTask(){
+			@Override
+			protected Object doInBackground(Object... objects) {
+				getAppConfiguration(appContext, GlobalInfo.apiKey);
+				return null;
+			}
+		}.execute();
 
 		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
 		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
@@ -78,17 +112,7 @@ public class Apptentive {
 	}
 
 	/**
-	 * Sets your Apptentive API key.<br/><br/>
-	 * This will be a long base64 token like:<br/>
-	 * <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
-	 * @param apiKey The API key.
-	 */
-	public void setApiKey(String apiKey) {
-		GlobalInfo.apiKey = apiKey;
-	}
-
-	/**
-	 * Sets your app's display name.<br/><br/>
+	 * Sets your app's display name.<p/>
 	 * Should be something like "My App Name".
 	 * @param name The display name of your app.
 	 */
