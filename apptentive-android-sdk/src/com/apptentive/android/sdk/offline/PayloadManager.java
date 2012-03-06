@@ -115,7 +115,7 @@ public class PayloadManager implements Runnable {
 				}
 				Log.d("Got a payload to send: " + name);
 				String json = prefs.getString(name, null);
-				//Log.d("Payload: " + json);
+				Log.v("Payload contents: " + json);
 				if(json == null){
 					prefs.edit().remove(name).commit();
 					continue;

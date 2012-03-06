@@ -20,7 +20,7 @@ public class GlobalInfo {
 	public static String androidId;
 	public static String appDisplayName;
 	public static String appPackage;
-	public static String apiKey;
+	public static String apiKey = null;
 
 	public static String userEmail;
 }

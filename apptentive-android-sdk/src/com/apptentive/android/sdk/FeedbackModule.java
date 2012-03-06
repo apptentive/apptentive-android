@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import com.apptentive.android.sdk.module.metric.MetricPayload;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
@@ -158,12 +159,14 @@ public class FeedbackModule {
 				}
 			});
 
-			findViewById(R.id.apptentive_button_send).setOnClickListener(new View.OnClickListener() {
+			Button send = (Button)findViewById(R.id.apptentive_button_send);
+			send.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					FeedbackModule.this.submit();
 					dismiss();
 				}
 			});
+			send.setEnabled(false);
 
 			findViewById(R.id.apptentive_branding_view).setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
@@ -199,7 +202,12 @@ public class FeedbackModule {
 				if (id == R.id.apptentive_feedback_user_email) {
 					FeedbackModule.this.feedback.setEmail(text);
 				} else if (id == R.id.apptentive_feedback_text) {
-					FeedbackModule.this.feedback.setFeedback(text);
+					if(text.equals("")) {
+						findViewById(R.id.apptentive_button_send).setEnabled(false);
+					} else {
+						findViewById(R.id.apptentive_button_send).setEnabled(true);
+						FeedbackModule.this.feedback.setFeedback(text);
+					}
 				}
 			}
 		}

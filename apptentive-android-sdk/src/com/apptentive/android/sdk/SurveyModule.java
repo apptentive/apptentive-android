@@ -38,6 +38,8 @@ public class SurveyModule {
 
 	private static SurveyModule instance;
 
+	private boolean submittable = false;
+
 	static SurveyModule getInstance() {
 		if (instance == null) {
 			instance = new SurveyModule();
@@ -104,8 +106,10 @@ public class SurveyModule {
 		Button skipSend = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
 		if (result.hasBeenAnswered()) {
 			skipSend.setText(R.string.apptentive_send);
+			submittable = true;
 		} else {
 			skipSend.setText(R.string.apptentive_skip);
+			submittable = false;
 		}
 	}
 
@@ -131,7 +135,9 @@ public class SurveyModule {
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-				PayloadManager.getInstance().putPayload(result);
+				if(submittable) {
+					PayloadManager.getInstance().putPayload(result);
+				}
 				cleanup();
 				activity.finish();
 			}
