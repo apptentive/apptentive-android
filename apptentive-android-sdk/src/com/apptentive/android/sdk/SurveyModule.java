@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +16,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.module.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.survey.QuestionDefinition;
@@ -22,9 +32,6 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
@@ -203,7 +210,7 @@ public class SurveyModule {
 					for (int i = 0; i < answerDefinitions.size(); i++) {
 						optionNames.add(answerDefinitions.get(i).getValue());
 					}
-					ArrayAdapter adapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_item, optionNames);
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, optionNames);
 					adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 					Spinner spinner = new Spinner(activity);
 					spinner.setLayoutParams(Constants.rowLayout);

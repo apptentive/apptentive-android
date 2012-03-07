@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,10 +18,11 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
 
-import java.util.Properties;
+import java.util.HashMap;
 
 /**
  * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
+ *
  * @author Sky Kelsey
  */
 public class Apptentive {
@@ -36,22 +36,8 @@ public class Apptentive {
 	}
 
 	/**
-	 * TODO: Where should this go?
-	 * @param context
-	 * @param apiKey
-	 */
-	private void getAppConfiguration(Context context, String apiKey){
-		Log.e("getAppConfiguration()");
-		ApptentiveClient client = new ApptentiveClient(apiKey);
-		Properties propers = client.getAppConfiguration(GlobalInfo.androidId);
-		SharedPreferences prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
-		for(Object key : propers.keySet()){
-			prefs.edit().putString("appConfiguration."+key, propers.getProperty((String)key)).commit();
-		}
-	}
-
-	/**
 	 * Gets the Apptentive singleton instance.
+	 *
 	 * @return The Apptentive singleton instance.
 	 */
 	public static Apptentive getInstance() {
@@ -63,19 +49,19 @@ public class Apptentive {
 
 	/**
 	 * Initializes the Apptentive Passes your application's Activity to Apptentive so we can initialize.
-	 * @param activity The activity from which you are calling this method.
+	 *
+	 * @param app    The top level application instance.
 	 * @param apiKey The API key. This will be a long base64 token like:<br/>
-	 * <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
-
+	 *               <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
 	 */
-	public void initialize(Activity activity, String apiKey) {
-		this.application = activity.getApplication();
+	public void initialize(Application app, String apiKey) {
+		this.application = app;
 		GlobalInfo.apiKey = apiKey;
 
-		final Context appContext = activity.getApplicationContext();
+		final Context appContext = application.getApplicationContext();
 
 		// Retrieve device/app configuration.
-		new AsyncTask(){
+		new AsyncTask() {
 			@Override
 			protected Object doInBackground(Object... objects) {
 				getAppConfiguration(appContext, GlobalInfo.apiKey);
@@ -86,16 +72,17 @@ public class Apptentive {
 		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
 		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
 		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
-		GlobalInfo.appPackage = activity.getApplicationContext().getPackageName();
+		//GlobalInfo.appPackage = appContext.getPackageName();
+		GlobalInfo.appPackage = "org.mozilla.firefox";
 		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		GlobalInfo.userEmail = getUserEmail(application.getApplicationContext());
+		GlobalInfo.userEmail = getUserEmail(appContext);
 
 		PayloadManager.getInstance().setContext(appContext);
 		PayloadManager.getInstance().start();
 
 		// Initialize modules.
-		RatingModule.getInstance().setContext(application.getApplicationContext());
-		FeedbackModule.getInstance().setContext(application.getApplicationContext());
+		RatingModule.getInstance().setContext(appContext);
+		FeedbackModule.getInstance().setContext(appContext);
 
 		// Instrumentation
 		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__launch);
@@ -103,9 +90,37 @@ public class Apptentive {
 	}
 
 	/**
+	 * Grabs the app configuration from the server and stores the keys into our SharedPreferences.
+	 * @param context
+	 * @param apiKey
+	 */
+	private void getAppConfiguration(Context context, String apiKey) {
+		Log.e("getAppConfiguration()");
+		ApptentiveClient client = new ApptentiveClient(apiKey);
+		HashMap<String, Object> config = client.getAppConfiguration(GlobalInfo.androidId);
+		SharedPreferences prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		for (String key : config.keySet()) {
+			Object value = config.get(key);
+			Log.e(key + " = " + value);
+			if (value instanceof Integer) {
+				prefs.edit().putInt("appConfiguration." + key, (Integer) value).commit();
+			} else if (value instanceof String) {
+				prefs.edit().putString("appConfiguration." + key, (String) value).commit();
+			} else if (value instanceof Boolean) {
+				prefs.edit().putBoolean("appConfiguration." + key, (Boolean) value).commit();
+			} else if (value instanceof Long) {
+				prefs.edit().putLong("appConfiguration." + key, (Long) value).commit();
+			} else if (value instanceof Float) {
+				prefs.edit().putFloat("appConfiguration." + key, (Float) value).commit();
+			}
+		}
+		Log.e("");
+	}
+
+	/**
 	 * Call this from your main Activity's onDestroy() method, so we can clean up.
 	 */
-	public void onDestroy(){
+	public void onDestroy() {
 		// Instrumentation
 		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__exit);
 		PayloadManager.getInstance().putPayload(metric);
@@ -114,6 +129,7 @@ public class Apptentive {
 	/**
 	 * Sets your app's display name.<p/>
 	 * Should be something like "My App Name".
+	 *
 	 * @param name The display name of your app.
 	 */
 	public void setAppDisplayName(String name) {
@@ -124,6 +140,7 @@ public class Apptentive {
 	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
 	 * This method will override the email address that Apptentive looks for programmatically, but will not override
 	 * an email address that the user has previously entered in an Apptentive dialog.
+	 *
 	 * @param email The user's email address.
 	 */
 	public void setUserEmail(String email) {
@@ -133,6 +150,7 @@ public class Apptentive {
 
 	/**
 	 * Gets the Apptentive Rating Module.
+	 *
 	 * @return The Apptentive Rating Module.
 	 */
 	public RatingModule getRatingModule() {
@@ -141,6 +159,7 @@ public class Apptentive {
 
 	/**
 	 * Gets the Apptentive Feedback Module.
+	 *
 	 * @return The Apptentive Feedback Module.
 	 */
 	public FeedbackModule getFeedbackModule() {
@@ -149,6 +168,7 @@ public class Apptentive {
 
 	/**
 	 * Gets the Apptentive Survey Module.
+	 *
 	 * @return The Apptentive Survey Module.
 	 */
 	public SurveyModule getSurveyModule() {

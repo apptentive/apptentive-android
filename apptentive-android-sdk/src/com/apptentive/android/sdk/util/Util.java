@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import com.apptentive.android.sdk.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,8 +24,8 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Util {
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SZ"); // 2011-01-01 11:59:59-0800
-	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.S"); // 2011-01-01_11-59-59
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ"); // 2011-01-01 11:59:59-0800
+	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS"); // 2011-01-01_11-59-59
 
 	public static String dateToString(Date date){
 		return dateToString(date, Util.DATE_FORMAT);
@@ -54,7 +55,7 @@ public class Util {
 	}
 
 	public static boolean timeHasElapsed(Date start, int days){
-		return new Date().after(addDaysToDate(start, days));
+		return !(new Date().before(addDaysToDate(start, days)));
 	}
 
 	private static List<PackageInfo> getPermissions(Context context){
