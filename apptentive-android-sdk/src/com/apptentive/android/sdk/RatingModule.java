@@ -205,21 +205,10 @@ public class RatingModule {
 
 		switch (getState()) {
 			case START:
-<<<<<<< HEAD
-				//Log.i("Checking Rating");
-				if (ratingPeriodElapsed()) {
-					//Log.i("Event threshold " + (this.eventThresholdReached() ? "is" : "not") + " reached");
-					if (eventThresholdReached()) {
-						showEnjoymentDialog(activity, Trigger.events);
-					} else if (usesThresholdReached()) {
-						showEnjoymentDialog(activity, Trigger.uses);
-					}
-=======
 				boolean canShow = canShowRatingFlow();
 				if(canShow) {
 					// TODO: Trigger no longer makes sense with boolean logic expressions. Axe it.
 					showEnjoymentDialog(activity, Trigger.events);
->>>>>>> 771fba72e17d88e0fb419503e48bc24bd71e3ff6
 				}
 				break;
 			case REMIND:
