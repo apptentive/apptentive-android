@@ -24,8 +24,8 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Util {
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ"); // 2011-01-01 11:59:59-0800
-	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); // 2011-01-01_11-59-59
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SZ"); // 2011-01-01 11:59:59-0800
+	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.S"); // 2011-01-01_11-59-59
 
 	public static String dateToString(Date date){
 		return dateToString(date, Util.DATE_FORMAT);

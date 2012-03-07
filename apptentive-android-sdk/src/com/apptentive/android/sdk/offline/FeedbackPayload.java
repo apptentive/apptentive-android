@@ -11,7 +11,6 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
-import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 import java.util.Date;
@@ -40,7 +39,6 @@ public class FeedbackPayload extends Payload {
 			setString(GlobalInfo.carrier,         "record", "device", "carrier");
 			setString(GlobalInfo.currentCarrier,  "record", "device", "current_carrier");
 			String networkType = Constants.networkTypeAsString(GlobalInfo.networkType);
-			Log.e("Network Type: " + networkType + " = " + GlobalInfo.networkType);
 			setString(networkType,                "record", "device", "network_type");
 			setString(Build.TYPE,                 "record", "device", "type");
 			setString(Build.ID,                   "record", "device", "id");
@@ -60,7 +58,6 @@ public class FeedbackPayload extends Payload {
 
 			// Other feedback fields.
 			setString(feedbackType,               "record", "feedback", "type");
-			setString(Util.dateToString(new Date()), "record", "date");
 		}catch(JSONException e){
 			Log.w("Exception creating Feedback Payload.", e);
 		}
