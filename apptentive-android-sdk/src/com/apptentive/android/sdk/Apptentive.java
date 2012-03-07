@@ -95,13 +95,11 @@ public class Apptentive {
 	 * @param apiKey
 	 */
 	private void getAppConfiguration(Context context, String apiKey) {
-		Log.e("getAppConfiguration()");
 		ApptentiveClient client = new ApptentiveClient(apiKey);
 		HashMap<String, Object> config = client.getAppConfiguration(GlobalInfo.androidId);
 		SharedPreferences prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 		for (String key : config.keySet()) {
 			Object value = config.get(key);
-			Log.e(key + " = " + value);
 			if (value instanceof Integer) {
 				prefs.edit().putInt("appConfiguration." + key, (Integer) value).commit();
 			} else if (value instanceof String) {
@@ -114,7 +112,6 @@ public class Apptentive {
 				prefs.edit().putFloat("appConfiguration." + key, (Float) value).commit();
 			}
 		}
-		Log.e("");
 	}
 
 	/**
