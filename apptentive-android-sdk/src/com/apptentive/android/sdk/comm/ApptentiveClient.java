@@ -36,7 +36,7 @@ import java.util.Iterator;
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
-	private static final String ENDPOINT_BASE = "http://api.apptentive-beta.com";
+	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
