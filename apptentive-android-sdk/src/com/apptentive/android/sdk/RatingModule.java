@@ -312,7 +312,6 @@ public class RatingModule {
 	 */
 	public void day() {
 		setStartOfRatingPeriod(Util.addDaysToDate(getStartOfRatingPeriod(), -1));
-		Log.e("Start of Rating Period: " + Util.dateToString(getStartOfRatingPeriod()));
 	}
 
 	// *************************************************************************************************
