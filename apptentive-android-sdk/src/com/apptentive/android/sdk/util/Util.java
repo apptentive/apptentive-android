@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -51,6 +52,7 @@ public class Util {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		cal.setTime(start);
 		cal.add(Calendar.DAY_OF_MONTH, days);
+		Log.d("Apptentive Utils", cal.toString());
 		return cal.getTime();
 	}
 

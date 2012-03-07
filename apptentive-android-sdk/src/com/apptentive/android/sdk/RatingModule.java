@@ -393,6 +393,7 @@ public class RatingModule {
 			PayloadManager.getInstance().putPayload(metric);
 
 			setCancelable(false);
+			//Log.i("EnjoymentDialog", "Showing the enjoyment dialog");
 			super.show();
 		}
 	}
