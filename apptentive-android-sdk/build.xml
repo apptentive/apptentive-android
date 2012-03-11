@@ -82,4 +82,45 @@
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+	<target name="findbugs" depends="-compile">
+		<mkdir dir="reports" />
+		<findbugs home="${findbugs.home}" output="xml" outputFile="reports/findbugs.xml" excludeFilter="findbugs-exclude.xml">
+			<auxClasspath path="${android.jar}" />
+			<auxClasspath>
+				<fileset dir="libs" includes="**/*.jar" />
+			</auxClasspath>
+			<class location="${out.dir}" />
+		</findbugs>
+	</target>
+
+	<target name="clean-reports">
+		<delete dir="reports" />
+	</target>
+
+	<path id="pmd.classpath">
+		<!--<pathelement location="${build}"/>-->
+		<fileset dir="${pmd.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
+	<target name="pmd">
+		<mkdir dir="reports" />
+		<pmd shortFilenames="true">
+			<ruleset>basic</ruleset>
+			<formatter type="xml" toFile="reports/pmd.xml"/>
+			<fileset dir="src">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
+	</target>
+	<target name="cpd">
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="pmd.classpath" />
+		<cpd minimumTokenCount="50" format="xml" outputFile="reports/cpd.xml">
+			<fileset dir="src">
+				<include name="**/*.java"/>
+			</fileset>
+		</cpd>
+	</target>
 </project>
