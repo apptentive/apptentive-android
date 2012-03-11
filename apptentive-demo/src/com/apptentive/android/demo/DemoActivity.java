@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import com.apptentive.android.sdk.*;
+import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
 
 /**
  * @author Sky Kelsey
@@ -24,12 +25,12 @@ public class DemoActivity extends Activity {
 		// BEGIN APPTENTIVE INITIALIZATION
 
 		final Apptentive apptentive = Apptentive.getInstance();
-		apptentive.initialize(this, "<YOUR_API_KEY>");
+		apptentive.initialize(getApplication(), "<YOUR_API_KEY>");
 		apptentive.setAppDisplayName("Apptentive Demo");
 		//apptentive.setUserEmail("user_email@example.com");
 
 		final RatingModule ratingModule = apptentive.getRatingModule();
-		ratingModule.setRatingProvider(RatingModule.RatingProvider.ANDROID_MARKET);
+		ratingModule.setRatingProvider(new AndroidMarketRatingProvider());
 		// Bump uses each time the app starts.
 		ratingModule.logUse();
 

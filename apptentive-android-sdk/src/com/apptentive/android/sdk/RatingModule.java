@@ -152,7 +152,7 @@ public class RatingModule {
 	 * Ues this to choose where to send the user when they are prompted to rate the app. This should be the same place
 	 * that the app was downloaded from.
 	 *
-	 * @param ratingProvider A {@link RatingProvider} value.
+	 * @param ratingProvider A {@link IRatingProvider} value.
 	 */
 	public void setRatingProvider(IRatingProvider ratingProvider) {
 		this.selectedRatingProvider = ratingProvider;
@@ -250,7 +250,8 @@ public class RatingModule {
 				JSONArray and = jsonObject.getJSONArray("and");
 				ret = true;
 				for (int i = 0; i < and.length(); i++) {
-					ret = ret && logic(and.get(i));
+					boolean prev = logic(and.get(i));
+					ret = ret && prev;
 				}
 			} else if ("or".equals(key)) {
 				JSONArray or = jsonObject.getJSONArray("or");
@@ -391,7 +392,6 @@ public class RatingModule {
 			PayloadManager.getInstance().putPayload(metric);
 
 			setCancelable(false);
-			//Log.i("EnjoymentDialog", "Showing the enjoyment dialog");
 			super.show();
 		}
 	}
