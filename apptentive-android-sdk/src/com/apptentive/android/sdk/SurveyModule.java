@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.module.survey.AnswerDefinition;
+import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 import com.apptentive.android.sdk.module.survey.QuestionDefinition;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
 import com.apptentive.android.sdk.offline.PayloadManager;
@@ -61,23 +62,10 @@ public class SurveyModule {
 
 	private SurveyDefinition surveyDefinition;
 	private SurveyPayload result;
+	private boolean fetching = false;
 
 	private SurveyModule() {
 		surveyDefinition = null;
-		fetchSurvey();
-	}
-
-	/**
-	 * Asynchronously download surveys and put them in the model.
-	 */
-	public void fetchSurvey() {
-		// Upload any payloads that were created while the device was offline.
-		new Thread() {
-			public void run() {
-				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-				setSurvey(client.getSurvey());
-			}
-		}.start();
 	}
 
 	private void setSurvey(SurveyDefinition surveyDefinition) {
@@ -89,8 +77,40 @@ public class SurveyModule {
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
+	/**
+	 * Fetches a survey.
+	 * 
+	 * @param onSurveyFetchedListener An optional {@link OnSurveyFetchedListener} that will be notified when the
+	 *                                survey has been fetched. Pass in null if you don't need to be notified.
+	 */
+	public synchronized void fetchSurvey(final OnSurveyFetchedListener onSurveyFetchedListener) {
+		if(fetching) {
+			Log.d("Already fetching survey");
+			return;
+		}
+		Log.d("Started survey fetch");
+		fetching = true;
+		// Upload any payloads that were created while the device was offline.
+		new Thread() {
+			public void run() {
+				try{
+					ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
+					SurveyDefinition definition = client.getSurvey();
+					if(definition != null) {
+						setSurvey(definition);
+					}
+					if(onSurveyFetchedListener != null) {
+						onSurveyFetchedListener.onSurveyFetched(definition != null);
+					}
+				} finally {
+					fetching = false;
+				}
+			}
+		}.start();
+	}
+
 	public void show(Context context) {
-		if(!hasSurvey()){
+		if(!isSurveyReady()){
 			return;
 		}
 		Intent intent = new Intent();
@@ -99,7 +119,7 @@ public class SurveyModule {
 		context.startActivity(intent);
 	}
 
-	public boolean hasSurvey() {
+	public boolean isSurveyReady() {
 		return (surveyDefinition != null);
 	}
 

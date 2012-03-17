@@ -9,15 +9,21 @@ package com.apptentive.android.demo;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
+import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 /**
  * @author Sky Kelsey
  */
 public class DemoActivity extends Activity {
+
+	private static final String LOG_TAG = "Apptentive";
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -77,14 +83,34 @@ public class DemoActivity extends Activity {
 				feedbackModule.forceShowFeedbackDialog(DemoActivity.this);
 			}
 		});
-		Button surveyButton = (Button) findViewById(R.id.button_survey);
-		surveyButton.setOnClickListener(new View.OnClickListener() {
+
+		Button fetchSurveyButton = (Button) findViewById(R.id.button_survey_fetch);
+		final Button showSurveyButton = (Button) findViewById(R.id.button_survey_show);
+		fetchSurveyButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				SurveyModule surveyModule = apptentive.getSurveyModule();
-				if(!surveyModule.hasSurvey()){
-					surveyModule.fetchSurvey();
-				} else {
+				final SurveyModule surveyModule = apptentive.getSurveyModule();
+				surveyModule.fetchSurvey(new OnSurveyFetchedListener() {
+					public void onSurveyFetched(final boolean success) {
+						Log.e(LOG_TAG, "onSurveyFetched("+success+")");
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast toast = Toast.makeText(DemoActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", 1000);
+								toast.setGravity(Gravity.CENTER, 0, 0);
+								toast.show();
+								showSurveyButton.setEnabled(success);
+							}
+						});
+					}
+				});
+			}
+		});
+
+		showSurveyButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				final SurveyModule surveyModule = apptentive.getSurveyModule();
+				if(surveyModule.isSurveyReady()) {
 					surveyModule.show(DemoActivity.this);
+					showSurveyButton.setEnabled(false);
 				}
 			}
 		});
@@ -92,7 +118,7 @@ public class DemoActivity extends Activity {
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		Log.e("DEMO", "onWindowFocusChanges(" + hasFocus + ")");
+		Log.e(LOG_TAG, "onWindowFocusChanges(" + hasFocus + ")");
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
 			Apptentive.getInstance().getRatingModule().run(DemoActivity.this);
