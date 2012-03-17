@@ -13,7 +13,7 @@ import android.os.AsyncTask;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.module.metric.MetricPayload;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -84,9 +84,8 @@ public class Apptentive {
 		RatingModule.getInstance().setContext(appContext);
 		FeedbackModule.getInstance().setContext(appContext);
 
-		// Instrumentation
-		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__launch);
-		PayloadManager.getInstance().putPayload(metric);
+		MetricModule.setContext(appContext);
+		MetricModule.sendMetric(MetricModule.Event.app__launch);
 	}
 
 	/**
@@ -118,9 +117,7 @@ public class Apptentive {
 	 * Call this from your main Activity's onDestroy() method, so we can clean up.
 	 */
 	public void onDestroy() {
-		// Instrumentation
-		MetricPayload metric = new MetricPayload(MetricPayload.Event.app__exit);
-		PayloadManager.getInstance().putPayload(metric);
+		MetricModule.sendMetric(MetricModule.Event.app__exit);
 	}
 
 	/**
