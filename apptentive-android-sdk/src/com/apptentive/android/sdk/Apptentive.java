@@ -72,8 +72,7 @@ public class Apptentive {
 		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
 		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
 		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
-		//GlobalInfo.appPackage = appContext.getPackageName();
-		GlobalInfo.appPackage = "org.mozilla.firefox";
+		GlobalInfo.appPackage = appContext.getPackageName();
 		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = getUserEmail(appContext);
 
