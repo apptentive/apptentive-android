@@ -36,6 +36,7 @@ import com.apptentive.android.sdk.util.Util;
 
 /**
  * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
+ *
  * @author Sky Kelsey
  */
 public class SurveyModule {
@@ -45,8 +46,6 @@ public class SurveyModule {
 	// *************************************************************************************************
 
 	private static SurveyModule instance;
-
-	private boolean submittable = false;
 
 	static SurveyModule getInstance() {
 		if (instance == null) {
@@ -79,12 +78,12 @@ public class SurveyModule {
 
 	/**
 	 * Fetches a survey.
-	 * 
+	 *
 	 * @param onSurveyFetchedListener An optional {@link OnSurveyFetchedListener} that will be notified when the
 	 *                                survey has been fetched. Pass in null if you don't need to be notified.
 	 */
 	public synchronized void fetchSurvey(final OnSurveyFetchedListener onSurveyFetchedListener) {
-		if(fetching) {
+		if (fetching) {
 			Log.d("Already fetching survey");
 			return;
 		}
@@ -93,13 +92,13 @@ public class SurveyModule {
 		// Upload any payloads that were created while the device was offline.
 		new Thread() {
 			public void run() {
-				try{
+				try {
 					ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 					SurveyDefinition definition = client.getSurvey();
-					if(definition != null) {
+					if (definition != null) {
 						setSurvey(definition);
 					}
-					if(onSurveyFetchedListener != null) {
+					if (onSurveyFetchedListener != null) {
 						onSurveyFetchedListener.onSurveyFetched(definition != null);
 					}
 				} finally {
@@ -110,7 +109,7 @@ public class SurveyModule {
 	}
 
 	public void show(Context context) {
-		if(!isSurveyReady()){
+		if (!isSurveyReady()) {
 			return;
 		}
 		Intent intent = new Intent();
@@ -128,15 +127,32 @@ public class SurveyModule {
 		this.result = null;
 	}
 
+	boolean isSkippable() {
+		return !surveyDefinition.isRequired();
+	}
+
+	boolean isCompleted() {
+		for (int i = 0; i < surveyDefinition.getQuestions().size(); i++) {
+			QuestionDefinition questionDefinition = surveyDefinition.getQuestions().get(i);
+			if (questionDefinition.isRequired() && result.getAnswer(questionDefinition.getId()).equals("")) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	void setAnswer(Activity activity, int questionIndex, String answer) {
 		result.setAnswer(questionIndex, answer);
 		Button skipSend = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
-		if (result.hasBeenAnswered()) {
+		if (isCompleted()) {
 			skipSend.setText(R.string.apptentive_send);
-			submittable = true;
-		} else {
+			skipSend.setEnabled(true);
+		} else if (!isSkippable()) {
+			skipSend.setText(R.string.apptentive_send);
+			skipSend.setEnabled(false);
+		} else if (isSkippable()) {
 			skipSend.setText(R.string.apptentive_skip);
-			submittable = false;
+			skipSend.setEnabled(true);
 		}
 	}
 
@@ -162,7 +178,7 @@ public class SurveyModule {
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-				if(submittable) {
+				if (isCompleted()) {
 					PayloadManager.getInstance().putPayload(result);
 				}
 				cleanup();
