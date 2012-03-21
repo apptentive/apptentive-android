@@ -68,6 +68,9 @@ public class SurveyDefinition {
 	}
 
 	public String getSuccessMessage() {
+		if(successMessage != null && successMessage.equals("")) {
+			return null;
+		}
 		return successMessage;
 	}
 

@@ -14,15 +14,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.*;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.module.survey.AnswerDefinition;
@@ -180,6 +175,13 @@ public class SurveyModule {
 				Util.hideSoftKeyboard(activity, view);
 				if (isCompleted()) {
 					PayloadManager.getInstance().putPayload(result);
+					if(surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
+						String successMessage = surveyDefinition.getSuccessMessage();
+						// TODO: Make this prettier.
+						Toast toast = Toast.makeText(activity, successMessage, 4000);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+					}
 				}
 				cleanup();
 				activity.finish();
