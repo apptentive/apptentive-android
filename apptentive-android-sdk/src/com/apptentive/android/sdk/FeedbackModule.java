@@ -15,7 +15,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import com.apptentive.android.sdk.module.metric.MetricPayload;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 
@@ -153,8 +153,7 @@ public class FeedbackModule {
 
 			findViewById(R.id.apptentive_button_cancel).setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricPayload metric = new MetricPayload(MetricPayload.Event.feedback_dialog__cancel);
-					PayloadManager.getInstance().putPayload(metric);
+					MetricModule.sendMetric(MetricModule.Event.feedback_dialog__cancel);
 					dismiss();
 				}
 			});
@@ -174,11 +173,7 @@ public class FeedbackModule {
 				}
 			});
 
-			// Instrumentation
-			MetricPayload metric = new MetricPayload(MetricPayload.Event.feedback_dialog__launch);
-			metric.putData("trigger", reason.name());
-			PayloadManager.getInstance().putPayload(metric);
-
+			MetricModule.sendMetric(MetricModule.Event.feedback_dialog__launch, reason.name());
 			super.show();
 		}
 

@@ -19,16 +19,19 @@ import java.util.Map;
 public class MetricPayload extends Payload {
 
 
-	public MetricPayload(Event type) {
+	MetricPayload(String event, String trigger) {
 		try {
-			setString(type.getRecordName(), "record", "metric", "event");
+			setString(event, "record", "metric", "event");
 			setString(GlobalInfo.androidId, "record", "device", "uuid");
+			if(trigger != null) {
+				putData("trigger", trigger);
+			}
 		} catch (JSONException e) {
 			Log.e("Exception generating metric JSON.", e);
 		}
 	}
 
-	public void putData(String key, String value) {
+	void putData(String key, String value) {
 		try {
 			setString(value, "record", "metric", "data", key);
 		} catch (Exception e) {
@@ -36,33 +39,9 @@ public class MetricPayload extends Payload {
 		}
 	}
 
-	public void putAllData(Map<String, String> data) {
+	void putAllData(Map<String, String> data) {
 		for (String key : data.keySet()) {
 			putData(key, data.get(key));
-		}
-	}
-
-	public static enum Event {
-		enjoyment_dialog__launch("enjoyment_dialog.launch"),
-		enjoyment_dialog__yes("enjoyment_dialog.yes"),
-		enjoyment_dialog__no("enjoyment_dialog.no"),
-		rating_dialog__launch("rating_dialog.launch"),
-		rating_dialog__rate("rating_dialog.rate"),
-		rating_dialog__remind("rating_dialog.remind"),
-		rating_dialog__decline("rating_dialog.decline"),
-		feedback_dialog__launch("feedback_dialog.launch"),
-		feedback_dialog__cancel("feedback_dialog.cancel"),
-		app__launch("app.launch"),
-		app__exit("app.exit");
-
-		private final String recordName;
-
-		Event(String recordName) {
-			this.recordName = recordName;
-		}
-
-		public String getRecordName() {
-			return recordName;
 		}
 	}
 }
