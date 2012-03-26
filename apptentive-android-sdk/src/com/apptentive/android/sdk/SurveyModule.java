@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -175,16 +176,25 @@ public class SurveyModule {
 				Util.hideSoftKeyboard(activity, view);
 				if (isCompleted()) {
 					PayloadManager.getInstance().putPayload(result);
-					if(surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-						String successMessage = surveyDefinition.getSuccessMessage();
-						// TODO: Make this prettier.
-						Toast toast = Toast.makeText(activity, successMessage, 4000);
-						toast.setGravity(Gravity.CENTER, 0, 0);
-						toast.show();
+					if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+						builder.setMessage(surveyDefinition.getSuccessMessage());
+						builder.setTitle("Survey Completed");
+						builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogInterface, int i) {
+								cleanup();
+								activity.finish();
+							}
+						});
+						builder.show();
+					} else {
+						cleanup();
+						activity.finish();
 					}
+				} else {
+					cleanup();
+					activity.finish();
 				}
-				cleanup();
-				activity.finish();
 			}
 		});
 
