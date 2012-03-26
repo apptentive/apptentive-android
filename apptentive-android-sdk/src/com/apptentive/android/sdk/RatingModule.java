@@ -25,11 +25,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.module.metric.MetricPayload;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
-import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -365,9 +364,7 @@ public class RatingModule {
 			yes.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					dismiss();
-					// Instrumentation
-					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__yes);
-					PayloadManager.getInstance().putPayload(metric);
+					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__yes);
 					Apptentive.getInstance().getRatingModule().showRatingDialog(activity);
 					dismiss();
 				}
@@ -375,22 +372,14 @@ public class RatingModule {
 			Button no = (Button) findViewById(R.id.apptentive_choice_no);
 			no.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					// Instrumentation
-					MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__no);
-					PayloadManager.getInstance().putPayload(metric);
+					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__no);
 					setState(RatingState.POSTPONE);
 					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
 					dismiss();
 				}
 			});
 
-			// Instrumentation
-			MetricPayload metric = new MetricPayload(MetricPayload.Event.enjoyment_dialog__launch);
-			if (reason != null) {
-				metric.putData("trigger", reason.name());
-			}
-			PayloadManager.getInstance().putPayload(metric);
-
+			MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__launch, reason.name());
 			setCancelable(false);
 			super.show();
 		}
@@ -431,9 +420,7 @@ public class RatingModule {
 							dismiss();
 							String errorMessage = activityContext.getString(R.string.apptentive_rating_error);
 							try {
-								// Instrumentation
-								MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__rate);
-								PayloadManager.getInstance().putPayload(metric);
+								MetricModule.sendMetric(MetricModule.Event.rating_dialog__rate);
 								// Send user to app rating page
 								if (RatingModule.this.selectedRatingProvider == null) {
 									// Default to the Android Market provider, if none has been specified
@@ -470,10 +457,7 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							// Instrumentation
-							MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__remind);
-							PayloadManager.getInstance().putPayload(metric);
-
+							MetricModule.sendMetric(MetricModule.Event.rating_dialog__remind);
 							setState(RatingState.REMIND);
 							setStartOfRatingPeriod(new Date());
 						}
@@ -484,19 +468,13 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							// Instrumentation
-							MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__decline);
-							PayloadManager.getInstance().putPayload(metric);
-
+							MetricModule.sendMetric(MetricModule.Event.rating_dialog__decline);
 							setState(RatingState.POSTPONE);
 						}
 					}
 			);
 
-			// Instrumentation
-			MetricPayload metric = new MetricPayload(MetricPayload.Event.rating_dialog__launch);
-			PayloadManager.getInstance().putPayload(metric);
-
+			MetricModule.sendMetric(MetricModule.Event.rating_dialog__launch);
 			setCancelable(false);
 			super.show();
 		}
