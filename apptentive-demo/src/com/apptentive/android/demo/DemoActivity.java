@@ -94,7 +94,7 @@ public class DemoActivity extends Activity {
 						Log.e(LOG_TAG, "onSurveyFetched("+success+")");
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast toast = Toast.makeText(DemoActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", 1000);
+								Toast toast = Toast.makeText(DemoActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
 								toast.setGravity(Gravity.CENTER, 0, 0);
 								toast.show();
 								showSurveyButton.setEnabled(success);
