@@ -1,34 +1,28 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.module.survey.AnswerDefinition;
-import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
-import com.apptentive.android.sdk.module.survey.QuestionDefinition;
-import com.apptentive.android.sdk.module.survey.SurveyDefinition;
+import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
-import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
@@ -57,6 +51,7 @@ public class SurveyModule {
 
 	private SurveyDefinition surveyDefinition;
 	private SurveyPayload result;
+	private SurveySendView sendView;
 	private boolean fetching = false;
 
 	private SurveyModule() {
@@ -129,27 +124,17 @@ public class SurveyModule {
 
 	boolean isCompleted() {
 		for (int i = 0; i < surveyDefinition.getQuestions().size(); i++) {
-			QuestionDefinition questionDefinition = surveyDefinition.getQuestions().get(i);
-			if (questionDefinition.isRequired() && result.getAnswer(questionDefinition.getId()).equals("")) {
+			Question question = surveyDefinition.getQuestions().get(i);
+			if (question.isRequired() && !result.isAnswered(question.getId())) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	void setAnswer(Activity activity, int questionIndex, String answer) {
+	void setAnswer(int questionIndex, String... answer) {
 		result.setAnswer(questionIndex, answer);
-		Button skipSend = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
-		if (isCompleted()) {
-			skipSend.setText(R.string.apptentive_send);
-			skipSend.setEnabled(true);
-		} else if (!isSkippable()) {
-			skipSend.setText(R.string.apptentive_send);
-			skipSend.setEnabled(false);
-		} else if (isSkippable()) {
-			skipSend.setText(R.string.apptentive_skip);
-			skipSend.setEnabled(true);
-		}
+		sendView.setEnabled(isCompleted());
 	}
 
 	void doShow(final Activity activity) {
@@ -158,45 +143,22 @@ public class SurveyModule {
 		}
 		result = new SurveyPayload(surveyDefinition);
 
-		TextView name = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
-		name.setText(surveyDefinition.getName());
+		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
+		surveyTitle.setFocusable(true);
+		surveyTitle.setFocusableInTouchMode(true);
+		surveyTitle.setText(surveyDefinition.getName());
 
-		View descriptionBox = activity.findViewById(R.id.apptentive_survey_description_box);
-
-		if (surveyDefinition.getDescription() != null) {
-			TextView description = (TextView) activity.findViewById(R.id.apptentive_survey_description_text);
-			description.setText(surveyDefinition.getDescription());
+		Button skipButton = (Button) activity.findViewById(R.id.apptentive_survey_button_skip);
+		if (surveyDefinition.isRequired()) {
+			((RelativeLayout) skipButton.getParent()).removeView(skipButton);
 		} else {
-			((ViewGroup) descriptionBox.getParent()).removeView(descriptionBox);
-		}
-
-		Button sendButton = (Button) activity.findViewById(R.id.apptentive_survey_button_send);
-		sendButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Util.hideSoftKeyboard(activity, view);
-				if (isCompleted()) {
-					PayloadManager.getInstance().putPayload(result);
-					if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-						AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-						builder.setMessage(surveyDefinition.getSuccessMessage());
-						builder.setTitle("Survey Completed");
-						builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialogInterface, int i) {
-								cleanup();
-								activity.finish();
-							}
-						});
-						builder.show();
-					} else {
-						cleanup();
-						activity.finish();
-					}
-				} else {
+			skipButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View view) {
 					cleanup();
 					activity.finish();
 				}
-			}
-		});
+			});
+		}
 
 		View brandingButton = activity.findViewById(R.id.apptentive_branding_view);
 		brandingButton.setOnClickListener(new View.OnClickListener() {
@@ -205,92 +167,101 @@ public class SurveyModule {
 			}
 		});
 
-		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
-		surveyTitle.setFocusable(true);
-		surveyTitle.setFocusableInTouchMode(true);
-		surveyTitle.setText(surveyDefinition.getName());
-
 		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
 
-		for (QuestionDefinition question : surveyDefinition.getQuestions()) {
-			int index = surveyDefinition.getQuestions().indexOf(question);
-
-			View questionRow = activity.getLayoutInflater().inflate(R.layout.apptentive_question, null);
-
-			TextView questionNumber = (TextView) questionRow.findViewById(R.id.apptentive_question_number);
-			TextView questionValue = (TextView) questionRow.findViewById(R.id.apptentive_question_value);
-			LinearLayout answerView = (LinearLayout) questionRow.findViewById(R.id.apptentive_question_answer_view);
-
-			questionNumber.setText(index + 1 + "");
-			questionValue.setText(question.getValue());
-
-			switch (question.getType()) {
-				case singleline:
-					EditText editText = new EditText(activity);
-					editText.setLayoutParams(Constants.rowLayout);
-
-					class TextAnswerTextWatcher implements TextWatcher {
-						private int listItem;
-
-						private TextAnswerTextWatcher(int listItem) {
-							this.listItem = listItem;
-						}
-
-						public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-						}
-
-						public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-						}
-
-						public void afterTextChanged(Editable editable) {
-							setAnswer(activity, listItem, editable.toString());
-						}
-					}
-
-					editText.addTextChangedListener(new TextAnswerTextWatcher(index));
-					answerView.addView(editText);
-					break;
-				case multichoice:
-					List<String> optionNames = new ArrayList<String>();
-					int selected = 0;
-					List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
-					optionNames.add(QuestionDefinition.DEFAULT);
-					for (int i = 0; i < answerDefinitions.size(); i++) {
-						optionNames.add(answerDefinitions.get(i).getValue());
-					}
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, optionNames);
-					adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-					Spinner spinner = new Spinner(activity);
-					spinner.setLayoutParams(Constants.rowLayout);
-					spinner.setPrompt("Choose one...");
-					spinner.setAdapter(adapter);
-
-					class DropdownListener implements AdapterView.OnItemSelectedListener {
-						int listItem;
-
-						public DropdownListener(int listItem) {
-							this.listItem = listItem;
-						}
-
-						public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-							TextView selected = (TextView) view;
-							String answer = selected.getText().toString();
-							setAnswer(activity, listItem, answer);
-						}
-
-						public void onNothingSelected(AdapterView<?> adapterView) {
-						}
-					}
-
-					spinner.setOnItemSelectedListener(new DropdownListener(index));
-					spinner.setSelection(selected);
-					answerView.addView(spinner);
-					break;
-				default:
-					break;
-			}
-			questionList.addView(questionRow);
+		// Render the survey description
+		if (surveyDefinition.getDescription() != null) {
+			SurveyDescriptionView surveyDescription = new SurveyDescriptionView(activity);
+			surveyDescription.setTitleText(surveyDefinition.getDescription());
+			questionList.addView(surveyDescription);
 		}
+
+		// Then render all the questions
+		for (Question question : surveyDefinition.getQuestions()) {
+			final int index = surveyDefinition.getQuestions().indexOf(question);
+			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
+				SinglelineQuestion temp = (SinglelineQuestion) question;
+				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity);
+				textQuestionView.setTitleText(temp.getValue());
+				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
+					public void onAnswered(TextSurveyQuestionView view) {
+						setAnswer(index, view.getAnswer());
+					}
+				});
+				questionList.addView(textQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
+				MultichoiceQuestion temp = (MultichoiceQuestion) question;
+				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity);
+				multichoiceQuestionView.setTitleText(temp.getValue());
+				multichoiceQuestionView.setAnswers(temp.getAnswerChoices());
+				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
+					public void onAnswered(MultichoiceSurveyQuestionView view) {
+						Map<String, Boolean> answers = view.getAnswers();
+						for (String id : answers.keySet()) {
+							boolean answered = answers.get(id);
+							if (answered) {
+								setAnswer(index, id);
+								break;
+							}
+						}
+					}
+				});
+				questionList.addView(multichoiceQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+				MultiselectQuestion temp = (MultiselectQuestion) question;
+				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity);
+				multiselectQuestionView.setTitleText(temp.getValue());
+				multiselectQuestionView.setAnswers(temp.getAnswerChoices());
+				multiselectQuestionView.setMaxChoices(temp.getMaxSelections());
+				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
+					public void onAnswered(MultiselectSurveyQuestionView view) {
+						Map<String, Boolean> answers = view.getAnswers();
+						Set<String> answersSet = new HashSet<String>();
+						for (String id : answers.keySet()) {
+							boolean answered = answers.get(id);
+							if (answered) {
+								answersSet.add(id);
+							}
+						}
+						if(answersSet.isEmpty()) {
+							setAnswer(index, "");
+						} else {
+							setAnswer(index, (String[]) answersSet.toArray(new String[]{}));
+						}
+					}
+				});
+				questionList.addView(multiselectQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
+				// TODO: This.
+			}
+		}
+
+		// Then render the send button.
+		sendView = new SurveySendView(activity);
+		sendView.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				Util.hideSoftKeyboard(activity, view);
+				PayloadManager.getInstance().putPayload(result);
+				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
+					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+					builder.setMessage(surveyDefinition.getSuccessMessage());
+					builder.setTitle("Survey Completed");
+					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialogInterface, int i) {
+							cleanup();
+							activity.finish();
+						}
+					});
+					builder.show();
+				} else {
+					cleanup();
+					activity.finish();
+				}
+			}
+		});
+		sendView.setEnabled(isCompleted());
+		questionList.addView(sendView);
+
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
 	}
