@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.module.survey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * @author Sky Kelsey.
  */
@@ -16,6 +18,8 @@ abstract public class BaseQuestion implements Question {
 	private String id;
 	private String value;
 	private boolean required;
+
+	String[] answers;
 
 	public abstract int getType();
 
@@ -35,5 +39,22 @@ abstract public class BaseQuestion implements Question {
 
 	public boolean isRequired() {
 		return required;
+	}
+
+	protected void setAnswers(String... answers) {
+		this.answers = answers;
+	}
+
+	public boolean isAnswered() {
+		String[] answers = getAnswers();
+		boolean answered = answers.length != 1 || !answers[0].equals("");
+		return answered;
+	}
+
+	public String[] getAnswers() {
+		if (answers == null || answers.length == 0) {
+			return new String[]{""};
+		}
+		return answers;
 	}
 }
