@@ -25,7 +25,7 @@ public class BaseChoice extends FrameLayout {
 
 	public BaseChoice(Context context) {
 		super(context);
-		appContext = context;
+		appContext = context.getApplicationContext();
 		initView();
 	}
 

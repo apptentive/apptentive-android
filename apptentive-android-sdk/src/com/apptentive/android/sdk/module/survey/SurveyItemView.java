@@ -35,21 +35,25 @@ abstract public class SurveyItemView extends FrameLayout {
 	}
 
 	protected void initView() {
-		int tenDips = Util.dipsToPixels(appContext, 10);
-		setPadding(0, tenDips, 0, 0);
+		int dip10 = Util.dipsToPixels(appContext, 10);
+		setPadding(0, dip10, 0, 0);
 
-		questionView = new LinearLayout(appContext);
-		questionView.setBackgroundResource(R.drawable.apptentive_question_item);
-		questionView.setOrientation(LinearLayout.VERTICAL);
-		addView(questionView);
+		LinearLayout innerLayout = new LinearLayout(appContext);
+		innerLayout.setBackgroundResource(R.drawable.apptentive_question_item);
+		innerLayout.setOrientation(LinearLayout.VERTICAL);
+		addView(innerLayout);
 
 		titleTextView = new TextView(appContext);
 		titleTextView.setLayoutParams(Constants.ROW_LAYOUT);
-		titleTextView.setPadding(tenDips, tenDips, tenDips, tenDips);
+		titleTextView.setPadding(dip10, dip10, dip10, dip10);
 		titleTextView.setTypeface(Typeface.DEFAULT_BOLD);
 		titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f);
 		titleTextView.setTextColor(Color.BLACK);
-		questionView.addView(titleTextView, 0);
+		innerLayout.addView(titleTextView);
+
+		questionView = new LinearLayout(appContext);
+		questionView.setOrientation(LinearLayout.VERTICAL);
+		innerLayout.addView(questionView);
 	}
 
 	public void setTitleText(String titleText) {

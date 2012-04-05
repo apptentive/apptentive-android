@@ -207,6 +207,10 @@ public class SurveyModule {
 					}
 				});
 				questionList.addView(multichoiceQuestionView);
+/*
+
+// TODO: This.
+
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 				MultiselectQuestion temp = (MultiselectQuestion) question;
 				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity);
@@ -231,8 +235,20 @@ public class SurveyModule {
 					}
 				});
 				questionList.addView(multiselectQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
-				// TODO: This.
+*/
+			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK || question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+//				StackrankQuestion temp = (StackrankQuestion) question;
+				MultiselectQuestion temp = (MultiselectQuestion) question;
+				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity);
+				questionView.setTitleText(temp.getValue());
+				questionView.setAnswers(temp.getAnswerChoices());
+				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered(Object view) {
+						// TODO: This.
+						Log.e("Stackrank question answered.");
+					}
+				});
+				questionList.addView(questionView);
 			}
 		}
 
