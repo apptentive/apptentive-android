@@ -20,18 +20,22 @@ import com.apptentive.android.sdk.util.Util;
 /**
  * @author Sky Kelsey.
  */
-abstract public class SurveyItemView extends FrameLayout {
+abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 	protected LinearLayout questionView;
 	protected TextView titleTextView;
 	protected Context appContext;
 	protected OnSurveyQuestionAnsweredListener listener;
+	protected Q question;
 
-
-	protected SurveyItemView(Context context) {
+	protected SurveyItemView(Context context, Q question) {
 		super(context);
 		this.appContext = context.getApplicationContext();
+		this.question = question;
 		initView();
+		if(question != null) {
+			setTitleText(question.getValue());
+		}
 	}
 
 	protected void initView() {

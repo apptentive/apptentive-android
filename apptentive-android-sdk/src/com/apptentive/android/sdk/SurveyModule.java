@@ -20,9 +20,6 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
@@ -118,23 +115,15 @@ public class SurveyModule {
 		this.result = null;
 	}
 
-	boolean isSkippable() {
-		return !surveyDefinition.isRequired();
-	}
-
 	boolean isCompleted() {
-		for (int i = 0; i < surveyDefinition.getQuestions().size(); i++) {
-			Question question = surveyDefinition.getQuestions().get(i);
-			if (question.isRequired() && !result.isAnswered(question.getId())) {
+		for (Question question : surveyDefinition.getQuestions()) {
+			boolean required = question.isRequired();
+			boolean answered = question.isAnswered();
+			if (required && !answered) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	void setAnswer(int questionIndex, String... answer) {
-		result.setAnswer(questionIndex, answer);
-		sendView.setEnabled(isCompleted());
 	}
 
 	void doShow(final Activity activity) {
@@ -180,30 +169,18 @@ public class SurveyModule {
 		for (Question question : surveyDefinition.getQuestions()) {
 			final int index = surveyDefinition.getQuestions().indexOf(question);
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				SinglelineQuestion temp = (SinglelineQuestion) question;
-				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity);
-				textQuestionView.setTitleText(temp.getValue());
+				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
 					public void onAnswered(TextSurveyQuestionView view) {
-						setAnswer(index, view.getAnswer());
+						sendView.setEnabled(isCompleted());
 					}
 				});
 				questionList.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceQuestion temp = (MultichoiceQuestion) question;
-				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity);
-				multichoiceQuestionView.setTitleText(temp.getValue());
-				multichoiceQuestionView.setAnswers(temp.getAnswerChoices());
+				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
 					public void onAnswered(MultichoiceSurveyQuestionView view) {
-						Map<String, Boolean> answers = view.getAnswers();
-						for (String id : answers.keySet()) {
-							boolean answered = answers.get(id);
-							if (answered) {
-								setAnswer(index, id);
-								break;
-							}
-						}
+						sendView.setEnabled(isCompleted());
 					}
 				});
 				questionList.addView(multichoiceQuestionView);
@@ -212,26 +189,10 @@ public class SurveyModule {
 // TODO: This.
 
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectQuestion temp = (MultiselectQuestion) question;
-				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity);
-				multiselectQuestionView.setTitleText(temp.getValue());
-				multiselectQuestionView.setAnswers(temp.getAnswerChoices());
-				multiselectQuestionView.setMaxChoices(temp.getMaxSelections());
+				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
 					public void onAnswered(MultiselectSurveyQuestionView view) {
-						Map<String, Boolean> answers = view.getAnswers();
-						Set<String> answersSet = new HashSet<String>();
-						for (String id : answers.keySet()) {
-							boolean answered = answers.get(id);
-							if (answered) {
-								answersSet.add(id);
-							}
-						}
-						if(answersSet.isEmpty()) {
-							setAnswer(index, "");
-						} else {
-							setAnswer(index, (String[]) answersSet.toArray(new String[]{}));
-						}
+						sendView.setEnabled(isCompleted());
 					}
 				});
 				questionList.addView(multiselectQuestionView);

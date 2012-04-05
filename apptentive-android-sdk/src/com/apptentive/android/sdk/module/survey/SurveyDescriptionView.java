@@ -13,7 +13,7 @@ import android.content.Context;
  */
 public class SurveyDescriptionView extends SurveyItemView {
 	public SurveyDescriptionView(Context context) {
-		super(context);
+		super(context, null);
 	}
 
 	@Override

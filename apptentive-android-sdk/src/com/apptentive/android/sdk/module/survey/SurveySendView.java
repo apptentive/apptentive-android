@@ -9,10 +9,10 @@ import android.view.Gravity;
  */
 public class SurveySendView extends SurveyItemView {
 	public SurveySendView(Context context) {
-		super(context);
+		super(context, null);
+		setTitleText("Send Response");
 		titleTextView.setTextColor(Color.BLUE);
 		titleTextView.setGravity(Gravity.CENTER);
-		titleTextView.setText("Send Response");
 	}
 
 	public void setEnabled(boolean enabled) {

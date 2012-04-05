@@ -8,16 +8,16 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Sky Kelsey.
  */
 public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView {
-	public MultiselectSurveyQuestionView(Context context) {
-		super(context);
-	}
-
-	public void setMaxChoices(int maxChoices) {
-		this.maxChoices = maxChoices;
+	public MultiselectSurveyQuestionView(Context context, MultiselectQuestion question) {
+		super(context, question);
+		setMaxChoices(question.getMaxSelections());
 	}
 
 	/**
@@ -27,6 +27,13 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 	protected void choiceClicked(CheckableChoice choice) {
 		if(choice.isChecked() || countSelectedChoices() < maxChoices) {
 			choice.toggle();
+			List<String> checkedChoices = new ArrayList<String>();
+			for (String id : answers.keySet()) {
+				if(answers.get(id).isChecked()) {
+					checkedChoices.add(id);
+				}
+			}
+			question.setAnswers((String[]) checkedChoices.toArray(new String[]{}));
 			fireListener();
 		} else {
 			choice.warn();

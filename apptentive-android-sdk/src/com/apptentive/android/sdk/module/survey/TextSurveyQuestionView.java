@@ -15,13 +15,13 @@ import com.apptentive.android.sdk.util.Constants;
 /**
  * @author Sky Kelsey.
  */
-public class TextSurveyQuestionView extends SurveyItemView {
+public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 
 
 	protected EditText answerText;
 
-	public TextSurveyQuestionView(Context context) {
-		super(context);
+	public TextSurveyQuestionView(Context context, BaseQuestion question) {
+		super(context, question);
 	}
 
 	@Override
@@ -31,6 +31,7 @@ public class TextSurveyQuestionView extends SurveyItemView {
 		answerText = new EditText(appContext);
 		answerText.setLayoutParams(Constants.ROW_LAYOUT);
 		answerText.setBackgroundDrawable(null); // No crappy looking border.
+		answerText.setText(question.getAnswers()[0]);
 		answerText.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 			}
@@ -39,14 +40,11 @@ public class TextSurveyQuestionView extends SurveyItemView {
 			}
 
 			public void afterTextChanged(Editable editable) {
+				question.setAnswers(editable.toString());
 				fireListener();
 			}
 		});
 		questionView.addView(answerText);
-	}
-
-	public String getAnswer() {
-		return answerText.getText().toString();
 	}
 
 }
