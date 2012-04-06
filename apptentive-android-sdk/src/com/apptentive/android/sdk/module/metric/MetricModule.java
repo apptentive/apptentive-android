@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.offline.PayloadManager;
 
 /**
@@ -22,9 +27,7 @@ public class MetricModule {
 
 	public static void sendMetric(MetricModule.Event event, String trigger) {
 		SharedPreferences prefs = appContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
-		Log.e("SEND METRIC?");
 		if (prefs.getBoolean("appConfiguration.metrics_enabled", true)) {
-			Log.e("SENDING METRIC");
 			PayloadManager.getInstance().putPayload(new MetricPayload(event.getRecordName(), trigger));
 		}
 	}

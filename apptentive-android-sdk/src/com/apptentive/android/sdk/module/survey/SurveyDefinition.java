@@ -34,7 +34,7 @@ public class SurveyDefinition {
 	private boolean showSuccessMessage;
 
 
-	private List<QuestionDefinition> questions;
+	private List<Question> questions;
 
 
 	public SurveyDefinition(JSONObject survey) throws JSONException{
@@ -44,11 +44,40 @@ public class SurveyDefinition {
 		this.required = survey.has("required") ? survey.optBoolean("required") : null;
 		this.successMessage = survey.has("success_message") ? survey.getString("success_message") : null;
 		this.showSuccessMessage = survey.has("show_success_message") ? survey.optBoolean("show_success_message") : null;
-		this.questions = new ArrayList<QuestionDefinition>();
+		this.questions = new ArrayList<Question>();
 		JSONArray questions = survey.getJSONArray("questions");
 		for(int i = 0; i < questions.length(); i++){
-			this.questions.add(new QuestionDefinition((JSONObject)questions.get(i)));
+			JSONObject questionJson = (JSONObject)questions.get(i);
+			Type type = Type.valueOf(questionJson.getString("type"));
+			Question question = null;
+			switch(type) {
+				case singleline:
+					question = new SinglelineQuestion(questionJson);
+					break;
+				case multichoice:
+					question = new MultichoiceQuestion(questionJson);
+					break;
+				case multiselect:
+					question = new MultiselectQuestion(questionJson);
+					break;
+				case stackrank:
+					// TODO: Don't even handle stackrank right now, even if it shows up.
+					//question = new StackrankQuestion(questionJson);
+					break;
+				default:
+					break;
+			}
+			if(question != null) {
+				this.questions.add(question);
+			}
 		}
+	}
+
+	public enum Type {
+		multichoice,
+		singleline,
+		multiselect,
+		stackrank
 	}
 
 	public String getId() {
@@ -78,7 +107,7 @@ public class SurveyDefinition {
 		return showSuccessMessage;
 	}
 
-	public List<QuestionDefinition> getQuestions() {
+	public List<Question> getQuestions() {
 		return questions;
 	}
 }

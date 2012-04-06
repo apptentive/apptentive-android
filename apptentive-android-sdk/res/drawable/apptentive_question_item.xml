@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -10,6 +10,6 @@
        android:shape="rectangle">
 	<solid android:color="#FFFFFFFF"/>
 	<corners android:radius="10dp"/>
-	<stroke android:color="@color/apptentive_blue"
-	        android:width="1.5dp"/>
+	<stroke android:color="@color/apptentive_grey"
+	        android:width="1px"/>
 </shape>
