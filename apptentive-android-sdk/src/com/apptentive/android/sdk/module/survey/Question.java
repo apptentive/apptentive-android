@@ -20,6 +20,8 @@ public interface Question {
 	public String getId();
 	public String getValue();
 	public boolean isRequired();
+	public String getInstructions();
+
 	public boolean isAnswered();
 
 	public String[] getAnswers();

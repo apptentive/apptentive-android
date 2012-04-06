@@ -33,7 +33,7 @@ public class BaseChoice extends FrameLayout {
 		setLayoutParams(Constants.ROW_LAYOUT);
 		int pad5  = Util.dipsToPixels(appContext, 5);
 		int pad10 = Util.dipsToPixels(appContext, 10);
-		setPadding(pad10, pad5, pad5, pad5);
+		setPadding(pad10, 0, pad5, 0);
 		setClickable(true);
 
 		container = new LinearLayout(appContext);
