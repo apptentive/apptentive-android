@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * @author Sky Kelsey.
  */
-public class StackrankSurveyQuestionView extends SurveyItemView {
+public class StackrankSurveyQuestionView extends SurveyItemView<StackrankQuestion> {
 
 	// The order of the choice views IS the answer, so don't need a structure to hold answers.
 
-	public StackrankSurveyQuestionView(Context context) {
-		super(context);
+	public StackrankSurveyQuestionView(Context context, StackrankQuestion question) {
+		super(context, question);
 	}
 
 	public void setAnswers(List<AnswerDefinition> answerDefinitions) {

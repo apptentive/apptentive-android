@@ -61,7 +61,8 @@ public class SurveyDefinition {
 					question = new MultiselectQuestion(questionJson);
 					break;
 				case stackrank:
-					question = new StackrankQuestion(questionJson);
+					// TODO: Don't even handle stackrank right now, even if it shows up.
+					//question = new StackrankQuestion(questionJson);
 					break;
 				default:
 					break;
