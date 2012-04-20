@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
+import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,15 @@ import java.util.List;
  * @author Sky Kelsey.
  */
 public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView {
+
+	protected int minSelections;
+	protected int maxSelections;
+
 	public MultiselectSurveyQuestionView(Context context, MultiselectQuestion question) {
 		super(context, question);
-		setMaxChoices(question.getMaxSelections());
+		this.minSelections = question.getMinSelections();
+		this.maxSelections = question.getMaxSelections();
+		updateInstructionsColor();
 	}
 
 	/**
@@ -25,7 +32,7 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 	 * @param choice
 	 */
 	protected void choiceClicked(CheckableChoice choice) {
-		if(choice.isChecked() || countSelectedChoices() < maxChoices) {
+		if(canToggle(choice)) {
 			choice.toggle();
 			List<String> checkedChoices = new ArrayList<String>();
 			for (String id : answers.keySet()) {
@@ -34,9 +41,30 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 				}
 			}
 			question.setAnswers((String[]) checkedChoices.toArray(new String[]{}));
-			fireListener();
+			updateInstructionsColor();
 		} else {
-			choice.warn();
+			flashInstructionsRed();
 		}
+		fireListener();
+	}
+
+	protected void updateInstructionsColor() {
+		if(question != null && !question.isAnswered()) {
+			instructionsTextView.setTextColor(Color.RED);
+		} else {
+			instructionsTextView.setTextColor(Color.GRAY);
+		}
+	}
+
+	private boolean canToggle(CheckableChoice choice) {
+		int selectedChoices = countSelectedChoices();
+		boolean allowToggle = true;
+		if(minSelections != -1 && choice.isChecked() && selectedChoices <= minSelections) {
+			allowToggle = false;
+		}
+		if(maxSelections != -1 && !choice.isChecked() && selectedChoices >= maxSelections) {
+			allowToggle = false;
+		}
+		return allowToggle;
 	}
 }

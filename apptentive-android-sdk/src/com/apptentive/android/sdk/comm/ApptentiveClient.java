@@ -50,7 +50,7 @@ public class ApptentiveClient {
 
 	public boolean postJSON(String json) {
 		final HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+		HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
 		HttpConnectionParams.setSoTimeout(httpParams, 30000);
 		HttpClient httpClient = new DefaultHttpClient(httpParams);
 		HttpPost post = new HttpPost(ENDPOINT_RECORDS);
@@ -77,7 +77,7 @@ public class ApptentiveClient {
 			return (200 <= response.getStatusLine().getStatusCode()) &&
 					(300 > response.getStatusLine().getStatusCode());
 		} catch (IOException e) {
-			Log.w("Error submitting feedback.", e);
+			Log.w("Error posting JSON.", e);
 		} finally {
 			if (is != null) {
 				try {
@@ -110,11 +110,11 @@ public class ApptentiveClient {
 				return SurveyManager.parseSurvey(content);
 			}
 		} catch (URISyntaxException e) {
-			Log.e("Error fetching contact information.", e);
+			Log.e("Error fetching survey.", e);
 		} catch (IOException e) {
-			Log.e("Error fetching contact information.", e);
+			Log.e("Error fetching survey.", e);
 		} catch (JSONException e) {
-			Log.e("Error parsing retrieved surveys.", e);
+			Log.e("Error parsing retrieved survey.", e);
 		} finally {
 			if (is != null) {
 				try {
