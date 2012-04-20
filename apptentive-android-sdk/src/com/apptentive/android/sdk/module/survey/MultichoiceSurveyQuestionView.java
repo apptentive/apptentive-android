@@ -17,7 +17,6 @@ import java.util.*;
 public class MultichoiceSurveyQuestionView extends SurveyItemView<MultichoiceQuestion> {
 
 	protected Map<String, CheckableChoice> answers;
-	protected int maxChoices = 1; // Default
 
 	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
 		super(context, question);
@@ -51,10 +50,6 @@ public class MultichoiceSurveyQuestionView extends SurveyItemView<MultichoiceQue
 		}
 	}
 
-	protected void setMaxChoices(int maxChoices) {
-		this.maxChoices = maxChoices;
-	}
-
 	/**
 	 * Override to change the behavior of clicking this.
 	 *
@@ -72,6 +67,7 @@ public class MultichoiceSurveyQuestionView extends SurveyItemView<MultichoiceQue
 			}
 		}
 		question.setAnswers((String[]) checkedChoices.toArray(new String[]{}));
+		updateInstructionsColor();
 		fireListener();
 	}
 
