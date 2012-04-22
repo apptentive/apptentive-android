@@ -45,6 +45,9 @@ public class ApptentiveClient {
 	private final String APPTENTIVE_API_KEY;
 
 	public ApptentiveClient(String apiKey) {
+		if(apiKey == null || apiKey.equals("")) {
+			Log.e("Your API Key is not set. Please see the integration instructions for Apptentive initialization.");
+		}
 		this.APPTENTIVE_API_KEY = apiKey;
 	}
 
