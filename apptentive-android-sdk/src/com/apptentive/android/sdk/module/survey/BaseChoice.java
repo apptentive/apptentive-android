@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,7 +18,7 @@ import com.apptentive.android.sdk.util.Util;
 /**
  * @author Sky Kelsey.
  */
-public class BaseChoice extends FrameLayout {
+public abstract class BaseChoice extends FrameLayout {
 
 	protected Context appContext;
 	protected LinearLayout container;
@@ -31,18 +32,21 @@ public class BaseChoice extends FrameLayout {
 
 	protected void initView() {
 		setLayoutParams(Constants.ROW_LAYOUT);
+		setClickable(true);
+
 		int pad5  = Util.dipsToPixels(appContext, 5);
 		int pad10 = Util.dipsToPixels(appContext, 10);
-		setPadding(pad10, 0, pad5, 0);
-		setClickable(true);
 
 		container = new LinearLayout(appContext);
 		container.setLayoutParams(Constants.ROW_LAYOUT);
+		container.setPadding(pad10, 0, pad5, 0);
+		container.setGravity(Gravity.CENTER_VERTICAL);
 		addView(container);
 
 		textView = new TextView(appContext);
 		textView.setTextColor(Color.BLACK);
 		textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1f));
+		textView.setPadding(0, pad5, 0, pad5);
 		container.addView(textView);
 	}
 

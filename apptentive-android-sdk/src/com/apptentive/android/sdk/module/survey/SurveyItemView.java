@@ -41,9 +41,9 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		initView();
 		if (question != null) {
 			setTitleText(question.getValue());
+			instructionsTextView.setVisibility(View.VISIBLE);
 			if (question.getInstructions() != null) {
 				setInstructionsText(question.getInstructions());
-				instructionsTextView.setVisibility(View.VISIBLE);
 			}
 		}
 	}
@@ -75,6 +75,8 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		questionView = new LinearLayout(appContext);
 		questionView.setOrientation(LinearLayout.VERTICAL);
 		container.addView(questionView);
+
+		updateInstructionsColor();
 	}
 
 	public void setTitleText(String titleText) {
@@ -100,5 +102,40 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		if (listener != null) {
 			listener.onAnswered(this);
 		}
+	}
+
+	protected void updateInstructionsColor() {
+		if(question != null && question.isRequired() && !question.isAnswered()) {
+			instructionsTextView.setTextColor(Color.RED);
+		} else {
+			instructionsTextView.setTextColor(Color.GRAY);
+		}
+	}
+
+	private boolean flashing = false;
+	protected synchronized void flashInstructionsRed() {
+		if(flashing) {
+			return;
+		}
+		setClickable(false);
+		instructionsTextView.setTextColor(Color.RED);
+		flashing = true;
+		instructionsTextView.post(new Runnable() {
+			public void run() {
+				try{
+					Thread.sleep(300);
+				}catch(InterruptedException e) {
+				}
+				instructionsTextView.setTextColor(Color.GRAY);
+
+				// A hack to make any pending clicks on this event go away.
+				instructionsTextView.post(new Runnable() {
+					public void run() {
+						flashing = false;
+						setClickable(true);
+					}
+				});
+			}
+		});
 	}
 }

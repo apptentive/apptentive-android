@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.module.survey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 /**
  * @author Sky Kelsey.
  */
