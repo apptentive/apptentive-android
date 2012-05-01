@@ -18,11 +18,13 @@ import java.util.List;
  */
 public class MultichoiceQuestion extends BaseQuestion {
 
+	protected int minSelections;
 	protected int maxSelections;
 	protected List<AnswerDefinition> answerChoices = null;
 
 	protected MultichoiceQuestion(JSONObject question) throws JSONException {
 		super(question);
+		this.minSelections = 1;
 		this.maxSelections = 1;
 		this.answerChoices = new ArrayList<AnswerDefinition>();
 		JSONArray multichoiceChoices = question.getJSONArray("answer_choices");
@@ -33,6 +35,10 @@ public class MultichoiceQuestion extends BaseQuestion {
 
 	public int getType() {
 		return QUESTION_TYPE_MULTICHOICE;
+	}
+
+	public int getMinSelections() {
+		return minSelections;
 	}
 
 	public int getMaxSelections() {

@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.CheckBox;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -36,32 +35,5 @@ public class CheckableChoice extends BaseChoice {
 	}
 	public boolean isChecked() {
 		return checkBox.isChecked();
-	}
-
-	private boolean warning = false;
-	public synchronized void warn() {
-		if(warning) {
-			return;
-		}
-		setClickable(false);
-		warning = true;
-		textView.setBackgroundColor(Color.RED);
-		textView.post(new Runnable() {
-			public void run() {
-				try{
-					Thread.sleep(250);
-				}catch(InterruptedException e) {
-				}
-				textView.setBackgroundColor(Color.TRANSPARENT);
-
-				// A hack to make any pending clicks on this event go away.
-				textView.post(new Runnable() {
-					public void run() {
-						warning = false;
-						setClickable(true);
-					}
-				});
-			}
-		});
 	}
 }

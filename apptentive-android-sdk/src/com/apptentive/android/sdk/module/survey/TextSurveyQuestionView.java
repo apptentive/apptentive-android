@@ -27,6 +27,8 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 	@Override
 	protected void initView() {
 		super.initView();
+		instructionsTextView.setText(question.isRequired() ? "Required" : "Optional");
+
 		addSeparator();
 		answerText = new EditText(appContext);
 		answerText.setLayoutParams(Constants.ROW_LAYOUT);
@@ -41,10 +43,10 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 
 			public void afterTextChanged(Editable editable) {
 				question.setAnswers(editable.toString());
+				updateInstructionsColor();
 				fireListener();
 			}
 		});
 		questionView.addView(answerText);
 	}
-
 }
