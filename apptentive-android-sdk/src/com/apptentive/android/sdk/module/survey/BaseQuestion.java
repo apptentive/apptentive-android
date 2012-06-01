@@ -18,7 +18,9 @@ abstract public class BaseQuestion implements Question {
 	private boolean required;
 	private String instructions;
 
-	String[] answers;
+	private String[] answers;
+
+	private boolean metricSent;
 
 	public abstract int getType();
 
@@ -31,6 +33,7 @@ abstract public class BaseQuestion implements Question {
 		} else {
 			this.instructions = null;
 		}
+		metricSent = false;
 	}
 
 	public String getId() {
@@ -64,5 +67,13 @@ abstract public class BaseQuestion implements Question {
 			return new String[]{""};
 		}
 		return answers;
+	}
+
+	public boolean isMetricSent() {
+		return metricSent;
+	}
+
+	public void setMetricSent(boolean metricSent) {
+		this.metricSent = metricSent;
 	}
 }
