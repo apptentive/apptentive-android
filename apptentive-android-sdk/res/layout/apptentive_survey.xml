@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -29,7 +29,7 @@
 		          android:shadowDy="-1"
 		          android:shadowRadius="1"
 		          android:text="Survey"/>
-		<Button android:id="@+id/apptentive_survey_button_send"
+		<Button android:id="@+id/apptentive_survey_button_skip"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_centerVertical="true"
@@ -43,7 +43,7 @@
 		        android:textSize="18sp"
 		        android:textStyle="bold"
 		        android:background="@drawable/apptentive_header_button"
-		        android:text="@string/apptentive_send"/>
+		        android:text="@string/apptentive_skip"/>
 	</RelativeLayout>
 	<ScrollView android:layout_width="fill_parent"
 	            android:layout_height="0dp"
@@ -52,21 +52,7 @@
 		              android:layout_height="fill_parent"
 		              android:orientation="vertical"
 		              android:paddingLeft="10dp"
-		              android:paddingTop="10dp"
-		              android:paddingRight="10dp"
-		              android:paddingBottom="10dp">
-			<FrameLayout android:id="@+id/apptentive_survey_description_box"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:padding="10dp"
-			             android:background="@drawable/apptentive_question_header"
-			             android:layout_gravity="center">
-				<TextView android:id="@+id/apptentive_survey_description_text"
-				          android:layout_width="wrap_content"
-				          android:layout_height="wrap_content"
-				          android:textColor="#000000"
-				          android:textSize="20sp"/>
-			</FrameLayout>
+		              android:paddingRight="10dp">
 			<LinearLayout android:id="@+id/aptentive_survey_question_list"
 			              android:layout_width="fill_parent"
 			              android:layout_height="wrap_content"
