@@ -147,6 +147,15 @@ public class RatingModule {
 		this.prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
 	}
 
+	void onAppVersionChanged() {
+		if(prefs.getBoolean("appConfiguration.ratings_clear_on_upgrade", false)) {
+			setState(RatingState.START);
+			setStartOfRatingPeriod(new Date());
+			setEvents(0);
+			setUses(1);
+		}
+	}
+
 	/**
 	 * Ues this to choose where to send the user when they are prompted to rate the app. This should be the same place
 	 * that the app was downloaded from.

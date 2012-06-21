@@ -9,10 +9,15 @@ package com.apptentive.android.sdk;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.NetworkStateListener;
+import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.EmailUtil;
@@ -60,6 +65,8 @@ public class Apptentive {
 
 		final Context appContext = application.getApplicationContext();
 
+		NetworkStateReceiver.clearListeners();
+
 		// Retrieve device/app configuration.
 		new AsyncTask() {
 			@Override
@@ -85,6 +92,35 @@ public class Apptentive {
 
 		MetricModule.setContext(appContext);
 		MetricModule.sendMetric(MetricModule.Event.app__launch);
+
+		NetworkStateListener networkStateListener = new NetworkStateListener() {
+			public void stateChanged(NetworkInfo networkInfo) {
+				if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
+					Log.v("Network connected.");
+					PayloadManager.getInstance().ensureRunning();
+				}
+				if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
+					Log.v("Network disconnected.");
+				}
+			}
+		};
+		NetworkStateReceiver.addListener(networkStateListener);
+
+		// Check the host app version, and notify modules if it's changed.
+		try {
+			PackageInfo packageInfo = appContext.getPackageManager().getPackageInfo(appContext.getPackageName(), 0);
+			int currentVersionCode = packageInfo.versionCode;
+			SharedPreferences prefs = appContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+			if(prefs.contains("app_version_code")) {
+				int previousVersionCode = prefs.getInt("app_version_code", 0);
+				if(previousVersionCode != currentVersionCode) {
+					RatingModule.getInstance().onAppVersionChanged();
+				}
+			}
+			prefs.edit().putInt("app_version_code", currentVersionCode).commit();
+		} catch(PackageManager.NameNotFoundException e) {
+			// Nothing we can do then.
+		}
 	}
 
 	/**
