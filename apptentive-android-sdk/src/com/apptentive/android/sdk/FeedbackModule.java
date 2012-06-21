@@ -71,6 +71,7 @@ public class FeedbackModule {
 		if(!startingEmail.equals(feedback.getEmail())){
 			prefs.edit().putString("userEnteredEmail", feedback.getEmail()).commit();
 		}
+		MetricModule.sendMetric(MetricModule.Event.feedback_dialog__submit);
 		PayloadManager.getInstance().putPayload(feedback);
 	}
 

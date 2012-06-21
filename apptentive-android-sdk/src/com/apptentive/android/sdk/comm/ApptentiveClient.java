@@ -51,7 +51,7 @@ public class ApptentiveClient {
 		this.APPTENTIVE_API_KEY = apiKey;
 	}
 
-	public boolean postJSON(String json) {
+	public int postJSON(String json) {
 		final HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
 		HttpConnectionParams.setSoTimeout(httpParams, 30000);
@@ -77,10 +77,9 @@ public class ApptentiveClient {
 			Log.d(response.getStatusLine().toString());
 			Log.v(content.toString());
 
-			return (200 <= response.getStatusLine().getStatusCode()) &&
-					(300 > response.getStatusLine().getStatusCode());
+			return response.getStatusLine().getStatusCode();
 		} catch (IOException e) {
-			Log.w("Error posting JSON.", e);
+			Log.w("Error posting JSON: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
 		} finally {
 			if (is != null) {
 				try {
@@ -89,7 +88,7 @@ public class ApptentiveClient {
 				}
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	public SurveyDefinition getSurvey() {
@@ -165,7 +164,7 @@ public class ApptentiveClient {
 		} catch (URISyntaxException e) {
 			Log.e("Error fetching configuration.", e);
 		} catch (IOException e) {
-			Log.e("Error fetching configuration.", e);
+			Log.e("Error fetching configuration: %s", e.getMessage());
 		} finally {
 			if (is != null) {
 				try {

@@ -40,8 +40,10 @@ public class MetricPayload extends Payload {
 	}
 
 	void putAllData(Map<String, String> data) {
-		for (String key : data.keySet()) {
-			putData(key, data.get(key));
+		if(data != null) {
+			for (String key : data.keySet()) {
+				putData(key, data.get(key));
+			}
 		}
 	}
 }

@@ -44,14 +44,14 @@ public class SurveyPayload extends Payload {
 			for(Question question : questions) {
 				String id = question.getId();
 				String[] questionAnswers = question.getAnswers();
-				if(questionAnswers.length == 1 && !questionAnswers[0].equals("")) {
-					answers.put(id, questionAnswers[0]);
-				} else {
+				if(questionAnswers.length > 1 || question.getType() == Question.QUESTION_TYPE_MULTICHOICE || question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 					JSONArray jsonArray = new JSONArray();
 					for (String answer : questionAnswers) {
 						jsonArray.put(answer);
 					}
 					answers.put(id, jsonArray);
+				} else if(questionAnswers.length == 1 && !questionAnswers[0].equals("")) {
+					answers.put(id, questionAnswers[0]);
 				}
 			}
 			survey.put("responses", answers);
