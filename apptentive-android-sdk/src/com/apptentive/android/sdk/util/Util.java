@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.util;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -14,8 +16,8 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import com.apptentive.android.sdk.Log;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -24,19 +26,21 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Util {
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ"); // 2011-01-01 11:59:59-0800
+	public static SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ"); // 2011-01-01 11:59:59-0800
 	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS"); // 2011-01-01_11-59-59
 
-	public static String dateToString(Date date){
-		return dateToString(date, Util.DATE_FORMAT);
-	}
-	public static Date stringToDate(String date) throws ParseException{
-		return stringToDate(date, Util.DATE_FORMAT);
+	public static String dateToIso8601String(long when) {
+		return dateToString(ISO8601_DATE_FORMAT, when);
 	}
 
-	public static String dateToString(Date date, SimpleDateFormat format){
-		return format.format(date);
+	public static Date iso8601StringToDate(String date) throws ParseException {
+		return stringToDate(date, Util.ISO8601_DATE_FORMAT);
 	}
+
+	public static String dateToString(DateFormat format, long when){
+		return format.format(new Date(when));
+	}
+
 	public static Date stringToDate(String date, SimpleDateFormat format) throws ParseException{
 		return format.parse(date);
 	}
@@ -47,16 +51,6 @@ public class Util {
 		return rectangle.top;
 	}
 
-	public static Date addDaysToDate(Date start, int days){
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		cal.setTime(start);
-		cal.add(Calendar.DAY_OF_MONTH, days);
-		return cal.getTime();
-	}
-
-	public static boolean timeHasElapsed(Date start, int days){
-		return !(new Date().before(addDaysToDate(start, days)));
-	}
 
 	private static List<PackageInfo> getPermissions(Context context){
 		return context.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
@@ -104,5 +98,38 @@ public class Util {
 		}
 	}
 */
+
+
+	public static String getUserEmail(Context context) {
+		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+			String email = getEmail(context);
+			if (email != null) {
+				return email;
+			}
+		}
+		return "";
+	}
+
+	public static String getEmail(Context context){
+		AccountManager accountManager = AccountManager.get(context);
+		Account account = getAccount(accountManager);
+		if(account == null){
+			return null;
+		}else{
+			return account.name;
+		}
+	}
+
+	// TODO: Use reflection to load this so we can drop 2.1 API requirement.
+	private static Account getAccount(AccountManager accountManager){
+		Account[] accounts = accountManager.getAccountsByType("com.google");
+		Account account;
+		if (accounts.length > 0){
+			account = accounts[0];
+		}else{
+			account = null;
+		}
+		return account;
+	}
 
 }
