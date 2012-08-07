@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.demo;
+package com.apptentive.android.testing;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,38 +13,29 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
-import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 /**
  * @author Sky Kelsey
  */
-public class DemoActivity extends Activity {
+public class TestingActivity extends ApptentiveActivity {
 
-	private static final String LOG_TAG = "Apptentive";
+	private static final String LOG_TAG = "Apptentive Testing App";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
 		// BEGIN APPTENTIVE INITIALIZATION
-
-		final Apptentive apptentive = Apptentive.getInstance();
-		apptentive.initialize(getApplication(), "<YOUR_API_KEY>");
-		apptentive.setAppDisplayName("Apptentive Demo");
-		//apptentive.setUserEmail("user_email@example.com");
-
-		final RatingModule ratingModule = apptentive.getRatingModule();
-		ratingModule.setRatingProvider(new AndroidMarketRatingProvider());
-		// Bump uses each time the app starts.
-		ratingModule.logUse();
-
-		// Add custom data fields to feedback this way:
-		final FeedbackModule feedbackModule = apptentive.getFeedbackModule();
-		feedbackModule.addDataField("foo", "bar");
-
+		// OPTIONAL: To specify a different user email than what the device was setup with.
+		//Apptentive.setUserEmail("user_email@example.com");
+		// OPTIONAL: To send extra data with your feedback.
+		Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
 		// END APPTENTIVE INITIALIZATION
 
+		// Setup UI:
+		final RatingModule ratingModule = Apptentive.getRatingModule();
+		final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
 
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
@@ -68,19 +58,19 @@ public class DemoActivity extends Activity {
 		Button choiceButton = (Button) findViewById(R.id.button_choice);
 		choiceButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.forceShowEnjoymentDialog(DemoActivity.this);
+				ratingModule.forceShowEnjoymentDialog(TestingActivity.this);
 			}
 		});
 		Button ratingsButton = (Button) findViewById(R.id.button_ratings);
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.showRatingDialog(DemoActivity.this);
+				ratingModule.showRatingDialog(TestingActivity.this);
 			}
 		});
 		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
 		feedbackButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				feedbackModule.forceShowFeedbackDialog(DemoActivity.this);
+				feedbackModule.forceShowFeedbackDialog(TestingActivity.this);
 			}
 		});
 
@@ -88,13 +78,13 @@ public class DemoActivity extends Activity {
 		final Button showSurveyButton = (Button) findViewById(R.id.button_survey_show);
 		fetchSurveyButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				final SurveyModule surveyModule = apptentive.getSurveyModule();
+				final SurveyModule surveyModule = Apptentive.getSurveyModule();
 				surveyModule.fetchSurvey(new OnSurveyFetchedListener() {
 					public void onSurveyFetched(final boolean success) {
-						Log.e(LOG_TAG, "onSurveyFetched("+success+")");
+						Log.e(LOG_TAG, "onSurveyFetched(" + success + ")");
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast toast = Toast.makeText(DemoActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
+								Toast toast = Toast.makeText(TestingActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
 								toast.setGravity(Gravity.CENTER, 0, 0);
 								toast.show();
 								showSurveyButton.setEnabled(success);
@@ -107,9 +97,9 @@ public class DemoActivity extends Activity {
 
 		showSurveyButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				final SurveyModule surveyModule = apptentive.getSurveyModule();
-				if(surveyModule.isSurveyReady()) {
-					surveyModule.show(DemoActivity.this);
+				final SurveyModule surveyModule = Apptentive.getSurveyModule();
+				if (surveyModule.isSurveyReady()) {
+					surveyModule.show(TestingActivity.this);
 					showSurveyButton.setEnabled(false);
 				}
 			}
@@ -118,16 +108,9 @@ public class DemoActivity extends Activity {
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		Log.e(LOG_TAG, "onWindowFocusChanges(" + hasFocus + ")");
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.getInstance().getRatingModule().run(DemoActivity.this);
+			Apptentive.getRatingModule().run(this);
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		Apptentive.getInstance().onDestroy();
-		super.onDestroy();
 	}
 }
