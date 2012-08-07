@@ -16,6 +16,17 @@ import android.view.animation.TranslateAnimation;
  * @author Sky Kelsey
  */
 public class Constants {
+
+	public static final String PREF_NAME = "APPTENTIVE";
+	public static final String PREF_KEY_APP_IN_BACKGROUND = "appIsInBackground";
+	public static final String PREF_KEY_APP_ACTIVE_SESSION = "appActiveSession";
+	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
+	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
+	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
+	public static final String PREF_KEY_APP_METRICS_ENABLED = PREF_KEY_APP_CONFIG_PREFIX+"metrics_enabled";
+
+	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 

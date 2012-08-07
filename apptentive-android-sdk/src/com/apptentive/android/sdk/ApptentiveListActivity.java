@@ -6,22 +6,21 @@
 
 package com.apptentive.android.sdk;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 
 /**
- * Extend this class instead of Activity to easily integrate Apptentive into your application.
+ * Extend this class instead of ListActivity to easily integrate Apptentive into your application.
  * <p/>
  * If you are unable to inherit from our Activity, you can delegate the calls to Apptentive static methods into your
  * own Activity manually, as specified below.
  * <p/>
  * All Activities in your Application MUST integrate Apptentive by extending of of the Apptentive Activities, or by
  * delegation.
- * @see ApptentiveListActivity
+ * @see ApptentiveActivity
  * @author Sky Kelsey
  */
-public class ApptentiveActivity extends Activity {
-
+public class ApptentiveListActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,5 +43,4 @@ public class ApptentiveActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		Apptentive.onDestroy(this);
-	}
-}
+	}}

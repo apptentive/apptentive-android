@@ -24,7 +24,8 @@ public class Log {
 	private static final String TAG = "Apptentive";
 
 	private static void doLog(int level, Throwable throwable, String message, Object... args){
-		if(message != null){
+		boolean loggable = GlobalInfo.isAppDebuggable || level > DEBUG; // Don't log below INFO unless we are debugging.
+		if(loggable && message != null){
 			if(args.length > 0){
 				try{
 					message = String.format(message, args);

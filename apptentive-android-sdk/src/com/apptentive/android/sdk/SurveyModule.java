@@ -108,8 +108,8 @@ public class SurveyModule {
 			return;
 		}
 		Intent intent = new Intent();
-		intent.setClass(context, ApptentiveActivity.class);
-		intent.putExtra("module", ApptentiveActivity.Module.SURVEY.toString());
+		intent.setClass(context, ViewActivity.class);
+		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
 		context.startActivity(intent);
 	}
 
@@ -175,7 +175,6 @@ public class SurveyModule {
 
 		// Then render all the questions
 		for (final Question question : surveyDefinition.getQuestions()) {
-			final int index = surveyDefinition.getQuestions().indexOf(question);
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {

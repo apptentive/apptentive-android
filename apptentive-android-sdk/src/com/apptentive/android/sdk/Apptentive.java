@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
-import android.app.Application;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -20,7 +22,8 @@ import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.PayloadManager;
-import com.apptentive.android.sdk.util.EmailUtil;
+import com.apptentive.android.sdk.util.ActivityUtil;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.HashMap;
@@ -32,56 +35,161 @@ import java.util.HashMap;
  */
 public class Apptentive {
 
-	public static final String APPTENTIVE_API_VERSION = "0.1";
-
-	private static Apptentive instance = null;
-	private Application application = null;
+	private static Context appContext = null;
 
 	private Apptentive() {
 	}
 
 	/**
-	 * Gets the Apptentive singleton instance.
+	 * Initializes Apptentive.
 	 *
-	 * @return The Apptentive singleton instance.
+	 * @param activity The Activity from which this method is called.
+	 * @param savedInstanceState
 	 */
-	public static Apptentive getInstance() {
-		if (instance == null) {
-			instance = new Apptentive();
+	public static void onCreate(Activity activity, Bundle savedInstanceState) {
+		appContext = activity.getApplicationContext();
+		boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
+		if(isMain) {
+			init();
+			MetricModule.sendMetric(MetricModule.Event.app__launch);
+			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit(); // Prime
 		}
-		return instance;
+	}
+
+
+	/**
+	 * @param activity The Activity from which this method is called.
+	 */
+	public static void onStart(Activity activity) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		// The first run of this method will be when the main Activity is launched.
+		boolean comingFromBackground = prefs.getBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true);
+		if(comingFromBackground) {
+			Apptentive.beginSession();
+			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, false).commit();
+			boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
+			if(isMain) {
+				// TODO: Only do this when the cache is expired, or when the app is debuggable. In that case, don't do the isMain check, or backbround check??
+				Apptentive.asyncFetchAppConfiguration();
+			}
+		}
 	}
 
 	/**
-	 * Initializes the Apptentive Passes your application's Activity to Apptentive so we can initialize.
-	 *
-	 * @param app    The top level application instance.
-	 * @param apiKey The API key. This will be a long base64 token like:<br/>
-	 *               <strong>0d7c775a973b30ed6a8cb2cf6469af3168a8c5e38ccd26755d1fdaa3397c6575</strong>
+	 * Reserved for future use.
+	 * @param activity The Activity from which this method is called.
 	 */
-	public void initialize(Application app, String apiKey) {
-		this.application = app;
-		GlobalInfo.apiKey = apiKey;
+	public static void onResume(Activity activity) {
+	}
 
-		final Context appContext = application.getApplicationContext();
+	/**
+	 * Reserved for future use.
+	 * @param activity The Activity from which this method is called.
+	 * @param hasFocus true if the activity is coming into focus, else false.
+	 */
+	public static void onWindowFocusChanged(Activity activity, boolean hasFocus) {
+	}
 
+	/**
+	 * Reserved for future use.
+	 * @param activity The Activity this method is called from.
+	 */
+	public static void onPause(Activity activity) {
+	}
+
+	/**
+	 * @param activity The Activity from which this method is called.
+	 */
+	public static void onStop(Activity activity) {
+		if(ActivityUtil.isApplicationBroughtToBackground(activity)) {
+			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit();
+			Apptentive.endSession();
+		}
+	}
+
+	/**
+	 * @param activity The Activity from which this method is called.
+	 */
+	public static void onDestroy(Activity activity) {
+		if(ActivityUtil.isCurrentActivityMainActivity(activity)) {
+			MetricModule.sendMetric(MetricModule.Event.app__exit);
+			Apptentive.endSession();
+		}
+	}
+
+	/**
+	 * Multiple calls to beginSession within a short period of time are NOPs.
+	 * Calls to beginSession when a session is running result in a new session.
+	 */
+	private static void beginSession() {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
+		if(!activeSession) {
+			Log.v("Starting session.");
+			MetricModule.sendMetric(MetricModule.Event.app__session_start);
+			RatingModule.getInstance().logUse();
+		} else {
+			// TODO: Log an error. This was either a crash, or a dev missing the onStop call.
+			Log.w("Starting session, but a session is already active.");
+		}
+		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, true).commit();
+	}
+
+	/**
+	 * If a session is active, will end it. If a session is not active, is a NOP.
+	 */
+	private static void endSession() {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
+		if(activeSession) {
+			Log.v("Ending Session.");
+			MetricModule.sendMetric(MetricModule.Event.app__session_end);
+		} else {
+			// This should never happen...
+			Log.w("Ending session, but no session is active.");
+		}
+		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false).commit();
+	}
+
+	private static void init() {
 		NetworkStateReceiver.clearListeners();
 
-		// Retrieve device/app configuration.
-		new AsyncTask() {
-			@Override
-			protected Object doInBackground(Object... objects) {
-				getAppConfiguration(appContext, GlobalInfo.apiKey);
-				return null;
-			}
-		}.execute();
+		GlobalInfo.isAppDebuggable = false;
 
-		GlobalInfo.carrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
-		GlobalInfo.currentCarrier = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
-		GlobalInfo.networkType = ((TelephonyManager) (application.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
+		// First, Get the api key, and figure out if app is debuggable.
+		String apiKey = null;
+		try {
+			ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
+			if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
+				apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+			}
+			if(ai != null && ((ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)) {
+				GlobalInfo.isAppDebuggable = true;
+			}
+		} catch(Exception e) {
+			Log.e("Unexpected error while reading application info.", e);
+		}
+
+		// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
+		String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
+		if((apiKey == null || apiKey.equals(""))) {
+			if(GlobalInfo.isAppDebuggable) {
+				throw new RuntimeException(errorString);
+			} else {
+				Log.e(errorString);
+			}
+		}
+		GlobalInfo.apiKey = apiKey;
+
+		// Grab device info.
+		GlobalInfo.carrier = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
+		GlobalInfo.currentCarrier = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
+		GlobalInfo.networkType = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
 		GlobalInfo.appPackage = appContext.getPackageName();
-		GlobalInfo.androidId = Settings.Secure.getString(application.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		GlobalInfo.userEmail = getUserEmail(appContext);
+		GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+		GlobalInfo.userEmail = Util.getUserEmail(appContext);
 
 		PayloadManager.getInstance().setContext(appContext);
 		PayloadManager.getInstance().start();
@@ -91,8 +199,8 @@ public class Apptentive {
 		FeedbackModule.getInstance().setContext(appContext);
 
 		MetricModule.setContext(appContext);
-		MetricModule.sendMetric(MetricModule.Event.app__launch);
 
+		// Listen for network state changes.
 		NetworkStateListener networkStateListener = new NetworkStateListener() {
 			public void stateChanged(NetworkInfo networkInfo) {
 				if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
@@ -108,61 +216,58 @@ public class Apptentive {
 
 		// Check the host app version, and notify modules if it's changed.
 		try {
-			PackageInfo packageInfo = appContext.getPackageManager().getPackageInfo(appContext.getPackageName(), 0);
+			PackageManager packageManager = appContext.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			int currentVersionCode = packageInfo.versionCode;
-			SharedPreferences prefs = appContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
-			if(prefs.contains("app_version_code")) {
-				int previousVersionCode = prefs.getInt("app_version_code", 0);
+			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
+				int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
 				if(previousVersionCode != currentVersionCode) {
 					RatingModule.getInstance().onAppVersionChanged();
 				}
 			}
-			prefs.edit().putInt("app_version_code", currentVersionCode).commit();
+			prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
+
+			GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 		} catch(PackageManager.NameNotFoundException e) {
 			// Nothing we can do then.
+			GlobalInfo.appDisplayName = "this app";
 		}
 	}
 
+
 	/**
-	 * Grabs the app configuration from the server and stores the keys into our SharedPreferences.
-	 * @param context
-	 * @param apiKey
+	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
 	 */
-	private void getAppConfiguration(Context context, String apiKey) {
-		ApptentiveClient client = new ApptentiveClient(apiKey);
+	private static void fetchAppConfiguration() {
+		ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 		HashMap<String, Object> config = client.getAppConfiguration(GlobalInfo.androidId);
-		SharedPreferences prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		Log.v("app configuration: " + config.toString());
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		for (String key : config.keySet()) {
 			Object value = config.get(key);
 			if (value instanceof Integer) {
-				prefs.edit().putInt("appConfiguration." + key, (Integer) value).commit();
+				prefs.edit().putInt(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Integer) value).commit();
 			} else if (value instanceof String) {
-				prefs.edit().putString("appConfiguration." + key, (String) value).commit();
+				prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (String) value).commit();
 			} else if (value instanceof Boolean) {
-				prefs.edit().putBoolean("appConfiguration." + key, (Boolean) value).commit();
+				prefs.edit().putBoolean(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Boolean) value).commit();
 			} else if (value instanceof Long) {
-				prefs.edit().putLong("appConfiguration." + key, (Long) value).commit();
+				prefs.edit().putLong(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Long) value).commit();
 			} else if (value instanceof Float) {
-				prefs.edit().putFloat("appConfiguration." + key, (Float) value).commit();
+				prefs.edit().putFloat(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Float) value).commit();
 			}
 		}
 	}
 
-	/**
-	 * Call this from your main Activity's onDestroy() method, so we can clean up.
-	 */
-	public void onDestroy() {
-		MetricModule.sendMetric(MetricModule.Event.app__exit);
-	}
-
-	/**
-	 * Sets your app's display name.<p/>
-	 * Should be something like "My App Name".
-	 *
-	 * @param name The display name of your app.
-	 */
-	public void setAppDisplayName(String name) {
-		GlobalInfo.appDisplayName = name;
+	private static void asyncFetchAppConfiguration() {
+		new AsyncTask() {
+			@Override
+			protected Object doInBackground(Object... objects) {
+				fetchAppConfiguration();
+				return null;
+			}
+		}.execute();
 	}
 
 	/**
@@ -172,7 +277,7 @@ public class Apptentive {
 	 *
 	 * @param email The user's email address.
 	 */
-	public void setUserEmail(String email) {
+	public static void setUserEmail(String email) {
 		GlobalInfo.userEmail = email;
 	}
 
@@ -182,7 +287,7 @@ public class Apptentive {
 	 *
 	 * @return The Apptentive Rating Module.
 	 */
-	public RatingModule getRatingModule() {
+	public static RatingModule getRatingModule() {
 		return RatingModule.getInstance();
 	}
 
@@ -191,7 +296,7 @@ public class Apptentive {
 	 *
 	 * @return The Apptentive Feedback Module.
 	 */
-	public FeedbackModule getFeedbackModule() {
+	public static FeedbackModule getFeedbackModule() {
 		return FeedbackModule.getInstance();
 	}
 
@@ -200,17 +305,7 @@ public class Apptentive {
 	 *
 	 * @return The Apptentive Survey Module.
 	 */
-	public SurveyModule getSurveyModule() {
+	public static SurveyModule getSurveyModule() {
 		return SurveyModule.getInstance();
-	}
-
-	private static String getUserEmail(Context context) {
-		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-			String email = EmailUtil.getEmail(context);
-			if (email != null) {
-				return email;
-			}
-		}
-		return "";
 	}
 }

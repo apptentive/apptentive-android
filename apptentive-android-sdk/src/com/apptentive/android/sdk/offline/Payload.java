@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,7 +20,7 @@ public abstract class Payload {
 
 	public Payload() {
 		try {
-			setString(Util.dateToString(new Date()), "record", "date");
+			setString(Util.dateToIso8601String(new Date().getTime()), "record", "date");
 		} catch (JSONException e) {
 			Log.e("Exception setting date.", e);
 		}
