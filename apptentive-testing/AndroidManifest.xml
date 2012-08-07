@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <application android:label="@string/app_name" android:icon="@drawable/icon">
-        <meta-data android:name="apptentive_api_key" android:value="aee1d553400bbd7491aca6875536b1183bab2edcb5906f07cea64f7638a3993b"/>
+        <meta-data android:name="apptentive_api_key" android:value=""/>
         <activity android:name=".TestingActivity"
                   android:label="@string/app_name"
                   android:configChanges="orientation|keyboardHidden"
