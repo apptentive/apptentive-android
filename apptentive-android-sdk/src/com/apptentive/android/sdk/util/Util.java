@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.net.ConnectivityManager;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -132,4 +133,8 @@ public class Util {
 		return account;
 	}
 
+	public static boolean isNetworkConnectionPresent(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		return cm != null && cm.getActiveNetworkInfo() != null;
+	}
 }

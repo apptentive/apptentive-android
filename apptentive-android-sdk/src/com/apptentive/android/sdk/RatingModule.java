@@ -29,6 +29,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -206,8 +207,10 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
-		// TODO: Check to see if a data connection exists first. We don't want to prompt to rate unless one exists.
-
+		if(!Util.isNetworkConnectionPresent(activity)) {
+			Log.d("Ratings can't be shown because the network is not available. Try again later.");
+			return;
+		}
 		switch (getState()) {
 			case START:
 				boolean canShow = canShowRatingFlow();
