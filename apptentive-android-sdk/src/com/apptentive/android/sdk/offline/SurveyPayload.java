@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.offline;
 
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.survey.Question;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
@@ -56,6 +57,11 @@ public class SurveyPayload extends Payload {
 			}
 			survey.put("responses", answers);
 			record.put("survey", survey);
+
+			JSONObject device = new JSONObject();
+			device.put("uuid", GlobalInfo.androidId);
+			record.put("device", device);
+
 			root.put("record", record);
 			return super.getAsJSON();
 		} catch (JSONException e) {
