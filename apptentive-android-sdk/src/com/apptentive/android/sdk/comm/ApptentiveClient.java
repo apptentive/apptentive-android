@@ -65,7 +65,7 @@ public class ApptentiveClient {
 		StringBuilder content = new StringBuilder();
 		InputStream is = null;
 		try {
-			Log.d("Posting JSON: " + json);
+			Log.v("Posting JSON: " + json);
 			post.setEntity(new StringEntity(json, "UTF-8"));
 			HttpResponse response = httpClient.execute(post);
 			is = response.getEntity().getContent();

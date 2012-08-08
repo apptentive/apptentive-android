@@ -207,6 +207,10 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
+		if(!prefs.getBoolean("appConfiguration.ratings_enabled", true)) {
+			Log.d("Skipped showing ratings because they are disabled.");
+			return;
+		}
 		if(!Util.isNetworkConnectionPresent(activity)) {
 			Log.d("Ratings can't be shown because the network is not available. Try again later.");
 			return;

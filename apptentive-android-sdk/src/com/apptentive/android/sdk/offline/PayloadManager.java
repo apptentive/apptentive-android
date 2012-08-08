@@ -114,7 +114,7 @@ public class PayloadManager implements Runnable {
 					// Can this even happen?
 					break;
 				}
-				Log.d("Got a payload to send: " + name);
+				Log.v("Got a payload to send: " + name);
 				String json = prefs.getString(name, null);
 				Log.v("Payload contents: " + json);
 				if (json == null) {
