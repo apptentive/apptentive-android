@@ -45,7 +45,7 @@ public class SurveyPayload extends Payload {
 			for(Question question : questions) {
 				String id = question.getId();
 				String[] questionAnswers = question.getAnswers();
-				if(questionAnswers.length > 1 || question.getType() == Question.QUESTION_TYPE_MULTICHOICE || question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+				if(questionAnswers.length > 1 || question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 					JSONArray jsonArray = new JSONArray();
 					for (String answer : questionAnswers) {
 						jsonArray.put(answer);
