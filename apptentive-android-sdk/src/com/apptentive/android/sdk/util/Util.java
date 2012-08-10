@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import com.apptentive.android.sdk.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -27,23 +28,58 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Util {
-	public static SimpleDateFormat ISO8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ"); // 2011-01-01 11:59:59-0800
-	public static SimpleDateFormat STRINGSAFE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS"); // 2011-01-01_11-59-59
 
-	public static String dateToIso8601String(long when) {
-		return dateToString(ISO8601_DATE_FORMAT, when);
+	// These date formats are as close as Java can get to ISO 8601 without royally screwing up.
+	public static String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
+	public static String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
+
+	public static String dateToIso8601String(Date date) {
+		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), date.getTime());
 	}
 
-	public static Date iso8601StringToDate(String date) throws ParseException {
-		return stringToDate(date, Util.ISO8601_DATE_FORMAT);
+	public static String dateToIso8601String(long when) {
+		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), when);
 	}
 
 	public static String dateToString(DateFormat format, long when){
 		return format.format(new Date(when));
 	}
 
-	public static Date stringToDate(String date, SimpleDateFormat format) throws ParseException{
-		return format.parse(date);
+	public static Date parseIso8601Date(final String iso8601DateString) {
+		// Normalize timezone.
+		String s = iso8601DateString.trim().replace("Z", "+00:00").replace("T", " ");
+		try{
+			// Remove colon in timezone.
+			int lastColonIndex = s.lastIndexOf(":");
+			s = s.substring(0, lastColonIndex) + s.substring(lastColonIndex+1);
+
+			// Right pad millis to 3 places. ISO 8601 supplies fractions of seconds, but Java interprets them as millis.
+			int milliStart = s.lastIndexOf('.');
+			int milliEnd = (s.lastIndexOf('+') != -1) ? s.lastIndexOf('+') : s.lastIndexOf('-');
+			if(milliStart != -1) {
+				String start = s.substring(0, milliStart+1);
+				String millis = s.substring(milliStart+1, milliEnd);
+				String end = s.substring(milliEnd);
+				millis = String.format("%-3s", millis).replace(" ", "0");
+				s = start + millis + end;
+			}
+		} catch (Exception e) {
+			Log.e("Error parsing date: " + iso8601DateString, e);
+			return new Date();
+		}
+		// Parse, accounting for millis, if provided.
+		try {
+			if(s.contains(".")) {
+				return new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS).parse(s);
+			} else {
+				return new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT).parse(s);
+			}
+		} catch (ParseException e) {
+			Log.e("Exception parsing date: " + s, e);
+		}
+
+		// Return null as default. Nothing we can do but log it.
+		return null;
 	}
 
 	public static int getStatusBarHeight(Window window){
@@ -137,4 +173,5 @@ public class Util {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
+
 }

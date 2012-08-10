@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -238,14 +239,32 @@ public class Apptentive {
 
 	/**
 	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
+	 * @param force If true, will always fetch configuration. If false, only fetches configuration if the cached
+	 *              configuration has expired.
 	 */
-	private static void fetchAppConfiguration() {
+	private static void fetchAppConfiguration(boolean force) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
+		// Don't get the app configuration unless forced, or the cache has expired.
+		if(!force) {
+			String iso8601DateString = prefs.getString(Constants.PREF_KEY_APP_CONFIG_PREFIX + "cache-expiration", null);
+			if(iso8601DateString != null) {
+				Date expiration = Util.parseIso8601Date(iso8601DateString);
+				boolean expired = new Date().getTime() > expiration.getTime();
+				if(!expired) {
+					Log.v("Using cached configuration.");
+					return;
+				}
+			}
+		}
+
+		Log.v("Fetching new configuration.");
 		ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
 		HashMap<String, Object> config = client.getAppConfiguration(GlobalInfo.androidId);
-		Log.v("app configuration: " + config.toString());
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		Log.v("App configuration: " + config.toString());
 		for (String key : config.keySet()) {
 			Object value = config.get(key);
+			Log.v("- %s = %s", key, value);
 			if (value instanceof Integer) {
 				prefs.edit().putInt(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Integer) value).commit();
 			} else if (value instanceof String) {
@@ -264,7 +283,7 @@ public class Apptentive {
 		new AsyncTask() {
 			@Override
 			protected Object doInBackground(Object... objects) {
-				fetchAppConfiguration();
+				fetchAppConfiguration(GlobalInfo.isAppDebuggable);
 				return null;
 			}
 		}.execute();

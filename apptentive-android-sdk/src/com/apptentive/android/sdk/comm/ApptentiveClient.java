@@ -75,7 +75,7 @@ public class ApptentiveClient {
 				content.append(new String(line, 0, size));
 			}
 			Log.d(response.getStatusLine().toString());
-			Log.v(content.toString());
+			Log.v("- %s", content.toString());
 
 			return response.getStatusLine().getStatusCode();
 		} catch (IOException e) {
