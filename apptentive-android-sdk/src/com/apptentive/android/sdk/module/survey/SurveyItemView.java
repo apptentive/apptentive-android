@@ -6,11 +6,13 @@
 
 package com.apptentive.android.sdk.module.survey;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -49,6 +51,14 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	}
 
 	protected void initView() {
+		setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				if(getContext() instanceof Activity) {
+					Util.hideSoftKeyboard((Activity)getContext(), SurveyItemView.this);
+				}
+				return false;
+			}
+		});
 		int tenDips = Util.dipsToPixels(appContext, 10);
 		setPadding(0, tenDips, 0, 0);
 		container = new LinearLayout(appContext);
