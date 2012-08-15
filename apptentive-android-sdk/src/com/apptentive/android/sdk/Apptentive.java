@@ -185,9 +185,10 @@ public class Apptentive {
 		GlobalInfo.apiKey = apiKey;
 
 		// Grab device info.
-		GlobalInfo.carrier = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getSimOperatorName();
-		GlobalInfo.currentCarrier = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkOperatorName();
-		GlobalInfo.networkType = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE))).getNetworkType();
+		TelephonyManager tm = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE)));
+		GlobalInfo.carrier = tm.getSimOperatorName();
+		GlobalInfo.currentCarrier = tm.getNetworkOperatorName();
+		GlobalInfo.networkType = tm.getNetworkType();
 		GlobalInfo.appPackage = appContext.getPackageName();
 		GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = Util.getUserEmail(appContext);
