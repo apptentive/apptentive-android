@@ -224,8 +224,8 @@ public class SurveyModule {
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle("Survey Completed");
-					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					builder.setTitle(view.getContext().getString(R.string.apptentive_survey_success_title));
+					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_survey_positive_button), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							cleanup();
 							activity.finish();

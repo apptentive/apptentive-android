@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class FeedbackModule {
 		}
 		// If the email was changed, then save it for future use.
 		if(!startingEmail.equals(feedback.getEmail())){
-			prefs.edit().putString("userEnteredEmail", feedback.getEmail()).commit();
+			prefs.edit().putString(Constants.PREF_KEY_USER_ENTERED_EMAIL, feedback.getEmail()).commit();
 		}
 		MetricModule.sendMetric(MetricModule.Event.feedback_dialog__submit);
 		PayloadManager.getInstance().putPayload(feedback);
@@ -81,7 +82,7 @@ public class FeedbackModule {
 	// *************************************************************************************************
 
 	void setContext(Context context) {
-		this.prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		this.prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 	}
 
 	void showFeedbackDialog(Context context, Trigger reason) {
@@ -128,7 +129,7 @@ public class FeedbackModule {
 
 		void show(FeedbackModule.Trigger reason) {
 			// Load the use entered email, if it exists. Otherwise, load the default email.
-			startingEmail = prefs.getString("userEnteredEmail", null);
+			startingEmail = prefs.getString(Constants.PREF_KEY_USER_ENTERED_EMAIL, null);
 			if(startingEmail == null){
 				startingEmail = GlobalInfo.userEmail;
 			}
