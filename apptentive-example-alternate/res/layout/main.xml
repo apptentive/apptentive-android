@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/demo_intro_text"/>
+    <Button android:id="@+id/feedback_button_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onFeedbackButtonPressed"
+            android:text="@string/feedback_button_label"/>
+    <Button android:id="@+id/fetch_survey_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onFetchSurveyButtonPressed"
+            android:text="@string/fetch_survey_button_label"/>
+    <Button android:id="@+id/show_survey_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onShowSurveyButtonPressed"
+            android:text="@string/show_survey_button_label"
+            android:enabled="false"/>
+</LinearLayout>

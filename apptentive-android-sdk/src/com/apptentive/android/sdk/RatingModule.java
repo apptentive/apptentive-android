@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +17,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.text.format.DateUtils;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +29,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,62 +82,63 @@ public class RatingModule {
 
 	private boolean ratingPeriodElapsed() {
 		RatingState state = getState();
-		boolean elapsed;
+		long days;
 		switch (state) {
 			case REMIND:
-				elapsed = Util.timeHasElapsed(getStartOfRatingPeriod(), prefs.getInt("appConfiguration.ratings_days_between_prompts", DEFAULT_DAYS_BEFORE_REPROMPTING));
+				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
 				break;
 			default:
-				elapsed = Util.timeHasElapsed(getStartOfRatingPeriod(), prefs.getInt("appConfiguration.ratings_days_before_prompt", DEFAULT_DAYS_BEFORE_PROMPT));
+				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
 				break;
 		}
-		return elapsed;
+		long now = new Date().getTime();
+		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
+		return now > periodEnd;
 	}
 
 	private boolean eventThresholdReached() {
-		int significantEventsBeforePrompt = prefs.getInt("appConfiguration.ratings_events_before_prompt", DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
+		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
 		return getEvents() >= significantEventsBeforePrompt;
 	}
 
 	private boolean usesThresholdReached() {
-		int usesBeforePrompt = prefs.getInt("appConfiguration.ratings_uses_before_prompt", DEFAULT_USES_BEFORE_PROMPT);
+		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
 		return getUses() >= usesBeforePrompt;
 	}
 
-	private Date getStartOfRatingPeriod() {
-		try {
-			return Util.stringToDate(prefs.getString("startOfRatingPeriod", ""));
-		} catch (ParseException e) {
-			return new Date();
+	private long getStartOfRatingPeriod() {
+		if(!prefs.contains(Constants.PREF_KEY_START_OF_RATING_PERIOD)) {
+			setStartOfRatingPeriod(new Date().getTime());
 		}
+		return prefs.getLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, new Date().getTime());
 	}
 
-	private void setStartOfRatingPeriod(Date startOfRatingPeriod) {
-		prefs.edit().putString("startOfRatingPeriod", Util.dateToString(startOfRatingPeriod)).commit();
+	private void setStartOfRatingPeriod(long startOfRatingPeriod) {
+		prefs.edit().putLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, startOfRatingPeriod).commit();
 	}
 
 	private RatingState getState() {
-		return RatingState.valueOf(prefs.getString("ratingState", "START"));
+		return RatingState.valueOf(prefs.getString(Constants.PREF_KEY_RATING_STATE, RatingState.START.toString()));
 	}
 
 	private void setState(RatingState state) {
-		prefs.edit().putString("ratingState", state.name()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_RATING_STATE, state.name()).commit();
 	}
 
 	private int getEvents() {
-		return prefs.getInt("events", 0);
+		return prefs.getInt(Constants.PREF_KEY_RATING_EVENTS, 0);
 	}
 
 	private void setEvents(int events) {
-		prefs.edit().putInt("events", events).commit();
+		prefs.edit().putInt(Constants.PREF_KEY_RATING_EVENTS, events).commit();
 	}
 
 	private int getUses() {
-		return prefs.getInt("uses", 0);
+		return prefs.getInt(Constants.PREF_KEY_RATING_USES, 0);
 	}
 
 	private void setUses(int uses) {
-		prefs.edit().putInt("uses", uses).commit();
+		prefs.edit().putInt(Constants.PREF_KEY_RATING_USES, uses).commit();
 	}
 
 	// *************************************************************************************************
@@ -144,13 +146,13 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	void setContext(Context context) {
-		this.prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		this.prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 	}
 
 	void onAppVersionChanged() {
-		if(prefs.getBoolean("appConfiguration.ratings_clear_on_upgrade", false)) {
+		if(prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_CLEAR_ON_UPGRADE, false)) {
 			setState(RatingState.START);
-			setStartOfRatingPeriod(new Date());
+			setStartOfRatingPeriod(new Date().getTime());
 			setEvents(0);
 			setUses(1);
 		}
@@ -209,8 +211,14 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
-		// TODO: Check to see if a data connection exists first. We don't want to prompt to rate unless one exists.
-
+		if(!prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_ENABLED, true)) {
+			Log.d("Skipped showing ratings because they are disabled.");
+			return;
+		}
+		if(!Util.isNetworkConnectionPresent(activity)) {
+			Log.d("Ratings can't be shown because the network is not available. Try again later.");
+			return;
+		}
 		switch (getState()) {
 			case START:
 				boolean canShow = canShowRatingFlow();
@@ -234,7 +242,7 @@ public class RatingModule {
 	}
 
 	private boolean canShowRatingFlow(){
-		ratingsPromptLogic = prefs.getString("appConfiguration.ratings_prompt_logic", DEFAULT_RATING_PROMPT_LOGIC);
+		ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
 		try{
 			return logic(new JSONObject(ratingsPromptLogic));
 		}catch(JSONException e){
@@ -290,7 +298,7 @@ public class RatingModule {
 	public void reset() {
 		if (RatingState.RATED != getState()) {
 			setState(RatingState.START);
-			setStartOfRatingPeriod(new Date());
+			setStartOfRatingPeriod(new Date().getTime());
 			setEvents(0);
 			setUses(0);
 		}
@@ -307,9 +315,12 @@ public class RatingModule {
 
 	/**
 	 * Increments the number of times this app has been used. This method should be called each time your app
-	 * starts. The number of uses is used be the Rating Module to determine if it is time to run the rating flow.
+	 * regains focus. The number of uses is used be the Rating Module to determine if it is time to run the rating flow.
+	 * <p/>A Use is defined as each time the App comes back to the foreground. It will happen with each launch, and each
+	 * time the app is switched back to, after another app has been brought to the foreground.
+	 * <p>Internal use only. We handle calls to this method.</p>
 	 */
-	public void logUse() {
+	void logUse() {
 		setUses(getUses() + 1);
 	}
 
@@ -319,7 +330,7 @@ public class RatingModule {
 	 * @deprecated
 	 */
 	public void day() {
-		setStartOfRatingPeriod(Util.addDaysToDate(getStartOfRatingPeriod(), -1));
+		setStartOfRatingPeriod(getStartOfRatingPeriod() - DateUtils.DAY_IN_MILLIS);
 	}
 
 	// *************************************************************************************************
@@ -374,7 +385,7 @@ public class RatingModule {
 				public void onClick(View view) {
 					dismiss();
 					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__yes);
-					Apptentive.getInstance().getRatingModule().showRatingDialog(activity);
+					Apptentive.getRatingModule().showRatingDialog(activity);
 					dismiss();
 				}
 			});
@@ -468,7 +479,7 @@ public class RatingModule {
 							dismiss();
 							MetricModule.sendMetric(MetricModule.Event.rating_dialog__remind);
 							setState(RatingState.REMIND);
-							setStartOfRatingPeriod(new Date());
+							setStartOfRatingPeriod(new Date().getTime());
 						}
 					}
 			);

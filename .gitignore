@@ -1,8 +1,10 @@
 
-# Androd intermediate buid artifacts 
+# Android intermediate build artifacts
 apptentive-android-sdk/gen/*
 apptentive-android-sdk/out/*
-apptentive-demo/gen/*
+apptentive-testing/gen/*
+apptentive-example/gen/*
+apptentive-example-alternate/gen/*
 out/*
 
 # IntelliJ noise

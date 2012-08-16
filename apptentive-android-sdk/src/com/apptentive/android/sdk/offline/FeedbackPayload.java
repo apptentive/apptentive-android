@@ -13,8 +13,6 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 import org.json.JSONException;
 
-import java.util.Date;
-
 /**
  * @author Sky Kelsey
  */

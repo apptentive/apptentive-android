@@ -108,8 +108,8 @@ public class SurveyModule {
 			return;
 		}
 		Intent intent = new Intent();
-		intent.setClass(context, ApptentiveActivity.class);
-		intent.putExtra("module", ApptentiveActivity.Module.SURVEY.toString());
+		intent.setClass(context, ViewActivity.class);
+		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
 		context.startActivity(intent);
 	}
 
@@ -175,7 +175,6 @@ public class SurveyModule {
 
 		// Then render all the questions
 		for (final Question question : surveyDefinition.getQuestions()) {
-			final int index = surveyDefinition.getQuestions().indexOf(question);
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
@@ -225,8 +224,8 @@ public class SurveyModule {
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle("Survey Completed");
-					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					builder.setTitle(view.getContext().getString(R.string.apptentive_survey_success_title));
+					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_survey_positive_button), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							cleanup();
 							activity.finish();

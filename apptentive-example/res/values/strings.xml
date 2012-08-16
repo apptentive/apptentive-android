@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <string name="app_name">Apptentive Example</string>
+    <string name="demo_intro_text">Apptentive Android SDK Example</string>
+    <string name="feedback_button_label">Give Feedback</string>
+    <string name="fetch_survey_button_label">Fetch Survey</string>
+    <string name="show_survey_button_label">Show Survey</string>
+    <string name="apptentive_api_key">aee1d553400bbd7491aca6875536b1183bab2edcb5906f07cea64f7638a3993b"</string>
+
+</resources>

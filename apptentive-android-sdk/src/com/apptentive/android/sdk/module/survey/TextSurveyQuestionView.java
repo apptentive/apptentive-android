@@ -10,6 +10,7 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
@@ -27,7 +28,7 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 	@Override
 	protected void initView() {
 		super.initView();
-		instructionsTextView.setText(question.isRequired() ? "Required" : "Optional");
+		instructionsTextView.setText(question.isRequired() ? appContext.getString(R.string.apptentive_survey_required) : appContext.getString(R.string.apptentive_survey_optional));
 
 		addSeparator();
 		answerText = new EditText(appContext);
