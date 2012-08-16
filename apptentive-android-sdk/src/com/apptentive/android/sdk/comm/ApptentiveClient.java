@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -31,7 +31,6 @@ import java.util.Iterator;
 /**
  * TODO: Make a generic get, post method, etc.
  * TODO: Catch HttpHostConnectException, which occurs when data connection is not there
- * TODO: Don't communicate when there is no connection present.
  *
  * @author Sky Kelsey
  */
@@ -65,7 +64,7 @@ public class ApptentiveClient {
 		StringBuilder content = new StringBuilder();
 		InputStream is = null;
 		try {
-			Log.d("Posting JSON: " + json);
+			Log.v("Posting JSON: " + json);
 			post.setEntity(new StringEntity(json, "UTF-8"));
 			HttpResponse response = httpClient.execute(post);
 			is = response.getEntity().getContent();
@@ -75,7 +74,7 @@ public class ApptentiveClient {
 				content.append(new String(line, 0, size));
 			}
 			Log.d(response.getStatusLine().toString());
-			Log.v(content.toString());
+			Log.v("- %s", content.toString());
 
 			return response.getStatusLine().getStatusCode();
 		} catch (IOException e) {

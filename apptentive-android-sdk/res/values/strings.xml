@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -10,6 +10,7 @@
 	<string name="apptentive_app_name">Apptentive</string>
 	<string name="apptentive_activity_name">Apptentive</string>
 
+    <string name="apptentive_default_host_app_name">this app</string>
 	<string name="apptentive_skip">Skip</string>
 	<string name="apptentive_cancel">Cancel</string>
 	<string name="apptentive_back">Back</string>
@@ -39,4 +40,10 @@
 	<string name="apptentive_rating_provider_no_android_market">Android Market was not found. Please install Android Market before rating this app.</string>
 	<string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
 	<string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
+
+    <string name="apptentive_survey_send_response">Send Response</string>
+    <string name="apptentive_survey_required">Required</string>
+    <string name="apptentive_survey_optional">Optional</string>
+    <string name="apptentive_survey_success_title">Survey Completed</string>
+    <string name="apptentive_survey_positive_button">OK</string>
 </resources>

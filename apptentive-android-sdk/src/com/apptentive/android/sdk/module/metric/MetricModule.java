@@ -8,7 +8,9 @@ package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Map;
 
@@ -32,8 +34,10 @@ public class MetricModule {
 	}
 
 	public static void sendMetric(MetricModule.Event event, String trigger, Map<String, String> data) {
-		SharedPreferences prefs = appContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
-		if (prefs.getBoolean("appConfiguration.metrics_enabled", true)) {
+		Log.v("Sending Metric: %s, trigger: %s, data: %s", event.getRecordName(), trigger, data != null ? data.toString() : "null");
+
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
 			MetricPayload payload = new MetricPayload(event.getRecordName(), trigger);
 			if(data != null) {
 				for(String key : data.keySet()) {
@@ -60,7 +64,9 @@ public class MetricModule {
 		survey__submit("survey.submit"),
 		survey__question_response("survey.question_response"),
 		app__launch("app.launch"),
-		app__exit("app.exit");
+		app__exit("app.exit"),
+		app__session_start("app.session_start"),
+		app__session_end("app.session_end");
 
 		private final String recordName;
 

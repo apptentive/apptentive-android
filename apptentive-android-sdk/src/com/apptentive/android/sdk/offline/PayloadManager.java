@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Set;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class PayloadManager implements Runnable {
 	}
 
 	public void setContext(Context context) {
-		prefs = context.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
+		prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 	}
 
 	public void start() {
@@ -114,7 +115,7 @@ public class PayloadManager implements Runnable {
 					// Can this even happen?
 					break;
 				}
-				Log.d("Got a payload to send: " + name);
+				Log.v("Got a payload to send: " + name);
 				String json = prefs.getString(name, null);
 				Log.v("Payload contents: " + json);
 				if (json == null) {
