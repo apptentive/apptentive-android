@@ -8,7 +8,11 @@ package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.util.Constants;
+
+import java.util.Map;
 
 /**
  * @author Sky Kelsey.
@@ -26,9 +30,21 @@ public class MetricModule {
 	}
 
 	public static void sendMetric(MetricModule.Event event, String trigger) {
-		SharedPreferences prefs = appContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE);
-		if (prefs.getBoolean("appConfiguration.metrics_enabled", true)) {
-			PayloadManager.getInstance().putPayload(new MetricPayload(event.getRecordName(), trigger));
+		sendMetric(event, trigger, null);
+	}
+
+	public static void sendMetric(MetricModule.Event event, String trigger, Map<String, String> data) {
+		Log.v("Sending Metric: %s, trigger: %s, data: %s", event.getRecordName(), trigger, data != null ? data.toString() : "null");
+
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
+			MetricPayload payload = new MetricPayload(event.getRecordName(), trigger);
+			if(data != null) {
+				for(String key : data.keySet()) {
+					payload.putData(key, data.get(key));
+				}
+			}
+			PayloadManager.getInstance().putPayload(payload);
 		}
 	}
 
@@ -41,9 +57,16 @@ public class MetricModule {
 		rating_dialog__remind("rating_dialog.remind"),
 		rating_dialog__decline("rating_dialog.decline"),
 		feedback_dialog__launch("feedback_dialog.launch"),
+		feedback_dialog__submit("feedback_dialog.submit"),
 		feedback_dialog__cancel("feedback_dialog.cancel"),
+		survey__launch("survey.launch"),
+		survey__cancel("survey.cancel"),
+		survey__submit("survey.submit"),
+		survey__question_response("survey.question_response"),
 		app__launch("app.launch"),
-		app__exit("app.exit");
+		app__exit("app.exit"),
+		app__session_start("app.session_start"),
+		app__session_end("app.session_end");
 
 		private final String recordName;
 

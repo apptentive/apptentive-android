@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -31,7 +31,6 @@ import java.util.Iterator;
 /**
  * TODO: Make a generic get, post method, etc.
  * TODO: Catch HttpHostConnectException, which occurs when data connection is not there
- * TODO: Don't communicate when there is no connection present.
  *
  * @author Sky Kelsey
  */
@@ -51,7 +50,7 @@ public class ApptentiveClient {
 		this.APPTENTIVE_API_KEY = apiKey;
 	}
 
-	public boolean postJSON(String json) {
+	public int postJSON(String json) {
 		final HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
 		HttpConnectionParams.setSoTimeout(httpParams, 30000);
@@ -65,7 +64,7 @@ public class ApptentiveClient {
 		StringBuilder content = new StringBuilder();
 		InputStream is = null;
 		try {
-			Log.d("Posting JSON: " + json);
+			Log.v("Posting JSON: " + json);
 			post.setEntity(new StringEntity(json, "UTF-8"));
 			HttpResponse response = httpClient.execute(post);
 			is = response.getEntity().getContent();
@@ -75,12 +74,11 @@ public class ApptentiveClient {
 				content.append(new String(line, 0, size));
 			}
 			Log.d(response.getStatusLine().toString());
-			Log.v(content.toString());
+			Log.v("- %s", content.toString());
 
-			return (200 <= response.getStatusLine().getStatusCode()) &&
-					(300 > response.getStatusLine().getStatusCode());
+			return response.getStatusLine().getStatusCode();
 		} catch (IOException e) {
-			Log.w("Error posting JSON.", e);
+			Log.w("Error posting JSON: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
 		} finally {
 			if (is != null) {
 				try {
@@ -89,7 +87,7 @@ public class ApptentiveClient {
 				}
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	public SurveyDefinition getSurvey() {
@@ -165,7 +163,7 @@ public class ApptentiveClient {
 		} catch (URISyntaxException e) {
 			Log.e("Error fetching configuration.", e);
 		} catch (IOException e) {
-			Log.e("Error fetching configuration.", e);
+			Log.e("Error fetching configuration: %s", e.getMessage());
 		} finally {
 			if (is != null) {
 				try {

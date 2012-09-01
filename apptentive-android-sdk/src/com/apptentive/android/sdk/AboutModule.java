@@ -41,10 +41,9 @@ public class AboutModule {
 
 	public void show(Context context) {
 		Intent intent = new Intent();
-		intent.setClass(context, ApptentiveActivity.class);
-		intent.putExtra("module", ApptentiveActivity.Module.ABOUT.toString());
+		intent.setClass(context, ViewActivity.class);
+		intent.putExtra("module", ViewActivity.Module.ABOUT.toString());
 		context.startActivity(intent);
-		return;
 	}
 
 	void doShow(final Activity activity){

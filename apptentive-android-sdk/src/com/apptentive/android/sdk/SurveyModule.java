@@ -15,10 +15,14 @@ import android.view.View;
 import android.widget.*;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -50,6 +54,7 @@ public class SurveyModule {
 	private SurveyPayload result;
 	private SurveySendView sendView;
 	private boolean fetching = false;
+	private Map<String, String> data;
 
 	private SurveyModule() {
 		surveyDefinition = null;
@@ -57,6 +62,8 @@ public class SurveyModule {
 
 	private void setSurvey(SurveyDefinition surveyDefinition) {
 		this.surveyDefinition = surveyDefinition;
+		data = new HashMap<String, String>();
+		data.put("id", surveyDefinition.getId());
 	}
 
 
@@ -101,8 +108,8 @@ public class SurveyModule {
 			return;
 		}
 		Intent intent = new Intent();
-		intent.setClass(context, ApptentiveActivity.class);
-		intent.putExtra("module", ApptentiveActivity.Module.SURVEY.toString());
+		intent.setClass(context, ViewActivity.class);
+		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
 		context.startActivity(intent);
 	}
 
@@ -143,6 +150,7 @@ public class SurveyModule {
 		} else {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
+					MetricModule.sendMetric(MetricModule.Event.survey__cancel, null, data);
 					cleanup();
 					activity.finish();
 				}
@@ -166,12 +174,12 @@ public class SurveyModule {
 		}
 
 		// Then render all the questions
-		for (Question question : surveyDefinition.getQuestions()) {
-			final int index = surveyDefinition.getQuestions().indexOf(question);
+		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
 					public void onAnswered(TextSurveyQuestionView view) {
+						sendMetricForQuestion(question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -180,6 +188,7 @@ public class SurveyModule {
 				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
 					public void onAnswered(MultichoiceSurveyQuestionView view) {
+						sendMetricForQuestion(question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -188,6 +197,7 @@ public class SurveyModule {
 				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
 					public void onAnswered(MultiselectSurveyQuestionView view) {
+						sendMetricForQuestion(question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -196,6 +206,7 @@ public class SurveyModule {
 				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity, (StackrankQuestion) question);
 				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered(Object view) {
+						sendMetricForQuestion(question);
 						// TODO: This.
 					}
 				});
@@ -208,12 +219,13 @@ public class SurveyModule {
 		sendView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
+				MetricModule.sendMetric(MetricModule.Event.survey__submit, null, data);
 				PayloadManager.getInstance().putPayload(result);
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle("Survey Completed");
-					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					builder.setTitle(view.getContext().getString(R.string.apptentive_survey_success_title));
+					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_survey_positive_button), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							cleanup();
 							activity.finish();
@@ -229,7 +241,20 @@ public class SurveyModule {
 		sendView.setEnabled(isCompleted());
 		questionList.addView(sendView);
 
+		MetricModule.sendMetric(MetricModule.Event.survey__launch, null, data);
+
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
+	}
+
+	void sendMetricForQuestion(Question question) {
+		if(!question.isMetricSent() && question.isAnswered()) {
+			Map<String, String> answerData = new HashMap<String, String>();
+			answerData.put("id", question.getId());
+			answerData.put("survey_id", surveyDefinition.getId());
+			MetricModule.sendMetric(MetricModule.Event.survey__question_response, null, answerData);
+			question.setMetricSent(true);
+		}
+
 	}
 }

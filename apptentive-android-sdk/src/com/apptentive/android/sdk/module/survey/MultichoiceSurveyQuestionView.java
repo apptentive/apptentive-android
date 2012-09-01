@@ -6,8 +6,10 @@
 
 package com.apptentive.android.sdk.module.survey;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.*;
 
@@ -42,6 +44,9 @@ public class MultichoiceSurveyQuestionView extends SurveyItemView<MultichoiceQue
 			}
 			choice.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
+					if(getContext() instanceof Activity) {
+						Util.hideSoftKeyboard((Activity)getContext(), MultichoiceSurveyQuestionView.this);
+					}
 					choiceClicked(choice);
 				}
 			});

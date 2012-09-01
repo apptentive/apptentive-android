@@ -25,4 +25,7 @@ public interface Question {
 	public boolean isAnswered();
 
 	public String[] getAnswers();
+
+	public boolean isMetricSent();
+	public void setMetricSent(boolean metricSent);
 }
