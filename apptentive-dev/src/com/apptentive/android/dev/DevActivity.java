@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.testing;
+package com.apptentive.android.dev;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 /**
  * @author Sky Kelsey
  */
-public class TestingActivity extends ApptentiveActivity {
+public class DevActivity extends ApptentiveActivity {
 
 	private static final String LOG_TAG = "Apptentive Testing App";
 
@@ -58,19 +58,19 @@ public class TestingActivity extends ApptentiveActivity {
 		Button choiceButton = (Button) findViewById(R.id.button_choice);
 		choiceButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.forceShowEnjoymentDialog(TestingActivity.this);
+				ratingModule.forceShowEnjoymentDialog(DevActivity.this);
 			}
 		});
 		Button ratingsButton = (Button) findViewById(R.id.button_ratings);
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.showRatingDialog(TestingActivity.this);
+				ratingModule.showRatingDialog(DevActivity.this);
 			}
 		});
 		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
 		feedbackButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				feedbackModule.forceShowFeedbackDialog(TestingActivity.this);
+				feedbackModule.forceShowFeedbackDialog(DevActivity.this);
 			}
 		});
 
@@ -84,7 +84,7 @@ public class TestingActivity extends ApptentiveActivity {
 						Log.e(LOG_TAG, "onSurveyFetched(" + success + ")");
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast toast = Toast.makeText(TestingActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
+								Toast toast = Toast.makeText(DevActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
 								toast.setGravity(Gravity.CENTER, 0, 0);
 								toast.show();
 								showSurveyButton.setEnabled(success);
@@ -99,7 +99,7 @@ public class TestingActivity extends ApptentiveActivity {
 			public void onClick(View view) {
 				final SurveyModule surveyModule = Apptentive.getSurveyModule();
 				if (surveyModule.isSurveyReady()) {
-					surveyModule.show(TestingActivity.this);
+					surveyModule.show(DevActivity.this);
 					showSurveyButton.setEnabled(false);
 				}
 			}
