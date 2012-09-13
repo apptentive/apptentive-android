@@ -101,7 +101,7 @@ public class Util {
 	public static boolean packageHasPermission(Context context, String packageName, String permission){
 		List<PackageInfo> packageInfos = getPermissions(context);
 		for(PackageInfo packageInfo : packageInfos){
-			if(packageInfo.packageName.equals(packageName)){
+			if(packageInfo.packageName.equals(packageName) && packageInfo.requestedPermissions != null){
 				for(String permissionName : packageInfo.requestedPermissions){
 					if(permissionName.equals(permission)){
 						return true;
