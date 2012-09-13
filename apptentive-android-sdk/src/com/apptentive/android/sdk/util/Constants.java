@@ -21,6 +21,9 @@ public class Constants {
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
 	public static final String PREF_KEY_APP_IN_BACKGROUND = "appIsInBackground";
 	public static final String PREF_KEY_APP_ACTIVE_SESSION = "appActiveSession";
+
+	public static final String PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES = "appActiveActivityNames";
+
 	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
 	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
 	public static final String PREF_KEY_START_OF_RATING_PERIOD = "startOfRatingPeriod";

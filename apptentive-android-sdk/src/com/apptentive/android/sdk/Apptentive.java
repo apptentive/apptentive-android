@@ -49,13 +49,24 @@ public class Apptentive {
 	 */
 	public static void onCreate(Activity activity, Bundle savedInstanceState) {
 		appContext = activity.getApplicationContext();
-		boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
-		if(isMain) {
-			init();
-			MetricModule.sendMetric(MetricModule.Event.app__launch);
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit(); // Prime
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
+		init();
+
+		boolean activityIsActive = isActivityActive(activity);
+
+		// If the activity is marked active, this means the app was stopped improperly last time (crash, low mem, or killed)
+		// Pretend it just started, since the last session has already ended and that's the best we can do.
+		if(activityIsActive) {
+			Log.i("App was not shutdown properly last time due to crash, force stop, or low memory condition.");
+			clearActiveActivities();
 		}
+
+		if(countActiveActivities() == 0) {
+			MetricModule.sendMetric(MetricModule.Event.app__launch);
+			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit(); // Prime the pipe
+		}
+		markActivityActive(activity);
 	}
 
 
@@ -69,11 +80,7 @@ public class Apptentive {
 		if(comingFromBackground) {
 			Apptentive.beginSession();
 			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, false).commit();
-			boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
-			if(isMain) {
-				// TODO: Only do this when the cache is expired, or when the app is debuggable. In that case, don't do the isMain check, or backbround check??
-				Apptentive.asyncFetchAppConfiguration();
-			}
+			Apptentive.asyncFetchAppConfiguration();
 		}
 	}
 
@@ -114,7 +121,8 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onDestroy(Activity activity) {
-		if(ActivityUtil.isCurrentActivityMainActivity(activity)) {
+		markActivityInactive(activity);
+		if(countActiveActivities() == 0) {
 			MetricModule.sendMetric(MetricModule.Event.app__exit);
 			Apptentive.endSession();
 		}
@@ -128,7 +136,7 @@ public class Apptentive {
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
 		if(!activeSession) {
-			Log.v("Starting session.");
+			Log.d("Starting session.");
 			MetricModule.sendMetric(MetricModule.Event.app__session_start);
 			RatingModule.getInstance().logUse();
 		} else {
@@ -145,7 +153,7 @@ public class Apptentive {
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
 		if(activeSession) {
-			Log.v("Ending Session.");
+			Log.d("Ending Session.");
 			MetricModule.sendMetric(MetricModule.Event.app__session_end);
 		} else {
 			// This should never happen...
@@ -154,7 +162,70 @@ public class Apptentive {
 		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false).commit();
 	}
 
+	private static int countActiveActivities() {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
+		String[] names = active.split(";");
+		int count = 0;
+		for (int i = 0; i < names.length; i++) {
+			String name = names[i];
+			if(!name.equals("")) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	private static boolean isActivityActive(Activity activity) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
+		String activityName = activity.getComponentName().getClassName();
+		String[] names = active.split(";");
+		for (int i = 0; i < names.length; i++) {
+			String name = names[i];
+			if(name.equals(activityName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static void markActivityActive(Activity activity) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
+		String activityName = activity.getComponentName().getClassName();
+		active = active + activityName + ";";
+		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, active).commit();
+	}
+
+	private static void markActivityInactive(Activity activity) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
+		String activityName = activity.getComponentName().getClassName();
+		String[] names = active.split(";");
+		active = "";
+		for (int i = 0; i < names.length; i++) {
+			String name = names[i];
+			if(name.equals(activityName) || name.equals("")) {
+				continue;
+			}
+			active = active + name + ";";
+		}
+		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, active).commit();
+	}
+
+	private static void clearActiveActivities() {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "").commit();
+	}
+
 	private static void init() {
+		if(GlobalInfo.initialized) {
+			Log.v("Already initialized...");
+			return;
+		}
+		Log.v("Initializing...");
+
 		NetworkStateReceiver.clearListeners();
 
 		GlobalInfo.isAppDebuggable = false;
@@ -225,7 +296,7 @@ public class Apptentive {
 			if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
 				int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
 				if(previousVersionCode != currentVersionCode) {
-					RatingModule.getInstance().onAppVersionChanged();
+					onVersionChanged(previousVersionCode, currentVersionCode);
 				}
 			}
 			prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
@@ -235,8 +306,14 @@ public class Apptentive {
 			// Nothing we can do then.
 			GlobalInfo.appDisplayName = "this app";
 		}
+
+		GlobalInfo.initialized = true;
+		Log.v("Done initializing...");
 	}
 
+	private static void onVersionChanged(int previousVersion, int currentVersion) {
+		RatingModule.getInstance().onAppVersionChanged();
+	}
 
 	/**
 	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
