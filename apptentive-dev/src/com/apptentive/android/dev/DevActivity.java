@@ -6,6 +6,7 @@
 
 package com.apptentive.android.dev;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -37,6 +38,14 @@ public class DevActivity extends ApptentiveActivity {
 		final RatingModule ratingModule = Apptentive.getRatingModule();
 		final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
 
+		Button testsButton = (Button) findViewById(R.id.button_tests);
+		testsButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				Intent testsIntent = new Intent();
+				testsIntent.setClass(DevActivity.this, TestsActivity.class);
+				startActivity(testsIntent);
+			}
+		});
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
