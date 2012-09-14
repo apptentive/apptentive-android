@@ -1,5 +1,14 @@
+2012-09-13 skykelsey v0.5.2
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-84 Remove checked in API keys from the Android repository
+* ANDROID-85 Example app has API key in the resources file, but also requires updating the manifest
+* ANDROID-89 Add callback after survey completion
+
 2012-09-12 skykelsey v0.5.1
--------------------------
+---------------------------
 
 Major changes:
 
@@ -14,7 +23,7 @@ Bugs fixed:
 * ANDROID-88: Android initialization needs rework
 
 2012-08-15 skykelsey v0.5.0
--------------------------
+---------------------------
 
 Major changes:
 
