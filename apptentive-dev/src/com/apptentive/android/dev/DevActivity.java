@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
+import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 /**
@@ -108,7 +109,11 @@ public class DevActivity extends ApptentiveActivity {
 			public void onClick(View view) {
 				final SurveyModule surveyModule = Apptentive.getSurveyModule();
 				if (surveyModule.isSurveyReady()) {
-					surveyModule.show(DevActivity.this);
+					surveyModule.show(DevActivity.this, new OnSurveyCompletedListener() {
+						public void onSurveyCompletedListener() {
+							Log.e(LOG_TAG, "SURVEY COMPLETED!!!");
+						}
+					});
 					showSurveyButton.setEnabled(false);
 				}
 			}
