@@ -55,6 +55,7 @@ public class SurveyModule {
 	private SurveySendView sendView;
 	private boolean fetching = false;
 	private Map<String, String> data;
+	private OnSurveyCompletedListener onSurveyCompletedListener;
 
 	private SurveyModule() {
 		surveyDefinition = null;
@@ -104,9 +105,14 @@ public class SurveyModule {
 	}
 
 	public void show(Context context) {
+		show(context, null);
+	}
+
+	public void show(Context context, OnSurveyCompletedListener onSurveyCompletedListener) {
 		if (!isSurveyReady()) {
 			return;
 		}
+		this.onSurveyCompletedListener = onSurveyCompletedListener;
 		Intent intent = new Intent();
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
@@ -221,6 +227,11 @@ public class SurveyModule {
 				Util.hideSoftKeyboard(activity, view);
 				MetricModule.sendMetric(MetricModule.Event.survey__submit, null, data);
 				PayloadManager.getInstance().putPayload(result);
+
+				if(SurveyModule.this.onSurveyCompletedListener != null) {
+					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener();
+				}
+
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
