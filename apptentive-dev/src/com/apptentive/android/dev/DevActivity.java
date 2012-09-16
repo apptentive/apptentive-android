@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
+import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
@@ -81,6 +82,12 @@ public class DevActivity extends ApptentiveActivity {
 		feedbackButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				feedbackModule.forceShowFeedbackDialog(DevActivity.this);
+			}
+		});
+		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
+		messageCenterButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				ApptentiveMessageCenter.show(DevActivity.this);
 			}
 		});
 

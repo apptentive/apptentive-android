@@ -117,6 +117,11 @@ public class Util {
 		return ((int) (dp * scale + 0.5f));
 	}
 
+	public static float dipsToPixelsFloat(Context context, int dp){
+		final float scale = context.getResources().getDisplayMetrics().density;
+		return dp * scale;
+	}
+
 	/**
 	 * Internal use only.
 	 */

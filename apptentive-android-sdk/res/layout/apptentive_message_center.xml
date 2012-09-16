@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="@android:color/background_light">
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+        <LinearLayout android:id="@+id/aptentive_message_center_list"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:orientation="vertical"
+                      android:paddingLeft="10dp"
+                      android:paddingRight="10dp">
+            <!-- This layout will hold messages -->
+        </LinearLayout>
+    </ScrollView>
+    <!--
+        <ScrollView android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#000000">
+        </ScrollView>
+    -->
+</LinearLayout>
