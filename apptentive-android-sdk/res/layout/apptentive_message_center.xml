@@ -11,22 +11,59 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:background="@android:color/background_light">
-    <ScrollView android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-        <LinearLayout android:id="@+id/aptentive_message_center_list"
-                      android:layout_width="fill_parent"
-                      android:layout_height="fill_parent"
-                      android:orientation="vertical"
-                      android:paddingLeft="10dp"
-                      android:paddingRight="10dp">
-            <!-- This layout will hold messages -->
-        </LinearLayout>
-    </ScrollView>
-    <!--
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:orientation="vertical">
         <ScrollView android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="#000000">
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+            <LinearLayout android:id="@+id/aptentive_message_center_list"
+                          android:layout_width="fill_parent"
+                          android:layout_height="fill_parent"
+                          android:orientation="vertical"
+                          android:paddingLeft="10dp"
+                          android:paddingRight="10dp">
+                <!-- This layout will hold messages -->
+            </LinearLayout>
         </ScrollView>
-    -->
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+                          android:gravity="center_vertical">
+                <ImageButton android:id="@+id/apptentive_message_center_attach"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:background="@android:drawable/ic_menu_camera"
+                             android:text="Send"/>
+                <LinearLayout android:layout_width="0px"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"
+                              android:orientation="vertical">
+                    <EditText android:id="@+id/apptentive_message_center_email"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:singleLine="true"
+                              android:autoText="false"
+                              android:inputType="textEmailAddress"
+                              android:hint="What is your email?"/>
+                    <EditText android:id="@+id/apptentive_message_center_mesage"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:singleLine="false"
+                              android:hint="Type a message..."/>
+                </LinearLayout>
+                <Button android:id="@+id/apptentive_message_center_send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Send"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="#44116655">
+    </ScrollView>
 </LinearLayout>
