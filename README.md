@@ -3,7 +3,7 @@ This document will guide you through the installation and configuration of the A
 out below are instructions that will allow you to ask users to rate your app, give feedback about app performance, and
 show surveys to your users.
 
-*Note: The installation instructions are also presented to you on our website when you add an app. This document is kept in synv with our web documentation.
+*Note: The installation instructions are also presented to you on [www.apptentive.com](http://www.apptentive.com) when you add an app. This document is kept in sync with our web documentation.
 
 Integration takes three steps:
 
@@ -12,7 +12,7 @@ Integration takes three steps:
 3. Modify your AndroidManifest.xml and Activities
 
 #Get the Apptentive Source
-All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be access in two ways:
+All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be accessed in two ways:
 
 * Download the latest tagged release (v0.5.2) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.5.2) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.5.2).
 * Clone our SDK using git: ``git clone https://github.com/apptentive/apptentive-android.git``
@@ -77,7 +77,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
             &lt;/intent-filter>
         &lt;/activity>
 
-        <strong>&lt;-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.appatentive.com -->
+        <strong>&lt;-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
         &lt;meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/></strong>
 
         <strong>&lt;-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
@@ -97,7 +97,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 ##2. Integrate yor Activities with Apptentive
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
 There are two ways of doing this: Inheritence, and Delegation. Inheritence is the easiest method, while delegation is
-provided if you can't or don't want to inherit from our Activities. Use one of these methods (mix and mathc is OK too) on
+provided if you can't or don't want to inherit from our Activities. Use one of these methods (mix and match is OK too) on
 ALL of the Activities you define in your manifest.
 
 ### Inheritence
