@@ -21,23 +21,23 @@ All of our client code is open source. We believe in "Your App, Your Code". Our 
 ##Using Eclipse
 These instructions were tested on the Juno release
 
-1. From the menu bar, click **`File`** -> **`Import`**. Under **`General`**, select **`Existing Projects into Workspace`**. Click **`Next`**.
+1. From the menu bar, click `File` -> `Import`. Under `General`, select `Existing Projects into Workspace`. Click `Next`.
 2. In the Package Explorer, select your project.
-3. From the menu bar, click **`Project`** -> **`Properties`**.
-4. On the left side, click **`Android`**. Then, under the **`Library`** section, click **`Add`**.
-5. Select **`apptentive-android-sdk`**, and click **`OK`**.
+3. From the menu bar, click `Project` -> `Properties`.
+4. On the left side, click `Android`. Then, under the `Library` section, click `Add`.
+5. Select `apptentive-android-sdk`, and click `OK`.
 
 The Apptentive SDK is now available in your Eclipse project.
 
 ##Using IntelliJ IDEA
 These instructions were tested on the Leda (12 EAP) release
 
-1. From the menu bar, click **`File`** -> **`Add Module`**.
-2. Click the **`Create module from existing sources`** radio button, choose the **`apptentive-android-sdk`** directory, and click **`Next`** until finished.
-3. From the menu bar, click **`File`** -> **`Project Structure...`**.
-4. Under **`Project Settings`** click **`Modules`**, and then select your app's module.
-5. Click the **`Dependencies`** tab, and then click the small **`+`** button in the lower left corner of that pane.
-6. Choose **`Module Dependency...`**, select **`apptentive-android-sdk`** module, and click **`OK`**.
+1. From the menu bar, click `File` -> `Add Module`.
+2. Click the `Create module from existing sources` radio button, choose the `apptentive-android-sdk` directory, and click `Next` until finished.
+3. From the menu bar, click `File` -> `Project Structure...`.
+4. Under `Project Settings` click `Modules`, and then select your app's module.
+5. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane.
+6. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`.
 
 The Apptentive SDK is now available in your IntelliJ IDEA project.
 
