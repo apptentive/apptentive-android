@@ -12,7 +12,7 @@ Integration takes three steps:
 3. Modify your AndroidManifest.xml and Activities
 
 #Get the Apptentive Source
-All of our client code is open source. We believe in "Your App, Your Code". Our code can be access in two ways:
+All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be access in two ways:
 
 * Download the latest tagged release (v0.5.2) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.5.2) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.5.2).
 * Clone our SDK using git: ``git clone https://github.com/apptentive/apptentive-android.git``
