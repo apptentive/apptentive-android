@@ -40,6 +40,8 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
+	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
+	private static final String ENDPOINT_MESSAGES_SINCE = ENDPOINT_MESSAGES + "?since=%s";
 
 	private final String APPTENTIVE_API_KEY;
 
@@ -173,5 +175,51 @@ public class ApptentiveClient {
 			}
 		}
 		return config;
+	}
+
+	/**
+	 * Gets all messages since the message specified by guid was specified.
+	 * @param lastGuid Specifies the last successfully fetched message. If null, all messages will be fetched.
+	 * @return
+	 */
+	public String getMessages(String lastGuid) {
+		Log.e("Fetching messages...");
+		InputStream is = null;
+		try {
+			String uri;
+			if(lastGuid != null) {
+				uri = String.format(ENDPOINT_MESSAGES_SINCE, lastGuid);
+			} else {
+				uri = ENDPOINT_MESSAGES_SINCE;
+			}
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpGet get = new HttpGet();
+
+			get.setURI(new URI(uri));
+			get.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
+			get.setHeader("Accept", "application/json");
+
+			HttpResponse response = httpClient.execute(get);
+			int code = response.getStatusLine().getStatusCode();
+			Log.d("Survey: HTTP response status line: " + response.getStatusLine().toString());
+
+			if (code >= 200 && code < 300) {
+				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
+				Log.v("Messages: " + content);
+				return content;
+			}
+		} catch (URISyntaxException e) {
+			Log.e("Error fetching survey.", e);
+		} catch (IOException e) {
+			Log.e("Error fetching survey.", e);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (Exception e) {
+				}
+			}
+		}
+		return null;
 	}
 }

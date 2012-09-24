@@ -8,10 +8,10 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
@@ -29,6 +29,7 @@ public class TextMessageView extends MessageView {
 		int dips5 = Util.dipsToPixels(context, 5);
 		setPadding(0, dips5, 0, dips5);
 
+
 		LinearLayout row = new LinearLayout(context);
 		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		row.setOrientation(LinearLayout.HORIZONTAL);
@@ -38,11 +39,11 @@ public class TextMessageView extends MessageView {
 		spacerParams.weight = 1;
 		spacer.setLayoutParams(spacerParams);
 
-
 		LinearLayout textRow = new LinearLayout(context);
 		LinearLayout.LayoutParams textRowParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
 		textRowParams.weight = 3;
 		textRow.setLayoutParams(textRowParams);
+		textRow.setOrientation(LinearLayout.VERTICAL);
 		textRow.setGravity(message.isIncoming() ? Gravity.LEFT : Gravity.RIGHT);
 
 		TextView textView = new TextView(context);
@@ -52,7 +53,15 @@ public class TextMessageView extends MessageView {
 		textView.setBackgroundResource(message.isIncoming() ? R.drawable.apptentive_message_incoming : R.drawable.apptentive_message_outgoing);
 		textView.setText(message.getText());
 
+		TextView timestampView = new TextView(context);
+		timestampView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		timestampView.setText(Util.dateToDisplayString(message.getCreated()));
+		timestampView.setPadding(0, 0, Util.dipsToPixels(context, 10), 0);
+		timestampView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+
+
 		textRow.addView(textView);
+		textRow.addView(timestampView);
 		if(message.isIncoming()) {
 			row.addView(textRow);
 			row.addView(spacer);

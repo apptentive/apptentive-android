@@ -6,23 +6,20 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
+import java.util.Date;
+
 /**
  * @author Sky Kelsey
  */
-public class TextMessage implements Message {
+public class TextMessage extends BaseMessage {
 	protected String text;
-	protected boolean incoming;
 
-	public TextMessage(String text, boolean incoming) {
+	public TextMessage(String guid, Date created, String text, boolean incoming) {
+		super(guid, created, incoming);
 		this.text = text;
-		this.incoming = incoming;
 	}
 
 	public String getText() {
 		return text;
-	}
-
-	public boolean isIncoming() {
-		return incoming;
 	}
 }
