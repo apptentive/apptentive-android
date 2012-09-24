@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
@@ -42,31 +43,12 @@ public class Apptentive {
 	}
 
 	/**
-	 * Initializes Apptentive.
-	 *
+	 * Reserved for future use.
 	 * @param activity The Activity from which this method is called.
 	 * @param savedInstanceState
 	 */
 	public static void onCreate(Activity activity, Bundle savedInstanceState) {
-		appContext = activity.getApplicationContext();
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-		init();
-
-		boolean activityIsActive = isActivityActive(activity);
-
-		// If the activity is marked active, this means the app was stopped improperly last time (crash, low mem, or killed)
-		// Pretend it just started, since the last session has already ended and that's the best we can do.
-		if(activityIsActive) {
-			Log.i("App was not shutdown properly last time due to crash, force stop, or low memory condition.");
-			clearActiveActivities();
-		}
-
-		if(countActiveActivities() == 0) {
-			MetricModule.sendMetric(MetricModule.Event.app__launch);
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit(); // Prime the pipe
-		}
-		markActivityActive(activity);
+		ActivityUtil.isCurrentActivityMainActivity(activity);
 	}
 
 
@@ -74,14 +56,10 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		// The first run of this method will be when the main Activity is launched.
-		boolean comingFromBackground = prefs.getBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true);
-		if(comingFromBackground) {
-			Apptentive.beginSession();
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, false).commit();
-			Apptentive.asyncFetchAppConfiguration();
-		}
+		appContext = activity.getApplicationContext();
+		init();
+		asyncFetchAppConfiguration();
+		ActivityLifecycleManager.activityStarted(activity);
 	}
 
 	/**
@@ -101,7 +79,7 @@ public class Apptentive {
 
 	/**
 	 * Reserved for future use.
-	 * @param activity The Activity this method is called from.
+	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onPause(Activity activity) {
 	}
@@ -110,113 +88,14 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStop(Activity activity) {
-		if(ActivityUtil.isApplicationBroughtToBackground(activity)) {
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit();
-			Apptentive.endSession();
-		}
+		ActivityLifecycleManager.activityStopped(activity);
 	}
 
 	/**
+	 * Reserved for future use.
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onDestroy(Activity activity) {
-		markActivityInactive(activity);
-		if(countActiveActivities() == 0) {
-			MetricModule.sendMetric(MetricModule.Event.app__exit);
-			Apptentive.endSession();
-		}
-	}
-
-	/**
-	 * Multiple calls to beginSession within a short period of time are NOPs.
-	 * Calls to beginSession when a session is running result in a new session.
-	 */
-	private static void beginSession() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
-		if(!activeSession) {
-			Log.d("Starting session.");
-			MetricModule.sendMetric(MetricModule.Event.app__session_start);
-			RatingModule.getInstance().logUse();
-		} else {
-			// TODO: Log an error. This was either a crash, or a dev missing the onStop call.
-			Log.w("Starting session, but a session is already active.");
-		}
-		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, true).commit();
-	}
-
-	/**
-	 * If a session is active, will end it. If a session is not active, is a NOP.
-	 */
-	private static void endSession() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
-		if(activeSession) {
-			Log.d("Ending Session.");
-			MetricModule.sendMetric(MetricModule.Event.app__session_end);
-		} else {
-			// This should never happen...
-			Log.w("Ending session, but no session is active.");
-		}
-		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false).commit();
-	}
-
-	private static int countActiveActivities() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
-		String[] names = active.split(";");
-		int count = 0;
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i];
-			if(!name.equals("")) {
-				count++;
-			}
-		}
-		return count;
-	}
-
-	private static boolean isActivityActive(Activity activity) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
-		String activityName = activity.getComponentName().getClassName();
-		String[] names = active.split(";");
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i];
-			if(name.equals(activityName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static void markActivityActive(Activity activity) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
-		String activityName = activity.getComponentName().getClassName();
-		active = active + activityName + ";";
-		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, active).commit();
-	}
-
-	private static void markActivityInactive(Activity activity) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String active = prefs.getString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "");
-		String activityName = activity.getComponentName().getClassName();
-		String[] names = active.split(";");
-		active = "";
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i];
-			if(name.equals(activityName) || name.equals("")) {
-				continue;
-			}
-			active = active + name + ";";
-		}
-		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, active).commit();
-	}
-
-	private static void clearActiveActivities() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_APP_ACTIVE_ACTIVITY_NAMES, "").commit();
 	}
 
 	private static void init() {

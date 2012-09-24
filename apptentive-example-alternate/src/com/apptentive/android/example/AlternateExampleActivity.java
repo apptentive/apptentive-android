@@ -27,7 +27,6 @@ public class AlternateExampleActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Apptentive.onCreate(this, savedInstanceState);
 	}
 
 	@Override
@@ -50,14 +49,6 @@ public class AlternateExampleActivity extends Activity {
 		Apptentive.onStop(this);
 		super.onStop();
 	}
-
-	@Override
-	protected void onDestroy() {
-		Apptentive.onDestroy(this);
-		super.onDestroy();
-	}
-
-
 
 	public void onFeedbackButtonPressed(View view) {
 		Apptentive.getFeedbackModule().forceShowFeedbackDialog(this);

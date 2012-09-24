@@ -24,6 +24,9 @@ import java.util.List;
 public class ActivityUtil {
 
 	/**
+	 * <strong>NOTE: This method is for debugging purposes only. Google may reject your app if you ship it with the
+	 * GET_TASKS permission enabled.</strong>
+	 * <p/>
 	 * This method will return true if the Application is going into the background because an Activity that is not defined
 	 * in the current Application's manifest is going into the foreground. It will return false if another Activity defined
 	 * in the current Application's manifest is going into the foreground, or if the Application is exiting.
