@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:text="Back"
             android:onClick="back"/>
-    <Button android:layout_width="fill_parent"
+    <Button android:id="@+id/test_tweet"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Test Tweet"
             android:onClick="testTweet"/>
