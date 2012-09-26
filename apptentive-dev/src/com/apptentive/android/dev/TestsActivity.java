@@ -61,4 +61,14 @@ public class TestsActivity extends ApptentiveActivity {
 	public void throwNpe(View view) {
 		throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
 	}
+
+	public void startNestedActivities(View view) {
+		Intent intent = new Intent();
+		intent.setClass(this, LifecycleTestActivityOne.class);
+		intent.putExtra("spawn_depth", 5);
+		intent.putExtra("method", "thread");
+		intent.putExtra("start_same_activity", true);
+		intent.putExtra("pause", 0);
+		startActivity(intent);
+	}
 }

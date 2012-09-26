@@ -71,7 +71,7 @@ public class SharedPreferencesPersistentSessionQueue implements PersistentSessio
 	}
 
 	private String generateStorableEventString(SessionEvent event) {
-		return String.format("%s%s%s%s%s", event.getTimestamp(), FIELD_SEP, event.getAction().name(), FIELD_SEP, event.getActivityName());
+		return String.format("%s%s%s%s%s", event.getTime(), FIELD_SEP, event.getAction().name(), FIELD_SEP, event.getActivityName());
 	}
 
 	private SessionEvent parseStorableEventString(String eventString) {

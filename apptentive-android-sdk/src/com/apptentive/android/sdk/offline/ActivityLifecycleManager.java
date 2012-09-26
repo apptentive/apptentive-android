@@ -46,6 +46,15 @@ import java.util.*;
  */
 public class ActivityLifecycleManager {
 
+	/**
+	 * A timeout in seconds for determining if the previous app session has stopped, and a new one has started. Timeout
+	 * will occur if the number of seconds between one Activity defined in the Application calling onStop(), and another
+	 * calling onStart() exceeds this value.
+	 * <p/>
+	 * Ten seconds was choosen because it is unlikely that it would take an Activity more than that amount of time to
+	 * be created and started, but it is also unlikely that we would incorrectly decide an Application session was still
+	 * in affect after ten seconds had passed.
+	 */
 	private static final int SESSION_TIMEOUT_SECONDS = 10;
 
 	private static Context appContext = null;
@@ -101,8 +110,8 @@ public class ActivityLifecycleManager {
 				sendEvent(lastStart != null ? lastStart : start);
 				addEvents(lastStart, start);
 			} else if (pairs == 1 && starts == 1) {
-				long expiration = lastStop.getTimestamp() + (SESSION_TIMEOUT_SECONDS * 1000);
-				boolean expired = expiration < start.getTimestamp();
+				long expiration = lastStop.getTime() + (SESSION_TIMEOUT_SECONDS * 1000);
+				boolean expired = expiration < start.getTime();
 				addEvents(start);
 				if (expired) {
 					Log.d("Session expired. Starting new session.");
@@ -158,18 +167,6 @@ public class ActivityLifecycleManager {
 			builder.append("\n  " + event.getDebugString());
 		}
 		return builder.toString();
-	}
-
-	/**
-	 * Choose which implementation to use here.
-	 *
-	 * @return
-	 */
-	private static PersistentSessionQueue initQueue() {
-		if (queue == null) {
-			queue = new SQLitePersistentSessionQueue(appContext);
-		}
-		return queue;
 	}
 
 	private static void addEvents(SessionEvent... events) {
@@ -258,7 +255,7 @@ public class ActivityLifecycleManager {
 	}
 
 	private static List<SessionEvent> getAllEvents() {
-		return initQueue().getAllEvents();
+		return queue.getAllEvents();
 	}
 
 	private static SessionEvent getLastEvent(SessionEvent.Action action) {

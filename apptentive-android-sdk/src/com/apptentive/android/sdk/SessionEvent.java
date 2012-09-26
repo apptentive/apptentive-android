@@ -14,7 +14,7 @@ import com.apptentive.android.sdk.util.Util;
  */
 public class SessionEvent {
 	private long id;
-	private long timestamp;
+	private long time;
 	private Action action;
 	private String activityName;
 
@@ -26,8 +26,8 @@ public class SessionEvent {
 	public SessionEvent() {
 	}
 
-	public SessionEvent(long timestamp, Action action, String activityName) {
-		this.timestamp = timestamp;
+	public SessionEvent(long time, Action action, String activityName) {
+		this.time = time;
 		this.action = action;
 		this.activityName = activityName;
 	}
@@ -40,12 +40,12 @@ public class SessionEvent {
 		this.id = id;
 	}
 
-	public long getTimestamp() {
-		return timestamp;
+	public long getTime() {
+		return time;
 	}
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 	public String getActivityName() {
@@ -73,7 +73,7 @@ public class SessionEvent {
 	}
 
 	public String getDebugString() {
-		return String.format("#%d : %s : %s : %s", id, action.name() + (isStopEvent() ? " " : ""), activityName, Util.dateToIso8601String(timestamp));
+		return String.format("#%d : %s : %s : %s", id, action.name() + (isStopEvent() ? " " : ""), activityName, Util.dateToIso8601String(time));
 	}
 
 	@Override
@@ -84,6 +84,6 @@ public class SessionEvent {
 		SessionEvent event = (SessionEvent) o;
 		return getAction() == event.getAction() &&
 				getActivityName().equals(event.getActivityName()) &&
-				getTimestamp() == event.getTimestamp();
+				getTime() == event.getTime();
 	}
 }
