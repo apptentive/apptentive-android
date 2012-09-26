@@ -21,8 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.apptentive.android.dev.TestsActivity"/>
-        <meta-data android:name="apptentive_api_key"
-                   android:value="92fbc432d3a47f212673171a2ca078c7290ca3f417a63e5e81184bddd929c325"/>
+        <meta-data android:name="apptentive_api_key" android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
