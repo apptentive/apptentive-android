@@ -15,11 +15,13 @@ import android.view.View;
 import android.widget.*;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,14 +91,18 @@ public class SurveyModule {
 		new Thread() {
 			public void run() {
 				try {
-					ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-					SurveyDefinition definition = client.getSurvey();
-					if (definition != null) {
-						setSurvey(definition);
+					ApptentiveHttpResponse response = ApptentiveClient.getSurvey();
+					if(response.wasSuccessful()) {
+						SurveyDefinition definition = SurveyManager.parseSurvey(response.getContent());
+						if (definition != null) {
+							setSurvey(definition);
+						}
+						if (onSurveyFetchedListener != null) {
+							onSurveyFetchedListener.onSurveyFetched(definition != null);
+						}
 					}
-					if (onSurveyFetchedListener != null) {
-						onSurveyFetchedListener.onSurveyFetched(definition != null);
-					}
+				} catch (JSONException e) {
+					Log.e("Exception parsing survey JSON.", e);
 				} finally {
 					fetching = false;
 				}

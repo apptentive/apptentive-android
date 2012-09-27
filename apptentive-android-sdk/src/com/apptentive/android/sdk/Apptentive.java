@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -25,9 +26,13 @@ import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
@@ -215,8 +220,24 @@ public class Apptentive {
 		}
 
 		Log.v("Fetching new configuration.");
-		ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-		HashMap<String, Object> config = client.getAppConfiguration(GlobalInfo.androidId);
+		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(GlobalInfo.androidId);
+		Map<String, Object> config = new HashMap<String, Object>();
+		try {
+			JSONObject root = new JSONObject(response.getContent());
+			Iterator it = root.keys();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				Object value = root.get(key);
+				if (value instanceof JSONObject) {
+					config.put(key, value.toString());
+				} else {
+					config.put(key, value);
+				}
+			}
+		} catch (JSONException e) {
+			Log.e("Error parsing app configuration from server.", e);
+		}
+
 		Log.v("App configuration: " + config.toString());
 		for (String key : config.keySet()) {
 			Object value = config.get(key);

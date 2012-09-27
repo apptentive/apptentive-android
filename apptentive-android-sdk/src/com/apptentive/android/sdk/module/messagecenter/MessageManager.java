@@ -6,8 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.messagecenter.model.Message;
 
 import java.util.ArrayList;
@@ -24,8 +24,7 @@ public class MessageManager {
 	}
 
 	private static List<Message> fetchMessages(String lastMessageGuid) {
-		ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-		String json = client.getMessages(lastMessageGuid);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(lastMessageGuid);
 
 		return new ArrayList<Message>();
 	}

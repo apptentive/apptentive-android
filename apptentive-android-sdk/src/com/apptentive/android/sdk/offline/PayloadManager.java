@@ -8,9 +8,9 @@ package com.apptentive.android.sdk.offline;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Set;
@@ -122,11 +122,10 @@ public class PayloadManager implements Runnable {
 					prefs.edit().remove(name).commit();
 					continue;
 				}
-				ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-				int code = client.postJSON(json);
-				if (code >= 200 && code < 300) { // Success
+				ApptentiveHttpResponse response = ApptentiveClient.postJSON(json);
+				if (response.wasSuccessful()) { // Success
 					prefs.edit().remove(name).commit();
-				} else if (code >= 400 && code < 500) { // Rejected by server.
+				} else if (response.getCode() >= 400 && response.getCode() < 500) { // Rejected by server.
 					prefs.edit().remove(name).commit();
 				} else { // Transient error / overload.
 					Log.d("Unable to send JSON. Placing back in queue.");
