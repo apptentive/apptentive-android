@@ -13,7 +13,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -237,13 +236,11 @@ public class Apptentive {
 	}
 
 	private static void asyncFetchAppConfiguration() {
-		new AsyncTask() {
-			@Override
-			protected Object doInBackground(Object... objects) {
+		new Thread() {
+			public void run() {
 				fetchAppConfiguration(GlobalInfo.isAppDebuggable);
-				return null;
 			}
-		}.execute();
+		}.start();
 	}
 
 	/**
