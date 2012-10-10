@@ -14,7 +14,7 @@ Integration takes three steps:
 #Get the Apptentive Source
 All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be accessed in two ways:
 
-* Download the latest tagged release (v0.5.2) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.5.2) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.5.2).
+* Download the latest tagged release (v0.6.0) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.6.0) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.6.0).
 * Clone our SDK using git: ``git clone https://github.com/apptentive/apptentive-android.git``
 
 #Add Apptentive to Your Project
@@ -56,7 +56,6 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
     <strong>&lt;!-- All permissions required except GET_ACCOUNTS, which is only need to pull user email -->
     &lt;uses-permission android:name="android.permission.INTERNET"/>
     &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    &lt;uses-permission android:name="android.permission.GET_TASKS"/>
     &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
 
     <strong>&lt;-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
@@ -116,13 +115,6 @@ public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
     &#8942
     <br/>
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        <strong>Apptentive.onCreate(this, savedInstanceState);</strong>
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         <strong>Apptentive.onStart(this);</strong>
@@ -132,12 +124,6 @@ public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
     protected void onStop() {
         super.onStop();
         <strong>Apptentive.onStop(this);</strong>
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        <strong>Apptentive.onDestroy(this);</strong>
     }
 </code></pre>
 
