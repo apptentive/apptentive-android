@@ -57,4 +57,8 @@ public class TestsActivity extends ApptentiveActivity {
 			android.util.Log.i("APPTENTIVE", "No native twitter app.", e);
 		}
 	}
+
+	public void throwNpe(View view) {
+		throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
+	}
 }
