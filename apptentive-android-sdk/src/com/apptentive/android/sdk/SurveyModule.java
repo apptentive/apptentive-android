@@ -53,7 +53,6 @@ public class SurveyModule {
 	// *************************************************************************************************
 
 	private SurveyDefinition surveyDefinition;
-	private SurveyPayload result;
 	private SurveySendView sendView;
 	private boolean fetching = false;
 	private Map<String, String> data;
@@ -131,7 +130,6 @@ public class SurveyModule {
 
 	public void cleanup() {
 		this.surveyDefinition = null;
-		this.result = null;
 	}
 
 	boolean isCompleted() {
@@ -149,8 +147,6 @@ public class SurveyModule {
 		if (surveyDefinition == null) {
 			return;
 		}
-		result = new SurveyPayload(surveyDefinition);
-
 		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
 		surveyTitle.setFocusable(true);
 		surveyTitle.setFocusableInTouchMode(true);
@@ -232,7 +228,7 @@ public class SurveyModule {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
 				MetricModule.sendMetric(MetricModule.Event.survey__submit, null, data);
-				PayloadManager.getInstance().putPayload(result);
+				PayloadManager.putPayload(new SurveyPayload(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyCompletedListener != null) {
 					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener();

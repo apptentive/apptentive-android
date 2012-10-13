@@ -19,29 +19,40 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class SurveyPayload extends Payload {
+public class SurveyPayload extends RecordPayload {
 
-	private SurveyDefinition definition;
+	private static final String KEY_RECORD = "record";
+	private static final String KEY_DEVICE = "device";
+	private static final String KEY_DEVICE_UUID = "uuid";
+
+	private static final String KEY_SURVEY = "survey";
+	private static final String KEY_SURVEY_ID = "id";
+
+	private static final String KEY_SURVEY_RESPONSES = "responses";
+
+	public SurveyPayload(String json) throws JSONException {
+		super(json);
+	}
 
 	public SurveyPayload(SurveyDefinition definition) {
 		super();
-		this.definition = definition;
-	}
 
-	/**
-	 * Return Object with array of Objects that are themselves a single key/value pair.
-	 *
-	 * @return JSON String
-	 */
-	@Override
-	public String getAsJSON() {
 		try {
 			JSONObject record = new JSONObject();
-			JSONObject survey = new JSONObject();
-			survey.put("id", definition.getId());
+			put(KEY_RECORD, record);
 
-			JSONObject answers = new JSONObject();
-			List<Question> questions = this.definition.getQuestions();
+			JSONObject device = new JSONObject();
+			record.put(KEY_DEVICE, device);
+			device.put(KEY_DEVICE_UUID, GlobalInfo.androidId);
+
+			JSONObject survey = new JSONObject();
+			record.put(KEY_SURVEY, survey);
+			survey.put(KEY_SURVEY_ID, definition.getId());
+
+			JSONObject responses = new JSONObject();
+			survey.put(KEY_SURVEY_RESPONSES, responses);
+
+			List<Question> questions = definition.getQuestions();
 			for(Question question : questions) {
 				String id = question.getId();
 				String[] questionAnswers = question.getAnswers();
@@ -50,24 +61,13 @@ public class SurveyPayload extends Payload {
 					for (String answer : questionAnswers) {
 						jsonArray.put(answer);
 					}
-					answers.put(id, jsonArray);
+					responses.put(id, jsonArray);
 				} else if(questionAnswers.length == 1 && !questionAnswers[0].equals("")) {
-					answers.put(id, questionAnswers[0]);
+					responses.put(id, questionAnswers[0]);
 				}
 			}
-			survey.put("responses", answers);
-			record.put("survey", survey);
-
-			JSONObject device = new JSONObject();
-			device.put("uuid", GlobalInfo.androidId);
-			record.put("device", device);
-
-			root.put("record", record);
-			return super.getAsJSON();
 		} catch (JSONException e) {
-			Log.e("Error encoding survey JSON.", e);
+			Log.e("Unable to construct survey payload.", e);
 		}
-		return null;
 	}
-
 }

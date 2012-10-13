@@ -6,47 +6,62 @@
 
 package com.apptentive.android.sdk.offline;
 
-import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author Sky Kelsey
  */
-public abstract class Payload {
+public class Payload extends JSONObject {
+
+	private long id;
+	private String payloadId;
+
+	public static enum PayloadType {
+		RECORD,
+		MESSAGE
+	}
 
 	public Payload() {
-		try {
-			setString(Util.dateToIso8601String(new Date().getTime()), "record", "date");
-		} catch (JSONException e) {
-			Log.e("Exception setting date.", e);
-		}
+		payloadId = UUID.randomUUID().toString();
 	}
 
-	protected JSONObject root = new JSONObject();
-
-	public String getAsJSON(){
-		return root.toString();
+	public Payload(String json) throws JSONException {
+		super(json);
 	}
 
-	public void setString(String value, String... keys) throws JSONException {
-		JSONObject parent = root;
-		for(int i = 0; i < keys.length; i++){
-			String key = keys[i];
-			if(i == keys.length - 1){ // Last key, must be a String
-				parent.put(key, value);
-			}else{ // Must be an Object
-				if(parent.has(key)){
-					parent = parent.getJSONObject(key);
-				}else{
-					JSONObject current = new JSONObject();
-					parent.put(key, current);
-					parent = current;
-				}
-			}
-		}
+	/**
+	 * Guaranteed to be there if retreived from DB.
+	 * @return
+	 */
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	/**
+	 * This is the database ID. Not stored in JSON.
+	 * @return The database ID, or null.
+	 */
+	public String getPayloadId() {
+		return payloadId;
+	}
+
+	public void setPayloadId(String payloadId) {
+		this.payloadId = payloadId;
+	}
+
+	/**
+	 * Override this method.
+	 * @return
+	 */
+	public PayloadType getPayloadType() {
+		return null;
 	}
 }
+

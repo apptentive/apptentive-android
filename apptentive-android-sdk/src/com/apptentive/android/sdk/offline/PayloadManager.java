@@ -6,142 +6,85 @@
 
 package com.apptentive.android.sdk.offline;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.util.Constants;
-
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 
 /**
  * @author Sky Kelsey
  */
-public class PayloadManager implements Runnable {
+public class PayloadManager {
 
-	// *************************************************************************************************
-	// ********************************************* Static ********************************************
-	// *************************************************************************************************
+	private static final int WAIT_TIMEOUT_SECONDS = 5;
 
-	private static final String PAYLOAD_KEY_PREFIX = "payload-";
-
-	private static PayloadManager instance;
 	private static boolean running;
 
-	public static PayloadManager getInstance() {
-		if (instance == null) {
-			instance = new PayloadManager();
-		}
-		return instance;
-	}
-
-
-	// *************************************************************************************************
-	// ********************************************* Private *******************************************
-	// *************************************************************************************************
-
-	private LinkedBlockingQueue<String> queue;
-	private SharedPreferences prefs;
-
-	private PayloadManager() {
-		this.queue = new LinkedBlockingQueue<String>();
-	}
-
-	public void setContext(Context context) {
-		prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-	}
-
-	public void start() {
-		// When the app starts, clear out the queue and fill it back up. This ensures all payloads get sent
-		// upon startup if the network is available.
-		instance.queue.clear();
-		instance.initQueue();
-		instance.ensureRunning();
-	}
-
-	public synchronized void ensureRunning() {
+	public static synchronized void start() {
 		if (!running) {
+			Log.i("Starting PayloadRunner.");
 			running = true;
-			new Thread(this).start();
+			new PayloadRunner().start();
 		}
 	}
 
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// LinkedBlockingQueue
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public void putPayload(Payload payload) {
-		String name = PAYLOAD_KEY_PREFIX + UUID.randomUUID().toString();
-		prefs.edit().putString(name, payload.getAsJSON()).commit();
-		queue.offer(name);
-		ensureRunning();
+	public static synchronized void putPayload(Payload payload) {
+		getPayloadStore().addPayload(payload);
+		start();
 	}
 
-	private synchronized void initQueue() {
-		Set<String> keys = prefs.getAll().keySet();
-		for (String key : keys) {
-			if (key.startsWith(PAYLOAD_KEY_PREFIX)) {
-				queue.offer(key);
+	private static PayloadStore getPayloadStore() {
+		return Apptentive.getDatabase();
+	}
+
+	private static class PayloadRunner extends Thread {
+		public void run() {
+			try {
+				synchronized (this) {
+					PayloadStore db = getPayloadStore();
+					while (true) {
+						Payload payload = null;
+						payload = db.getNextPayload();
+						if (payload == null) {
+							// There is no payload in the db.
+							try {
+								Thread.sleep(WAIT_TIMEOUT_SECONDS * 1000);
+							} catch (InterruptedException e) {
+							}
+							continue;
+						}
+						Log.d("Got a payload to send: " + payload.getPayloadId());
+						String json = payload.toString();
+						Log.v("Payload contents: " + json);
+						ApptentiveHttpResponse response = null;
+						switch (payload.getPayloadType()) {
+							case RECORD:
+								response = ApptentiveClient.postRecord(json);
+								break;
+							case MESSAGE:
+								response = ApptentiveClient.postMessage(json);
+								MessageManager.sentMessage(payload.getPayloadId(), response);
+								break;
+							default:
+								break;
+						}
+
+						if (response != null && response.wasSuccessful()) { // Success
+							db.deletePayload(payload);
+						} else if (response.getCode() >= 400 && response.getCode() < 500) { // Rejected by server.
+							Log.e("Payload %s rejected.", payload.getPayloadId());
+							db.deletePayload(payload);
+						} else { // Transient error / overload.
+							Log.d("Unable to send JSON. Leaving in queue.");
+							// Break the loop. Restart when network is reachable.
+							break;
+						}
+					}
+				}
+			} finally {
+				running = false;
 			}
 		}
 	}
-
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Runnable
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Blocks on the payload queue until a payload becomes available.
-	 * If any error occurs, exit thread.
-	 * If the json is bad, delete it.
-	 * If the json was sent successfully, delete it.
-	 * If the json is rejected by the server, delete it.
-	 */
-	public void run() {
-		try {
-			while (true) {
-				String name = null;
-				try {
-					name = queue.take();
-				} catch (InterruptedException e) {
-					break;
-				}
-				if (name == null) {
-					// Can this even happen?
-					break;
-				}
-				Log.v("Got a payload to send: " + name);
-				String json = prefs.getString(name, null);
-				Log.v("Payload contents: " + json);
-				if (json == null) {
-					prefs.edit().remove(name).commit();
-					continue;
-				}
-				ApptentiveHttpResponse response = ApptentiveClient.postJSON(json);
-				if (response.wasSuccessful()) { // Success
-					prefs.edit().remove(name).commit();
-				} else if (response.getCode() >= 400 && response.getCode() < 500) { // Rejected by server.
-					prefs.edit().remove(name).commit();
-				} else { // Transient error / overload.
-					Log.d("Unable to send JSON. Placing back in queue.");
-					// On failures involving the network or server, put the item back on the queue.
-					queue.offer(name);
-					// Break the loop. Restart when network is reachable.
-					break;
-				}
-			}
-		} finally {
-			running = false;
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-
 }

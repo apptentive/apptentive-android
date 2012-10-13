@@ -19,7 +19,7 @@ public class Constants {
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
-	public static final String PREF_KEY_USER_ID = "userId";
+	public static final String PREF_KEY_PERSON_ID = "userId";
 
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
 

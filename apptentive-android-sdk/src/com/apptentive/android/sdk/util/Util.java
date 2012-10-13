@@ -42,6 +42,10 @@ public class Util {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
 	}
 
+	public static String dateToDisplayString(long millis) {
+		return dateToString(new SimpleDateFormat(DISPLAY_DATE_FORMAT), new Date(millis));
+	}
+
 	public static String dateToDisplayString(Date date) {
 		return dateToString(new SimpleDateFormat(DISPLAY_DATE_FORMAT), date);
 	}

@@ -6,20 +6,42 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import java.util.Date;
+
+import com.apptentive.android.sdk.Log;
+import org.json.JSONException;
 
 /**
  * @author Sky Kelsey
  */
-public class TextMessage extends BaseMessage {
-	protected String text;
+public class TextMessage extends Message {
 
-	public TextMessage(String guid, Date created, String text, boolean incoming) {
-		super(guid, created, incoming);
-		this.text = text;
+	private static final String KEY_BODY = "body";
+
+	public TextMessage() {
+		super();
+		setType(MessageType.text_message);
 	}
 
-	public String getText() {
-		return text;
+	public TextMessage(String json) throws JSONException {
+		super(json);
+		setType(MessageType.text_message);
+	}
+
+	public String getBody() {
+		try {
+			if(has(KEY_BODY)) {
+				return getString(KEY_BODY);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setBody(String body) {
+		try {
+			put(KEY_BODY, body);
+		} catch (JSONException e) {
+			Log.e("Unable to set message body.");
+		}
 	}
 }

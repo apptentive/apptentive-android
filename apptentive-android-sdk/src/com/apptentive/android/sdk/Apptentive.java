@@ -22,6 +22,7 @@ import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
+import com.apptentive.android.sdk.offline.ApptentiveDatabase;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
@@ -42,6 +43,7 @@ import java.util.Map;
 public class Apptentive {
 
 	private static Context appContext = null;
+	private static ApptentiveDatabase db;
 
 	private Apptentive() {
 	}
@@ -102,12 +104,19 @@ public class Apptentive {
 	public static void onDestroy(Activity activity) {
 	}
 
+	public static ApptentiveDatabase getDatabase() {
+		return db;
+	}
+
 	private static void init() {
 		if(GlobalInfo.initialized) {
 			Log.v("Already initialized...");
 			return;
 		}
 		Log.v("Initializing...");
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
+		db = new ApptentiveDatabase(appContext);
 
 		NetworkStateReceiver.clearListeners();
 
@@ -147,8 +156,7 @@ public class Apptentive {
 		GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = Util.getUserEmail(appContext);
 
-		PayloadManager.getInstance().setContext(appContext);
-		PayloadManager.getInstance().start();
+		PayloadManager.start();
 
 		// Initialize modules.
 		RatingModule.getInstance().setContext(appContext);
@@ -161,7 +169,7 @@ public class Apptentive {
 			public void stateChanged(NetworkInfo networkInfo) {
 				if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
 					Log.v("Network connected.");
-					PayloadManager.getInstance().ensureRunning();
+					PayloadManager.start();
 				}
 				if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
 					Log.v("Network disconnected.");
@@ -175,7 +183,6 @@ public class Apptentive {
 			PackageManager packageManager = appContext.getPackageManager();
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			int currentVersionCode = packageInfo.versionCode;
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
 				int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
 				if(previousVersionCode != currentVersionCode) {
@@ -190,12 +197,59 @@ public class Apptentive {
 			GlobalInfo.appDisplayName = "this app";
 		}
 
+		asyncFetchPersonId();
+
 		GlobalInfo.initialized = true;
 		Log.v("Done initializing...");
 	}
 
 	private static void onVersionChanged(int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged();
+	}
+
+	private static void asyncFetchPersonId() {
+		new Thread() {
+			@Override
+			public void run() {
+				fetchPersonId();
+			}
+		}.start();
+	}
+
+	/**
+	 * First looks to see if we've saved the personId in memory, then in SharedPreferences, and finally tries to get one
+	 * from the server.
+	 */
+	private static void fetchPersonId() {
+
+		// Check if we've already got the personId.
+		if(GlobalInfo.personId != null) {
+			return;
+		}
+
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if(prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+			GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
+			return;
+		}
+		ApptentiveHttpResponse response = ApptentiveClient.createPerson();
+		if (response == null) {
+			Log.w("Got null response fetching person.");
+			return;
+		}
+		if(response.wasSuccessful()) {
+			try {
+				JSONObject root = new JSONObject(response.getContent());
+				String personId = root.getString("id");
+				Log.d("Person ID: " + personId);
+				if (personId != null && !personId.equals("")) {
+					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
+					GlobalInfo.personId = personId;
+				}
+			} catch (JSONException e) {
+				Log.e("Error parsing person json.", e);
+			}
+		}
 	}
 
 	/**
@@ -220,8 +274,12 @@ public class Apptentive {
 		}
 
 		Log.v("Fetching new configuration.");
-		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(GlobalInfo.androidId);
 		Map<String, Object> config = new HashMap<String, Object>();
+		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(GlobalInfo.androidId);
+		if(!response.wasSuccessful()) {
+			return;
+		}
+
 		try {
 			JSONObject root = new JSONObject(response.getContent());
 			Iterator it = root.keys();

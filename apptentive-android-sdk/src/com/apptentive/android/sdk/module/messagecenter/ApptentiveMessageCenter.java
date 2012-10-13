@@ -9,15 +9,17 @@ package com.apptentive.android.sdk.module.messagecenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.view.ViewGroup;
+import android.widget.ScrollView;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
 
 /**
  * @author Sky Kelsey
@@ -27,55 +29,76 @@ public class ApptentiveMessageCenter {
 	protected static MessageCenterView messageCenterView;
 
 	public static void show(Context context) {
-		messageCenterView = new MessageCenterView(context);
-
 		Intent intent = new Intent();
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
 		context.startActivity(intent);
 	}
 
-	public static void doShow(Context context) {
+	public static void doShow(final Context context) {
 		if (!(context instanceof Activity)) {
 			Log.e(ApptentiveMessageCenter.class.getSimpleName() + " must be initialized with an Activity Context.");
 			return;
 		}
 
-		List<Message> messages = new ArrayList<Message>();
-		messages.add(new TextMessage("guid", new Date(), "Hey, I'm having a problem with your app. It keeps crashing when I open up the map view. It's getting really frustrating.", false));
-		messages.add(new TextMessage("guid", new Date(), "Hi. I'm sorry to hear you're having problems with our app. We would like to try to solve this problem for you. I'll get back to you when we have a solution, OK?", true));
-		messages.add(new TextMessage("guid", new Date(), "Alright, we found the problem, and will be pushing out an update shortly.", true));
-		messages.add(new TextMessage("guid", new Date(), "Sweet, thanks. I will be looking forward to a fix.", false));
-		messages.add(new TextMessage("guid", new Date(), "Awesome! It works :)", false));
-		messages.add(new TextMessage("guid", new Date(), "Great!", true));
-		messages.add(new TextMessage("guid", new Date(), "Hey, I'm having a problem with your app. It keeps crashing when I open up the map view. It's getting really frustrating.", false));
-		messages.add(new TextMessage("guid", new Date(), "Hi. I'm sorry to hear you're having problems with our app. We would like to try to solve this problem for you. I'll get back to you when we have a solution, OK?", true));
-		messages.add(new TextMessage("guid", new Date(), "Alright, we found the problem, and will be pushing out an update shortly.", true));
-		messages.add(new TextMessage("guid", new Date(), "Sweet, thanks. I will be looking forward to a fix.", false));
-		messages.add(new TextMessage("guid", new Date(), "Awesome! It works :)", false));
-		messages.add(new TextMessage("guid", new Date(), "Great!", true));
-		messages.add(new TextMessage("guid", new Date(), "Hey, I'm having a problem with your app. It keeps crashing when I open up the map view. It's getting really frustrating.", false));
-		messages.add(new TextMessage("guid", new Date(), "Hi. I'm sorry to hear you're having problems with our app. We would like to try to solve this problem for you. I'll get back to you when we have a solution, OK?", true));
-		messages.add(new TextMessage("guid", new Date(), "Alright, we found the problem, and will be pushing out an update shortly.", true));
-		messages.add(new TextMessage("guid", new Date(), "Sweet, thanks. I will be looking forward to a fix.", false));
-		messages.add(new TextMessage("guid", new Date(), "Awesome! It works :)", false));
-		messages.add(new TextMessage("guid", new Date(), "Great!", true));
-		messages.add(new TextMessage("guid", new Date(), "Hey, I'm having a problem with your app. It keeps crashing when I open up the map view. It's getting really frustrating.", false));
-		messages.add(new TextMessage("guid", new Date(), "Hi. I'm sorry to hear you're having problems with our app. We would like to try to solve this problem for you. I'll get back to you when we have a solution, OK?", true));
-		messages.add(new TextMessage("guid", new Date(), "Alright, we found the problem, and will be pushing out an update shortly.", true));
-		messages.add(new TextMessage("guid", new Date(), "Sweet, thanks. I will be looking forward to a fix.", false));
-		messages.add(new TextMessage("guid", new Date(), "Awesome! It works :)", false));
-		messages.add(new TextMessage("guid", new Date(), "Great!", true));
-		messages.add(new TextMessage("guid", new Date(), "Hey, I'm having a problem with your app. It keeps crashing when I open up the map view. It's getting really frustrating.", false));
-		messages.add(new TextMessage("guid", new Date(), "Hi. I'm sorry to hear you're having problems with our app. We would like to try to solve this problem for you. I'll get back to you when we have a solution, OK?", true));
-		messages.add(new TextMessage("guid", new Date(), "Alright, we found the problem, and will be pushing out an update shortly.", true));
-		messages.add(new TextMessage("guid", new Date(), "Sweet, thanks. I will be looking forward to a fix.", false));
-		messages.add(new TextMessage("guid", new Date(), "Awesome! It works :)", false));
-		messages.add(new TextMessage("guid", new Date(), "Great!", true));
+		if (messageCenterView == null) {
+			messageCenterView = new MessageCenterView(context, new MessageCenterView.OnSendMessageListener() {
+				public void onSendMessage(String text) {
+					final TextMessage message = new TextMessage();
+					message.setBody(text);
+					MessageManager.sendMessage(message);
+					messageCenterView.post(new Runnable() {
+						public void run() {
+							messageCenterView.addMessage(message);
+						}
+					});
 
-		messageCenterView.setMessages(messages);
+					scrollToBottom();
+				}
+			});
 
+			scrollToBottom();
+		}
+
+		if (messageCenterView.getParent() != null) {
+			((ViewGroup) messageCenterView.getParent()).removeView(messageCenterView);
+		}
 		((Activity) context).setContentView(messageCenterView);
+
+		// Display the messages we already have for starters.
+		messageCenterView.setMessages(MessageManager.getMessages());
+
+		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
+		final MessageManager.MessagesUpdatedListener listener = new MessageManager.MessagesUpdatedListener() {
+			public boolean onMessagesUpdated() {
+				messageCenterView.post(new Runnable() {
+					public void run() {
+						List<Message> messages = MessageManager.getMessages();
+						messageCenterView.setMessages(messages);
+						return;
+					}
+				});
+				return false;
+			}
+		};
+
+		// Fetch the messages in a non-blocking manner.
+		new Thread() {
+			@Override
+			public void run() {
+				MessageManager.fetchAndStoreMessages(listener);
+			}
+		}.start();
 	}
 
+	private static void scrollToBottom() {
+		messageCenterView.post(new Runnable() {
+			public void run() {
+				ScrollView scroll = (ScrollView) messageCenterView.findViewById(R.id.apptentive_message_center_scrollview);
+				scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			}
+		});
+	}
 }
+
+

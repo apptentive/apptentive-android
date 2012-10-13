@@ -21,6 +21,10 @@
             android:onClick="testTweet"/>
     <Button android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:text="Delete StoredMessages"
+            android:onClick="deleteStoredMessages"/>
+    <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:text="Test NullPointerException"
             android:onClick="throwNpe"/>
 </LinearLayout>

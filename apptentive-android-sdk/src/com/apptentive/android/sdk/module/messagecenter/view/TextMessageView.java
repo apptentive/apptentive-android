@@ -44,30 +44,30 @@ public class TextMessageView extends MessageView {
 		textRowParams.weight = 3;
 		textRow.setLayoutParams(textRowParams);
 		textRow.setOrientation(LinearLayout.VERTICAL);
-		textRow.setGravity(message.isIncoming() ? Gravity.LEFT : Gravity.RIGHT);
+		textRow.setGravity(message.isOutgoingMessage() ? Gravity.RIGHT : Gravity.LEFT);
 
 		TextView textView = new TextView(context);
 		LayoutParams textViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		textView.setLayoutParams(textViewParams);
 		textView.setTextColor(Color.BLACK);
-		textView.setBackgroundResource(message.isIncoming() ? R.drawable.apptentive_message_incoming : R.drawable.apptentive_message_outgoing);
-		textView.setText(message.getText());
+		textView.setBackgroundResource(message.isOutgoingMessage() ? R.drawable.apptentive_message_outgoing : R.drawable.apptentive_message_incoming);
+		textView.setText(message.getBody());
 
 		TextView timestampView = new TextView(context);
 		timestampView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		timestampView.setText(Util.dateToDisplayString(message.getCreated()));
+		timestampView.setText(Util.dateToDisplayString(Math.round(message.getCreatedAt() * 1000)));
 		timestampView.setPadding(0, 0, Util.dipsToPixels(context, 10), 0);
 		timestampView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
 
 
 		textRow.addView(textView);
 		textRow.addView(timestampView);
-		if(message.isIncoming()) {
-			row.addView(textRow);
+		if (message.isOutgoingMessage()) {
 			row.addView(spacer);
+			row.addView(textRow);
 		} else {
-			row.addView(spacer);
 			row.addView(textRow);
+			row.addView(spacer);
 		}
 		addView(row);
 	}

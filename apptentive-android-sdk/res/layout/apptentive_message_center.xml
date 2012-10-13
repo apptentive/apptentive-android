@@ -31,7 +31,8 @@
                        android:padding="10dp"
                        android:src="@drawable/apptentive_icon_small"/>
         </FrameLayout>
-        <ScrollView android:layout_width="fill_parent"
+        <ScrollView android:id="@+id/apptentive_message_center_scrollview"
+                    android:layout_width="fill_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
             <LinearLayout android:id="@+id/aptentive_message_center_list"
@@ -59,6 +60,7 @@
                               android:layout_height="wrap_content"
                               android:layout_weight="1"
                               android:orientation="vertical">
+<!--
                     <EditText android:id="@+id/apptentive_message_center_email"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
@@ -66,7 +68,8 @@
                               android:autoText="false"
                               android:inputType="textEmailAddress"
                               android:hint="What is your email?"/>
-                    <EditText android:id="@+id/apptentive_message_center_mesage"
+-->
+                    <EditText android:id="@+id/apptentive_message_center_message"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:singleLine="false"

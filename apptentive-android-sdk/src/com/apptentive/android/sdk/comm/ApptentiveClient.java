@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.Person;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,114 +24,100 @@ import org.apache.http.util.EntityUtils;
 import java.io.*;
 
 /**
- * TODO: Catch HttpHostConnectException, which occurs when data connection is not there
- *
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
-	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
+	//private static final String ENDPOINT_BASE = "https://api.apptentive.com";
+	private static final String ENDPOINT_BASE = "http://api.apptentive-beta.com";
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
-	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
-	private static final String ENDPOINT_MESSAGES_SINCE = ENDPOINT_MESSAGES + "?since=%s";
+	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/people/%s/messages";
+	private static final String ENDPOINT_MESSAGES_SINCE = ENDPOINT_MESSAGES + "?newer_than=%s";
+	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 
-	public static ApptentiveHttpResponse postJSON(String json) {
-		try {
-			return performHttpRequest(ENDPOINT_RECORDS, Method.POST, json);
-		} catch (IllegalArgumentException e) {
-			Log.w("Error posting JSON: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
-		} catch (IOException e) {
-			Log.w("Error posting JSON: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
-		}
-		return null;
-	}
-
-	public static ApptentiveHttpResponse getSurvey() {
-		try {
-			return performHttpRequest(ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
-		} catch (IllegalArgumentException e) {
-			Log.e("Error fetching survey.", e);
-		} catch (IOException e) {
-			Log.e("Error fetching survey.", e);
-		}
-		return null;
-	}
-
-	public static ApptentiveHttpResponse getAppConfiguration(String deviceId) {
-		String uri = String.format(ENDPOINT_CONFIGURATION, deviceId);
-		try {
-			return performHttpRequest(uri, Method.GET, null);
-		} catch (IllegalArgumentException e) {
-			Log.e("Error fetching configuration.", e);
-		} catch (IOException e) {
-			Log.e("Error fetching configuration: %s", e.getMessage());
-		}
-		return null;
-	}
 
 	/**
 	 * Gets all messages since the message specified by guid was specified.
 	 *
-	 * @param lastGuid Specifies the last successfully fetched message. If null, all messages will be fetched.
+	 * @param lastMessageId Specifies the last successfully fetched message. If null, all messages will be fetched.
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
-	public static ApptentiveHttpResponse getMessages(String lastGuid) {
-		Log.e("Fetching messages...");
-		String uri;
-		if (lastGuid != null) {
-			uri = String.format(ENDPOINT_MESSAGES_SINCE, lastGuid);
-		} else {
-			uri = ENDPOINT_MESSAGES_SINCE;
+	public static ApptentiveHttpResponse getMessages(String personId, String lastMessageId) {
+		Log.d("Fetching messages for person: " + personId + ", and lastGuid: " + lastMessageId);
+		String uri = String.format(ENDPOINT_MESSAGES, personId);
+		if (lastMessageId != null) {
+			uri = String.format(ENDPOINT_MESSAGES_SINCE, personId, lastMessageId);
 		}
-		try {
-			return performHttpRequest(uri, Method.GET, null);
-		} catch (IOException e) {
-			Log.e("Error fetching survey.", e);
-		}
-		return null;
+		return performHttpRequest(uri, Method.GET, null);
 	}
 
+	public static ApptentiveHttpResponse createPerson() {
+		return performHttpRequest(ENDPOINT_PEOPLE, Method.POST, new Person().toString());
+	}
 
-	private static ApptentiveHttpResponse performHttpRequest(String uri, Method method, String postBody) throws IOException, IllegalArgumentException {
-		Log.e("Performing request...");
+	public static ApptentiveHttpResponse getSurvey() {
+		return performHttpRequest(ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
+	}
+
+	public static ApptentiveHttpResponse getAppConfiguration(String deviceId) {
+		String uri = String.format(ENDPOINT_CONFIGURATION, deviceId);
+		return performHttpRequest(uri, Method.GET, null);
+	}
+
+	public static ApptentiveHttpResponse postMessage(String json) {
+		String uri = String.format(ENDPOINT_MESSAGES, GlobalInfo.personId);
+		return performHttpRequest(uri, Method.POST, json);
+	}
+
+	public static ApptentiveHttpResponse postRecord(String json) {
+		return performHttpRequest(ENDPOINT_RECORDS, Method.POST, json);
+	}
+
+	private static ApptentiveHttpResponse performHttpRequest(String uri, Method method, String postBody) {
+		Log.v("Performing request to %s", uri);
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
-		HttpClient httpClient;
-		HttpRequestBase request;
-		httpClient = new DefaultHttpClient();
-		switch (method) {
-			case GET:
-				request = new HttpGet(uri);
-				break;
-			case POST:
-				request = new HttpPost(uri);
-				HttpParams httpParams = request.getParams();
-				HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
-				HttpConnectionParams.setSoTimeout(httpParams, 30000);
-				request.setHeader("Content-Type", "application/json");
-				Log.v("Post body: " + postBody);
-				((HttpPost)request).setEntity(new StringEntity(postBody, "UTF-8"));
-				break;
-			default:
-				Log.e("Unrecognized method: " + method.name());
-				return null;
-		}
-		request.setHeader("Authorization", "OAuth " + GlobalInfo.apiKey);
-		request.setHeader("Accept", "application/json");
-
-
-		HttpResponse response = httpClient.execute(request);
-		int code = response.getStatusLine().getStatusCode();
-		ret.setCode(code);
-		ret.setReason(response.getStatusLine().getReasonPhrase());
-		Log.e("Response Status Line: " + response.getStatusLine().toString());
-		if (code >= 200 && code < 300) {
-			HttpEntity entity = response.getEntity();
-			if(entity != null) {
-				ret.setContent(EntityUtils.toString(entity, "UTF-8"));
-				Log.e("Content: " + ret.getContent());
+		try {
+			HttpClient httpClient;
+			HttpRequestBase request;
+			httpClient = new DefaultHttpClient();
+			switch (method) {
+				case GET:
+					request = new HttpGet(uri);
+					break;
+				case POST:
+					request = new HttpPost(uri);
+					HttpParams httpParams = request.getParams();
+					HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
+					HttpConnectionParams.setSoTimeout(httpParams, 30000);
+					request.setHeader("Content-Type", "application/json");
+					Log.v("Post body: " + postBody);
+					((HttpPost) request).setEntity(new StringEntity(postBody, "UTF-8"));
+					break;
+				default:
+					Log.e("Unrecognized method: " + method.name());
+					return null;
 			}
+			request.setHeader("Authorization", "OAuth " + GlobalInfo.apiKey);
+			request.setHeader("Accept", "application/json");
+
+			HttpResponse response = httpClient.execute(request);
+			int code = response.getStatusLine().getStatusCode();
+			ret.setCode(code);
+			ret.setReason(response.getStatusLine().getReasonPhrase());
+			Log.v("Response Status Line: " + response.getStatusLine().toString());
+			if (code >= 200 && code < 300) {
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					ret.setContent(EntityUtils.toString(entity, "UTF-8"));
+					Log.e("Content: " + ret.getContent());
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			Log.w("Error communicating with server.", e);
+		} catch (IOException e) {
+			Log.w("Error communicating with server.", e);
 		}
 		return ret;
 	}

@@ -59,21 +59,10 @@ public class FeedbackModule {
 
 	private void submit() {
 		// Add in the key.value pairs that the developer passed in as "record[data][KEY] = VALUE"
-		if (dataFields != null) {
-			for (String key : dataFields.keySet()) {
-				try {
-					feedback.setString(dataFields.get(key), "record", "data", key);
-				} catch (Exception e) {
-					Log.e("Error setting developer defined custom feedback field", e);
-				}
-			}
-		}
-		// If the email was changed, then save it for future use.
-		if(!startingEmail.equals(feedback.getEmail())){
-			prefs.edit().putString(Constants.PREF_KEY_USER_ENTERED_EMAIL, feedback.getEmail()).commit();
-		}
+		feedback.setData(dataFields);
+		prefs.edit().putString(Constants.PREF_KEY_USER_ENTERED_EMAIL, feedback.getEmail()).commit();
 		MetricModule.sendMetric(MetricModule.Event.feedback_dialog__submit);
-		PayloadManager.getInstance().putPayload(feedback);
+		PayloadManager.putPayload(feedback);
 	}
 
 
@@ -86,7 +75,7 @@ public class FeedbackModule {
 	}
 
 	void showFeedbackDialog(Context context, Trigger reason) {
-		feedback = new FeedbackPayload("feedback");
+		feedback = new FeedbackPayload();
 		new FeedbackDialog(context).show(reason);
 	}
 

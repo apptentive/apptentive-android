@@ -39,12 +39,8 @@ public class MetricModule {
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
 			MetricPayload payload = new MetricPayload(event.getRecordName(), trigger);
-			if(data != null) {
-				for(String key : data.keySet()) {
-					payload.putData(key, data.get(key));
-				}
-			}
-			PayloadManager.getInstance().putPayload(payload);
+			payload.putData(data);
+			PayloadManager.putPayload(payload);
 		}
 	}
 

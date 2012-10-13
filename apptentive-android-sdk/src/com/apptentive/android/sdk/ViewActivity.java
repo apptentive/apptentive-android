@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 
 /**
  * For internal use only. Used to launch Apptentive Feedback, Survey, and Message Center views.
@@ -49,6 +48,7 @@ public class ViewActivity extends ApptentiveActivity {
 				SurveyModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 				ApptentiveMessageCenter.doShow(this);
 				break;
 			default:
