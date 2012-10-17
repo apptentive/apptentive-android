@@ -127,15 +127,25 @@ public class MessageManager {
 
 	private static List<Message> fetchMessages(String lastMessageGuid) {
 		Log.d("Fetching messages newer than: " + lastMessageGuid);
-		List<Message> ret = new ArrayList<Message>();
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(GlobalInfo.personId, lastMessageGuid);
 
+		List<Message> ret = new ArrayList<Message>();
 		if (!response.wasSuccessful()) {
 			return ret;
 		}
-
 		try {
-			JSONObject root = new JSONObject(response.getContent());
+			ret = parseMessagesString(response.getContent());
+		} catch (JSONException e) {
+			Log.e("Error parsing messages JSON.", e);
+		} catch (Exception e) {
+			Log.e("Unexpected error parsing messages JSON.", e);
+		}
+		return ret;
+	}
+
+	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
+		List<Message> ret = new ArrayList<Message>();
+			JSONObject root = new JSONObject(messageString);
 			if (root.has("messages")) {
 				JSONArray messages = root.getJSONArray("messages");
 				for (int i = 0; i < messages.length(); i++) {
@@ -144,11 +154,6 @@ public class MessageManager {
 					ret.add(message);
 				}
 			}
-		} catch (JSONException e) {
-			Log.e("Error parsing messages JSON.", e);
-		} catch (Exception e) {
-			Log.e("Unexpected error parsing messages JSON.", e);
-		}
 		return ret;
 	}
 

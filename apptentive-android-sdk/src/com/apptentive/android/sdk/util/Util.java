@@ -59,9 +59,10 @@ public class Util {
 		String s = iso8601DateString.trim().replace("Z", "+00:00").replace("T", " ");
 		try{
 			// Remove colon in timezone.
-			int lastColonIndex = s.lastIndexOf(":");
-			s = s.substring(0, lastColonIndex) + s.substring(lastColonIndex+1);
-
+			if(s.charAt(s.length()-3) == ':') {
+				int lastColonIndex = s.lastIndexOf(":");
+				s = s.substring(0, lastColonIndex) + s.substring(lastColonIndex+1);
+			}
 			// Right pad millis to 3 places. ISO 8601 supplies fractions of seconds, but Java interprets them as millis.
 			int milliStart = s.lastIndexOf('.');
 			int milliEnd = (s.lastIndexOf('+') != -1) ? s.lastIndexOf('+') : s.lastIndexOf('-');
