@@ -31,7 +31,11 @@ public class ViewActivity extends ApptentiveActivity {
 
 		getWindow().setFormat(PixelFormat.RGBA_8888);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
 		switch (activeModule) {
 			case ABOUT:
 				setContentView(R.layout.apptentive_about);
