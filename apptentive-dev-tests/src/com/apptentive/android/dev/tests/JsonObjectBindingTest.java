@@ -6,7 +6,6 @@
 
 package com.apptentive.android.dev.tests;
 
-import android.util.Log;
 import junit.framework.TestCase;
 
 /**

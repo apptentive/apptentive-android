@@ -1,6 +1,5 @@
 package com.apptentive.android.dev.tests;
 
-import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 import com.apptentive.android.dev.DevActivity;
 

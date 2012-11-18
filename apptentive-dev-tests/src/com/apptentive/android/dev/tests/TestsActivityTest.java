@@ -6,11 +6,9 @@
 
 package com.apptentive.android.dev.tests;
 
-import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.widget.Button;
-import com.apptentive.android.dev.DevActivity;
 import com.apptentive.android.dev.TestsActivity;
 
 /**
