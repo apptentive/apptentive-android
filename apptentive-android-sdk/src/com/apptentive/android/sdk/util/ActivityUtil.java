@@ -24,6 +24,9 @@ import java.util.List;
 public class ActivityUtil {
 
 	/**
+	 * <strong>NOTE: This method is for debugging purposes only. Google may reject your app if you ship it with the
+	 * GET_TASKS permission enabled.</strong>
+	 * <p/>
 	 * This method will return true if the Application is going into the background because an Activity that is not defined
 	 * in the current Application's manifest is going into the foreground. It will return false if another Activity defined
 	 * in the current Application's manifest is going into the foreground, or if the Application is exiting.
@@ -31,6 +34,7 @@ public class ActivityUtil {
 	 * Application can run.
 	 * <p/>Requires permission: android.permission.GET_TASKS
 	 * @param activity The activity you are calling from.
+	 * @deprecated Marking this deprecated simply so you read this whole javadoc before trying to use this method.
 	 * @return true: if another Application is coming to the foreground.<p/>
 	 *         false: if the Activity is merely giving way to another Activity defined in the same Application.
 	 */
@@ -65,8 +69,9 @@ public class ActivityUtil {
 	}
 
 	/**
-	 * Tells you whether the currentActivity is the main Activity of the app. In order for this to work, it must be called
-	 * from the main Activity before any other Activity is called.
+	 * Tells you whether the currentActivity is the main Activity of the app. The side effect is that this will register
+	 * the first Activity is is called form as the main Activity, so make sure it's called from the main Activity before
+	 * any others.
 	 * @param currentActivity The Activity from which this method is called.
 	 * @return true iff currentActivity is the Application's main Activity.
 	 */

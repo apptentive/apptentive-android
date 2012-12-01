@@ -13,7 +13,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -21,6 +20,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
@@ -42,20 +42,12 @@ public class Apptentive {
 	}
 
 	/**
-	 * Initializes Apptentive.
-	 *
+	 * Reserved for future use.
 	 * @param activity The Activity from which this method is called.
 	 * @param savedInstanceState
 	 */
 	public static void onCreate(Activity activity, Bundle savedInstanceState) {
-		appContext = activity.getApplicationContext();
-		boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
-		if(isMain) {
-			init();
-			MetricModule.sendMetric(MetricModule.Event.app__launch);
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit(); // Prime
-		}
+		ActivityUtil.isCurrentActivityMainActivity(activity);
 	}
 
 
@@ -63,18 +55,10 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		// The first run of this method will be when the main Activity is launched.
-		boolean comingFromBackground = prefs.getBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true);
-		if(comingFromBackground) {
-			Apptentive.beginSession();
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, false).commit();
-			boolean isMain = ActivityUtil.isCurrentActivityMainActivity(activity);
-			if(isMain) {
-				// TODO: Only do this when the cache is expired, or when the app is debuggable. In that case, don't do the isMain check, or backbround check??
-				Apptentive.asyncFetchAppConfiguration();
-			}
-		}
+		appContext = activity.getApplicationContext();
+		init();
+		asyncFetchAppConfiguration();
+		ActivityLifecycleManager.activityStarted(activity);
 	}
 
 	/**
@@ -94,7 +78,7 @@ public class Apptentive {
 
 	/**
 	 * Reserved for future use.
-	 * @param activity The Activity this method is called from.
+	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onPause(Activity activity) {
 	}
@@ -103,58 +87,23 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStop(Activity activity) {
-		if(ActivityUtil.isApplicationBroughtToBackground(activity)) {
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putBoolean(Constants.PREF_KEY_APP_IN_BACKGROUND, true).commit();
-			Apptentive.endSession();
-		}
+		ActivityLifecycleManager.activityStopped(activity);
 	}
 
 	/**
+	 * Reserved for future use.
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onDestroy(Activity activity) {
-		if(ActivityUtil.isCurrentActivityMainActivity(activity)) {
-			MetricModule.sendMetric(MetricModule.Event.app__exit);
-			Apptentive.endSession();
-		}
-	}
-
-	/**
-	 * Multiple calls to beginSession within a short period of time are NOPs.
-	 * Calls to beginSession when a session is running result in a new session.
-	 */
-	private static void beginSession() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
-		if(!activeSession) {
-			Log.v("Starting session.");
-			MetricModule.sendMetric(MetricModule.Event.app__session_start);
-			RatingModule.getInstance().logUse();
-		} else {
-			// TODO: Log an error. This was either a crash, or a dev missing the onStop call.
-			Log.w("Starting session, but a session is already active.");
-		}
-		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, true).commit();
-	}
-
-	/**
-	 * If a session is active, will end it. If a session is not active, is a NOP.
-	 */
-	private static void endSession() {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean activeSession = prefs.getBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false);
-		if(activeSession) {
-			Log.v("Ending Session.");
-			MetricModule.sendMetric(MetricModule.Event.app__session_end);
-		} else {
-			// This should never happen...
-			Log.w("Ending session, but no session is active.");
-		}
-		prefs.edit().putBoolean(Constants.PREF_KEY_APP_ACTIVE_SESSION, false).commit();
 	}
 
 	private static void init() {
+		if(GlobalInfo.initialized) {
+			Log.v("Already initialized...");
+			return;
+		}
+		Log.v("Initializing...");
+
 		NetworkStateReceiver.clearListeners();
 
 		GlobalInfo.isAppDebuggable = false;
@@ -225,7 +174,7 @@ public class Apptentive {
 			if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
 				int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
 				if(previousVersionCode != currentVersionCode) {
-					RatingModule.getInstance().onAppVersionChanged();
+					onVersionChanged(previousVersionCode, currentVersionCode);
 				}
 			}
 			prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
@@ -235,8 +184,14 @@ public class Apptentive {
 			// Nothing we can do then.
 			GlobalInfo.appDisplayName = "this app";
 		}
+
+		GlobalInfo.initialized = true;
+		Log.v("Done initializing...");
 	}
 
+	private static void onVersionChanged(int previousVersion, int currentVersion) {
+		RatingModule.getInstance().onAppVersionChanged();
+	}
 
 	/**
 	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
@@ -281,13 +236,11 @@ public class Apptentive {
 	}
 
 	private static void asyncFetchAppConfiguration() {
-		new AsyncTask() {
-			@Override
-			protected Object doInBackground(Object... objects) {
+		new Thread() {
+			public void run() {
 				fetchAppConfiguration(GlobalInfo.isAppDebuggable);
-				return null;
 			}
-		}.execute();
+		}.start();
 	}
 
 	/**

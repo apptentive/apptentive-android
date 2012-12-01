@@ -70,8 +70,6 @@ public class RatingModule {
 	private SharedPreferences prefs;
 	private IRatingProvider selectedRatingProvider = null;
 
-	private String ratingsPromptLogic;
-
 	private Map<String, String> ratingProviderArgs;
 
 	private RatingModule() {
@@ -242,7 +240,7 @@ public class RatingModule {
 	}
 
 	private boolean canShowRatingFlow(){
-		ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
 		try{
 			return logic(new JSONObject(ratingsPromptLogic));
 		}catch(JSONException e){
@@ -320,7 +318,7 @@ public class RatingModule {
 	 * time the app is switched back to, after another app has been brought to the foreground.
 	 * <p>Internal use only. We handle calls to this method.</p>
 	 */
-	void logUse() {
+	public void logUse() {
 		setUses(getUses() + 1);
 	}
 
@@ -362,6 +360,31 @@ public class RatingModule {
 		forced
 	}
 
+	/**
+	 * This method is for debugging purposed only.
+	 */
+	void logRatingFlowState() {
+		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+
+		RatingState state = getState();
+		long days;
+		switch (state) {
+			case REMIND:
+				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
+				break;
+			default:
+				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
+				break;
+		}
+		long now = new Date().getTime();
+		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
+		boolean elapsed = now > periodEnd;
+
+		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
+		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
+
+		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(), usesBeforePrompt, getEvents(), significantEventsBeforePrompt));
+	}
 
 	private final class EnjoymentDialog extends Dialog {
 

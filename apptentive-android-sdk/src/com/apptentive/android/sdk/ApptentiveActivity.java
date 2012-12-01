@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.os.Bundle;
 
 /**
  * Extend this class instead of Activity to easily integrate Apptentive into your application.
@@ -23,12 +22,6 @@ import android.os.Bundle;
 public class ApptentiveActivity extends Activity {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Apptentive.onCreate(this, savedInstanceState);
-	}
-
-	@Override
 	protected void onStart() {
 		super.onStart();
 		Apptentive.onStart(this);
@@ -38,11 +31,5 @@ public class ApptentiveActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		Apptentive.onStop(this);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Apptentive.onDestroy(this);
 	}
 }

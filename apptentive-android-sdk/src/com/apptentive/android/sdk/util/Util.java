@@ -101,7 +101,7 @@ public class Util {
 	public static boolean packageHasPermission(Context context, String packageName, String permission){
 		List<PackageInfo> packageInfos = getPermissions(context);
 		for(PackageInfo packageInfo : packageInfos){
-			if(packageInfo.packageName.equals(packageName)){
+			if(packageInfo.packageName.equals(packageName) && packageInfo.requestedPermissions != null){
 				for(String permissionName : packageInfo.requestedPermissions){
 					if(permissionName.equals(permission)){
 						return true;
@@ -159,12 +159,14 @@ public class Util {
 
 	// TODO: Use reflection to load this so we can drop 2.1 API requirement.
 	private static Account getAccount(AccountManager accountManager){
-		Account[] accounts = accountManager.getAccountsByType("com.google");
-		Account account;
-		if (accounts.length > 0){
-			account = accounts[0];
-		}else{
-			account = null;
+		Account account = null;
+		try {
+			Account[] accounts = accountManager.getAccountsByType("com.google");
+			if (accounts.length > 0){
+				account = accounts[0];
+			}
+		} catch(VerifyError e) {
+			// Ignore here because the phone is on a pre API Level 5 SDK.
 		}
 		return account;
 	}
