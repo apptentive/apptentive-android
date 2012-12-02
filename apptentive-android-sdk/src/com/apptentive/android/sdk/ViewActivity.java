@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
+import com.apptentive.android.sdk.util.Constants;
 
 /**
  * For internal use only. Used to launch Apptentive Feedback, Survey, and Message Center views.
@@ -59,6 +63,20 @@ public class ViewActivity extends ApptentiveActivity {
 				Log.w("No Activity specified. Finishing...");
 				finish();
 				break;
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == Activity.RESULT_OK) {
+			switch(requestCode) {
+				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
+					MessageCenterView.showAttachmentDialog(this, data.getData());
+					break;
+				default:
+					break;
+			}
 		}
 	}
 

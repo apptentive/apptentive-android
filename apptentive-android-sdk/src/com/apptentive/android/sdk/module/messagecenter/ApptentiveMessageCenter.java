@@ -9,11 +9,13 @@ package com.apptentive.android.sdk.module.messagecenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
@@ -41,24 +43,31 @@ public class ApptentiveMessageCenter {
 			return;
 		}
 
-		if (messageCenterView == null) {
-			messageCenterView = new MessageCenterView(context, new MessageCenterView.OnSendMessageListener() {
-				public void onSendMessage(String text) {
-					final TextMessage message = new TextMessage();
-					message.setBody(text);
-					MessageManager.sendMessage(message);
-					messageCenterView.post(new Runnable() {
-						public void run() {
-							messageCenterView.addMessage(message);
-						}
-					});
+		messageCenterView = new MessageCenterView(context, new MessageCenterView.OnSendMessageListener() {
+			public void onSendTextMessage(String text) {
+				final TextMessage message = new TextMessage();
+				message.setBody(text);
+				MessageManager.sendMessage(message);
+				messageCenterView.post(new Runnable() {
+					public void run() {
+						messageCenterView.addMessage(message);
+					}
+				});
+				scrollToBottom();
+			}
 
-					scrollToBottom();
-				}
-			});
-
-			scrollToBottom();
-		}
+			public void onSendFileMessage(Uri uri) {
+				final FileMessage message = FileMessage.createMessage(context, uri);
+				MessageManager.sendMessage(message);
+				messageCenterView.post(new Runnable() {
+					public void run() {
+						messageCenterView.addMessage(message);
+					}
+				});
+				scrollToBottom();
+			}
+		});
+		scrollToBottom();
 
 		if (messageCenterView.getParent() != null) {
 			((ViewGroup) messageCenterView.getParent()).removeView(messageCenterView);

@@ -21,7 +21,7 @@ public class AboutModule {
 	// *************************************************************************************************
 	private static AboutModule instance = null;
 
-	static AboutModule getInstance() {
+	public static AboutModule getInstance() {
 		if (instance == null) {
 			instance = new AboutModule();
 		}

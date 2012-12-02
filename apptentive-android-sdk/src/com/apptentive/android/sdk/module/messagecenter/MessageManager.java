@@ -84,7 +84,7 @@ public class MessageManager {
 	 * This doesn't need to be run during normal program execution.
 	 */
 	public static void deleteAllMessages() {
-		Log.e("DELETING ALL MESSAGES!");
+		Log.d("Deleting all messages.");
 		getMessageStore().deleteAllMessages();
 	}
 
@@ -96,10 +96,7 @@ public class MessageManager {
 		Message ret = null;
 		Message.MessageType type = Message.MessageType.unknown;
 
-		if (typeString == null) {
-			Message message = new Message(json);
-			type = message.getTypeEnum();
-		} else {
+		if (typeString != null) {
 			try {
 				type = Message.MessageType.valueOf(typeString);
 			} catch (IllegalArgumentException e) {
@@ -115,6 +112,9 @@ public class MessageManager {
 				break;
 			case share_request:
 				ret = new ShareRequest(json);
+				break;
+			case file_message:
+				ret = new FileMessage(json);
 				break;
 			case unknown:
 				ret = new Message(json);

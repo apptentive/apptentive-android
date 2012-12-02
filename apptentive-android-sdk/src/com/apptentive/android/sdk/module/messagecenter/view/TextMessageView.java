@@ -50,15 +50,17 @@ public class TextMessageView extends MessageView {
 		LayoutParams textViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		textView.setLayoutParams(textViewParams);
 		textView.setTextColor(Color.BLACK);
-		textView.setBackgroundResource(message.isOutgoingMessage() ? R.drawable.apptentive_message_outgoing : R.drawable.apptentive_message_incoming);
 		textView.setText(message.getBody());
+		textView.setBackgroundResource(message.isOutgoingMessage() ? R.drawable.apptentive_message_outgoing : R.drawable.apptentive_message_incoming);
+		textView.setGravity(Gravity.CENTER_VERTICAL);
 
 		TextView timestampView = new TextView(context);
 		timestampView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		timestampView.setText(Util.dateToDisplayString(Math.round(message.getCreatedAt() * 1000)));
 		timestampView.setPadding(0, 0, Util.dipsToPixels(context, 10), 0);
-		timestampView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-
+		timestampView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+		timestampView.setTextColor(Color.parseColor("#777777"));
+		timestampView.setShadowLayer(1, 0, 0.5f, Color.WHITE);
 
 		textRow.addView(textView);
 		textRow.addView(timestampView);

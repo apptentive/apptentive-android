@@ -17,6 +17,8 @@ import android.view.animation.TranslateAnimation;
  */
 public class Constants {
 
+	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
+
 	public static final String PREF_NAME = "APPTENTIVE";
 
 	public static final String PREF_KEY_PERSON_ID = "userId";

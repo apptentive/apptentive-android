@@ -10,6 +10,7 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.offline.Payload;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 
@@ -23,10 +24,12 @@ public class Message extends Payload {
 	private long id = -1; // The DB id of this stored object. Not stored in JSON.
 	private static final String KEY_MESSAGE_ID = "id";
 	protected static final String KEY_CREATED_AT = "created_at";
-	private static final String KEY_SENDER_ID = "sender_id";
+	private static final String KEY_SENDER = "sender";
+	private static final String KEY_SENDER_ID = "id"; // TODO: Sender ID, etc.
 	private static final String KEY_PRIORITY = "priority";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_DISPLAY = "display";
+	private static final String KEY_USER_VISIBLE = "user_visible";
 
 	public Message() {
 		super();
@@ -79,8 +82,11 @@ public class Message extends Payload {
 
 	public String getSenderId() {
 		try {
-			if (has((KEY_SENDER_ID))) {
-				return getString(KEY_SENDER_ID);
+			if (has((KEY_SENDER))) {
+				JSONObject sender = getJSONObject(KEY_SENDER);
+				if (sender.has((KEY_SENDER_ID))) {
+					return sender.getString(KEY_SENDER_ID);
+				}
 			}
 		} catch (JSONException e) {
 		}
@@ -138,15 +144,25 @@ public class Message extends Payload {
 		return null;
 	}
 
+	public boolean isUserVisible() {
+		try {
+			return getBoolean(KEY_USER_VISIBLE);
+		} catch (JSONException e) {
+		}
+		return false; // Unsupported.
+	}
+
 	public boolean isOutgoingMessage() {
 		String senderId = getSenderId();
-		return senderId == null || senderId.equals(GlobalInfo.personId);
+		boolean outgoing = senderId == null || senderId.equals(GlobalInfo.personId);
+		return outgoing;
 	}
 
 	public enum MessageType {
 		text_message,
 		upgrade_request,
 		share_request,
+		file_message,
 		unknown
 	}
 }
