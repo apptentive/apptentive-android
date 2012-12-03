@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -97,6 +98,7 @@ public class Apptentive {
 	public static void onDestroy(Activity activity) {
 	}
 
+	@SuppressLint("NewApi")
 	private static void init() {
 		if(GlobalInfo.initialized) {
 			Log.v("Already initialized...");
