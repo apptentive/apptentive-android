@@ -10,6 +10,8 @@ import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 
 /**
+ * This class is a hack that lets you tile a bitmap that is actually larger in either dimension than the view it will
+ * tile into.
  * @author Sky Kelsey
  */
 public class ZeroMinSizeDrawable extends BitmapDrawable {

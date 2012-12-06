@@ -11,48 +11,63 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:orientation="vertical">
-        <LinearLayout android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:background="@drawable/apptentive_message_center_header"
-                      android:gravity="center">
-            <TextView android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:paddingTop="8dp"
-                      android:paddingBottom="8dp"
-                      android:textSize="20sp"
-                      android:textStyle="bold"
-                      android:textColor="@android:color/white"
-                      android:shadowColor="#000000"
-                      android:shadowDx="0"
-                      android:shadowDy="-1"
-                      android:shadowRadius="1"
-                      android:drawableLeft="@drawable/android_ic_menu_start_conversation"
-                      android:drawablePadding="5dp"
-                      android:text="Message Center"/>
-        </LinearLayout>
-        <ScrollView android:id="@+id/apptentive_message_center_scrollview"
-                    android:layout_width="fill_parent"
-                    android:background="@drawable/apptentive_message_center_background"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
-            <LinearLayout android:id="@+id/aptentive_message_center_list"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent"
-                          android:orientation="vertical"
-                          android:paddingLeft="10dp"
-                          android:paddingRight="10dp">
-                <!-- This layout will hold messages -->
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="fill_parent">
+        <LinearLayout android:id="@+id/apptentive_message_center_top_area"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:background="@drawable/apptentive_message_center_header"
+                          android:gravity="center">
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:gravity="center"
+                          android:paddingTop="8dp"
+                          android:paddingBottom="8dp"
+                          android:textSize="20sp"
+                          android:textStyle="bold"
+                          android:textColor="@android:color/white"
+                          android:shadowColor="#000000"
+                          android:shadowDx="0"
+                          android:shadowDy="-1"
+                          android:shadowRadius="1"
+                          android:drawableLeft="@drawable/android_ic_menu_start_conversation"
+                          android:drawablePadding="5dp"
+                          android:text="Message Center"/>
             </LinearLayout>
-        </ScrollView>
+            <ScrollView android:id="@+id/apptentive_message_center_scrollview"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:fillViewport="true"
+                        android:fadingEdgeLength="5dp">
+                <LinearLayout android:layout_height="fill_parent"
+                              android:layout_width="fill_parent"
+                              android:orientation="vertical">
+                    <!--
+                                        <LinearLayout android:layout_height="5dp"
+                                                      android:layout_width="fill_parent"/>
+                    -->
+                    <LinearLayout android:id="@+id/apptentive_message_center_list"
+                                  android:layout_width="fill_parent"
+                                  android:layout_height="fill_parent"
+                                  android:orientation="vertical"
+                                  android:background="@drawable/apptentive_message_center_background"
+                                  android:paddingLeft="10dp"
+                                  android:paddingRight="10dp">
+                        <!-- This layout will hold messages -->
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
         <LinearLayout android:id="@+id/apptentive_message_center_drawer"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      android:orientation="vertical">
-            <LinearLayout android:layout_width="fill_parent"
+                      android:orientation="vertical"
+                      android:layout_gravity="bottom">
+            <LinearLayout android:id="@+id/apptentive_message_center_drawer_handle"
+                          android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
                           android:orientation="horizontal"
                           android:gravity="center_vertical"
@@ -73,7 +88,6 @@
                               android:layout_weight="4"
                               android:clickable="true"
                               android:gravity="center"
-                              android:visibility="gone"
                               android:background="@drawable/android_expander_open_holo_dark"/>
                 <EditText android:id="@+id/apptentive_message_center_message"
                           android:layout_width="0px"
@@ -97,7 +111,7 @@
                           android:orientation="vertical"
                           android:paddingLeft="10dp"
                           android:paddingRight="10dp"
-                          android:visibility="gone">
+                          android:visibility="visible">
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:orientation="horizontal"
@@ -161,18 +175,9 @@
                         <LinearLayout android:layout_width="0px"
                                       android:layout_height="wrap_content"
                                       android:layout_weight="1"/>
-                        <!--
-                                                <ImageView android:layout_width="wrap_content"
-                                                           android:layout_height="wrap_content"
-                                                           android:src="@drawable/apptentive_icon_info"/>
-                        -->
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-    <ScrollView android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="#44116655">
-    </ScrollView>
+    </FrameLayout>
 </LinearLayout>

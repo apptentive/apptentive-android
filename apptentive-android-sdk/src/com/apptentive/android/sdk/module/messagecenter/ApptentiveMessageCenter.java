@@ -43,7 +43,7 @@ public class ApptentiveMessageCenter {
 			return;
 		}
 
-		messageCenterView = new MessageCenterView(context, new MessageCenterView.OnSendMessageListener() {
+		messageCenterView = new MessageCenterView((Activity) context, new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
 				final TextMessage message = new TextMessage();
 				message.setBody(text);
@@ -84,7 +84,6 @@ public class ApptentiveMessageCenter {
 					public void run() {
 						List<Message> messages = MessageManager.getMessages();
 						messageCenterView.setMessages(messages);
-						return;
 					}
 				});
 				return false;

@@ -14,9 +14,9 @@ import android.content.Intent;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Log;
@@ -34,44 +34,44 @@ import java.util.List;
  */
 public class MessageCenterView extends FrameLayout {
 
-	private boolean keyboardUp = false;
-	private static boolean drawerUp = false;
+	private final static int DRAWER_ANIMATION_DURATION = 250;
 
-	Context context;
+	private boolean keyboardUp = false;
+	private static boolean drawerUp = true;
+
+	private static int drawerHeight;
+	private static int drawerHandleHeight;
+
+	Activity context;
 	static OnSendMessageListener onSendMessageListener;
 	LinearLayout messageList;
 	private List<Message> messages;
 	EditText messageEditText;
 
-	public MessageCenterView(Context context, OnSendMessageListener onSendMessageListener) {
+	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
 		super(context);
 		this.context = context;
 		this.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
-		setup();
+		setup(); // TODO: Move this into a configurationchange handler?
 	}
 
 	protected void setup() {
-		if (!(context instanceof Activity)) {
-			Log.e(this.getClass().getSimpleName() + " must be initialized with an Activity Context.");
-			return;
-		}
 		messages = new ArrayList<Message>();
 
-		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+		LayoutInflater inflater = context.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
-		messageList = (LinearLayout) findViewById(R.id.aptentive_message_center_list);
+		messageList = (LinearLayout) findViewById(R.id.apptentive_message_center_list);
 		messageEditText = (EditText) findViewById(R.id.apptentive_message_center_message);
 
-		// This is a hack because the tile is bigger than the size of the collapsed drawer view.
 		final LinearLayout drawer = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer);
+		final LinearLayout drawerHandle = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer_handle);
+
 		BitmapDrawable drawerDrawable = new ZeroMinSizeDrawable(getResources(), R.drawable.apptentive_grey_denim);
 		drawerDrawable.setTileModeX(Shader.TileMode.REPEAT);
 		drawerDrawable.setTileModeY(Shader.TileMode.REPEAT);
 		drawer.setBackgroundDrawable(drawerDrawable);
-
-		final LinearLayout drawerContents = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer_contents);
 
 		Button send = (Button) findViewById(R.id.apptentive_message_center_send);
 		send.setOnClickListener(new OnClickListener() {
@@ -81,8 +81,8 @@ public class MessageCenterView extends FrameLayout {
 					return;
 				}
 				messageEditText.setText("");
-				Util.hideSoftKeyboard((Activity) context, messageEditText);
 				onSendMessageListener.onSendTextMessage(text);
+				Util.hideSoftKeyboard(context, view);
 			}
 		});
 
@@ -91,13 +91,15 @@ public class MessageCenterView extends FrameLayout {
 
 		drawerOpen.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				openDrawer();
+				Util.hideSoftKeyboard(context, messageEditText);
+				positionDrawerWithAnimation(true);
 			}
 		});
 
 		drawerClose.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				closeDrawer();
+				repositionTopArea(false); // Do this first on close so the background is already there when it closes.
+				positionDrawerWithAnimation(false);
 			}
 		});
 
@@ -112,38 +114,85 @@ public class MessageCenterView extends FrameLayout {
 		screenshotButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-				((Activity) context).startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+				context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 			}
 		});
 
-		if(drawerUp) {
-			openDrawer();
+		// Need to perform a few things after the view has been laid out.
+		post(new Runnable() {
+			public void run() {
+				if (drawerHeight == 0) {
+					drawerHeight = drawer.getHeight();
+				}
+				if (drawerHandleHeight == 0) {
+					drawerHandleHeight = drawerHandle.getHeight();
+				}
+				repositionDrawer(drawerUp);
+			}
+		});
+	}
+
+	private void positionDrawerWithAnimation(final boolean opening) {
+		final LinearLayout drawer = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer);
+
+		Animation animation;
+		final int contentsHeight = drawerHeight - drawerHandleHeight;
+
+		if (opening) {
+			animation = new TranslateAnimation(0, 0, 0, -contentsHeight);
 		} else {
-			closeDrawer();
+			animation = new TranslateAnimation(0, 0, 0, contentsHeight);
+		}
+		animation.setDuration(DRAWER_ANIMATION_DURATION);
+		animation.setAnimationListener(new Animation.AnimationListener() {
+			public void onAnimationStart(Animation animation) {
+			}
+
+			public void onAnimationEnd(Animation animation) {
+				repositionDrawer(opening);
+				// This dummy animation is important. For some reason, it fixes a flicker that would otherwise occur.
+				animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 0.0f);
+				animation.setDuration(1);
+				drawer.startAnimation(animation);
+			}
+
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		drawer.startAnimation(animation);
+	}
+
+	private void repositionTopArea(boolean openingDrawer) {
+		View v = findViewById(R.id.apptentive_message_center_top_area);
+		if (openingDrawer) {
+			v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), drawerHeight);
+		} else {
+			v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), drawerHandleHeight);
 		}
 	}
 
-	private void openDrawer() {
-		View drawerOpen = findViewById(R.id.apptentive_message_center_drawer_open);
-		View drawerClose = findViewById(R.id.apptentive_message_center_drawer_close);
-		LinearLayout drawerContents = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer_contents);
-		Util.hideSoftKeyboard((Activity) context, messageEditText);
-		drawerContents.setVisibility(View.VISIBLE);
-		drawerClose.setVisibility(View.VISIBLE);
-		drawerOpen.setVisibility(View.GONE);
-		drawerUp = true;
-	}
+	private void repositionDrawer(final boolean openingDrawer) {
+		final LinearLayout drawer = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer);
+		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) drawer.getLayoutParams();
+		final View drawerOpen = findViewById(R.id.apptentive_message_center_drawer_open);
+		final View drawerClose = findViewById(R.id.apptentive_message_center_drawer_close);
 
-	private void closeDrawer() {
-		View drawerOpen = findViewById(R.id.apptentive_message_center_drawer_open);
-		View drawerClose = findViewById(R.id.apptentive_message_center_drawer_close);
-		LinearLayout drawerContents = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer_contents);
-		drawerContents.setVisibility(View.GONE);
-		drawerClose.setVisibility(View.GONE);
-		drawerOpen.setVisibility(View.VISIBLE);
-		drawerUp = false;
+		final int contentsHeight = drawerHeight - drawerHandleHeight;
+		if (openingDrawer) {
+			params.setMargins(0, 0, 0, 0);
+		} else {
+			params.setMargins(0, 0, 0, -contentsHeight);
+		}
+		repositionTopArea(openingDrawer);
+		drawerUp = openingDrawer;
+		if (openingDrawer) {
+			drawerClose.setVisibility(View.VISIBLE);
+			drawerOpen.setVisibility(View.GONE);
+		} else {
+			drawerClose.setVisibility(View.GONE);
+			drawerOpen.setVisibility(View.VISIBLE);
+		}
 	}
-
 
 	@Override
 	protected void onAttachedToWindow() {
@@ -151,18 +200,18 @@ public class MessageCenterView extends FrameLayout {
 		// We need to put this here because the listener is removed when the View is detached.
 		getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			public void onGlobalLayout() {
-				// Listen for the keyboard opening and closing.
+				// Listen for the IME (soft keyboard) opening and closing.
 				int heightDiff = getRootView().getHeight() - getHeight();
-				if (heightDiff > 100) {
+				if (heightDiff > 100) { // IME is shown now.
 					if (!keyboardUp) { // If the keyboard is up when the change starts, don't hide the actionBar.
 						keyboardUp = true;
-						View drawer = findViewById(R.id.apptentive_message_center_drawer_contents);
-						if (drawer != null) {
-							closeDrawer();
-						}
+						repositionDrawer(false);
 					}
-				} else {
-					keyboardUp = false;
+				} else { // IME is not shown now.
+					if (keyboardUp) {
+						keyboardUp = false;
+						repositionDrawer(false);
+					}
 				}
 			}
 		});
@@ -219,6 +268,7 @@ public class MessageCenterView extends FrameLayout {
 
 	public interface OnSendMessageListener {
 		void onSendTextMessage(String text);
+
 		void onSendFileMessage(Uri uri);
 	}
 }
