@@ -7,10 +7,9 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.ViewGroup;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
@@ -20,57 +19,34 @@ import com.apptentive.android.sdk.util.Util;
 /**
  * @author Sky Kelsey
  */
-public class TextMessageView extends MessageView {
-
+public class TextMessageView extends MessageView<TextMessage> {
 
 	public TextMessageView(Context context, TextMessage message) {
 		super(context, message);
-		setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		int dips5 = Util.dipsToPixels(context, 5);
-		setPadding(0, dips5, 0, dips5);
 
+		LayoutInflater inflater = LayoutInflater.from(context);
+		inflater.inflate(R.layout.apptentive_message_center_text_message, this);
 
-		LinearLayout row = new LinearLayout(context);
-		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		row.setOrientation(LinearLayout.HORIZONTAL);
+		LinearLayout messageRow = (LinearLayout) findViewById(R.id.apptentive_message_center_message_row);
+		TextView text = (TextView) findViewById(R.id.apptentive_message_center_text_message_text);
+		TextView timestamp = (TextView) findViewById(R.id.apptentive_message_center_timestamp);
 
-		LinearLayout spacer = new LinearLayout(context);
-		LinearLayout.LayoutParams spacerParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
-		spacerParams.weight = 1;
-		spacer.setLayoutParams(spacerParams);
+		// Set content
+		text.setText(message.getBody());
 
-		LinearLayout textRow = new LinearLayout(context);
-		LinearLayout.LayoutParams textRowParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
-		textRowParams.weight = 3;
-		textRow.setLayoutParams(textRowParams);
-		textRow.setOrientation(LinearLayout.VERTICAL);
-		textRow.setGravity(message.isOutgoingMessage() ? Gravity.RIGHT : Gravity.LEFT);
+		// Set timestamp
+		// TODO: Move this to the middle, and only print a timestamp if later than 15 minutes since last message received.
+		timestamp.setText(Util.dateToDisplayString(Math.round(message.getCreatedAt() * 1000)));
 
-		TextView textView = new TextView(context);
-		LayoutParams textViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		textView.setLayoutParams(textViewParams);
-		textView.setTextColor(Color.BLACK);
-		textView.setText(message.getBody());
-		textView.setBackgroundResource(message.isOutgoingMessage() ? R.drawable.apptentive_message_outgoing : R.drawable.apptentive_message_incoming);
-		textView.setGravity(Gravity.CENTER_VERTICAL);
-
-		TextView timestampView = new TextView(context);
-		timestampView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		timestampView.setText(Util.dateToDisplayString(Math.round(message.getCreatedAt() * 1000)));
-		timestampView.setPadding(0, 0, Util.dipsToPixels(context, 10), 0);
-		timestampView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-		timestampView.setTextColor(Color.parseColor("#777777"));
-		timestampView.setShadowLayer(1, 0, 0.5f, Color.WHITE);
-
-		textRow.addView(textView);
-		textRow.addView(timestampView);
-		if (message.isOutgoingMessage()) {
-			row.addView(spacer);
-			row.addView(textRow);
+		// Set up appearance based on incoming / outgoing.
+		if(message.isOutgoingMessage()) {
+			findViewById(R.id.apptentive_message_center_text_message_spacer_left).setVisibility(View.VISIBLE);
+			messageRow.setGravity(Gravity.RIGHT);
+			text.setBackgroundResource(R.drawable.apptentive_message_outgoing);
 		} else {
-			row.addView(textRow);
-			row.addView(spacer);
+			findViewById(R.id.apptentive_message_center_text_message_spacer_right).setVisibility(View.VISIBLE);
+			messageRow.setGravity(Gravity.LEFT);
+			text.setBackgroundResource(R.drawable.apptentive_message_incoming);
 		}
-		addView(row);
 	}
 }

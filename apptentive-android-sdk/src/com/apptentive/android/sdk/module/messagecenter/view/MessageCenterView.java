@@ -37,10 +37,10 @@ public class MessageCenterView extends FrameLayout {
 	private final static int DRAWER_ANIMATION_DURATION = 250;
 
 	private boolean keyboardUp = false;
-	private static boolean drawerUp = true;
+	private static boolean drawerUp = false;
 
-	private static int drawerHeight;
-	private static int drawerHandleHeight;
+	private int drawerHeight;
+	private int drawerHandleHeight;
 
 	Activity context;
 	static OnSendMessageListener onSendMessageListener;
