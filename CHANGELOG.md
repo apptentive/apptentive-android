@@ -1,3 +1,24 @@
+2012-12-14 skykelsey v0.6.2
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-109 Google Play opens up on top of host application when rating app
+* ANDROID-110 Ratings prompt doesn't respect zero value settings.
+
+Added some tests as well.
+
+
+2012-10-10 skykelsey v0.6.1
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-95 Come up with a new way to detect app starts and stops
+* ANDROID-96 Crash on pre API 5 phones
+
+App starts are now detected by looking for a 10 second gap where no App Activities are running.
+
 2012-09-13 skykelsey v0.5.2
 ---------------------------
 
