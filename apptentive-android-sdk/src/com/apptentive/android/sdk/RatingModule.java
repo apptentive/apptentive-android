@@ -78,7 +78,7 @@ public class RatingModule {
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
-	private boolean ratingPeriodElapsed() {
+	private TriState ratingPeriodElapsed() {
 		RatingState state = getState();
 		long days;
 		switch (state) {
@@ -89,19 +89,28 @@ public class RatingModule {
 				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
 				break;
 		}
+		if(days == 0) {
+			return TriState.IGNORE;
+		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
-		return now > periodEnd;
+		return now > periodEnd ? TriState.TRUE : TriState.FALSE;
 	}
 
-	private boolean eventThresholdReached() {
+	private TriState eventThresholdReached() {
 		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
-		return getEvents() >= significantEventsBeforePrompt;
+		if(significantEventsBeforePrompt == 0) {
+			return TriState.IGNORE;
+		}
+		return getEvents() >= significantEventsBeforePrompt ? TriState.TRUE : TriState.FALSE;
 	}
 
-	private boolean usesThresholdReached() {
+	private TriState usesThresholdReached() {
 		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
-		return getUses() >= usesBeforePrompt;
+		if(usesBeforePrompt == 0) {
+			return TriState.IGNORE;
+		}
+		return getUses() >= usesBeforePrompt ? TriState.TRUE : TriState.FALSE;
 	}
 
 	private long getStartOfRatingPeriod() {
@@ -226,7 +235,7 @@ public class RatingModule {
 				}
 				break;
 			case REMIND:
-				if (ratingPeriodElapsed()) {
+				if(ratingPeriodElapsed() == TriState.TRUE) {
 					showRatingDialog(activity);
 				}
 				break;
@@ -242,20 +251,22 @@ public class RatingModule {
 	private boolean canShowRatingFlow(){
 		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
 		try{
-			return logic(new JSONObject(ratingsPromptLogic));
+			return logic(new JSONObject(ratingsPromptLogic), true);
 		}catch(JSONException e){
 			// Fall back to old logic.
-			return ratingPeriodElapsed() && (eventThresholdReached() || usesThresholdReached());
+			return ratingPeriodElapsed() != TriState.FALSE && (eventThresholdReached() != TriState.FALSE || usesThresholdReached() != TriState.FALSE);
 		}
 	}
 
 	/**
 	 * Apply the rules from the logic expression.
-	 * @param obj
+	 * @param obj The current node in the boolean expression.
+	 * @param andOr True if the parent node is an AND, false if it's an OR. Affects how we ignore zero value variables.
+	 *              Variables with a zero are ignored from the calculation.
 	 * @return True it the logic expression is true.
 	 * @throws JSONException
 	 */
-	private boolean logic(Object obj) throws JSONException {
+	private boolean logic(Object obj, boolean andOr) throws JSONException {
 		boolean ret = false;
 		if (obj instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) obj;
@@ -264,24 +275,30 @@ public class RatingModule {
 				JSONArray and = jsonObject.getJSONArray("and");
 				ret = true;
 				for (int i = 0; i < and.length(); i++) {
-					boolean prev = logic(and.get(i));
+					boolean prev = logic(and.get(i), true);
 					ret = ret && prev;
 				}
 			} else if ("or".equals(key)) {
 				JSONArray or = jsonObject.getJSONArray("or");
 				for (int i = 0; i < or.length(); i++) {
-					ret = ret || logic(or.get(i));
+					ret = ret || logic(or.get(i), false);
 				}
 			} else {
-				return logic(key);
+				return logic(key, true); // This shouldn't happen.
 			}
 		} else if(obj instanceof String){
+			TriState result = TriState.IGNORE;
 			if("uses".equals(obj)) {
-				return usesThresholdReached();
+				result = usesThresholdReached();
 			} else if("days".equals(obj)) {
-				return ratingPeriodElapsed();
+				result = ratingPeriodElapsed();
 			} else if("events".equals(obj)) {
-				return eventThresholdReached();
+				result = eventThresholdReached();
+			}
+			if(result == TriState.IGNORE) {
+				return andOr;
+			} else {
+				return result == TriState.TRUE;
 			}
 		} else {
 			Log.w("Unknown logic token: " + obj);
@@ -358,6 +375,12 @@ public class RatingModule {
 		uses,
 		events,
 		forced
+	}
+
+	enum TriState {
+		TRUE,
+		FALSE,
+		IGNORE
 	}
 
 	/**
