@@ -14,7 +14,7 @@ Integration takes three steps:
 #Get the Apptentive Source
 All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be accessed in two ways:
 
-* Download the latest tagged release (v0.6.2) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.6.2) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.6.2).
+* Download the latest tagged release (v0.6.3) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.6.3) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.6.3).
 * Clone our SDK using git: ``git clone https://github.com/apptentive/apptentive-android.git``
 
 #Add Apptentive to Your Project

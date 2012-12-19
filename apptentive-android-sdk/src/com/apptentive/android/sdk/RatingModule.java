@@ -47,6 +47,7 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	private static RatingModule instance = null;
+	private static boolean displaying = false;
 
 	static RatingModule getInstance() {
 		if (instance == null) {
@@ -89,7 +90,8 @@ public class RatingModule {
 				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
 				break;
 		}
-		if(days == 0) {
+		// Allow a zero value for remind state that means always remind if given the chance.
+		if(state != RatingState.REMIND && days == 0) {
 			return TriState.IGNORE;
 		}
 		long now = new Date().getTime();
@@ -196,13 +198,22 @@ public class RatingModule {
 		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
-	void showEnjoymentDialog(Activity activity, Trigger reason) {
-		this.new EnjoymentDialog(activity).show(reason);
+	synchronized void showEnjoymentDialog(Activity activity, Trigger reason) {
+		if(!displaying) {
+			displaying = true;
+			EnjoymentDialog dialog = this.new EnjoymentDialog(activity);
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				public void onDismiss(DialogInterface dialogInterface) {
+					displaying = false;
+				}
+			});
+			dialog.show(reason);
+		}
 	}
 
 	/**
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
-	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
+	 * It will be called automatically if the user chooses "Yes" in the "Are you enjoying this app?" dialog.
 	 *
 	 * @param activity The acvitity from which this method was called.
 	 */
@@ -320,7 +331,7 @@ public class RatingModule {
 	}
 
 	/**
-	 * Increments the number of "significant events" the app's user has achieved. What you condider to be a significant
+	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
 	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
 	 * is time to run the rating flow.
 	 */
