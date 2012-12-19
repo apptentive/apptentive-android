@@ -1,3 +1,11 @@
+2012-12-18 skykelsey v0.6.3
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-112 Choice dialog comes up twice
+* ANDROID-113 Revert behavior of remind setting
+
 2012-12-14 skykelsey v0.6.2
 ---------------------------
 
