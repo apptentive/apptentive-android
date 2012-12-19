@@ -1,3 +1,10 @@
+2012-12-18 skykelsey v0.6.4
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-114 Rating dialog comes up twice
+
 2012-12-18 skykelsey v0.6.3
 ---------------------------
 
