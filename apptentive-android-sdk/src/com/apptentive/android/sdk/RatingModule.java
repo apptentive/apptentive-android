@@ -47,7 +47,8 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	private static RatingModule instance = null;
-	private static boolean displaying = false;
+	private static boolean displayingEnjoymentDialog = false;
+	private static boolean displayingRatingDialog = false;
 
 	static RatingModule getInstance() {
 		if (instance == null) {
@@ -192,19 +193,19 @@ public class RatingModule {
 	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
 	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
 	 *
-	 * @param activity The activityContext from which this method was called.
+	 * @param activity The Activity from which this method was called.
 	 */
 	public void forceShowEnjoymentDialog(Activity activity) {
 		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
 	synchronized void showEnjoymentDialog(Activity activity, Trigger reason) {
-		if(!displaying) {
-			displaying = true;
+		if(!displayingEnjoymentDialog) {
+			displayingEnjoymentDialog = true;
 			EnjoymentDialog dialog = this.new EnjoymentDialog(activity);
 			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 				public void onDismiss(DialogInterface dialogInterface) {
-					displaying = false;
+					displayingEnjoymentDialog = false;
 				}
 			});
 			dialog.show(reason);
@@ -215,10 +216,19 @@ public class RatingModule {
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
 	 * It will be called automatically if the user chooses "Yes" in the "Are you enjoying this app?" dialog.
 	 *
-	 * @param activity The acvitity from which this method was called.
+	 * @param activity The Activity from which this method was called.
 	 */
-	public void showRatingDialog(Activity activity) {
-		this.new RatingDialog(activity).show();
+	synchronized public void showRatingDialog(Activity activity) {
+		if(!displayingRatingDialog) {
+			displayingRatingDialog = true;
+			RatingDialog dialog = this.new RatingDialog(activity);
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				public void onDismiss(DialogInterface dialogInterface) {
+					displayingRatingDialog = false;
+				}
+			});
+			dialog.show();
+		}
 	}
 
 	/**
