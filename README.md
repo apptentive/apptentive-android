@@ -58,7 +58,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
     &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
 
-    <strong>&lt;-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
+    <strong>&lt;!-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
         UI elements look great! -->
     &lt;supports-screens android:largeScreens="true"
                       android:normalScreens="true"
@@ -76,10 +76,10 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
             &lt;/intent-filter>
         &lt;/activity>
 
-        <strong>&lt;-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
+        <strong>&lt;!-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
         &lt;meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/></strong>
 
-        <strong>&lt;-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
+        <strong>&lt;!-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
             notified when the internet connection comes up, so we can handle sending and receiving message reliably -->
         &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"/>
         &lt;receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
