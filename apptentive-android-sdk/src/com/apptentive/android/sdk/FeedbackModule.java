@@ -87,6 +87,7 @@ public class FeedbackModule {
 
 	void showFeedbackDialog(Context context, Trigger reason) {
 		feedback = new FeedbackPayload("feedback");
+		feedback.setSource(reason.name());
 		new FeedbackDialog(context).show(reason);
 	}
 
@@ -113,7 +114,7 @@ public class FeedbackModule {
 	// *************************************************************************************************
 
 	enum Trigger {
-		rating,
+		enjoyment_dialog,
 		forced
 	}
 
@@ -142,7 +143,7 @@ public class FeedbackModule {
 				case forced:
 					feedback.setHint(R.string.apptentive_edittext_feedback_message_forced);
 					break;
-				case rating:
+				case enjoyment_dialog:
 					feedback.setHint(R.string.apptentive_edittext_feedback_message);
 					break;
 				default:

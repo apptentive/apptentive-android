@@ -461,7 +461,7 @@ public class RatingModule {
 				public void onClick(View view) {
 					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__no);
 					setState(RatingState.POSTPONE);
-					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
+					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.enjoyment_dialog);
 					dismiss();
 				}
 			});
