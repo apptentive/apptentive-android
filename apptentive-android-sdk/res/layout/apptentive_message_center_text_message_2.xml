@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:baselineAligned="false"
+              android:background="@android:color/transparent">
+    <LinearLayout android:id="@+id/apptentive_message_center_message_background"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:paddingTop="5dp"
+                  android:paddingBottom="5dp"
+                  android:baselineAligned="false"
+                  android:background="@android:color/transparent">
+        <FrameLayout android:id="@+id/apptentive_message_avatar_left"
+                     android:layout_width="60dp"
+                     android:layout_height="60dp"
+                     android:layout_marginLeft="10dp"
+                     android:visibility="gone"/>
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:paddingLeft="10dp"
+                      android:paddingRight="10dp"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+                <TextView android:id="@+id/apptentive_message_sender"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="0dp"
+                          android:textSize="16sp"
+                          android:textStyle="bold"
+                          android:textColor="@color/apptentive_message_sender_text_color"/>
+                <LinearLayout android:layout_width="0dp"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"/>
+                <TextView android:id="@+id/apptentive_message_timestamp"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="0dp"
+                          android:textSize="12sp"
+                          android:textStyle="bold"
+                          android:textColor="@color/apptentive_message_center_timestamp"/>
+            </LinearLayout>
+            <TextView android:id="@+id/apptentive_message_center_text_message_text"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="@color/apptentive_text_message_text_color"
+                      android:gravity="center_vertical"/>
+        </LinearLayout>
+        <!-- -->
+        <FrameLayout android:id="@+id/apptentive_message_avatar_right"
+                     android:layout_width="60dp"
+                     android:layout_height="60dp"
+                     android:layout_marginRight="10dp"
+                     android:visibility="gone"/>
+        <!-- -->
+    </LinearLayout>
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="1dp"
+                  android:background="#999999"/>
+</LinearLayout>

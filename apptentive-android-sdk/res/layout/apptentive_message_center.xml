@@ -19,22 +19,12 @@
                       android:orientation="vertical">
             <LinearLayout android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:background="@drawable/apptentive_message_center_header"
+                          style="@style/ApptentiveHeader"
                           android:gravity="center">
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:gravity="center"
-                          android:paddingTop="8dp"
-                          android:paddingBottom="8dp"
-                          android:textSize="20sp"
-                          android:textStyle="bold"
-                          android:textColor="@android:color/white"
-                          android:shadowColor="#000000"
-                          android:shadowDx="0"
-                          android:shadowDy="-1"
-                          android:shadowRadius="1"
-                          android:drawableLeft="@drawable/android_ic_menu_start_conversation"
-                          android:drawablePadding="5dp"
+                          style="@style/ApptentiveHeaderText"
                           android:text="Message Center"/>
             </LinearLayout>
             <ScrollView android:id="@+id/apptentive_message_center_scrollview"
@@ -45,17 +35,11 @@
                 <LinearLayout android:layout_height="fill_parent"
                               android:layout_width="fill_parent"
                               android:orientation="vertical">
-                    <!--
-                                        <LinearLayout android:layout_height="5dp"
-                                                      android:layout_width="fill_parent"/>
-                    -->
                     <LinearLayout android:id="@+id/apptentive_message_center_list"
                                   android:layout_width="fill_parent"
                                   android:layout_height="fill_parent"
                                   android:orientation="vertical"
-                                  android:background="@drawable/apptentive_message_center_background"
-                                  android:paddingLeft="10dp"
-                                  android:paddingRight="10dp">
+                                  style="@style/ApptentiveMainArea">
                         <!-- This layout will hold messages -->
                     </LinearLayout>
                 </LinearLayout>
@@ -65,6 +49,7 @@
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
+                      style="@style/ApptentiveMessageCenterDrawer"
                       android:layout_gravity="bottom">
             <LinearLayout android:id="@+id/apptentive_message_center_drawer_handle"
                           android:layout_width="fill_parent"

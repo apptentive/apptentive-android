@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.*;
 import android.view.animation.Animation;
@@ -68,10 +69,13 @@ public class MessageCenterView extends FrameLayout {
 		final LinearLayout drawer = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer);
 		final LinearLayout drawerHandle = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer_handle);
 
-		BitmapDrawable drawerDrawable = new ZeroMinSizeDrawable(getResources(), R.drawable.apptentive_grey_denim);
-		drawerDrawable.setTileModeX(Shader.TileMode.REPEAT);
-		drawerDrawable.setTileModeY(Shader.TileMode.REPEAT);
-		drawer.setBackgroundDrawable(drawerDrawable);
+		Drawable drawerBackground = drawer.getBackground();
+		if(drawerBackground != null && drawerBackground instanceof BitmapDrawable) {
+			BitmapDrawable drawerDrawable = new ZeroMinSizeDrawable(getResources(), (BitmapDrawable) drawerBackground);
+			drawerDrawable.setTileModeX(Shader.TileMode.REPEAT);
+			drawerDrawable.setTileModeY(Shader.TileMode.REPEAT);
+			drawer.setBackgroundDrawable(drawerDrawable);
+		}
 
 		Button send = (Button) findViewById(R.id.apptentive_message_center_send);
 		send.setOnClickListener(new OnClickListener() {
@@ -253,7 +257,7 @@ public class MessageCenterView extends FrameLayout {
 		messages.add(message);
 		switch (message.getTypeEnum()) {
 			case text_message:
-				messageList.addView(new TextMessageView(context, (TextMessage) message));
+				messageList.addView(new TextMessageView2(context, (TextMessage) message));
 				break;
 			case upgrade_request:
 				break;

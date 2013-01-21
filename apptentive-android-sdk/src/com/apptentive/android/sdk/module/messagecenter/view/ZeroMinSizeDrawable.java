@@ -20,6 +20,10 @@ public class ZeroMinSizeDrawable extends BitmapDrawable {
 		super(res, ((BitmapDrawable)res.getDrawable(resId)).getBitmap());
 	}
 
+	public ZeroMinSizeDrawable(Resources res, BitmapDrawable drawable) {
+		super(res, drawable.getBitmap());
+	}
+
 	@Override
 	public int getMinimumWidth() {
 		return 0;

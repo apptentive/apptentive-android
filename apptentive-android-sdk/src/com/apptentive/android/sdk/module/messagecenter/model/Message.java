@@ -33,6 +33,7 @@ public class Message extends Payload {
 
 	public Message() {
 		super();
+		setSenderId(GlobalInfo.personId);
 		setCreatedAt(((double) new Date().getTime()) / 1000);
 	}
 
@@ -92,6 +93,22 @@ public class Message extends Payload {
 		}
 		return null;
 	}
+
+	public void setSenderId(String senderId) {
+		try {
+			JSONObject sender;
+			if (has((KEY_SENDER))) {
+				sender = getJSONObject(KEY_SENDER);
+			} else {
+				sender = new JSONObject();
+				put(KEY_SENDER, sender);
+			}
+			sender.put(KEY_SENDER_ID, senderId);
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_SENDER_ID);
+		}
+	}
+
 
 	public Integer getPriority() {
 		try {

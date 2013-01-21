@@ -30,9 +30,9 @@ import java.util.*;
 public class Util {
 
 	// These date formats are as close as Java can get to ISO 8601 without royally screwing up.
-	public static String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
-	public static String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
-	public static String DISPLAY_DATE_FORMAT = "MMM dd, yyyy hh:mm a";
+	public static final String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
+	public static final String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
+	public static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy hh:mm a";
 
 	public static String dateToIso8601String(Date date) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), date);

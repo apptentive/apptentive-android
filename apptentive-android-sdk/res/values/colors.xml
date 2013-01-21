@@ -6,13 +6,16 @@
   -->
 
 <resources>
-    <color name="apptentive_text_message_text_color">#FF000000</color>
-    <color name="apptentive_message_center_timestamp">#FF777777</color>
-    <color name="apptentive_message_center_timestamp_shadow">#FF999999</color>
+    <color name="apptentive_text_message_text_color">#000000</color>
+    <color name="apptentive_message_sender_text_color">#222222</color>
+    <color name="apptentive_message_center_timestamp">#999999</color>
+    <color name="apptentive_message_center_timestamp_shadow">#FFBBBBBB</color>
+    <color name="apptentive_message_center_header_text_shadow">#AA000000</color>
 
     <!-- TODO: Remove these colors, or do something better with them. -->
     <color name="apptentive_grey">#FF999999</color>
     <color name="apptentive_light_grey">#66AAAAAA</color>
     <color name="apptentive_dark_blue">#FF2EA0E6</color>
     <color name="apptentive_blue">#662EA0E6</color>
+
 </resources>
