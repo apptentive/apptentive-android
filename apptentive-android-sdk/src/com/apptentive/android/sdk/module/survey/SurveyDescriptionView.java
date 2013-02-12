@@ -11,6 +11,7 @@ import android.content.Context;
 /**
  * @author Sky Kelsey.
  */
+@SuppressWarnings({"rawtypes","unchecked"})
 public class SurveyDescriptionView extends SurveyItemView {
 	public SurveyDescriptionView(Context context) {
 		super(context, null);

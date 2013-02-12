@@ -6,14 +6,11 @@
 
 package com.apptentive.android.sdk.module.survey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Color;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Sky Kelsey.

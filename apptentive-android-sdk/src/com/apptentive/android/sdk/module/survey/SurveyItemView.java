@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.survey;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -24,6 +25,7 @@ import com.apptentive.android.sdk.util.Util;
 /**
  * @author Sky Kelsey.
  */
+@SuppressLint("ViewConstructor")
 abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 	protected Context appContext;
@@ -34,6 +36,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	protected TextView titleTextView;
 	protected TextView instructionsTextView;
 
+	@SuppressWarnings("rawtypes")
 	protected OnSurveyQuestionAnsweredListener listener;
 
 	protected SurveyItemView(Context context, Q question) {
@@ -104,10 +107,12 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		questionView.addView(separator);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void setOnSurveyQuestionAnsweredListener(OnSurveyQuestionAnsweredListener listener) {
 		this.listener = listener;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void fireListener() {
 		if (listener != null) {
 			listener.onAnswered(this);

@@ -6,23 +6,40 @@
 
 package com.apptentive.android.sdk;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.module.survey.*;
+import com.apptentive.android.sdk.module.survey.MultichoiceQuestion;
+import com.apptentive.android.sdk.module.survey.MultichoiceSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.MultiselectQuestion;
+import com.apptentive.android.sdk.module.survey.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
+import com.apptentive.android.sdk.module.survey.Question;
+import com.apptentive.android.sdk.module.survey.SinglelineQuestion;
+import com.apptentive.android.sdk.module.survey.StackrankQuestion;
+import com.apptentive.android.sdk.module.survey.StackrankSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.SurveyDefinition;
+import com.apptentive.android.sdk.module.survey.SurveyDescriptionView;
+import com.apptentive.android.sdk.module.survey.SurveySendView;
+import com.apptentive.android.sdk.module.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -139,6 +156,7 @@ public class SurveyModule {
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	void doShow(final Activity activity) {
 		if (surveyDefinition == null) {
 			return;

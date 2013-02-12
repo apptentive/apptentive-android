@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.R;
 /**
  * @author Sky Kelsey.
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class SurveySendView extends SurveyItemView {
 
 	public SurveySendView(Context context) {
