@@ -11,6 +11,7 @@ import android.content.Context;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SessionEvent;
+import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.util.*;
@@ -65,10 +66,10 @@ public class ActivityLifecycleManager {
 		switch (event.getAction()) {
 			case START:
 				Apptentive.getRatingModule().logUse();
-				MetricModule.sendMetric(MetricModule.Event.app__session_start);
+				MetricModule.sendMetric(Event.EventType.app__session_start);
 				break;
 			case STOP:
-				MetricModule.sendMetric(MetricModule.Event.app__session_end);
+				MetricModule.sendMetric(Event.EventType.app__session_end);
 				break;
 			default:
 				break;

@@ -9,12 +9,13 @@ package com.apptentive.android.sdk.module.metric;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Map;
 
 /**
+ * TODO: Get rid of all of this.
  * @author Sky Kelsey.
  */
 public class MetricModule {
@@ -25,53 +26,22 @@ public class MetricModule {
 		MetricModule.appContext = appContext;
 	}
 
-	public static void sendMetric(MetricModule.Event event) {
-		sendMetric(event, null);
+	public static void sendMetric(Event.EventType type) {
+		sendMetric(type, null);
 	}
 
-	public static void sendMetric(MetricModule.Event event, String trigger) {
-		sendMetric(event, trigger, null);
+	public static void sendMetric(Event.EventType type, String trigger) {
+		sendMetric(type, trigger, null);
 	}
 
-	public static void sendMetric(MetricModule.Event event, String trigger, Map<String, String> data) {
-		Log.v("Sending Metric: %s, trigger: %s, data: %s", event.getRecordName(), trigger, data != null ? data.toString() : "null");
+	public static void sendMetric(Event.EventType type, String trigger, Map<String, String> data) {
+		Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getRecordName(), trigger, data != null ? data.toString() : "null");
 
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
-			MetricPayload payload = new MetricPayload(event.getRecordName(), trigger);
-			payload.putData(data);
-			PayloadManager.putPayload(payload);
-		}
-	}
-
-	public static enum Event {
-		enjoyment_dialog__launch("enjoyment_dialog.launch"),
-		enjoyment_dialog__yes("enjoyment_dialog.yes"),
-		enjoyment_dialog__no("enjoyment_dialog.no"),
-		rating_dialog__launch("rating_dialog.launch"),
-		rating_dialog__rate("rating_dialog.rate"),
-		rating_dialog__remind("rating_dialog.remind"),
-		rating_dialog__decline("rating_dialog.decline"),
-		feedback_dialog__launch("feedback_dialog.launch"),
-		feedback_dialog__submit("feedback_dialog.submit"),
-		feedback_dialog__cancel("feedback_dialog.cancel"),
-		survey__launch("survey.launch"),
-		survey__cancel("survey.cancel"),
-		survey__submit("survey.submit"),
-		survey__question_response("survey.question_response"),
-		app__launch("app.launch"),
-		app__exit("app.exit"),
-		app__session_start("app.session_start"),
-		app__session_end("app.session_end");
-
-		private final String recordName;
-
-		Event(String recordName) {
-			this.recordName = recordName;
-		}
-
-		public String getRecordName() {
-			return recordName;
+			Event event = new com.apptentive.android.sdk.module.metric.Event(type.getRecordName(), trigger);
+			event.putData(data);
+			EventManager.sendEvent(event);
 		}
 	}
 }

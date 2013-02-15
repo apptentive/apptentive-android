@@ -18,6 +18,14 @@ public class ApptentiveHttpResponse {
 		return code >= 200 && code < 300;
 	}
 
+	public boolean wasRejectedPermanently() {
+		return code >= 400 && code < 500;
+	}
+
+	public boolean wasRejectedTemporarily() {
+		return !(wasSuccessful() || wasRejectedPermanently());
+	}
+
 	public ApptentiveHttpResponse() {
 		content = null;
 		reason = null;

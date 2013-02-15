@@ -8,7 +8,6 @@ package com.apptentive.android.sdk;
 
 import java.util.IllegalFormatException;
 
-// TODO: Make package private
 /**
  * @author Sky Kelsey
  */

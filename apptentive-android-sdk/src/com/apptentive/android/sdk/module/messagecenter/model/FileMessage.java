@@ -10,9 +10,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
-import android.widget.ImageView;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.model.Message;
 import org.json.JSONException;
 
 /**
@@ -30,12 +29,15 @@ public class FileMessage extends Message {
 
 	public FileMessage() {
 		super();
-		setType(MessageType.file_message);
 	}
 
 	public FileMessage(String json) throws JSONException {
 		super(json);
-		setType(MessageType.file_message);
+	}
+
+	@Override
+	protected void initType() {
+		setType(Type.FileMessage);
 	}
 
 	public void setFileName(String fileName) {

@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
@@ -407,7 +408,7 @@ public class RatingModule {
 			yes.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					dismiss();
-					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__yes);
+					MetricModule.sendMetric(Event.EventType.enjoyment_dialog__yes);
 					Apptentive.getRatingModule().showRatingDialog(activity);
 					dismiss();
 				}
@@ -415,14 +416,16 @@ public class RatingModule {
 			Button no = (Button) findViewById(R.id.apptentive_choice_no);
 			no.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__no);
+					MetricModule.sendMetric(Event.EventType.enjoyment_dialog__no);
 					setState(RatingState.POSTPONE);
-					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
+
+					// TODO: What do we do here?
+					//FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
 					dismiss();
 				}
 			});
 
-			MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__launch, reason.name());
+			MetricModule.sendMetric(Event.EventType.enjoyment_dialog__launch, reason.name());
 			setCancelable(false);
 			super.show();
 		}
@@ -463,7 +466,7 @@ public class RatingModule {
 							dismiss();
 							String errorMessage = activityContext.getString(R.string.apptentive_rating_error);
 							try {
-								MetricModule.sendMetric(MetricModule.Event.rating_dialog__rate);
+								MetricModule.sendMetric(Event.EventType.rating_dialog__rate);
 								// Send user to app rating page
 								if (RatingModule.this.selectedRatingProvider == null) {
 									// Default to the Android Market provider, if none has been specified
@@ -500,7 +503,7 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							MetricModule.sendMetric(MetricModule.Event.rating_dialog__remind);
+							MetricModule.sendMetric(Event.EventType.rating_dialog__remind);
 							setState(RatingState.REMIND);
 							setStartOfRatingPeriod(new Date().getTime());
 						}
@@ -511,13 +514,13 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							MetricModule.sendMetric(MetricModule.Event.rating_dialog__decline);
+							MetricModule.sendMetric(Event.EventType.rating_dialog__decline);
 							setState(RatingState.POSTPONE);
 						}
 					}
 			);
 
-			MetricModule.sendMetric(MetricModule.Event.rating_dialog__launch);
+			MetricModule.sendMetric(Event.EventType.rating_dialog__launch);
 			setCancelable(false);
 			super.show();
 		}

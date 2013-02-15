@@ -6,8 +6,9 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.ActivityFeedItem;
+import com.apptentive.android.sdk.model.Message;
 import org.json.JSONException;
 
 /**
@@ -19,17 +20,21 @@ public class TextMessage extends Message {
 
 	public TextMessage() {
 		super();
-		setType(MessageType.text_message);
+		setType(ActivityFeedItem.Type.TextMessage);
 	}
 
 	public TextMessage(String json) throws JSONException {
 		super(json);
-		setType(MessageType.text_message);
+	}
+
+	@Override
+	protected void initType() {
+		setType(Type.TextMessage);
 	}
 
 	public String getBody() {
 		try {
-			if(has(KEY_BODY)) {
+			if(!isNull(KEY_BODY)) {
 				return getString(KEY_BODY);
 			}
 		} catch (JSONException e) {

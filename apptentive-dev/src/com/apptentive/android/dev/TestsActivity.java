@@ -64,6 +64,6 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void deleteStoredMessages(View view) {
-		MessageManager.deleteAllMessages();
+		MessageManager.deleteAllRecords();
 	}
 }

@@ -40,10 +40,10 @@ public class SurveyDefinition {
 	public SurveyDefinition(JSONObject survey) throws JSONException{
 		this.id = survey.getString("id");
 		this.name = survey.getString("name");
-		this.description = survey.has("description") ? survey.getString("description") : null;
-		this.required = survey.has("required") ? survey.optBoolean("required") : null;
-		this.successMessage = survey.has("success_message") ? survey.getString("success_message") : null;
-		this.showSuccessMessage = survey.has("show_success_message") ? survey.optBoolean("show_success_message") : null;
+		this.description = !survey.isNull("description") ? survey.getString("description") : null;
+		this.required = !survey.isNull("required") ? survey.optBoolean("required") : null;
+		this.successMessage = !survey.isNull("success_message") ? survey.getString("success_message") : null;
+		this.showSuccessMessage = !survey.isNull("show_success_message") ? survey.optBoolean("show_success_message") : null;
 		this.questions = new ArrayList<Question>();
 		JSONArray questions = survey.getJSONArray("questions");
 		for(int i = 0; i < questions.length(); i++){

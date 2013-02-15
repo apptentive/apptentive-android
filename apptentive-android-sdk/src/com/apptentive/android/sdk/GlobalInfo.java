@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,6 +13,7 @@ public class GlobalInfo {
 	// Don't ever use "1.0". I prematurely incremented to 1.0, so we should skip over it.
 	public static final String APPTENTIVE_API_VERSION = "0.6.1";
 
+	public static String activityFeedToken;
 	public static String personId;
 
 	public static boolean initialized = false;

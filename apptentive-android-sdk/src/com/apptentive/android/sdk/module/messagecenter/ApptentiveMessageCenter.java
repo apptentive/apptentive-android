@@ -16,7 +16,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 
@@ -69,6 +69,7 @@ public class ApptentiveMessageCenter {
 		});
 		scrollToBottom();
 
+		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
 			((ViewGroup) messageCenterView.getParent()).removeView(messageCenterView);
 		}
@@ -90,13 +91,10 @@ public class ApptentiveMessageCenter {
 			}
 		};
 
-		// Fetch the messages in a non-blocking manner.
-		new Thread() {
-			@Override
-			public void run() {
-				MessageManager.fetchAndStoreMessages(listener);
-			}
-		}.start();
+		MessageManager.asyncFetchAndStoreMessages(listener);
+
+		// Give the MessageCenterView a callback when a message is sent.
+		MessageManager.setInternalSentMessageListener(messageCenterView);
 	}
 
 	private static void scrollToBottom() {

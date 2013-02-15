@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,6 +13,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -20,12 +21,15 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
+import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
+import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.offline.ApptentiveDatabase;
-import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.offline.RecordSendWorker;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Reflection;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -156,11 +160,10 @@ public class Apptentive {
 		GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		GlobalInfo.userEmail = Util.getUserEmail(appContext);
 
-		PayloadManager.start();
+		RecordSendWorker.start();
 
 		// Initialize modules.
 		RatingModule.getInstance().setContext(appContext);
-		FeedbackModule.getInstance().setContext(appContext);
 
 		MetricModule.setContext(appContext);
 
@@ -169,7 +172,7 @@ public class Apptentive {
 			public void stateChanged(NetworkInfo networkInfo) {
 				if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
 					Log.v("Network connected.");
-					PayloadManager.start();
+					RecordSendWorker.start();
 				}
 				if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
 					Log.v("Network disconnected.");
@@ -197,7 +200,7 @@ public class Apptentive {
 			GlobalInfo.appDisplayName = "this app";
 		}
 
-		asyncFetchPersonId();
+		asyncFetchActivityFeedToken();
 
 		GlobalInfo.initialized = true;
 		Log.v("Done initializing...");
@@ -207,49 +210,100 @@ public class Apptentive {
 		RatingModule.getInstance().onAppVersionChanged();
 	}
 
-	private static void asyncFetchPersonId() {
+	private static void asyncFetchActivityFeedToken() {
 		new Thread() {
 			@Override
 			public void run() {
-				fetchPersonId();
+				fetchActivityFeedToken();
 			}
 		}.start();
 	}
 
 	/**
-	 * First looks to see if we've saved the personId in memory, then in SharedPreferences, and finally tries to get one
+	 * First looks to see if we've saved the activityFeedToken in memory, then in SharedPreferences, and finally tries to get one
 	 * from the server.
 	 */
-	private static void fetchPersonId() {
+	private static void fetchActivityFeedToken() {
 
-		// Check if we've already got the personId.
-		if(GlobalInfo.personId != null) {
+		// Have we already loaded the activityFeedToken info?
+		if(GlobalInfo.activityFeedToken != null && GlobalInfo.personId != null) {
 			return;
 		}
 
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		if(prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+
+		// Try to get it from SharedPreferences
+		if(prefs.contains(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+			GlobalInfo.activityFeedToken = prefs.getString(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN, null);
 			GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
 			return;
 		}
-		ApptentiveHttpResponse response = ApptentiveClient.createPerson();
+
+		// Try to fetch a new one from the server.
+		ActivityFeedTokenRequest request = new ActivityFeedTokenRequest();
+		request.setDevice(generateDevice());
+		// TODO: Allow host app to send a user id, if available.
+		ApptentiveHttpResponse response = ApptentiveClient.getActivityFeedToken(request);
 		if (response == null) {
-			Log.w("Got null response fetching person.");
+			Log.w("Got null response fetching ActivityFeedToken.");
 			return;
 		}
 		if(response.wasSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
-				String personId = root.getString("id");
-				Log.d("Person ID: " + personId);
+				String activityFeedToken = root.getString("token");
+				Log.d("ActivityFeedToken: " + activityFeedToken);
+				if (activityFeedToken != null && !activityFeedToken.equals("")) {
+					GlobalInfo.activityFeedToken = activityFeedToken;
+					prefs.edit().putString(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN, activityFeedToken).commit();
+				}
+				String personId = root.getString("person_id");
+				Log.d("PersonId: " + personId);
 				if (personId != null && !personId.equals("")) {
-					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
 					GlobalInfo.personId = personId;
+					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
 				}
 			} catch (JSONException e) {
-				Log.e("Error parsing person json.", e);
+				Log.e("Error parsing ActivityFeedToken response json.", e);
 			}
 		}
+	}
+
+	private static Device generateDevice() {
+		Device device = new Device();
+		device.setOsName("Android");
+		device.setOsVersion(Build.VERSION.RELEASE);
+		device.setOsBuild(Build.VERSION.INCREMENTAL);
+		device.setManufacturer(Build.MANUFACTURER);
+		device.setModel(Build.MODEL);
+		device.setBoard(Build.BOARD);
+		device.setProduct(Build.PRODUCT);
+		device.setBrand(Build.BRAND);
+		device.setCpu(Build.CPU_ABI);
+		device.setDevice(Build.DEVICE);
+		device.setId(GlobalInfo.androidId);
+		device.setCarrier(GlobalInfo.carrier);
+		device.setCurrentCarrier(GlobalInfo.currentCarrier);
+		device.setNetworkType(Constants.networkTypeAsString(GlobalInfo.networkType));
+		device.setBuildType(Build.TYPE);
+		device.setBuildId(Build.ID);
+
+		// Use reflection to load info from classes not available at API level 7.
+		String bootloaderVersion = Reflection.getBootloaderVersion();
+		if (bootloaderVersion != null) {
+			device.setBootloaderVersion(bootloaderVersion);
+		}
+		String radioVersion = Reflection.getRadioVersion();
+		if (radioVersion != null) {
+			device.setRadioVersion(radioVersion);
+		}
+		/*
+		// Client stuff... TODO: Move this into its own class?
+		JSONObject client = new JSONObject();
+		record.put(KEY_CLIENT, client);
+		client.put(KEY_CLIENT_VERSION, GlobalInfo.APPTENTIVE_API_VERSION);
+		*/
+		return device;
 	}
 
 	/**
@@ -341,15 +395,6 @@ public class Apptentive {
 	 */
 	public static RatingModule getRatingModule() {
 		return RatingModule.getInstance();
-	}
-
-	/**
-	 * Gets the Apptentive Feedback Module.
-	 *
-	 * @return The Apptentive Feedback Module.
-	 */
-	public static FeedbackModule getFeedbackModule() {
-		return FeedbackModule.getInstance();
 	}
 
 	/**

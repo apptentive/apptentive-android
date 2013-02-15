@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.offline;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.ActivityFeedItem;
 import com.apptentive.android.sdk.module.survey.Question;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
 import org.json.JSONArray;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class SurveyPayload extends RecordPayload {
+public class SurveyPayload extends ActivityFeedItem {
 
 	private static final String KEY_RECORD = "record";
 	private static final String KEY_DEVICE = "device";
@@ -69,5 +70,10 @@ public class SurveyPayload extends RecordPayload {
 		} catch (JSONException e) {
 			Log.e("Unable to construct survey payload.", e);
 		}
+	}
+
+	@Override
+	protected void initType() {
+		setType(Type.survey);
 	}
 }

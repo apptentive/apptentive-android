@@ -1,7 +1,6 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
-import android.util.Log;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import junit.framework.TestCase;
 import org.json.JSONException;

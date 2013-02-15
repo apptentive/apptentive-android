@@ -33,12 +33,13 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
 		// OPTIONAL: To send extra data with your feedback.
-		Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
+		// TODO: Figure this out.
+		//Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
 		// END APPTENTIVE INITIALIZATION
 
 		// Setup UI:
 		final RatingModule ratingModule = Apptentive.getRatingModule();
-		final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
+		//final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {
@@ -76,12 +77,6 @@ public class DevActivity extends ApptentiveActivity {
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				ratingModule.showRatingDialog(DevActivity.this);
-			}
-		});
-		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
-		feedbackButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				feedbackModule.forceShowFeedbackDialog(DevActivity.this);
 			}
 		});
 		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);

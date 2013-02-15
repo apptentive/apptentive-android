@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,8 +11,11 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.messagecenter.model.*;
-import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.model.ActivityFeedItem;
+import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.model.MessageStore;
+import com.apptentive.android.sdk.offline.RecordSendWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,50 +28,36 @@ import java.util.List;
  */
 public class MessageManager {
 
+	private static OnSentMessageListener internalSentMessageListener;
+
+	public static void asyncFetchAndStoreMessages(final MessagesUpdatedListener listener) {
+		new Thread() {
+			@Override
+			public void run() {
+				MessageManager.fetchAndStoreMessages(listener);
+			}
+		}.start();
+	}
+
 	/**
 	 * Make sure to run this off the UI Thread.
 	 *
 	 * @param listener
 	 */
 	public static void fetchAndStoreMessages(MessagesUpdatedListener listener) {
-		if (GlobalInfo.personId == null) {
+		if (GlobalInfo.activityFeedToken == null) {
 			return;
 		}
 		// Fetch the messages.
-		List<Message> messagesToSave = fetchMessages(getMessageStore().getLastMessageId());
+		List<Message> messagesToSave = fetchMessages(getMessageStore().getLastReceivedMessageId());
 
 		if (messagesToSave == null) {
 			return;
 		}
-		// Store messages. Don't save messages we've already seen.
-		List<Message> storedMessages = getMessageStore().getAllMessages();
-		for (Message storedMessage : storedMessages) {
-			for (Message messageToSave : messagesToSave) {
-				String storedId = storedMessage.getMessageId();
-				String currentId = messageToSave.getMessageId();
-				if (storedId != null && currentId != null && storedId.equals(currentId)) {
-					messagesToSave.remove(messageToSave);
-					break;
-				}
-			}
-		}
-		getMessageStore().addMessages(messagesToSave.toArray(new Message[]{}));
+		getMessageStore().addOrUpdateItems(messagesToSave.toArray(new Message[]{}));
 
 		// Signal listener
 		listener.onMessagesUpdated();
-	}
-
-	public static void sentMessage(String payloadId, ApptentiveHttpResponse response) {
-		if (!response.wasSuccessful()) {
-			return;
-		}
-		try {
-			Message message = MessageManager.constructTypedMessage(response.getContent());
-			getMessageStore().updateMessageWithPayloadId(payloadId, message);
-		} catch (JSONException e) {
-			Log.e("Error processing message response.", e);
-		}
-
 	}
 
 	public static List<Message> getMessages() {
@@ -76,58 +65,21 @@ public class MessageManager {
 	}
 
 	public static void sendMessage(Message message) {
-		PayloadManager.putPayload(message);
-		getMessageStore().addMessages(message);
+		getMessageStore().addOrUpdateItems(message);
+		RecordSendWorker.start();
 	}
 
 	/**
 	 * This doesn't need to be run during normal program execution.
 	 */
-	public static void deleteAllMessages() {
+	public static void deleteAllRecords() {
 		Log.d("Deleting all messages.");
-		getMessageStore().deleteAllMessages();
+		getMessageStore().deleteAllRecords();
 	}
 
-	public static Message constructTypedMessage(String json) throws JSONException {
-		return constructTypedMessage(json, null);
-	}
-
-	public static Message constructTypedMessage(String json, String typeString) throws JSONException {
-		Message ret = null;
-		Message.MessageType type = Message.MessageType.unknown;
-
-		if (typeString != null) {
-			try {
-				type = Message.MessageType.valueOf(typeString);
-			} catch (IllegalArgumentException e) {
-			}
-		}
-
-		switch (type) {
-			case text_message:
-				ret = new TextMessage(json);
-				break;
-			case upgrade_request:
-				ret = new UpgradeRequest(json);
-				break;
-			case share_request:
-				ret = new ShareRequest(json);
-				break;
-			case file_message:
-				ret = new FileMessage(json);
-				break;
-			case unknown:
-				ret = new Message(json);
-				break;
-			default:
-				break;
-		}
-		return ret;
-	}
-
-	private static List<Message> fetchMessages(String lastMessageGuid) {
-		Log.d("Fetching messages newer than: " + lastMessageGuid);
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(GlobalInfo.personId, lastMessageGuid);
+	private static List<Message> fetchMessages(String after_id) {
+		Log.d("Fetching messages newer than: " + after_id);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, after_id, null);
 
 		List<Message> ret = new ArrayList<Message>();
 		if (!response.wasSuccessful()) {
@@ -146,11 +98,13 @@ public class MessageManager {
 	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
 		List<Message> ret = new ArrayList<Message>();
 			JSONObject root = new JSONObject(messageString);
-			if (root.has("messages")) {
-				JSONArray messages = root.getJSONArray("messages");
-				for (int i = 0; i < messages.length(); i++) {
-					JSONObject json = messages.getJSONObject(i);
-					Message message = MessageManager.constructTypedMessage(json.toString());
+			if (!root.isNull("items")) {
+				JSONArray items = root.getJSONArray("items");
+				for (int i = 0; i < items.length(); i++) {
+					String json = items.getJSONObject(i).toString();
+					Message message = MessageFactory.fromJson(json);
+					// Since these came back from the server, mark them saved before updating them in the DB.
+					message.setState(ActivityFeedItem.State.saved);
 					ret.add(message);
 				}
 			}
@@ -163,5 +117,36 @@ public class MessageManager {
 
 	public interface MessagesUpdatedListener {
 		public boolean onMessagesUpdated();
+	}
+
+	public static void onSentMessage(Message message, ApptentiveHttpResponse response) {
+		if (!response.wasSuccessful()) {
+			return;
+		}
+		if(response.wasSuccessful()) {
+			try {
+				JSONObject responseJson = new JSONObject(response.getContent());
+				if (message.getState() == ActivityFeedItem.State.sending) {
+					message.setState(ActivityFeedItem.State.sent);
+				}
+				message.setId(responseJson.getString(ActivityFeedItem.KEY_ID));
+				message.setCreatedAt(responseJson.getDouble(ActivityFeedItem.KEY_CREATED_AT));
+			} catch (JSONException e) {
+				Log.e("Error parsing sent message response.", e);
+			}
+			getMessageStore().updateRecord(message);
+
+			if(internalSentMessageListener != null) {
+				internalSentMessageListener.onSentMessage(message);
+			}
+		}
+	}
+
+	public interface OnSentMessageListener {
+		public void onSentMessage(Message message);
+	}
+
+	public static void setInternalSentMessageListener(OnSentMessageListener onSentMessageListener) {
+		internalSentMessageListener = onSentMessageListener;
 	}
 }
