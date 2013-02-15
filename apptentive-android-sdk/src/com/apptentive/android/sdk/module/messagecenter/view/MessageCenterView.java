@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -22,18 +22,20 @@ import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterView extends FrameLayout {
+public class MessageCenterView extends FrameLayout implements MessageManager.OnSentMessageListener {
 
 	private final static int DRAWER_ANIMATION_DURATION = 250;
 
@@ -46,7 +48,7 @@ public class MessageCenterView extends FrameLayout {
 	Activity context;
 	static OnSendMessageListener onSendMessageListener;
 	LinearLayout messageList;
-	private List<Message> messages;
+	private Map<String, MessageView> messages;
 	EditText messageEditText;
 
 	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
@@ -58,7 +60,7 @@ public class MessageCenterView extends FrameLayout {
 	}
 
 	protected void setup() {
-		messages = new ArrayList<Message>();
+		messages = new HashMap<String, MessageView>();
 
 		LayoutInflater inflater = context.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
@@ -247,26 +249,28 @@ public class MessageCenterView extends FrameLayout {
 
 	public void setMessages(List<Message> messages) {
 		messageList.removeAllViews();
-		this.messages = new ArrayList<Message>();
+		this.messages = new HashMap<String, MessageView>(messages.size());
 		for (Message message : messages) {
 			addMessage(message);
 		}
 	}
 
 	public void addMessage(Message message) {
-		messages.add(message);
-		switch (message.getTypeEnum()) {
-			case text_message:
-				messageList.addView(new TextMessageView2(context, (TextMessage) message));
+		MessageView messageView = null;
+		switch (message.getType()) {
+			case TextMessage:
+				messageView = new TextMessageView4(context, (TextMessage) message);
 				break;
-			case upgrade_request:
-				break;
-			case share_request:
+			case FileMessage:
 				break;
 			case unknown:
 				break;
 			default:
 				break;
+		}
+		if(messageView != null) {
+			messageList.addView(messageView);
+			messages.put(message.getNonce(), messageView);
 		}
 	}
 
@@ -274,5 +278,14 @@ public class MessageCenterView extends FrameLayout {
 		void onSendTextMessage(String text);
 
 		void onSendFileMessage(Uri uri);
+	}
+
+	public synchronized void onSentMessage(final Message message) {
+		final MessageView messageView = messages.get(message.getNonce());
+		messageView.post(new Runnable() {
+			public void run() {
+				messageView.setMessage(message);
+			}
+		});
 	}
 }

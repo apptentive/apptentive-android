@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A persistent queue of Activity starts and stops backed with SharedPreferences. I used SharedPreferences instead of
+ * a SQLite database because these events will be generated often in the app, and a SQLite database save or retrieve
+ * operation takes a significant fraction of a second to complete. SharedPreferences are less elegant, but they can be
+ * modified and read quickly.
  * @author Sky Kelsey
  */
 public class SharedPreferencesPersistentSessionQueue implements PersistentSessionQueue {

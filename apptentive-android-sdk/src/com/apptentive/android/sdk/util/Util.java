@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -32,7 +32,7 @@ public class Util {
 	// These date formats are as close as Java can get to ISO 8601 without royally screwing up.
 	public static final String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
 	public static final String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
-	public static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy hh:mm a";
+	public static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy h:mma";
 
 	public static String dateToIso8601String(Date date) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), date);
@@ -44,6 +44,11 @@ public class Util {
 
 	public static String dateToDisplayString(long millis) {
 		return dateToString(new SimpleDateFormat(DISPLAY_DATE_FORMAT), new Date(millis));
+	}
+
+	public static String secondsToDisplayString(Double seconds) {
+		String dateString = dateToString(new SimpleDateFormat(DISPLAY_DATE_FORMAT), new Date(Math.round(seconds * 1000)));
+		return dateString.replace("PM", "pm").replace("AM", "am");
 	}
 
 	public static String dateToDisplayString(Date date) {
