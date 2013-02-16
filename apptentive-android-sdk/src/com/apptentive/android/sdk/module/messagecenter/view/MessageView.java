@@ -70,11 +70,17 @@ abstract public class MessageView<T extends Message> extends FrameLayout {
 		String photoUrl = message.getSenderProfilePhoto();
 		boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
 		if (avatarNeedsUpdate) {
-			post(new Runnable() {
+			// Perform the fetch on a new thread, and the UI update on the UI thread so we don't block everything.
+			new Thread() {
 				public void run() {
-					avatarFrame.addView(new AvatarView(context, message.getSenderProfilePhoto()));
+					final AvatarView avatar = new AvatarView(context, message.getSenderProfilePhoto());
+					post(new Runnable() {
+						public void run() {
+							avatarFrame.addView(avatar);
+						}
+					});
 				}
-			});
+			}.start();
 		}
 	}
 
