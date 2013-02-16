@@ -259,7 +259,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		MessageView messageView = null;
 		switch (message.getType()) {
 			case TextMessage:
-				messageView = new TextMessageView4(context, (TextMessage) message);
+				messageView = new TextMessageView(context, (TextMessage) message);
 				break;
 			case FileMessage:
 				break;
@@ -280,11 +280,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		void onSendFileMessage(Uri uri);
 	}
 
+	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goea into.
 	public synchronized void onSentMessage(final Message message) {
 		final MessageView messageView = messages.get(message.getNonce());
 		messageView.post(new Runnable() {
 			public void run() {
-				messageView.setMessage(message);
+				messageView.updateMessage(message);
 			}
 		});
 	}

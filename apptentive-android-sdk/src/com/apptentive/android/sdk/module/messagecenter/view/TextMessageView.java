@@ -7,10 +7,8 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
@@ -24,29 +22,18 @@ public class TextMessageView extends MessageView<TextMessage> {
 		super(context, message);
 	}
 
-	public void setMessage(TextMessage message) {
+	protected void init(TextMessage message) {
+		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
-		inflater.inflate(R.layout.apptentive_message_center_text_message, this);
+		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.apptentive_message_body);
+		inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
+	}
 
-		LinearLayout messageRow = (LinearLayout) findViewById(R.id.apptentive_message_center_message_row);
-		TextView text = (TextView) findViewById(R.id.apptentive_message_center_text_message_text);
-		TextView timestamp = (TextView) findViewById(R.id.apptentive_message_center_timestamp);
-
+	public void updateMessage(final TextMessage newMessage) {
+		super.updateMessage(newMessage);
 		// Set content
-		text.setText(message.getBody());
-
-		// Set timestamp
-		timestamp.setText(createTimestamp(message.getCreatedAt()));
-
-		// Set up appearance based on incoming / outgoing.
-		if(message.isOutgoingMessage()) {
-			findViewById(R.id.apptentive_message_center_text_message_spacer_left).setVisibility(View.VISIBLE);
-			messageRow.setGravity(Gravity.RIGHT);
-			text.setBackgroundResource(R.drawable.apptentive_message_bubble_outgoing_bottom);
-		} else {
-			findViewById(R.id.apptentive_message_center_text_message_spacer_right).setVisibility(View.VISIBLE);
-			messageRow.setGravity(Gravity.LEFT);
-			text.setBackgroundResource(R.drawable.apptentive_message_bubble_incoming_bottom);
-		}
+		TextView textView = (TextView) findViewById(R.id.apptentive_text_message_text);
+		textView.setText(newMessage.getBody());
+//		invalidate();
 	}
 }
