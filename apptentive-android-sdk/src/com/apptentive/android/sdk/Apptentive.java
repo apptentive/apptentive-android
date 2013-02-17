@@ -113,104 +113,110 @@ public class Apptentive {
 	}
 
 	private static void init() {
-		if(GlobalInfo.initialized) {
+
+		//
+		// First, initialize data relies on synchronous reads from local resources.
+		//
+
+		if(!GlobalInfo.initialized) {
+			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			db = new ApptentiveDatabase(appContext);
+			NetworkStateReceiver.clearListeners();
+
+			// First, Get the api key, and figure out if app is debuggable.
+			GlobalInfo.isAppDebuggable = false;
+			String apiKey = null;
+			try {
+				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
+				if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
+					apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+				}
+				if(ai != null && ((ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)) {
+					GlobalInfo.isAppDebuggable = true;
+				}
+			} catch(Exception e) {
+				Log.e("Unexpected error while reading application info.", e);
+			}
+
+			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
+			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
+			if((apiKey == null || apiKey.equals(""))) {
+				if(GlobalInfo.isAppDebuggable) {
+					throw new RuntimeException(errorString);
+				} else {
+					Log.e(errorString);
+				}
+			}
+			GlobalInfo.apiKey = apiKey;
+
+			// Grab device info.
+			TelephonyManager tm = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE)));
+			GlobalInfo.carrier = tm.getSimOperatorName();
+			GlobalInfo.currentCarrier = tm.getNetworkOperatorName();
+			GlobalInfo.networkType = tm.getNetworkType();
+			GlobalInfo.appPackage = appContext.getPackageName();
+			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+			GlobalInfo.userEmail = Util.getUserEmail(appContext);
+
+			// Initialize modules.
+			RatingModule.getInstance().setContext(appContext);
+			MetricModule.setContext(appContext);
+
+			// Check the host app version, and notify modules if it's changed.
+			try {
+				PackageManager packageManager = appContext.getPackageManager();
+				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
+				int currentVersionCode = packageInfo.versionCode;
+				if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
+					int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
+					if(previousVersionCode != currentVersionCode) {
+						onVersionChanged(previousVersionCode, currentVersionCode);
+					}
+				}
+				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
+
+				GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
+			} catch(PackageManager.NameNotFoundException e) {
+				// Nothing we can do then.
+				GlobalInfo.appDisplayName = "this app";
+			}
+
+			// Listen for network state changes.
+			NetworkStateListener networkStateListener = new NetworkStateListener() {
+				public void stateChanged(NetworkInfo networkInfo) {
+					if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
+						Log.v("Network connected.");
+						RecordSendWorker.start();
+					}
+					if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
+						Log.v("Network disconnected.");
+					}
+				}
+			};
+			NetworkStateReceiver.addListener(networkStateListener);
+			GlobalInfo.initialized = true;
+			Log.v("Done initializing...");
+		} else {
 			Log.v("Already initialized...");
-			return;
-		}
-		Log.v("Initializing...");
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-		db = new ApptentiveDatabase(appContext);
-
-		NetworkStateReceiver.clearListeners();
-
-		GlobalInfo.isAppDebuggable = false;
-
-		// First, Get the api key, and figure out if app is debuggable.
-		String apiKey = null;
-		try {
-			ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
-			if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
-				apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-			}
-			if(ai != null && ((ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)) {
-				GlobalInfo.isAppDebuggable = true;
-			}
-		} catch(Exception e) {
-			Log.e("Unexpected error while reading application info.", e);
 		}
 
-		// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
-		String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
-		if((apiKey == null || apiKey.equals(""))) {
-			if(GlobalInfo.isAppDebuggable) {
-				throw new RuntimeException(errorString);
-			} else {
-				Log.e(errorString);
-			}
-		}
-		GlobalInfo.apiKey = apiKey;
-
-		// Grab device info.
-		TelephonyManager tm = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE)));
-		GlobalInfo.carrier = tm.getSimOperatorName();
-		GlobalInfo.currentCarrier = tm.getNetworkOperatorName();
-		GlobalInfo.networkType = tm.getNetworkType();
-		GlobalInfo.appPackage = appContext.getPackageName();
-		GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		GlobalInfo.userEmail = Util.getUserEmail(appContext);
-
-		RecordSendWorker.start();
-
-		// Initialize modules.
-		RatingModule.getInstance().setContext(appContext);
-
-		MetricModule.setContext(appContext);
-
-		// Listen for network state changes.
-		NetworkStateListener networkStateListener = new NetworkStateListener() {
-			public void stateChanged(NetworkInfo networkInfo) {
-				if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
-					Log.v("Network connected.");
-					RecordSendWorker.start();
-				}
-				if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
-					Log.v("Network disconnected.");
-				}
-			}
-		};
-		NetworkStateReceiver.addListener(networkStateListener);
-
-		// Check the host app version, and notify modules if it's changed.
-		try {
-			PackageManager packageManager = appContext.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
-			int currentVersionCode = packageInfo.versionCode;
-			if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
-				int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
-				if(previousVersionCode != currentVersionCode) {
-					onVersionChanged(previousVersionCode, currentVersionCode);
-				}
-			}
-			prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
-
-			GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
-		} catch(PackageManager.NameNotFoundException e) {
-			// Nothing we can do then.
-			GlobalInfo.appDisplayName = "this app";
-		}
-
+		// We need to try to fetch the token each time, because it is asynchronous, and we can't say for sure it's been
+		// fetched when this method exits.
 		asyncFetchActivityFeedToken();
 
-		GlobalInfo.initialized = true;
-		Log.v("Done initializing...");
+		// Finally, ensure the send worker is running.
+		RecordSendWorker.start();
 	}
 
 	private static void onVersionChanged(int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged();
 	}
 
-	private static void asyncFetchActivityFeedToken() {
+	private synchronized static void asyncFetchActivityFeedToken() {
+		// Don't even start a thread if another one fetched already. Yes this is redundant.
+		if(GlobalInfo.activityFeedToken != null) {
+			return;
+		}
 		new Thread() {
 			@Override
 			public void run() {
