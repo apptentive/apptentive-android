@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.util.Constants;
@@ -264,6 +265,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageView = new TextMessageView(context, (TextMessage) message);
 				break;
 			case FileMessage:
+				messageView = new FileMessageView(context, (FileMessage) message);
 				break;
 			case unknown:
 				break;

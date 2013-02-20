@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
 
@@ -36,10 +37,16 @@ public class FileMessageView extends MessageView<FileMessage> {
 		FileMessage oldMessage = message;
 		super.updateMessage(newMessage);
 
-
-		if (newMessage != null && !newMessage.getLocalUri().equals(oldMessage.getLocalUri())) {
+		boolean hasNoOldUri = oldMessage == null;
+		boolean hasNewUri = newMessage != null && newMessage.getLocalUri() != null;
+		boolean uriDiffers = newMessage != null && oldMessage != null && !newMessage.getLocalUri().equals(oldMessage.getLocalUri());
+		if ((hasNoOldUri && hasNewUri) || hasNewUri && uriDiffers) {
 			// TODO: Figure out a way to group into classes by mime type (image, text, other).
 			String mimeType = newMessage.getMimeType();
+			if(mimeType == null) {
+				Log.e("FileMessage mime type is null.");
+				return;
+			}
 			if (mimeType.contains("image")) {
 				ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
 				imageView.setImageURI(Uri.parse(newMessage.getLocalUri()));
