@@ -49,52 +49,42 @@ public class RecordSendWorker {
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
-						ActivityFeedItem activityFeedItem = null;
-						activityFeedItem = db.getOldestUnsentRecord();
-						if (activityFeedItem == null) {
+						ActivityFeedItem item = null;
+						item = db.getOldestUnsentRecord();
+						if (item == null) {
 							// There is no payload in the db.
 							pause(EMPTY_QUEUE_SLEEP_TIME);
 							continue;
 						}
-						Log.d("Got a payload to send: " + activityFeedItem.getNonce());
-						// Wrap the record in a JSONObject.
-						JSONObject wrapper = new JSONObject();
-						try {
-							wrapper.put(ActivityFeedItem.BaseType.message.name(), activityFeedItem);
-						} catch (JSONException e) {
-							Log.w("Error wrapping Record in JSONObject.", e);
-							db.deleteRecord(activityFeedItem);
-							continue;
-						}
-						String json = wrapper.toString();
-						Log.d("Payload contents: " + json);
+						Log.d("Got a payload to send: " + item.getNonce());
 
 						ApptentiveHttpResponse response = null;
 
-						switch (activityFeedItem.getBaseType()) {
+						switch (item.getBaseType()) {
 							case message:
-								response = ApptentiveClient.postMessage(json);
-								MessageManager.onSentMessage((Message) activityFeedItem, response);
+								response = ApptentiveClient.postMessage((Message) item);
+								MessageManager.onSentMessage((Message) item, response);
 								break;
 							case event:
-								response = ApptentiveClient.postEvent(json);
-								EventManager.onSentEvent((Event) activityFeedItem, response);
+								response = ApptentiveClient.postEvent((Event) item);
+								EventManager.onSentEvent((Event) item, response);
 								break;
 							default:
-								Log.d("Sent unknown ActivityFeedItemType: " + activityFeedItem.getType());
+								Log.d("Sent unknown ActivityFeedItemType: " + item.getType());
+								// TODO: Still send this stuff.
 								break;
 						}
 
 						// Each Record type is handled by the appropriate handler, but if the message send fails permanently, delete it.
 						if (response != null) {
 							if (response.wasSuccessful()) {
-								Log.d("ActivityFeedItem submission successful. Marking sent.", activityFeedItem.getNonce());
-								activityFeedItem.setState(ActivityFeedItem.State.sent);
-								db.updateRecord(activityFeedItem);
+								Log.d("ActivityFeedItem submission successful. Marking sent.", item.getNonce());
+								item.setState(ActivityFeedItem.State.sent);
+								db.updateRecord(item);
 							} else if (response.wasRejectedPermanently()) {
-								Log.d("ActivityFeedItem %s rejected.", activityFeedItem.getNonce());
-								Log.v("Rejected json:", activityFeedItem.toString());
-								db.deleteRecord(activityFeedItem);
+								Log.d("ActivityFeedItem %s rejected.", item.getNonce());
+								Log.v("Rejected json:", item.toString());
+								db.deleteRecord(item);
 							} else if (response.wasRejectedTemporarily()) {
 								Log.d("Unable to send JSON. Leaving in queue.");
 								// Break the loop. Restart when network is reachable.

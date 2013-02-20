@@ -6,9 +6,17 @@
 
 package com.apptentive.android.sdk.comm;
 
+import android.content.ContentResolver;
+import android.net.Uri;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.ActivityFeedItem;
 import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
+import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.module.metric.Event;
+import com.apptentive.android.sdk.util.Util;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,7 +30,10 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.UUID;
 
 /**
  * @author Sky Kelsey
@@ -72,16 +83,31 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.activityFeedToken, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse postMessage(String json) {
-		return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, Method.POST, json);
+	public static ApptentiveHttpResponse postMessage(Message message) {
+		switch (message.getType()) {
+			case TextMessage:
+				return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+			case FileMessage:
+				FileMessage fileMessage = (FileMessage) message;
+				return performMultipartFilePost(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, message.marshallForSending(), fileMessage.getLocalUri(), fileMessage.getMimeType());
+			case Event:
+				break;
+			case feedback:
+				break;
+			case survey:
+				break;
+			case unknown:
+				break;
+		}
+		return null;
 	}
 
-	public static ApptentiveHttpResponse postEvent(String json) {
-		return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_EVENTS, Method.POST, json);
+	public static ApptentiveHttpResponse postEvent(Event event) {
+		return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postRecord(String json) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, json);
+	public static ApptentiveHttpResponse postSurvey(ActivityFeedItem survey) {
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse getSurvey() {
@@ -135,6 +161,128 @@ public class ApptentiveClient {
 			Log.w("Error communicating with server.", e);
 		} catch (IOException e) {
 			Log.w("Error communicating with server.", e);
+		}
+		return ret;
+	}
+
+	private static ApptentiveHttpResponse performMultipartFilePost(String oauthToken, String uri, String postBody, String localFileUriString, String mimeType) {
+		Log.d("Performing multipart request to %s", uri);
+
+		int bytesRead;
+		int bufferSize = 4096;
+		byte[] buffer;
+
+		String lineEnd = "\r\n";
+		String twoHyphens = "--";
+		String boundary = UUID.randomUUID().toString();
+
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+
+		HttpURLConnection connection;
+		DataOutputStream os = null;
+		InputStream is = null;
+		ContentResolver contentResolver = Apptentive.getContentResolver();
+
+		try {
+			Uri localFileUri = Uri.parse((localFileUriString));
+			is = contentResolver.openInputStream(localFileUri);
+
+			// Set up the request.
+			URL url = new URL(uri);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setUseCaches(false);
+			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
+			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setRequestMethod("POST");
+
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			connection.setRequestProperty("Accept", "application/json");
+			connection.setRequestProperty("X-API-Version", API_VERSION);
+
+			// Open an output stream.
+			os = new DataOutputStream(connection.getOutputStream());
+
+			// Write form data
+			os.writeBytes(twoHyphens + boundary + lineEnd);
+			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			os.writeBytes("Content-Type: text/plain" + lineEnd);
+			os.writeBytes(lineEnd);
+			os.writeBytes(postBody);
+			os.writeBytes(lineEnd);
+
+			// Write file attributes.
+			os.writeBytes(twoHyphens + boundary + lineEnd);
+			os.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
+			os.writeBytes("Content-Type: " + mimeType + lineEnd);
+			os.writeBytes(lineEnd);
+
+			// Write the actual file.
+			buffer = new byte[bufferSize];
+			while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
+				os.write(buffer, 0, bytesRead);
+			}
+
+			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+			os.close();
+
+			ret.setCode(connection.getResponseCode());
+			ret.setReason(connection.getResponseMessage());
+
+			// Read the normal response.
+			InputStream nis = null;
+			ByteArrayOutputStream nbaos = null;
+			try {
+				nis = connection.getInputStream();
+				nbaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while ( nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
+					nbaos.write(eBuf, 0, eRead);
+				}
+				ret.setContent(nbaos.toString());
+			} catch (IOException e) {
+				Log.e("Can't read return stream.", e);
+			} finally {
+				Util.ensureClosed(nis);
+				Util.ensureClosed(nbaos);
+			}
+
+			// Read the error response.
+			InputStream eis = null;
+			ByteArrayOutputStream ebaos = null;
+			try {
+				eis = connection.getErrorStream();
+				ebaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while ( eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
+					ebaos.write(eBuf, 0, eRead);
+				}
+				if(ebaos.size() > 0) {
+					ret.setContent(ebaos.toString());
+				}
+			} catch (IOException e) {
+				Log.e("Can't read error stream.", e);
+			} finally {
+				Util.ensureClosed(eis);
+				Util.ensureClosed(ebaos);
+			}
+
+			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
+			Log.v(ret.getContent());
+		} catch (FileNotFoundException e) {
+			Log.e("Error getting file to upload.", e);
+		} catch (MalformedURLException e) {
+			Log.e("Error constructing url for file upload.", e);
+		} catch (IOException e) {
+			Log.e("Error executing file upload.", e);
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(os);
 		}
 		return ret;
 	}

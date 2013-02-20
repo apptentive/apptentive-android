@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,7 +20,6 @@ import org.json.JSONException;
 public class FileMessage extends Message {
 
 	private static final String KEY_FILE_NAME = "file_name";
-	private static final String KEY_DATA = "data";
 	private static final String KEY_MIME_TYPE = "mime_type";
 	private static final String KEY_LOCAL_URI = "local_uri";
 
@@ -40,6 +39,15 @@ public class FileMessage extends Message {
 		setType(Type.FileMessage);
 	}
 
+	/**
+	 * FileMessages are sent using a multipart form encoded request, so they are handled differently here.
+	 * @return
+	 */
+	@Override
+	public String marshallForSending() {
+		return toString();
+	}
+
 	public void setFileName(String fileName) {
 		try {
 			put(KEY_FILE_NAME, fileName);
@@ -48,12 +56,12 @@ public class FileMessage extends Message {
 		}
 	}
 
-	public void setData(String data) {
+	public String getLocalUri() {
 		try {
-			put(KEY_DATA, data);
-		} catch (JSONException e) {
-			Log.e("Unable to set data.");
+			return getString(KEY_LOCAL_URI);
+		}catch (JSONException e) {
 		}
+		return null;
 	}
 
 	public void setLocalUri(String localUri) {
@@ -62,6 +70,14 @@ public class FileMessage extends Message {
 		}catch (JSONException e) {
 			Log.e("Unable to set local Uri.");
 		}
+	}
+
+	public String getMimeType() {
+		try {
+			return getString(KEY_MIME_TYPE);
+		} catch (JSONException e) {
+		}
+		return null;
 	}
 
 	public void setMimeType(String mimeType) {
@@ -84,7 +100,6 @@ public class FileMessage extends Message {
 			message.setLocalUri(uri.toString());
 			message.setFileName(uri.getLastPathSegment() + "." + extension);
 			message.setMimeType(mimeType);
-			message.setData("DATA GOES HERE"); //TODO
 		} catch (Exception e) {
 			Log.w("Error creating FileMessage from " + uri.toString());
 		}

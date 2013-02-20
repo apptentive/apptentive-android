@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -110,6 +111,10 @@ public class Apptentive {
 
 	public static ApptentiveDatabase getDatabase() {
 		return db;
+	}
+
+	public static ContentResolver getContentResolver() {
+		return appContext.getContentResolver();
 	}
 
 	private static void init() {

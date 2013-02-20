@@ -50,6 +50,21 @@ public abstract class ActivityFeedItem extends JSONObject {
 	 */
 	protected abstract void initType();
 
+	/**
+	 * Subclasses should override this method if there is any peculiarity in how they present or wrap json before sending.
+	 * @return
+	 */
+	public String marshallForSending() {
+		JSONObject wrapper = new JSONObject();
+		try {
+			wrapper.put(getBaseType().name(), this);
+		} catch (JSONException e) {
+			Log.w("Error wrapping Record in JSONObject.", e);
+			return null;
+		}
+		return wrapper.toString();
+	}
+
 	public long getDatabaseId() {
 		return databaseId;
 	}

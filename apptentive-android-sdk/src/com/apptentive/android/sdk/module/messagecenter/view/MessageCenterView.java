@@ -116,6 +116,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			}
 		});
 
+		// TODO: Either find some way to only choose from screenshots, or reject if they select a picassa image. That requires a permission we can't grant. Or, we can save a copy of the image when they grab it the first time. Seems weird.
 		View screenshotButton = findViewById(R.id.apptentive_message_center_button_screenshot);
 		screenshotButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
@@ -247,6 +248,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		dialog.show();
 	}
 
+	// TODO: Important: Update this method to do an intelligent insert/update of messages in the view without recreating it each time it's called. Currently this behavior looks like shit.
 	public void setMessages(List<Message> messages) {
 		messageList.removeAllViews();
 		this.messages = new HashMap<String, MessageView>(messages.size());
@@ -283,10 +285,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goea into.
 	public synchronized void onSentMessage(final Message message) {
 		final MessageView messageView = messages.get(message.getNonce());
-		messageView.post(new Runnable() {
-			public void run() {
-				messageView.updateMessage(message);
-			}
-		});
+		if(messageView != null) {
+			messageView.post(new Runnable() {
+				public void run() {
+					messageView.updateMessage(message);
+				}
+			});
+		}
 	}
 }
