@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.offline.SurveyPayload;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +41,11 @@ public class RecordFactory {
 				return MessageFactory.fromJson(json);
 			case event:
 				return EventFactory.fromJson(json);
+			case survey:
+				try {
+					return new SurveyPayload(json);
+				} catch (JSONException e) {
+				}
 			case unknown:
 				Log.v("Ignoring unknown RecordType.");
 				break;

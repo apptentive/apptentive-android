@@ -43,12 +43,17 @@ public class FileMessageView extends MessageView<FileMessage> {
 		if ((hasNoOldUri && hasNewUri) || hasNewUri && uriDiffers) {
 			// TODO: Figure out a way to group into classes by mime type (image, text, other).
 			String mimeType = newMessage.getMimeType();
+
+			// TODO: Get Mike to store and return the mime type!
+			mimeType = "image/png";
 			if(mimeType == null) {
 				Log.e("FileMessage mime type is null.");
 				return;
 			}
+
+			ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
 			if (mimeType.contains("image")) {
-				ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
+				//ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
 				imageView.setImageURI(Uri.parse(newMessage.getLocalUri()));
 				imageView.setVisibility(View.VISIBLE);
 			} else {

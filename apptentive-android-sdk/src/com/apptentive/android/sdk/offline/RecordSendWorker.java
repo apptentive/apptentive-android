@@ -66,12 +66,20 @@ public class RecordSendWorker {
 								MessageManager.onSentMessage((Message) item, response);
 								break;
 							case event:
+								// TODO: Delete events from our DB once they are sent? THey are no longer needed.
 								response = ApptentiveClient.postEvent((Event) item);
 								EventManager.onSentEvent((Event) item, response);
 								break;
+							case survey:
+								response = ApptentiveClient.postSurvey((SurveyPayload) item);
+								// Survey responses don't need to be stored locally.
+								if(response.wasSuccessful()) {
+									db.deleteRecord(item);
+								}
+								break;
 							default:
-								Log.d("Sent unknown ActivityFeedItemType: " + item.getType());
-								// TODO: Still send this stuff.
+								Log.e("Didn't send unknown ActivityFeedItemType: " + item.getType());
+								// TODO: Still send this stuff?
 								break;
 						}
 

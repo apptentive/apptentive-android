@@ -76,4 +76,9 @@ public class SurveyPayload extends ActivityFeedItem {
 	protected void initType() {
 		setType(Type.survey);
 	}
+
+	@Override
+	public String marshallForSending() {
+		return toString();
+	}
 }

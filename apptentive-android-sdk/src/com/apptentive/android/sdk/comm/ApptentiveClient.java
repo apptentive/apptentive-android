@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
 import com.apptentive.android.sdk.module.metric.Event;
+import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -106,7 +107,7 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postSurvey(ActivityFeedItem survey) {
+	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
 		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
 	}
 

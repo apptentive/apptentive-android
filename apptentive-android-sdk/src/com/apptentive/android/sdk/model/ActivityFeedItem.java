@@ -205,6 +205,8 @@ public abstract class ActivityFeedItem extends JSONObject {
 					return BaseType.message;
 				case Event:
 					return BaseType.event;
+				case survey:
+					return BaseType.survey;
 				case unknown:
 					return BaseType.unknown;
 				default:
@@ -216,7 +218,9 @@ public abstract class ActivityFeedItem extends JSONObject {
 	public static enum BaseType {
 		message,
 		event,
-		unknown;
+		unknown,
+		// Legacy
+		survey;
 
 		public static BaseType parse(String type) {
 			try {

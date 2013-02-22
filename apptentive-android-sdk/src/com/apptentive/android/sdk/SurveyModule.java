@@ -19,6 +19,8 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
+import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -85,7 +87,7 @@ public class SurveyModule {
 		}
 		Log.d("Started survey fetch");
 		fetching = true;
-		// Upload any payloads that were created while the device was offline.
+
 		new Thread() {
 			public void run() {
 				try {
@@ -228,6 +230,9 @@ public class SurveyModule {
 				Util.hideSoftKeyboard(activity, view);
 				MetricModule.sendMetric(Event.EventType.survey__submit, null, data);
 
+				// TODO: Send the survey.
+				getSurveyStore().addOrUpdateItems(new SurveyPayload(surveyDefinition));
+
 				if(SurveyModule.this.onSurveyCompletedListener != null) {
 					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener();
 				}
@@ -266,6 +271,9 @@ public class SurveyModule {
 			MetricModule.sendMetric(Event.EventType.survey__question_response, null, answerData);
 			question.setMetricSent(true);
 		}
+	}
 
+	private static PayloadStore getSurveyStore() {
+		return Apptentive.getDatabase();
 	}
 }
