@@ -285,7 +285,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		void onSendFileMessage(Uri uri);
 	}
 
-	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goea into.
+	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
 		final MessageView messageView = messages.get(message.getNonce());
 		if(messageView != null) {
