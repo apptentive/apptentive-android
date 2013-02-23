@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.Toast;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
@@ -57,14 +58,24 @@ public class ApptentiveMessageCenter {
 			}
 
 			public void onSendFileMessage(Uri uri) {
-				final FileMessage message = FileMessage.createMessage(context, uri);
-				MessageManager.sendMessage(message);
-				messageCenterView.post(new Runnable() {
-					public void run() {
-						messageCenterView.addMessage(message);
-					}
-				});
-				scrollToBottom();
+
+				// First, create the file, and populate some metadata about it.
+				final FileMessage message = new FileMessage();
+				boolean successful = message.createStoredFile(uri.toString());
+
+				if(successful) {
+					// Finally, send out the message.
+					MessageManager.sendMessage(message);
+					messageCenterView.post(new Runnable() {
+						public void run() {
+							messageCenterView.addMessage(message);
+						}
+					});
+					scrollToBottom();
+				} else {
+					Log.e("Unable to send file.");
+					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT);
+				}
 			}
 		});
 		scrollToBottom();

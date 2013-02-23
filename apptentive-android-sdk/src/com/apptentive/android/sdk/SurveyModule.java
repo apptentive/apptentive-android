@@ -92,7 +92,7 @@ public class SurveyModule {
 			public void run() {
 				try {
 					ApptentiveHttpResponse response = ApptentiveClient.getSurvey();
-					if(response.wasSuccessful()) {
+					if(response.isSuccessful()) {
 						SurveyDefinition definition = SurveyManager.parseSurvey(response.getContent());
 						if (definition != null) {
 							setSurvey(definition);

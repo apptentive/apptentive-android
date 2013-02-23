@@ -15,6 +15,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -117,11 +118,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			}
 		});
 
-		// TODO: Either find some way to only choose from screenshots, or reject if they select a picassa image. That requires a permission we can't grant. Or, we can save a copy of the image when they grab it the first time. Seems weird.
 		View screenshotButton = findViewById(R.id.apptentive_message_center_button_screenshot);
 		screenshotButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+				Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				intent.setType("image/*");
 				context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 			}
 		});

@@ -6,14 +6,13 @@
 
 package com.apptentive.android.sdk.comm;
 
-import android.content.ContentResolver;
 import android.net.Uri;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ActivityFeedItem;
 import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
 import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
@@ -90,7 +89,8 @@ public class ApptentiveClient {
 				return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case FileMessage:
 				FileMessage fileMessage = (FileMessage) message;
-				return performMultipartFilePost(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, message.marshallForSending(), fileMessage.getLocalUri(), fileMessage.getMimeType());
+				StoredFile storedFile = fileMessage.getStoredFile();
+				return performMultipartFilePost(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
 			case Event:
 				break;
 			case feedback:
@@ -100,7 +100,7 @@ public class ApptentiveClient {
 			case unknown:
 				break;
 		}
-		return null;
+		return new ApptentiveHttpResponse();
 	}
 
 	public static ApptentiveHttpResponse postEvent(Event event) {
@@ -137,7 +137,7 @@ public class ApptentiveClient {
 					break;
 				default:
 					Log.e("Unrecognized method: " + method.name());
-					return null;
+					return ret;
 			}
 			request.setHeader("Authorization", "OAuth " + oauthToken);
 			request.setHeader("Accept", "application/json");
@@ -166,8 +166,15 @@ public class ApptentiveClient {
 		return ret;
 	}
 
-	private static ApptentiveHttpResponse performMultipartFilePost(String oauthToken, String uri, String postBody, String localFileUriString, String mimeType) {
+	private static ApptentiveHttpResponse performMultipartFilePost(String oauthToken, String uri, String postBody, StoredFile storedFile) {
 		Log.d("Performing multipart request to %s", uri);
+
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+
+		if(storedFile == null) {
+			Log.e("StoredFile is null. Unable to send.");
+			return ret;
+		}
 
 		int bytesRead;
 		int bufferSize = 4096;
@@ -177,16 +184,12 @@ public class ApptentiveClient {
 		String twoHyphens = "--";
 		String boundary = UUID.randomUUID().toString();
 
-		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
-
 		HttpURLConnection connection;
 		DataOutputStream os = null;
 		InputStream is = null;
-		ContentResolver contentResolver = Apptentive.getContentResolver();
 
 		try {
-			Uri localFileUri = Uri.parse((localFileUriString));
-			is = contentResolver.openInputStream(localFileUri);
+			is = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
 
 			// Set up the request.
 			URL url = new URL(uri);
@@ -204,22 +207,29 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", API_VERSION);
 
+			StringBuilder requestText = new StringBuilder();
+
+			// Write form data
+			requestText.append(twoHyphens + boundary + lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			requestText.append("Content-Type: text/plain" + lineEnd);
+			requestText.append(lineEnd);
+			requestText.append(postBody);
+			requestText.append(lineEnd);
+
+			// Write file attributes.
+			requestText.append(twoHyphens + boundary + lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
+			requestText.append("Content-Type: " + storedFile.getMimeType() + lineEnd);
+			requestText.append(lineEnd);
+
+			Log.d("Post body: " + requestText);
+
 			// Open an output stream.
 			os = new DataOutputStream(connection.getOutputStream());
 
-			// Write form data
-			os.writeBytes(twoHyphens + boundary + lineEnd);
-			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
-			os.writeBytes("Content-Type: text/plain" + lineEnd);
-			os.writeBytes(lineEnd);
-			os.writeBytes(postBody);
-			os.writeBytes(lineEnd);
-
-			// Write file attributes.
-			os.writeBytes(twoHyphens + boundary + lineEnd);
-			os.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
-			os.writeBytes("Content-Type: " + mimeType + lineEnd);
-			os.writeBytes(lineEnd);
+			// Write the text so far.
+			os.writeBytes(requestText.toString());
 
 			// Write the actual file.
 			buffer = new byte[bufferSize];
@@ -233,10 +243,12 @@ public class ApptentiveClient {
 			ret.setCode(connection.getResponseCode());
 			ret.setReason(connection.getResponseMessage());
 
+			// TODO: These streams may not be ready to read now. Put this in a new thread.
 			// Read the normal response.
 			InputStream nis = null;
 			ByteArrayOutputStream nbaos = null;
 			try {
+				Log.d("Sending file: " + storedFile.getLocalFilePath());
 				nis = connection.getInputStream();
 				nbaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
@@ -246,7 +258,7 @@ public class ApptentiveClient {
 				}
 				ret.setContent(nbaos.toString());
 			} catch (IOException e) {
-				Log.e("Can't read return stream.", e);
+				Log.w("Can't read return stream.", e);
 			} finally {
 				Util.ensureClosed(nis);
 				Util.ensureClosed(nbaos);
@@ -267,7 +279,7 @@ public class ApptentiveClient {
 					ret.setContent(ebaos.toString());
 				}
 			} catch (IOException e) {
-				Log.e("Can't read error stream.", e);
+				Log.w("Can't read error stream.", e);
 			} finally {
 				Util.ensureClosed(eis);
 				Util.ensureClosed(ebaos);

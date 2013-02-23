@@ -26,6 +26,8 @@ public class EventManager {
 	}
 
 	public static void onSentEvent(Event event, ApptentiveHttpResponse response) {
-		// TODO: Update the event status as sent in the db.
+		if(response.isSuccessful()) {
+			getEventStore().deleteRecord(event);
+		}
 	}
 }

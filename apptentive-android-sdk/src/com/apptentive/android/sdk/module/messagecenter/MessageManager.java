@@ -82,7 +82,7 @@ public class MessageManager {
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, after_id, null);
 
 		List<Message> ret = new ArrayList<Message>();
-		if (!response.wasSuccessful()) {
+		if (!response.isSuccessful()) {
 			return ret;
 		}
 		try {
@@ -120,10 +120,10 @@ public class MessageManager {
 	}
 
 	public static void onSentMessage(Message message, ApptentiveHttpResponse response) {
-		if (!response.wasSuccessful()) {
+		if (response == null || !response.isSuccessful()) {
 			return;
 		}
-		if(response.wasSuccessful()) {
+		if(response.isSuccessful()) {
 			try {
 				JSONObject responseJson = new JSONObject(response.getContent());
 				if (message.getState() == ActivityFeedItem.State.sending) {
@@ -139,6 +139,9 @@ public class MessageManager {
 			if(internalSentMessageListener != null) {
 				internalSentMessageListener.onSentMessage(message);
 			}
+		}
+		if(response.isUnableToSend()) {
+			// TODO: Tell the user that this message failed to send. It will be deleted by the record send worker.
 		}
 	}
 

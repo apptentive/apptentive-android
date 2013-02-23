@@ -14,8 +14,6 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.metric.Event;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Sky Kelsey
@@ -66,14 +64,13 @@ public class RecordSendWorker {
 								MessageManager.onSentMessage((Message) item, response);
 								break;
 							case event:
-								// TODO: Delete events from our DB once they are sent? THey are no longer needed.
 								response = ApptentiveClient.postEvent((Event) item);
 								EventManager.onSentEvent((Event) item, response);
 								break;
 							case survey:
 								response = ApptentiveClient.postSurvey((SurveyPayload) item);
 								// Survey responses don't need to be stored locally.
-								if(response.wasSuccessful()) {
+								if(response.isSuccessful()) {
 									db.deleteRecord(item);
 								}
 								break;
@@ -85,15 +82,15 @@ public class RecordSendWorker {
 
 						// Each Record type is handled by the appropriate handler, but if the message send fails permanently, delete it.
 						if (response != null) {
-							if (response.wasSuccessful()) {
+							if (response.isSuccessful()) {
 								Log.d("ActivityFeedItem submission successful. Marking sent.", item.getNonce());
 								item.setState(ActivityFeedItem.State.sent);
 								db.updateRecord(item);
-							} else if (response.wasRejectedPermanently()) {
+							} else if (response.isRejectedPermanently() || response.isUnableToSend()) {
 								Log.d("ActivityFeedItem %s rejected.", item.getNonce());
 								Log.v("Rejected json:", item.toString());
 								db.deleteRecord(item);
-							} else if (response.wasRejectedTemporarily()) {
+							} else if (response.isRejectedTemporarily()) {
 								Log.d("Unable to send JSON. Leaving in queue.");
 								// Break the loop. Restart when network is reachable.
 								break;

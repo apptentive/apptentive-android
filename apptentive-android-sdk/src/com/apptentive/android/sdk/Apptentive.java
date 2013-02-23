@@ -109,6 +109,10 @@ public class Apptentive {
 	public static void onDestroy(Activity activity) {
 	}
 
+	public static Context getAppContext() {
+		return appContext;
+	}
+
 	public static ApptentiveDatabase getDatabase() {
 		return db;
 	}
@@ -259,7 +263,7 @@ public class Apptentive {
 			Log.w("Got null response fetching ActivityFeedToken.");
 			return;
 		}
-		if(response.wasSuccessful()) {
+		if(response.isSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
 				String activityFeedToken = root.getString("token");
@@ -341,7 +345,7 @@ public class Apptentive {
 		Log.v("Fetching new configuration.");
 		Map<String, Object> config = new HashMap<String, Object>();
 		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(GlobalInfo.androidId);
-		if(!response.wasSuccessful()) {
+		if(!response.isSuccessful()) {
 			return;
 		}
 

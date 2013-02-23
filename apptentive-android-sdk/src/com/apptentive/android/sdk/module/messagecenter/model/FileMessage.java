@@ -10,9 +10,18 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.storage.FileStore;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  * @author Sky Kelsey
@@ -21,10 +30,6 @@ public class FileMessage extends Message {
 
 	private static final String KEY_FILE_NAME = "file_name";
 	private static final String KEY_MIME_TYPE = "mime_type";
-	private static final String KEY_LOCAL_URI = "local_uri";
-
-	public static final String MIME_TYPE_TEXT = "text/plain";
-	public static final String MIME_TYPE_PNG = "image/png";
 
 	public FileMessage() {
 		super();
@@ -48,27 +53,19 @@ public class FileMessage extends Message {
 		return toString();
 	}
 
-	public void setFileName(String fileName) {
+	public String getFileName() {
 		try {
-			put(KEY_FILE_NAME, fileName);
-		} catch (JSONException e) {
-			Log.e("Unable to set file name.");
-		}
-	}
-
-	public String getLocalUri() {
-		try {
-			return getString(KEY_LOCAL_URI);
+			return getString(KEY_FILE_NAME);
 		}catch (JSONException e) {
 		}
 		return null;
 	}
 
-	public void setLocalUri(String localUri) {
+	public void setFileName(String fileName) {
 		try {
-			put(KEY_LOCAL_URI, localUri);
-		}catch (JSONException e) {
-			Log.e("Unable to set local Uri.");
+			put(KEY_FILE_NAME, fileName);
+		} catch (JSONException e) {
+			Log.e("Unable to set file name.");
 		}
 	}
 
@@ -88,21 +85,63 @@ public class FileMessage extends Message {
 		}
 	}
 
-	public static FileMessage createMessage(Context context, Uri uri) {
-		FileMessage message = null;
-		try {
-			ContentResolver resolver = context.getContentResolver();
-			String mimeType = resolver.getType(uri);
-			MimeTypeMap mime = MimeTypeMap.getSingleton();
-			String extension = mime.getExtensionFromMimeType(mimeType);
+	private String getStoredFileId() {
+		return "apptentive-file-" + getNonce();
+	}
 
-			message = new FileMessage();
-			message.setLocalUri(uri.toString());
-			message.setFileName(uri.getLastPathSegment() + "." + extension);
-			message.setMimeType(mimeType);
+	public boolean createStoredFile(String uriString) {
+		Context appContext = Apptentive.getAppContext();
+		Uri uri = Uri.parse(uriString);
+
+		ContentResolver resolver = appContext.getContentResolver();
+		String mimeType = resolver.getType(uri);
+		MimeTypeMap mime = MimeTypeMap.getSingleton();
+		String extension = mime.getExtensionFromMimeType(mimeType);
+		setFileName(uri.getLastPathSegment() + "." + extension);
+		setMimeType(mimeType);
+
+		// Create a file to save locally.
+		String localFileName = getStoredFileId();
+		File localFile = new File(localFileName);
+
+		// Copy the file contents over.
+		InputStream is = null;
+		FileOutputStream fos = null;
+		try {
+			is = Apptentive.getContentResolver().openInputStream(uri);
+			fos = appContext.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE);
+			byte[] buffer = new byte[1024];
+			int read;
+			int total = 0;
+			while ((read = is.read(buffer, 0, 1024)) > 0) {
+				total++;
+				fos.write(buffer, 0, read);
+			}
+			Log.d("Saved file, size = " + total + "k");
+		} catch (FileNotFoundException e) {
+			Log.e("File not found while storing file.", e);
+			return false;
 		} catch (Exception e) {
-			Log.w("Error creating FileMessage from " + uri.toString());
+			Log.a("Error storing file.", e);
+			return false;
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(fos);
 		}
-		return message;
+
+		// Create a StoredFile database entry for this locally saved file.
+		StoredFile storedFile = new StoredFile();
+		storedFile.setId(getStoredFileId());
+		storedFile.setOriginalUri(uri.toString());
+		storedFile.setLocalFilePath(localFile.getPath());
+		storedFile.setMimeType(mimeType);
+		FileStore db = Apptentive.getDatabase();
+		return db.putStoredFile(storedFile);
+	}
+
+	public StoredFile getStoredFile() {
+		FileStore fileStore = Apptentive.getDatabase();
+		StoredFile storedFile = fileStore.getStoredFile(getStoredFileId());
+		return storedFile;
 	}
 }

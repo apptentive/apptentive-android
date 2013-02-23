@@ -13,23 +13,29 @@ public class ApptentiveHttpResponse {
 	private String content;
 	private String reason;
 	private int code;
-
-	public boolean wasSuccessful() {
-		return code >= 200 && code < 300;
-	}
-
-	public boolean wasRejectedPermanently() {
-		return code >= 400 && code < 500;
-	}
-
-	public boolean wasRejectedTemporarily() {
-		return !(wasSuccessful() || wasRejectedPermanently());
-	}
+	private boolean unableToSend;
 
 	public ApptentiveHttpResponse() {
 		content = null;
 		reason = null;
 		code = -1;
+		unableToSend = true;
+	}
+
+	public boolean isSuccessful() {
+		return code >= 200 && code < 300;
+	}
+
+	public boolean isRejectedPermanently() {
+		return code >= 400 && code < 500;
+	}
+
+	public boolean isUnableToSend() {
+		return unableToSend;
+	}
+
+	public boolean isRejectedTemporarily() {
+		return !(isSuccessful() || isRejectedPermanently());
 	}
 
 	public String getContent() {
@@ -54,5 +60,6 @@ public class ApptentiveHttpResponse {
 
 	public void setCode(int code) {
 		this.code = code;
+		unableToSend = false;
 	}
 }

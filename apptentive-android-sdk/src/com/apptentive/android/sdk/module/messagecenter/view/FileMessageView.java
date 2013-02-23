@@ -7,15 +7,21 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.util.Util;
+
+import java.io.FileInputStream;
 
 /**
  * @author Sky Kelsey
@@ -37,15 +43,25 @@ public class FileMessageView extends MessageView<FileMessage> {
 		FileMessage oldMessage = message;
 		super.updateMessage(newMessage);
 
-		boolean hasNoOldUri = oldMessage == null;
-		boolean hasNewUri = newMessage != null && newMessage.getLocalUri() != null;
-		boolean uriDiffers = newMessage != null && oldMessage != null && !newMessage.getLocalUri().equals(oldMessage.getLocalUri());
-		if ((hasNoOldUri && hasNewUri) || hasNewUri && uriDiffers) {
-			// TODO: Figure out a way to group into classes by mime type (image, text, other).
-			String mimeType = newMessage.getMimeType();
+		if(newMessage == null) {
+			return;
+		}
+		StoredFile storedFile = newMessage.getStoredFile();
+		if(storedFile == null || storedFile.getLocalFilePath() == null) {
+			return;
+		}
 
-			// TODO: Get Mike to store and return the mime type!
-			mimeType = "image/png";
+		StoredFile oldStoredFile = null;
+		if(oldMessage != null) {
+			oldStoredFile = oldMessage.getStoredFile();
+		}
+
+		boolean hasNoOldFilePath = oldMessage == null || oldStoredFile.getLocalFilePath() == null;
+		boolean pathDiffers = oldMessage != null && !storedFile.getLocalFilePath().equals(oldStoredFile.getLocalFilePath());
+		if (hasNoOldFilePath || pathDiffers) {
+			// TODO: Figure out a way to group into classes by mime type (image, text, other).
+			String mimeType = storedFile.getMimeType();
+
 			if(mimeType == null) {
 				Log.e("FileMessage mime type is null.");
 				return;
@@ -53,10 +69,20 @@ public class FileMessageView extends MessageView<FileMessage> {
 
 			ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
 			if (mimeType.contains("image")) {
-				//ImageView imageView = (ImageView) findViewById(R.id.apptentive_file_message_image);
-				imageView.setImageURI(Uri.parse(newMessage.getLocalUri()));
+				FileInputStream fis = null;
+				Bitmap imageBitmap = null;
+				try {
+					fis = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
+					imageBitmap = BitmapFactory.decodeStream(fis);
+				} catch (Exception e) {
+					Log.e("Error opening stored file.", e);
+				} finally {
+					Util.ensureClosed(fis);
+				}
+				imageView.setImageBitmap(imageBitmap);
 				imageView.setVisibility(View.VISIBLE);
 			} else {
+				// TODO: We aren't creating other FileMessage types than image yet. This isn't tested.
 				TextView textView = (TextView) findViewById(R.id.apptentive_file_message_text);
 				textView.setVisibility(View.VISIBLE);
 				if (mimeType.contains("text")) {

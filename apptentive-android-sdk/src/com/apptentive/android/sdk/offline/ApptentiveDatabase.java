@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.storage.FileStore;
 import com.apptentive.android.sdk.storage.PayloadStore;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Sky Kelsey
  */
-public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore, MessageStore, EventStore, PayloadStore, KeyValueStore {
+public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore, MessageStore, EventStore, PayloadStore, KeyValueStore, FileStore {
 
 	// COMMON
 	private static int DATABASE_VERSION = 1;
@@ -66,6 +66,23 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 					KEYVALUE_KEY_VALUE + " TEXT" +
 					");";
 
+	// FileStore
+	private static final String TABLE_FILESTORE = "file_store";
+	private static final String FILESTORE_KEY_ID = "id";                         // 0
+	private static final String FILESTORE_KEY_MIME_TYPE = "mime_type";           // 1
+	private static final String FILESTORE_KEY_ORIGINAL_URL = "original_uri";     // 2
+	private static final String FILESTORE_KEY_LOCAL_URL = "local_uri";           // 3
+	private static final String FILESTORE_KEY_APPTENTIVE_URL = "apptentive_uri"; // 4
+	private static final String TABLE_CREATE_FILESTORE =
+			"CREATE TABLE " + TABLE_FILESTORE +
+					" (" +
+					FILESTORE_KEY_ID + " TEXT PRIMARY KEY, " +
+					FILESTORE_KEY_MIME_TYPE + " TEXT, " +
+					FILESTORE_KEY_ORIGINAL_URL + " TEXT, " +
+					FILESTORE_KEY_LOCAL_URL + " TEXT, " +
+					FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
+					");";
+
 	// Raw SQL
 	private static final String QUERY_RECORD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ActivityFeedItem.State.sending.name() + "' ORDER BY " + RECORD_KEY_DB_ID + " ASC LIMIT 1";
 
@@ -88,18 +105,21 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(TABLE_CREATE_RECORD);
 		db.execSQL(TABLE_CREATE_KEYVALUE);
+		db.execSQL(TABLE_CREATE_FILESTORE);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int i, int i1) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORD);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_KEYVALUE);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILESTORE);
 		onCreate(db);
 	}
 
 	/**
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
+	 *
 	 * @param activityFeedItems
 	 */
 	public synchronized void addOrUpdateItems(ActivityFeedItem... activityFeedItems) {
@@ -127,13 +147,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 			} else {
 				db.insert(TABLE_RECORD, null, values);
 			}
-			// Special case for FileMessages
-			if(activityFeedItem.getType().equals(ActivityFeedItem.Type.FileMessage)) {
-				FileMessage fileMessage = (FileMessage) activityFeedItem;
-				if(fileMessage.getLocalUri() != null) {
-					putKeyValue(fileMessage.getNonce(), fileMessage.getLocalUri());
-				}
-			}
 		}
 		db.setTransactionSuccessful();
 		db.endTransaction();
@@ -152,14 +165,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 			values.put(RECORD_KEY_STATE, activityFeedItem.getState().name());
 			values.put(RECORD_KEY_JSON, activityFeedItem.toString());
 			db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{activityFeedItem.getNonce()});
-
-			// Special case for FileMessages
-			if(activityFeedItem.getType().equals(ActivityFeedItem.Type.FileMessage)) {
-				FileMessage fileMessage = (FileMessage) activityFeedItem;
-				if(fileMessage.getLocalUri() != null) {
-					putKeyValue(fileMessage.getNonce(), fileMessage.getLocalUri());
-				}
-			}
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
@@ -181,12 +186,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 			String json = cursor.getString(7);
 			String baseType = cursor.getString(2);
 			activityFeedItem = RecordFactory.fromJson(json, ActivityFeedItem.BaseType.parse(baseType));
-
-			// Special case for FileMessages
-			if(activityFeedItem != null && activityFeedItem.getType().equals(ActivityFeedItem.Type.FileMessage)) {
-				FileMessage fileMessage = (FileMessage) activityFeedItem;
-				fileMessage.setLocalUri(getKeyValue(fileMessage.getNonce()));
-			}
 		}
 
 		cursor.close();
@@ -231,13 +230,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 					continue;
 				}
 				message.setDatabaseId(cursor.getLong(0));
-
-				// Special case for FileMessages
-				if(message != null && message.getType().equals(ActivityFeedItem.Type.FileMessage)) {
-					FileMessage fileMessage = (FileMessage) message;
-					fileMessage.setLocalUri(getKeyValue(fileMessage.getNonce()));
-				}
-
 				messages.add(message);
 			} while (cursor.moveToNext());
 		}
@@ -258,6 +250,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		return ret;
 	}
 
+	//
+	// KeyValueStore
+	//
+
 	public synchronized void putKeyValue(String key, String value) {
 		SQLiteDatabase db = getWritableDatabase();
 
@@ -266,7 +262,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		values.put(KEYVALUE_KEY_VALUE, value);
 
 		String existingValue = getKeyValue(key);
-		if(existingValue == null) {
+		if (existingValue == null) {
 			db.insert(TABLE_KEYVALUE, null, values);
 		} else {
 			db.update(TABLE_KEYVALUE, values, KEYVALUE_KEY_KEY + " = ?", new String[]{key});
@@ -276,15 +272,57 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 	public synchronized String getKeyValue(String key) {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery(QUERY_KEYVALUE_BY_KEY, new String[]{key});
-		if(cursor.moveToFirst()) {
+		if (cursor.moveToFirst()) {
 			return cursor.getString(0);
 		}
 		return null;
 	}
 
 
-	//// Features that haven't been reimplemented yet: PayloadStore section.
+	//
+	// File Store
+	//
+
+	public synchronized boolean putStoredFile(StoredFile storedFile) {
+		long ret = -1;
+		SQLiteDatabase db = getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(FILESTORE_KEY_ID, storedFile.getId());
+		values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
+		values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUri());
+		values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
+		values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
+
+		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
+		boolean doUpdate = cursor.moveToFirst();
+		cursor.close();
+		if (doUpdate) {
+			ret = db.update(TABLE_FILESTORE, values, FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
+		} else {
+			ret = db.insert(TABLE_FILESTORE, null, values);
+		}
+		cursor.close();
+		db.close();
+		return ret != -1;
+	}
 
 
-
+	public synchronized StoredFile getStoredFile(String id) {
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
+		if (cursor.moveToFirst()) {
+			StoredFile storedFile = new StoredFile();
+			storedFile.setId(id);
+			storedFile.setMimeType(cursor.getString(1));
+			storedFile.setOriginalUri(cursor.getString(2));
+			storedFile.setLocalFilePath(cursor.getString(3));
+			storedFile.setApptentiveUri(cursor.getString(4));
+			cursor.close();
+			db.close();
+			return storedFile;
+		}
+		cursor.close();
+		db.close();
+		return null;
+	}
 }
