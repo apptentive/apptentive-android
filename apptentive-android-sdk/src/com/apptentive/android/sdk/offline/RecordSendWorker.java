@@ -43,11 +43,11 @@ public class RecordSendWorker {
 				synchronized (this) {
 					RecordStore db = getRecordStore();
 					while (true) {
-						if (GlobalInfo.activityFeedToken == null || GlobalInfo.activityFeedToken.equals("")) {
+						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
-						ActivityFeedItem item = null;
+						ConversationItem item = null;
 						item = db.getOldestUnsentRecord();
 						if (item == null) {
 							// There is no payload in the db.
@@ -75,7 +75,7 @@ public class RecordSendWorker {
 								}
 								break;
 							default:
-								Log.e("Didn't send unknown ActivityFeedItemType: " + item.getType());
+								Log.e("Didn't send unknown ConversationItemType: " + item.getType());
 								// TODO: Still send this stuff?
 								break;
 						}
@@ -83,11 +83,11 @@ public class RecordSendWorker {
 						// Each Record type is handled by the appropriate handler, but if the message send fails permanently, delete it.
 						if (response != null) {
 							if (response.isSuccessful()) {
-								Log.d("ActivityFeedItem submission successful. Marking sent.", item.getNonce());
-								item.setState(ActivityFeedItem.State.sent);
+								Log.d("ConversationItem submission successful. Marking sent.", item.getNonce());
+								item.setState(ConversationItem.State.sent);
 								db.updateRecord(item);
 							} else if (response.isRejectedPermanently() || response.isUnableToSend()) {
-								Log.d("ActivityFeedItem %s rejected.", item.getNonce());
+								Log.d("ConversationItem %s rejected.", item.getNonce());
 								Log.v("Rejected json:", item.toString());
 								db.deleteRecord(item);
 							} else if (response.isRejectedTemporarily()) {

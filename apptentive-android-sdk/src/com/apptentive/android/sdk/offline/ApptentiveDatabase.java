@@ -84,9 +84,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 					");";
 
 	// Raw SQL
-	private static final String QUERY_RECORD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ActivityFeedItem.State.sending.name() + "' ORDER BY " + RECORD_KEY_DB_ID + " ASC LIMIT 1";
+	private static final String QUERY_RECORD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ConversationItem.State.sending.name() + "' ORDER BY " + RECORD_KEY_DB_ID + " ASC LIMIT 1";
 
-	private static final String QUERY_RECORD_GET_LAST_ID = "SELECT " + RECORD_KEY_ID + " FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ActivityFeedItem.State.saved + "' AND " + RECORD_KEY_ID + " NOTNULL ORDER BY " + RECORD_KEY_ID + " DESC LIMIT 1";
+	private static final String QUERY_RECORD_GET_LAST_ID = "SELECT " + RECORD_KEY_ID + " FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ConversationItem.State.saved + "' AND " + RECORD_KEY_ID + " NOTNULL ORDER BY " + RECORD_KEY_ID + " DESC LIMIT 1";
 
 	private static final String QUERY_RECORD_GET_BY_LOCAL_ID = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_NONCE + " = ?";
 
@@ -120,9 +120,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 *
-	 * @param activityFeedItems
+	 * @param conversationItems
 	 */
-	public synchronized void addOrUpdateItems(ActivityFeedItem... activityFeedItems) {
+	public synchronized void addOrUpdateItems(ConversationItem... conversationItems) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		List<String> nonces = new ArrayList<String>();
@@ -133,17 +133,17 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		}
 
 		db.beginTransaction();
-		for (ActivityFeedItem activityFeedItem : activityFeedItems) {
+		for (ConversationItem conversationItem : conversationItems) {
 			ContentValues values = new ContentValues();
-			values.put(RECORD_KEY_ID, activityFeedItem.getId());
-			values.put(RECORD_KEY_BASE_TYPE, activityFeedItem.getBaseType().name());
-			values.put(RECORD_KEY_CREATED_AT, activityFeedItem.getCreatedAt());
-			values.put(RECORD_KEY_CLIENT_CREATED_AT, activityFeedItem.getCreatedAt());
-			values.put(RECORD_KEY_NONCE, activityFeedItem.getNonce());
-			values.put(RECORD_KEY_STATE, activityFeedItem.getState().name());
-			values.put(RECORD_KEY_JSON, activityFeedItem.toString());
-			if (nonces.contains(activityFeedItem.getNonce())) {
-				db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{activityFeedItem.getNonce()});
+			values.put(RECORD_KEY_ID, conversationItem.getId());
+			values.put(RECORD_KEY_BASE_TYPE, conversationItem.getBaseType().name());
+			values.put(RECORD_KEY_CREATED_AT, conversationItem.getCreatedAt());
+			values.put(RECORD_KEY_CLIENT_CREATED_AT, conversationItem.getCreatedAt());
+			values.put(RECORD_KEY_NONCE, conversationItem.getNonce());
+			values.put(RECORD_KEY_STATE, conversationItem.getState().name());
+			values.put(RECORD_KEY_JSON, conversationItem.toString());
+			if (nonces.contains(conversationItem.getNonce())) {
+				db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
 			} else {
 				db.insert(TABLE_RECORD, null, values);
 			}
@@ -153,18 +153,18 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		db.close();
 	}
 
-	public synchronized void updateRecord(ActivityFeedItem activityFeedItem) {
+	public synchronized void updateRecord(ConversationItem conversationItem) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		try {
 			db.beginTransaction();
 			ContentValues values = new ContentValues();
-			values.put(RECORD_KEY_ID, activityFeedItem.getId());
-			values.put(RECORD_KEY_BASE_TYPE, activityFeedItem.getBaseType().name());
-			values.put(RECORD_KEY_CREATED_AT, activityFeedItem.getCreatedAt());
-			values.put(RECORD_KEY_CLIENT_CREATED_AT, activityFeedItem.getClientCreatedAt());
-			values.put(RECORD_KEY_STATE, activityFeedItem.getState().name());
-			values.put(RECORD_KEY_JSON, activityFeedItem.toString());
-			db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{activityFeedItem.getNonce()});
+			values.put(RECORD_KEY_ID, conversationItem.getId());
+			values.put(RECORD_KEY_BASE_TYPE, conversationItem.getBaseType().name());
+			values.put(RECORD_KEY_CREATED_AT, conversationItem.getCreatedAt());
+			values.put(RECORD_KEY_CLIENT_CREATED_AT, conversationItem.getClientCreatedAt());
+			values.put(RECORD_KEY_STATE, conversationItem.getState().name());
+			values.put(RECORD_KEY_JSON, conversationItem.toString());
+			db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
@@ -178,39 +178,39 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		db.close();
 	}
 
-	public ActivityFeedItem getRecordByNonce(String nonce) {
+	public ConversationItem getRecordByNonce(String nonce) {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_BY_LOCAL_ID, new String[]{nonce});
-		ActivityFeedItem activityFeedItem = null;
+		ConversationItem conversationItem = null;
 		if (cursor.moveToFirst()) {
 			String json = cursor.getString(7);
 			String baseType = cursor.getString(2);
-			activityFeedItem = RecordFactory.fromJson(json, ActivityFeedItem.BaseType.parse(baseType));
+			conversationItem = RecordFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
 		}
 
 		cursor.close();
 		db.close();
-		return activityFeedItem;
+		return conversationItem;
 	}
 
-	public synchronized ActivityFeedItem getOldestUnsentRecord() {
+	public synchronized ConversationItem getOldestUnsentRecord() {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_NEXT_TO_SEND, null);
-		ActivityFeedItem activityFeedItem = null;
+		ConversationItem conversationItem = null;
 		if (cursor.moveToFirst()) {
 			String json = cursor.getString(7);
 			String baseType = cursor.getString(2);
-			activityFeedItem = RecordFactory.fromJson(json, ActivityFeedItem.BaseType.parse(baseType));
+			conversationItem = RecordFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
 		}
 		cursor.close();
 		db.close();
-		return activityFeedItem;
+		return conversationItem;
 	}
 
-	public synchronized void deleteRecord(ActivityFeedItem activityFeedItem) {
-		if (activityFeedItem != null) {
+	public synchronized void deleteRecord(ConversationItem conversationItem) {
+		if (conversationItem != null) {
 			SQLiteDatabase db = getWritableDatabase();
-			db.delete(TABLE_RECORD, RECORD_KEY_NONCE + " = ?", new String[]{activityFeedItem.getNonce()});
+			db.delete(TABLE_RECORD, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
 			db.close();
 		}
 	}
@@ -219,7 +219,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		List<Message> messages = new ArrayList<Message>();
 		SQLiteDatabase db = this.getReadableDatabase();
 
-		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_ALL_BY_BASE_TYPE, new String[]{ActivityFeedItem.BaseType.message.name()});
+		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_ALL_BY_BASE_TYPE, new String[]{ConversationItem.BaseType.message.name()});
 
 		if (cursor.moveToFirst()) {
 			do {

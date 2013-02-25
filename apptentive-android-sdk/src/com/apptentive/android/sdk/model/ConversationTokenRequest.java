@@ -13,17 +13,17 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class ActivityFeedTokenRequest extends JSONObject {
+public class ConversationTokenRequest extends JSONObject {
 
 
-	public ActivityFeedTokenRequest() {
+	public ConversationTokenRequest() {
 	}
 
 	public void setDevice(Device device) {
 		try {
 			put(Device.KEY, device);
 		} catch (JSONException e) {
-			Log.e("Error adding %s to ActivityFeedRequest", Device.KEY);
+			Log.e("Error adding %s to ConversationTokenRequest", Device.KEY);
 		}
 	}
 
@@ -31,7 +31,7 @@ public class ActivityFeedTokenRequest extends JSONObject {
 		try {
 			put(Person.KEY, person);
 		} catch (JSONException e) {
-			Log.e("Error adding %s to ActivityFeedRequest", Person.KEY);
+			Log.e("Error adding %s to ConversationTokenRequest", Person.KEY);
 		}
 	}
 

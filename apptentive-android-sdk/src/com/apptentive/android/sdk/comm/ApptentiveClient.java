@@ -6,11 +6,10 @@
 
 package com.apptentive.android.sdk.comm;
 
-import android.net.Uri;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
+import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
@@ -48,8 +47,8 @@ public class ApptentiveClient {
 
 	// New API
 	private static final String ENDPOINT_BASE = "http://api.apptentive-beta.com";
-	private static final String ENDPOINT_ACTIVITY_FEED_CREATE = ENDPOINT_BASE + "/activity_feed";
-	private static final String ENDPOINT_ACTIVITY_FEED_FETCH = ENDPOINT_BASE + "/activity_feed?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_CONVERSATION_CREATE = ENDPOINT_BASE + "/conversation";
+	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_BASE + "/conversation?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
 
@@ -64,8 +63,8 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 
 
-	public static ApptentiveHttpResponse getActivityFeedToken(ActivityFeedTokenRequest activityFeedTokenRequest) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_ACTIVITY_FEED_CREATE, Method.POST, activityFeedTokenRequest.toString());
+	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION_CREATE, Method.POST, conversationTokenRequest.toString());
 	}
 
 	public static ApptentiveHttpResponse getAppConfiguration(String deviceId) {
@@ -79,18 +78,18 @@ public class ApptentiveClient {
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
 	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
-		String uri = String.format(ENDPOINT_ACTIVITY_FEED_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(GlobalInfo.activityFeedToken, uri, Method.GET, null);
+		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
+		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse postMessage(Message message) {
 		switch (message.getType()) {
 			case TextMessage:
-				return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case FileMessage:
 				FileMessage fileMessage = (FileMessage) message;
 				StoredFile storedFile = fileMessage.getStoredFile();
-				return performMultipartFilePost(GlobalInfo.activityFeedToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
+				return performMultipartFilePost(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
 			case Event:
 				break;
 			case feedback:
@@ -104,7 +103,7 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse postEvent(Event event) {
-		return performHttpRequest(GlobalInfo.activityFeedToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {

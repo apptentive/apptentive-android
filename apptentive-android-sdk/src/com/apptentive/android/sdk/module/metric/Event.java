@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.metric;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ActivityFeedItem;
+import com.apptentive.android.sdk.model.ConversationItem;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public class Event extends ActivityFeedItem {
+public class Event extends ConversationItem {
 
 	private static final String KEY_RECORD = "record";
 	private static final String KEY_DEVICE = "device";

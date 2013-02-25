@@ -13,7 +13,7 @@ public class GlobalInfo {
 	// Don't ever use "1.0". I prematurely incremented to 1.0, so we should skip over it.
 	public static final String APPTENTIVE_API_VERSION = "0.6.1";
 
-	public static String activityFeedToken;
+	public static String conversationToken;
 	public static String personId;
 
 	public static boolean initialized = false;

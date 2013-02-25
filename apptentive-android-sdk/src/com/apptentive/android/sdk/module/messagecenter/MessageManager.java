@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.ActivityFeedItem;
+import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.model.MessageStore;
@@ -45,7 +45,7 @@ public class MessageManager {
 	 * @param listener
 	 */
 	public static void fetchAndStoreMessages(MessagesUpdatedListener listener) {
-		if (GlobalInfo.activityFeedToken == null) {
+		if (GlobalInfo.conversationToken == null) {
 			return;
 		}
 		// Fetch the messages.
@@ -104,7 +104,7 @@ public class MessageManager {
 					String json = items.getJSONObject(i).toString();
 					Message message = MessageFactory.fromJson(json);
 					// Since these came back from the server, mark them saved before updating them in the DB.
-					message.setState(ActivityFeedItem.State.saved);
+					message.setState(ConversationItem.State.saved);
 					ret.add(message);
 				}
 			}
@@ -126,11 +126,11 @@ public class MessageManager {
 		if(response.isSuccessful()) {
 			try {
 				JSONObject responseJson = new JSONObject(response.getContent());
-				if (message.getState() == ActivityFeedItem.State.sending) {
-					message.setState(ActivityFeedItem.State.sent);
+				if (message.getState() == ConversationItem.State.sending) {
+					message.setState(ConversationItem.State.sent);
 				}
-				message.setId(responseJson.getString(ActivityFeedItem.KEY_ID));
-				message.setCreatedAt(responseJson.getDouble(ActivityFeedItem.KEY_CREATED_AT));
+				message.setId(responseJson.getString(ConversationItem.KEY_ID));
+				message.setCreatedAt(responseJson.getDouble(ConversationItem.KEY_CREATED_AT));
 			} catch (JSONException e) {
 				Log.e("Error parsing sent message response.", e);
 			}

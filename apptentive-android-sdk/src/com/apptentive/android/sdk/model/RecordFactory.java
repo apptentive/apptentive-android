@@ -23,10 +23,10 @@ public class RecordFactory {
 	 * @param json
 	 * @return
 	 */
-	public static ActivityFeedItem fromJson(String json) {
+	public static ConversationItem fromJson(String json) {
 		try {
 			JSONObject root = new JSONObject(json);
-			ActivityFeedItem.BaseType type = ActivityFeedItem.BaseType.parse(root.getString(ActivityFeedItem.KEY_TYPE));
+			ConversationItem.BaseType type = ConversationItem.BaseType.parse(root.getString(ConversationItem.KEY_TYPE));
 			return fromJson(json, type);
 		} catch (JSONException e) {
 			// This is a low level log for forward compatibility.
@@ -35,7 +35,7 @@ public class RecordFactory {
 		return null;
 	}
 
-	public static ActivityFeedItem fromJson(String json, ActivityFeedItem.BaseType baseType) {
+	public static ConversationItem fromJson(String json, ConversationItem.BaseType baseType) {
 		switch (baseType) {
 			case message:
 				return MessageFactory.fromJson(json);

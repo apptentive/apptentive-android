@@ -22,7 +22,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
-import com.apptentive.android.sdk.model.ActivityFeedTokenRequest;
+import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
@@ -211,7 +211,7 @@ public class Apptentive {
 
 		// We need to try to fetch the token each time, because it is asynchronous, and we can't say for sure it's been
 		// fetched when this method exits.
-		asyncFetchActivityFeedToken();
+		asyncFetchConversationToken();
 
 		// Finally, ensure the send worker is running.
 		RecordSendWorker.start();
@@ -221,56 +221,56 @@ public class Apptentive {
 		RatingModule.getInstance().onAppVersionChanged();
 	}
 
-	private synchronized static void asyncFetchActivityFeedToken() {
+	private synchronized static void asyncFetchConversationToken() {
 		// Don't even start a thread if another one fetched already. Yes this is redundant.
-		if(GlobalInfo.activityFeedToken != null) {
+		if(GlobalInfo.conversationToken != null) {
 			return;
 		}
 		new Thread() {
 			@Override
 			public void run() {
-				fetchActivityFeedToken();
+				fetchConversationToken();
 			}
 		}.start();
 	}
 
 	/**
-	 * First looks to see if we've saved the activityFeedToken in memory, then in SharedPreferences, and finally tries to get one
+	 * First looks to see if we've saved the ConversationToken in memory, then in SharedPreferences, and finally tries to get one
 	 * from the server.
 	 */
-	private static void fetchActivityFeedToken() {
+	private static void fetchConversationToken() {
 
-		// Have we already loaded the activityFeedToken info?
-		if(GlobalInfo.activityFeedToken != null && GlobalInfo.personId != null) {
+		// Have we already loaded the ConversationToken info?
+		if(GlobalInfo.conversationToken != null && GlobalInfo.personId != null) {
 			return;
 		}
 
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
 		// Try to get it from SharedPreferences
-		if(prefs.contains(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
-			GlobalInfo.activityFeedToken = prefs.getString(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN, null);
+		if(prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+			GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 			GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
 			return;
 		}
 
 		// Try to fetch a new one from the server.
-		ActivityFeedTokenRequest request = new ActivityFeedTokenRequest();
+		ConversationTokenRequest request = new ConversationTokenRequest();
 		request.setDevice(generateDevice());
 		// TODO: Allow host app to send a user id, if available.
-		ApptentiveHttpResponse response = ApptentiveClient.getActivityFeedToken(request);
+		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
-			Log.w("Got null response fetching ActivityFeedToken.");
+			Log.w("Got null response fetching ConversationToken.");
 			return;
 		}
 		if(response.isSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
-				String activityFeedToken = root.getString("token");
-				Log.d("ActivityFeedToken: " + activityFeedToken);
-				if (activityFeedToken != null && !activityFeedToken.equals("")) {
-					GlobalInfo.activityFeedToken = activityFeedToken;
-					prefs.edit().putString(Constants.PREF_KEY_ACTIVITY_FEED_TOKEN, activityFeedToken).commit();
+				String conversationToken = root.getString("token");
+				Log.d("ConversationToken: " + conversationToken);
+				if (conversationToken != null && !conversationToken.equals("")) {
+					GlobalInfo.conversationToken = conversationToken;
+					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
 				}
 				String personId = root.getString("person_id");
 				Log.d("PersonId: " + personId);
@@ -279,7 +279,7 @@ public class Apptentive {
 					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
 				}
 			} catch (JSONException e) {
-				Log.e("Error parsing ActivityFeedToken response json.", e);
+				Log.e("Error parsing ConversationToken response json.", e);
 			}
 		}
 	}

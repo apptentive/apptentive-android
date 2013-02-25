@@ -5,16 +5,16 @@ package com.apptentive.android.sdk.model;
  */
 public interface RecordStore {
 
-	public void addOrUpdateItems(ActivityFeedItem... activityFeedItems);
+	public void addOrUpdateItems(ConversationItem... conversationItems);
 
-	public void updateRecord(ActivityFeedItem records);
+	public void updateRecord(ConversationItem records);
 
 	public void deleteAllRecords();
 
-	public ActivityFeedItem getRecordByNonce(String nonce);
+	public ConversationItem getRecordByNonce(String nonce);
 
-	public ActivityFeedItem getOldestUnsentRecord();
+	public ConversationItem getOldestUnsentRecord();
 
-	public void deleteRecord(ActivityFeedItem activityFeedItem);
+	public void deleteRecord(ConversationItem conversationItem);
 
 }

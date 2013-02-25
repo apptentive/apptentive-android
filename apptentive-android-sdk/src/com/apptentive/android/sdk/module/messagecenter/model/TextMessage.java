@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ActivityFeedItem;
+import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.Message;
 import org.json.JSONException;
 
@@ -20,7 +20,7 @@ public class TextMessage extends Message {
 
 	public TextMessage() {
 		super();
-		setType(ActivityFeedItem.Type.TextMessage);
+		setType(ConversationItem.Type.TextMessage);
 	}
 
 	public TextMessage(String json) throws JSONException {

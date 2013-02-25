@@ -14,7 +14,7 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public abstract class Message extends ActivityFeedItem {
+public abstract class Message extends ConversationItem {
 
 	public static final int DEFAULT_PRIORITY = 10;
 

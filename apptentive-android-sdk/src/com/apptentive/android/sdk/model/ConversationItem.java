@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * @author Sky Kelsey
  */
-public abstract class ActivityFeedItem extends JSONObject {
+public abstract class ConversationItem extends JSONObject {
 
 	private Long databaseId;
 	private State state;
@@ -27,7 +27,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
 	protected static final String KEY_NONCE = "nonce";
 
-	public ActivityFeedItem() {
+	public ConversationItem() {
 		initType();
 		long millis = new Date().getTime();
 		Log.e("millis: " + millis);
@@ -41,7 +41,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		state = State.sending;
 	}
 
-	public ActivityFeedItem(String json) throws JSONException {
+	public ConversationItem(String json) throws JSONException {
 		super(json);
 	}
 
@@ -89,7 +89,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		try {
 			put(KEY_ID, id);
 		} catch (JSONException e) {
-			Log.e("Exception setting ActivityFeedItem's %s field.", e, KEY_ID);
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_ID);
 		}
 	}
 
@@ -115,7 +115,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		try {
 			put(KEY_TYPE, type.name());
 		} catch (JSONException e) {
-			Log.e("Exception setting ActivityFeedItem's %s field.", e, KEY_TYPE);
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_TYPE);
 		}
 	}
 
@@ -127,7 +127,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		try {
 			put(KEY_NONCE, nonce);
 		} catch (JSONException e) {
-			Log.e("Exception setting ActivityFeedItem's %s field.", e, KEY_NONCE);
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_NONCE);
 		}
 	}
 
@@ -153,7 +153,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		try {
 			put(KEY_CREATED_AT, createdAt);
 		} catch (JSONException e) {
-			Log.e("Exception setting ActivityFeedItem's %s field.", e, KEY_CREATED_AT);
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CREATED_AT);
 		}
 	}
 
@@ -169,7 +169,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 		try {
 			put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
 		} catch (JSONException e) {
-			Log.e("Exception setting ActivityFeedItem's %s field.", e, KEY_CLIENT_CREATED_AT);
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT);
 		}
 	}
 
@@ -192,7 +192,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 			try {
 				return Type.valueOf(rawType);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ActivityFeedItem.Type: " + rawType);
+				Log.v("Error parsing unknown ConversationItem.Type: " + rawType);
 			}
 			return unknown;
 		}
@@ -226,7 +226,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 			try {
 				return BaseType.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ActivityFeedItem.BaseType: " + type);
+				Log.v("Error parsing unknown ConversationItem.BaseType: " + type);
 			}
 			return unknown;
 		}
@@ -243,7 +243,7 @@ public abstract class ActivityFeedItem extends JSONObject {
 			try {
 				return State.valueOf(state);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ActivityFeedItem.State: " + state);
+				Log.v("Error parsing unknown ConversationItem.State: " + state);
 			}
 			return unknown;
 		}

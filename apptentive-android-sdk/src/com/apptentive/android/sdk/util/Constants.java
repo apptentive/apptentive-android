@@ -21,7 +21,7 @@ public class Constants {
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
-	public static final String PREF_KEY_ACTIVITY_FEED_TOKEN = "activityFeedToken";
+	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
 	public static final String PREF_KEY_PERSON_ID = "personId";
 
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
