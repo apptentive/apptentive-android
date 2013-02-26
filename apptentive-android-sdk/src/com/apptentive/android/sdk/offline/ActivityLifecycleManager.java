@@ -66,10 +66,10 @@ public class ActivityLifecycleManager {
 		switch (event.getAction()) {
 			case START:
 				Apptentive.getRatingModule().logUse();
-				MetricModule.sendMetric(Event.EventType.app__session_start);
+				MetricModule.sendMetric(Event.EventLabel.app__session_start);
 				break;
 			case STOP:
-				MetricModule.sendMetric(Event.EventType.app__session_end);
+				MetricModule.sendMetric(Event.EventLabel.app__session_end);
 				break;
 			default:
 				break;

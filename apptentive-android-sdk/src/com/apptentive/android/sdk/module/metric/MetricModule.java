@@ -26,20 +26,20 @@ public class MetricModule {
 		MetricModule.appContext = appContext;
 	}
 
-	public static void sendMetric(Event.EventType type) {
+	public static void sendMetric(Event.EventLabel type) {
 		sendMetric(type, null);
 	}
 
-	public static void sendMetric(Event.EventType type, String trigger) {
+	public static void sendMetric(Event.EventLabel type, String trigger) {
 		sendMetric(type, trigger, null);
 	}
 
-	public static void sendMetric(Event.EventType type, String trigger, Map<String, String> data) {
-		Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getRecordName(), trigger, data != null ? data.toString() : "null");
+	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
+		Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
-			Event event = new com.apptentive.android.sdk.module.metric.Event(type.getRecordName(), trigger);
+			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
 			EventManager.sendEvent(event);
 		}

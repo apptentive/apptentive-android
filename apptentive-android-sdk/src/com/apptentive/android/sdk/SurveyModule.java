@@ -159,7 +159,7 @@ public class SurveyModule {
 		} else {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(Event.EventType.survey__cancel, null, data);
+					MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
 					cleanup();
 					activity.finish();
 				}
@@ -228,7 +228,7 @@ public class SurveyModule {
 		sendView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(Event.EventType.survey__submit, null, data);
+				MetricModule.sendMetric(Event.EventLabel.survey__submit, null, data);
 
 				// TODO: Send the survey.
 				getSurveyStore().addOrUpdateItems(new SurveyPayload(surveyDefinition));
@@ -257,7 +257,7 @@ public class SurveyModule {
 		sendView.setEnabled(isCompleted());
 		questionList.addView(sendView);
 
-		MetricModule.sendMetric(Event.EventType.survey__launch, null, data);
+		MetricModule.sendMetric(Event.EventLabel.survey__launch, null, data);
 
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
@@ -268,7 +268,7 @@ public class SurveyModule {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
-			MetricModule.sendMetric(Event.EventType.survey__question_response, null, answerData);
+			MetricModule.sendMetric(Event.EventLabel.survey__question_response, null, answerData);
 			question.setMetricSent(true);
 		}
 	}

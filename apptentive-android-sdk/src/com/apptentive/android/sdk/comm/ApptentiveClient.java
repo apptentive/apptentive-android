@@ -56,8 +56,6 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
-	private static final String ENDPOINT_MESSAGES_SINCE = ENDPOINT_MESSAGES + "?since_id=%s";
-	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 
 	// Deprecated API
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
