@@ -9,7 +9,8 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.metric.Event;
-import com.apptentive.android.sdk.offline.RecordSendWorker;
+import com.apptentive.android.sdk.storage.EventStore;
+import com.apptentive.android.sdk.storage.RecordSendWorker;
 
 /**
  * @author Sky Kelsey

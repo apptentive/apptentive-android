@@ -16,9 +16,9 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
+import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 
 import java.util.List;

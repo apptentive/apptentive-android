@@ -4,7 +4,10 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.storage;
+
+import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.storage.RecordStore;
 
 import java.util.List;
 

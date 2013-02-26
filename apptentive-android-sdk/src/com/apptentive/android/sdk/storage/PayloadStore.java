@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.model.RecordStore;
-
 /**
  * Added back in to support sending Survey results, etc., while we transition to the new API.
  * @author Sky Kelsey

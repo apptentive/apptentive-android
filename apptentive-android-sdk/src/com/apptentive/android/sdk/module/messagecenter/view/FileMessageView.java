@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.FileInputStream;

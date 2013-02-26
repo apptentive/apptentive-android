@@ -12,7 +12,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
+import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;

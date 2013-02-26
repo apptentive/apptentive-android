@@ -7,8 +7,6 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.model.FileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 

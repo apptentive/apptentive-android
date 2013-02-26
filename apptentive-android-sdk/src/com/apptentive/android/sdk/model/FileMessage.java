@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.messagecenter.model;
+package com.apptentive.android.sdk.model;
 
 import android.content.ContentResolver;
 import android.content.Context;

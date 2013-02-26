@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.offline;
+package com.apptentive.android.sdk.storage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,8 +13,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.storage.FileStore;
-import com.apptentive.android.sdk.storage.PayloadStore;
 
 import java.util.ArrayList;
 import java.util.List;

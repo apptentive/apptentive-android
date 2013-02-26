@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.TextMessage;
+import com.apptentive.android.sdk.model.TextMessage;
 
 /**
  * @author Sky Kelsey

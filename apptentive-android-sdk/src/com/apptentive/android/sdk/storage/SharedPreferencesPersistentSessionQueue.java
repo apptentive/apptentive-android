@@ -4,11 +4,12 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.offline;
+package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.SessionEvent;
+import com.apptentive.android.sdk.storage.PersistentSessionQueue;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.offline;
+package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.SessionEvent;
 

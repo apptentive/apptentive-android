@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SessionEvent;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.PersistentSessionQueue;
+import com.apptentive.android.sdk.storage.SharedPreferencesPersistentSessionQueue;
 
 import java.util.*;
 

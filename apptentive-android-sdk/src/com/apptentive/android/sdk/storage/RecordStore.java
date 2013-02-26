@@ -1,4 +1,6 @@
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.storage;
+
+import com.apptentive.android.sdk.model.ConversationItem;
 
 /**
  * @author Sky Kelsey
