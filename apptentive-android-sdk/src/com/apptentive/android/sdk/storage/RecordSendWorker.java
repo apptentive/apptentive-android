@@ -69,7 +69,7 @@ public class RecordSendWorker {
 								EventManager.onSentEvent((Event) item, response);
 								break;
 							case device:
-								response = ApptentiveClient.postDevice((Device) item);
+								response = ApptentiveClient.putDevice((Device) item);
 								DeviceManager.onSentDevice((Device) item, response);
 								break;
 							case survey:

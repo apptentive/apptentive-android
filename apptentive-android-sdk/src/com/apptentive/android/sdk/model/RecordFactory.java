@@ -41,6 +41,8 @@ public class RecordFactory {
 				return MessageFactory.fromJson(json);
 			case event:
 				return EventFactory.fromJson(json);
+			case device:
+				return DeviceFactory.fromJson(json);
 			case survey:
 				try {
 					return new SurveyPayload(json);

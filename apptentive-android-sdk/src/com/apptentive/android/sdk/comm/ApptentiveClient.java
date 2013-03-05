@@ -18,6 +18,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -102,8 +103,8 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postDevice(Device device) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.POST, device.marshallForSending());
+	public static ApptentiveHttpResponse putDevice(Device device) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
@@ -114,7 +115,7 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
 	}
 
-	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String postBody) {
+	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		Log.d("Performing request to %s", uri);
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		try {
@@ -125,19 +126,27 @@ public class ApptentiveClient {
 				case GET:
 					request = new HttpGet(uri);
 					break;
+				case PUT:
+					request = new HttpPut(uri);
+					request.setHeader("Content-Type", "application/json");
+					Log.d("PUT body: " + body);
+					((HttpPut) request).setEntity(new StringEntity(body, "UTF-8"));
+					break;
 				case POST:
 					request = new HttpPost(uri);
-					HttpParams httpParams = request.getParams();
-					HttpConnectionParams.setConnectionTimeout(httpParams, DEFAULT_HTTP_CONNECT_TIMEOUT);
-					HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
 					request.setHeader("Content-Type", "application/json");
-					Log.d("Post body: " + postBody);
-					((HttpPost) request).setEntity(new StringEntity(postBody, "UTF-8"));
+					Log.d("POST body: " + body);
+					((HttpPost) request).setEntity(new StringEntity(body, "UTF-8"));
 					break;
 				default:
 					Log.e("Unrecognized method: " + method.name());
 					return ret;
 			}
+
+			HttpParams httpParams = request.getParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, DEFAULT_HTTP_CONNECT_TIMEOUT);
+			HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
+
 			request.setHeader("Authorization", "OAuth " + oauthToken);
 			request.setHeader("Accept", "application/json");
 			request.setHeader("X-API-Version", API_VERSION);
@@ -301,6 +310,7 @@ public class ApptentiveClient {
 
 	private enum Method {
 		GET,
+		PUT,
 		POST
 	}
 }
