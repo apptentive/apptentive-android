@@ -93,7 +93,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 &lt;/manifest>
 </code></pre>
 
-##2. Integrate yor Activities with Apptentive
+##2. Integrate your Activities with Apptentive
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
 There are two ways of doing this: Inheritence, and Delegation. Inheritence is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities. Use one of these methods (mix and match is OK too) on
