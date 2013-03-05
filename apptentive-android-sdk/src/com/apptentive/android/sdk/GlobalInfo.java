@@ -20,9 +20,6 @@ public class GlobalInfo {
 	public static boolean isAppDebuggable = false;
 
 	public static String version;
-	public static String carrier;
-	public static String currentCarrier;
-	public static int    networkType;
 
 	public static String androidId;
 	public static String appDisplayName;

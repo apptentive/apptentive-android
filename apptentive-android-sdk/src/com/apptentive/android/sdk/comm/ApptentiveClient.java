@@ -9,10 +9,7 @@ package com.apptentive.android.sdk.comm;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.model.FileMessage;
+import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
@@ -51,6 +48,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_BASE + "/conversation?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
+	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 
 	// Old API
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
@@ -102,6 +100,10 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse postEvent(Event event) {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse postDevice(Device device) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.POST, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {

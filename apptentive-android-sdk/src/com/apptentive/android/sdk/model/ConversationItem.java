@@ -181,6 +181,9 @@ public abstract class ConversationItem extends JSONObject {
 		// Event
 		Event,
 
+		// Device
+		Device,
+
 		// Legacy
 		feedback,
 		survey,
@@ -207,6 +210,8 @@ public abstract class ConversationItem extends JSONObject {
 					return BaseType.event;
 				case survey:
 					return BaseType.survey;
+				case Device:
+					return BaseType.device;
 				case unknown:
 					return BaseType.unknown;
 				default:
@@ -218,6 +223,7 @@ public abstract class ConversationItem extends JSONObject {
 	public static enum BaseType {
 		message,
 		event,
+		device,
 		unknown,
 		// Legacy
 		survey;

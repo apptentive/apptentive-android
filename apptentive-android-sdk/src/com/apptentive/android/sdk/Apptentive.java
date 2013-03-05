@@ -14,10 +14,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
@@ -27,10 +25,10 @@ import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
+import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.RecordSendWorker;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Reflection;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -158,11 +156,7 @@ public class Apptentive {
 			}
 			GlobalInfo.apiKey = apiKey;
 
-			// Grab device info.
-			TelephonyManager tm = ((TelephonyManager) (appContext.getSystemService(Context.TELEPHONY_SERVICE)));
-			GlobalInfo.carrier = tm.getSimOperatorName();
-			GlobalInfo.currentCarrier = tm.getNetworkOperatorName();
-			GlobalInfo.networkType = tm.getNetworkType();
+			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = appContext.getPackageName();
 			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 			GlobalInfo.userEmail = Util.getUserEmail(appContext);
@@ -213,6 +207,21 @@ public class Apptentive {
 		// fetched when this method exits.
 		asyncFetchConversationToken();
 
+		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
+		// See if the device info has changed.
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(appContext);
+		if(deviceInfo != null) {
+			Log.d("Device info was updated.");
+			Log.e(deviceInfo.toString());
+			Apptentive.getDatabase().addOrUpdateItems(deviceInfo);
+		} else {
+			Log.d("Device info was not updated.");
+		}
+
+		// TODO: Send AppInfo update if app info was updated.
+
+		// TODO: Handle upgrades to the database.
+
 		// Finally, ensure the send worker is running.
 		RecordSendWorker.start();
 	}
@@ -256,7 +265,6 @@ public class Apptentive {
 
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
-		request.setDevice(generateDevice());
 		// TODO: Allow host app to send a user id, if available.
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
@@ -282,43 +290,6 @@ public class Apptentive {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
 		}
-	}
-
-	private static Device generateDevice() {
-		Device device = new Device();
-		device.setOsName("Android");
-		device.setOsVersion(Build.VERSION.RELEASE);
-		device.setOsBuild(Build.VERSION.INCREMENTAL);
-		device.setManufacturer(Build.MANUFACTURER);
-		device.setModel(Build.MODEL);
-		device.setBoard(Build.BOARD);
-		device.setProduct(Build.PRODUCT);
-		device.setBrand(Build.BRAND);
-		device.setCpu(Build.CPU_ABI);
-		device.setDevice(Build.DEVICE);
-		device.setId(GlobalInfo.androidId);
-		device.setCarrier(GlobalInfo.carrier);
-		device.setCurrentCarrier(GlobalInfo.currentCarrier);
-		device.setNetworkType(Constants.networkTypeAsString(GlobalInfo.networkType));
-		device.setBuildType(Build.TYPE);
-		device.setBuildId(Build.ID);
-
-		// Use reflection to load info from classes not available at API level 7.
-		String bootloaderVersion = Reflection.getBootloaderVersion();
-		if (bootloaderVersion != null) {
-			device.setBootloaderVersion(bootloaderVersion);
-		}
-		String radioVersion = Reflection.getRadioVersion();
-		if (radioVersion != null) {
-			device.setRadioVersion(radioVersion);
-		}
-		/*
-		// Client stuff... TODO: Move this into its own class?
-		JSONObject client = new JSONObject();
-		record.put(KEY_CLIENT, client);
-		client.put(KEY_CLIENT_VERSION, GlobalInfo.APPTENTIVE_API_VERSION);
-		*/
-		return device;
 	}
 
 	/**

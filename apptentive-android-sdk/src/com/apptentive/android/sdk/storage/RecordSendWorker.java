@@ -68,6 +68,10 @@ public class RecordSendWorker {
 								response = ApptentiveClient.postEvent((Event) item);
 								EventManager.onSentEvent((Event) item, response);
 								break;
+							case device:
+								response = ApptentiveClient.postDevice((Device) item);
+								DeviceManager.onSentDevice((Device) item, response);
+								break;
 							case survey:
 								response = ApptentiveClient.postSurvey((SurveyPayload) item);
 								// Survey responses don't need to be stored locally.
