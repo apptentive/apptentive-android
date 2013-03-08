@@ -6,7 +6,6 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
@@ -210,18 +209,15 @@ public class DeviceManager {
 
 		// New value.
 		if(old != null && newer != null && !old.equals(newer)) {
-			Log.e("Updating with " + newer);
 		 	return newer;
 		}
 
 		// Clear existing value.
 		if(old != null && newer == null) {
-			Log.e("Clearing a value");
 			return "";
 		}
 
 		// Do nothing.
-		Log.e("Value did not change");
 		return null;
 	}
 
