@@ -91,7 +91,7 @@ public class RecordSendWorker {
 								Log.d("ConversationItem submission successful. Marking sent.", item.getNonce());
 								item.setState(ConversationItem.State.sent);
 								db.updateRecord(item);
-							} else if (response.isRejectedPermanently() || response.isUnableToSend()) {
+							} else if (response.isRejectedPermanently() || response.isBadpayload()) {
 								Log.d("ConversationItem %s rejected.", item.getNonce());
 								Log.v("Rejected json:", item.toString());
 								db.deleteRecord(item);

@@ -140,7 +140,7 @@ public class MessageManager {
 				internalSentMessageListener.onSentMessage(message);
 			}
 		}
-		if(response.isUnableToSend()) {
+		if(response.isBadpayload()) {
 			// TODO: Tell the user that this message failed to send. It will be deleted by the record send worker.
 		}
 	}

@@ -13,13 +13,13 @@ public class ApptentiveHttpResponse {
 	private String content;
 	private String reason;
 	private int code;
-	private boolean unableToSend;
+	private boolean badpayload;
 
 	public ApptentiveHttpResponse() {
 		content = null;
 		reason = null;
 		code = -1;
-		unableToSend = true;
+		badpayload = false;
 	}
 
 	public boolean isSuccessful() {
@@ -28,10 +28,6 @@ public class ApptentiveHttpResponse {
 
 	public boolean isRejectedPermanently() {
 		return code >= 400 && code < 500;
-	}
-
-	public boolean isUnableToSend() {
-		return unableToSend;
 	}
 
 	public boolean isRejectedTemporarily() {
@@ -60,6 +56,13 @@ public class ApptentiveHttpResponse {
 
 	public void setCode(int code) {
 		this.code = code;
-		unableToSend = false;
+	}
+
+	public boolean isBadpayload() {
+		return badpayload;
+	}
+
+	public void setBadPayload(boolean badPayload) {
+		this.badpayload = badPayload;
 	}
 }

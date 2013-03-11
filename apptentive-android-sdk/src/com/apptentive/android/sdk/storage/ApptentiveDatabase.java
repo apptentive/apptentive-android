@@ -88,8 +88,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 
 	private static final String QUERY_RECORD_GET_BY_LOCAL_ID = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_NONCE + " = ?";
 
-	// TODO: This returns sorted by DB ID, when we really want to sort by ID, but sort by Client Created At if ID is blank. Complicated...
-	private static final String QUERY_RECORD_GET_ALL_BY_BASE_TYPE = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_BASE_TYPE + " = ? ORDER BY " + RECORD_KEY_DB_ID + " ASC";
+	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
+	private static final String QUERY_RECORD_GET_ALL_BY_BASE_TYPE = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_BASE_TYPE + " = ? ORDER BY COALESCE(" + RECORD_KEY_ID + ", 'z') ASC";
 
 	private static final String QUERY_ITEM_GET_ALL_NONCES = "SELECT " + RECORD_KEY_NONCE + " FROM " + TABLE_RECORD;
 

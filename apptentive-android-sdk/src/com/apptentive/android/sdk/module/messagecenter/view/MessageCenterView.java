@@ -250,17 +250,33 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		dialog.show();
 	}
 
-	// TODO: Important: Update this method to do an intelligent insert/update of messages in the view without recreating it each time it's called. Currently this behavior looks like shit.
-	public void setMessages(List<Message> messages) {
-		messageList.removeAllViews();
-		this.messages = new HashMap<String, MessageView>(messages.size());
-		for (Message message : messages) {
-			addMessage(message);
+	//TODO: Keep the views in messageView sorted!
+	public void addMessages(List<Message> messages) {
+		for(Message message : messages) {
+			addMessage(message, true);
 		}
 	}
 
-	public void addMessage(Message message) {
+	public void setMessages(List<Message> messages) {
+		messageList.removeAllViews();
+		this.messages.clear();
+		for (Message message : messages) {
+			addMessage(message, false);
+		}
+	}
+
+	public void addMessage(Message message, boolean replace) {
 		MessageView messageView = null;
+
+		// If we've already seen the message, don't render it again.
+		if(messages.containsKey(message.getNonce())) {
+			if(replace) {
+				messageList.removeView(messages.get(message.getNonce()));
+				messages.remove(message.getNonce());
+			} else {
+				return;
+			}
+		}
 		switch (message.getType()) {
 			case TextMessage:
 				messageView = new TextMessageView(context, (TextMessage) message);

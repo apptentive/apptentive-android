@@ -239,10 +239,16 @@ public class ApptentiveClient {
 			// Write the text so far.
 			os.writeBytes(requestText.toString());
 
-			// Write the actual file.
-			buffer = new byte[bufferSize];
-			while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
-				os.write(buffer, 0, bytesRead);
+			try {
+				// Write the actual file.
+				buffer = new byte[bufferSize];
+				while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
+					os.write(buffer, 0, bytesRead);
+				}
+			} catch (IOException e) {
+				Log.d("Error writing file bytes to HTTP connection.", e);
+				ret.setBadPayload(true);
+				throw e;
 			}
 
 			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);

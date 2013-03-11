@@ -51,7 +51,7 @@ public class ApptentiveMessageCenter {
 				MessageManager.sendMessage(message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						messageCenterView.addMessage(message);
+						messageCenterView.addMessage(message, false);
 					}
 				});
 				scrollToBottom();
@@ -68,7 +68,7 @@ public class ApptentiveMessageCenter {
 					MessageManager.sendMessage(message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
-							messageCenterView.addMessage(message);
+							messageCenterView.addMessage(message, false);
 						}
 					});
 					scrollToBottom();
