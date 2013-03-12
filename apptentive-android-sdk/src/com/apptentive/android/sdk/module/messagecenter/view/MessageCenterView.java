@@ -180,7 +180,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 	}
 
-	private void repositionDrawer(final boolean openingDrawer) {
+	public void repositionDrawer(final boolean openingDrawer) {
 		final LinearLayout drawer = (LinearLayout) findViewById(R.id.apptentive_message_center_drawer);
 		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) drawer.getLayoutParams();
 		final View drawerOpen = findViewById(R.id.apptentive_message_center_drawer_open);

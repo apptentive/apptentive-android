@@ -29,7 +29,10 @@ import java.util.List;
  */
 public class ApptentiveMessageCenter {
 
+	private static final int DEFAULT_POLLING_INTERVAL = 8000;
+
 	protected static MessageCenterView messageCenterView;
+	private static boolean pollForMessages = false;
 
 	public static void show(Context context) {
 		Intent intent = new Intent();
@@ -44,7 +47,7 @@ public class ApptentiveMessageCenter {
 			return;
 		}
 
-		messageCenterView = new MessageCenterView((Activity) context, new MessageCenterView.OnSendMessageListener() {
+		MessageCenterView.OnSendMessageListener onSendMessagelistener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
 				final TextMessage message = new TextMessage();
 				message.setBody(text);
@@ -56,19 +59,17 @@ public class ApptentiveMessageCenter {
 				});
 				scrollToBottom();
 			}
-
 			public void onSendFileMessage(Uri uri) {
-
 				// First, create the file, and populate some metadata about it.
 				final FileMessage message = new FileMessage();
 				boolean successful = message.createStoredFile(uri.toString());
-
 				if(successful) {
 					// Finally, send out the message.
 					MessageManager.sendMessage(message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
 							messageCenterView.addMessage(message, false);
+							messageCenterView.repositionDrawer(false);
 						}
 					});
 					scrollToBottom();
@@ -77,8 +78,9 @@ public class ApptentiveMessageCenter {
 					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT);
 				}
 			}
-		});
-		scrollToBottom();
+		};
+
+		messageCenterView = new MessageCenterView((Activity) context, onSendMessagelistener);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
@@ -96,25 +98,53 @@ public class ApptentiveMessageCenter {
 					public void run() {
 						List<Message> messages = MessageManager.getMessages();
 						messageCenterView.setMessages(messages);
+						scrollToBottom();
 					}
 				});
 				return false;
 			}
 		};
 
-		MessageManager.asyncFetchAndStoreMessages(listener);
-
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setInternalSentMessageListener(messageCenterView);
+
+		Log.d("Starting Message Center polling thread.");
+		pollForMessages = true;
+		new Thread() {
+			@Override
+			public void run() {
+				while(pollForMessages) {
+					MessageManager.fetchAndStoreMessages(listener);
+					try {
+						Thread.sleep(DEFAULT_POLLING_INTERVAL);
+					} catch (InterruptedException e) {
+						Log.w("Message Center polling thread interrupted.");
+						return;
+					}
+				}
+				Log.d("Stopping Message Center polling thread.");
+			}
+		}.start();
+
+		scrollToBottom();
 	}
 
 	private static void scrollToBottom() {
+		// Double post to make sure it's absolutely run last after anything else in queue.
 		messageCenterView.post(new Runnable() {
 			public void run() {
-				ScrollView scroll = (ScrollView) messageCenterView.findViewById(R.id.apptentive_message_center_scrollview);
-				scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				messageCenterView.post(new Runnable() {
+					public void run() {
+						ScrollView scroll = (ScrollView) messageCenterView.findViewById(R.id.apptentive_message_center_scrollview);
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+					}
+				});
 			}
 		});
+	}
+
+	public static void onStop(Context context) {
+		pollForMessages = false;
 	}
 }
 

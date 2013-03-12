@@ -67,6 +67,24 @@ public class ViewActivity extends ApptentiveActivity {
 	}
 
 	@Override
+	protected void onStop() {
+		super.onStop();
+		switch (activeModule) {
+			case ABOUT:
+				break;
+			case SURVEY:
+				break;
+			case MESSAGE_CENTER:
+				ApptentiveMessageCenter.onStop(this);
+				break;
+			default:
+				Log.w("No Activity specified. Finishing...");
+				finish();
+				break;
+		}
+	}
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode == Activity.RESULT_OK) {

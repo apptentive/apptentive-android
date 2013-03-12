@@ -51,9 +51,10 @@ public class MessageManager {
 		// Fetch the messages.
 		List<Message> messagesToSave = fetchMessages(getMessageStore().getLastReceivedMessageId());
 
-		if (messagesToSave == null) {
+		if (messagesToSave == null || messagesToSave.size() == 0) {
 			return;
 		}
+		Log.d("Messages retrieved.");
 		getMessageStore().addOrUpdateItems(messagesToSave.toArray(new Message[]{}));
 
 		// Signal listener
