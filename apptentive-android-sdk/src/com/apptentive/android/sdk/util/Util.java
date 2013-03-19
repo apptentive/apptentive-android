@@ -12,10 +12,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
-import android.view.View;
-import android.view.Window;
+import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import com.apptentive.android.sdk.Log;
 
@@ -217,4 +217,17 @@ public class Util {
 		}
 	}
 
+	public static Point getScreenSize(Context context) {
+		Point ret = new Point();
+		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = windowManager.getDefaultDisplay();
+		// TODO: getWidth(), getHeight(), and getOrientation() are deprecated in API 13 in favor of getSize() and getRotation().
+		int orientation = display.getOrientation();
+		if(orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+			ret.set(display.getWidth(), display.getHeight());
+		} else {
+			ret.set(display.getHeight(), display.getWidth());
+		}
+		return ret;
+	}
 }

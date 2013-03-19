@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.FileMessage;
+import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.FileInputStream;
@@ -27,6 +28,14 @@ import java.io.FileInputStream;
  * @author Sky Kelsey
  */
 public class FileMessageView extends MessageView<FileMessage> {
+
+	// Some limits to keep images from being bigger than their display area.
+	private final static float MAX_IMAGE_SCREEN_PROPORTION_X = 0.5f;
+	private final static float MAX_IMAGE_SCREEN_PROPORTION_Y = 0.6f;
+
+	// Some absolute size limits to keep bitmap sizes down.
+	private final static int MAX_IMAGE_DISPLAY_WIDTH = 800;
+	private final static int MAX_IMAGE_DISPLAY_HEIGHT = 800;
 
 	public FileMessageView(Context context, FileMessage message) {
 		super(context, message);
@@ -72,8 +81,14 @@ public class FileMessageView extends MessageView<FileMessage> {
 				FileInputStream fis = null;
 				Bitmap imageBitmap = null;
 				try {
+					System.gc();
 					fis = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
-					imageBitmap = BitmapFactory.decodeStream(fis);
+					Point point = Util.getScreenSize(context);
+					int maxImageWidth = (int)(MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
+					int maxImageHeight = (int)(MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
+					maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
+					maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
+					imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null);
 				} catch (Exception e) {
 					Log.e("Error opening stored file.", e);
 				} finally {

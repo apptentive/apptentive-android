@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -28,8 +30,11 @@ import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -233,7 +238,25 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 		AlertDialog dialog = new AlertDialog.Builder(context).create();
 		ImageView imageView = new ImageView(context);
-		imageView.setImageURI(data);
+
+		// Show a thumbnail version of the image.
+		InputStream is = null;
+		final Bitmap thumbnail;
+		try {
+			is = Apptentive.getContentResolver().openInputStream(data);
+			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null); // Uses 2-bytes instead of default 4 per pixel
+		} catch (FileNotFoundException e) {
+			// TODO: Error toast?
+			return;
+		} finally {
+			Util.ensureClosed(is);
+		}
+		if(thumbnail == null) {
+			return;
+		}
+
+		imageView.setImageBitmap(thumbnail);
+		//imageView.setImageURI(data);
 		dialog.setView(imageView);
 		dialog.setTitle("Send attachment?");
 		dialog.setButton("Yes", new DialogInterface.OnClickListener() {
@@ -245,6 +268,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		dialog.setButton2("No", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				Log.v("Don't send attachment.");
+			}
+		});
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface dialogInterface) {
+				thumbnail.recycle();
+				System.gc();
 			}
 		});
 		dialog.show();

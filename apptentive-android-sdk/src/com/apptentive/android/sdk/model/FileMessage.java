@@ -8,25 +8,25 @@ package com.apptentive.android.sdk.model;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.FileStore;
+import com.apptentive.android.sdk.util.CountingOutputStream;
+import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author Sky Kelsey
  */
 public class FileMessage extends Message {
+
+	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 
 	private static final String KEY_FILE_NAME = "file_name";
 	private static final String KEY_MIME_TYPE = "mime_type";
@@ -106,18 +106,18 @@ public class FileMessage extends Message {
 
 		// Copy the file contents over.
 		InputStream is = null;
-		FileOutputStream fos = null;
+		CountingOutputStream cos = null;
 		try {
-			is = Apptentive.getContentResolver().openInputStream(uri);
-			fos = appContext.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE);
-			byte[] buffer = new byte[1024];
-			int read;
-			int total = 0;
-			while ((read = is.read(buffer, 0, 1024)) > 0) {
-				total++;
-				fos.write(buffer, 0, read);
-			}
-			Log.d("Saved file, size = " + total + "k");
+			is = new BufferedInputStream(Apptentive.getContentResolver().openInputStream(uri));
+			cos = new CountingOutputStream(new BufferedOutputStream(appContext.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
+			System.gc();
+			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_STORED_IMAGE_EDGE, MAX_STORED_IMAGE_EDGE, null);
+			// TODO: Is JPEG what we want here?
+			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
+			cos.flush();
+			Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			smaller.recycle();
+			System.gc();
 		} catch (FileNotFoundException e) {
 			Log.e("File not found while storing file.", e);
 			return false;
@@ -126,7 +126,7 @@ public class FileMessage extends Message {
 			return false;
 		} finally {
 			Util.ensureClosed(is);
-			Util.ensureClosed(fos);
+			Util.ensureClosed(cos);
 		}
 
 		// Create a StoredFile database entry for this locally saved file.
