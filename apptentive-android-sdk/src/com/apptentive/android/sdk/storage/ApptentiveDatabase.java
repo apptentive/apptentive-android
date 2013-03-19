@@ -146,6 +146,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 				db.insert(TABLE_RECORD, null, values);
 			}
 		}
+		cursor.close();
 		db.setTransactionSuccessful();
 		db.endTransaction();
 		db.close();
@@ -265,15 +266,19 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		} else {
 			db.update(TABLE_KEYVALUE, values, KEYVALUE_KEY_KEY + " = ?", new String[]{key});
 		}
+		db.close();
 	}
 
 	public synchronized String getKeyValue(String key) {
+		String ret = null;
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery(QUERY_KEYVALUE_BY_KEY, new String[]{key});
 		if (cursor.moveToFirst()) {
-			return cursor.getString(0);
+			ret = cursor.getString(0);
 		}
-		return null;
+		cursor.close();
+		db.close();
+		return ret;
 	}
 
 
@@ -306,21 +311,19 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 
 
 	public synchronized StoredFile getStoredFile(String id) {
+		StoredFile ret = null;
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
 		if (cursor.moveToFirst()) {
-			StoredFile storedFile = new StoredFile();
-			storedFile.setId(id);
-			storedFile.setMimeType(cursor.getString(1));
-			storedFile.setOriginalUri(cursor.getString(2));
-			storedFile.setLocalFilePath(cursor.getString(3));
-			storedFile.setApptentiveUri(cursor.getString(4));
-			cursor.close();
-			db.close();
-			return storedFile;
+			ret = new StoredFile();
+			ret.setId(id);
+			ret.setMimeType(cursor.getString(1));
+			ret.setOriginalUri(cursor.getString(2));
+			ret.setLocalFilePath(cursor.getString(3));
+			ret.setApptentiveUri(cursor.getString(4));
 		}
 		cursor.close();
 		db.close();
-		return null;
+		return ret;
 	}
 }
