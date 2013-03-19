@@ -114,6 +114,7 @@ public class ApptentiveMessageCenter {
 			@Override
 			public void run() {
 				while(pollForMessages) {
+					// TODO: Check for data connection present before trying.
 					MessageManager.fetchAndStoreMessages(listener);
 					try {
 						Thread.sleep(DEFAULT_POLLING_INTERVAL);

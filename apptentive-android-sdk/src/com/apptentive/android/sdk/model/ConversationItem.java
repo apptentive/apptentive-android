@@ -30,11 +30,8 @@ public abstract class ConversationItem extends JSONObject {
 	public ConversationItem() {
 		initType();
 		long millis = new Date().getTime();
-		Log.e("millis: " + millis);
 		double point = (double)millis;
-		Log.e("point: " + point);
 		double seconds = point / 1000;
-		Log.e("stamp: " + seconds);
 
 		setClientCreatedAt(seconds);
 		setNonce(UUID.randomUUID().toString());

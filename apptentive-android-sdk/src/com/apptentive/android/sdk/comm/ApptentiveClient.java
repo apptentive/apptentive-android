@@ -29,6 +29,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -168,6 +169,8 @@ public class ApptentiveClient {
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
 		} catch (IOException e) {
 			Log.w("Error communicating with server.", e);
 		}
@@ -305,6 +308,8 @@ public class ApptentiveClient {
 			Log.e("Error getting file to upload.", e);
 		} catch (MalformedURLException e) {
 			Log.e("Error constructing url for file upload.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
 		} finally {
