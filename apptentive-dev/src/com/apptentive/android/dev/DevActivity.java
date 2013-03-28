@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
+import com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
@@ -39,7 +40,9 @@ public class DevActivity extends ApptentiveActivity {
 
 		// Setup UI:
 		final RatingModule ratingModule = Apptentive.getRatingModule();
-		//final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
+
+		// Uncomment if this app exists in the Amazon Store.
+		//ratingModule.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {

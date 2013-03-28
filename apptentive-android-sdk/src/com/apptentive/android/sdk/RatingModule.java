@@ -29,7 +29,7 @@ import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
-import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -470,7 +470,7 @@ public class RatingModule {
 								// Send user to app rating page
 								if (RatingModule.this.selectedRatingProvider == null) {
 									// Default to the Android Market provider, if none has been specified
-									RatingModule.this.selectedRatingProvider = new AndroidMarketRatingProvider();
+									RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
 								}
 								errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activityContext);
 								RatingModule.this.selectedRatingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
