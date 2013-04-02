@@ -22,21 +22,20 @@ import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Device;
+import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.RecordSendWorker;
+import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
@@ -212,13 +211,25 @@ public class Apptentive {
 		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(appContext);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
-			Log.e(deviceInfo.toString());
+			Log.v(deviceInfo.toString());
 			Apptentive.getDatabase().addOrUpdateItems(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
 
+		Sdk sdk = SdkManager.storeSdkAndReturnDiff(appContext);
+		if(sdk != null) {
+			Log.d("Sdk was updated.");
+			Log.v(sdk.toString());
+			Apptentive.getDatabase().addOrUpdateItems(sdk);
+		} else {
+			Log.d("Sdk was not updated.");
+		}
+
 		// TODO: Send AppInfo update if app info was updated.
+
+		// TODO: Check out locale...
+		Log.e("Default Locale: %s", Locale.getDefault().toString());
 
 		// TODO: Handle upgrades to the database.
 

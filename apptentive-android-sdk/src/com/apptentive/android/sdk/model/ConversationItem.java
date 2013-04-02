@@ -181,6 +181,9 @@ public abstract class ConversationItem extends JSONObject {
 		// Device
 		Device,
 
+		// Sdk
+		Sdk,
+
 		// Legacy
 		feedback,
 		survey,
@@ -209,6 +212,8 @@ public abstract class ConversationItem extends JSONObject {
 					return BaseType.survey;
 				case Device:
 					return BaseType.device;
+				case Sdk:
+					return BaseType.sdk;
 				case unknown:
 					return BaseType.unknown;
 				default:
@@ -221,6 +226,7 @@ public abstract class ConversationItem extends JSONObject {
 		message,
 		event,
 		device,
+		sdk,
 		unknown,
 		// Legacy
 		survey;

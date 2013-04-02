@@ -51,6 +51,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
+	private static final String ENDPOINT_SDKS = ENDPOINT_BASE + "/sdks";
 
 	// Old API
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
@@ -106,6 +107,10 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse putDevice(Device device) {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SDKS, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {

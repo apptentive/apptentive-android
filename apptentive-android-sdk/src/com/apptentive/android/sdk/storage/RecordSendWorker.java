@@ -72,6 +72,10 @@ public class RecordSendWorker {
 								response = ApptentiveClient.putDevice((Device) item);
 								DeviceManager.onSentDevice((Device) item, response);
 								break;
+							case sdk:
+								response = ApptentiveClient.putSdk((Sdk) item);
+								SdkManager.onSentSdk((Sdk) item, response);
+								break;
 							case survey:
 								response = ApptentiveClient.postSurvey((SurveyPayload) item);
 								// Survey responses don't need to be stored locally.
