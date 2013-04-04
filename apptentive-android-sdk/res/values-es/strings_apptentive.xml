@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="apptentive_app_name">Apptentive</string>
+	<string name="apptentive_activity_name">Apptentive</string>
+	<string name="apptentive_default_host_app_name">Esta Aplicacion</string>
+	<string name="apptentive_skip">Saltar</string>
+	<string name="apptentive_cancel">Cancelar</string>
+	<string name="apptentive_back">Regresar</string>
+	<string name="apptentive_send">Enviar</string>
+	<string name="apptentive_ok">Aceptar </string>
+	<string name="apptentive_oops">¡Vaya!</string>
+	<string name="apptentive_feedback_title">Sugerencias </string>
+	<string name="apptentive_edittext_feedback_message_forced">Sugerencias (necesarias)</string>
+	<string name="apptentive_edittext_feedback_message">¿Que podemos hacer para que usted disfrute su Aplicacion? Apreciamos sus sugerencias</string>
+	<string name="apptentive_edittext_email_text">Correo Electronico</string>
+	<string name="apptentive_branding_text">Sugerencias proporcionadas por Apptentive</string>
+	<string name="apptentive_about_title">Acerca de Apptentive</string>
+	<string name="apptentive_about_header_button_okay_text">Aceptar</string>
+	<string name="apptentive_about_message_1">Esta Aplicacion esta usando los servicios de Apptentive para escuchar sus sugerencias y comentarios.</string>
+	<string name="apptentive_about_message_2">Sus sugerencias y comentarios seran hospedados por Apptentive bajo sus politicas de confidencialidad y las politicas de confidencialidad del Desarollador</string>
+	<string name="apptentive_enjoyment_message_fs">Te gusta %s?</string>
+	<string name="apptentive_rating_title">Gracias</string>
+	<string name="apptentive_rating_message_fs">Estamos muy contentos de que hayas disfrutado %s. Nos seria de gran ayuda si nos evaluaras en nuestro Mercado. Gracias por elegirnos y por pasar tiempo con nosotros.</string>
+	<string name="apptentive_rating_rate">Evaluar %s</string>
+	<string name="apptentive_rating_remind">Recordarme mas tarde</string>
+	<string name="apptentive_rating_no">No Gracias</string>
+	<string name="apptentive_rating_provider_no_android_market">El Mercado de Android no se encontro. Por favor instale El Mercado de Android antes de evaluar esta Aplicacion</string>
+	<string name="apptentive_rating_provider_no_mikandi">El Mercado de MiKandi no se encontro. Por favor instale El Mercado de Mikandi antes de evaluar esta Aplicacion.</string>
+	<string name="apptentive_rating_error">Por el momento no podemos cargar los rangos para esta Aplicacion. Por favor visita nuestro mercado y calificalo ahi.</string>
+	<string name="apptentive_survey_send_response">Enviar respuesta</string>
+	<string name="apptentive_survey_required">Obligatorio</string>
+	<string name="apptentive_survey_optional">Opcional</string>
+	<string name="apptentive_survey_success_title">Encuesta Terminada</string>
+	<string name="apptentive_survey_positive_button">Aceptar</string>
+</resources>
