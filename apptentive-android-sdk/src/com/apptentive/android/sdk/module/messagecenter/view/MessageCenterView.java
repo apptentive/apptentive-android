@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.*;
 import android.widget.*;
+import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -71,14 +72,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			}
 		});
 
-/*
 		View aboutApptentive = findViewById(R.id.apptentive_message_center_powered_by_apptentive);
 		aboutApptentive.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				AboutModule.getInstance().show(context);
 			}
 		});
-*/
 
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
 		attachButton.setOnClickListener(new OnClickListener() {
