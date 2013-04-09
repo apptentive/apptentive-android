@@ -16,43 +16,37 @@
               android:paddingBottom="3dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp">
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal">
+    <RelativeLayout android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
         <TextView android:id="@+id/apptentive_message_sender_name"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:padding="0dp"
                   android:textSize="16sp"
                   android:textStyle="bold"
-                  android:textColor="@color/apptentive_message_sender_text_color"/>
-        <LinearLayout android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"/>
+                  android:textColor="@color/apptentive_message_sender_text_color"
+                  android:layout_alignParentTop="true"
+                  android:layout_alignParentRight="true"/>
+        <FrameLayout android:id="@+id/apptentive_message_avatar"
+                     android:layout_width="40dp"
+                     android:layout_height="40dp"
+                     android:layout_marginLeft="5dp"
+                     android:layout_alignParentRight="true"
+                     android:layout_below="@id/apptentive_message_sender_name"/>
+        <FrameLayout android:id="@+id/apptentive_message_body"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:background="@drawable/apptentive_message_bubble_outgoing_top"
+                     android:layout_toLeftOf="@id/apptentive_message_avatar"
+                     android:layout_below="@id/apptentive_message_sender_name"/>
         <TextView android:id="@+id/apptentive_message_timestamp"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:padding="0dp"
                   android:textSize="9sp"
                   android:textStyle="bold"
-                  android:textColor="@color/apptentive_message_center_timestamp"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal">
-        <LinearLayout android:layout_width="0px"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:orientation="horizontal"
-                      android:gravity="right">
-            <FrameLayout android:id="@+id/apptentive_message_body"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:background="@drawable/apptentive_message_bubble_outgoing_top"/>
-        </LinearLayout>
-        <FrameLayout android:id="@+id/apptentive_message_avatar"
-                     android:layout_width="40dp"
-                     android:layout_height="40dp"
-                     android:layout_marginLeft="5dp"/>
-    </LinearLayout>
+                  android:textColor="@color/apptentive_message_center_timestamp"
+                  android:layout_alignParentRight="true"
+                  android:layout_below="@id/apptentive_message_body"/>
+    </RelativeLayout>
 </LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,10 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 import android.widget.Toast;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
@@ -54,7 +52,7 @@ public class ApptentiveMessageCenter {
 				MessageManager.sendMessage(message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						messageCenterView.addMessage(message, false);
+						messageCenterView.addMessage(message);
 					}
 				});
 				scrollToBottom();
@@ -68,8 +66,7 @@ public class ApptentiveMessageCenter {
 					MessageManager.sendMessage(message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
-							messageCenterView.addMessage(message, false);
-							messageCenterView.repositionDrawer(false);
+							messageCenterView.addMessage(message);
 						}
 					});
 					scrollToBottom();
@@ -130,18 +127,8 @@ public class ApptentiveMessageCenter {
 		scrollToBottom();
 	}
 
-	private static void scrollToBottom() {
-		// Double post to make sure it's absolutely run last after anything else in queue.
-		messageCenterView.post(new Runnable() {
-			public void run() {
-				messageCenterView.post(new Runnable() {
-					public void run() {
-						ScrollView scroll = (ScrollView) messageCenterView.findViewById(R.id.apptentive_message_center_scrollview);
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
-					}
-				});
-			}
-		});
+	public static void scrollToBottom() {
+		messageCenterView.scrollMessageListViewToBottom();
 	}
 
 	public static void onStop(Context context) {

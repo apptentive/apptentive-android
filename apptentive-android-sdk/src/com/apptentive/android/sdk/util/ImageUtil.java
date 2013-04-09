@@ -48,26 +48,9 @@ public class ImageUtil {
 		return inSampleSize;
 	}
 
-	public static Bitmap decodeSampledBitmapFromResource(InputStream stream, int reqWidth, int reqHeight) {
-
-		// First decode with inJustDecodeBounds=true to check dimensions
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeStream(stream, null, options);
-
-		Log.e("Bitmap dimensions: %d x %d", options.outWidth, options.outHeight);
-
-		// Calculate inSampleSize
-		options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-		// Decode bitmap with inSampleSize set
-		options.inJustDecodeBounds = false;
-		return BitmapFactory.decodeStream(stream, null, options);
-	}
-
 	/**
 	 * This method decodes a bitmap from a file, and does pixel combining in order to produce an in-memory bitmap that is
-	 * smaller than the original.
+	 * smaller than the original. It will create only the returned bitmap in memory.
 	 * From <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large Bitmaps Efficiently</a>
 	 *
 	 * @param is              An InputStream containing the bytes of an image.
@@ -104,7 +87,7 @@ public class ImageUtil {
 			Log.d("Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
 			return ret;
 		} catch (IOException e) {
-			Log.e("Error resizing bitmap from is.", e);
+			Log.e("Error resizing bitmap from InputStream.", e);
 		} finally {
 			Util.ensureClosed(bis);
 		}
@@ -132,9 +115,7 @@ public class ImageUtil {
 		int height = tempBitmap.getHeight();
 
 		// Find the greatest ration difference, as this is what we will shrink both sides to.
-		float widthRatio = maxWidth <= 0 ? 1.0f : (float) maxWidth / width;
-		float heightRatio = maxHeight <= 0 ? 1.0f : (float) maxHeight / height;
-		float ratio = Math.min(widthRatio, heightRatio);
+		float ratio = calculateBitmapScaleFactor(width, height, maxWidth, maxHeight);
 
 		if (ratio < 1.0f) { // Don't blow up small images, only shrink bigger ones.
 			int newWidth = (int) (ratio * width);
@@ -145,5 +126,11 @@ public class ImageUtil {
 			tempBitmap.recycle();
 		}
 		return outBitmap;
+	}
+
+	public static float calculateBitmapScaleFactor(int width, int height, int maxWidth, int maxHeight) {
+		float widthRatio = maxWidth <= 0 ? 1.0f : (float) maxWidth / width;
+		float heightRatio = maxHeight <= 0 ? 1.0f : (float) maxHeight / height;
+		return Math.min(1.0f, Math.min(widthRatio, heightRatio)); // Don't scale above 1.0x
 	}
 }

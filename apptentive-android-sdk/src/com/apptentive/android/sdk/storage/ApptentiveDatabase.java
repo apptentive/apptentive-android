@@ -184,7 +184,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		if (cursor.moveToFirst()) {
 			String json = cursor.getString(7);
 			String baseType = cursor.getString(2);
-			conversationItem = RecordFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
+			conversationItem = ConversationItemFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
 		}
 
 		cursor.close();
@@ -199,7 +199,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		if (cursor.moveToFirst()) {
 			String json = cursor.getString(7);
 			String baseType = cursor.getString(2);
-			conversationItem = RecordFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
+			conversationItem = ConversationItemFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
 		}
 		cursor.close();
 		db.close();

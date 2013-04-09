@@ -14,7 +14,7 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class RecordFactory {
+public class ConversationItemFactory {
 
 	/**
 	 * Constructing a JSONObject is zero cost, since nothing is parsed. So this implementation allows creating a JSONObject
@@ -43,6 +43,8 @@ public class RecordFactory {
 				return EventFactory.fromJson(json);
 			case device:
 				return DeviceFactory.fromJson(json);
+			case sdk:
+				return SdkFactory.fromJson(json);
 			case survey:
 				try {
 					return new SurveyPayload(json);
