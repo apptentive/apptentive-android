@@ -195,7 +195,7 @@ public class FeedbackModule {
 			}
 
 			public void afterTextChanged(Editable editable) {
-				String text = editable.toString();
+				String text = editable.toString().trim();
 				int id = view.getId();
 				if (id == R.id.apptentive_feedback_user_email) {
 					FeedbackModule.this.feedback.setEmail(text);
