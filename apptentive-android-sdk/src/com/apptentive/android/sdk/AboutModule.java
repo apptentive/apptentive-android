@@ -55,7 +55,6 @@ public class AboutModule {
 				}
 			}
 		};
-		activity.findViewById(R.id.apptentive_button_about_okay);
 		activity.findViewById(R.id.apptentive_button_about_okay).setOnClickListener(clickListener);
 	}
 }
