@@ -37,7 +37,7 @@
 	<string name="apptentive_rating_rate">Rate %s</string>
 	<string name="apptentive_rating_remind">Remind me Later</string>
 	<string name="apptentive_rating_no">No Thanks</string>
-	<string name="apptentive_rating_provider_no_android_market">Android Market was not found. Please install Android Market before rating this app.</string>
+	<string name="apptentive_rating_provider_no_android_market">Google Play Store was not found. Please install Google Play Store before rating this app.</string>
 	<string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
 	<string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
 
