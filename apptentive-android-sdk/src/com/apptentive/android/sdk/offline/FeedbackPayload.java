@@ -19,6 +19,7 @@ import org.json.JSONException;
 public class FeedbackPayload extends Payload {
 	private String email;
 	private String feedback;
+	private String source;
 
 	public FeedbackPayload(String feedbackType){
 		try{
@@ -66,6 +67,7 @@ public class FeedbackPayload extends Payload {
 		try {
 			setString(email, "record", "user", "email");
 			setString(feedback, "record", "feedback", "feedback");
+			setString(source, "record", "feedback", "source");
 		} catch (JSONException e) {
 			Log.w("Exception getting Feedback Payload as JSON.", e);
 		}
@@ -81,5 +83,9 @@ public class FeedbackPayload extends Payload {
 
 	public void setFeedback(String feedback) {
 		this.feedback = feedback;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }
