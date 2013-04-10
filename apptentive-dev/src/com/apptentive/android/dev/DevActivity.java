@@ -85,7 +85,7 @@ public class DevActivity extends ApptentiveActivity {
 		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
 		messageCenterButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ApptentiveMessageCenter.show(DevActivity.this);
+				Apptentive.showMessageCenter(DevActivity.this);
 			}
 		});
 

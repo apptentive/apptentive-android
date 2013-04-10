@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Sdk;
+import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -401,5 +402,13 @@ public class Apptentive {
 	 */
 	public static SurveyModule getSurveyModule() {
 		return SurveyModule.getInstance();
+	}
+
+	/**
+	 * Opens the Apptentive Message Center UI Activity
+	 * @param context The Context from which to launch the Message Center
+	 */
+	public static void showMessageCenter(Context context) {
+		ApptentiveMessageCenter.show(context);
 	}
 }
