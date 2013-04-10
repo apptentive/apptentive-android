@@ -13,7 +13,7 @@
               android:baselineAligned="false"
               android:background="@android:color/transparent"
               android:paddingTop="3dp"
-              android:paddingBottom="3dp"
+              android:paddingBottom="5dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp">
     <RelativeLayout android:layout_width="fill_parent"

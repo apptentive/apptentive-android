@@ -32,18 +32,18 @@
     <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="44dp"
                   android:orientation="horizontal"
-                  android:paddingTop="3dp"
                   android:gravity="center_vertical">
         <ImageView android:id="@+id/apptentive_message_center_attach_button"
                    android:layout_width="44dp"
                    android:layout_height="fill_parent"
                    android:scaleType="fitCenter"
                    android:clickable="true"
-                   android:src="@drawable/android_perm_group_camera"/>
+                   android:src="@drawable/android_ic_action_photo"/>
         <EditText android:id="@+id/apptentive_message_center_message"
                   android:layout_width="0px"
                   android:layout_height="fill_parent"
                   android:layout_weight="1"
+                  android:layout_marginTop="2dp"
                   android:singleLine="false"
                   android:background="@drawable/android_textfield_default"
                   android:hint="Type a message..."/>
@@ -52,7 +52,7 @@
                    android:layout_height="fill_parent"
                    android:scaleType="fitCenter"
                    android:clickable="true"
-                   android:src="@drawable/android_ic_menu_send"/>
+                   android:src="@drawable/android_ic_action_send"/>
     </LinearLayout>
     <FrameLayout android:id="@+id/apptentive_message_center_powered_by_apptentive"
                  android:layout_width="fill_parent"
