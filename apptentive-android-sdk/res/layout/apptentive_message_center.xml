@@ -45,6 +45,7 @@
                   android:layout_weight="1"
                   android:layout_marginTop="2dp"
                   android:singleLine="false"
+                  android:textColor="@android:color/black"
                   android:background="@drawable/android_textfield_default"
                   android:hint="Type a message..."/>
         <ImageView android:id="@+id/apptentive_message_center_send"
