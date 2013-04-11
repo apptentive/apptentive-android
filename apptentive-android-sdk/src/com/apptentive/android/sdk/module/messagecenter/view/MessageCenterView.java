@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -38,7 +39,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	Activity context;
 	static OnSendMessageListener onSendMessageListener;
 	ListView messageListView;
-	MessageAdapter messageAdapter;
+	MessageAdapter<Message> messageAdapter;
 
 	EditText messageEditText;
 
@@ -139,14 +140,15 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 		imageView.setImageBitmap(thumbnail);
 		dialog.setView(imageView);
-		dialog.setTitle("Send attachment?");
-		dialog.setButton("Yes", new DialogInterface.OnClickListener() {
+		Resources resources = context.getResources();
+		dialog.setTitle(resources.getString(R.string.apptentive_message_center_attachment_title));
+		dialog.setButton(resources.getString(R.string.apptentive_yes), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				Log.v("Yes, send attachment.");
 				onSendMessageListener.onSendFileMessage(data);
 			}
 		});
-		dialog.setButton2("No", new DialogInterface.OnClickListener() {
+		dialog.setButton2(resources.getString(R.string.apptentive_no), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				Log.v("Don't send attachment.");
 			}

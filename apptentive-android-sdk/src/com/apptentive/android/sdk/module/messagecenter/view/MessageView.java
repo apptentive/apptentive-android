@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -61,7 +62,8 @@ abstract public class MessageView<T extends Message> extends FrameLayout {
 		TextView nameView = (TextView) findViewById(R.id.apptentive_message_sender_name);
 		String name = message.getSenderUsername();
 		if (name == null || name.equals("")) {
-			name = newMessage.isOutgoingMessage() ? "You" : "Them";
+			Resources resources = context.getResources();
+			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_them);
 		}
 		nameView.setText(name);
 
@@ -85,9 +87,10 @@ abstract public class MessageView<T extends Message> extends FrameLayout {
 	}
 
 	protected String createTimestamp(Double seconds) {
+		Resources resources = context.getResources();
 		if (seconds != null) {
-			return Util.secondsToDisplayString(seconds);
+			return Util.secondsToDisplayString(resources.getString(R.string.apptentive_message_sent_timestamp_format), seconds);
 		}
-		return "Sending...";
+		return resources.getString(R.string.apptentive_sending);
 	}
 }
