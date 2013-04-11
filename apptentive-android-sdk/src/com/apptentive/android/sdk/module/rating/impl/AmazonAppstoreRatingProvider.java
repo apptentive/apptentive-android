@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.rating.impl;
 
 import android.content.Context;
@@ -17,7 +23,9 @@ public class AmazonAppstoreRatingProvider implements IRatingProvider {
 		if (!args.containsKey("package")) {
 			throw new InsufficientRatingArgumentsException("Missing required argument 'package'");
 		}
-		context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + args.get("package"))));
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + args.get("package")));
+		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
 	}
 
 	public String activityNotFoundMessage(Context context) {

@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
-import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
@@ -36,6 +35,10 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To send extra data with your feedback.
 		// TODO: Figure this out.
 		//Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
+
+		// Uncomment if this app exists in the Amazon Store.
+		//Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());
+
 		// END APPTENTIVE INITIALIZATION
 
 		// Setup UI:

@@ -30,14 +30,16 @@ These instructions were tested on the Juno release
 The Apptentive SDK is now available in your Eclipse project.
 
 ##Using IntelliJ IDEA
-These instructions were tested on the Leda (12 EAP) release
+These instructions were tested on IDEA 12.1
 
-1. From the menu bar, click `File` -> `Add Module`.
-2. Click the `Create module from existing sources` radio button, choose the `apptentive-android-sdk` directory, and click `Next` until finished.
-3. From the menu bar, click `File` -> `Project Structure...`.
-4. Under `Project Settings` click `Modules`, and then select your app's module.
-5. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane.
-6. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`.
+1. From the menu bar, click `File` -> `Import Module`.
+2. Select the apptentive-android-sdk directory
+3. Click the `Create module from existing sources` radio button, and click `Next` until finished.
+4. From the menu bar, click `File` -> `Project Structure...`.
+5. Under `Project Settings` click `Modules`, and then select your app's module.
+6. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane.
+7. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`.
+8. Click `OK` to save and close the settings.
 
 The Apptentive SDK is now available in your IntelliJ IDEA project.
 
@@ -171,6 +173,15 @@ Apptentive.getSurveyModule().fetchSurvey(new OnSurveyFetchedListener() {
         });
     }
 });
+</code></pre>
+
+##4. Support for Amazon Appstore (Optional)
+If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
+there instead of to Google Play. To do this, simply add the following line in onCreate(). If you omit this line, ratings
+will go to Google Play.
+
+<pre><code>
+Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());
 </code></pre>
 
 # Done
