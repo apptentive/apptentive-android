@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -37,9 +37,10 @@
 	<string name="apptentive_rating_rate">Rate %s</string>
 	<string name="apptentive_rating_remind">Remind me Later</string>
 	<string name="apptentive_rating_no">No Thanks</string>
-	<string name="apptentive_rating_provider_no_android_market">Google Play Store was not found. Please install Google Play Store before rating this app.</string>
-	<string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
-	<string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
+    <string name="apptentive_rating_provider_no_google_play">Google Play was not found. Please install Google Play before rating this app.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore was not found. Please install Amazon Appstore before rating this app.</string>
+    <string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
+    <string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
 
     <string name="apptentive_survey_send_response">Send Response</string>
     <string name="apptentive_survey_required">Required</string>
