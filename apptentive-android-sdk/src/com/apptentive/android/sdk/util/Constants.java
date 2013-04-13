@@ -43,14 +43,15 @@ public class Constants {
 	public static final String PREF_KEY_RATING_USES = "uses";
 
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
-	public static final String PREF_KEY_APP_METRICS_ENABLED = PREF_KEY_APP_CONFIG_PREFIX+"metrics_enabled";
-	public static final String PREF_KEY_APP_RATINGS_ENABLED = PREF_KEY_APP_CONFIG_PREFIX+"ratings_enabled";
-	public static final String PREF_KEY_APP_RATINGS_CLEAR_ON_UPGRADE = PREF_KEY_APP_CONFIG_PREFIX+"ratings_clear_on_upgrade";
-	public static final String PREF_KEY_APP_RATINGS_PROMPT_LOGIC = PREF_KEY_APP_CONFIG_PREFIX+"ratings_prompt_logic";
-	public static final String PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT = PREF_KEY_APP_CONFIG_PREFIX+"ratings_days_before_prompt";
-	public static final String PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS = PREF_KEY_APP_CONFIG_PREFIX+"ratings_days_between_prompts";
-	public static final String PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT = PREF_KEY_APP_CONFIG_PREFIX+"ratings_events_before_prompt";
-	public static final String PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT = PREF_KEY_APP_CONFIG_PREFIX+"ratings_uses_before_prompt";
+	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
+	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
+
+	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION = 86400; // 24 hours
+	public static final int CONFIG_DEFAULT_DAYS_BEFORE_PROMPT = 30;
+	public static final int CONFIG_DEFAULT_USES_BEFORE_PROMPT = 5;
+	public static final int CONFIG_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
+	public static final int CONFIG_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
+	public static final String CONFIG_DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 

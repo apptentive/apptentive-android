@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
+import org.apache.http.Header;
+import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -31,6 +33,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,15 +50,15 @@ public class ApptentiveClient {
 
 	// New API
 	private static final String ENDPOINT_BASE = "http://api.apptentive-beta.com";
-	private static final String ENDPOINT_CONVERSATION_CREATE = ENDPOINT_BASE + "/conversation";
-	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_BASE + "/conversation?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_CONVERSATION = ENDPOINT_BASE + "/conversation";
+	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 	private static final String ENDPOINT_SDKS = ENDPOINT_BASE + "/sdks";
+	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
 
 	// Old API
-	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
 
@@ -63,12 +67,11 @@ public class ApptentiveClient {
 
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION_CREATE, Method.POST, conversationTokenRequest.toString());
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
 	}
 
-	public static ApptentiveHttpResponse getAppConfiguration(String deviceId) {
-		String uri = String.format(ENDPOINT_CONFIGURATION, deviceId);
-		return performHttpRequest(GlobalInfo.apiKey, uri, Method.GET, null);
+	public static ApptentiveHttpResponse getAppConfiguration() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -170,6 +173,14 @@ public class ApptentiveClient {
 					Log.d("Response: " + ret.getContent());
 				} else {
 					Log.w("Response: " + ret.getContent());
+				}
+			}
+			HeaderIterator headerIterator = response.headerIterator();
+			if(headerIterator != null) {
+				List<Header> headers = new ArrayList<Header>();
+				while (headerIterator.hasNext()) {
+					Header header = (Header) headerIterator.next();
+					headers.add(header);
 				}
 			}
 		} catch (IllegalArgumentException e) {

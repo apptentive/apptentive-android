@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Sdk;
@@ -67,7 +68,6 @@ public class Apptentive {
 	public static void onStart(Activity activity) {
 		appContext = activity.getApplicationContext();
 		init();
-		asyncFetchAppConfiguration();
 		ActivityLifecycleManager.activityStarted(activity);
 	}
 
@@ -197,15 +197,25 @@ public class Apptentive {
 				}
 			};
 			NetworkStateReceiver.addListener(networkStateListener);
+
+			// Grab the conversation token from shared preferences.
+			if(prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+				GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
+				GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
+			}
+
 			GlobalInfo.initialized = true;
 			Log.v("Done initializing...");
 		} else {
 			Log.v("Already initialized...");
 		}
 
-		// We need to try to fetch the token each time, because it is asynchronous, and we can't say for sure it's been
-		// fetched when this method exits.
-		asyncFetchConversationToken();
+		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
+		if(GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
+			asyncFetchConversationToken();
+		} else {
+			asyncFetchAppConfiguration();
+		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
@@ -243,10 +253,6 @@ public class Apptentive {
 	}
 
 	private synchronized static void asyncFetchConversationToken() {
-		// Don't even start a thread if another one fetched already. Yes this is redundant.
-		if(GlobalInfo.conversationToken != null) {
-			return;
-		}
 		new Thread() {
 			@Override
 			public void run() {
@@ -260,21 +266,6 @@ public class Apptentive {
 	 * from the server.
 	 */
 	private static void fetchConversationToken() {
-
-		// Have we already loaded the ConversationToken info?
-		if(GlobalInfo.conversationToken != null && GlobalInfo.personId != null) {
-			return;
-		}
-
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-		// Try to get it from SharedPreferences
-		if(prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
-			GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-			GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
-			return;
-		}
-
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
 		// TODO: Allow host app to send a user id, if available.
@@ -288,6 +279,7 @@ public class Apptentive {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
 				Log.d("ConversationToken: " + conversationToken);
+				SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				if (conversationToken != null && !conversationToken.equals("")) {
 					GlobalInfo.conversationToken = conversationToken;
 					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
@@ -298,6 +290,8 @@ public class Apptentive {
 					GlobalInfo.personId = personId;
 					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
 				}
+				// Try to fetch app configuration, since it depends on the conversation token.
+				asyncFetchAppConfiguration();
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -314,7 +308,7 @@ public class Apptentive {
 
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if(!force) {
-			String iso8601DateString = prefs.getString(Constants.PREF_KEY_APP_CONFIG_PREFIX + "cache-expiration", null);
+			String iso8601DateString = prefs.getString(Constants.PREF_KEY_APP_CONFIG_EXPIRATION, null);
 			if(iso8601DateString != null) {
 				Date expiration = Util.parseIso8601Date(iso8601DateString);
 				boolean expired = new Date().getTime() > expiration.getTime();
@@ -326,43 +320,28 @@ public class Apptentive {
 		}
 
 		Log.v("Fetching new configuration.");
-		Map<String, Object> config = new HashMap<String, Object>();
-		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(GlobalInfo.androidId);
+		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
 		if(!response.isSuccessful()) {
 			return;
 		}
 
 		try {
-			JSONObject root = new JSONObject(response.getContent());
-			Iterator it = root.keys();
-			while (it.hasNext()) {
-				String key = (String) it.next();
-				Object value = root.get(key);
-				if (value instanceof JSONObject) {
-					config.put(key, value.toString());
-				} else {
-					config.put(key, value);
+			int cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION;
+			if(response.getHeaders() != null && response.getHeaders().get("Cache-Control") != null) {
+				String cacheControl = response.getHeaders().get("Cache-Control");
+				String[] parts = cacheControl.split("max-age=");
+				if(parts.length == 2) {
+					try {
+						cacheSeconds = Integer.parseInt(parts[1]);
+					} catch (NumberFormatException e) {
+						Log.e("Error parsing cache expiration as number: %d", e, parts[1]);
+					}
 				}
 			}
+			Configuration config = new Configuration(response.getContent());
+			config.save(appContext, cacheSeconds);
 		} catch (JSONException e) {
 			Log.e("Error parsing app configuration from server.", e);
-		}
-
-		Log.v("App configuration: " + config.toString());
-		for (String key : config.keySet()) {
-			Object value = config.get(key);
-			Log.v("- %s = %s", key, value);
-			if (value instanceof Integer) {
-				prefs.edit().putInt(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Integer) value).commit();
-			} else if (value instanceof String) {
-				prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (String) value).commit();
-			} else if (value instanceof Boolean) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Boolean) value).commit();
-			} else if (value instanceof Long) {
-				prefs.edit().putLong(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Long) value).commit();
-			} else if (value instanceof Float) {
-				prefs.edit().putFloat(Constants.PREF_KEY_APP_CONFIG_PREFIX + key, (Float) value).commit();
-			}
 		}
 	}
 

@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -56,13 +57,6 @@ public class RatingModule {
 		return instance;
 	}
 
-	// Default configuration variables
-	public static int DEFAULT_DAYS_BEFORE_PROMPT = 30;
-	public static int DEFAULT_USES_BEFORE_PROMPT = 5;
-	public static int DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
-	public static int DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
-	public static String DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
-
 
 	// *************************************************************************************************
 	// ********************************************* Private *******************************************
@@ -80,14 +74,15 @@ public class RatingModule {
 	}
 
 	private boolean ratingPeriodElapsed() {
+		Configuration config = Configuration.load(prefs);
 		RatingState state = getState();
 		long days;
 		switch (state) {
 			case REMIND:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
+				days = config.getRatingsDaysBetweenPrompts();
 				break;
 			default:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
+				days = config.getRatingsDaysBeforePrompt();
 				break;
 		}
 		long now = new Date().getTime();
@@ -96,12 +91,14 @@ public class RatingModule {
 	}
 
 	private boolean eventThresholdReached() {
-		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
+		Configuration config = Configuration.load(prefs);
+		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
 		return getEvents() >= significantEventsBeforePrompt;
 	}
 
 	private boolean usesThresholdReached() {
-		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
+		Configuration config = Configuration.load(prefs);
+		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
 		return getUses() >= usesBeforePrompt;
 	}
 
@@ -149,7 +146,8 @@ public class RatingModule {
 	}
 
 	void onAppVersionChanged() {
-		if(prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_CLEAR_ON_UPGRADE, false)) {
+		Configuration config = Configuration.load(prefs);
+		if(config.isRatingsClearOnUpgrade()) {
 			setState(RatingState.START);
 			setStartOfRatingPeriod(new Date().getTime());
 			setEvents(0);
@@ -210,7 +208,8 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
-		if(!prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_ENABLED, true)) {
+		Configuration config = Configuration.load(prefs);
+		if(!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");
 			return;
 		}
@@ -241,7 +240,8 @@ public class RatingModule {
 	}
 
 	private boolean canShowRatingFlow(){
-		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+		Configuration config = Configuration.load(prefs);
+		String ratingsPromptLogic = config.getRatingsPromptLogic();
 		try{
 			return logic(new JSONObject(ratingsPromptLogic));
 		}catch(JSONException e){
@@ -365,24 +365,25 @@ public class RatingModule {
 	 * This method is for debugging purposed only.
 	 */
 	void logRatingFlowState() {
-		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+		Configuration config = Configuration.load(prefs);
+		String ratingsPromptLogic = config.getRatingsPromptLogic();
 
 		RatingState state = getState();
 		long days;
 		switch (state) {
 			case REMIND:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
+				days = config.getRatingsDaysBetweenPrompts();
 				break;
 			default:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
+				days = config.getRatingsDaysBeforePrompt();
 				break;
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
 		boolean elapsed = now > periodEnd;
 
-		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
-		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
+		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
+		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
 
 		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(), usesBeforePrompt, getEvents(), significantEventsBeforePrompt));
 	}

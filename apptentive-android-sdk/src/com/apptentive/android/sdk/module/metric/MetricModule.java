@@ -7,10 +7,9 @@
 package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventManager;
-import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Map;
 
@@ -37,8 +36,8 @@ public class MetricModule {
 	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
 		Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		if (prefs.getBoolean(Constants.PREF_KEY_APP_METRICS_ENABLED, true)) {
+		Configuration config = Configuration.load(appContext);
+		if (config.isMetricsEnabled()) {
 			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
 			EventManager.sendEvent(event);
