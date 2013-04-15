@@ -166,16 +166,16 @@ public class Configuration extends JSONObject {
 		return null;
 	}
 
-	public String getMessageCenterFgPoll() {
+	public int getMessageCenterFgPoll() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
 			if(messageCenter != null) {
 				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_FG_POLL)) {
-					return messageCenter.getString(KEY_MESSAGE_CENTER_FG_POLL);
+					return messageCenter.getInt(KEY_MESSAGE_CENTER_FG_POLL);
 				}
 			}
 		} catch (JSONException e) {
 		}
-		return null;
+		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
 	}
 }

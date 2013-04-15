@@ -52,6 +52,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
 	public static final int CONFIG_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
 	public static final String CONFIG_DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
+	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
 
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 

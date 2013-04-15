@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.TextMessage;
@@ -26,8 +27,6 @@ import java.util.List;
  * @author Sky Kelsey
  */
 public class ApptentiveMessageCenter {
-
-	private static final int DEFAULT_POLLING_INTERVAL = 8000;
 
 	protected static MessageCenterView messageCenterView;
 	private static boolean pollForMessages = false;
@@ -106,6 +105,8 @@ public class ApptentiveMessageCenter {
 		MessageManager.setInternalSentMessageListener(messageCenterView);
 
 		Log.d("Starting Message Center polling thread.");
+		Configuration configuration = Configuration.load(context);
+		final int fgPoll = configuration.getMessageCenterFgPoll() * 1000;
 		pollForMessages = true;
 		new Thread() {
 			@Override
@@ -114,7 +115,7 @@ public class ApptentiveMessageCenter {
 					// TODO: Check for data connection present before trying.
 					MessageManager.fetchAndStoreMessages(listener);
 					try {
-						Thread.sleep(DEFAULT_POLLING_INTERVAL);
+						Thread.sleep(fgPoll);
 					} catch (InterruptedException e) {
 						Log.w("Message Center polling thread interrupted.");
 						return;
