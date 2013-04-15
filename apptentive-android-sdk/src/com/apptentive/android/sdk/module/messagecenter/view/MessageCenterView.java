@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.util.Constants;
@@ -54,6 +55,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	protected void setup() {
 		LayoutInflater inflater = context.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
+
+		TextView titleTextView = (TextView) findViewById(R.id.apptentive_message_center_header_title);
+		String titleText = Configuration.load(context).getMessageCenterTitle();
+		if(titleText != null) {
+			titleTextView.setText(titleText);
+		}
 
 		messageListView = (ListView) findViewById(R.id.apptentive_message_center_list);
 		messageListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);

@@ -104,9 +104,9 @@ public class ApptentiveMessageCenter {
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setInternalSentMessageListener(messageCenterView);
 
-		Log.d("Starting Message Center polling thread.");
 		Configuration configuration = Configuration.load(context);
 		final int fgPoll = configuration.getMessageCenterFgPoll() * 1000;
+		Log.d("Starting Message Center polling every %d millis", fgPoll);
 		pollForMessages = true;
 		new Thread() {
 			@Override
