@@ -7,10 +7,8 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.metric.Event;
 import com.apptentive.android.sdk.storage.EventStore;
-import com.apptentive.android.sdk.storage.RecordSendWorker;
+import com.apptentive.android.sdk.storage.PayloadSendWorker;
 
 /**
  * @author Sky Kelsey
@@ -22,13 +20,7 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Event event) {
-		getEventStore().addOrUpdateItems(event);
-		RecordSendWorker.start();
-	}
-
-	public static void onSentEvent(Event event, ApptentiveHttpResponse response) {
-		if(response.isSuccessful()) {
-			getEventStore().deleteRecord(event);
-		}
+		getEventStore().addPayload(event);
+		PayloadSendWorker.start();
 	}
 }

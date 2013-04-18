@@ -22,47 +22,55 @@ import java.util.List;
  *
  * @author Sky Kelsey
  */
-public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore, MessageStore, EventStore, PayloadStore, KeyValueStore, FileStore {
+public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore, FileStore {
 
 	// COMMON
 	private static int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "apptentive";
 
-	// RECORD
-	private static final String TABLE_RECORD = "record";
-	private static final String RECORD_KEY_DB_ID = "_id";                           // 0
-	private static final String RECORD_KEY_ID = "id";                               // 1
-	private static final String RECORD_KEY_BASE_TYPE = "base_type";                 // 2
-	private static final String RECORD_KEY_CREATED_AT = "created_at";               // 3
-	private static final String RECORD_KEY_CLIENT_CREATED_AT = "client_created_at"; // 4
-	private static final String RECORD_KEY_NONCE = "nonce";                         // 5
-	private static final String RECORD_KEY_STATE = "state";                         // 6
-	private static final String RECORD_KEY_JSON = "json";                           // 7
 
-	private static final String TABLE_CREATE_RECORD =
-			"CREATE TABLE " + TABLE_RECORD +
+	// PAYLOAD
+	private static final String TABLE_PAYLOAD = "payload";
+	private static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
+	private static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
+	private static final String PAYLOAD_KEY_JSON = "json";           // 2
+
+	private static final String TABLE_CREATE_PAYLOAD =
+			"CREATE TABLE " + TABLE_PAYLOAD +
 					" (" +
-					RECORD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
-					RECORD_KEY_ID + " TEXT, " +
-					RECORD_KEY_BASE_TYPE + " TEXT, " +
-					RECORD_KEY_CREATED_AT + " DOUBLE, " +
-					RECORD_KEY_CLIENT_CREATED_AT + " DOUBLE, " +
-					RECORD_KEY_NONCE + " LONG, " +
-					RECORD_KEY_STATE + " TEXT, " +
-					RECORD_KEY_JSON + " TEXT" +
+					PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
+					PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
+					PAYLOAD_KEY_JSON + " TEXT" +
 					");";
 
-	// KeyValue TODO: Is this really necessary? There has to be a more elegant way to do this that is simpler.
-	private static final String TABLE_KEYVALUE = "key_value";
-	private static final String KEYVALUE_KEY_KEY = "key";     // 0
-	private static final String KEYVALUE_KEY_VALUE = "value"; // 1
+	private static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
 
-	private static final String TABLE_CREATE_KEYVALUE =
-			"CREATE TABLE " + TABLE_KEYVALUE +
+
+	// MESSAGE
+	private static final String TABLE_MESSAGE = "message";
+	private static final String MESSAGE_KEY_DB_ID = "_id";                           // 0
+	private static final String MESSAGE_KEY_ID = "id";                               // 1
+	private static final String MESSAGE_KEY_CLIENT_CREATED_AT = "client_created_at"; // 2
+	private static final String MESSAGE_KEY_NONCE = "nonce";                         // 3
+	private static final String MESSAGE_KEY_STATE = "state";                         // 4
+	private static final String MESSAGE_KEY_JSON = "json";                           // 5
+
+	private static final String TABLE_CREATE_MESSAGE =
+			"CREATE TABLE " + TABLE_MESSAGE +
 					" (" +
-					KEYVALUE_KEY_KEY + " TEXT PRIMARY KEY, " +
-					KEYVALUE_KEY_VALUE + " TEXT" +
+					MESSAGE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
+					MESSAGE_KEY_ID + " TEXT, " +
+					MESSAGE_KEY_CLIENT_CREATED_AT + " DOUBLE, " +
+					MESSAGE_KEY_NONCE + " TEXT, " +
+					MESSAGE_KEY_STATE + " TEXT, " +
+					MESSAGE_KEY_JSON + " TEXT" +
 					");";
+
+	private static final String QUERY_MESSAGE_GET_BY_NONCE = "SELECT * FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_NONCE + " = ?";
+	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
+	private static final String QUERY_MESSAGE_GET_ALL_IN_ORDER = "SELECT * FROM " + TABLE_MESSAGE + " ORDER BY COALESCE(" + MESSAGE_KEY_ID + ", 'z') ASC";
+	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + Message.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
+
 
 	// FileStore
 	private static final String TABLE_FILESTORE = "file_store";
@@ -81,19 +89,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 					FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
 					");";
 
-	// Raw SQL
-	private static final String QUERY_RECORD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ConversationItem.State.sending.name() + "' ORDER BY " + RECORD_KEY_DB_ID + " ASC LIMIT 1";
-
-	private static final String QUERY_RECORD_GET_LAST_ID = "SELECT " + RECORD_KEY_ID + " FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_STATE + " = '" + ConversationItem.State.saved + "' AND " + RECORD_KEY_ID + " NOTNULL ORDER BY " + RECORD_KEY_ID + " DESC LIMIT 1";
-
-	private static final String QUERY_RECORD_GET_BY_LOCAL_ID = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_NONCE + " = ?";
-
-	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
-	private static final String QUERY_RECORD_GET_ALL_BY_BASE_TYPE = "SELECT * FROM " + TABLE_RECORD + " WHERE " + RECORD_KEY_BASE_TYPE + " = ? ORDER BY COALESCE(" + RECORD_KEY_ID + ", 'z') ASC";
-
-	private static final String QUERY_ITEM_GET_ALL_NONCES = "SELECT " + RECORD_KEY_NONCE + " FROM " + TABLE_RECORD;
-
-	private static final String QUERY_KEYVALUE_BY_KEY = "SELECT " + KEYVALUE_KEY_VALUE + " FROM " + TABLE_KEYVALUE + " WHERE " + KEYVALUE_KEY_KEY + " = ?";
 
 	public ApptentiveDatabase(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -101,115 +96,131 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(TABLE_CREATE_RECORD);
-		db.execSQL(TABLE_CREATE_KEYVALUE);
+		db.execSQL(TABLE_CREATE_MESSAGE);
+		db.execSQL(TABLE_CREATE_PAYLOAD);
 		db.execSQL(TABLE_CREATE_FILESTORE);
 	}
 
+	/**
+	 * TODO: Handle upgrade properly.
+	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORD);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_KEYVALUE);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYLOAD);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILESTORE);
 		onCreate(db);
 	}
 
+	// PAYLOAD: This table is used to store all the Payloads we want to send to the server.
+
 	/**
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
-	 *
-	 * @param conversationItems
 	 */
-	public synchronized void addOrUpdateItems(ConversationItem... conversationItems) {
+	public synchronized void addPayload(Payload... payloads) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		List<String> nonces = new ArrayList<String>();
-		Cursor cursor = db.rawQuery(QUERY_ITEM_GET_ALL_NONCES, null);
-
-		while (cursor.moveToNext()) {
-			nonces.add(cursor.getString(0));
-		}
-
 		db.beginTransaction();
-		for (ConversationItem conversationItem : conversationItems) {
+		for (Payload payload : payloads) {
 			ContentValues values = new ContentValues();
-			values.put(RECORD_KEY_ID, conversationItem.getId());
-			values.put(RECORD_KEY_BASE_TYPE, conversationItem.getBaseType().name());
-			values.put(RECORD_KEY_CREATED_AT, conversationItem.getCreatedAt());
-			values.put(RECORD_KEY_CLIENT_CREATED_AT, conversationItem.getCreatedAt());
-			values.put(RECORD_KEY_NONCE, conversationItem.getNonce());
-			values.put(RECORD_KEY_STATE, conversationItem.getState().name());
-			values.put(RECORD_KEY_JSON, conversationItem.toString());
-			if (nonces.contains(conversationItem.getNonce())) {
-				db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
-			} else {
-				db.insert(TABLE_RECORD, null, values);
-			}
+			values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
+			values.put(PAYLOAD_KEY_JSON, payload.toString());
+			db.insert(TABLE_PAYLOAD, null, values);
 		}
-		cursor.close();
 		db.setTransactionSuccessful();
 		db.endTransaction();
 		db.close();
 	}
 
-	public synchronized void updateRecord(ConversationItem conversationItem) {
-		SQLiteDatabase db = this.getWritableDatabase();
-		try {
-			db.beginTransaction();
-			ContentValues values = new ContentValues();
-			values.put(RECORD_KEY_ID, conversationItem.getId());
-			values.put(RECORD_KEY_BASE_TYPE, conversationItem.getBaseType().name());
-			values.put(RECORD_KEY_CREATED_AT, conversationItem.getCreatedAt());
-			values.put(RECORD_KEY_CLIENT_CREATED_AT, conversationItem.getClientCreatedAt());
-			values.put(RECORD_KEY_STATE, conversationItem.getState().name());
-			values.put(RECORD_KEY_JSON, conversationItem.toString());
-			db.update(TABLE_RECORD, values, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
-			db.setTransactionSuccessful();
-		} finally {
-			db.endTransaction();
+	public synchronized void deletePayload(Payload payload) {
+		if (payload != null) {
+			SQLiteDatabase db = getWritableDatabase();
+			db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
 			db.close();
 		}
 	}
 
-	public synchronized void deleteAllRecords() {
+	public synchronized void deleteAllPayloads() {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_RECORD, "", null);
+		db.delete(TABLE_PAYLOAD, "", null);
 		db.close();
 	}
 
-	public ConversationItem getRecordByNonce(String nonce) {
+	public synchronized Payload getOldestUnsentPayload() {
 		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_BY_LOCAL_ID, new String[]{nonce});
-		ConversationItem conversationItem = null;
+		Cursor cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
+		Payload payload = null;
 		if (cursor.moveToFirst()) {
-			String json = cursor.getString(7);
-			String baseType = cursor.getString(2);
-			conversationItem = ConversationItemFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
-		}
-
-		cursor.close();
-		db.close();
-		return conversationItem;
-	}
-
-	public synchronized ConversationItem getOldestUnsentRecord() {
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_NEXT_TO_SEND, null);
-		ConversationItem conversationItem = null;
-		if (cursor.moveToFirst()) {
-			String json = cursor.getString(7);
-			String baseType = cursor.getString(2);
-			conversationItem = ConversationItemFactory.fromJson(json, ConversationItem.BaseType.parse(baseType));
+			long databaseId = Long.parseLong(cursor.getString(0));
+			Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
+			String json = cursor.getString(2);
+			payload = PayloadFactory.fromJson(json, baseType);
+			payload.setDatabaseId(databaseId);
 		}
 		cursor.close();
 		db.close();
-		return conversationItem;
+		return payload;
 	}
 
-	public synchronized void deleteRecord(ConversationItem conversationItem) {
-		if (conversationItem != null) {
-			SQLiteDatabase db = getWritableDatabase();
-			db.delete(TABLE_RECORD, RECORD_KEY_NONCE + " = ?", new String[]{conversationItem.getNonce()});
+
+	// MessageStore
+
+	/**
+	 * Saves the message into the message table, and also into the payload table so it can be sent to the server.
+	 */
+	public synchronized void addOrUpdateMessages(boolean fromServer, Message... messages) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		try {
+			for (Message message : messages) {
+				Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_BY_NONCE, new String[]{message.getNonce()});
+				if (cursor.moveToFirst()) {
+					// Update
+					String databaseId = cursor.getString(0);
+					ContentValues messageValues = new ContentValues();
+					messageValues.put(MESSAGE_KEY_ID, message.getId());
+					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+					messageValues.put(MESSAGE_KEY_JSON, message.toString());
+					db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
+				} else {
+					// Insert
+					db.beginTransaction();
+					ContentValues messageValues = new ContentValues();
+					messageValues.put(MESSAGE_KEY_ID, message.getId());
+					messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
+					messageValues.put(MESSAGE_KEY_NONCE, message.getNonce());
+					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+					messageValues.put(MESSAGE_KEY_JSON, message.toString());
+					db.insert(TABLE_MESSAGE, null, messageValues);
+					if (!fromServer) {
+						ContentValues payloadValues = new ContentValues();
+						payloadValues.put(PAYLOAD_KEY_BASE_TYPE, message.getBaseType().name());
+						payloadValues.put(MESSAGE_KEY_JSON, message.toString());
+						db.insert(TABLE_PAYLOAD, null, payloadValues);
+					}
+					db.setTransactionSuccessful();
+					db.endTransaction();
+				}
+			}
+		} finally {
+			db.close();
+		}
+	}
+
+	public synchronized void updateMessage(Message message) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		try {
+			db.beginTransaction();
+			ContentValues values = new ContentValues();
+			values.put(MESSAGE_KEY_ID, message.getId());
+			values.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
+			values.put(MESSAGE_KEY_NONCE, message.getNonce());
+			values.put(MESSAGE_KEY_STATE, message.getState().name());
+			values.put(MESSAGE_KEY_JSON, message.toString());
+			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{message.getNonce()});
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
 			db.close();
 		}
 	}
@@ -218,11 +229,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		List<Message> messages = new ArrayList<Message>();
 		SQLiteDatabase db = this.getReadableDatabase();
 
-		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_ALL_BY_BASE_TYPE, new String[]{ConversationItem.BaseType.message.name()});
+		Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
 
 		if (cursor.moveToFirst()) {
 			do {
-				String json = cursor.getString(7);
+				String json = cursor.getString(5);
 				Message message = MessageFactory.fromJson(json);
 				if (message == null) {
 					Log.e("Error parsing Record json from database: %s", json);
@@ -239,40 +250,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 
 	public synchronized String getLastReceivedMessageId() {
 		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_RECORD_GET_LAST_ID, null);
+		Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_LAST_ID, null);
 		String ret = null;
-		if (cursor.moveToFirst()) {
-			ret = cursor.getString(0);
-		}
-		cursor.close();
-		db.close();
-		return ret;
-	}
-
-	//
-	// KeyValueStore
-	//
-
-	public synchronized void putKeyValue(String key, String value) {
-		SQLiteDatabase db = getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(KEYVALUE_KEY_KEY, key);
-		values.put(KEYVALUE_KEY_VALUE, value);
-
-		String existingValue = getKeyValue(key);
-		if (existingValue == null) {
-			db.insert(TABLE_KEYVALUE, null, values);
-		} else {
-			db.update(TABLE_KEYVALUE, values, KEYVALUE_KEY_KEY + " = ?", new String[]{key});
-		}
-		db.close();
-	}
-
-	public synchronized String getKeyValue(String key) {
-		String ret = null;
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_KEYVALUE_BY_KEY, new String[]{key});
 		if (cursor.moveToFirst()) {
 			ret = cursor.getString(0);
 		}
@@ -286,8 +265,25 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 	// File Store
 	//
 
+	public synchronized StoredFile getStoredFile(String id) {
+		StoredFile ret = null;
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
+		if (cursor.moveToFirst()) {
+			ret = new StoredFile();
+			ret.setId(id);
+			ret.setMimeType(cursor.getString(1));
+			ret.setOriginalUri(cursor.getString(2));
+			ret.setLocalFilePath(cursor.getString(3));
+			ret.setApptentiveUri(cursor.getString(4));
+		}
+		cursor.close();
+		db.close();
+		return ret;
+	}
+
 	public synchronized boolean putStoredFile(StoredFile storedFile) {
-		long ret = -1;
+		long ret;
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(FILESTORE_KEY_ID, storedFile.getId());
@@ -307,23 +303,5 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements RecordStore,
 		cursor.close();
 		db.close();
 		return ret != -1;
-	}
-
-
-	public synchronized StoredFile getStoredFile(String id) {
-		StoredFile ret = null;
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
-		if (cursor.moveToFirst()) {
-			ret = new StoredFile();
-			ret.setId(id);
-			ret.setMimeType(cursor.getString(1));
-			ret.setOriginalUri(cursor.getString(2));
-			ret.setLocalFilePath(cursor.getString(3));
-			ret.setApptentiveUri(cursor.getString(4));
-		}
-		cursor.close();
-		db.close();
-		return ret;
 	}
 }

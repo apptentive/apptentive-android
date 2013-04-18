@@ -29,7 +29,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.RecordSendWorker;
+import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
@@ -54,8 +54,6 @@ public class Apptentive {
 
 	/**
 	 * Reserved for future use.
-	 * @param activity The Activity from which this method is called.
-	 * @param savedInstanceState
 	 */
 	public static void onCreate(Activity activity, Bundle savedInstanceState) {
 		ActivityUtil.isCurrentActivityMainActivity(activity);
@@ -189,7 +187,7 @@ public class Apptentive {
 				public void stateChanged(NetworkInfo networkInfo) {
 					if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
 						Log.v("Network connected.");
-						RecordSendWorker.start();
+						PayloadSendWorker.start();
 					}
 					if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
 						Log.v("Network disconnected.");
@@ -223,7 +221,7 @@ public class Apptentive {
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			Apptentive.getDatabase().addOrUpdateItems(deviceInfo);
+			Apptentive.getDatabase().addPayload(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -232,7 +230,7 @@ public class Apptentive {
 		if(sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			Apptentive.getDatabase().addOrUpdateItems(sdk);
+			Apptentive.getDatabase().addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -245,7 +243,7 @@ public class Apptentive {
 		// TODO: Handle upgrades to the database.
 
 		// Finally, ensure the send worker is running.
-		RecordSendWorker.start();
+		PayloadSendWorker.start();
 	}
 
 	private static void onVersionChanged(int previousVersion, int currentVersion) {

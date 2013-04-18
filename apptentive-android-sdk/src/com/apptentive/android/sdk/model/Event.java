@@ -4,10 +4,9 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.metric;
+package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ConversationItem;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,11 +18,9 @@ import java.util.Map;
  */
 public class Event extends ConversationItem {
 
-
 	private static final String KEY_LABEL = "label";
 	private static final String KEY_DATA = "data";
 	private static final String KEY_TRIGGER = "trigger";
-
 
 	public Event(String json) throws JSONException {
 		super(json);
@@ -41,7 +38,7 @@ public class Event extends ConversationItem {
 				put(KEY_DATA, dataObject);
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to construct MetricPayload.", e);
+			Log.e("Unable to construct Event.", e);
 		}
 	}
 
@@ -53,8 +50,8 @@ public class Event extends ConversationItem {
 	}
 
 	@Override
-	protected void initType() {
-		setType(Type.Event);
+	protected void initBaseType() {
+		setBaseType(BaseType.event);
 	}
 
 	public void putData(Map<String, String> data) {
@@ -62,7 +59,7 @@ public class Event extends ConversationItem {
 			return;
 		}
 		try {
-			JSONObject dataObject = null;
+			JSONObject dataObject;
 			if (isNull(KEY_DATA)) {
 				dataObject = new JSONObject();
 				put(KEY_DATA, dataObject);
@@ -73,7 +70,7 @@ public class Event extends ConversationItem {
 				dataObject.put(key, data.get(key));
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to add data to metric.", e);
+			Log.e("Unable to add data to Event.", e);
 		}
 	}
 

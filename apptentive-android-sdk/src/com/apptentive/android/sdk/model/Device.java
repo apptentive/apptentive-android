@@ -12,7 +12,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class Device extends ConversationItem {
+public class Device extends Payload {
 
 	public static final String KEY = "device";
 
@@ -35,15 +35,16 @@ public class Device extends ConversationItem {
 	private static final String KEY_BOOTLOADER_VERSION = "bootloader_version";
 	private static final String KEY_RADIO_VERSION = "radio_version";
 
+	public Device() {
+		super();
+	}
+
 	public Device(String json) throws JSONException {
 		super(json);
 	}
 
-	public Device() {
-	}
-
-	public void initType() {
-		setType(Type.Device);
+	public void initBaseType() {
+		setBaseType(BaseType.device);
 	}
 
 	public String getUuid() {

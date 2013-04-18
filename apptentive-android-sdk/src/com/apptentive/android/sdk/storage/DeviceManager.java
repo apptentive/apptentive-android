@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
@@ -219,11 +217,5 @@ public class DeviceManager {
 
 		// Do nothing.
 		return null;
-	}
-
-	public static void onSentDevice(Device device, ApptentiveHttpResponse response) {
-		if(response.isSuccessful()) {
-			Apptentive.getDatabase().deleteRecord(device);
-		}
 	}
 }

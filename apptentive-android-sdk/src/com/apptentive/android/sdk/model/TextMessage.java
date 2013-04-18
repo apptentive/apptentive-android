@@ -7,8 +7,6 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ConversationItem;
-import com.apptentive.android.sdk.model.Message;
 import org.json.JSONException;
 
 /**
@@ -20,7 +18,6 @@ public class TextMessage extends Message {
 
 	public TextMessage() {
 		super();
-		setType(ConversationItem.Type.TextMessage);
 	}
 
 	public TextMessage(String json) throws JSONException {

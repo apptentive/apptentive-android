@@ -11,11 +11,10 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.storage.RecordSendWorker;
+import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public class MessageManager {
 	}
 
 	/**
-	 * Make sure to run this off the UI Thread.
+	 * Make sure to run this off the UI Thread, as it blocks on IO.
 	 *
 	 * @param listener
 	 */
@@ -55,7 +54,7 @@ public class MessageManager {
 			return;
 		}
 		Log.d("Messages retrieved.");
-		getMessageStore().addOrUpdateItems(messagesToSave.toArray(new Message[]{}));
+		getMessageStore().addOrUpdateMessages(true, messagesToSave.toArray(new Message[]{}));
 
 		// Signal listener
 		listener.onMessagesUpdated();
@@ -66,16 +65,16 @@ public class MessageManager {
 	}
 
 	public static void sendMessage(Message message) {
-		getMessageStore().addOrUpdateItems(message);
-		RecordSendWorker.start();
+		getMessageStore().addOrUpdateMessages(false, message);
+		PayloadSendWorker.start();
 	}
 
 	/**
-	 * This doesn't need to be run during normal program execution.
+	 * This doesn't need to be run during normal program execution. Testing only.
 	 */
 	public static void deleteAllRecords() {
-		Log.d("Deleting all messages.");
-		getMessageStore().deleteAllRecords();
+		Log.e("Deleting all messages.");
+		getMessageStore().deleteAllPayloads();
 	}
 
 	private static List<Message> fetchMessages(String after_id) {
@@ -105,7 +104,7 @@ public class MessageManager {
 					String json = items.getJSONObject(i).toString();
 					Message message = MessageFactory.fromJson(json);
 					// Since these came back from the server, mark them saved before updating them in the DB.
-					message.setState(ConversationItem.State.saved);
+					message.setState(Message.State.saved);
 					ret.add(message);
 				}
 			}
@@ -127,15 +126,15 @@ public class MessageManager {
 		if(response.isSuccessful()) {
 			try {
 				JSONObject responseJson = new JSONObject(response.getContent());
-				if (message.getState() == ConversationItem.State.sending) {
-					message.setState(ConversationItem.State.sent);
+				if (message.getState() == Message.State.sending) {
+					message.setState(Message.State.sent);
 				}
-				message.setId(responseJson.getString(ConversationItem.KEY_ID));
-				message.setCreatedAt(responseJson.getDouble(ConversationItem.KEY_CREATED_AT));
+				message.setId(responseJson.getString(Message.KEY_ID));
+				message.setCreatedAt(responseJson.getDouble(Message.KEY_CREATED_AT));
 			} catch (JSONException e) {
 				Log.e("Error parsing sent message response.", e);
 			}
-			getMessageStore().updateRecord(message);
+			getMessageStore().updateMessage(message);
 
 			if(internalSentMessageListener != null) {
 				internalSentMessageListener.onSentMessage(message);

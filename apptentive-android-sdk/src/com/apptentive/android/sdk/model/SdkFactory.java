@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Sky Kelsey
@@ -16,20 +15,12 @@ import org.json.JSONObject;
 public class SdkFactory {
 	public static Sdk fromJson(String json) {
 		try {
-			JSONObject root = new JSONObject(json);
-			ConversationItem.Type type = ConversationItem.Type.valueOf(root.getString(ConversationItem.KEY_TYPE));
-			switch (type) {
-				case Sdk:
-					return new Sdk(json);
-				case unknown:
-					break;
-				default:
-					break;
-			}
+			return new Sdk(json);
 		} catch (JSONException e) {
 			Log.v("Error parsing json as Sdk: %s", e, json);
 		} catch (IllegalArgumentException e) {
 			// Unknown unknown #rumsfeld
 		}
 		return null;
-	}}
+	}
+}

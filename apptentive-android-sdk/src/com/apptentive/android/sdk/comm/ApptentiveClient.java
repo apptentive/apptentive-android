@@ -10,7 +10,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.module.metric.Event;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.Header;
@@ -92,12 +92,6 @@ public class ApptentiveClient {
 				FileMessage fileMessage = (FileMessage) message;
 				StoredFile storedFile = fileMessage.getStoredFile();
 				return performMultipartFilePost(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
-			case Event:
-				break;
-			case feedback:
-				break;
-			case survey:
-				break;
 			case unknown:
 				break;
 		}
@@ -126,6 +120,8 @@ public class ApptentiveClient {
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		Log.d("Performing request to %s", uri);
+		//Log.e("OAUTH Token: %s", oauthToken);
+
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		try {
 			HttpClient httpClient;

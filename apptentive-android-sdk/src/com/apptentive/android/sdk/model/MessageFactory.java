@@ -17,7 +17,7 @@ public class MessageFactory {
 	public static Message fromJson(String json) {
 		try {
 			JSONObject root = new JSONObject(json);
-			ConversationItem.Type type = ConversationItem.Type.valueOf(root.getString(ConversationItem.KEY_TYPE));
+			Message.Type type = Message.Type.valueOf(root.getString(Message.KEY_TYPE));
 			switch (type) {
 				case TextMessage:
 					return new TextMessage(json);

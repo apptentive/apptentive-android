@@ -7,9 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.metric.Event;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Sky Kelsey
@@ -17,16 +15,7 @@ import org.json.JSONObject;
 public class EventFactory {
 	public static Event fromJson(String json) {
 		try {
-			JSONObject root = new JSONObject(json);
-			ConversationItem.Type type = ConversationItem.Type.valueOf(root.getString(ConversationItem.KEY_TYPE));
-			switch (type) {
-				case Event:
-					return new Event(json);
-				case unknown:
-					break;
-				default:
-					break;
-			}
+			return new Event(json);
 		} catch (JSONException e) {
 			Log.v("Error parsing json as Event: %s", e, json);
 		} catch (IllegalArgumentException e) {

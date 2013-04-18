@@ -9,6 +9,6 @@ package com.apptentive.android.sdk.storage;
 /**
  * @author Sky Kelsey
  */
-public interface EventStore extends RecordStore {
+public interface EventStore extends PayloadStore {
 
 }

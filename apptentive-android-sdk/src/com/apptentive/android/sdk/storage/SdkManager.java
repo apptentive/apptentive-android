@@ -8,9 +8,6 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -21,7 +18,7 @@ public class SdkManager {
 
 	public static Sdk storeSdkAndReturnDiff(Context context) {
 		Sdk original = getStoredSdk(context);
-		Sdk current = generateCurrentSdk(context);
+		Sdk current = generateCurrentSdk();
 		Sdk diff = diffSdk(original, current);
 		if(diff != null) {
 			storeSdk(context, current);
@@ -30,7 +27,7 @@ public class SdkManager {
 		return null;
 	}
 
-	private static Sdk generateCurrentSdk(Context context) {
+	private static Sdk generateCurrentSdk() {
 		Sdk sdk = new Sdk();
 
 		// First, get all the information we can load from static resources.
@@ -126,11 +123,5 @@ public class SdkManager {
 
 		// Do nothing.
 		return null;
-	}
-
-	public static void onSentSdk(Sdk sdk, ApptentiveHttpResponse response) {
-		if(response.isSuccessful()) {
-			Apptentive.getDatabase().deleteRecord(sdk);
-		}
 	}
 }

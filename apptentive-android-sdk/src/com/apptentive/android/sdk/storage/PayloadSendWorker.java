@@ -13,13 +13,13 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.metric.Event;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 
 /**
  * @author Sky Kelsey
  */
-public class RecordSendWorker {
+public class PayloadSendWorker {
 
 	private static final int NO_TOKEN_SLEEP = 5000;
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
@@ -34,7 +34,7 @@ public class RecordSendWorker {
 		}
 	}
 
-	private static RecordStore getRecordStore() {
+	private static PayloadStore getPayloadStore() {
 		return Apptentive.getDatabase();
 	}
 
@@ -42,63 +42,55 @@ public class RecordSendWorker {
 		public void run() {
 			try {
 				synchronized (this) {
-					RecordStore db = getRecordStore();
+					PayloadStore db = getPayloadStore();
 					while (true) {
 						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
-						ConversationItem item = null;
-						item = db.getOldestUnsentRecord();
-						if (item == null) {
+						Payload payload;
+						payload = db.getOldestUnsentPayload();
+						if (payload == null) {
 							// There is no payload in the db.
 							pause(EMPTY_QUEUE_SLEEP_TIME);
 							continue;
 						}
-						Log.d("Got a payload to send: " + item.getNonce());
+						Log.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
 
 						ApptentiveHttpResponse response = null;
 
-						switch (item.getBaseType()) {
+						switch (payload.getBaseType()) {
 							case message:
-								response = ApptentiveClient.postMessage((Message) item);
-								MessageManager.onSentMessage((Message) item, response);
+								response = ApptentiveClient.postMessage((Message) payload);
+								MessageManager.onSentMessage((Message) payload, response);
 								break;
 							case event:
-								response = ApptentiveClient.postEvent((Event) item);
-								EventManager.onSentEvent((Event) item, response);
+								response = ApptentiveClient.postEvent((Event) payload);
 								break;
 							case device:
-								response = ApptentiveClient.putDevice((Device) item);
-								DeviceManager.onSentDevice((Device) item, response);
+								response = ApptentiveClient.putDevice((Device) payload);
 								break;
 							case sdk:
-								response = ApptentiveClient.putSdk((Sdk) item);
-								SdkManager.onSentSdk((Sdk) item, response);
+								response = ApptentiveClient.putSdk((Sdk) payload);
 								break;
 							case survey:
-								response = ApptentiveClient.postSurvey((SurveyPayload) item);
-								// Survey responses don't need to be stored locally.
-								if(response.isSuccessful()) {
-									db.deleteRecord(item);
-								}
+								response = ApptentiveClient.postSurvey((SurveyPayload) payload);
 								break;
 							default:
-								Log.e("Didn't send unknown ConversationItemType: " + item.getType());
-								// TODO: Still send this stuff?
+								Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
+								db.deletePayload(payload);
 								break;
 						}
 
-						// Each Record type is handled by the appropriate handler, but if the message send fails permanently, delete it.
+						// Each Payload type is handled by the appropriate handler, but if sent correctly, or failed permanently to send, it should be removed from the queue.
 						if (response != null) {
 							if (response.isSuccessful()) {
-								Log.d("ConversationItem submission successful. Marking sent.", item.getNonce());
-								item.setState(ConversationItem.State.sent);
-								db.updateRecord(item);
+								Log.d("Payload submission successful. Removing from send queue.");
+								db.deletePayload(payload);
 							} else if (response.isRejectedPermanently() || response.isBadpayload()) {
-								Log.d("ConversationItem %s rejected.", item.getNonce());
-								Log.v("Rejected json:", item.toString());
-								db.deleteRecord(item);
+								Log.d("Payload rejected. Removing from send queue.");
+								Log.v("Rejected json:", payload.toString());
+								db.deletePayload(payload);
 							} else if (response.isRejectedTemporarily()) {
 								Log.d("Unable to send JSON. Leaving in queue.");
 								// Break the loop. Restart when network is reachable.

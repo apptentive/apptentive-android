@@ -8,116 +8,40 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
  * @author Sky Kelsey
  */
-public abstract class ConversationItem extends JSONObject {
+public abstract class ConversationItem extends Payload {
 
-	private Long databaseId;
-	private State state;
-
-	public static final String KEY_ID = "id";
-	public static final String KEY_TYPE = "type";
-	public static final String KEY_CREATED_AT = "created_at";
-	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
 	protected static final String KEY_NONCE = "nonce";
+	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
+	protected static final String KEY_CLIENT_CREATED_AT_TIMEZONE = "client_created_at_timezone";
+	protected static final String KEY_CLIENT_CREATED_AT_UTC_OFFSET = "client_created_at_utc_offset";
 
-	public ConversationItem() {
-		initType();
+	protected ConversationItem() {
+		super();
+		setNonce(UUID.randomUUID().toString());
+
 		long millis = new Date().getTime();
 		double point = (double)millis;
 		double seconds = point / 1000;
+		TimeZone timezone = TimeZone.getDefault();
+		Date now = new Date();
+		int utcOffset = timezone.getOffset(now.getTime()) / 1000;
 
 		setClientCreatedAt(seconds);
-		setNonce(UUID.randomUUID().toString());
-		state = State.sending;
+		setClientCreatedAtTimezone(timezone.getID());
+		setClientCreatedAtUtcOffset(utcOffset);
+
 	}
 
-	public ConversationItem(String json) throws JSONException {
+	protected ConversationItem(String json) throws JSONException {
 		super(json);
-	}
-
-	/**
-	 * Each subclass must set its type in this method.
-	 */
-	protected abstract void initType();
-
-	/**
-	 * Subclasses should override this method if there is any peculiarity in how they present or wrap json before sending.
-	 * @return
-	 */
-	public String marshallForSending() {
-		JSONObject wrapper = new JSONObject();
-		try {
-			wrapper.put(getBaseType().name(), this);
-		} catch (JSONException e) {
-			Log.w("Error wrapping Record in JSONObject.", e);
-			return null;
-		}
-		return wrapper.toString();
-	}
-
-	public long getDatabaseId() {
-		return databaseId;
-	}
-
-	public void setDatabaseId(long databaseId) {
-		this.databaseId = databaseId;
-	}
-
-	public State getState() {
-		if(state == null) {
-			return State.unknown;
-		}
-		return state;
-	}
-
-	public void setState(
-			State state) {
-		this.state = state;
-	}
-
-	public void setId(String id) {
-		try {
-			put(KEY_ID, id);
-		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_ID);
-		}
-	}
-
-	public String getId() {
-		try {
-			if (!isNull((KEY_ID))) {
-				return getString(KEY_ID);
-			}
-		} catch (JSONException e) {
-		}
-		return null;
-	}
-
-	public Type getType() {
-		try {
-			return Type.parse(getString(KEY_TYPE));
-		} catch (JSONException e) {
-		}
-		return Type.unknown;
-	}
-
-	protected void setType(Type type) {
-		try {
-			put(KEY_TYPE, type.name());
-		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_TYPE);
-		}
-	}
-
-	public BaseType getBaseType() {
-		return getType().getBaseType();
 	}
 
 	protected void setNonce(String nonce) {
@@ -138,22 +62,6 @@ public abstract class ConversationItem extends JSONObject {
 		return null;
 	}
 
-	public Double getCreatedAt() {
-		try {
-			return getDouble(KEY_CREATED_AT);
-		} catch (JSONException e) {
-		}
-		return null;
-	}
-
-	public void setCreatedAt(Double createdAt) {
-		try {
-			put(KEY_CREATED_AT, createdAt);
-		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CREATED_AT);
-		}
-	}
-
 	public Double getClientCreatedAt() {
 		try {
 			return getDouble(KEY_CLIENT_CREATED_AT);
@@ -170,102 +78,21 @@ public abstract class ConversationItem extends JSONObject {
 		}
 	}
 
-	public enum Type {
-		// Message
-		TextMessage,
-		FileMessage,
-
-		// Event
-		Event,
-
-		// Device
-		Device,
-
-		// Sdk
-		Sdk,
-
-		// Legacy
-		feedback,
-		survey,
-
-		// Unknown
-		unknown;
-
-		public static Type parse(String rawType) {
-			try {
-				return Type.valueOf(rawType);
-			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ConversationItem.Type: " + rawType);
-			}
-			return unknown;
-		}
-
-		public BaseType getBaseType() {
-			switch(this) {
-				case TextMessage:
-					return BaseType.message;
-				case FileMessage:
-					return BaseType.message;
-				case Event:
-					return BaseType.event;
-				case survey:
-					return BaseType.survey;
-				case Device:
-					return BaseType.device;
-				case Sdk:
-					return BaseType.sdk;
-				case unknown:
-					return BaseType.unknown;
-				default:
-					return BaseType.unknown;
-			}
+	private void setClientCreatedAtTimezone(String clientCreatedAtTimezone) {
+		try {
+			put(KEY_CLIENT_CREATED_AT_TIMEZONE, clientCreatedAtTimezone);
+		} catch (JSONException e) {
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_TIMEZONE);
 		}
 	}
 
-	public static enum BaseType {
-		message,
-		event,
-		device,
-		sdk,
-		unknown,
-		// Legacy
-		survey;
-
-		public static BaseType parse(String type) {
-			try {
-				return BaseType.valueOf(type);
-			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ConversationItem.BaseType: " + type);
-			}
-			return unknown;
-		}
-
-	}
-
-	public static enum State {
-		sending, // The item is either being sent, or is queued for sending.
-		sent,    // The item has been posted to the server successfully.
-		saved,   // The item has been returned from the server during a fetch.
-		unknown;
-
-		public static State parse(String state) {
-			try {
-				return State.valueOf(state);
-			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ConversationItem.State: " + state);
-			}
-			return unknown;
+	private void setClientCreatedAtUtcOffset(int clientCreatedAtUtcOffset) {
+		try {
+			put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
+		} catch (JSONException e) {
+			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_UTC_OFFSET);
 		}
 	}
 
-	/**
-	 * @deprecated Do not use this method to check for key existence. Instead us !isNull(KEY_NAME), as this works better
-	 * with keys with null values.
-	 * @param key
-	 * @return
-	 */
-	@Override
-	public boolean has(String key) {
-		return super.has(key);
-	}
+
 }

@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.module.metric.Event;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;

@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.offline;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ConversationItem;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.module.survey.Question;
 import com.apptentive.android.sdk.module.survey.SurveyDefinition;
 import org.json.JSONArray;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class SurveyPayload extends ConversationItem {
+public class SurveyPayload extends Payload {
 
 	private static final String KEY_RECORD = "record";
 	private static final String KEY_DEVICE = "device";
@@ -73,8 +73,8 @@ public class SurveyPayload extends ConversationItem {
 	}
 
 	@Override
-	protected void initType() {
-		setType(Type.survey);
+	protected void initBaseType() {
+		setBaseType(BaseType.survey);
 	}
 
 	@Override

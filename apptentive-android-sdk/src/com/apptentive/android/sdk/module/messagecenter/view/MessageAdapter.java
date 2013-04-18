@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.ConversationItem;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.TextMessage;
@@ -28,7 +28,7 @@ public class MessageAdapter<T extends Message> extends ArrayAdapter<T> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Message message = getItem(position);
-		if (message.getBaseType() == ConversationItem.BaseType.message) {
+		if (message.getBaseType() == Payload.BaseType.message) {
 			switch (message.getType()) {
 				case TextMessage:
 					return new TextMessageView(parent.getContext(), (TextMessage) message);
@@ -39,7 +39,7 @@ public class MessageAdapter<T extends Message> extends ArrayAdapter<T> {
 					return null;
 			}
 		}
-		Log.d("Can't render non-message conversation item as message: %s", message.getType());
+		Log.d("Can't render non-Message Payload as Message: %s", message.getType());
 		return null;
 
 	}

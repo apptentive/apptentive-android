@@ -16,27 +16,97 @@ import org.json.JSONObject;
  */
 public abstract class Message extends ConversationItem {
 
-	public static final int DEFAULT_PRIORITY = 10;
+	public static final String KEY_ID = "id";
+	public static final String KEY_CREATED_AT = "created_at";
+	public static final String KEY_TYPE = "type";
+	// State is not stored in JSON, only in DB.
+	private State state;
+
+	private static final String KEY_READ = "read";
 
 	private static final String KEY_SENDER = "sender";
 	private static final String KEY_SENDER_ID = "id";
 	private static final String KEY_SENDER_NAME = "name";
 	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
-	private static final String KEY_PRIORITY = "priority";
-	private static final String KEY_DISPLAY = "display";
-	private static final String KEY_USER_VISIBLE = "user_visible";
-	private static final String KEY_READ = "read";
 
 	protected Message() {
 		super();
 		setSenderId(GlobalInfo.personId);
+		state = State.sending;
+		setBaseType(BaseType.message);
+		initType();
 	}
 
 	protected Message(String json) throws JSONException {
 		super(json);
 	}
 
+	protected void initBaseType() {
+		setBaseType(BaseType.message);
+	}
+
 	protected abstract void initType();
+
+	public void setId(String id) {
+		try {
+			put(KEY_ID, id);
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_ID);
+		}
+	}
+
+	public String getId() {
+		try {
+			if (!isNull((KEY_ID))) {
+				return getString(KEY_ID);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public Double getCreatedAt() {
+		try {
+			return getDouble(KEY_CREATED_AT);
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setCreatedAt(Double createdAt) {
+		try {
+			put(KEY_CREATED_AT, createdAt);
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_CREATED_AT);
+		}
+	}
+
+	public Type getType() {
+		try {
+			return Type.parse(getString(KEY_TYPE));
+		} catch (JSONException e) {
+		}
+		return Type.unknown;
+	}
+
+	protected void setType(Type type) {
+		try {
+			put(KEY_TYPE, type.name());
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_TYPE);
+		}
+	}
+
+	public State getState() {
+		if(state == null) {
+			return State.unknown;
+		}
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
 
 	public String getSenderId() {
 		try {
@@ -94,37 +164,42 @@ public abstract class Message extends ConversationItem {
 		return null;
 	}
 
-	public Integer getPriority() {
-		try {
-			if (!isNull((KEY_PRIORITY))) {
-				return getInt(KEY_PRIORITY);
-			}
-		} catch (JSONException e) {
-		}
-		return DEFAULT_PRIORITY;
-	}
-
-	public String getDisplay() {
-		try {
-			if (!isNull((KEY_DISPLAY))) {
-				return getString(KEY_DISPLAY);
-			}
-		} catch (JSONException e) {
-		}
-		return null;
-	}
-
-	public boolean isUserVisible() {
-		try {
-			return getBoolean(KEY_USER_VISIBLE);
-		} catch (JSONException e) {
-		}
-		return false; // Unsupported.
-	}
-
 	public boolean isOutgoingMessage() {
 		String senderId = getSenderId();
 		boolean outgoing = senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
 		return outgoing;
+	}
+
+	public enum Type {
+		TextMessage,
+		FileMessage,
+
+		// Unknown
+		unknown;
+
+		public static Type parse(String rawType) {
+			try {
+				return Type.valueOf(rawType);
+			} catch (IllegalArgumentException e) {
+				Log.v("Error parsing unknown Message.Type: " + rawType);
+			}
+			return unknown;
+		}
+	}
+
+	public static enum State {
+		sending, // The item is either being sent, or is queued for sending.
+		sent,    // The item has been posted to the server successfully.
+		saved,   // The item has been returned from the server during a fetch.
+		unknown;
+
+		public static State parse(String state) {
+			try {
+				return State.valueOf(state);
+			} catch (IllegalArgumentException e) {
+				Log.v("Error parsing unknown Message.State: " + state);
+			}
+			return unknown;
+		}
 	}
 }

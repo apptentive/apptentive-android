@@ -7,16 +7,20 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.storage.RecordStore;
 
 import java.util.List;
 
 /**
  * @author Sky Kelsey
  */
-public interface MessageStore extends RecordStore {
+public interface MessageStore extends PayloadStore {
+
+	public void addOrUpdateMessages(boolean fromServer, Message... message);
+
+	public void updateMessage(Message message);
+
+	public List<Message> getAllMessages();
 
 	public String getLastReceivedMessageId();
 
-	public List<Message> getAllMessages();
 }

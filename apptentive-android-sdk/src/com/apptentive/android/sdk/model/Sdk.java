@@ -6,9 +6,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class Sdk extends ConversationItem {
-
-	public static final String KEY = "sdk";
+public class Sdk extends Payload {
 
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_PROGRAMMING_LANGUAGE = "programming_language";
@@ -22,10 +20,11 @@ public class Sdk extends ConversationItem {
 	}
 
 	public Sdk() {
+		super();
 	}
 
-	public void initType() {
-		setType(Type.Sdk);
+	public void initBaseType() {
+		setBaseType(BaseType.sdk);
 	}
 
 	public String getVersion() {
