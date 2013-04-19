@@ -14,11 +14,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.TextMessage;
+import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.util.List;
 
@@ -30,8 +28,14 @@ public class ApptentiveMessageCenter {
 
 	protected static MessageCenterView messageCenterView;
 	private static boolean pollForMessages = false;
+	private static Trigger trigger;
 
 	public static void show(Context context) {
+		show(context, Trigger.forced);
+	}
+
+	public static void show(Context context, Trigger reason) {
+		ApptentiveMessageCenter.trigger = reason;
 		Intent intent = new Intent();
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
@@ -43,6 +47,8 @@ public class ApptentiveMessageCenter {
 			Log.e(ApptentiveMessageCenter.class.getSimpleName() + " must be initialized with an Activity Context.");
 			return;
 		}
+
+		MetricModule.sendMetric(Event.EventLabel.message_center__launch, (trigger == null ? null : trigger.name()));
 
 		MessageCenterView.OnSendMessageListener onSendMessagelistener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
@@ -135,6 +141,13 @@ public class ApptentiveMessageCenter {
 	public static void onStop(Context context) {
 		pollForMessages = false;
 	}
+
+	public static void onBackPressed() {
+		MetricModule.sendMetric(Event.EventLabel.message_center__close);
+	}
+
+	enum Trigger {
+		enjoyment_dialog,
+		forced
+	}
 }
-
-

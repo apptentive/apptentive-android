@@ -15,7 +15,6 @@ import com.apptentive.android.sdk.model.EventManager;
 import java.util.Map;
 
 /**
- * TODO: Get rid of all of this.
  * @author Sky Kelsey.
  */
 public class MetricModule {
@@ -35,10 +34,9 @@ public class MetricModule {
 	}
 
 	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
-		Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
-
 		Configuration config = Configuration.load(appContext);
 		if (config.isMetricsEnabled()) {
+			Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
 			EventManager.sendEvent(event);

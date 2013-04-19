@@ -22,8 +22,10 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -90,6 +92,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
 		attachButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
+				MetricModule.sendMetric(Event.EventLabel.message_center__attach);
 				Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				intent.setType("image/*");
 				context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
@@ -100,7 +103,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		messageListView.setAdapter(messageAdapter);
 	}
 
-	//TODO
 	public void setMessages(final List<Message> messages) {
 		messageListView.post(new Runnable() {
 			public void run() {

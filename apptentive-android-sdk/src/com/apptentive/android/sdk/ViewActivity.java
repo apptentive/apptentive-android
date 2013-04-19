@@ -78,10 +78,24 @@ public class ViewActivity extends ApptentiveActivity {
 				ApptentiveMessageCenter.onStop(this);
 				break;
 			default:
-				Log.w("No Activity specified. Finishing...");
-				finish();
 				break;
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		switch(activeModule) {
+			case ABOUT:
+				break;
+			case SURVEY:
+				break;
+			case MESSAGE_CENTER:
+				ApptentiveMessageCenter.onBackPressed();
+				break;
+			default:
+				break;
+		}
+		super.onBackPressed();
 	}
 
 	@Override
