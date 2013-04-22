@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.view.*;
 import android.widget.*;
@@ -90,15 +91,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		});
 
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
-		attachButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				MetricModule.sendMetric(Event.EventLabel.message_center__attach);
-				Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-				intent.setType("image/*");
-				context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
-			}
-		});
-
+		// Android devices can't take screenshots until version 4+
+		boolean canTakeScreenshot = Build.VERSION.RELEASE.matches("^4.*");
+		if(canTakeScreenshot) {
+			attachButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View view) {
+					MetricModule.sendMetric(Event.EventLabel.message_center__attach);
+					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					intent.setType("image/*");
+					context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+				}
+			});
+		} else {
+			attachButton.setVisibility(GONE);
+		}
 		messageAdapter = new MessageAdapter<Message>(context);
 		messageListView.setAdapter(messageAdapter);
 	}
