@@ -107,7 +107,7 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SDKS, Method.PUT, sdk.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
