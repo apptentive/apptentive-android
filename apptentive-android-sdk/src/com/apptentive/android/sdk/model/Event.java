@@ -76,6 +76,9 @@ public class Event extends ConversationItem {
 
 	public static enum EventLabel {
 
+		app__launch("app.launch"),
+		app__exit("app.exit"),
+
 		enjoyment_dialog__launch("enjoyment_dialog.launch"),
 		enjoyment_dialog__yes("enjoyment_dialog.yes"),
 		enjoyment_dialog__no("enjoyment_dialog.no"),
@@ -85,19 +88,10 @@ public class Event extends ConversationItem {
 		rating_dialog__remind("rating_dialog.remind"),
 		rating_dialog__decline("rating_dialog.decline"),
 
-		feedback_dialog__launch("feedback_dialog.launch"),
-		feedback_dialog__submit("feedback_dialog.submit"),
-		feedback_dialog__cancel("feedback_dialog.cancel"),
-
 		survey__launch("survey.launch"),
 		survey__cancel("survey.cancel"),
 		survey__submit("survey.submit"),
 		survey__question_response("survey.question_response"),
-
-		app__launch("app.launch"),
-		app__exit("app.exit"),
-		app__session_start("app.session_start"),
-		app__session_end("app.session_end"),
 
 		message_center__launch("message_center.launch"),
 		message_center__close("message_center.close"),
