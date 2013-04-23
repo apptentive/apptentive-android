@@ -25,7 +25,7 @@ import java.util.List;
 public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore, FileStore {
 
 	// COMMON
-	private static int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "apptentive";
 
 
@@ -94,22 +94,30 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
+	/**
+	 * This function is called only for new installs, and onUpgrade is not called in that case. Therefore, you must include the
+	 * latest complete set of DDL here.
+	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(TABLE_CREATE_MESSAGE);
+		Log.d("ApptentiveDatabase.onCreate(db)");
 		db.execSQL(TABLE_CREATE_PAYLOAD);
+		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
+
 	}
 
 	/**
-	 * TODO: Handle upgrade properly.
+	 * This method is called when an app is upgraded. Add alter table statements here for each version in a non-breaking
+	 * switch, so that all the necessary upgrades occur for each older version.
 	 */
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYLOAD);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILESTORE);
-		onCreate(db);
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		switch (oldVersion) {
+			case 1:
+			case 2:
+		}
 	}
 
 	// PAYLOAD: This table is used to store all the Payloads we want to send to the server.
@@ -303,5 +311,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		cursor.close();
 		db.close();
 		return ret != -1;
+	}
+
+	private void upgrade1to2() {
 	}
 }
