@@ -6,11 +6,14 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
+import android.content.res.Resources;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.model.AutoMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -163,5 +166,18 @@ public class MessageManager {
 
 	public static int getUnreadMessageCount() {
 		return getMessageStore().getUnreadMessageCount();
+	}
+
+	public static void createMessageCenterAutoMessage(boolean forced) {
+		AutoMessage message = new AutoMessage();
+		Resources resources = Apptentive.getAppContext().getResources();
+		if(forced) {
+			message.setTitle(resources.getString(R.string.apptentive_message_auto_title_manual));
+			message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
+		} else {
+			message.setTitle(resources.getString(R.string.apptentive_message_auto_body_no_love));
+			message.setBody(resources.getString(R.string.apptentive_message_auto_body_no_love));
+		}
+		getMessageStore().addOrUpdateMessages(true, message);
 	}
 }

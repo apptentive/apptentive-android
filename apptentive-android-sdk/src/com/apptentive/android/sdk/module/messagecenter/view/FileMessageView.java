@@ -28,7 +28,7 @@ import java.io.FileInputStream;
 /**
  * @author Sky Kelsey
  */
-public class FileMessageView extends MessageView<FileMessage> {
+public class FileMessageView extends PersonalMessageView<FileMessage> {
 
 	// Some limits to keep images from being bigger than their display area.
 	private final static float MAX_IMAGE_SCREEN_PROPORTION_X = 0.5f;

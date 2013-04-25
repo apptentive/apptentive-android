@@ -420,8 +420,7 @@ public class RatingModule {
 					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__no);
 					setState(RatingState.POSTPONE);
 
-					// TODO: What do we do here?
-					//FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
+					Apptentive.showMessageCenter(activity, false);
 					dismiss();
 				}
 			});

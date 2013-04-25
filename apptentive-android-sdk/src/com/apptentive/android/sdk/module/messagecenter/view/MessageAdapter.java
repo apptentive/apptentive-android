@@ -11,10 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.TextMessage;
+import com.apptentive.android.sdk.model.*;
 
 /**
  * @author Sky Kelsey
@@ -34,8 +31,10 @@ public class MessageAdapter<T extends Message> extends ArrayAdapter<T> {
 					return new TextMessageView(parent.getContext(), (TextMessage) message);
 				case FileMessage:
 					return new FileMessageView(parent.getContext(), (FileMessage) message);
+				case AutoMessage:
+					return new AutoMessageView(parent.getContext(), (AutoMessage) message);
 				default:
-					Log.d("Unrecognized message type: %s", message.getType());
+					Log.a("Unrecognized message type: %s", message.getType());
 					return null;
 			}
 		}

@@ -16,7 +16,7 @@ import com.apptentive.android.sdk.model.TextMessage;
 /**
  * @author Sky Kelsey
  */
-public class TextMessageView extends MessageView<TextMessage> {
+public class TextMessageView extends PersonalMessageView<TextMessage> {
 
 	public TextMessageView(Context context, TextMessage message) {
 		super(context, message);

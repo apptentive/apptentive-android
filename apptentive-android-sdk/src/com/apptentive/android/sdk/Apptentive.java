@@ -386,9 +386,33 @@ public class Apptentive {
 
 	/**
 	 * Opens the Apptentive Message Center UI Activity
+	 *
 	 * @param context The Context from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Context context) {
+		showMessageCenter(context, true);
+	}
+
+	/**
+	 * Internal use only.
+	 * @param context The Context from which to launch the Message Center
+	 * @param forced True if opened manually. False if opened from ratings flow.
+	 */
+	static void showMessageCenter(Context context, boolean forced) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (forced) {
+			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
+			if(!shownManual) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
+				MessageManager.createMessageCenterAutoMessage(forced);
+			}
+		} else {
+			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
+			if(!shownManual) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
+				MessageManager.createMessageCenterAutoMessage(forced);
+			}
+		}
 		ApptentiveMessageCenter.show(context);
 	}
 
@@ -396,12 +420,19 @@ public class Apptentive {
 		unreadMessagesListener = listener;
 	}
 
+	/**
+	 * Internal use only.
+	 */
 	public static void notifyUnreadMessagesListener(int unreadMessages) {
 		Log.v("Notifying UnreadMessagesListener");
 		if(unreadMessagesListener != null) {
 			unreadMessagesListener.onUnreadMessagesAvailable(unreadMessages);
 		}
 	}
+
+	/**
+	 * Internal use only.
+	 */
 	public static void onAppLaunch() {
 		Apptentive.getRatingModule().logUse();
 		MessageManager.asyncFetchAndStoreMessages(new MessageManager.MessagesUpdatedListener() {
@@ -411,6 +442,9 @@ public class Apptentive {
 		});
 	}
 
+	/**
+	 * Internal use only.
+	 */
 	public static void onAppDidExit() {
 	}
 }
