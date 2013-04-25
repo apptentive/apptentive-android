@@ -50,14 +50,18 @@ public class MessageManager {
 		// Fetch the messages.
 		List<Message> messagesToSave = fetchMessages(getMessageStore().getLastReceivedMessageId());
 
-		if (messagesToSave == null || messagesToSave.size() == 0) {
-			return;
+		if (messagesToSave != null && messagesToSave.size() > 0) {
+			Log.d("Messages retrieved.");
+			// Mark messages from server where sender is the app user as read.
+			for (Message message : messagesToSave) {
+				if(message.isOutgoingMessage()) {
+					message.setRead(true);
+				}
+			}
+			getMessageStore().addOrUpdateMessages(true, messagesToSave.toArray(new Message[]{}));
+			// Signal listener
+			listener.onMessagesUpdated();
 		}
-		Log.d("Messages retrieved.");
-		getMessageStore().addOrUpdateMessages(true, messagesToSave.toArray(new Message[]{}));
-
-		// Signal listener
-		listener.onMessagesUpdated();
 	}
 
 	public static List<Message> getMessages() {
@@ -95,6 +99,10 @@ public class MessageManager {
 		return ret;
 	}
 
+	public static void updateMessage(Message message) {
+		getMessageStore().updateMessage(message);
+	}
+
 	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
 		List<Message> ret = new ArrayList<Message>();
 			JSONObject root = new JSONObject(messageString);
@@ -116,7 +124,7 @@ public class MessageManager {
 	}
 
 	public interface MessagesUpdatedListener {
-		public boolean onMessagesUpdated();
+		public void onMessagesUpdated();
 	}
 
 	public static void onSentMessage(Message message, ApptentiveHttpResponse response) {
@@ -151,5 +159,9 @@ public class MessageManager {
 
 	public static void setInternalSentMessageListener(OnSentMessageListener onSentMessageListener) {
 		internalSentMessageListener = onSentMessageListener;
+	}
+
+	public static int getUnreadMessageCount() {
+		return getMessageStore().getUnreadMessageCount();
 	}
 }

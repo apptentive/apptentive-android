@@ -19,10 +19,10 @@ public abstract class Message extends ConversationItem {
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
 	public static final String KEY_TYPE = "type";
-	// State is not stored in JSON, only in DB.
-	private State state;
 
-	private static final String KEY_READ = "read";
+	// State and Read are not stored in JSON, only in DB.
+	private State state;
+	private boolean read = false;
 
 	private static final String KEY_SENDER = "sender";
 	private static final String KEY_SENDER_ID = "id";
@@ -33,6 +33,7 @@ public abstract class Message extends ConversationItem {
 		super();
 		setSenderId(GlobalInfo.personId);
 		state = State.sending;
+		read = true; // This message originated here.
 		setBaseType(BaseType.message);
 		initType();
 	}
@@ -106,6 +107,14 @@ public abstract class Message extends ConversationItem {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
 	}
 
 	public String getSenderId() {

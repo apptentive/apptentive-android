@@ -23,4 +23,5 @@ public interface MessageStore extends PayloadStore {
 
 	public String getLastReceivedMessageId();
 
+	public int getUnreadMessageCount();
 }

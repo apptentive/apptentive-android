@@ -27,7 +27,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// COMMON
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "apptentive";
-
+	private static final int TRUE = 1;
+	private static final int FALSE = 0;
 
 	// PAYLOAD
 	private static final String TABLE_PAYLOAD = "payload";
@@ -53,7 +54,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	private static final String MESSAGE_KEY_CLIENT_CREATED_AT = "client_created_at"; // 2
 	private static final String MESSAGE_KEY_NONCE = "nonce";                         // 3
 	private static final String MESSAGE_KEY_STATE = "state";                         // 4
-	private static final String MESSAGE_KEY_JSON = "json";                           // 5
+	private static final String MESSAGE_KEY_READ = "read";                           // 5
+	private static final String MESSAGE_KEY_JSON = "json";                           // 6
 
 	private static final String TABLE_CREATE_MESSAGE =
 			"CREATE TABLE " + TABLE_MESSAGE +
@@ -63,6 +65,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					MESSAGE_KEY_CLIENT_CREATED_AT + " DOUBLE, " +
 					MESSAGE_KEY_NONCE + " TEXT, " +
 					MESSAGE_KEY_STATE + " TEXT, " +
+					MESSAGE_KEY_READ + " INTEGER, " +
 					MESSAGE_KEY_JSON + " TEXT" +
 					");";
 
@@ -70,6 +73,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
 	private static final String QUERY_MESSAGE_GET_ALL_IN_ORDER = "SELECT * FROM " + TABLE_MESSAGE + " ORDER BY COALESCE(" + MESSAGE_KEY_ID + ", 'z') ASC";
 	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + Message.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
+	private static final String QUERY_MESSAGE_UNREAD = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_READ + " = " + FALSE + " AND " + MESSAGE_KEY_ID + " NOTNULL";
 
 
 	// FileStore
@@ -188,6 +192,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					ContentValues messageValues = new ContentValues();
 					messageValues.put(MESSAGE_KEY_ID, message.getId());
 					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+					if(message.isRead()) { // A message can't be unread after being read.
+						messageValues.put(MESSAGE_KEY_READ, TRUE);
+					}
 					messageValues.put(MESSAGE_KEY_JSON, message.toString());
 					db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
 				} else {
@@ -198,6 +205,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
 					messageValues.put(MESSAGE_KEY_NONCE, message.getNonce());
 					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+					messageValues.put(MESSAGE_KEY_READ, message.isRead() ? TRUE : FALSE);
 					messageValues.put(MESSAGE_KEY_JSON, message.toString());
 					db.insert(TABLE_MESSAGE, null, messageValues);
 					if (!fromServer) {
@@ -224,6 +232,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			values.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
 			values.put(MESSAGE_KEY_NONCE, message.getNonce());
 			values.put(MESSAGE_KEY_STATE, message.getState().name());
+			if(message.isRead()) { // A message can't be unread after being read.
+				values.put(MESSAGE_KEY_READ, TRUE);
+			}
 			values.put(MESSAGE_KEY_JSON, message.toString());
 			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{message.getNonce()});
 			db.setTransactionSuccessful();
@@ -241,13 +252,14 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 		if (cursor.moveToFirst()) {
 			do {
-				String json = cursor.getString(5);
+				String json = cursor.getString(6);
 				Message message = MessageFactory.fromJson(json);
 				if (message == null) {
 					Log.e("Error parsing Record json from database: %s", json);
 					continue;
 				}
 				message.setDatabaseId(cursor.getLong(0));
+				message.setRead(cursor.getInt(5) == TRUE);
 				messages.add(message);
 			} while (cursor.moveToNext());
 		}
@@ -268,6 +280,14 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		return ret;
 	}
 
+	public synchronized int getUnreadMessageCount() {
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
+		int ret = cursor.getCount();
+		cursor.close();
+		db.close();
+		return ret;
+	}
 
 	//
 	// File Store

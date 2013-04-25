@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.offline;
+package com.apptentive.android.sdk.lifecycle;
 
 import android.app.Activity;
 import android.content.Context;
@@ -67,11 +67,12 @@ public class ActivityLifecycleManager {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
-				Apptentive.getRatingModule().logUse();
 				MetricModule.sendMetric(Event.EventLabel.app__launch);
+				Apptentive.onAppLaunch();
 				break;
 			case STOP:
 				MetricModule.sendMetric(Event.EventLabel.app__exit);
+				Apptentive.onAppDidExit();
 				break;
 			default:
 				break;

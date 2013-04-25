@@ -110,5 +110,4 @@ public class Event extends ConversationItem {
 			return labelName;
 		}
 	}
-
 }

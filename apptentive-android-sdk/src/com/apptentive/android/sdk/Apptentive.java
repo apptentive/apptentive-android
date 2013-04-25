@@ -25,8 +25,10 @@ import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.offline.ActivityLifecycleManager;
+import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
@@ -48,6 +50,7 @@ public class Apptentive {
 
 	private static Context appContext = null;
 	private static ApptentiveDatabase db;
+	private static UnreadMessagesListener unreadMessagesListener;
 
 	private Apptentive() {
 	}
@@ -387,5 +390,27 @@ public class Apptentive {
 	 */
 	public static void showMessageCenter(Context context) {
 		ApptentiveMessageCenter.show(context);
+	}
+
+	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
+		unreadMessagesListener = listener;
+	}
+
+	public static void notifyUnreadMessagesListener(int unreadMessages) {
+		Log.v("Notifying UnreadMessagesListener");
+		if(unreadMessagesListener != null) {
+			unreadMessagesListener.onUnreadMessagesAvailable(unreadMessages);
+		}
+	}
+	public static void onAppLaunch() {
+		Apptentive.getRatingModule().logUse();
+		MessageManager.asyncFetchAndStoreMessages(new MessageManager.MessagesUpdatedListener() {
+			public void onMessagesUpdated() {
+				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());
+			}
+		});
+	}
+
+	public static void onAppDidExit() {
 	}
 }

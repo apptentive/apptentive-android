@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
-import com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider;
+import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
@@ -23,18 +23,29 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
  */
 public class DevActivity extends ApptentiveActivity {
 
-	private static final String LOG_TAG = "Apptentive Testing App";
+	private static final String LOG_TAG = "Apptentive Dev App";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// If you would like to be notified when there are unread messages available, set a listener like this.
+		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+			public void onUnreadMessagesAvailable(final int unreadMessages) {
+				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
+				DevActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
+						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
+					}
+				});
+
+			}
+		});
 		// BEGIN APPTENTIVE INITIALIZATION
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
 		// OPTIONAL: To send extra data with your feedback.
-		// TODO: Figure this out.
-		//Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
 
 		// Uncomment if this app exists in the Amazon Store.
 		//Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());

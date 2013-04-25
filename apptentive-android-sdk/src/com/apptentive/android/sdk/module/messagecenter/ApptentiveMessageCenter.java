@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.*;
@@ -54,6 +55,7 @@ public class ApptentiveMessageCenter {
 			public void onSendTextMessage(String text) {
 				final TextMessage message = new TextMessage();
 				message.setBody(text);
+				message.setRead(true);
 				MessageManager.sendMessage(message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
@@ -67,6 +69,7 @@ public class ApptentiveMessageCenter {
 				final FileMessage message = new FileMessage();
 				boolean successful = message.createStoredFile(uri.toString());
 				if(successful) {
+					message.setRead(true);
 					// Finally, send out the message.
 					MessageManager.sendMessage(message);
 					messageCenterView.post(new Runnable() {
@@ -95,15 +98,15 @@ public class ApptentiveMessageCenter {
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 		final MessageManager.MessagesUpdatedListener listener = new MessageManager.MessagesUpdatedListener() {
-			public boolean onMessagesUpdated() {
+			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
 						List<Message> messages = MessageManager.getMessages();
 						messageCenterView.setMessages(messages);
 						scrollToBottom();
+						Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());
 					}
 				});
-				return false;
 			}
 		};
 
