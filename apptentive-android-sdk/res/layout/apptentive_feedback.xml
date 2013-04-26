@@ -1,106 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
-  -->
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp" >
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:paddingLeft="5dp"
-              android:paddingTop="3dp"
-              android:paddingRight="7dp"
-              android:paddingBottom="10dp">
-	<FrameLayout android:id="@+id/apptentive_paper_frame"
-	             android:layout_width="fill_parent"
-	             android:layout_height="fill_parent">
-		<com.apptentive.android.sdk.view.PaperBackground android:layout_width="fill_parent"
-		                                                 android:layout_height="fill_parent"/>
-		<LinearLayout android:layout_width="fill_parent"
-		              android:layout_height="fill_parent"
-		              android:orientation="vertical"
-		              android:paddingTop="7dp">
-			<FrameLayout android:layout_width="fill_parent"
-			             android:layout_height="wrap_content"
-			             android:paddingBottom="11dp">
-				<RelativeLayout android:layout_width="fill_parent"
-				                android:layout_height="wrap_content"
-				                android:orientation="horizontal">
-					<Button android:id="@+id/apptentive_button_cancel"
-					        android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					        android:layout_centerVertical="true"
-					        android:layout_alignParentLeft="true"
-					        android:layout_marginLeft="7dp"
-					        android:paddingLeft="10dp"
-					        android:paddingTop="6dp"
-					        android:paddingRight="10dp"
-					        android:paddingBottom="6dp"
-					        android:textColor="#EEEEEE"
-					        android:textSize="18sp"
-					        android:textStyle="bold"
-					        android:background="@drawable/apptentive_header_button"
-					        android:text="@string/apptentive_cancel"/>
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:layout_centerInParent="true"
-					          android:textStyle="bold"
-					          android:textSize="20sp"
-					          android:textColor="#666666"
-					          android:shadowColor="#FFFFFF"
-					          android:shadowDx="0"
-					          android:shadowDy="1"
-					          android:shadowRadius="1"
-					          android:text="@string/apptentive_feedback_title"/>
-					<Button android:id="@+id/apptentive_button_send"
-					        android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					        android:layout_centerVertical="true"
-					        android:layout_alignParentRight="true"
-					        android:layout_marginRight="7dp"
-					        android:paddingLeft="10dp"
-					        android:paddingTop="6dp"
-					        android:paddingRight="10dp"
-					        android:paddingBottom="6dp"
-					        android:textColor="#EEEEEE"
-					        android:textSize="18sp"
-					        android:textStyle="bold"
-					        android:background="@drawable/apptentive_header_button"
-					        android:text="@string/apptentive_send"/>
-				</RelativeLayout>
-			</FrameLayout>
-			<LinearLayout android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:background="@drawable/apptentive_dotted_red_line_layout"/>
-			<EditText android:id="@+id/apptentive_feedback_user_email"
-			          android:layout_width="fill_parent"
-			          android:layout_height="wrap_content"
-			          android:paddingLeft="7dp"
-			          android:paddingBottom="6dp"
-			          android:background="#00000000"
-			          android:singleLine="true"
-			          android:inputType="textEmailAddress"
-			          android:hint="@string/apptentive_edittext_email_text"/>
-			<LinearLayout android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:background="@drawable/apptentive_grey_line_layout"/>
-			<EditText android:id="@+id/apptentive_feedback_text"
-			          android:layout_width="fill_parent"
-			          android:layout_height="0dp"
-			          android:layout_weight="1"
-			          android:paddingTop="2dp"
-			          android:paddingLeft="7dp"
-			          android:gravity="top"
-			          android:minLines="6"
-			          android:maxLines="6"
-			          android:background="#00000000"
-			          android:inputType="textMultiLine"/>
-			<include layout="@layout/apptentive_branding"/>
-		</LinearLayout>
-	</FrameLayout>
-	<ScrollView android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"/>
-</LinearLayout>
+    <com.apptentive.android.sdk.view.PaperBackground
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" >
+
+        <include layout="@layout/apptentive_branding" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/apptentive_button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="4dp"
+        android:background="@drawable/apptentive_header_button"
+        android:gravity="center"
+        android:paddingBottom="6dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="6dp"
+        android:text="@string/apptentive_cancel"
+        android:textColor="#EEEEEE"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/apptentive_button_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="4dp"
+        android:background="@drawable/apptentive_header_button"
+        android:paddingBottom="6dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="6dp"
+        android:text="@string/apptentive_send"
+        android:textColor="#EEEEEE"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/apptentive_button_cancel"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/apptentive_button_send"
+        android:layout_toRightOf="@+id/apptentive_button_cancel"
+        android:gravity="center"
+        android:text="@string/apptentive_feedback_title"
+        android:textColor="#666666"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="fill_parent"
+        android:layout_height="5dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/apptentive_button_cancel"
+        android:background="@drawable/apptentive_dotted_red_line_layout" />
+
+    <EditText
+        android:id="@+id/apptentive_feedback_user_email"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/view1"
+        android:background="#00000000"
+        android:ems="10"
+        android:hint="@string/apptentive_edittext_email_text"
+        android:inputType="textEmailAddress"
+        android:paddingBottom="6dp"
+        android:paddingLeft="7dp"
+        android:singleLine="true" >
+
+        <requestFocus />
+    </EditText>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="5dp"
+        android:layout_alignBottom="@+id/apptentive_feedback_user_email"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/apptentive_dotted_red_line_layout" />
+
+    <EditText
+        android:id="@+id/apptentive_feedback_text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/frame_layout"
+        android:layout_below="@+id/apptentive_feedback_user_email"
+        android:background="#00000000"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:maxLines="6"
+        android:minLines="6"
+        android:paddingLeft="7dp"
+        android:paddingTop="2dp" />
+
+</RelativeLayout>

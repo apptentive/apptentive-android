@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -13,15 +16,14 @@ import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.offline.FeedbackPayload;
 import com.apptentive.android.sdk.offline.PayloadManager;
 import com.apptentive.android.sdk.util.Constants;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This module is responsible for showing the feedback dialog, and sending feedback payloads to the Apptentive server.
@@ -134,6 +136,9 @@ public class FeedbackModule {
 			if(startingEmail == null){
 				startingEmail = GlobalInfo.userEmail;
 			}
+			
+			getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
 			setContentView(R.layout.apptentive_feedback);
 
