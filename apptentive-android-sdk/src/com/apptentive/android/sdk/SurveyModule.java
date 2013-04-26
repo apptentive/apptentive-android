@@ -182,36 +182,47 @@ public class SurveyModule {
 		// Then render all the questions
 		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
-					public void onAnswered(TextSurveyQuestionView view) {
-						sendMetricForQuestion(question);
-						sendView.setEnabled(isCompleted());
-					}
-				});
+				TextSurveyQuestionView<SinglelineQuestion> textQuestionView = new TextSurveyQuestionView<SinglelineQuestion>(
+						activity, (SinglelineQuestion) question);
+				textQuestionView
+						.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<SurveyItemView<SinglelineQuestion>>() {
+							@Override
+							public void onAnswered(
+									SurveyItemView<SinglelineQuestion> view) {
+								sendMetricForQuestion(question);
+								sendView.setEnabled(isCompleted());
+								
+							}
+						});
 				questionList.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
-					public void onAnswered(MultichoiceSurveyQuestionView view) {
-						sendMetricForQuestion(question);
-						sendView.setEnabled(isCompleted());
-					}
-				});
+				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(
+						activity, (MultichoiceQuestion) question);
+				multichoiceQuestionView
+						.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<SurveyItemView<MultichoiceQuestion>>() {
+							public void onAnswered(
+									SurveyItemView<MultichoiceQuestion> view) {
+								sendMetricForQuestion(question);
+								sendView.setEnabled(isCompleted());
+							}
+						});
 				questionList.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
-					public void onAnswered(MultiselectSurveyQuestionView view) {
-						sendMetricForQuestion(question);
-						sendView.setEnabled(isCompleted());
+				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(
+						activity, (MultiselectQuestion) question);
+				multiselectQuestionView
+						.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<SurveyItemView<MultichoiceQuestion>>() {
+							public void onAnswered(
+									SurveyItemView<MultichoiceQuestion> view) {
+								sendMetricForQuestion(question);
+								sendView.setEnabled(isCompleted());
 					}
 				});
 				questionList.addView(multiselectQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
 				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity, (StackrankQuestion) question);
-				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered(Object view) {
+				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<SurveyItemView<StackrankQuestion>>() {
+					public void onAnswered(SurveyItemView<StackrankQuestion> view) {
 						sendMetricForQuestion(question);
 						// TODO: This.
 					}

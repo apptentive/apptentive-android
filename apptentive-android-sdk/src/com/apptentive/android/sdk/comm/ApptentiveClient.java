@@ -146,7 +146,7 @@ public class ApptentiveClient {
 			if (code >= 200 && code < 300) {
 				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
 				JSONObject root = new JSONObject(content);
-				Iterator it = root.keys();
+				Iterator<?> it = root.keys();
 				while (it.hasNext()) {
 					String key =  (String)it.next();
 					Object value = root.get(key);

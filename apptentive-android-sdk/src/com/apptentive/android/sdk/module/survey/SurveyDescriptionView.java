@@ -11,7 +11,7 @@ import android.content.Context;
 /**
  * @author Sky Kelsey.
  */
-public class SurveyDescriptionView extends SurveyItemView {
+public class SurveyDescriptionView extends SurveyItemView<Question> {
 	public SurveyDescriptionView(Context context) {
 		super(context, null);
 	}

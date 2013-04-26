@@ -34,7 +34,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	protected TextView titleTextView;
 	protected TextView instructionsTextView;
 
-	protected OnSurveyQuestionAnsweredListener listener;
+	protected OnSurveyQuestionAnsweredListener<SurveyItemView<Q>> listener;
 
 	protected SurveyItemView(Context context, Q question) {
 		super(context);
@@ -104,7 +104,8 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		questionView.addView(separator);
 	}
 
-	public void setOnSurveyQuestionAnsweredListener(OnSurveyQuestionAnsweredListener listener) {
+	public void setOnSurveyQuestionAnsweredListener(
+			OnSurveyQuestionAnsweredListener<SurveyItemView<Q>> listener) {
 		this.listener = listener;
 	}
 
