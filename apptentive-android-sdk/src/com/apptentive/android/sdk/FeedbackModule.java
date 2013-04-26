@@ -175,7 +175,7 @@ public class FeedbackModule {
 			});
 			send.setEnabled(false);
 
-			findViewById(R.id.apptentive_branding_view).setOnClickListener(new View.OnClickListener() {
+			findViewById(R.id.apptentive_branding_text).setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					AboutModule.getInstance().show(context);
 				}

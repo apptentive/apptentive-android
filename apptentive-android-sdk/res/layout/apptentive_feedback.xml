@@ -8,11 +8,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:background="@drawable/apptentive_bg"
     android:padding="8dp" >
-
-    <com.apptentive.android.sdk.view.PaperBackground
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
 
     <FrameLayout
         android:id="@+id/frame_layout"
@@ -32,16 +29,12 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="4dp"
-        android:background="@drawable/apptentive_header_button"
         android:gravity="center"
-        android:paddingBottom="6dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="6dp"
+        android:background="@drawable/btn_default_holo_light"
         android:text="@string/apptentive_cancel"
-        android:textColor="#EEEEEE"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textColor="#eeeeee"
+        android:minWidth="84dp"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/apptentive_button_send"
@@ -50,15 +43,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="4dp"
-        android:background="@drawable/apptentive_header_button"
-        android:paddingBottom="6dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="6dp"
+        android:background="@drawable/btn_default_holo_light"
         android:text="@string/apptentive_send"
-        android:textColor="#EEEEEE"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textColor="#eeeeee"
+        android:minWidth="84dp"
+        android:textSize="18sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -70,8 +59,7 @@
         android:gravity="center"
         android:text="@string/apptentive_feedback_title"
         android:textColor="#666666"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textSize="20sp" />
 
     <View
         android:id="@+id/view1"

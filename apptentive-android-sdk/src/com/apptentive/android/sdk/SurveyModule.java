@@ -163,7 +163,7 @@ public class SurveyModule {
 			});
 		}
 
-		View brandingButton = activity.findViewById(R.id.apptentive_branding_view);
+		View brandingButton = activity.findViewById(R.id.apptentive_branding_text);
 		brandingButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				AboutModule.getInstance().show(activity);

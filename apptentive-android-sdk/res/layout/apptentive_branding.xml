@@ -1,33 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
-  -->
+-->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content">
-	<LinearLayout android:id="@+id/apptentive_branding_view"
-	              android:layout_width="fill_parent"
-	              android:layout_height="wrap_content"
-	              android:paddingTop="14dp"
-	              android:paddingLeft="10dp"
-	              android:paddingBottom="7dp"
-	              android:gravity="center_vertical"
-	              android:clickable="true">
-		<ImageView android:layout_width="wrap_content"
-		           android:layout_height="wrap_content"
-		           android:src="@drawable/apptentive_icon_small_layout"/>
-		<TextView android:text="@string/apptentive_branding_text"
-		          android:layout_width="wrap_content"
-		          android:layout_height="wrap_content"
-		          android:paddingLeft="4dp"
-		          android:textColor="#888888"
-		          android:shadowColor="#FFFFFF"
-		          android:shadowDx="0"
-		          android:shadowDy="1"
-		          android:shadowRadius="1"/>
-	</LinearLayout>
-</FrameLayout>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/apptentive_branding_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:drawableLeft="@drawable/apptentive_icon_small_layout"
+    android:drawablePadding="4dp"
+    android:paddingLeft="4dp"
+    android:padding="8dp"
+    android:text="@string/apptentive_branding_text"
+    android:textColor="#888888" />
