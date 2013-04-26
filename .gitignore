@@ -1,11 +1,53 @@
-
 # Android intermediate build artifacts
-apptentive-android-sdk/gen/*
-apptentive-android-sdk/out/*
-apptentive-testing/gen/*
-apptentive-example/gen/*
-apptentive-example-alternate/gen/*
-out/*
+apptentive-android-sdk/.project
+apptentive-android-sdk/.classpath
+apptentive-android-sdk/.settings/
+apptentive-android-sdk/local.properties
+apptentive-android-sdk/lint.xml
+apptentive-android-sdk/bin/**
+apptentive-android-sdk/gen/**
+apptentive-android-sdk/tmp/**
+apptentive-android-sdk/proguard/**
+
+apptentive-dev/.project
+apptentive-dev/.classpath
+apptentive-dev/.settings/
+apptentive-dev/local.properties
+apptentive-dev/lint.xml
+apptentive-dev/bin/**
+apptentive-dev/gen/**
+apptentive-dev/tmp/**
+apptentive-dev/proguard/**
+
+apptentive-dev-tests/.project
+apptentive-dev-tests/.classpath
+apptentive-dev-tests/.settings/
+apptentive-dev-tests/local.properties
+apptentive-dev-tests/lint.xml
+apptentive-dev-tests/bin/**
+apptentive-dev-tests/gen/**
+apptentive-dev-tests/tmp/**
+apptentive-dev-tests/proguard/**
+
+apptentive-example/.project
+apptentive-example/.classpath
+apptentive-example/.settings/
+apptentive-example/local.properties
+apptentive-example/lint.xml
+apptentive-example/bin/**
+apptentive-example/gen/**
+apptentive-example/tmp/**
+apptentive-example/proguard/**
+
+apptentive-example-alternate/.project
+apptentive-example-alternate/.classpath
+apptentive-example-alternate/.settings/
+apptentive-example-alternate/local.properties
+apptentive-example-alternate/lint.xml
+apptentive-example-alternate/bin/**
+apptentive-example-alternate/gen/**
+apptentive-example-alternate/tmp/**
+apptentive-example-alternate/proguard/**
 
 # IntelliJ noise
 *.ipr
@@ -14,3 +56,14 @@ out/*
 
 # My local stuff
 todo.txt
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.launch
+
+#Mac stuff
+**/.DS_Store
+.DS_Store
+
