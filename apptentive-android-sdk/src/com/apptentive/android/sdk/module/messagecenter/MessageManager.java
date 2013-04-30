@@ -170,25 +170,32 @@ public class MessageManager {
 		return getMessageStore().getUnreadMessageCount();
 	}
 
+	/**
+	 * This method will show either a Welcome or a No Love AutomatedMessage. If a No Love message has been shown, no other
+	 * AutomatedMessage shall be shown, and no AutomatedMessage shall be shown twice.
+	 * @param forced If true, show a Welcome AutomatedMessage, else show a NoLove AutomatedMessage.
+	 */
 	public static void createMessageCenterAutoMessage(boolean forced) {
 		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
+		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
+
 		AutomatedMessage message = null;
-		if(forced) {
-			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
-			if(!shownManual) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
-				message = AutomatedMessage.createWelcomeMessage();
-			}
-		} else {
-			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
-			if(!shownManual) {
+
+		if(!shownNoLove) {
+			if(forced) {
+				if(!shownManual) {
+					prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
+					message = AutomatedMessage.createWelcomeMessage();
+				}
+			} else {
 				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
 				message = AutomatedMessage.createNoLoveMessage();
 			}
-		}
-		if(message != null) {
-			getMessageStore().addOrUpdateMessages(message);
-			Apptentive.getDatabase().addPayload(message);
+			if(message != null) {
+				getMessageStore().addOrUpdateMessages(message);
+				Apptentive.getDatabase().addPayload(message);
+			}
 		}
 	}
 }
