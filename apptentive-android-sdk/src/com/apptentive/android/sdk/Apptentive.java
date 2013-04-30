@@ -399,20 +399,7 @@ public class Apptentive {
 	 * @param forced True if opened manually. False if opened from ratings flow.
 	 */
 	static void showMessageCenter(Context context, boolean forced) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		if (forced) {
-			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
-			if(!shownManual) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
-				MessageManager.createMessageCenterAutoMessage(forced);
-			}
-		} else {
-			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
-			if(!shownManual) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
-				MessageManager.createMessageCenterAutoMessage(forced);
-			}
-		}
+		MessageManager.createMessageCenterAutoMessage(forced);
 		ApptentiveMessageCenter.show(context);
 	}
 

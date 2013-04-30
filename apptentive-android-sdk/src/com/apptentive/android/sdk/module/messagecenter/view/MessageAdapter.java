@@ -31,8 +31,8 @@ public class MessageAdapter<T extends Message> extends ArrayAdapter<T> {
 					return new TextMessageView(parent.getContext(), (TextMessage) message);
 				case FileMessage:
 					return new FileMessageView(parent.getContext(), (FileMessage) message);
-				case AutoMessage:
-					return new AutoMessageView(parent.getContext(), (AutoMessage) message);
+				case AutomatedMessage:
+					return new AutomatedMessageView(parent.getContext(), (AutomatedMessage) message);
 				default:
 					Log.a("Unrecognized message type: %s", message.getType());
 					return null;

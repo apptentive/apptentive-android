@@ -23,8 +23,8 @@ public class MessageFactory {
 					return new TextMessage(json);
 				case FileMessage:
 					return new FileMessage(json);
-				case AutoMessage:
-					return new AutoMessage(json);
+				case AutomatedMessage:
+					return new AutomatedMessage(json);
 				case unknown:
 					break;
 				default:

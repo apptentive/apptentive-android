@@ -6,18 +6,19 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
-import android.content.res.Resources;
+import android.content.Context;
+import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.AutoMessage;
+import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
+import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +62,7 @@ public class MessageManager {
 					message.setRead(true);
 				}
 			}
-			getMessageStore().addOrUpdateMessages(true, messagesToSave.toArray(new Message[]{}));
+			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new Message[]{}));
 			// Signal listener
 			listener.onMessagesUpdated();
 		}
@@ -72,7 +73,8 @@ public class MessageManager {
 	}
 
 	public static void sendMessage(Message message) {
-		getMessageStore().addOrUpdateMessages(false, message);
+		getMessageStore().addOrUpdateMessages(message);
+		Apptentive.getDatabase().addPayload(message);
 		PayloadSendWorker.start();
 	}
 
@@ -169,15 +171,24 @@ public class MessageManager {
 	}
 
 	public static void createMessageCenterAutoMessage(boolean forced) {
-		AutoMessage message = new AutoMessage();
-		Resources resources = Apptentive.getAppContext().getResources();
+		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		AutomatedMessage message = null;
 		if(forced) {
-			message.setTitle(resources.getString(R.string.apptentive_message_auto_title_manual));
-			message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
+			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
+			if(!shownManual) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
+				message = AutomatedMessage.createWelcomeMessage();
+			}
 		} else {
-			message.setTitle(resources.getString(R.string.apptentive_message_auto_body_no_love));
-			message.setBody(resources.getString(R.string.apptentive_message_auto_body_no_love));
+			boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
+			if(!shownManual) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
+				message = AutomatedMessage.createNoLoveMessage();
+			}
 		}
-		getMessageStore().addOrUpdateMessages(true, message);
+		if(message != null) {
+			getMessageStore().addOrUpdateMessages(message);
+			Apptentive.getDatabase().addPayload(message);
+		}
 	}
 }

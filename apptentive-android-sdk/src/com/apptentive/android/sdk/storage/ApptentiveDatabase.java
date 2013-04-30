@@ -181,7 +181,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	/**
 	 * Saves the message into the message table, and also into the payload table so it can be sent to the server.
 	 */
-	public synchronized void addOrUpdateMessages(boolean fromServer, Message... messages) {
+	public synchronized void addOrUpdateMessages(Message... messages) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		try {
 			for (Message message : messages) {
@@ -208,12 +208,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					messageValues.put(MESSAGE_KEY_READ, message.isRead() ? TRUE : FALSE);
 					messageValues.put(MESSAGE_KEY_JSON, message.toString());
 					db.insert(TABLE_MESSAGE, null, messageValues);
-					if (!fromServer) {
-						ContentValues payloadValues = new ContentValues();
-						payloadValues.put(PAYLOAD_KEY_BASE_TYPE, message.getBaseType().name());
-						payloadValues.put(MESSAGE_KEY_JSON, message.toString());
-						db.insert(TABLE_PAYLOAD, null, payloadValues);
-					}
 					db.setTransactionSuccessful();
 					db.endTransaction();
 				}

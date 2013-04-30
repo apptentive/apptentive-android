@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface MessageStore extends PayloadStore {
 
-	public void addOrUpdateMessages(boolean fromServer, Message... message);
+	public void addOrUpdateMessages(Message... message);
 
 	public void updateMessage(Message message);
 

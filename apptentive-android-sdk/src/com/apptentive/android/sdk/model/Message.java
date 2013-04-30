@@ -182,7 +182,7 @@ public abstract class Message extends ConversationItem {
 	public enum Type {
 		TextMessage,
 		FileMessage,
-		AutoMessage,
+		AutomatedMessage,
 
 		// Unknown
 		unknown;

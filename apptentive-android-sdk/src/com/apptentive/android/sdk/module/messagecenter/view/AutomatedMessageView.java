@@ -11,18 +11,18 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.AutoMessage;
+import com.apptentive.android.sdk.model.AutomatedMessage;
 
 /**
  * @author Sky Kelsey
  */
-public class AutoMessageView extends MessageView<AutoMessage> {
+public class AutomatedMessageView extends MessageView<AutomatedMessage> {
 
-	public AutoMessageView(Context context, AutoMessage message) {
+	public AutomatedMessageView(Context context, AutomatedMessage message) {
 		super(context, message);
 	}
 
-	protected void init(AutoMessage message) {
+	protected void init(AutomatedMessage message) {
 		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_auto, this);
@@ -30,7 +30,7 @@ public class AutoMessageView extends MessageView<AutoMessage> {
 		frame.setBackgroundDrawable(new ZeroMinSizeDrawable(context.getResources(), R.drawable.apptentive_paper_bg));
 	}
 
-	public void updateMessage(final AutoMessage newMessage) {
+	public void updateMessage(final AutomatedMessage newMessage) {
 		TextView title = (TextView) findViewById(R.id.apptentive_message_auto_title);
 		title.setText(newMessage.getTitle());
 		TextView body = (TextView) findViewById(R.id.apptentive_message_auto_body);

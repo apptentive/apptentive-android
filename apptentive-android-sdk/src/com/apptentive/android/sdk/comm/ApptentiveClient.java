@@ -55,7 +55,6 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
-	private static final String ENDPOINT_SDKS = ENDPOINT_BASE + "/sdks";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
 
 	// Old API
@@ -87,6 +86,8 @@ public class ApptentiveClient {
 	public static ApptentiveHttpResponse postMessage(Message message) {
 		switch (message.getType()) {
 			case TextMessage:
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+			case AutomatedMessage:
 				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case FileMessage:
 				FileMessage fileMessage = (FileMessage) message;
