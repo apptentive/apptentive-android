@@ -9,6 +9,9 @@ import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 /**
  * A helper class with static methods for getting, storing, retrieving, and diffing information about the current device.
  * @author Sky Kelsey
@@ -60,6 +63,10 @@ public class DeviceManager {
 		device.setBootloaderVersion(Reflection.getBootloaderVersion());
 		device.setRadioVersion(Reflection.getRadioVersion());
 
+		device.setLocaleCountryCode(Locale.getDefault().getCountry());
+		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
+		device.setLocaleRaw(Locale.getDefault().toString());
+		device.setUtcOffset(""+(TimeZone.getDefault().getRawOffset() / 1000));
 		return device;
 	}
 
@@ -183,6 +190,27 @@ public class DeviceManager {
 		if (radioVersion != null) {
 			ret.setRadioVersion(radioVersion);
 		}
+
+		String localeCountryCode = chooseLatest(older.getLocaleCountryCode(), newer.getLocaleCountryCode());
+		if (localeCountryCode != null) {
+			ret.setLocaleCountryCode(localeCountryCode);
+		}
+
+		String localeLanguageCode = chooseLatest(older.getLocaleLanguageCode(), newer.getLocaleLanguageCode());
+		if (localeLanguageCode != null) {
+			ret.setLocaleLanguageCode(localeLanguageCode);
+		}
+
+		String localeRaw = chooseLatest(older.getLocaleRaw(), newer.getLocaleRaw());
+		if (localeRaw != null) {
+			ret.setLocaleRaw(localeRaw);
+		}
+
+		String utcOffset = chooseLatest(older.getUtcOffset(), newer.getUtcOffset());
+		if (utcOffset != null) {
+			ret.setUtcOffset(utcOffset);
+		}
+
 
 		// If there were no differences, return null.
 		if(ret.length() <= baseEntries) {

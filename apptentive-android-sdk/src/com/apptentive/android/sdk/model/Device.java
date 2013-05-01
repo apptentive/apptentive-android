@@ -35,6 +35,11 @@ public class Device extends Payload {
 	private static final String KEY_BOOTLOADER_VERSION = "bootloader_version";
 	private static final String KEY_RADIO_VERSION = "radio_version";
 
+	private static final String KEY_LOCALE_COUNTRY_CODE = "locale_country_code";
+	private static final String KEY_LOCALE_LANGUAGE_CODE = "locale_language_code";
+	private static final String KEY_LOCALE_RAW = "locale_raw";
+	private static final String KEY_UTC_OFFSET = "utc_offset";
+
 	public Device() {
 		super();
 	}
@@ -370,4 +375,77 @@ public class Device extends Payload {
 			Log.w("Error adding %s to Device.", KEY_RADIO_VERSION);
 		}
 	}
+
+	public String getLocaleCountryCode() {
+		try {
+			if(!isNull(KEY_LOCALE_COUNTRY_CODE)) {
+				return getString(KEY_LOCALE_COUNTRY_CODE);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setLocaleCountryCode(String localeCountryCode) {
+		try {
+			put(KEY_LOCALE_COUNTRY_CODE, localeCountryCode);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_LOCALE_COUNTRY_CODE);
+		}
+	}
+
+	public String getLocaleLanguageCode() {
+		try {
+			if(!isNull(KEY_LOCALE_LANGUAGE_CODE)) {
+				return getString(KEY_LOCALE_LANGUAGE_CODE);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setLocaleLanguageCode(String localeLanguageCode) {
+		try {
+			put(KEY_LOCALE_LANGUAGE_CODE, localeLanguageCode);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_LOCALE_LANGUAGE_CODE);
+		}
+	}
+
+	public String getLocaleRaw() {
+		try {
+			if(!isNull(KEY_LOCALE_RAW)) {
+				return getString(KEY_LOCALE_RAW);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setLocaleRaw(String localeRaw) {
+		try {
+			put(KEY_LOCALE_RAW, localeRaw);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_LOCALE_RAW);
+		}
+	}
+
+	public String getUtcOffset() {
+		try {
+			if(!isNull(KEY_UTC_OFFSET)) {
+				return getString(KEY_UTC_OFFSET);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setUtcOffset(String utcOffset) {
+		try {
+			put(KEY_UTC_OFFSET, utcOffset);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_UTC_OFFSET);
+		}
+	}
+
 }
