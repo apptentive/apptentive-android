@@ -18,6 +18,9 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Sky Kelsey
  */
@@ -29,19 +32,6 @@ public class DevActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// If you would like to be notified when there are unread messages available, set a listener like this.
-		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
-			public void onUnreadMessagesAvailable(final int unreadMessages) {
-				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
-				DevActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
-						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
-					}
-				});
-
-			}
-		});
 		// BEGIN APPTENTIVE INITIALIZATION
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
@@ -137,8 +127,30 @@ public class DevActivity extends ApptentiveActivity {
 				}
 			}
 		});
+
+		// If you would like to be notified when there are unread messages available, set a listener like this.
+		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+			public void onUnreadMessagesAvailable(final int unreadMessages) {
+				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
+				DevActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
+						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
+					}
+				});
+
+			}
+		});
+
+		// Optionally send extra custom data to the server.
+		Map<String, String> customData = new HashMap<String, String>();
+		customData.put("user-id", "1234567890");
+		customData.put("user-email", "sky@apptentive.com");
+		Apptentive.setCustomData(customData);
 	}
 
+	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window
+	// gains focus.
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);

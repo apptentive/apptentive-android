@@ -8,6 +8,11 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -34,7 +39,7 @@ public class Device extends Payload {
 	private static final String KEY_BUILD_ID = "build_id";
 	private static final String KEY_BOOTLOADER_VERSION = "bootloader_version";
 	private static final String KEY_RADIO_VERSION = "radio_version";
-
+	private static final String KEY_CUSTOM_DATA = "custom_data";
 	private static final String KEY_LOCALE_COUNTRY_CODE = "locale_country_code";
 	private static final String KEY_LOCALE_LANGUAGE_CODE = "locale_language_code";
 	private static final String KEY_LOCALE_RAW = "locale_raw";
@@ -373,6 +378,51 @@ public class Device extends Payload {
 			put(KEY_RADIO_VERSION, radioVersion);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Device.", KEY_RADIO_VERSION);
+		}
+	}
+
+	@SuppressWarnings("unchecked") // We check it coming in.
+	public Map<String, String> getCustomData() {
+		Map<String, String> customData = null;
+		if(!isNull(KEY_CUSTOM_DATA)) {
+			customData = new HashMap<String, String>();
+			try {
+				JSONObject existingCustomData = getJSONObject(KEY_CUSTOM_DATA);
+				Iterator<String> iterator = (Iterator<String>) existingCustomData.keys();
+				while (iterator.hasNext()) {
+					String key =  (String)iterator.next();
+					customData.put(key, existingCustomData.getString(key));
+				}
+			} catch (JSONException e) {
+
+			}
+		}
+		return customData;
+	}
+
+	public void setCustomData(Map<String, String> customData) {
+		JSONObject existingCustomData = null;
+		try {
+			existingCustomData = getJSONObject(KEY_CUSTOM_DATA);
+		} catch (JSONException e) {
+			existingCustomData = new JSONObject();
+			try {
+				put(KEY_CUSTOM_DATA, existingCustomData);
+			} catch (JSONException ee) {
+				Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
+			}
+		}
+		if(existingCustomData != null) {
+			if(customData == null) {
+				return;
+			}
+			try {
+				for(String key : customData.keySet()) {
+					existingCustomData.put(key, customData.get(key));
+				}
+			} catch (JSONException e) {
+				Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
+			}
 		}
 	}
 

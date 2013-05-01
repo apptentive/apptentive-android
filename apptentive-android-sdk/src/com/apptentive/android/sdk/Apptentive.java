@@ -45,6 +45,7 @@ public class Apptentive {
 	private static Context appContext = null;
 	private static ApptentiveDatabase db;
 	private static UnreadMessagesListener unreadMessagesListener;
+	private static Map<String, String> customData;
 
 	private Apptentive() {
 	}
@@ -102,17 +103,62 @@ public class Apptentive {
 	public static void onDestroy(Activity activity) {
 	}
 
-	public static Context getAppContext() {
-		return appContext;
+	/**
+	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
+	 * This method will override the email address that Apptentive looks for programmatically, but will not override
+	 * an email address that the user has previously entered in an Apptentive dialog.
+	 *
+	 * @param email The user's email address.
+	 */
+	public static void setUserEmail(String email) {
+		GlobalInfo.userEmail = email;
 	}
 
-	public static ApptentiveDatabase getDatabase() {
-		return db;
+	/**
+	 * Allows you to pass arbitrary string data to the server along with this device's info.
+	 * @param customData A Map of key/value pairs to send to the server.
+	 */
+	public static void setCustomData(Map<String, String> customData) {
+		Apptentive.customData = customData;
 	}
 
-	public static ContentResolver getContentResolver() {
-		return appContext.getContentResolver();
+	/**
+	 * Gets the Apptentive Rating Module.
+	 *
+	 * @return The Apptentive Rating Module.
+	 */
+	public static RatingModule getRatingModule() {
+		return RatingModule.getInstance();
 	}
+
+	/**
+	 * Gets the Apptentive Survey Module.
+	 *
+	 * @return The Apptentive Survey Module.
+	 */
+	public static SurveyModule getSurveyModule() {
+		return SurveyModule.getInstance();
+	}
+
+	/**
+	 * Opens the Apptentive Message Center UI Activity
+	 *
+	 * @param context The Context from which to launch the Message Center
+	 */
+	public static void showMessageCenter(Context context) {
+		showMessageCenter(context, true);
+	}
+
+	/**
+	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
+	 * @param listener An UnreadMessageListener that you instantiate.
+	 */
+	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
+		unreadMessagesListener = listener;
+	}
+
+
+
 
 	private static void init() {
 
@@ -217,7 +263,7 @@ public class Apptentive {
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(appContext);
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(appContext, customData);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
@@ -350,45 +396,6 @@ public class Apptentive {
 	}
 
 	/**
-	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
-	 * This method will override the email address that Apptentive looks for programmatically, but will not override
-	 * an email address that the user has previously entered in an Apptentive dialog.
-	 *
-	 * @param email The user's email address.
-	 */
-	public static void setUserEmail(String email) {
-		GlobalInfo.userEmail = email;
-	}
-
-
-	/**
-	 * Gets the Apptentive Rating Module.
-	 *
-	 * @return The Apptentive Rating Module.
-	 */
-	public static RatingModule getRatingModule() {
-		return RatingModule.getInstance();
-	}
-
-	/**
-	 * Gets the Apptentive Survey Module.
-	 *
-	 * @return The Apptentive Survey Module.
-	 */
-	public static SurveyModule getSurveyModule() {
-		return SurveyModule.getInstance();
-	}
-
-	/**
-	 * Opens the Apptentive Message Center UI Activity
-	 *
-	 * @param context The Context from which to launch the Message Center
-	 */
-	public static void showMessageCenter(Context context) {
-		showMessageCenter(context, true);
-	}
-
-	/**
 	 * Internal use only.
 	 * @param context The Context from which to launch the Message Center
 	 * @param forced True if opened manually. False if opened from ratings flow.
@@ -398,8 +405,18 @@ public class Apptentive {
 		ApptentiveMessageCenter.show(context);
 	}
 
-	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		unreadMessagesListener = listener;
+	/**
+	 * Internal use only.
+	 */
+	public static ApptentiveDatabase getDatabase() {
+		return db;
+	}
+
+	/**
+	 * Internal use only.
+	 */
+	public static ContentResolver getContentResolver() {
+		return appContext.getContentResolver();
 	}
 
 	/**
@@ -410,6 +427,13 @@ public class Apptentive {
 		if(unreadMessagesListener != null) {
 			unreadMessagesListener.onUnreadMessagesAvailable(unreadMessages);
 		}
+	}
+
+	/**
+	 * Internal use only.
+	 */
+	public static Context getAppContext() {
+		return appContext;
 	}
 
 	/**

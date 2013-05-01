@@ -9,7 +9,9 @@ import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -23,10 +25,11 @@ public class DeviceManager {
 	 * cleared, set that value to null in the Device. The first time this is called, all Device will be returned.
 	 * @return
 	 */
-	public static Device storeDeviceAndReturnDiff(Context context) {
+	public static Device storeDeviceAndReturnDiff(Context context, Map<String, String> customData) {
 
 		Device original = getStoredDevice(context);
 		Device current = generateCurrentDevice(context);
+		current.setCustomData(customData);
 		Device diff = diffDevice(original, current);
 		if(diff != null) {
 			storeDevice(context, current);
@@ -191,6 +194,11 @@ public class DeviceManager {
 			ret.setRadioVersion(radioVersion);
 		}
 
+		Map<String, String> customData = chooseLatest(older.getCustomData(), newer.getCustomData());
+		if(customData != null) {
+			ret.setCustomData(customData);
+		}
+
 		String localeCountryCode = chooseLatest(older.getLocaleCountryCode(), newer.getLocaleCountryCode());
 		if (localeCountryCode != null) {
 			ret.setLocaleCountryCode(localeCountryCode);
@@ -241,6 +249,36 @@ public class DeviceManager {
 		// Clear existing value.
 		if(old != null && newer == null) {
 			return "";
+		}
+
+		if(old == null && newer != null) {
+			return newer;
+		}
+
+		// Do nothing.
+		return null;
+	}
+
+	private static Map<String, String> chooseLatest(Map<String, String> old, Map<String, String> newer) {
+		if(old == null || old.isEmpty()) {
+			old = null;
+		}
+		if(newer == null || newer.isEmpty()) {
+			newer = null;
+		}
+
+		// New value.
+		if(old != null && newer != null && !old.equals(newer)) {
+			return newer;
+		}
+
+		// Clear existing value.
+		if(old != null && newer == null) {
+			return new HashMap<String, String>();
+		}
+
+		if(old == null && newer != null) {
+			return newer;
 		}
 
 		// Do nothing.
