@@ -20,19 +20,13 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
-import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.Device;
-import com.apptentive.android.sdk.model.Sdk;
+import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
-import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
-import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -176,6 +170,9 @@ public class Apptentive {
 					if(previousVersionCode != currentVersionCode) {
 						onVersionChanged(previousVersionCode, currentVersionCode);
 					}
+				} else {
+					// First start.
+					onVersionChanged(-1, currentVersionCode);
 				}
 				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
 
@@ -238,12 +235,8 @@ public class Apptentive {
 			Log.d("Sdk was not updated.");
 		}
 
-		// TODO: Send AppInfo update if app info was updated.
-
 		// TODO: Check out locale...
 		Log.e("Default Locale: %s", Locale.getDefault().toString());
-
-		// TODO: Handle upgrades to the database.
 
 		// Finally, ensure the send worker is running.
 		PayloadSendWorker.start();
@@ -251,6 +244,8 @@ public class Apptentive {
 
 	private static void onVersionChanged(int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged();
+		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(Apptentive.getAppContext());
+		getDatabase().addPayload(appRelease);
 	}
 
 	private synchronized static void asyncFetchConversationToken() {

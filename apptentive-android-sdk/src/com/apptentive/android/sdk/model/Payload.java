@@ -69,6 +69,7 @@ public abstract class Payload extends JSONObject {
 		event,
 		device,
 		sdk,
+		app_release,
 		unknown,
 		// Legacy
 		survey;

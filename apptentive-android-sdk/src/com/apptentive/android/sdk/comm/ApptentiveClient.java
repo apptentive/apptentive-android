@@ -111,6 +111,10 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
+	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+	}
+
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
 		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
 	}

@@ -73,6 +73,9 @@ public class PayloadSendWorker {
 							case sdk:
 								response = ApptentiveClient.putSdk((Sdk) payload);
 								break;
+							case app_release:
+								response = ApptentiveClient.putAppRelease((AppRelease) payload);
+								break;
 							case survey:
 								response = ApptentiveClient.postSurvey((SurveyPayload) payload);
 								break;
