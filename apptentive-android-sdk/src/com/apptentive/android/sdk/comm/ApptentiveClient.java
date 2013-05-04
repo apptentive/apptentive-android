@@ -1,178 +1,344 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.comm;
 
+import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.survey.SurveyDefinition;
-import com.apptentive.android.sdk.module.survey.SurveyManager;
+import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.util.Util;
+import org.apache.http.Header;
+import org.apache.http.HeaderIterator;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
- * TODO: Make a generic get, post method, etc.
- * TODO: Catch HttpHostConnectException, which occurs when data connection is not there
- *
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
+
+	// TODO: Break out a version for each endpoint if we start to version endpoints separately.
+	private static final String API_VERSION = "1";
+
+	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
+	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
+
+	// New API
 	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
-	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
+	private static final String ENDPOINT_CONVERSATION = ENDPOINT_BASE + "/conversation";
+	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
+	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
+	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
+	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
+
+	// Old API
 	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
-	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_BASE + "/devices/%s/configuration";
 
-	private final String APPTENTIVE_API_KEY;
+	// Deprecated API
+	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 
-	public ApptentiveClient(String apiKey) {
-		if(apiKey == null || apiKey.equals("")) {
-			Log.e("Your API Key is not set. Please see the integration instructions for Apptentive initialization.");
-		}
-		this.APPTENTIVE_API_KEY = apiKey;
+
+	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
 	}
 
-	public int postJSON(String json) {
-		final HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
-		HttpConnectionParams.setSoTimeout(httpParams, 30000);
-		HttpClient httpClient = new DefaultHttpClient(httpParams);
-		HttpPost post = new HttpPost(ENDPOINT_RECORDS);
-
-		post.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
-		post.setHeader("Content-Type", "application/json");
-		post.setHeader("Accept", "application/json");
-
-		StringBuilder content = new StringBuilder();
-		InputStream is = null;
-		try {
-			Log.v("Posting JSON: " + json);
-			post.setEntity(new StringEntity(json, "UTF-8"));
-			HttpResponse response = httpClient.execute(post);
-			is = response.getEntity().getContent();
-			byte[] line = new byte[1024];
-			int size;
-			while ((size = is.read(line)) != -1) {
-				content.append(new String(line, 0, size));
-			}
-			Log.d(response.getStatusLine().toString());
-			Log.v("- %s", content.toString());
-
-			return response.getStatusLine().getStatusCode();
-		} catch (IOException e) {
-			Log.w("Error posting JSON: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (Exception e) {
-				}
-			}
-		}
-		return -1;
+	public static ApptentiveHttpResponse getAppConfiguration() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
-	public SurveyDefinition getSurvey() {
-		InputStream is = null;
+	/**
+	 * Gets all messages since the message specified by guid was specified.
+	 *
+	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
+	 */
+	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
+		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
+		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
+	}
+
+	public static ApptentiveHttpResponse postMessage(Message message) {
+		switch (message.getType()) {
+			case TextMessage:
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+			case AutomatedMessage:
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+			case FileMessage:
+				FileMessage fileMessage = (FileMessage) message;
+				StoredFile storedFile = fileMessage.getStoredFile();
+				return performMultipartFilePost(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
+			case unknown:
+				break;
+		}
+		return new ApptentiveHttpResponse();
+	}
+
+	public static ApptentiveHttpResponse postEvent(Event event) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse putDevice(Device device) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse getSurvey() {
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
+	}
+
+	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
+		Log.d("Performing request to %s", uri);
+		//Log.e("OAUTH Token: %s", oauthToken);
+
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		try {
-			String uri = ENDPOINT_SURVEYS_ACTIVE;
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet get = new HttpGet();
+			HttpClient httpClient;
+			HttpRequestBase request;
+			httpClient = new DefaultHttpClient();
+			switch (method) {
+				case GET:
+					request = new HttpGet(uri);
+					break;
+				case PUT:
+					request = new HttpPut(uri);
+					request.setHeader("Content-Type", "application/json");
+					Log.d("PUT body: " + body);
+					((HttpPut) request).setEntity(new StringEntity(body, "UTF-8"));
+					break;
+				case POST:
+					request = new HttpPost(uri);
+					request.setHeader("Content-Type", "application/json");
+					Log.d("POST body: " + body);
+					((HttpPost) request).setEntity(new StringEntity(body, "UTF-8"));
+					break;
+				default:
+					Log.e("Unrecognized method: " + method.name());
+					return ret;
+			}
 
-			get.setURI(new URI(uri));
-			get.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
-			get.setHeader("Accept", "application/json");
+			HttpParams httpParams = request.getParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, DEFAULT_HTTP_CONNECT_TIMEOUT);
+			HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
 
-			HttpResponse response = httpClient.execute(get);
+			request.setHeader("Authorization", "OAuth " + oauthToken);
+			request.setHeader("Accept", "application/json");
+			request.setHeader("X-API-Version", API_VERSION);
+
+			HttpResponse response = httpClient.execute(request);
 			int code = response.getStatusLine().getStatusCode();
-			Log.d("Survey: HTTP response status line: " + response.getStatusLine().toString());
+			ret.setCode(code);
+			ret.setReason(response.getStatusLine().getReasonPhrase());
+			Log.d("Response Status Line: " + response.getStatusLine().toString());
 
-			if (code >= 200 && code < 300) {
-				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-				Log.v("Survey: " + content);
-				return SurveyManager.parseSurvey(content);
-			}
-		} catch (URISyntaxException e) {
-			Log.e("Error fetching survey.", e);
-		} catch (IOException e) {
-			Log.e("Error fetching survey.", e);
-		} catch (JSONException e) {
-			Log.e("Error parsing retrieved survey.", e);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (Exception e) {
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				ret.setContent(EntityUtils.toString(entity, "UTF-8"));
+				if (code >= 200 && code < 300) {
+					Log.d("Response: " + ret.getContent());
+				} else {
+					Log.w("Response: " + ret.getContent());
 				}
 			}
+			HeaderIterator headerIterator = response.headerIterator();
+			if(headerIterator != null) {
+				List<Header> headers = new ArrayList<Header>();
+				while (headerIterator.hasNext()) {
+					Header header = (Header) headerIterator.next();
+					headers.add(header);
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			Log.w("Error communicating with server.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
+		} catch (IOException e) {
+			Log.w("Error communicating with server.", e);
 		}
-		return null;
+		return ret;
 	}
 
-	public HashMap<String, Object> getAppConfiguration(String deviceId) {
-		HashMap<String, Object> config = new HashMap<String, Object>();
-		InputStream is = null;
-		try {
-			String uri = String.format(ENDPOINT_CONFIGURATION, deviceId);
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet get = new HttpGet();
+	private static ApptentiveHttpResponse performMultipartFilePost(String oauthToken, String uri, String postBody, StoredFile storedFile) {
+		Log.d("Performing multipart request to %s", uri);
 
-			get.setURI(new URI(uri));
-			get.setHeader("Authorization", "OAuth " + APPTENTIVE_API_KEY);
-			get.setHeader("Accept", "application/json");
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 
-			HttpResponse response = httpClient.execute(get);
-			int code = response.getStatusLine().getStatusCode();
-			Log.d("Configuration: HTTP response status line: " + response.getStatusLine().toString());
-
-			if (code >= 200 && code < 300) {
-				String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-				JSONObject root = new JSONObject(content);
-				@SuppressWarnings("unchecked")
-				Iterator<String> it = root.keys();
-				while (it.hasNext()) {
-					String key =  it.next();
-					Object value = root.get(key);
-					if(value instanceof JSONObject) {
-						config.put(key, value.toString());
-					} else {
-						config.put(key, value);
-					}
-				}
-				Log.v("Configuration: " + content);
-			}
-		} catch (JSONException e) {
-			Log.e("Error fetching configuration.", e);
-		} catch (URISyntaxException e) {
-			Log.e("Error fetching configuration.", e);
-		} catch (IOException e) {
-			Log.e("Error fetching configuration: %s", e.getMessage());
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (Exception e) {
-				}
-			}
+		if(storedFile == null) {
+			Log.e("StoredFile is null. Unable to send.");
+			return ret;
 		}
-		return config;
+
+		int bytesRead;
+		int bufferSize = 4096;
+		byte[] buffer;
+
+		String lineEnd = "\r\n";
+		String twoHyphens = "--";
+		String boundary = UUID.randomUUID().toString();
+
+		HttpURLConnection connection;
+		DataOutputStream os = null;
+		InputStream is = null;
+
+		try {
+			is = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
+
+			// Set up the request.
+			URL url = new URL(uri);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setUseCaches(false);
+			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
+			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setRequestMethod("POST");
+
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			connection.setRequestProperty("Accept", "application/json");
+			connection.setRequestProperty("X-API-Version", API_VERSION);
+
+			StringBuilder requestText = new StringBuilder();
+
+			// Write form data
+			requestText.append(twoHyphens + boundary + lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			requestText.append("Content-Type: text/plain" + lineEnd);
+			requestText.append(lineEnd);
+			requestText.append(postBody);
+			requestText.append(lineEnd);
+
+			// Write file attributes.
+			requestText.append(twoHyphens + boundary + lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
+			requestText.append("Content-Type: " + storedFile.getMimeType() + lineEnd);
+			requestText.append(lineEnd);
+
+			Log.d("Post body: " + requestText);
+
+			// Open an output stream.
+			os = new DataOutputStream(connection.getOutputStream());
+
+			// Write the text so far.
+			os.writeBytes(requestText.toString());
+
+			try {
+				// Write the actual file.
+				buffer = new byte[bufferSize];
+				while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
+					os.write(buffer, 0, bytesRead);
+				}
+			} catch (IOException e) {
+				Log.d("Error writing file bytes to HTTP connection.", e);
+				ret.setBadPayload(true);
+				throw e;
+			}
+
+			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+			os.close();
+
+			ret.setCode(connection.getResponseCode());
+			ret.setReason(connection.getResponseMessage());
+
+			// TODO: These streams may not be ready to read now. Put this in a new thread.
+			// Read the normal response.
+			InputStream nis = null;
+			ByteArrayOutputStream nbaos = null;
+			try {
+				Log.d("Sending file: " + storedFile.getLocalFilePath());
+				nis = connection.getInputStream();
+				nbaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while ( nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
+					nbaos.write(eBuf, 0, eRead);
+				}
+				ret.setContent(nbaos.toString());
+			} catch (IOException e) {
+				Log.w("Can't read return stream.", e);
+			} finally {
+				Util.ensureClosed(nis);
+				Util.ensureClosed(nbaos);
+			}
+
+			// Read the error response.
+			InputStream eis = null;
+			ByteArrayOutputStream ebaos = null;
+			try {
+				eis = connection.getErrorStream();
+				ebaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while ( eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
+					ebaos.write(eBuf, 0, eRead);
+				}
+				if(ebaos.size() > 0) {
+					ret.setContent(ebaos.toString());
+				}
+			} catch (IOException e) {
+				Log.w("Can't read error stream.", e);
+			} finally {
+				Util.ensureClosed(eis);
+				Util.ensureClosed(ebaos);
+			}
+
+			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
+			Log.v(ret.getContent());
+		} catch (FileNotFoundException e) {
+			Log.e("Error getting file to upload.", e);
+		} catch (MalformedURLException e) {
+			Log.e("Error constructing url for file upload.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
+		} catch (IOException e) {
+			Log.e("Error executing file upload.", e);
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(os);
+		}
+		return ret;
+	}
+
+	private enum Method {
+		GET,
+		PUT,
+		POST
 	}
 }

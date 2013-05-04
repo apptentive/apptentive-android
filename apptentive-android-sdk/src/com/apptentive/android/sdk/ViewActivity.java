@@ -6,13 +6,20 @@
 
 package com.apptentive.android.sdk;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
+import com.apptentive.android.sdk.util.Constants;
 
 /**
- * For internal use only. Used to launch Apptentive feedback and ratings views.
+ * For internal use only. Used to launch Apptentive Feedback, Survey, and Message Center views.
  * @author Sky Kelsey
  */
 public class ViewActivity extends ApptentiveActivity {
@@ -26,6 +33,13 @@ public class ViewActivity extends ApptentiveActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeModule = Module.valueOf(getIntent().getStringExtra("module"));
 
+		getWindow().setFormat(PixelFormat.RGBA_8888);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 		switch (activeModule) {
 			case ABOUT:
 				setContentView(R.layout.apptentive_about);
@@ -41,6 +55,10 @@ public class ViewActivity extends ApptentiveActivity {
 
 				SurveyModule.getInstance().doShow(this);
 				break;
+			case MESSAGE_CENTER:
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+				ApptentiveMessageCenter.doShow(this);
+				break;
 			default:
 				Log.w("No Activity specified. Finishing...");
 				finish();
@@ -48,8 +66,55 @@ public class ViewActivity extends ApptentiveActivity {
 		}
 	}
 
+	@Override
+	protected void onStop() {
+		super.onStop();
+		switch (activeModule) {
+			case ABOUT:
+				break;
+			case SURVEY:
+				break;
+			case MESSAGE_CENTER:
+				ApptentiveMessageCenter.onStop(this);
+				break;
+			default:
+				break;
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		switch(activeModule) {
+			case ABOUT:
+				break;
+			case SURVEY:
+				break;
+			case MESSAGE_CENTER:
+				ApptentiveMessageCenter.onBackPressed();
+				break;
+			default:
+				break;
+		}
+		super.onBackPressed();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == Activity.RESULT_OK) {
+			switch(requestCode) {
+				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
+					MessageCenterView.showAttachmentDialog(this, data.getData());
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 	public static enum Module {
 		ABOUT,
-		SURVEY
+		SURVEY,
+		MESSAGE_CENTER
 	}
 }

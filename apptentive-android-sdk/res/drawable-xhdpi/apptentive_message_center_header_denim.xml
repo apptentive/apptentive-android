@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap android:src="@drawable/apptentive_blue_denim"
+                android:tileMode="repeat"
+                android:antialias="false"/>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:startColor="#88AAAAFF"
+                      android:endColor="@android:color/transparent"
+                      android:gradientRadius="500"
+                      android:centerX="0.5"
+                      android:centerY="2.0"
+                      android:type="radial"/>
+        </shape>
+    </item>
+</layer-list>

@@ -15,6 +15,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
 import com.apptentive.android.sdk.ApptentiveActivity;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 
 import java.util.List;
 
@@ -59,6 +60,10 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void throwNpe(View view) {
-		throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
+		//throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
+	}
+
+	public void deleteStoredMessages(View view) {
+		MessageManager.deleteAllRecords();
 	}
 }

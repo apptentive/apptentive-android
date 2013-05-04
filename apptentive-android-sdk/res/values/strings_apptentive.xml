@@ -11,17 +11,19 @@
 	<string name="apptentive_activity_name">Apptentive</string>
 
     <string name="apptentive_default_host_app_name">this app</string>
+
 	<string name="apptentive_skip">Skip</string>
 	<string name="apptentive_cancel">Cancel</string>
 	<string name="apptentive_back">Back</string>
 	<string name="apptentive_send">Send</string>
 	<string name="apptentive_ok">OK</string>
-
+	<string name="apptentive_yes">Yes</string>
+	<string name="apptentive_no">No</string>
 	<string name="apptentive_oops">Oops!</string>
+	<string name="apptentive_you">You</string>
+	<string name="apptentive_them">Them</string>
+	<string name="apptentive_sending">Sending&#8230;</string>
 
-	<string name="apptentive_feedback_title">Feedback</string>
-	<string name="apptentive_edittext_feedback_message_forced">Feedback (required)</string>
-	<string name="apptentive_edittext_feedback_message">What can we do to ensure you love our app? We appreciate constructive feedback.</string>
 
 	<string name="apptentive_edittext_email_text">Email Address</string>
 
@@ -30,6 +32,7 @@
 	<string name="apptentive_about_header_button_okay_text">Okay</string>
 	<string name="apptentive_about_message_1">This application is using Apptentive in-app feedback service in order to listen to you more effectively.</string>
 	<string name="apptentive_about_message_2">Your feedback is hosted by Apptentive and is subject to Apptentive\'s privacy policy and your developer\'s privacy policy.</string>
+    <string name="apptentive_about_apptentive_link">For more information, please visit <a href="http://www.apptentive.com">apptentive.com</a>.</string>
 
 	<string name="apptentive_enjoyment_message_fs">Do you love %s?</string>
 	<string name="apptentive_rating_title">Thank You</string>
@@ -37,7 +40,8 @@
 	<string name="apptentive_rating_rate">Rate %s</string>
 	<string name="apptentive_rating_remind">Remind me Later</string>
 	<string name="apptentive_rating_no">No Thanks</string>
-	<string name="apptentive_rating_provider_no_android_market">Android Market was not found. Please install Android Market before rating this app.</string>
+	<string name="apptentive_rating_provider_no_google_play">Google Play was not found. Please install Google Play before rating this app.</string>
+	<string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore was not found. Please install Amazon Appstore before rating this app.</string>
 	<string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
 	<string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
 
@@ -46,4 +50,15 @@
     <string name="apptentive_survey_optional">Optional</string>
     <string name="apptentive_survey_success_title">Survey Completed</string>
     <string name="apptentive_survey_positive_button">OK</string>
+
+    <string name="apptentive_message_center_header_title">Message Center</string>
+    <string name="apptentive_message_center_compose_hint">Type a message&#8230;</string>
+    <string name="apptentive_message_center_attachment_title">Send attachment?</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
+
+    <string name="apptentive_message_auto_title_manual">Hi There!</string>
+    <string name="apptentive_message_auto_body_manual">This is the Message Center. Please send any problems, suggestions, or bugs to us, and we\'ll try to respond to you as soon as we can. Thanks!</string>
+    <string name="apptentive_message_auto_title_no_love">We\'re Sorry!</string>
+    <string name="apptentive_message_auto_body_no_love">If you don\'t love this app, we\'ve done something wrong. We\'d love to hear from you. If you take a second to tell us why, we\'ll be able to improve it to suit your needs.</string>
+
 </resources>

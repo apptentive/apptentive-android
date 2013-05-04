@@ -9,7 +9,8 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 
 /**
  * @author Sky Kelsey
@@ -21,7 +22,7 @@ public class AboutModule {
 	// *************************************************************************************************
 	private static AboutModule instance = null;
 
-	static AboutModule getInstance() {
+	public static AboutModule getInstance() {
 		if (instance == null) {
 			instance = new AboutModule();
 		}
@@ -46,16 +47,8 @@ public class AboutModule {
 		context.startActivity(intent);
 	}
 
-	void doShow(final Activity activity){
-		View.OnClickListener clickListener = new View.OnClickListener() {
-			public void onClick(View view) {
-				int id = view.getId();
-				if(id == R.id.apptentive_button_about_okay){
-					activity.finish();
-				}
-			}
-		};
-		activity.findViewById(R.id.apptentive_button_about_okay);
-		activity.findViewById(R.id.apptentive_button_about_okay).setOnClickListener(clickListener);
+	void doShow(final Activity activity) {
+		TextView links = (TextView) activity.findViewById(R.id.apptentive_about_links);
+		links.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 }

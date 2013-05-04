@@ -14,15 +14,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
+import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
  */
 public class DevActivity extends ApptentiveActivity {
 
-	private static final String LOG_TAG = "Apptentive Testing App";
+	private static final String LOG_TAG = "Apptentive Dev App";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,12 +36,17 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
 		// OPTIONAL: To send extra data with your feedback.
-		Apptentive.getFeedbackModule().addDataField("username", "Sky Kelsey");
+
+		// Uncomment if this app exists in the Amazon Store.
+		//Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());
+
 		// END APPTENTIVE INITIALIZATION
 
 		// Setup UI:
 		final RatingModule ratingModule = Apptentive.getRatingModule();
-		final FeedbackModule feedbackModule = Apptentive.getFeedbackModule();
+
+		// Uncomment if this app exists in the Amazon Store.
+		//ratingModule.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {
@@ -77,10 +86,10 @@ public class DevActivity extends ApptentiveActivity {
 				ratingModule.showRatingDialog(DevActivity.this);
 			}
 		});
-		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
-		feedbackButton.setOnClickListener(new View.OnClickListener() {
+		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
+		messageCenterButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				feedbackModule.forceShowFeedbackDialog(DevActivity.this);
+				Apptentive.showMessageCenter(DevActivity.this);
 			}
 		});
 
@@ -118,8 +127,30 @@ public class DevActivity extends ApptentiveActivity {
 				}
 			}
 		});
+
+		// If you would like to be notified when there are unread messages available, set a listener like this.
+		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+			public void onUnreadMessagesAvailable(final int unreadMessages) {
+				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
+				DevActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
+						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
+					}
+				});
+
+			}
+		});
+
+		// Optionally send extra custom data to the server.
+		Map<String, String> customData = new HashMap<String, String>();
+		customData.put("user-id", "1234567890");
+		customData.put("user-email", "sky@apptentive.com");
+		Apptentive.setCustomData(customData);
 	}
 
+	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window
+	// gains focus.
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);

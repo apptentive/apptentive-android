@@ -25,10 +25,12 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.model.Configuration;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
-import com.apptentive.android.sdk.module.rating.impl.AndroidMarketRatingProvider;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -47,8 +49,6 @@ public class RatingModule {
 	// *************************************************************************************************
 
 	private static RatingModule instance = null;
-	private static boolean displayingEnjoymentDialog = false;
-	private static boolean displayingRatingDialog = false;
 
 	static RatingModule getInstance() {
 		if (instance == null) {
@@ -56,13 +56,6 @@ public class RatingModule {
 		}
 		return instance;
 	}
-
-	// Default configuration variables
-	public static int DEFAULT_DAYS_BEFORE_PROMPT = 30;
-	public static int DEFAULT_USES_BEFORE_PROMPT = 5;
-	public static int DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
-	public static int DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
-	public static String DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 
 
 	// *************************************************************************************************
@@ -80,40 +73,33 @@ public class RatingModule {
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
-	private TriState ratingPeriodElapsed() {
+	private boolean ratingPeriodElapsed() {
+		Configuration config = Configuration.load(prefs);
 		RatingState state = getState();
 		long days;
 		switch (state) {
 			case REMIND:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
+				days = config.getRatingsDaysBetweenPrompts();
 				break;
 			default:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
+				days = config.getRatingsDaysBeforePrompt();
 				break;
-		}
-		// Allow a zero value for remind state that means always remind if given the chance.
-		if(state != RatingState.REMIND && days == 0) {
-			return TriState.IGNORE;
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
-		return now > periodEnd ? TriState.TRUE : TriState.FALSE;
+		return now > periodEnd;
 	}
 
-	private TriState eventThresholdReached() {
-		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
-		if(significantEventsBeforePrompt == 0) {
-			return TriState.IGNORE;
-		}
-		return getEvents() >= significantEventsBeforePrompt ? TriState.TRUE : TriState.FALSE;
+	private boolean eventThresholdReached() {
+		Configuration config = Configuration.load(prefs);
+		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
+		return getEvents() >= significantEventsBeforePrompt;
 	}
 
-	private TriState usesThresholdReached() {
-		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
-		if(usesBeforePrompt == 0) {
-			return TriState.IGNORE;
-		}
-		return getUses() >= usesBeforePrompt ? TriState.TRUE : TriState.FALSE;
+	private boolean usesThresholdReached() {
+		Configuration config = Configuration.load(prefs);
+		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
+		return getUses() >= usesBeforePrompt;
 	}
 
 	private long getStartOfRatingPeriod() {
@@ -160,7 +146,8 @@ public class RatingModule {
 	}
 
 	void onAppVersionChanged() {
-		if(prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_CLEAR_ON_UPGRADE, false)) {
+		Configuration config = Configuration.load(prefs);
+		if(config.isRatingsClearOnUpgrade()) {
 			setState(RatingState.START);
 			setStartOfRatingPeriod(new Date().getTime());
 			setEvents(0);
@@ -193,42 +180,24 @@ public class RatingModule {
 	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
 	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
 	 *
-	 * @param activity The Activity from which this method was called.
+	 * @param activity The activityContext from which this method was called.
 	 */
 	public void forceShowEnjoymentDialog(Activity activity) {
 		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
-	synchronized void showEnjoymentDialog(Activity activity, Trigger reason) {
-		if(!displayingEnjoymentDialog) {
-			displayingEnjoymentDialog = true;
-			EnjoymentDialog dialog = this.new EnjoymentDialog(activity);
-			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface dialogInterface) {
-					displayingEnjoymentDialog = false;
-				}
-			});
-			dialog.show(reason);
-		}
+	void showEnjoymentDialog(Activity activity, Trigger reason) {
+		this.new EnjoymentDialog(activity).show(reason);
 	}
 
 	/**
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
-	 * It will be called automatically if the user chooses "Yes" in the "Are you enjoying this app?" dialog.
+	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
 	 *
-	 * @param activity The Activity from which this method was called.
+	 * @param activity The acvitity from which this method was called.
 	 */
-	synchronized public void showRatingDialog(Activity activity) {
-		if(!displayingRatingDialog) {
-			displayingRatingDialog = true;
-			RatingDialog dialog = this.new RatingDialog(activity);
-			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface dialogInterface) {
-					displayingRatingDialog = false;
-				}
-			});
-			dialog.show();
-		}
+	public void showRatingDialog(Activity activity) {
+		this.new RatingDialog(activity).show();
 	}
 
 	/**
@@ -239,7 +208,8 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	public void run(Activity activity) {
-		if(!prefs.getBoolean(Constants.PREF_KEY_APP_RATINGS_ENABLED, true)) {
+		Configuration config = Configuration.load(prefs);
+		if(!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");
 			return;
 		}
@@ -256,7 +226,7 @@ public class RatingModule {
 				}
 				break;
 			case REMIND:
-				if(ratingPeriodElapsed() == TriState.TRUE) {
+				if (ratingPeriodElapsed()) {
 					showRatingDialog(activity);
 				}
 				break;
@@ -270,24 +240,23 @@ public class RatingModule {
 	}
 
 	private boolean canShowRatingFlow(){
-		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+		Configuration config = Configuration.load(prefs);
+		String ratingsPromptLogic = config.getRatingsPromptLogic();
 		try{
-			return logic(new JSONObject(ratingsPromptLogic), true);
+			return logic(new JSONObject(ratingsPromptLogic));
 		}catch(JSONException e){
 			// Fall back to old logic.
-			return ratingPeriodElapsed() != TriState.FALSE && (eventThresholdReached() != TriState.FALSE || usesThresholdReached() != TriState.FALSE);
+			return ratingPeriodElapsed() && (eventThresholdReached() || usesThresholdReached());
 		}
 	}
 
 	/**
 	 * Apply the rules from the logic expression.
-	 * @param obj The current node in the boolean expression.
-	 * @param andOr True if the parent node is an AND, false if it's an OR. Affects how we ignore zero value variables.
-	 *              Variables with a zero are ignored from the calculation.
+	 * @param obj
 	 * @return True it the logic expression is true.
 	 * @throws JSONException
 	 */
-	private boolean logic(Object obj, boolean andOr) throws JSONException {
+	private boolean logic(Object obj) throws JSONException {
 		boolean ret = false;
 		if (obj instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) obj;
@@ -296,30 +265,24 @@ public class RatingModule {
 				JSONArray and = jsonObject.getJSONArray("and");
 				ret = true;
 				for (int i = 0; i < and.length(); i++) {
-					boolean prev = logic(and.get(i), true);
+					boolean prev = logic(and.get(i));
 					ret = ret && prev;
 				}
 			} else if ("or".equals(key)) {
 				JSONArray or = jsonObject.getJSONArray("or");
 				for (int i = 0; i < or.length(); i++) {
-					ret = ret || logic(or.get(i), false);
+					ret = ret || logic(or.get(i));
 				}
 			} else {
-				return logic(key, true); // This shouldn't happen.
+				return logic(key);
 			}
 		} else if(obj instanceof String){
-			TriState result = TriState.IGNORE;
 			if("uses".equals(obj)) {
-				result = usesThresholdReached();
+				return usesThresholdReached();
 			} else if("days".equals(obj)) {
-				result = ratingPeriodElapsed();
+				return ratingPeriodElapsed();
 			} else if("events".equals(obj)) {
-				result = eventThresholdReached();
-			}
-			if(result == TriState.IGNORE) {
-				return andOr;
-			} else {
-				return result == TriState.TRUE;
+				return eventThresholdReached();
 			}
 		} else {
 			Log.w("Unknown logic token: " + obj);
@@ -341,7 +304,7 @@ public class RatingModule {
 	}
 
 	/**
-	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
+	 * Increments the number of "significant events" the app's user has achieved. What you condider to be a significant
 	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
 	 * is time to run the rating flow.
 	 */
@@ -398,34 +361,29 @@ public class RatingModule {
 		forced
 	}
 
-	enum TriState {
-		TRUE,
-		FALSE,
-		IGNORE
-	}
-
 	/**
 	 * This method is for debugging purposed only.
 	 */
 	void logRatingFlowState() {
-		String ratingsPromptLogic = prefs.getString(Constants.PREF_KEY_APP_RATINGS_PROMPT_LOGIC, DEFAULT_RATING_PROMPT_LOGIC);
+		Configuration config = Configuration.load(prefs);
+		String ratingsPromptLogic = config.getRatingsPromptLogic();
 
 		RatingState state = getState();
 		long days;
 		switch (state) {
 			case REMIND:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BETWEEN_PROMPTS, DEFAULT_DAYS_BEFORE_REPROMPTING);
+				days = config.getRatingsDaysBetweenPrompts();
 				break;
 			default:
-				days = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_DAYS_BEFORE_PROMPT, DEFAULT_DAYS_BEFORE_PROMPT);
+				days = config.getRatingsDaysBeforePrompt();
 				break;
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
 		boolean elapsed = now > periodEnd;
 
-		int usesBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_USES_BEFORE_PROMPT, DEFAULT_USES_BEFORE_PROMPT);
-		int significantEventsBeforePrompt = prefs.getInt(Constants.PREF_KEY_APP_RATINGS_EVENTS_BEFORE_PROMPT, DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT);
+		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
+		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
 
 		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(), usesBeforePrompt, getEvents(), significantEventsBeforePrompt));
 	}
@@ -451,7 +409,7 @@ public class RatingModule {
 			yes.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					dismiss();
-					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__yes);
+					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__yes);
 					Apptentive.getRatingModule().showRatingDialog(activity);
 					dismiss();
 				}
@@ -459,14 +417,15 @@ public class RatingModule {
 			Button no = (Button) findViewById(R.id.apptentive_choice_no);
 			no.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__no);
+					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__no);
 					setState(RatingState.POSTPONE);
-					FeedbackModule.getInstance().showFeedbackDialog(activity, FeedbackModule.Trigger.rating);
+
+					Apptentive.showMessageCenter(activity, false);
 					dismiss();
 				}
 			});
 
-			MetricModule.sendMetric(MetricModule.Event.enjoyment_dialog__launch, reason.name());
+			MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__launch, reason.name());
 			setCancelable(false);
 			super.show();
 		}
@@ -507,11 +466,11 @@ public class RatingModule {
 							dismiss();
 							String errorMessage = activityContext.getString(R.string.apptentive_rating_error);
 							try {
-								MetricModule.sendMetric(MetricModule.Event.rating_dialog__rate);
+								MetricModule.sendMetric(Event.EventLabel.rating_dialog__rate);
 								// Send user to app rating page
 								if (RatingModule.this.selectedRatingProvider == null) {
 									// Default to the Android Market provider, if none has been specified
-									RatingModule.this.selectedRatingProvider = new AndroidMarketRatingProvider();
+									RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
 								}
 								errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activityContext);
 								RatingModule.this.selectedRatingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
@@ -544,7 +503,7 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							MetricModule.sendMetric(MetricModule.Event.rating_dialog__remind);
+							MetricModule.sendMetric(Event.EventLabel.rating_dialog__remind);
 							setState(RatingState.REMIND);
 							setStartOfRatingPeriod(new Date().getTime());
 						}
@@ -555,13 +514,13 @@ public class RatingModule {
 					new View.OnClickListener() {
 						public void onClick(View view) {
 							dismiss();
-							MetricModule.sendMetric(MetricModule.Event.rating_dialog__decline);
+							MetricModule.sendMetric(Event.EventLabel.rating_dialog__decline);
 							setState(RatingState.POSTPONE);
 						}
 					}
 			);
 
-			MetricModule.sendMetric(MetricModule.Event.rating_dialog__launch);
+			MetricModule.sendMetric(Event.EventLabel.rating_dialog__launch);
 			setCancelable(false);
 			super.show();
 		}

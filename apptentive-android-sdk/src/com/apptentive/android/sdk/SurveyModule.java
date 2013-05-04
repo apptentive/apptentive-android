@@ -6,40 +6,26 @@
 
 package com.apptentive.android.sdk;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.*;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.module.survey.MultichoiceQuestion;
-import com.apptentive.android.sdk.module.survey.MultichoiceSurveyQuestionView;
-import com.apptentive.android.sdk.module.survey.MultiselectQuestion;
-import com.apptentive.android.sdk.module.survey.MultiselectSurveyQuestionView;
-import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
-import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
-import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
-import com.apptentive.android.sdk.module.survey.Question;
-import com.apptentive.android.sdk.module.survey.SinglelineQuestion;
-import com.apptentive.android.sdk.module.survey.StackrankQuestion;
-import com.apptentive.android.sdk.module.survey.StackrankSurveyQuestionView;
-import com.apptentive.android.sdk.module.survey.SurveyDefinition;
-import com.apptentive.android.sdk.module.survey.SurveyDescriptionView;
-import com.apptentive.android.sdk.module.survey.SurveySendView;
-import com.apptentive.android.sdk.module.survey.TextSurveyQuestionView;
-import com.apptentive.android.sdk.offline.PayloadManager;
+import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -68,7 +54,6 @@ public class SurveyModule {
 	// *************************************************************************************************
 
 	private SurveyDefinition surveyDefinition;
-	private SurveyPayload result;
 	private SurveySendView sendView;
 	private boolean fetching = false;
 	private Map<String, String> data;
@@ -102,18 +87,22 @@ public class SurveyModule {
 		}
 		Log.d("Started survey fetch");
 		fetching = true;
-		// Upload any payloads that were created while the device was offline.
+
 		new Thread() {
 			public void run() {
 				try {
-					ApptentiveClient client = new ApptentiveClient(GlobalInfo.apiKey);
-					SurveyDefinition definition = client.getSurvey();
-					if (definition != null) {
-						setSurvey(definition);
+					ApptentiveHttpResponse response = ApptentiveClient.getSurvey();
+					if(response.isSuccessful()) {
+						SurveyDefinition definition = SurveyManager.parseSurvey(response.getContent());
+						if (definition != null) {
+							setSurvey(definition);
+						}
+						if (onSurveyFetchedListener != null) {
+							onSurveyFetchedListener.onSurveyFetched(definition != null);
+						}
 					}
-					if (onSurveyFetchedListener != null) {
-						onSurveyFetchedListener.onSurveyFetched(definition != null);
-					}
+				} catch (JSONException e) {
+					Log.e("Exception parsing survey JSON.", e);
 				} finally {
 					fetching = false;
 				}
@@ -142,7 +131,6 @@ public class SurveyModule {
 
 	public void cleanup() {
 		this.surveyDefinition = null;
-		this.result = null;
 	}
 
 	boolean isCompleted() {
@@ -156,13 +144,10 @@ public class SurveyModule {
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
 	void doShow(final Activity activity) {
 		if (surveyDefinition == null) {
 			return;
 		}
-		result = new SurveyPayload(surveyDefinition);
-
 		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
 		surveyTitle.setFocusable(true);
 		surveyTitle.setFocusableInTouchMode(true);
@@ -174,7 +159,7 @@ public class SurveyModule {
 		} else {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(MetricModule.Event.survey__cancel, null, data);
+					MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
 					cleanup();
 					activity.finish();
 				}
@@ -243,8 +228,9 @@ public class SurveyModule {
 		sendView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(MetricModule.Event.survey__submit, null, data);
-				PayloadManager.getInstance().putPayload(result);
+				MetricModule.sendMetric(Event.EventLabel.survey__submit, null, data);
+
+				getSurveyStore().addPayload(new SurveyPayload(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyCompletedListener != null) {
 					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener();
@@ -270,7 +256,7 @@ public class SurveyModule {
 		sendView.setEnabled(isCompleted());
 		questionList.addView(sendView);
 
-		MetricModule.sendMetric(MetricModule.Event.survey__launch, null, data);
+		MetricModule.sendMetric(Event.EventLabel.survey__launch, null, data);
 
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
@@ -281,9 +267,12 @@ public class SurveyModule {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
-			MetricModule.sendMetric(MetricModule.Event.survey__question_response, null, answerData);
+			MetricModule.sendMetric(Event.EventLabel.survey__question_response, null, answerData);
 			question.setMetricSent(true);
 		}
+	}
 
+	private static PayloadStore getSurveyStore() {
+		return Apptentive.getDatabase();
 	}
 }

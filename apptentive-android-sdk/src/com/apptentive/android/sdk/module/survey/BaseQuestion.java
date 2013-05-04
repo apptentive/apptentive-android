@@ -28,7 +28,7 @@ abstract public class BaseQuestion implements Question {
 		this.id = question.getString("id");
 		this.value = question.getString("value");
 		this.required = question.optBoolean("required", false);
-		if (question.has("instructions")) {
+		if (!question.isNull("instructions")) {
 			this.instructions = question.getString("instructions");
 		} else {
 			this.instructions = null;

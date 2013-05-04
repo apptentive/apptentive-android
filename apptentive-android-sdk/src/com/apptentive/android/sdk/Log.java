@@ -8,7 +8,6 @@ package com.apptentive.android.sdk;
 
 import java.util.IllegalFormatException;
 
-// TODO: Make package private
 /**
  * @author Sky Kelsey
  */
@@ -24,8 +23,7 @@ public class Log {
 	private static final String TAG = "Apptentive";
 
 	private static void doLog(int level, Throwable throwable, String message, Object... args){
-		boolean loggable = GlobalInfo.isAppDebuggable || level > DEBUG; // Don't log below INFO unless we are debugging.
-		if(loggable && message != null){
+		if(canLog(level) && message != null){
 			if(args.length > 0){
 				try{
 					message = String.format(message, args);
@@ -42,6 +40,10 @@ public class Log {
 				android.util.Log.println(level, TAG, android.util.Log.getStackTraceString(throwable));
 			}
 		}
+	}
+
+	public static boolean canLog(int level) {
+		return GlobalInfo.isAppDebuggable || level > DEBUG; // Don't log below "level" unless we are debugging.
 	}
 
 	public static void v(String message, Object... args){
