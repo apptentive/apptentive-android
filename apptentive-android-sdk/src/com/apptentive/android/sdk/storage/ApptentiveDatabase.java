@@ -253,6 +253,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					continue;
 				}
 				message.setDatabaseId(cursor.getLong(0));
+				message.setState(Message.State.parse(cursor.getString(4)));
 				message.setRead(cursor.getInt(5) == TRUE);
 				messages.add(message);
 			} while (cursor.moveToNext());
