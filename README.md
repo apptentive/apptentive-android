@@ -14,7 +14,7 @@ Integration takes three steps:
 #Get the Apptentive Source
 All of our client code is open source, and [available here on github](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". Our code can be accessed in two ways:
 
-* Download the latest tagged release (v0.6.1) as a [.zip](https://github.com/apptentive/apptentive-android/zipball/v0.6.1) or [.tar.gz](https://github.com/apptentive/apptentive-android/tarball/v0.6.1).
+* Download the latest tagged release [here](https://github.com/apptentive/apptentive-android/tags).
 * Clone our SDK using git: ``git clone https://github.com/apptentive/apptentive-android.git``
 
 #Add Apptentive to Your Project
@@ -60,7 +60,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
     &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
 
-    <strong>&lt;-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
+    <strong>&lt;!-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
         UI elements look great! -->
     &lt;supports-screens android:largeScreens="true"
                       android:normalScreens="true"
@@ -78,10 +78,10 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
             &lt;/intent-filter>
         &lt;/activity>
 
-        <strong>&lt;-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
+        <strong>&lt;!-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
         &lt;meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/></strong>
 
-        <strong>&lt;-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
+        <strong>&lt;!-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
             notified when the internet connection comes up, so we can handle sending and receiving message reliably -->
         &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"/>
         &lt;receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
@@ -95,7 +95,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 &lt;/manifest>
 </code></pre>
 
-##2. Integrate yor Activities with Apptentive
+##2. Integrate your Activities with Apptentive
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
 There are two ways of doing this: Inheritence, and Delegation. Inheritence is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities. Use one of these methods (mix and match is OK too) on
@@ -141,19 +141,30 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        <strong>Apptentive.getRatingModule().run(this);</strong>
+        <strong>Apttentive.showRatingFlowIfConditionsAreMet(this);</strong>
     }
 }
 </code></pre>
 
-### Feedback
-You can add a button that will show a feedback dialog when pressed. Here is an example button click handler:
+### Message Center
+You can add a button that will show the Message Center when pressed. Here is an example button click handler:
 
 <pre><code>
-Button feedbackButton = (Button)findViewById(R.id.your_feedback_button);
-feedbackButton.setOnClickListener(new View.OnClickListener(){
+Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
+messageCenterButton.setOnClickListener(new View.OnClickListener(){
     public void onClick(View v) {
-        <strong>Apptentive.getFeedbackModule().forceShowFeedbackDialog(YourActivity.this);</strong>
+        <strong>Apptentive.showMessageCenter(YourActivity.this);</strong>
+    }
+});
+</code></pre>
+
+You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
+Do this in your main Activity's onCreate() method:
+
+<pre><code>
+Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+    public void onUnreadMessageCountChanged(final int unreadMessages) {
+        // Use the updated count.
     }
 });
 </code></pre>
