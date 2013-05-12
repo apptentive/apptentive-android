@@ -156,12 +156,9 @@ public class RatingModule {
 	}
 
 	/**
-	 * Ues this to choose where to send the user when they are prompted to rate the app. This should be the same place
-	 * that the app was downloaded from.
-	 *
-	 * @param ratingProvider A {@link IRatingProvider} value.
+	 * Internal use.
 	 */
-	public void setRatingProvider(IRatingProvider ratingProvider) {
+	void setRatingProvider(IRatingProvider ratingProvider) {
 		this.selectedRatingProvider = ratingProvider;
 	}
 
@@ -172,17 +169,18 @@ public class RatingModule {
 	 * @param key The argument name the the chosen {@link IRatingProvider} needs.
 	 * @param value The value of the argument.
  	 */
-	public void putRatingProviderArg(String key, String value) {
+	void putRatingProviderArg(String key, String value) {
 		this.ratingProviderArgs.put(key, value);
 	}
 
 	/**
+	 * Internal use only.
 	 * Shows the initial "Are you enjoying this app?" dialog that starts the rating flow.
 	 * It will be called if you call RatingModule.run() and any of the usage conditions have been met.
 	 *
 	 * @param activity The activityContext from which this method was called.
 	 */
-	public void forceShowEnjoymentDialog(Activity activity) {
+	void forceShowEnjoymentDialog(Activity activity) {
 		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
@@ -191,12 +189,13 @@ public class RatingModule {
 	}
 
 	/**
+	 * Internal use only.
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
 	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
 	 *
 	 * @param activity The acvitity from which this method was called.
 	 */
-	public void showRatingDialog(Activity activity) {
+	void forceShowRatingDialog(Activity activity) {
 		this.new RatingDialog(activity).show();
 	}
 
@@ -207,7 +206,7 @@ public class RatingModule {
 	 *
 	 * @param activity The activityContext from which this method was called.
 	 */
-	public void run(Activity activity) {
+	void run(Activity activity) {
 		Configuration config = Configuration.load(prefs);
 		if(!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");
@@ -227,7 +226,7 @@ public class RatingModule {
 				break;
 			case REMIND:
 				if (ratingPeriodElapsed()) {
-					showRatingDialog(activity);
+					forceShowRatingDialog(activity);
 				}
 				break;
 			case POSTPONE:
@@ -294,7 +293,7 @@ public class RatingModule {
 	 * Resets the Rating Module metrics such as significant events, start of rating period, and number of uses.
 	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
 	 */
-	public void reset() {
+	void reset() {
 		if (RatingState.RATED != getState()) {
 			setState(RatingState.START);
 			setStartOfRatingPeriod(new Date().getTime());
@@ -303,12 +302,7 @@ public class RatingModule {
 		}
 	}
 
-	/**
-	 * Increments the number of "significant events" the app's user has achieved. What you condider to be a significant
-	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
-	 * is time to run the rating flow.
-	 */
-	public void logEvent() {
+	void logSignificantEvent() {
 		setEvents(getEvents() + 1);
 	}
 
@@ -319,16 +313,14 @@ public class RatingModule {
 	 * time the app is switched back to, after another app has been brought to the foreground.
 	 * <p>Internal use only. We handle calls to this method.</p>
 	 */
-	public void logUse() {
+	void logUse() {
 		setUses(getUses() + 1);
 	}
 
 	/**
 	 * This method is for debugging purposes only. It will move the rating start date one day into the past.
-	 *
-	 * @deprecated
 	 */
-	public void day() {
+	void logDay() {
 		setStartOfRatingPeriod(getStartOfRatingPeriod() - DateUtils.DAY_IN_MILLIS);
 	}
 
@@ -410,7 +402,7 @@ public class RatingModule {
 				public void onClick(View view) {
 					dismiss();
 					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__yes);
-					Apptentive.getRatingModule().showRatingDialog(activity);
+					forceShowRatingDialog(activity);
 					dismiss();
 				}
 			});

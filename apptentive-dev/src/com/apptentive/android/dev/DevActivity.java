@@ -32,21 +32,22 @@ public class DevActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// BEGIN APPTENTIVE INITIALIZATION
+		// *** BEGIN APPTENTIVE INITIALIZATION
+
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
-		// OPTIONAL: To send extra data with your feedback.
 
-		// Uncomment if this app exists in the Amazon Store.
-		//Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());
+		// OPTIONAL: To send extra about the app to the server.
+		Map<String, String> customData = new HashMap<String, String>();
+		customData.put("user-id", "1234567890");
+		customData.put("user-email", "sky@apptentive.com");
+		Apptentive.setCustomData(customData);
 
-		// END APPTENTIVE INITIALIZATION
+		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
+		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
-		// Setup UI:
-		final RatingModule ratingModule = Apptentive.getRatingModule();
+		// *** END APPTENTIVE INITIALIZATION
 
-		// Uncomment if this app exists in the Amazon Store.
-		//ratingModule.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {
@@ -59,31 +60,31 @@ public class DevActivity extends ApptentiveActivity {
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.reset();
+				DevDebugHelper.resetRatingFlow();
 			}
 		});
 		Button eventButton = (Button) findViewById(R.id.button_event);
 		eventButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.logEvent();
+				Apptentive.logSignificantEvent();
 			}
 		});
 		Button dayButton = (Button) findViewById(R.id.button_day);
 		dayButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.day();
+				DevDebugHelper.resetRatingFlow();
 			}
 		});
 		Button choiceButton = (Button) findViewById(R.id.button_choice);
 		choiceButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.forceShowEnjoymentDialog(DevActivity.this);
+				DevDebugHelper.forceShowEnjoymentDialog(DevActivity.this);
 			}
 		});
 		Button ratingsButton = (Button) findViewById(R.id.button_ratings);
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				ratingModule.showRatingDialog(DevActivity.this);
+				DevDebugHelper.showRatingDialog(DevActivity.this);
 			}
 		});
 		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
@@ -130,7 +131,7 @@ public class DevActivity extends ApptentiveActivity {
 
 		// If you would like to be notified when there are unread messages available, set a listener like this.
 		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
-			public void onUnreadMessagesAvailable(final int unreadMessages) {
+			public void onUnreadMessageCountChanged(final int unreadMessages) {
 				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
 				DevActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -141,12 +142,6 @@ public class DevActivity extends ApptentiveActivity {
 
 			}
 		});
-
-		// Optionally send extra custom data to the server.
-		Map<String, String> customData = new HashMap<String, String>();
-		customData.put("user-id", "1234567890");
-		customData.put("user-email", "sky@apptentive.com");
-		Apptentive.setCustomData(customData);
 	}
 
 	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window
@@ -155,7 +150,7 @@ public class DevActivity extends ApptentiveActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.getRatingModule().run(this);
+			Apptentive.showRatingFlowIfConditionsAreMet(DevActivity.this);
 		}
 	}
 }
