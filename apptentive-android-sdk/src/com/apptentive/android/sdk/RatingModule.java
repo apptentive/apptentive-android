@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -485,6 +486,7 @@ public class RatingModule {
 							}
 						}
 
+						@SuppressLint("NewApi")
 						private void displayError(String message) {
 							final AlertDialog alertDialog = new AlertDialog.Builder(activityContext).create();
 							alertDialog.setTitle(activityContext.getString(R.string.apptentive_oops));

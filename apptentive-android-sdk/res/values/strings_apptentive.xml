@@ -60,5 +60,4 @@
     <string name="apptentive_message_auto_body_manual">This is the Message Center. Please send any problems, suggestions, or bugs to us, and we\'ll try to respond to you as soon as we can. Thanks!</string>
     <string name="apptentive_message_auto_title_no_love">We\'re Sorry!</string>
     <string name="apptentive_message_auto_body_no_love">If you don\'t love this app, we\'ve done something wrong. We\'d love to hear from you. If you take a second to tell us why, we\'ll be able to improve it to suit your needs.</string>
-
 </resources>
