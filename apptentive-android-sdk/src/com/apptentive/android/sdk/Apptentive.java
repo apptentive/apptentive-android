@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -201,6 +202,7 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
+	@SuppressLint("NewApi")
 	private static void init() {
 
 		//
