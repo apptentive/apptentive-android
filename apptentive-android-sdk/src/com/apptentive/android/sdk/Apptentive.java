@@ -492,6 +492,5 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static void onAppDidExit() {
-	}
+	public static void onAppDidExit() {}
 }
