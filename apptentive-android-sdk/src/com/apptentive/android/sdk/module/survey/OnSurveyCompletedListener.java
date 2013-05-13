@@ -15,6 +15,7 @@ public interface OnSurveyCompletedListener {
 
 	/**
 	 * Callback called when a survey has been completed. This is not called if the survey was skipped
+	 * @param completedSurvey	True if the end user completed the survey, false if they skipped it.
 	 */
-	public void onSurveyCompletedListener();
+	public void onSurveyCompletedListener(boolean completedSurvey);
 }

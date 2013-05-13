@@ -12,6 +12,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
@@ -38,12 +39,16 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * TODO: When we drop API level 7 (2.1) support, we can start using AndroidHttpClient.
+ *       http://developer.android.com/reference/android/net/http/AndroidHttpClient.html
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
 
 	// TODO: Break out a version for each endpoint if we start to version endpoints separately.
 	private static final String API_VERSION = "1";
+
+	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
 	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
@@ -156,7 +161,7 @@ public class ApptentiveClient {
 			HttpParams httpParams = request.getParams();
 			HttpConnectionParams.setConnectionTimeout(httpParams, DEFAULT_HTTP_CONNECT_TIMEOUT);
 			HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
-
+			httpParams.setParameter("http.useragent", getUserAgentString());
 			request.setHeader("Authorization", "OAuth " + oauthToken);
 			request.setHeader("Accept", "application/json");
 			request.setHeader("X-API-Version", API_VERSION);
@@ -234,6 +239,7 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", API_VERSION);
+			connection.setRequestProperty("User-Agent", getUserAgentString());
 
 			StringBuilder requestText = new StringBuilder();
 
@@ -340,5 +346,9 @@ public class ApptentiveClient {
 		GET,
 		PUT,
 		POST
+	}
+
+	private static String getUserAgentString() {
+		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
 }

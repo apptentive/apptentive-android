@@ -160,6 +160,9 @@ public class SurveyModule {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
+					if(SurveyModule.this.onSurveyCompletedListener != null) {
+						SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener(false);
+					}
 					cleanup();
 					activity.finish();
 				}
@@ -233,7 +236,7 @@ public class SurveyModule {
 				getSurveyStore().addPayload(new SurveyPayload(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyCompletedListener != null) {
-					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener();
+					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener(true);
 				}
 
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
