@@ -28,6 +28,8 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER = "message_center";
 	private static final String KEY_MESSAGE_CENTER_TITLE = "title";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
+	// This one is not sent in JSON, but as a header form the server.
+	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
 
 
 	public Configuration() {
@@ -38,12 +40,9 @@ public class Configuration extends JSONObject {
 		super(json);
 	}
 
-	public void save(Context context, int cacheSeconds) {
+	public void save(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit()
-				.putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString())
-				.putString(Constants.PREF_KEY_APP_CONFIG_EXPIRATION, ""+cacheSeconds)
-				.commit();
+		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).commit();
 	}
 
 	public static Configuration load(Context context) {
@@ -177,5 +176,23 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
+	}
+
+	public long getConfigurationCacheExpirationMillis() {
+		try {
+			if (!isNull(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS)) {
+				return getLong(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+			}
+		} catch (JSONException e) {
+		}
+		return Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS;
+	}
+
+	public void setConfigurationCacheExpirationMillis(long configurationCacheExpirationMillis) {
+		try {
+			put(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS, configurationCacheExpirationMillis);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+		}
 	}
 }

@@ -391,14 +391,11 @@ public class Apptentive {
 
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if(!force) {
-			String iso8601DateString = prefs.getString(Constants.PREF_KEY_APP_CONFIG_EXPIRATION, null);
-			if(iso8601DateString != null) {
-				Date expiration = Util.parseIso8601Date(iso8601DateString);
-				boolean expired = new Date().getTime() > expiration.getTime();
-				if(!expired) {
-					Log.v("Using cached configuration.");
-					return;
-				}
+			Configuration config = Configuration.load(prefs);
+			Long expiration = config.getConfigurationCacheExpirationMillis();
+			if(System.currentTimeMillis() < expiration){
+				Log.v("Using cached configuration.");
+				return;
 			}
 		}
 
@@ -409,7 +406,7 @@ public class Apptentive {
 		}
 
 		try {
-			int cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION;
+			int cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 			if(response.getHeaders() != null && response.getHeaders().get("Cache-Control") != null) {
 				String cacheControl = response.getHeaders().get("Cache-Control");
 				String[] parts = cacheControl.split("max-age=");
@@ -422,7 +419,8 @@ public class Apptentive {
 				}
 			}
 			Configuration config = new Configuration(response.getContent());
-			config.save(appContext, cacheSeconds);
+			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+			config.save(appContext);
 		} catch (JSONException e) {
 			Log.e("Error parsing app configuration from server.", e);
 		}
