@@ -88,6 +88,7 @@ public class ViewActivity extends ApptentiveActivity {
 			case ABOUT:
 				break;
 			case SURVEY:
+				SurveyModule.getInstance().onBackPressed();
 				break;
 			case MESSAGE_CENTER:
 				ApptentiveMessageCenter.onBackPressed();

@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 import java.util.HashMap;
@@ -119,9 +119,9 @@ public class DevActivity extends ApptentiveActivity {
 			public void onClick(View view) {
 				final SurveyModule surveyModule = Apptentive.getSurveyModule();
 				if (surveyModule.isSurveyReady()) {
-					surveyModule.show(DevActivity.this, new OnSurveyCompletedListener() {
-						public void onSurveyCompletedListener() {
-							Log.e(LOG_TAG, "SURVEY COMPLETED!!!");
+					surveyModule.show(DevActivity.this, new OnSurveyFinishedListener() {
+						public void onSurveyFinished(boolean completed) {
+							Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
 						}
 					});
 					showSurveyButton.setEnabled(false);

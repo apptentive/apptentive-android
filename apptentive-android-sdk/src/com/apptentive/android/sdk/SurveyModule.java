@@ -57,7 +57,7 @@ public class SurveyModule {
 	private SurveySendView sendView;
 	private boolean fetching = false;
 	private Map<String, String> data;
-	private OnSurveyCompletedListener onSurveyCompletedListener;
+	private OnSurveyFinishedListener onSurveyFinishedListener;
 
 	private SurveyModule() {
 		surveyDefinition = null;
@@ -114,11 +114,11 @@ public class SurveyModule {
 		show(context, null);
 	}
 
-	public void show(Context context, OnSurveyCompletedListener onSurveyCompletedListener) {
+	public void show(Context context, OnSurveyFinishedListener onSurveyFinishedListener) {
 		if (!isSurveyReady()) {
 			return;
 		}
-		this.onSurveyCompletedListener = onSurveyCompletedListener;
+		this.onSurveyFinishedListener = onSurveyFinishedListener;
 		Intent intent = new Intent();
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
@@ -159,11 +159,7 @@ public class SurveyModule {
 		} else {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
-					if(SurveyModule.this.onSurveyCompletedListener != null) {
-						SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener(false);
-					}
-					cleanup();
+					onBackPressed();
 					activity.finish();
 				}
 			});
@@ -235,8 +231,8 @@ public class SurveyModule {
 
 				getSurveyStore().addPayload(new SurveyPayload(surveyDefinition));
 
-				if(SurveyModule.this.onSurveyCompletedListener != null) {
-					SurveyModule.this.onSurveyCompletedListener.onSurveyCompletedListener(true);
+				if(SurveyModule.this.onSurveyFinishedListener != null) {
+					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
 				}
 
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
@@ -277,5 +273,13 @@ public class SurveyModule {
 
 	private static PayloadStore getSurveyStore() {
 		return Apptentive.getDatabase();
+	}
+
+	void onBackPressed() {
+		MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
+		if(SurveyModule.this.onSurveyFinishedListener != null) {
+			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
+		}
+		cleanup();
 	}
 }

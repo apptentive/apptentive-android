@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
-import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 /**
@@ -39,12 +39,12 @@ public class ExampleActivity extends ApptentiveActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.getRatingModule().run(this);
+			Apptentive.showRatingFlowIfConditionsAreMet(this);
 		}
 	}
 
-	public void onFeedbackButtonPressed(View view) {
-		Apptentive.getFeedbackModule().forceShowFeedbackDialog(this);
+	public void onMessageCenterButtonPressed(View view) {
+		Apptentive.showMessageCenter(this);
 	}
 
 	public void onFetchSurveyButtonPressed(View view) {
@@ -64,9 +64,9 @@ public class ExampleActivity extends ApptentiveActivity {
 	}
 
 	public void onShowSurveyButtonPressed(View view) {
-		Apptentive.getSurveyModule().show(this, new OnSurveyCompletedListener() {
-			public void onSurveyCompletedListener() {
-				Log.e(LOG_TAG, "Got a callback from completed survey!");
+		Apptentive.getSurveyModule().show(this, new OnSurveyFinishedListener() {
+			public void onSurveyFinished(boolean completed) {
+				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
 			}
 		});
 	}
