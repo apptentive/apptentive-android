@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <meta-data android:name="apptentive_api_key" android:value="e972c850464202b3fc6699159c386783c42877e151ec4f3ec7a1c83e4b83d657"/>
+        <meta-data android:name="apptentive_api_key" android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
