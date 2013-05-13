@@ -39,7 +39,7 @@ public class AlternateExampleActivity extends Activity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.getRatingModule().run(this);
+			Apptentive.showRatingFlowIfConditionsAreMet(this);
 		}
 
 	}
@@ -50,8 +50,8 @@ public class AlternateExampleActivity extends Activity {
 		super.onStop();
 	}
 
-	public void onFeedbackButtonPressed(View view) {
-		Apptentive.getFeedbackModule().forceShowFeedbackDialog(this);
+	public void onMessageCenterButtonPressed(View view) {
+		Apptentive.showMessageCenter(this);
 	}
 
 	public void onFetchSurveyButtonPressed(View view) {

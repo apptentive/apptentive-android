@@ -39,12 +39,12 @@ public class ExampleActivity extends ApptentiveActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.getRatingModule().run(this);
+			Apptentive.showRatingFlowIfConditionsAreMet(this);
 		}
 	}
 
-	public void onFeedbackButtonPressed(View view) {
-		Apptentive.getFeedbackModule().forceShowFeedbackDialog(this);
+	public void onMessageCenterButtonPressed(View view) {
+		Apptentive.showMessageCenter(this);
 	}
 
 	public void onFetchSurveyButtonPressed(View view) {
