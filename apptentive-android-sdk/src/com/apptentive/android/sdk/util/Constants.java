@@ -50,7 +50,8 @@ public class Constants {
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
-	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION = 86400; // 24 hours
+	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
+	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_DAYS_BEFORE_PROMPT = 30;
 	public static final int CONFIG_DEFAULT_USES_BEFORE_PROMPT = 5;
 	public static final int CONFIG_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
