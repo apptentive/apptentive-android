@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
-import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 /**
@@ -64,9 +64,9 @@ public class ExampleActivity extends ApptentiveActivity {
 	}
 
 	public void onShowSurveyButtonPressed(View view) {
-		Apptentive.getSurveyModule().show(this, new OnSurveyCompletedListener() {
-			public void onSurveyCompletedListener() {
-				Log.e(LOG_TAG, "Got a callback from completed survey!");
+		Apptentive.getSurveyModule().show(this, new OnSurveyFinishedListener() {
+			public void onSurveyFinished(boolean completed) {
+				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
 			}
 		});
 	}
