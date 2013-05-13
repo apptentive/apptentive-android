@@ -52,19 +52,27 @@ public class MessageManager {
 			return;
 		}
 		// Fetch the messages.
-		List<Message> messagesToSave = fetchMessages(getMessageStore().getLastReceivedMessageId());
+		String lastId = getMessageStore().getLastReceivedMessageId();
+		Log.d("Fetching messages after last id: " + lastId);
+		List<Message> messagesToSave = fetchMessages(lastId);
 
 		if (messagesToSave != null && messagesToSave.size() > 0) {
 			Log.d("Messages retrieved.");
+			// Also get the count of incoming unread messages.
+			int incomingUnreadMessages = 0;
 			// Mark messages from server where sender is the app user as read.
 			for (Message message : messagesToSave) {
 				if(message.isOutgoingMessage()) {
 					message.setRead(true);
+				} else {
+					incomingUnreadMessages++;
 				}
 			}
 			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new Message[]{}));
 			// Signal listener
-			listener.onMessagesUpdated();
+			if(incomingUnreadMessages > 0) {
+				listener.onMessagesUpdated();
+			}
 		}
 	}
 

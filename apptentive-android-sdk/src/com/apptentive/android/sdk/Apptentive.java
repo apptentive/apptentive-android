@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
+import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
@@ -49,6 +50,10 @@ public class Apptentive {
 
 	private Apptentive() {
 	}
+
+	// ****************************************************************************************
+	// DELEGATE METHODS
+	// ****************************************************************************************
 
 	/**
 	 * Reserved for future use.
@@ -103,6 +108,11 @@ public class Apptentive {
 	public static void onDestroy(Activity activity) {
 	}
 
+
+	// ****************************************************************************************
+	// GLOBAL DATA METHODS
+	// ****************************************************************************************
+
 	/**
 	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
 	 * This method will override the email address that Apptentive looks for programmatically, but will not override
@@ -122,23 +132,39 @@ public class Apptentive {
 		Apptentive.customData = customData;
 	}
 
+
+	// ****************************************************************************************
+	// RATINGS
+	// ****************************************************************************************
+
 	/**
-	 * Gets the Apptentive Rating Module.
-	 *
-	 * @return The Apptentive Rating Module.
+	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
+	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
+	 * is time to run the rating flow.
 	 */
-	public static RatingModule getRatingModule() {
-		return RatingModule.getInstance();
+	public static void logSignificantEvent() {
+		RatingModule.getInstance().logSignificantEvent();
 	}
 
 	/**
-	 * Gets the Apptentive Survey Module.
+	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
+	 * that the app was downloaded from.
 	 *
-	 * @return The Apptentive Survey Module.
+	 * @param ratingProvider A {@link IRatingProvider} value.
 	 */
-	public static SurveyModule getSurveyModule() {
-		return SurveyModule.getInstance();
+
+	public static void setRatingProvider(IRatingProvider ratingProvider) {
+		RatingModule.getInstance().setRatingProvider(ratingProvider);
 	}
+
+	public static void showRatingFlowIfConditionsAreMet(Activity activity) {
+		RatingModule.getInstance().run(activity);
+	}
+
+	// ****************************************************************************************
+	// MESSAGE CENTER
+	// ****************************************************************************************
+
 
 	/**
 	 * Opens the Apptentive Message Center UI Activity
@@ -157,8 +183,23 @@ public class Apptentive {
 		unreadMessagesListener = listener;
 	}
 
+	// ****************************************************************************************
+	// SURVEYS
+	// ****************************************************************************************
+
+	/**
+	 * Gets the Apptentive Survey Module.
+	 *
+	 * @return The Apptentive Survey Module.
+	 */
+	public static SurveyModule getSurveyModule() {
+		return SurveyModule.getInstance();
+	}
 
 
+	// ****************************************************************************************
+	// INTERNAL METHODS
+	// ****************************************************************************************
 
 	private static void init() {
 
@@ -425,7 +466,7 @@ public class Apptentive {
 	public static void notifyUnreadMessagesListener(int unreadMessages) {
 		Log.v("Notifying UnreadMessagesListener");
 		if(unreadMessagesListener != null) {
-			unreadMessagesListener.onUnreadMessagesAvailable(unreadMessages);
+			unreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
 		}
 	}
 
@@ -440,7 +481,7 @@ public class Apptentive {
 	 * Internal use only.
 	 */
 	public static void onAppLaunch() {
-		Apptentive.getRatingModule().logUse();
+		RatingModule.getInstance().logUse();
 		MessageManager.asyncFetchAndStoreMessages(new MessageManager.MessagesUpdatedListener() {
 			public void onMessagesUpdated() {
 				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());

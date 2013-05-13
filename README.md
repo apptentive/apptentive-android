@@ -141,19 +141,30 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        <strong>Apptentive.getRatingModule().run(this);</strong>
+        <strong>Apttentive.showRatingFlowIfConditionsAreMet(this);</strong>
     }
 }
 </code></pre>
 
-### Feedback
-You can add a button that will show a feedback dialog when pressed. Here is an example button click handler:
+### Message Center
+You can add a button that will show the Message Center when pressed. Here is an example button click handler:
 
 <pre><code>
-Button feedbackButton = (Button)findViewById(R.id.your_feedback_button);
-feedbackButton.setOnClickListener(new View.OnClickListener(){
+Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
+messageCenterButton.setOnClickListener(new View.OnClickListener(){
     public void onClick(View v) {
-        <strong>Apptentive.getFeedbackModule().forceShowFeedbackDialog(YourActivity.this);</strong>
+        <strong>Apptentive.showMessageCenter(YourActivity.this);</strong>
+    }
+});
+</code></pre>
+
+You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
+Do this in your main Activity's onCreate() method:
+
+<pre><code>
+Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+    public void onUnreadMessageCountChanged(final int unreadMessages) {
+        // Use the updated count.
     }
 });
 </code></pre>
