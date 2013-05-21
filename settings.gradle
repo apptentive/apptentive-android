@@ -1,0 +1,3 @@
+include ':apptentive-android-sdk'
+include ':apptentive-example'
+include ':apptentive-example-alternate'

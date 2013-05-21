@@ -1,0 +1,105 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.4'
+    }
+}
+
+apply plugin: 'android-library'
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    deployerJars
+}
+
+dependencies {
+    deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+}
+
+version = "1.0"
+archivesBaseName = "apptentive"
+group = "com.apptentive"
+
+android {
+    compileSdkVersion 7
+    buildToolsVersion "17"
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 17
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+}
+
+task createPomFile {
+    project.ext.pomFile = pom {
+        version = project.version
+        artifactId = project.archivesBaseName
+        groupId = project.group
+        project {
+            name 'ApptentiveAndroidSDK'
+            description 'library ApptentiveAndroidSDK.'
+            url 'http://apptentive.com'
+            inceptionYear '2012'
+
+            licenses {
+                license {
+                    name 'Apptentive internal'
+                    url 'https://github.com/apptentive/apptentive-android/blob/master/License.txt'
+                    distribution 'repo'
+                }
+            }
+
+            scm {
+                url "https://github.com/apptentive/apptentive-android/"
+                connection "https://github.com/apptentive/apptentive-android.git"
+            }
+            developers {
+                developer {
+                    name 'Apptentive, Inc'
+                }
+            }
+        }
+    }
+}
+
+task install(type: Upload, dependsOn: createPomFile) {
+    description = "Upload archives to local repository"
+    configuration = configurations.archives
+    repositories.mavenInstaller {
+        pom = project.ext.pomFile
+    }
+}
+
+uploadArchives {
+    description = "Upload archives to maven repository"
+    dependsOn createPomFile
+    repositories {
+        mavenDeployer {
+            configuration = configurations.deployerJars
+            repository(url: "sftp://mavenrepo@192.158.30.128/repository/") {
+                authentication(userName: "mavenrepo")
+            }
+            pom = project.ext.pomFile
+        }
+    }
+}
+
