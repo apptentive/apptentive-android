@@ -14,7 +14,7 @@ import com.apptentive.android.sdk.R;
 /**
  * @author Sky Kelsey.
  */
-public class SurveySendView extends SurveyItemView {
+public class SurveySendView extends SurveyItemView<Question> {
 
 	public SurveySendView(Context context) {
 		super(context, null);

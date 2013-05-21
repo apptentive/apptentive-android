@@ -1,11 +1,21 @@
-
 # Android intermediate build artifacts
-apptentive-android-sdk/gen/*
-apptentive-android-sdk/out/*
-apptentive-testing/gen/*
-apptentive-example/gen/*
-apptentive-example-alternate/gen/*
-out/*
+*/local.properties
+*/lint.xml
+*/bin/**
+*/gen/**
+*/tmp/**
+*/proguard/**
+
+# Eclipse stuff
+.project
+*/.project
+*/.classpath
+*/.settings/
+
+#Gradle
+.gradle/**
+*/.gradle/**
+*/build/**
 
 # IntelliJ noise
 *.ipr
@@ -14,3 +24,14 @@ out/*
 
 # My local stuff
 todo.txt
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.launch
+
+#Mac stuff
+**/.DS_Store
+.DS_Store
+

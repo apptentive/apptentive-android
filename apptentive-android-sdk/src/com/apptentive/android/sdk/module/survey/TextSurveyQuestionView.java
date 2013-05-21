@@ -10,18 +10,19 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
  * @author Sky Kelsey.
  */
-public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
+public class TextSurveyQuestionView<Q extends BaseQuestion> extends SurveyItemView<Q> {
 
 
 	protected EditText answerText;
 
-	public TextSurveyQuestionView(Context context, BaseQuestion question) {
+	public TextSurveyQuestionView(Context context, Q question) {
 		super(context, question);
 	}
 

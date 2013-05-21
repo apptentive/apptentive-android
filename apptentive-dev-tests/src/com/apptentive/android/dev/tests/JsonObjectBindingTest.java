@@ -13,6 +13,7 @@ import junit.framework.TestCase;
  */
 public class JsonObjectBindingTest extends TestCase {
 
+	@SuppressWarnings("unused")
 	private static final String TAG = "JsonObjectBindingTest";
 
 	public JsonObjectBindingTest() {
@@ -23,6 +24,5 @@ public class JsonObjectBindingTest extends TestCase {
 	}
 
 	public void testTextMessageRoundTrip() {
-		String messageRawString = "";
 	}
 }

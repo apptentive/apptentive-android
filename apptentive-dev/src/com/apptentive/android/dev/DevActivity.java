@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
-import com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyCompletedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
@@ -65,6 +64,7 @@ public class DevActivity extends ApptentiveActivity {
 		});
 		Button dayButton = (Button) findViewById(R.id.button_day);
 		dayButton.setOnClickListener(new View.OnClickListener() {
+			@SuppressWarnings("deprecation")
 			public void onClick(View view) {
 				ratingModule.day();
 			}
