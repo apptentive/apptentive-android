@@ -64,6 +64,7 @@ public class Apptentive {
 
 
 	/**
+	 * Call this method from each of your Activity's onStart() methods. Must be called before using other Apptentive APIs.
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
@@ -95,6 +96,7 @@ public class Apptentive {
 	}
 
 	/**
+	 * Call this method from each of your Activity's onStop() methods.
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStop(Activity activity) {

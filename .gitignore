@@ -11,8 +11,6 @@ apptentive-example-alternate/out/*
 out/*
 
 # IntelliJ noise
-*.ipr
-*.iml
 *.iws
 
 # My local stuff
