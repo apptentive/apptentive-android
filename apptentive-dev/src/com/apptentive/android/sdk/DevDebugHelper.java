@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
+import com.apptentive.android.sdk.module.messagecenter.MessageCenterHelper;
 
 /**
  * All methods in this class are here for dev/debug purposes only. This class allows us to access package private methods
@@ -24,5 +25,9 @@ public class DevDebugHelper {
 
 	public static void showRatingDialog(Activity activity) {
 		RatingModule.getInstance().forceShowRatingDialog(activity);
+	}
+
+	public static void forceShowFeedbackDialog(Activity activity) {
+		MessageCenterHelper.forceShowFeedbackDialog(activity);
 	}
 }

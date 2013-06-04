@@ -99,26 +99,29 @@ public class SdkManager {
 
 	/**
 	 * A convenience method.
-	 * @param old
-	 * @param newer
+	 *
 	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
 	 */
 	private static String chooseLatest(String old, String newer) {
-		if(old == null || old.equals("")) {
+		if (old == null || old.equals("")) {
 			old = null;
 		}
-		if(newer == null || newer.equals("")) {
+		if (newer == null || newer.equals("")) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
+		if (old != null && newer != null && !old.equals(newer)) {
 			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
+		if (old != null && newer == null) {
 			return "";
+		}
+
+		if (old == null && newer != null) {
+			return newer;
 		}
 
 		// Do nothing.

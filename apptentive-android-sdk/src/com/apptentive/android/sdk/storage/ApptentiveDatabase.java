@@ -211,6 +211,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					db.setTransactionSuccessful();
 					db.endTransaction();
 				}
+				cursor.close();
 			}
 		} finally {
 			db.close();

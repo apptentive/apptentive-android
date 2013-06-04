@@ -27,6 +27,8 @@ public class PayloadFactory {
 				return SdkFactory.fromJson(json);
 			case app_release:
 				return AppReleaseFactory.fromJson(json);
+			case person:
+				return PersonFactory.fromJson(json);
 			case survey:
 				try {
 					return new SurveyPayload(json);

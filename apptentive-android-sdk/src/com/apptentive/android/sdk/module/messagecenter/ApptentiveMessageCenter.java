@@ -8,16 +8,21 @@ package com.apptentive.android.sdk.module.messagecenter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.view.FeedbackDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
+import com.apptentive.android.sdk.module.messagecenter.view.ThankyouDialog;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.PersonManager;
+import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.List;
 
@@ -31,18 +36,29 @@ public class ApptentiveMessageCenter {
 	private static boolean pollForMessages = false;
 	private static Trigger trigger;
 
-	public static void show(Context context) {
-		show(context, Trigger.forced);
+	public static void show(Activity activity, boolean forced) {
+		show(activity, forced ? Trigger.forced : Trigger.enjoyment_dialog);
 	}
 
-	public static void show(Context context, Trigger reason) {
-		ApptentiveMessageCenter.trigger = reason;
-		Intent intent = new Intent();
-		intent.setClass(context, ViewActivity.class);
-		intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
-		context.startActivity(intent);
+	public static void show(Activity activity, Trigger reason) {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean emailRequired = false; // TODO: Get this from configuration.
+		boolean shouldShowFeedbackDialog = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_FEEDBACK_DIALOG, true);
+		// TODO: What if there is an incoming message that is unread? Shouldn't they see the Message Center right away?
+		if (shouldShowFeedbackDialog) {
+			showFeedbackDialog(activity, reason, emailRequired);
+		} else {
+			ApptentiveMessageCenter.trigger = reason;
+			Intent intent = new Intent();
+			intent.setClass(activity, ViewActivity.class);
+			intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
+			activity.startActivity(intent);
+		}
 	}
 
+	/**
+	 * @param context The Activity Context that launched this view.
+	 */
 	public static void doShow(final Context context) {
 		if (!(context instanceof Activity)) {
 			Log.e(ApptentiveMessageCenter.class.getSimpleName() + " must be initialized with an Activity Context.");
@@ -64,11 +80,12 @@ public class ApptentiveMessageCenter {
 				});
 				scrollToBottom();
 			}
+
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
 				final FileMessage message = new FileMessage();
 				boolean successful = message.createStoredFile(uri.toString());
-				if(successful) {
+				if (successful) {
 					message.setRead(true);
 					// Finally, send out the message.
 					MessageManager.sendMessage(message);
@@ -120,7 +137,7 @@ public class ApptentiveMessageCenter {
 		new Thread() {
 			@Override
 			public void run() {
-				while(pollForMessages) {
+				while (pollForMessages) {
 					// TODO: Check for data connection present before trying.
 					MessageManager.fetchAndStoreMessages(listener);
 					try {
@@ -135,6 +152,84 @@ public class ApptentiveMessageCenter {
 		}.start();
 
 		scrollToBottom();
+	}
+
+	static void showFeedbackDialog(final Activity activity, final Trigger reason, boolean emailRequired) {
+		final FeedbackDialog dialog = new FeedbackDialog(activity);
+		dialog.setEmailRequired(emailRequired);
+
+		String email = Util.getEmail(activity);
+		Person storedPerson = PersonManager.getStoredPerson(activity);
+		if (storedPerson != null && Util.isEmpty(storedPerson.getEmail())) {
+			if (email != null) {
+				dialog.setEmailFieldHidden(false);
+				dialog.prePopulateEmail(email);
+			}
+		} else {
+			dialog.setEmailFieldHidden(true);
+		}
+		dialog.setCanceledOnTouchOutside(false);
+
+		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialogInterface) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.setOnSendListener(new FeedbackDialog.OnSendListener() {
+			@Override
+			public void onSend(String email, String message) {
+				SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_FEEDBACK_DIALOG, false).commit();
+				// Save the email.
+				if (dialog.isEmailFieldVisible()) {
+					if (email != null && email.length() != 0) {
+						Apptentive.setUserEmail(email);
+						Person person = PersonManager.storePersonAndReturnDiff(activity);
+						if(person != null) {
+							Log.d("Person was updated.");
+							Log.v(person.toString());
+							Apptentive.getDatabase().addPayload(person);
+						} else {
+							Log.d("Person was not updated.");
+						}
+					}
+				}
+				// Send the message.
+				final TextMessage textMessage = new TextMessage();
+				textMessage.setBody(message);
+				textMessage.setRead(true);
+				MessageManager.sendMessage(textMessage);
+				dialog.dismiss();
+				final ThankyouDialog thankyouDialog = new ThankyouDialog(activity);
+				thankyouDialog.setOnChoiceMadeListener(new ThankyouDialog.OnChoiceMadeListener() {
+					@Override
+					public void onNo() {
+					}
+
+					@Override
+					public void onYes() {
+						show(activity, reason);
+					}
+				});
+				thankyouDialog.show();
+			}
+		});
+
+		switch (reason) {
+			case enjoyment_dialog:
+				dialog.setTitle(R.string.apptentive_feedback_dialog_title_no_love);
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_feedback_dialog_body_no_love, GlobalInfo.appDisplayName));
+				break;
+			case forced:
+				dialog.setTitle(R.string.apptentive_feedback_dialog_title_default);
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_feedback_dialog_body_default, GlobalInfo.appDisplayName));
+				break;
+			default:
+				return;
+		}
+		dialog.show();
 	}
 
 	public static void scrollToBottom() {

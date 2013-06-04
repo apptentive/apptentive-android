@@ -8,12 +8,11 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Sky Kelsey
  */
-public class Person extends JSONObject {
+public class Person extends Payload {
 
 	public static final String KEY = "person";
 
@@ -27,19 +26,26 @@ public class Person extends JSONObject {
 	private static final String KEY_COUNTRY = "country";
 	private static final String KEY_BIRTHDAY = "birthday";
 
+	public Person() {
+		super();
+	}
+
 	public Person(String json) throws JSONException {
 		super(json);
 	}
 
-	public Person() {
+	public void initBaseType() {
+		setBaseType(BaseType.person);
 	}
 
 	public String getId() {
 		try {
-			return getString(KEY_ID);
+			if (!isNull(KEY_ID)) {
+				return getString(KEY_ID);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setId(String id) {
@@ -52,10 +58,12 @@ public class Person extends JSONObject {
 
 	public String getEmail() {
 		try {
-			return getString(KEY_EMAIL);
+			if (!isNull(KEY_EMAIL)) {
+				return getString(KEY_EMAIL);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setEmail(String email) {
@@ -68,10 +76,12 @@ public class Person extends JSONObject {
 
 	public String getFacebookId() {
 		try {
-			return getString(KEY_FACEBOOK_ID);
+			if (!isNull(KEY_FACEBOOK_ID)) {
+				return getString(KEY_FACEBOOK_ID);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setFacebookId(String facebookId) {
@@ -82,12 +92,14 @@ public class Person extends JSONObject {
 		}
 	}
 
-	public String getPhoneNumber(String phoneNumber) {
+	public String getPhoneNumber() {
 		try {
-			return getString(KEY_PHONE_NUMBER);
+			if (!isNull(KEY_PHONE_NUMBER)) {
+				return getString(KEY_PHONE_NUMBER);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
@@ -100,13 +112,15 @@ public class Person extends JSONObject {
 
 	public String getStreet() {
 		try {
-			return getString(KEY_STREET);
+			if (!isNull(KEY_STREET)) {
+				return getString(KEY_STREET);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
-	public void setstreet(String street) {
+	public void setStreet(String street) {
 		try {
 			put(KEY_STREET, street);
 		} catch (JSONException e) {
@@ -116,10 +130,12 @@ public class Person extends JSONObject {
 
 	public String getCity() {
 		try {
-			return getString(KEY_CITY);
+			if (!isNull(KEY_CITY)) {
+				return getString(KEY_CITY);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setCity(String city) {
@@ -132,10 +148,12 @@ public class Person extends JSONObject {
 
 	public String getZip() {
 		try {
-			return getString(KEY_ZIP);
+			if (!isNull(KEY_ZIP)) {
+				return getString(KEY_ZIP);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setZip(String zip) {
@@ -148,10 +166,12 @@ public class Person extends JSONObject {
 
 	public String getCountry() {
 		try {
-			return getString(KEY_COUNTRY);
+			if (!isNull(KEY_COUNTRY)) {
+				return getString(KEY_COUNTRY);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setCountry(String country) {
@@ -164,10 +184,12 @@ public class Person extends JSONObject {
 
 	public String getBirthday() {
 		try {
-			return getString(KEY_BIRTHDAY);
+			if (!isNull(KEY_BIRTHDAY)) {
+				return getString(KEY_BIRTHDAY);
+			}
 		} catch (JSONException e) {
-			return null;
 		}
+		return null;
 	}
 
 	public void setBirthday(String birthday) {

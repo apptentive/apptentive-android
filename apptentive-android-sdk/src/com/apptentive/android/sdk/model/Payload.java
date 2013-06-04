@@ -70,6 +70,7 @@ public abstract class Payload extends JSONObject {
 		device,
 		sdk,
 		app_release,
+		person,
 		unknown,
 		// Legacy
 		survey;
