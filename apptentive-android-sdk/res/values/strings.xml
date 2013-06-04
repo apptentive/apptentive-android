@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -24,8 +24,7 @@
 	<string name="apptentive_them">Them</string>
 	<string name="apptentive_sending">Sending&#8230;</string>
 
-
-	<string name="apptentive_edittext_email_text">Email Address</string>
+	<string name="apptentive_edittext_hint_email">Your Email</string>
 
 	<string name="apptentive_branding_text">Feedback Powered By Apptentive</string>
 	<string name="apptentive_about_title">About Apptentive</string>
@@ -35,15 +34,32 @@
     <string name="apptentive_about_apptentive_link">For more information, please visit <a href="http://www.apptentive.com">apptentive.com</a>.</string>
 
 	<string name="apptentive_enjoyment_message_fs">Do you love %s?</string>
-	<string name="apptentive_rating_title">Thank You</string>
+	<string name="apptentive_enjoyment_nope">Nope.</string>
+	<string name="apptentive_enjoyment_love_it">Love it!</string>
+
+	<string name="apptentive_rating_title">Thank You!</string>
 	<string name="apptentive_rating_message_fs">We\'re so happy to hear that you love %s. It\'d be really helpful if you rated us in the Market. Thanks so much for spending some time with us.</string>
-	<string name="apptentive_rating_rate">Rate %s</string>
-	<string name="apptentive_rating_remind">Remind me Later</string>
-	<string name="apptentive_rating_no">No Thanks</string>
+	<string name="apptentive_rating_rate">Rate %s.</string>
+	<string name="apptentive_rating_remind">Remind me later.</string>
+	<string name="apptentive_rating_no">No thanks.</string>
+    <string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
+
 	<string name="apptentive_rating_provider_no_google_play">Google Play was not found. Please install Google Play before rating this app.</string>
 	<string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore was not found. Please install Amazon Appstore before rating this app.</string>
 	<string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
-	<string name="apptentive_rating_error">We\'re not able to automatically launch ratings for this app. Please visit the app\'s market to rate it.</string>
+
+	<string name="apptentive_feedback_dialog_title_no_love">We\'re sorry to hear that.</string>
+	<string name="apptentive_feedback_dialog_title_default">Thanks for your feedback!</string>
+	<string name="apptentive_feedback_dialog_body_no_love">Let us know how to make %s better for you!</string>
+	<string name="apptentive_feedback_dialog_body_default">Let us know how to make %s better for you!</string>
+    <string name="apptentive_feedback_dialog_edittext_hint">How can we help? (required)</string>
+    <string name="apptentive_feedback_dialog_no_thanks">No Thanks.</string>
+    <string name="apptentive_feedback_dialog_send">Send.</string>
+
+    <string name="apptentive_thankyou_dialog_title">Thanks!</string>
+    <string name="apptentive_thankyou_dialog_body">Your response has been saved in the Message Center, where you may get a reply from us.</string>
+    <string name="apptentive_thankyou_dialog_close">Close.</string>
+    <string name="apptentive_thankyou_dialog_view_messages">View Messages.</string>
 
     <string name="apptentive_survey_send_response">Send Response</string>
     <string name="apptentive_survey_required">Required</string>

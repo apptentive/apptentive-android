@@ -116,9 +116,9 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Sets the user email address. This address will be used in the feedback module, or elsewhere where needed.
-	 * This method will override the email address that Apptentive looks for programmatically, but will not override
-	 * an email address that the user has previously entered in an Apptentive dialog.
+	 * Sets the user email address. This email address will be sent to the Apptentive server to allow out of app
+	 * communication, and to help provide more context about this user. This email will be the definitive email address
+	 * for this user.
 	 *
 	 * @param email The user's email address.
 	 */
@@ -159,6 +159,10 @@ public class Apptentive {
 		RatingModule.getInstance().setRatingProvider(ratingProvider);
 	}
 
+	/**
+	 * If you want to launch the ratings flow when conditions are met, call this at an appropriate place in your code.
+	 * @param activity The activity from which this set of dialogs is launched.
+	 */
 	public static void showRatingFlowIfConditionsAreMet(Activity activity) {
 		RatingModule.getInstance().run(activity);
 	}
@@ -171,10 +175,10 @@ public class Apptentive {
 	/**
 	 * Opens the Apptentive Message Center UI Activity
 	 *
-	 * @param context The Context from which to launch the Message Center
+	 * @param activity The Activity from which to launch the Message Center
 	 */
-	public static void showMessageCenter(Context context) {
-		showMessageCenter(context, true);
+	public static void showMessageCenter(Activity activity) {
+		showMessageCenter(activity, true);
 	}
 
 	/**
@@ -243,7 +247,6 @@ public class Apptentive {
 			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = appContext.getPackageName();
 			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-			GlobalInfo.userEmail = Util.getUserEmail(appContext);
 
 			// Initialize modules.
 			RatingModule.getInstance().setContext(appContext);
@@ -322,6 +325,15 @@ public class Apptentive {
 			Apptentive.getDatabase().addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
+		}
+
+		Person person = PersonManager.storePersonAndReturnDiff(appContext);
+		if(person != null) {
+			Log.d("Person was updated.");
+			Log.v(person.toString());
+			Apptentive.getDatabase().addPayload(person);
+		} else {
+			Log.d("Person was not updated.");
 		}
 
 		// TODO: Check out locale...
@@ -438,12 +450,12 @@ public class Apptentive {
 
 	/**
 	 * Internal use only.
-	 * @param context The Context from which to launch the Message Center
+	 * @param activity The Activity from which to launch the Message Center
 	 * @param forced True if opened manually. False if opened from ratings flow.
 	 */
-	static void showMessageCenter(Context context, boolean forced) {
+	static void showMessageCenter(Activity activity, boolean forced) {
 		MessageManager.createMessageCenterAutoMessage(forced);
-		ApptentiveMessageCenter.show(context);
+		ApptentiveMessageCenter.show(activity, forced);
 	}
 
 	/**

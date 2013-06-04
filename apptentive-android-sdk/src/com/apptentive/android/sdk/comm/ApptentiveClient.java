@@ -60,6 +60,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
 	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
+	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
 
 	// Old API
@@ -118,6 +119,10 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse putPerson(Person person) {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {

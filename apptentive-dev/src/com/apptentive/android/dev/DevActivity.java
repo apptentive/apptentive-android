@@ -40,8 +40,10 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To send extra about the app to the server.
 		Map<String, String> customData = new HashMap<String, String>();
 		customData.put("user-id", "1234567890");
-		customData.put("user-email", "sky@apptentive.com");
 		Apptentive.setCustomData(customData);
+
+		// OPTIONAL: Specify the user's email.
+		//Apptentive.setUserEmail("sky@apptentive.com");
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
@@ -85,6 +87,12 @@ public class DevActivity extends ApptentiveActivity {
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				DevDebugHelper.showRatingDialog(DevActivity.this);
+			}
+		});
+		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
+		feedbackButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				DevDebugHelper.forceShowFeedbackDialog(DevActivity.this);
 			}
 		});
 		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);

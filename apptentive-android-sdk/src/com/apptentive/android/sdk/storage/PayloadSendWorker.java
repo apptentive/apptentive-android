@@ -76,6 +76,9 @@ public class PayloadSendWorker {
 							case app_release:
 								response = ApptentiveClient.putAppRelease((AppRelease) payload);
 								break;
+							case person:
+								response = ApptentiveClient.putPerson((Person) payload);
+								break;
 							case survey:
 								response = ApptentiveClient.postSurvey((SurveyPayload) payload);
 								break;
