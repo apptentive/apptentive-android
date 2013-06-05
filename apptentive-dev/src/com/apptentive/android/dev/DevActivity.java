@@ -42,14 +42,13 @@ public class DevActivity extends ApptentiveActivity {
 		customData.put("user-id", "1234567890");
 		Apptentive.setCustomData(customData);
 
-		// OPTIONAL: Specify the user's email.
-		//Apptentive.setUserEmail("sky@apptentive.com");
-
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 		// *** END APPTENTIVE INITIALIZATION
 
+
+		// Set up buttons used to test parts of the SDK.
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {

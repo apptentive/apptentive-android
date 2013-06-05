@@ -1,3 +1,13 @@
+# BETA
+
+Welcome to the Apptentive Message Center Beta. Message Center enables direct, two-way customer communication within your
+ app. To get started, please email [beta@apptentive.com](mailto:beta@apptentive.com) and request that your account be
+enabled for the beta. Then, downloading the SDK and following the upgrade instructions below to integrate. Please note
+ that this is beta software – we're eager for your feedback and appreciate you spending time with it, but we don't yet
+ recommend shipping your app with the beta integrated. We're hoping to release the official version of Message Center
+ shortly.
+
+
 # Overview
 This document will guide you through the installation and configuration of the Apptentive SDK in your Android apps. Laid
 out below are instructions that will allow you to ask users to rate your app, give feedback about app performance, and
@@ -186,14 +196,51 @@ Apptentive.getSurveyModule().fetchSurvey(new OnSurveyFetchedListener() {
 });
 </code></pre>
 
-##4. Support for Amazon Appstore (Optional)
+##4. Extra configuration (Optional)
+
+These steps must all be performed in your main Activity's **onCreate()** method.
+
+#### Support for Amazon Appstore (Optional)
+
 If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
 there instead of to Google Play. To do this, simply add the following line in onCreate(). If you omit this line, ratings
 will go to Google Play.
 
 <pre><code>
-Apptentive.getRatingModule().setRatingProvider(new AmazonAppstoreRatingProvider());
+Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 </code></pre>
+
+#### Specifying the user's email address
+
+If you are authorized to access the user's email address, you may specify it during initialization so that in the event
+the user does not respond in-app, your message can still get to them through email.
+
+<pre><code>
+Apptentive.setUserEmail("user_email@example.com");
+</code></pre>
+
+#### Send custom data to apptentive.com
+
+This data will show up when you view the profile of the person who sent you feedback. It is especially useful for
+specifying any internal user IDs that you use to identify users.
+
+<pre><code>
+Map<String, String> customData = new HashMap<String, String>();
+customData.put("user-id", "1234567890");
+Apptentive.setCustomData(customData);
+</code></pre>
+
+#### Send custom data to apptentive.com
+
+This data will show up when you view the profile of the person who sent you feedback. It is especially useful for
+specifying any internal user IDs that you use to identify users.
+
+<pre><code>
+Map<String, String> customData = new HashMap<String, String>();
+customData.put("user-id", "1234567890");
+Apptentive.setCustomData(customData);
+</code></pre>
+
 
 # Done
 That's it. If you have any questions or concerns, please email <strong>sky@apptentive.com</strong>.
