@@ -20,7 +20,7 @@ import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
 /**
  * @author Sky Kelsey
  */
-public class FeedbackDialog extends ApptentiveBaseDialog {
+public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 
 	private OnSendListener onSendListener;
 	private boolean emailRequired = false;
@@ -28,8 +28,8 @@ public class FeedbackDialog extends ApptentiveBaseDialog {
 	private CharSequence email;
 	private CharSequence message;
 
-	public FeedbackDialog(Context context) {
-		super(context, R.layout.apptentive_feedback_dialog);
+	public MessageCenterIntroDialog(Context context) {
+		super(context, R.layout.apptentive_message_center_intro_dialog);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class FeedbackDialog extends ApptentiveBaseDialog {
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (FeedbackDialog.this.onSendListener != null) {
+				if (MessageCenterIntroDialog.this.onSendListener != null) {
 					onSendListener.onSend(emailText.getText().toString(), messageText.getText().toString());
 				}
 			}

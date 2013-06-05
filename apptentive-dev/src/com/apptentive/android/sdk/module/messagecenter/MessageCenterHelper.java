@@ -12,7 +12,7 @@ import android.app.Activity;
  * @author Sky Kelsey
  */
 public class MessageCenterHelper {
-	public static void forceShowFeedbackDialog(Activity activity) {
-		ApptentiveMessageCenter.showFeedbackDialog(activity, ApptentiveMessageCenter.Trigger.forced, false);
+	public static void forceShowIntroDialog(Activity activity) {
+		ApptentiveMessageCenter.showIntroDialog(activity, ApptentiveMessageCenter.Trigger.forced, false);
 	}
 }

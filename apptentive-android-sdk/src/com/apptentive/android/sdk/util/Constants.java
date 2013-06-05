@@ -44,7 +44,7 @@ public class Constants {
 
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
-	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_FEEDBACK_DIALOG = "messageCenterChouldShowFeedbackDialog";
+	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";

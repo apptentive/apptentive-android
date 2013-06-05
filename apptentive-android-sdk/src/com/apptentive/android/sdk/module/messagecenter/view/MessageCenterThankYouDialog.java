@@ -16,12 +16,12 @@ import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
 /**
  * @author Sky Kelsey
  */
-public class ThankyouDialog extends ApptentiveBaseDialog {
+public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 
 	private OnChoiceMadeListener onChoiceMadeListener;
 
-	public ThankyouDialog(Context context) {
-		super(context, R.layout.apptentive_thankyou_dialog);
+	public MessageCenterThankYouDialog(Context context) {
+		super(context, R.layout.apptentive_message_center_thank_you_dialog);
 	}
 
 	@Override

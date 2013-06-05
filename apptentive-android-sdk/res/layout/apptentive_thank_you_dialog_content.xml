@@ -19,7 +19,7 @@
               android:layout_marginBottom="16dp"
               android:textColor="@color/apptentive_dialog_title_text"
               android:textSize="@dimen/apptentive_text_large"
-              android:text="@string/apptentive_thankyou_dialog_title"/>
+              android:text="@string/apptentive_thank_you_dialog_title"/>
     <TextView android:id="@+id/body"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
               android:layout_marginBottom="24dp"
               android:textColor="@color/apptentive_dialog_body_text"
               android:textSize="@dimen/apptentive_text_medium"
-              android:text="@string/apptentive_thankyou_dialog_body"/>
+              android:text="@string/apptentive_thank_you_dialog_body"/>
     <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="fill_parent"
                   android:orientation="horizontal">
@@ -39,7 +39,7 @@
                 android:background="@drawable/apptentive_dialog_negative_button"
                 android:textColor="@drawable/apptentive_dialog_negative_button_text"
                 android:textSize="@dimen/apptentive_text_medium"
-                android:text="@string/apptentive_thankyou_dialog_close"/>
+                android:text="@string/apptentive_thank_you_dialog_close"/>
         <Button android:id="@+id/view_messages"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
@@ -48,6 +48,6 @@
                 android:background="@drawable/apptentive_dialog_positive_button"
                 android:textColor="@drawable/apptentive_dialog_positive_button_text"
                 android:textSize="@dimen/apptentive_text_medium"
-                android:text="@string/apptentive_thankyou_dialog_view_messages"/>
+                android:text="@string/apptentive_thank_you_dialog_view_messages"/>
     </LinearLayout>
 </LinearLayout>

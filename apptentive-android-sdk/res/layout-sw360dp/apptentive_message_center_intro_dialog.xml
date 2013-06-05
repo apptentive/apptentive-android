@@ -9,7 +9,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:paddingLeft="96dp"
-            android:paddingRight="96dp">
-    <include layout="@layout/apptentive_feedback_dialog_content"/>
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+    <include layout="@layout/apptentive_message_center_intro_dialog_content"/>
 </ScrollView>

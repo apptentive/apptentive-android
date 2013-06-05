@@ -27,7 +27,7 @@ public class DevDebugHelper {
 		RatingModule.getInstance().forceShowRatingDialog(activity);
 	}
 
-	public static void forceShowFeedbackDialog(Activity activity) {
-		MessageCenterHelper.forceShowFeedbackDialog(activity);
+	public static void forceShowIntroDialog(Activity activity) {
+		MessageCenterHelper.forceShowIntroDialog(activity);
 	}
 }
