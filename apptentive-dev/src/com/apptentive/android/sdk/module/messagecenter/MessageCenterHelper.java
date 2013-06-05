@@ -13,6 +13,6 @@ import android.app.Activity;
  */
 public class MessageCenterHelper {
 	public static void forceShowIntroDialog(Activity activity) {
-		ApptentiveMessageCenter.showIntroDialog(activity, ApptentiveMessageCenter.Trigger.forced, false);
+		ApptentiveMessageCenter.showIntroDialog(activity, ApptentiveMessageCenter.Trigger.message_center, false);
 	}
 }

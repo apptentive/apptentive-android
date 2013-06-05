@@ -37,7 +37,7 @@ public class ApptentiveMessageCenter {
 	private static Trigger trigger;
 
 	public static void show(Activity activity, boolean forced) {
-		show(activity, forced ? Trigger.forced : Trigger.enjoyment_dialog);
+		show(activity, forced ? Trigger.message_center : Trigger.enjoyment_dialog);
 	}
 
 	public static void show(Activity activity, Trigger reason) {
@@ -173,6 +173,7 @@ public class ApptentiveMessageCenter {
 		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialogInterface) {
+				MetricModule.sendMetric(Event.EventLabel.message_center__intro__cancel);
 				dialog.dismiss();
 			}
 		});
@@ -201,18 +202,23 @@ public class ApptentiveMessageCenter {
 				textMessage.setBody(message);
 				textMessage.setRead(true);
 				MessageManager.sendMessage(textMessage);
+				MetricModule.sendMetric(Event.EventLabel.message_center__intro__send);
 				dialog.dismiss();
+
 				final MessageCenterThankYouDialog messageCenterThankYouDialog = new MessageCenterThankYouDialog(activity);
 				messageCenterThankYouDialog.setOnChoiceMadeListener(new MessageCenterThankYouDialog.OnChoiceMadeListener() {
 					@Override
 					public void onNo() {
+						MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__close);
 					}
 
 					@Override
 					public void onYes() {
+						MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__messages);
 						show(activity, reason);
 					}
 				});
+				MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__launch);
 				messageCenterThankYouDialog.show();
 			}
 		});
@@ -222,13 +228,14 @@ public class ApptentiveMessageCenter {
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_no_love);
 				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body_no_love, GlobalInfo.appDisplayName));
 				break;
-			case forced:
+			case message_center:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_default);
 				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body_default, GlobalInfo.appDisplayName));
 				break;
 			default:
 				return;
 		}
+		MetricModule.sendMetric(Event.EventLabel.message_center__intro__launch, reason.name());
 		dialog.show();
 	}
 
@@ -246,6 +253,6 @@ public class ApptentiveMessageCenter {
 
 	enum Trigger {
 		enjoyment_dialog,
-		forced
+		message_center
 	}
 }

@@ -98,6 +98,14 @@ public class Event extends ConversationItem {
 		message_center__attach("message_center.attach"),
 		message_center__read("message_center.read"),
 
+		message_center__intro__launch("message_center.intro.launch"),
+		message_center__intro__send("message_center.intro.send"),
+		message_center__intro__cancel("message_center.intro.cancel"),
+
+		message_center__thank_you__launch("message_center.thank_you.launch"),
+		message_center__thank_you__messages("message_center.thank_you.messages"),
+		message_center__thank_you__close("message_center.thank_you.close"),
+
 		error("error");
 
 		private final String labelName;
