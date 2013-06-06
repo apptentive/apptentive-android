@@ -125,6 +125,10 @@ public class SurveyModule {
 		context.startActivity(intent);
 	}
 
+	/**
+	 * A method for querying whether a survey is downloaded and ready to show to the user.
+	 * @return true if a survey is ready, else false.
+	 */
 	public boolean isSurveyReady() {
 		return (surveyDefinition != null);
 	}

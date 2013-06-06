@@ -7,14 +7,14 @@
 package com.apptentive.android.sdk.module.survey;
 
 /**
- * This interface is provided so you can get a callback when a survey has been completed.
+ * This interface is provided so you can get a callback when a survey has been finished.
  *
  * @author Sky Kelsey
  */
 public interface OnSurveyFinishedListener {
 
 	/**
-	 * Callback called when a survey has been finished.
+	 * Called when a survey has been finished.
 	 * @param completed true if the survey was fully completed. Otherwise false.
 	 */
 	public void onSurveyFinished(boolean completed);

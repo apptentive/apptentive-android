@@ -161,6 +161,8 @@ public class Apptentive {
 
 	/**
 	 * If you want to launch the ratings flow when conditions are met, call this at an appropriate place in your code.
+	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
+	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
 	 * @param activity The activity from which this set of dialogs is launched.
 	 */
 	public static void showRatingFlowIfConditionsAreMet(Activity activity) {
