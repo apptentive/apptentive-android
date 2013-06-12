@@ -30,7 +30,6 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -157,6 +156,16 @@ public class Apptentive {
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
 		RatingModule.getInstance().setRatingProvider(ratingProvider);
+	}
+
+	/**
+	 * If there are any properties that your {@link IRatingProvider} implementation requires, populate them here. This
+	 * is not currently needed with the Google Play and Amazon Appstore IRatingProviders.
+	 * @param key A String
+	 * @param value A String
+	 */
+	public static void putRatingProviderArg(String key, String value) {
+		RatingModule.getInstance().putRatingProviderArg(key, value);
 	}
 
 	/**
