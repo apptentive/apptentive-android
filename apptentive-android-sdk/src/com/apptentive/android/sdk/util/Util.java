@@ -178,7 +178,8 @@ public class Util {
 		try {
 			Account[] accounts = accountManager.getAccountsByType("com.google");
 			if (accounts.length > 0) {
-				account = accounts[0];
+				// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
+				account = accounts[accounts.length - 1];
 			}
 		} catch (VerifyError e) {
 			// Ignore here because the phone is on a pre API Level 5 SDK.
