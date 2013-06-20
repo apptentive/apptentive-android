@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,7 +11,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.SurveyModule;
 import com.apptentive.android.sdk.util.Constants;
+
+import java.util.ArrayList;
+import java.util.Set;
+
 
 /**
  * @author Sky Kelsey.
@@ -34,7 +39,10 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 		answerText = new EditText(appContext);
 		answerText.setLayoutParams(Constants.ROW_LAYOUT);
 		answerText.setBackgroundDrawable(null); // No crappy looking border.
-		answerText.setText(question.getAnswers()[0]);
+		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
+		if(answers.size() > 0) {
+			answerText.setText(new ArrayList<String>(answers).get(0));
+		}
 		answerText.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 			}
@@ -43,7 +51,10 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 			}
 
 			public void afterTextChanged(Editable editable) {
-				question.setAnswers(editable.toString());
+				String questionId = question.getId();
+				SurveyState state = SurveyModule.getInstance().getSurveyState();
+				state.clearAnswers(questionId);
+				state.addAnswer(questionId, editable.toString());
 				updateInstructionsColor();
 				fireListener();
 			}

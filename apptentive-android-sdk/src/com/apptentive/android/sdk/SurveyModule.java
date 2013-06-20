@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,22 +14,19 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.*;
 
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
 /**
- * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
+ * This module is responsible for displaying Surveys.
  *
  * @author Sky Kelsey
  */
@@ -41,7 +38,7 @@ public class SurveyModule {
 
 	private static SurveyModule instance;
 
-	static SurveyModule getInstance() {
+	public static SurveyModule getInstance() {
 		if (instance == null) {
 			instance = new SurveyModule();
 		}
@@ -54,93 +51,47 @@ public class SurveyModule {
 	// *************************************************************************************************
 
 	private SurveyDefinition surveyDefinition;
+	private SurveyState surveyState;
 	private SurveySendView sendView;
-	private boolean fetching = false;
 	private Map<String, String> data;
 	private OnSurveyFinishedListener onSurveyFinishedListener;
 
 	private SurveyModule() {
-		surveyDefinition = null;
 	}
 
-	private void setSurvey(SurveyDefinition surveyDefinition) {
-		this.surveyDefinition = surveyDefinition;
-		data = new HashMap<String, String>();
-		data.put("id", surveyDefinition.getId());
+	private void cleanup() {
+		this.surveyDefinition = null;
+		this.surveyState = null;
+		this.onSurveyFinishedListener = null;
+		this.data = null;
 	}
-
 
 	// *************************************************************************************************
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
-	/**
-	 * Fetches a survey.
-	 *
-	 * @param onSurveyFetchedListener An optional {@link OnSurveyFetchedListener} that will be notified when the
-	 *                                survey has been fetched. Pass in null if you don't need to be notified.
-	 */
-	public synchronized void fetchSurvey(final OnSurveyFetchedListener onSurveyFetchedListener) {
-		if (fetching) {
-			Log.d("Already fetching survey");
-			return;
-		}
-		Log.d("Started survey fetch");
-		fetching = true;
-
-		new Thread() {
-			public void run() {
-				try {
-					ApptentiveHttpResponse response = ApptentiveClient.getSurvey();
-					if(response.isSuccessful()) {
-						SurveyDefinition definition = SurveyManager.parseSurvey(response.getContent());
-						if (definition != null) {
-							setSurvey(definition);
-						}
-						if (onSurveyFetchedListener != null) {
-							onSurveyFetchedListener.onSurveyFetched(definition != null);
-						}
-					}
-				} catch (JSONException e) {
-					Log.e("Exception parsing survey JSON.", e);
-				} finally {
-					fetching = false;
-				}
-			}
-		}.start();
-	}
-
-	public void show(Context context) {
-		show(context, null);
-	}
-
-	public void show(Context context, OnSurveyFinishedListener onSurveyFinishedListener) {
-		if (!isSurveyReady()) {
-			return;
-		}
+	public void show(Context context, SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
+		this.surveyDefinition = surveyDefinition;
+		this.surveyState = new SurveyState(surveyDefinition);
 		this.onSurveyFinishedListener = onSurveyFinishedListener;
+		data = new HashMap<String, String>();
+		data.put("id", surveyDefinition.getId());
+
 		Intent intent = new Intent();
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
 		context.startActivity(intent);
 	}
 
-	/**
-	 * A method for querying whether a survey is downloaded and ready to show to the user.
-	 * @return true if a survey is ready, else false.
-	 */
-	public boolean isSurveyReady() {
-		return (surveyDefinition != null);
-	}
-
-	public void cleanup() {
-		this.surveyDefinition = null;
+	public SurveyState getSurveyState() {
+		return this.surveyState;
 	}
 
 	boolean isCompleted() {
 		for (Question question : surveyDefinition.getQuestions()) {
+			String questionId = question.getId();
 			boolean required = question.isRequired();
-			boolean answered = question.isAnswered();
+			boolean answered = surveyState.isAnswered(questionId);
 			if (required && !answered) {
 				return false;
 			}
@@ -266,12 +217,13 @@ public class SurveyModule {
 	}
 
 	void sendMetricForQuestion(Question question) {
-		if(!question.isMetricSent() && question.isAnswered()) {
+		String questionId = question.getId();
+		if(!surveyState.isMetricSent(questionId) && surveyState.isAnswered(questionId)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
 			MetricModule.sendMetric(Event.EventLabel.survey__question_response, null, answerData);
-			question.setMetricSent(true);
+			surveyState.markMetricSent(questionId);
 		}
 	}
 

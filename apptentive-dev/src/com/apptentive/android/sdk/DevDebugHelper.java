@@ -19,6 +19,10 @@ public class DevDebugHelper {
 		RatingModule.getInstance().reset();
 	}
 
+	public static void logDay() {
+		RatingModule.getInstance().logDay();
+	}
+
 	public static void forceShowEnjoymentDialog(Activity activity) {
 		RatingModule.getInstance().forceShowEnjoymentDialog(activity);
 	}

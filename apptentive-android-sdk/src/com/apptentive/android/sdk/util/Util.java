@@ -231,4 +231,27 @@ public class Util {
 	public static boolean isEmpty(String theString) {
 		return theString == null || theString.length() == 0;
 	}
+
+	public static Integer parseCacheControlHeader(String cacheControlHeader) {
+		if (cacheControlHeader != null) {
+			String[] cacheControlParts = cacheControlHeader.split(",");
+			for(String part : cacheControlParts) {
+				part = part.trim();
+				if(part.startsWith("max-age=")) {
+					String[] maxAgeParts = part.split("=");
+					if (maxAgeParts.length == 2) {
+						String expiration = null;
+						try {
+							expiration = maxAgeParts[1];
+							Integer ret = Integer.parseInt(expiration);
+							return ret;
+						} catch (NumberFormatException e) {
+							Log.e("Error parsing cache expiration as number: %s", e, expiration);
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 }

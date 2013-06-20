@@ -34,9 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * TODO: When we drop API level 7 (2.1) support, we can start using AndroidHttpClient.
@@ -62,9 +60,9 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
+	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 
 	// Old API
-	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
 
 	// Deprecated API
@@ -129,8 +127,8 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse getSurvey() {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
+	public static ApptentiveHttpResponse getSurveys() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SURVEYS, Method.GET, null);
 	}
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
@@ -188,11 +186,13 @@ public class ApptentiveClient {
 			}
 			HeaderIterator headerIterator = response.headerIterator();
 			if(headerIterator != null) {
-				List<Header> headers = new ArrayList<Header>();
+				Map<String, String> headers = new HashMap<String, String>();
 				while (headerIterator.hasNext()) {
 					Header header = (Header) headerIterator.next();
-					headers.add(header);
+					headers.put(header.getName(), header.getValue());
+					//Log.v("Header: %s = %s", header.getName(), header.getValue());
 				}
+				ret.setHeaders(headers);
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);

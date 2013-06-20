@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,61 +16,20 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class SurveyDefinition {
+public class SurveyDefinition extends JSONObject {
 
-	private String id;
-
-	private String name;
-
-	private String description;
-
-	/**
-	 * If true, this survey must not be skipped.
-	 */
-	private boolean required;
-
-	private String successMessage;
-
-	private boolean showSuccessMessage;
+	private static final String KEY_ID = "id";
+	private static final String KEY_NAME = "name";
+	private static final String KEY_DESCRIPTION = "description";
+	private static final String KEY_REQUIRED = "required";
+	private static final String KEY_SUCCESS_MESSAGE = "success_message";
+	private static final String KEY_SHOW_SUCCESS_MESSAGE = "show_success_message";
+	private static final String KEY_TAGS = "tags";
+	private static final String KEY_QUESTIONS = "questions";
 
 
-	private List<Question> questions;
-
-
-	public SurveyDefinition(JSONObject survey) throws JSONException{
-		this.id = survey.getString("id");
-		this.name = survey.getString("name");
-		this.description = !survey.isNull("description") ? survey.getString("description") : null;
-		this.required = !survey.isNull("required") ? survey.optBoolean("required") : null;
-		this.successMessage = !survey.isNull("success_message") ? survey.getString("success_message") : null;
-		this.showSuccessMessage = !survey.isNull("show_success_message") ? survey.optBoolean("show_success_message") : null;
-		this.questions = new ArrayList<Question>();
-		JSONArray questions = survey.getJSONArray("questions");
-		for(int i = 0; i < questions.length(); i++){
-			JSONObject questionJson = (JSONObject)questions.get(i);
-			Type type = Type.valueOf(questionJson.getString("type"));
-			Question question = null;
-			switch(type) {
-				case singleline:
-					question = new SinglelineQuestion(questionJson);
-					break;
-				case multichoice:
-					question = new MultichoiceQuestion(questionJson);
-					break;
-				case multiselect:
-					question = new MultiselectQuestion(questionJson);
-					break;
-				case stackrank:
-					// TODO: Don't even handle stackrank right now, even if it shows up.
-					//question = new StackrankQuestion(questionJson);
-					break;
-				default:
-					break;
-			}
-			if(question != null) {
-				this.questions.add(question);
-			}
-		}
+	public SurveyDefinition(String json) throws JSONException {
+		super(json);
 	}
 
 	public enum Type {
@@ -81,33 +40,112 @@ public class SurveyDefinition {
 	}
 
 	public String getId() {
-		return id;
+		try {
+			if (!isNull(KEY_ID)) {
+				return getString(KEY_ID);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
 	}
 
 	public String getName() {
-		return name;
+		try {
+			if (!isNull(KEY_NAME)) {
+				return getString(KEY_NAME);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
 	}
 
 	public String getDescription() {
-		return description;
+		try {
+			if (!isNull(KEY_DESCRIPTION)) {
+				return getString(KEY_DESCRIPTION);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
 	}
 
 	public boolean isRequired() {
-		return required;
+		try {
+			if (!isNull(KEY_REQUIRED)) {
+				return getBoolean(KEY_REQUIRED);
+			}
+		} catch (JSONException e) {
+		}
+		return false;
 	}
 
 	public String getSuccessMessage() {
-		if(successMessage != null && successMessage.equals("")) {
-			return null;
+		try {
+			if (!isNull(KEY_SUCCESS_MESSAGE)) {
+				return getString(KEY_SUCCESS_MESSAGE);
+			}
+		} catch (JSONException e) {
 		}
-		return successMessage;
+		return null;
 	}
 
 	public boolean isShowSuccessMessage() {
-		return showSuccessMessage;
+		try {
+			if (!isNull(KEY_SHOW_SUCCESS_MESSAGE)) {
+				return getBoolean(KEY_SHOW_SUCCESS_MESSAGE);
+			}
+		} catch (JSONException e) {
+		}
+		return false;
+	}
+
+	public List<String> getTags() {
+		List<String> ret = null;
+		JSONArray tags = optJSONArray(KEY_TAGS);
+		if (tags != null) {
+			ret = new ArrayList<String>();
+			for (int i = 0; i < tags.length(); i++) {
+				String tag = tags.optString(i);
+				if (tag != null) {
+					ret.add(tag);
+				}
+			}
+		}
+		return ret;
 	}
 
 	public List<Question> getQuestions() {
-		return questions;
+		try {
+			List<Question> questions = new ArrayList<Question>();
+			JSONArray questionsArray = getJSONArray(KEY_QUESTIONS);
+			for (int i = 0; i < questionsArray.length(); i++) {
+				JSONObject questionJson = (JSONObject) questionsArray.get(i);
+				Type type = Type.valueOf(questionJson.getString("type"));
+				Question question = null;
+				switch (type) {
+					case singleline:
+						question = new SinglelineQuestion(questionJson.toString());
+						break;
+					case multichoice:
+						question = new MultichoiceQuestion(questionJson.toString());
+						break;
+					case multiselect:
+						question = new MultiselectQuestion(questionJson.toString());
+						break;
+					case stackrank:
+						// TODO: Don't even handle stackrank right now, even if it shows up.
+						//question = new StackrankQuestion(questionJson);
+						break;
+					default:
+						break;
+				}
+				if (question != null) {
+					questions.add(question);
+				}
+			}
+			return questions;
+		} catch (JSONException e) {
+		}
+		return null;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -9,14 +9,14 @@ package com.apptentive.android.dev;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.module.survey.OnSurveyFetchedListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,8 @@ import java.util.Map;
 public class DevActivity extends ApptentiveActivity {
 
 	private static final String LOG_TAG = "Apptentive Dev App";
+
+	private String selectedTag;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,95 +49,6 @@ public class DevActivity extends ApptentiveActivity {
 
 		// *** END APPTENTIVE INITIALIZATION
 
-
-		// Set up buttons used to test parts of the SDK.
-
-		Button testsButton = (Button) findViewById(R.id.button_tests);
-		testsButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Intent testsIntent = new Intent();
-				testsIntent.setClass(DevActivity.this, TestsActivity.class);
-				startActivity(testsIntent);
-			}
-		});
-		Button resetButton = (Button) findViewById(R.id.button_reset);
-		resetButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
-			}
-		});
-		Button eventButton = (Button) findViewById(R.id.button_event);
-		eventButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Apptentive.logSignificantEvent();
-			}
-		});
-		Button dayButton = (Button) findViewById(R.id.button_day);
-		dayButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
-			}
-		});
-		Button choiceButton = (Button) findViewById(R.id.button_choice);
-		choiceButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				DevDebugHelper.forceShowEnjoymentDialog(DevActivity.this);
-			}
-		});
-		Button ratingsButton = (Button) findViewById(R.id.button_ratings);
-		ratingsButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				DevDebugHelper.showRatingDialog(DevActivity.this);
-			}
-		});
-		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
-		feedbackButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				DevDebugHelper.forceShowIntroDialog(DevActivity.this);
-			}
-		});
-		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
-		messageCenterButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Apptentive.showMessageCenter(DevActivity.this);
-			}
-		});
-
-		Button fetchSurveyButton = (Button) findViewById(R.id.button_survey_fetch);
-		final Button showSurveyButton = (Button) findViewById(R.id.button_survey_show);
-		fetchSurveyButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				final SurveyModule surveyModule = Apptentive.getSurveyModule();
-				surveyModule.fetchSurvey(new OnSurveyFetchedListener() {
-					public void onSurveyFetched(final boolean success) {
-						Log.e(LOG_TAG, "onSurveyFetched(" + success + ")");
-						runOnUiThread(new Runnable() {
-							public void run() {
-								Toast toast = Toast.makeText(DevActivity.this, success ? "Survey fetch successful." : "Survey fetch failed.", Toast.LENGTH_SHORT);
-								toast.setGravity(Gravity.CENTER, 0, 0);
-								toast.show();
-								showSurveyButton.setEnabled(success);
-							}
-						});
-					}
-				});
-			}
-		});
-
-		showSurveyButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				final SurveyModule surveyModule = Apptentive.getSurveyModule();
-				if (surveyModule.isSurveyReady()) {
-					surveyModule.show(DevActivity.this, new OnSurveyFinishedListener() {
-						public void onSurveyFinished(boolean completed) {
-							Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
-						}
-					});
-					showSurveyButton.setEnabled(false);
-				}
-			}
-		});
-
 		// If you would like to be notified when there are unread messages available, set a listener like this.
 		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {
@@ -149,6 +62,74 @@ public class DevActivity extends ApptentiveActivity {
 
 			}
 		});
+
+		// Set up a spinner to choose which tag we will use to show a survey.
+		Spinner surveySpinner = (Spinner) findViewById(R.id.survey_spinner);
+		surveySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+				if (i != 0) {
+					String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
+					selectedTag = tagsArray[i];
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {
+			}
+		});
+	}
+
+	public void runTests(View view) {
+		Intent testsIntent = new Intent();
+		testsIntent.setClass(DevActivity.this, TestsActivity.class);
+		startActivity(testsIntent);
+	}
+
+	public void reinstall(View view) {
+		DevDebugHelper.resetRatingFlow();
+	}
+
+	public void logSignificantEvent(View view) {
+		Apptentive.logSignificantEvent();
+	}
+
+	public void logDay(View view) {
+		DevDebugHelper.logDay();
+	}
+
+	public void showChoice(View view) {
+		DevDebugHelper.forceShowEnjoymentDialog(DevActivity.this);
+	}
+
+	public void showRating(View view) {
+		DevDebugHelper.showRatingDialog(DevActivity.this);
+	}
+
+	public void showFeedback(View view) {
+		DevDebugHelper.forceShowIntroDialog(DevActivity.this);
+	}
+
+	public void showMessageCenter(View view) {
+		Apptentive.showMessageCenter(DevActivity.this);
+	}
+
+	public void showSurvey(View view) {
+		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
+			public void onSurveyFinished(boolean completed) {
+				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
+			}
+		};
+
+		boolean ret;
+		if (selectedTag != null) {
+			ret = Apptentive.showSurvey(this, listener, selectedTag);
+		} else {
+			ret = Apptentive.showSurvey(this, listener);
+		}
+		if (!ret) {
+			Toast.makeText(this, "No matching survey found.", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window

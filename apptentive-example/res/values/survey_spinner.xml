@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <string-array name="survey_tags">
+        <item>No Tag</item>
+        <item>test_tag_1</item>
+        <item>test_tag_2</item>
+        <item>test_tag_3</item>
+    </string-array>
+</resources>

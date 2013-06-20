@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -15,57 +15,66 @@
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="runTests"
             android:text="Tests"/>
     <Button android:id="@+id/button_reset"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="reinstall"
             android:text="Reinstall"/>
     <Button android:id="@+id/button_event"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="logSignificantEvent"
             android:text="Trigger Event"/>
     <Button android:id="@+id/button_day"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="logDay"
             android:text="Subtract a Day"/>
     <Button android:id="@+id/button_choice"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="showChoice"
             android:text="Force Choice"/>
     <Button android:id="@+id/button_ratings"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="showRating"
             android:text="Force Rating"/>
     <Button android:id="@+id/button_feedback"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="showFeedback"
             android:text="Force Feedback"/>
     <Button android:id="@+id/button_message_center"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:onClick="showMessageCenter"
             android:text="Message Center"/>
     <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="0dp"
                   android:layout_weight="1"
                   android:orientation="horizontal">
-        <Button android:id="@+id/button_survey_fetch"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:text="Fetch Survey"/>
-        <Button android:id="@+id/button_survey_show"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:text="Show Survey"
-                android:enabled="false"/>
+        <Button android:id="@+id/show_survey_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showSurvey"
+                android:text="Show Survey"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="with tag:"/>
+        <Spinner android:id="@+id/survey_spinner"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:entries="@array/survey_tags"/>
     </LinearLayout>
 </LinearLayout>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.SurveyModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -39,6 +40,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	protected SurveyItemView(Context context, Q question) {
 		super(context);
 		this.appContext = context.getApplicationContext();
+		assert(question != null);
 		this.question = question;
 		initView();
 		if (question != null) {
@@ -115,7 +117,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	}
 
 	protected void updateInstructionsColor() {
-		if(question != null && question.isRequired() && !question.isAnswered()) {
+		if(question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
 			instructionsTextView.setTextColor(Color.RED);
 		} else {
 			instructionsTextView.setTextColor(Color.GRAY);

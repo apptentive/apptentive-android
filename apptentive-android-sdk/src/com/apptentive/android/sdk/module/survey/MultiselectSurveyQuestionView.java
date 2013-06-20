@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,12 +8,10 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 import android.graphics.Color;
+import com.apptentive.android.sdk.SurveyModule;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Sky Kelsey.
@@ -37,13 +35,13 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 	protected void choiceClicked(CheckableChoice choice) {
 		if(canToggle(choice)) {
 			choice.toggle();
-			List<String> checkedChoices = new ArrayList<String>();
-			for (String id : answers.keySet()) {
-				if(answers.get(id).isChecked()) {
+			Set<String> checkedChoices = new HashSet<String>();
+			for (String id : answersChoices.keySet()) {
+				if(answersChoices.get(id).isChecked()) {
 					checkedChoices.add(id);
 				}
 			}
-			question.setAnswers((String[]) checkedChoices.toArray(new String[]{}));
+			SurveyModule.getInstance().getSurveyState().setAnswers(question.getId(), checkedChoices);
 			updateInstructionsColor();
 		} else {
 			flashInstructionsRed();
@@ -52,7 +50,7 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 	}
 
 	protected void updateInstructionsColor() {
-		if(question != null && !question.isAnswered()) {
+		if(!SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
 			instructionsTextView.setTextColor(Color.RED);
 		} else {
 			instructionsTextView.setTextColor(Color.GRAY);

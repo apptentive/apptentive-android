@@ -27,9 +27,12 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -205,12 +208,25 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Gets the Apptentive Survey Module.
+	 * Queries to see if a survey with tags is available to be shown.
 	 *
-	 * @return The Apptentive Survey Module.
+	 * @param tags An optional array of tags. If specified, Apptentive will check for the availability of surveys matching
+	 *             at least one tag.
+	 * @return True if a survey can be shown, else false.
 	 */
-	public static SurveyModule getSurveyModule() {
-		return SurveyModule.getInstance();
+	public static boolean isSurveyAvailableWithTags(String... tags) {
+		return SurveyManager.isSurveyAvailable(tags);
+	}
+
+	/**
+	 * Shows a survey if one is available that has no tags associated with it.
+	 *
+	 * @param listener An {@link OnSurveyFinishedListener} that is called when the survey is dismissed.
+	 * @param tags An optional array of tags that correspond to tags applied to the surveys you create on www.apptentive.com.
+	 * @return True if a survey was shown, else false.
+	 */
+	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
+		return SurveyManager.showSurvey(context, listener, tags);
 	}
 
 
@@ -316,6 +332,7 @@ public class Apptentive {
 			asyncFetchConversationToken();
 		} else {
 			asyncFetchAppConfiguration();
+			SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired();
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
@@ -346,9 +363,6 @@ public class Apptentive {
 		} else {
 			Log.d("Person was not updated.");
 		}
-
-		// TODO: Check out locale...
-		Log.e("Default Locale: %s", Locale.getDefault().toString());
 
 		// Finally, ensure the send worker is running.
 		PayloadSendWorker.start();
@@ -400,6 +414,7 @@ public class Apptentive {
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration();
+				SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired();
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -431,17 +446,10 @@ public class Apptentive {
 		}
 
 		try {
-			int cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-			if(response.getHeaders() != null && response.getHeaders().get("Cache-Control") != null) {
-				String cacheControl = response.getHeaders().get("Cache-Control");
-				String[] parts = cacheControl.split("max-age=");
-				if(parts.length == 2) {
-					try {
-						cacheSeconds = Integer.parseInt(parts[1]);
-					} catch (NumberFormatException e) {
-						Log.e("Error parsing cache expiration as number: %d", e, parts[1]);
-					}
-				}
+			String cacheControl = response.getHeaders().get("Cache-Control");
+			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+			if(cacheSeconds == null) {
+				cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 			}
 			Configuration config = new Configuration(response.getContent());
 			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
