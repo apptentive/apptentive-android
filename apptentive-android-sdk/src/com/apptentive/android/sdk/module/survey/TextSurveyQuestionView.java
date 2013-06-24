@@ -21,12 +21,12 @@ import java.util.Set;
 /**
  * @author Sky Kelsey.
  */
-public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
+public class TextSurveyQuestionView extends SurveyItemView<SinglelineQuestion> {
 
 
 	protected EditText answerText;
 
-	public TextSurveyQuestionView(Context context, BaseQuestion question) {
+	public TextSurveyQuestionView(Context context, SinglelineQuestion question) {
 		super(context, question);
 	}
 
@@ -59,6 +59,16 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 				fireListener();
 			}
 		});
+
+		if (question.isMultiLine()) {
+			answerText.setMinLines(5);
+			answerText.setMaxLines(12);
+		} else {
+			answerText.setMinLines(1);
+			answerText.setMaxLines(5);
+		}
+
 		questionView.addView(answerText);
+
 	}
 }
