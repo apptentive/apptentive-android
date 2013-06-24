@@ -157,10 +157,13 @@ public class SurveyManager {
 		if (surveys == null || surveys.size() == 0) {
 			return null;
 		}
+
 		for (SurveyDefinition survey : surveys) {
 			List<String> surveyTags = survey.getTags();
-			if (tags.length == 0 && surveyTags == null) { // Case: Need untagged survey.
-				return survey;
+			if (tags.length == 0) { // Case: Need untagged survey.
+				if (surveyTags == null || surveyTags.size() == 0) {
+					return survey;
+				}
 			} else { // Case: Need tagged survey.
 				if (surveyTags != null) {
 					for (String tag : tags) {
