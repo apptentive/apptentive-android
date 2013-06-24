@@ -68,7 +68,9 @@ public class DevActivity extends ApptentiveActivity {
 		surveySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-				if (i != 0) {
+				if (i == 0) {
+					selectedTag = null;
+				} else {
 					String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
 					selectedTag = tagsArray[i];
 				}

@@ -41,8 +41,12 @@ public class ExampleActivity extends ApptentiveActivity {
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 				if (i != 0) {
-					String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
-					selectedTag = tagsArray[i];
+					if (i == 0) {
+						selectedTag = null;
+					} else {
+						String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
+						selectedTag = tagsArray[i];
+					}
 				}
 			}
 
