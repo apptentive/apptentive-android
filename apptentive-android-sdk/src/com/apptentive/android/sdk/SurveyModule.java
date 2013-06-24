@@ -108,6 +108,8 @@ public class SurveyModule {
 		surveyTitle.setFocusableInTouchMode(true);
 		surveyTitle.setText(surveyDefinition.getName());
 
+/*
+		// TODO: Put this into the onBackButtonPressed method.
 		Button skipButton = (Button) activity.findViewById(R.id.apptentive_survey_button_skip);
 		if (surveyDefinition.isRequired()) {
 			((RelativeLayout) skipButton.getParent()).removeView(skipButton);
@@ -119,6 +121,7 @@ public class SurveyModule {
 				}
 			});
 		}
+*/
 
 		View brandingButton = activity.findViewById(R.id.apptentive_branding_view);
 		brandingButton.setOnClickListener(new View.OnClickListener() {

@@ -24,17 +24,17 @@
                   android:layout_height="wrap_content"
                   android:gravity="center"
                   android:textStyle="bold"
-                  android:textColor="@android:color/black"
+                  android:textColor="@color/apptentive_message_auto_text"
                   android:textSize="18sp"/>
         <FrameLayout android:layout_width="fill_parent"
                      android:layout_height="1dp"
-                     android:background="@color/apptentive_light_grey"/>
+                     android:background="@color/apptentive_message_auto_separator"/>
         <TextView android:id="@+id/apptentive_message_auto_body"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:paddingTop="8dp"
                   android:paddingLeft="10dp"
                   android:paddingRight="10dp"
-                  android:textColor="@android:color/black"/>
+                  android:textColor="@color/apptentive_message_auto_text"/>
     </LinearLayout>
 </FrameLayout>

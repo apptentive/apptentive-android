@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -40,7 +40,6 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	protected SurveyItemView(Context context, Q question) {
 		super(context);
 		this.appContext = context.getApplicationContext();
-		assert(question != null);
 		this.question = question;
 		initView();
 		if (question != null) {
@@ -61,8 +60,9 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 				return false;
 			}
 		});
-		int tenDips = Util.dipsToPixels(appContext, 10);
-		setPadding(0, tenDips, 0, 0);
+		int dips12 = Util.dipsToPixels(appContext, 12);
+		int dips16 = Util.dipsToPixels(appContext, 16);
+		setPadding(0, dips16, 0, 0);
 		container = new LinearLayout(appContext);
 		container.setOrientation(LinearLayout.VERTICAL);
 		container.setBackgroundResource(R.drawable.apptentive_question_item);
@@ -70,16 +70,17 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 		titleTextView = new TextView(appContext);
 		titleTextView.setLayoutParams(Constants.ROW_LAYOUT);
-		titleTextView.setPadding(tenDips, tenDips, tenDips, tenDips);
+		titleTextView.setPadding(dips12, dips12, dips12, dips12);
 		titleTextView.setTypeface(Typeface.DEFAULT_BOLD);
-		titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f);
-		titleTextView.setTextColor(Color.BLACK);
+		Resources resources = getContext().getResources();
+		titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.apptentive_text_medium));
+		titleTextView.setTextColor(resources.getColor(R.color.apptentive_survey_title_text));
 		container.addView(titleTextView);
 
 		instructionsTextView = new TextView(appContext);
 		instructionsTextView.setLayoutParams(Constants.ROW_LAYOUT);
-		instructionsTextView.setPadding(0, 0, tenDips, 0);
-		instructionsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10.0f);
+		instructionsTextView.setPadding(0, 0, dips16, 0);
+		instructionsTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.apptentive_text_tiny));
 		instructionsTextView.setVisibility(View.GONE);
 		instructionsTextView.setGravity(Gravity.RIGHT);
 		container.addView(instructionsTextView);
@@ -102,7 +103,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	protected void addSeparator() {
 		LinearLayout separator = new LinearLayout(appContext);
 		separator.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 1));
-		separator.setBackgroundColor(Color.LTGRAY);
+		separator.setBackgroundColor(R.color.apptentive_survey_question_answer_separator);
 		questionView.addView(separator);
 	}
 
@@ -118,9 +119,9 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 	protected void updateInstructionsColor() {
 		if(question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
-			instructionsTextView.setTextColor(Color.RED);
+			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_invalid_text));
 		} else {
-			instructionsTextView.setTextColor(Color.GRAY);
+			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_text));
 		}
 	}
 
@@ -130,7 +131,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 			return;
 		}
 		setClickable(false);
-		instructionsTextView.setTextColor(Color.RED);
+		instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_invalid_text));
 		flashing = true;
 		instructionsTextView.post(new Runnable() {
 			public void run() {
@@ -138,7 +139,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 					Thread.sleep(300);
 				}catch(InterruptedException e) {
 				}
-				instructionsTextView.setTextColor(Color.GRAY);
+				instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_text));
 
 				// A hack to make any pending clicks on this event go away.
 				instructionsTextView.post(new Runnable() {

@@ -13,11 +13,17 @@ import org.json.JSONException;
  */
 public class SinglelineQuestion extends BaseQuestion {
 
+	private static final String KEY_MULTILINE = "multiline";
+
 	public SinglelineQuestion(String json) throws JSONException {
 		super(json);
 	}
 
 	public int getType() {
 		return QUESTION_TYPE_SINGLELINE;
+	}
+
+	public boolean isMultiLine() {
+		return optBoolean(KEY_MULTILINE, false);
 	}
 }

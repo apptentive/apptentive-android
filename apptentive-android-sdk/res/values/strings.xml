@@ -61,6 +61,7 @@
     <string name="apptentive_thank_you_dialog_close">Close.</string>
     <string name="apptentive_thank_you_dialog_view_messages">View Messages.</string>
 
+    <string name="apptentive_survey_header">Survey</string>
     <string name="apptentive_survey_send_response">Send Response</string>
     <string name="apptentive_survey_required">Required</string>
     <string name="apptentive_survey_optional">Optional</string>

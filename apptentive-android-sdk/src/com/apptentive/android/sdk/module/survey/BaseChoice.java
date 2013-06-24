@@ -34,19 +34,19 @@ public abstract class BaseChoice extends FrameLayout {
 		setLayoutParams(Constants.ROW_LAYOUT);
 		setClickable(true);
 
-		int pad5  = Util.dipsToPixels(appContext, 5);
-		int pad10 = Util.dipsToPixels(appContext, 10);
+		int pad4  = Util.dipsToPixels(appContext, 4);
+		int pad12  = Util.dipsToPixels(appContext, 12);
 
 		container = new LinearLayout(appContext);
 		container.setLayoutParams(Constants.ROW_LAYOUT);
-		container.setPadding(pad10, 0, pad5, 0);
+		container.setPadding(pad12, 0, pad4, 0);
 		container.setGravity(Gravity.CENTER_VERTICAL);
 		addView(container);
 
 		textView = new TextView(appContext);
 		textView.setTextColor(Color.BLACK);
 		textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1f));
-		textView.setPadding(0, pad5, 0, pad5);
+		textView.setPadding(0, pad12, 0, pad12);
 		container.addView(textView);
 	}
 

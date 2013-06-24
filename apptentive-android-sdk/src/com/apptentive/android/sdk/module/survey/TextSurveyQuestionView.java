@@ -39,8 +39,10 @@ public class TextSurveyQuestionView extends SurveyItemView<SinglelineQuestion> {
 		answerText = new EditText(appContext);
 		answerText.setLayoutParams(Constants.ROW_LAYOUT);
 		answerText.setBackgroundDrawable(null); // No crappy looking border.
+		answerText.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_answer_text));
+
 		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
-		if(answers.size() > 0) {
+		if (answers.size() > 0) {
 			answerText.setText(new ArrayList<String>(answers).get(0));
 		}
 		answerText.addTextChangedListener(new TextWatcher() {
