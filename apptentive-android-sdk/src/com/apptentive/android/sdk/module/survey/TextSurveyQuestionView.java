@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.survey;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.widget.EditText;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.SurveyModule;
@@ -38,6 +39,7 @@ public class TextSurveyQuestionView extends SurveyItemView<SinglelineQuestion> {
 		addSeparator();
 		answerText = new EditText(appContext);
 		answerText.setLayoutParams(Constants.ROW_LAYOUT);
+		answerText.setGravity(Gravity.TOP);
 		answerText.setBackgroundDrawable(null); // No crappy looking border.
 		answerText.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_answer_text));
 

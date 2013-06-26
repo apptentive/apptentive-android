@@ -119,9 +119,9 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 	protected void updateInstructionsColor() {
 		if(question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
-			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_invalid_text));
+			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_dialog_question_instruction_text_invalid));
 		} else {
-			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_text));
+			instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_dialog_question_instruction_text_valid));
 		}
 	}
 
@@ -131,7 +131,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 			return;
 		}
 		setClickable(false);
-		instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_invalid_text));
+		instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_dialog_question_instruction_text_invalid));
 		flashing = true;
 		instructionsTextView.post(new Runnable() {
 			public void run() {
@@ -139,7 +139,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 					Thread.sleep(300);
 				}catch(InterruptedException e) {
 				}
-				instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_question_hint_text));
+				instructionsTextView.setTextColor(getContext().getResources().getColor(R.color.apptentive_survey_dialog_question_instruction_text_valid));
 
 				// A hack to make any pending clicks on this event go away.
 				instructionsTextView.post(new Runnable() {

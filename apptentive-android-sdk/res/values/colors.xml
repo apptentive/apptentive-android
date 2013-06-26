@@ -44,11 +44,24 @@
     <color name="apptentive_survey_title_text">#000000</color>
     <color name="apptentive_survey_question_text">#000000</color>
     <color name="apptentive_survey_question_answer_text">#000000</color>
-    <color name="apptentive_survey_question_hint_text">#999999</color>
-    <color name="apptentive_survey_question_hint_invalid_text">#FF5555</color>
     <color name="apptentive_survey_question_background">#EAEEEE</color>
     <color name="apptentive_survey_question_border">#999999</color>
     <color name="apptentive_survey_question_answer_separator">#999999</color>
+
+    <color name="apptentive_survey_dialog_background">#FFFFFF</color>
+    <color name="apptentive_survey_dialog_title_background">#FFFFFF</color>
+    <color name="apptentive_survey_dialog_title_text">#000000</color>
+    <color name="apptentive_survey_dialog_content_background">#D0D7D7</color>
+    <color name="apptentive_survey_dialog_question_background">#FFFFFF</color>
+    <color name="apptentive_survey_dialog_question_instruction_text">#000000</color>
+    <color name="apptentive_survey_dialog_question_instruction_text_valid">#668888</color>
+    <color name="apptentive_survey_dialog_question_instruction_background_valid">#E7F7F7</color>
+    <color name="apptentive_survey_dialog_question_instruction_text_invalid">#BB6F6F</color>
+    <color name="apptentive_survey_dialog_question_instruction_background_invalid">#FFF7F7</color>
+    <color name="apptentive_survey_dialog_question_text">#000000</color>
+    <color name="apptentive_survey_dialog_question_separator">#DDDDDD</color>
+    <color name="apptentive_survey_dialog_answer_text">#000000</color>
+
 
     <!-- TODO: Remove these colors, or do something better with them. -->
     <color name="apptentive_dark_blue">#FF2EA0E6</color>

@@ -39,8 +39,8 @@ public class MultichoiceQuestion extends BaseQuestion {
 	}
 
 	public List<AnswerDefinition> getAnswerChoices() {
+		List<AnswerDefinition> answerChoices = new ArrayList<AnswerDefinition>();
 		try {
-			List<AnswerDefinition> answerChoices = new ArrayList<AnswerDefinition>();
 			JSONArray multichoiceChoices = getJSONArray(KEY_ANSWER_CHOICES);
 			for (int i = 0; i < multichoiceChoices.length(); i++) {
 				JSONObject answer = multichoiceChoices.optJSONObject(i);
@@ -51,6 +51,6 @@ public class MultichoiceQuestion extends BaseQuestion {
 			return answerChoices;
 		} catch (JSONException e) {
 		}
-		return null;
+		return answerChoices;
 	}
 }

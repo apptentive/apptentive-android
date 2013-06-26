@@ -141,11 +141,15 @@ public class SurveyManager {
 		return surveyDefinition != null;
 	}
 
-	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
+	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, boolean useDialog, String... tags) {
 		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
-			SurveyModule.getInstance().show(context, surveyDefinition, listener);
+			if(useDialog) {
+				SurveyModule.getInstance().showSurveyAsDialog(context, surveyDefinition, listener);
+			} else {
+				SurveyModule.getInstance().show(context, surveyDefinition, listener);
+			}
 			return true;
 		}
 		Log.d("No matching survey available.");

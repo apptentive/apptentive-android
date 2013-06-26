@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:paddingTop="16dp"
+              android:paddingBottom="16dp">
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:background="@drawable/apptentive_survey_dialog_background">
+        <TextView android:id="@+id/title"
+                  android:layout_width="fill_parent"
+                  android:layout_height="64dp"
+                  android:gravity="center_vertical|left"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+                  android:textColor="@color/apptentive_survey_dialog_title_text"
+                  android:textStyle="bold"
+                  android:textSize="@dimen/apptentive_text_large"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:gravity="center_vertical"
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:background="@color/apptentive_survey_dialog_content_background">
+            <TextView android:id="@+id/description"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center_vertical|left"
+                      android:paddingTop="16dp"
+                      android:textSize="@dimen/apptentive_text_medium"
+                      android:textColor="@color/apptentive_survey_dialog_question_instruction_text"/>
+            <LinearLayout android:id="@+id/questions"
+                          android:layout_width="fill_parent"
+                          android:layout_height="fill_parent"
+                          android:orientation="vertical">
+                <!-- Filled programmatically -->
+            </LinearLayout>
+            <Button android:id="@+id/send"
+                    android:layout_width="fill_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/apptentive_dialog_positive_button"
+                    android:textColor="@drawable/apptentive_dialog_positive_button_text"
+                    android:textSize="@dimen/apptentive_text_medium"
+                    android:text="@string/apptentive_survey_send_response"/>
+            <include layout="@layout/apptentive_branding"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
