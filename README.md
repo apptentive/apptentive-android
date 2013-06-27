@@ -225,18 +225,7 @@ This data will show up when you view the profile of the person who sent you feed
 specifying any internal user IDs that you use to identify users.
 
 <pre><code>
-Map<String, String> customData = new HashMap<String, String>();
-customData.put("user-id", "1234567890");
-Apptentive.setCustomData(customData);
-</code></pre>
-
-#### Send custom data to apptentive.com
-
-This data will show up when you view the profile of the person who sent you feedback. It is especially useful for
-specifying any internal user IDs that you use to identify users.
-
-<pre><code>
-Map<String, String> customData = new HashMap<String, String>();
+Map&lt;String, String&gt; customData = new HashMap&lt;String, String&gt;();
 customData.put("user-id", "1234567890");
 Apptentive.setCustomData(customData);
 </code></pre>
