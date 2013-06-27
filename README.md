@@ -58,8 +58,7 @@ The Apptentive SDK is now available in your IntelliJ IDEA project.
 ##1. Modify your AndroidManifest.xml
 You will need to copy in the bold text below into your AndroidManifest.xml. Comments note the required and optional changes.
 
-<pre><code>
-&lt;?xml version="1.0" encoding="utf-8"?>
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?>
 &lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.apptentive.android.example"
           android:versionCode="1"
@@ -113,16 +112,14 @@ ALL of the Activities you define in your manifest.
 
 ### Inheritence
 
-<pre><code>
-<strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
+<pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
 
 public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
 </code></pre>
 
 ### Delegation
 
-<pre><code>
-<strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
+<pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
     <br/>
     &#8942
     <br/>
@@ -146,8 +143,7 @@ Apptentive can ask users to rate your app after a set of conditions are met. Tho
 Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
 have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity:
 
-<pre><code>
-@Override
+<pre><code>@Override
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
@@ -159,8 +155,7 @@ public void onWindowFocusChanged(boolean hasFocus) {
 ### Message Center
 You can add a button that will show the Message Center when pressed. Here is an example button click handler:
 
-<pre><code>
-Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
+<pre><code>Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
 messageCenterButton.setOnClickListener(new View.OnClickListener(){
     public void onClick(View v) {
         <strong>Apptentive.showMessageCenter(YourActivity.this);</strong>
@@ -171,8 +166,7 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
 Do this in your main Activity's onCreate() method:
 
-<pre><code>
-Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+<pre><code>Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
     public void onUnreadMessageCountChanged(final int unreadMessages) {
         // Use the updated count.
     }
@@ -184,8 +178,7 @@ Surveys currently require a fetch and then show operation. The easiest way to sh
 the survey fetch method, and then show a survey when the listener gets a callback. You can also pass a listener into the
 survey show method, and be notified of successful survey completions.
 
-<pre><code>
-Apptentive.getSurveyModule().fetchSurvey(new OnSurveyFetchedListener() {
+<pre><code>Apptentive.getSurveyModule().fetchSurvey(new OnSurveyFetchedListener() {
     public void onSurveyFetched(final boolean success) {
         Apptentive.getSurveyModule().show(this, new OnSurveyCompletedListener() {
             public void onSurveyCompletedListener() {
@@ -206,8 +199,7 @@ If your app is being built for the Amazon Appstore, you will want to make sure u
 there instead of to Google Play. To do this, simply add the following line in onCreate(). If you omit this line, ratings
 will go to Google Play.
 
-<pre><code>
-Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
+<pre><code>Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 </code></pre>
 
 #### Specifying the user's email address
@@ -215,8 +207,7 @@ Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 If you are authorized to access the user's email address, you may specify it during initialization so that in the event
 the user does not respond in-app, your message can still get to them through email.
 
-<pre><code>
-Apptentive.setUserEmail("user_email@example.com");
+<pre><code>Apptentive.setUserEmail("user_email@example.com");
 </code></pre>
 
 #### Send custom data to apptentive.com
@@ -224,8 +215,7 @@ Apptentive.setUserEmail("user_email@example.com");
 This data will show up when you view the profile of the person who sent you feedback. It is especially useful for
 specifying any internal user IDs that you use to identify users.
 
-<pre><code>
-Map&lt;String, String&gt; customData = new HashMap&lt;String, String&gt;();
+<pre><code>Map&lt;String, String&gt; customData = new HashMap&lt;String, String&gt;();
 customData.put("user-id", "1234567890");
 Apptentive.setCustomData(customData);
 </code></pre>
