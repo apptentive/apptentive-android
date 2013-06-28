@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -19,27 +19,21 @@ import java.util.Map;
  */
 public class MetricModule {
 
-	private static Context appContext = null;
-
-	public static void setContext(Context appContext) {
-		MetricModule.appContext = appContext;
+	public static void sendMetric(Context context, Event.EventLabel type) {
+		sendMetric(context, type, null);
 	}
 
-	public static void sendMetric(Event.EventLabel type) {
-		sendMetric(type, null);
+	public static void sendMetric(Context context, Event.EventLabel type, String trigger) {
+		sendMetric(context, type, trigger, null);
 	}
 
-	public static void sendMetric(Event.EventLabel type, String trigger) {
-		sendMetric(type, trigger, null);
-	}
-
-	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
-		Configuration config = Configuration.load(appContext);
+	public static void sendMetric(Context context, Event.EventLabel type, String trigger, Map<String, String> data) {
+		Configuration config = Configuration.load(context);
 		if (config.isMetricsEnabled()) {
 			Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
-			EventManager.sendEvent(event);
+			EventManager.sendEvent(context, event);
 		}
 	}
 }

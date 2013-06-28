@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -64,6 +64,6 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void deleteStoredMessages(View view) {
-		MessageManager.deleteAllRecords();
+		MessageManager.deleteAllRecords(TestsActivity.this);
 	}
 }

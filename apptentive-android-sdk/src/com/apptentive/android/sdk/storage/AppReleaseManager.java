@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
@@ -22,7 +21,7 @@ public class AppReleaseManager {
 
 	public static AppRelease storeAppReleaseAndReturnDiff(Context context) {
 		AppRelease original = getStoredAppRelease(context);
-		AppRelease current = generateCurrentAppRelease();
+		AppRelease current = generateCurrentAppRelease(context);
 		AppRelease diff = diffAppRelease(original, current);
 		if(diff != null) {
 			storeAppRelease(context, current);
@@ -31,10 +30,9 @@ public class AppReleaseManager {
 		return null;
 	}
 
-	private static AppRelease generateCurrentAppRelease() {
+	private static AppRelease generateCurrentAppRelease(Context context) {
 		AppRelease appRelease = new AppRelease();
 
-		Context context = Apptentive.getAppContext();
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);

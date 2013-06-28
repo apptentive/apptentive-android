@@ -33,11 +33,11 @@ public class MessageManager {
 
 	private static OnSentMessageListener internalSentMessageListener;
 
-	public static void asyncFetchAndStoreMessages(final MessagesUpdatedListener listener) {
+	public static void asyncFetchAndStoreMessages(final Context context, final MessagesUpdatedListener listener) {
 		new Thread() {
 			@Override
 			public void run() {
-				MessageManager.fetchAndStoreMessages(listener);
+				MessageManager.fetchAndStoreMessages(context, listener);
 			}
 		}.start();
 	}
@@ -45,14 +45,15 @@ public class MessageManager {
 	/**
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
 	 *
+	 * @param context
 	 * @param listener
 	 */
-	public static void fetchAndStoreMessages(MessagesUpdatedListener listener) {
+	public static void fetchAndStoreMessages(Context context, MessagesUpdatedListener listener) {
 		if (GlobalInfo.conversationToken == null) {
 			return;
 		}
 		// Fetch the messages.
-		String lastId = getMessageStore().getLastReceivedMessageId();
+		String lastId = getMessageStore(context).getLastReceivedMessageId();
 		Log.d("Fetching messages after last id: " + lastId);
 		List<Message> messagesToSave = fetchMessages(lastId);
 
@@ -68,7 +69,7 @@ public class MessageManager {
 					incomingUnreadMessages++;
 				}
 			}
-			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new Message[]{}));
+			getMessageStore(context).addOrUpdateMessages(messagesToSave.toArray(new Message[messagesToSave.size()]));
 			// Signal listener
 			if(incomingUnreadMessages > 0) {
 				listener.onMessagesUpdated();
@@ -76,22 +77,23 @@ public class MessageManager {
 		}
 	}
 
-	public static List<Message> getMessages() {
-		return getMessageStore().getAllMessages();
+	public static List<Message> getMessages(Context context) {
+		return getMessageStore(context).getAllMessages();
 	}
 
-	public static void sendMessage(Message message) {
-		getMessageStore().addOrUpdateMessages(message);
-		Apptentive.getDatabase().addPayload(message);
-		PayloadSendWorker.start();
+	public static void sendMessage(Context context, Message message) {
+		getMessageStore(context).addOrUpdateMessages(message);
+		Apptentive.getDatabase(context).addPayload(message);
+		PayloadSendWorker.start(context);
 	}
 
 	/**
 	 * This doesn't need to be run during normal program execution. Testing only.
+	 * @param context
 	 */
-	public static void deleteAllRecords() {
+	public static void deleteAllRecords(Context context) {
 		Log.e("Deleting all messages.");
-		getMessageStore().deleteAllPayloads();
+		getMessageStore(context).deleteAllPayloads();
 	}
 
 	private static List<Message> fetchMessages(String after_id) {
@@ -112,8 +114,8 @@ public class MessageManager {
 		return ret;
 	}
 
-	public static void updateMessage(Message message) {
-		getMessageStore().updateMessage(message);
+	public static void updateMessage(Context context, Message message) {
+		getMessageStore(context).updateMessage(message);
 	}
 
 	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
@@ -132,15 +134,15 @@ public class MessageManager {
 		return ret;
 	}
 
-	private static MessageStore getMessageStore() {
-		return Apptentive.getDatabase();
+	private static MessageStore getMessageStore(Context context) {
+		return Apptentive.getDatabase(context);
 	}
 
 	public interface MessagesUpdatedListener {
 		public void onMessagesUpdated();
 	}
 
-	public static void onSentMessage(Message message, ApptentiveHttpResponse response) {
+	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
 		if (response == null || !response.isSuccessful()) {
 			return;
 		}
@@ -155,7 +157,7 @@ public class MessageManager {
 			} catch (JSONException e) {
 				Log.e("Error parsing sent message response.", e);
 			}
-			getMessageStore().updateMessage(message);
+			getMessageStore(context).updateMessage(message);
 
 			if(internalSentMessageListener != null) {
 				internalSentMessageListener.onSentMessage(message);
@@ -174,17 +176,18 @@ public class MessageManager {
 		internalSentMessageListener = onSentMessageListener;
 	}
 
-	public static int getUnreadMessageCount() {
-		return getMessageStore().getUnreadMessageCount();
+	public static int getUnreadMessageCount(Context context) {
+		return getMessageStore(context).getUnreadMessageCount();
 	}
 
 	/**
 	 * This method will show either a Welcome or a No Love AutomatedMessage. If a No Love message has been shown, no other
 	 * AutomatedMessage shall be shown, and no AutomatedMessage shall be shown twice.
+	 * @param context The context from which this method is called.
 	 * @param forced If true, show a Welcome AutomatedMessage, else show a NoLove AutomatedMessage.
 	 */
-	public static void createMessageCenterAutoMessage(boolean forced) {
-		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void createMessageCenterAutoMessage(Context context,boolean forced) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
 		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
 
@@ -194,15 +197,15 @@ public class MessageManager {
 			if(forced) {
 				if(!shownManual) {
 					prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
-					message = AutomatedMessage.createWelcomeMessage();
+					message = AutomatedMessage.createWelcomeMessage(context);
 				}
 			} else {
 				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
-				message = AutomatedMessage.createNoLoveMessage();
+				message = AutomatedMessage.createNoLoveMessage(context);
 			}
 			if(message != null) {
-				getMessageStore().addOrUpdateMessages(message);
-				Apptentive.getDatabase().addPayload(message);
+				getMessageStore(context).addOrUpdateMessages(message);
+				Apptentive.getDatabase(context).addPayload(message);
 			}
 		}
 	}

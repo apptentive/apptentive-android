@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -63,15 +63,15 @@ public class ActivityLifecycleManager {
 	private static Context appContext = null;
 	private static PersistentSessionQueue queue = null;
 
-	private static void sendEvent(SessionEvent event) {
+	private static void sendEvent(Context context, SessionEvent event) {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
-				MetricModule.sendMetric(Event.EventLabel.app__launch);
-				Apptentive.onAppLaunch();
+				MetricModule.sendMetric(context, Event.EventLabel.app__launch);
+				Apptentive.onAppLaunch(context);
 				break;
 			case STOP:
-				MetricModule.sendMetric(Event.EventLabel.app__exit);
+				MetricModule.sendMetric(context, Event.EventLabel.app__exit);
 				Apptentive.onAppDidExit();
 				break;
 			default:
@@ -103,14 +103,14 @@ public class ActivityLifecycleManager {
 			if (pairs == 0 && starts == 0) {
 				Log.v("First start.");
 				addEvents(start);
-				sendEvent(start);
+				sendEvent(activity, start);
 			} else if (pairs == 0 && starts == 1) {
 				Log.v("Continuation Start. (1)");
 				addEvents(start);
 			} else if (pairs == 0 && starts == 2) {
 				Log.i("Starting new session after crash. (1)");
 				removeAllEvents();
-				sendEvent(lastStart != null ? lastStart : start);
+				sendEvent(activity, lastStart != null ? lastStart : start);
 				addEvents(lastStart, start);
 			} else if (pairs == 1 && starts == 1) {
 				long expiration = lastStop.getTime() + (SESSION_TIMEOUT_SECONDS * 1000);
@@ -118,8 +118,8 @@ public class ActivityLifecycleManager {
 				addEvents(start);
 				if (expired) {
 					Log.d("Session expired. Starting new session.");
-					sendEvent(lastStop);
-					sendEvent(start);
+					sendEvent(activity, lastStop);
+					sendEvent(activity, start);
 				} else {
 					Log.v("Continuation Start. (2)");
 				}
@@ -128,7 +128,7 @@ public class ActivityLifecycleManager {
 				addEvents(start);
 			} else if (pairs == 1 && starts == 3) {
 				Log.i("Starting new session after crash. (2)");
-				sendEvent(lastStart != null ? lastStart : start);
+				sendEvent(activity, lastStart != null ? lastStart : start);
 				// Reconstruct Queue.
 				removeAllEvents();
 				addEvents(lastStart, start);
@@ -229,7 +229,7 @@ public class ActivityLifecycleManager {
 			}
 		}
 		// Do the actual deletion.
-		removeEvent(eventsToDelete.toArray(new SessionEvent[]{}));
+		removeEvent(eventsToDelete.toArray(new SessionEvent[eventsToDelete.size()]));
 	}
 
 	private static int countPairsInQueue() {

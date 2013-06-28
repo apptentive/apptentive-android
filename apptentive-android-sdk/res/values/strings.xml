@@ -61,6 +61,10 @@
     <string name="apptentive_thank_you_dialog_close">Close.</string>
     <string name="apptentive_thank_you_dialog_view_messages">View Messages.</string>
 
+    <string name="apptentive_dialog_email_validation_failed_title">Invalid email.</string>
+    <string name="apptentive_dialog_email_validation_failed_body">Please enter a valid email.</string>
+    <string name="apptentive_dialog_email_validation_failed_ok">OK</string>
+
     <string name="apptentive_survey_header">Survey</string>
     <string name="apptentive_survey_send_response">Send Response</string>
     <string name="apptentive_survey_required">Required</string>
