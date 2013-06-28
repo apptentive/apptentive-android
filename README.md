@@ -1,13 +1,3 @@
-# BETA
-
-Welcome to the Apptentive Message Center Beta. Message Center enables direct, two-way customer communication within your
- app. To get started, please email [beta@apptentive.com](mailto:beta@apptentive.com) and request that your account be
-enabled for the beta. Then, downloading the SDK and following the upgrade instructions below to integrate. Please note
- that this is beta software – we're eager for your feedback and appreciate you spending time with it, but we don't yet
- recommend shipping your app with the beta integrated. We're hoping to release the official version of Message Center
- shortly.
-
-
 # Overview
 This document will guide you through the installation and configuration of the Apptentive SDK in your Android apps. Laid
 out below are instructions that will allow you to ask users to rate your app, give feedback about app performance, and
@@ -151,6 +141,12 @@ public void onWindowFocusChanged(boolean hasFocus) {
     }
 }
 </code></pre>
+
+You can change the conditions necessary for the ratings flow to be shown by looging into your www.apptentive.com acount.
+Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
+days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
+
+<pre><code><strong>Apttentive.logSignificantEvent(this);</strong></code></pre>
 
 ### Message Center
 You can add a button that will show the Message Center when pressed. Here is an example button click handler:

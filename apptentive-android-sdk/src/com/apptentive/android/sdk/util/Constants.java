@@ -18,7 +18,7 @@ import android.view.animation.TranslateAnimation;
 public class Constants {
 
 	// Don't ever use "1.0". I prematurely incremented to 1.0, so we should skip over it.
-	public static final String APPTENTIVE_SDK_VERSION = "1.0.1";
+	public static final String APPTENTIVE_SDK_VERSION = "1.0.2";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
