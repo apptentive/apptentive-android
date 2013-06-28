@@ -339,8 +339,7 @@ public class Apptentive {
 			Log.d("Person was not updated.");
 		}
 
-		// TODO: Check out locale...
-		Log.e("Default Locale: %s", Locale.getDefault().toString());
+		Log.d("Default Locale: %s", Locale.getDefault().toString());
 
 		// Finally, ensure the send worker is running.
 		PayloadSendWorker.start(context);

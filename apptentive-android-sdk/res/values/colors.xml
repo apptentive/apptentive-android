@@ -17,6 +17,7 @@
     <color name="apptentive_dialog_title_text">#000000</color>
     <color name="apptentive_dialog_body_text">#444444</color>
     <color name="apptentive_dialog_form_text">#000000</color>
+    <color name="apptentive_dialog_validation_text_invalid">#FF3333</color>
 
     <color name="apptentive_dialog_button_negative">#DDDDDD</color>
     <color name="apptentive_dialog_button_negative_text">#000000</color>

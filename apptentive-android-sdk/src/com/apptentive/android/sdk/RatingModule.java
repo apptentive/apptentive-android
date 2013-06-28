@@ -282,7 +282,6 @@ public class RatingModule {
 	 */
 	void run(Activity activity) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		logRatingFlowState(prefs);
 		Configuration config = Configuration.load(prefs);
 		if (!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");

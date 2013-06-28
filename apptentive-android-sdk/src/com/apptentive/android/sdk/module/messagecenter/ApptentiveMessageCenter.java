@@ -158,7 +158,7 @@ public class ApptentiveMessageCenter {
 		final MessageCenterIntroDialog dialog = new MessageCenterIntroDialog(activity);
 		dialog.setEmailRequired(emailRequired);
 
-		String email = Util.getEmail(activity);
+		String email = Util.getUserEmail(activity);
 		Person storedPerson = PersonManager.getStoredPerson(activity);
 		if (storedPerson != null && Util.isEmpty(storedPerson.getEmail())) {
 			if (email != null) {

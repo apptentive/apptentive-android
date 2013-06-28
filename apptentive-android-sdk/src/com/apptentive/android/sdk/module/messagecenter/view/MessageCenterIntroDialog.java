@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -49,7 +50,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				email = charSequence;
-				setSendButton(sendButton);
+				validateForm(sendButton);
 			}
 
 			@Override
@@ -65,7 +66,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				message = charSequence;
-				setSendButton(sendButton);
+				validateForm(sendButton);
 			}
 
 			@Override
@@ -85,6 +86,11 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
+					EmailValidationFailedDialog dialog = new EmailValidationFailedDialog(getContext());
+					dialog.show();
+					return;
+				}
 				if (MessageCenterIntroDialog.this.onSendListener != null) {
 					onSendListener.onSend(emailText.getText().toString(), messageText.getText().toString());
 				}
@@ -135,7 +141,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 		this.emailRequired = emailRequired;
 	}
 
-	private void setSendButton(Button sendButton) {
+	private void validateForm(Button sendButton) {
 		boolean passedEmail = true;
 		boolean passedMessage = true;
 		if (emailRequired) {
