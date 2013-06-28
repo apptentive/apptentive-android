@@ -65,14 +65,14 @@ public class ApptentiveMessageCenter {
 			return;
 		}
 
-		MetricModule.sendMetric(Event.EventLabel.message_center__launch, (trigger == null ? null : trigger.name()));
+		MetricModule.sendMetric(context, Event.EventLabel.message_center__launch, (trigger == null ? null : trigger.name()));
 
 		MessageCenterView.OnSendMessageListener onSendMessagelistener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
 				final TextMessage message = new TextMessage();
 				message.setBody(text);
 				message.setRead(true);
-				MessageManager.sendMessage(message);
+				MessageManager.sendMessage(context, message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
 						messageCenterView.addMessage(message);
@@ -84,11 +84,11 @@ public class ApptentiveMessageCenter {
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
 				final FileMessage message = new FileMessage();
-				boolean successful = message.createStoredFile(uri.toString());
+				boolean successful = message.createStoredFile(context, uri.toString());
 				if (successful) {
 					message.setRead(true);
 					// Finally, send out the message.
-					MessageManager.sendMessage(message);
+					MessageManager.sendMessage(context, message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
 							messageCenterView.addMessage(message);
@@ -111,17 +111,17 @@ public class ApptentiveMessageCenter {
 		((Activity) context).setContentView(messageCenterView);
 
 		// Display the messages we already have for starters.
-		messageCenterView.setMessages(MessageManager.getMessages());
+		messageCenterView.setMessages(MessageManager.getMessages(context));
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 		final MessageManager.MessagesUpdatedListener listener = new MessageManager.MessagesUpdatedListener() {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						List<Message> messages = MessageManager.getMessages();
+						List<Message> messages = MessageManager.getMessages(context);
 						messageCenterView.setMessages(messages);
 						scrollToBottom();
-						Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());
+						Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
 					}
 				});
 			}
@@ -139,7 +139,7 @@ public class ApptentiveMessageCenter {
 			public void run() {
 				while (pollForMessages) {
 					// TODO: Check for data connection present before trying.
-					MessageManager.fetchAndStoreMessages(listener);
+					MessageManager.fetchAndStoreMessages(context, listener);
 					try {
 						Thread.sleep(fgPoll);
 					} catch (InterruptedException e) {
@@ -173,7 +173,7 @@ public class ApptentiveMessageCenter {
 		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialogInterface) {
-				MetricModule.sendMetric(Event.EventLabel.message_center__intro__cancel);
+				MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__cancel);
 				dialog.dismiss();
 			}
 		});
@@ -191,7 +191,7 @@ public class ApptentiveMessageCenter {
 						if(person != null) {
 							Log.d("Person was updated.");
 							Log.v(person.toString());
-							Apptentive.getDatabase().addPayload(person);
+							Apptentive.getDatabase(activity).addPayload(person);
 						} else {
 							Log.d("Person was not updated.");
 						}
@@ -201,24 +201,24 @@ public class ApptentiveMessageCenter {
 				final TextMessage textMessage = new TextMessage();
 				textMessage.setBody(message);
 				textMessage.setRead(true);
-				MessageManager.sendMessage(textMessage);
-				MetricModule.sendMetric(Event.EventLabel.message_center__intro__send);
+				MessageManager.sendMessage(activity, textMessage);
+				MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__send);
 				dialog.dismiss();
 
 				final MessageCenterThankYouDialog messageCenterThankYouDialog = new MessageCenterThankYouDialog(activity);
 				messageCenterThankYouDialog.setOnChoiceMadeListener(new MessageCenterThankYouDialog.OnChoiceMadeListener() {
 					@Override
 					public void onNo() {
-						MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__close);
+						MetricModule.sendMetric(activity, Event.EventLabel.message_center__thank_you__close);
 					}
 
 					@Override
 					public void onYes() {
-						MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__messages);
+						MetricModule.sendMetric(activity, Event.EventLabel.message_center__thank_you__messages);
 						show(activity, reason);
 					}
 				});
-				MetricModule.sendMetric(Event.EventLabel.message_center__thank_you__launch);
+				MetricModule.sendMetric(activity, Event.EventLabel.message_center__thank_you__launch);
 				messageCenterThankYouDialog.show();
 			}
 		});
@@ -235,7 +235,7 @@ public class ApptentiveMessageCenter {
 			default:
 				return;
 		}
-		MetricModule.sendMetric(Event.EventLabel.message_center__intro__launch, reason.name());
+		MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__launch, reason.name());
 		dialog.show();
 	}
 
@@ -247,8 +247,8 @@ public class ApptentiveMessageCenter {
 		pollForMessages = false;
 	}
 
-	public static void onBackPressed() {
-		MetricModule.sendMetric(Event.EventLabel.message_center__close);
+	public static void onBackPressed(Context context) {
+		MetricModule.sendMetric(context, Event.EventLabel.message_center__close);
 	}
 
 	enum Trigger {

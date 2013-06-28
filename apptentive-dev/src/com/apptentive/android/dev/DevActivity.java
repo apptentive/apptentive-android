@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -61,19 +61,19 @@ public class DevActivity extends ApptentiveActivity {
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
+				DevDebugHelper.resetRatingFlow(DevActivity.this);
 			}
 		});
 		Button eventButton = (Button) findViewById(R.id.button_event);
 		eventButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				Apptentive.logSignificantEvent();
+				Apptentive.logSignificantEvent(DevActivity.this);
 			}
 		});
 		Button dayButton = (Button) findViewById(R.id.button_day);
 		dayButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
+				DevDebugHelper.logDay(DevActivity.this);
 			}
 		});
 		Button choiceButton = (Button) findViewById(R.id.button_choice);

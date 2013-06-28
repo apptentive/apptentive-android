@@ -89,11 +89,10 @@ public class FileMessage extends Message {
 		return "apptentive-file-" + getNonce();
 	}
 
-	public boolean createStoredFile(String uriString) {
-		Context appContext = Apptentive.getAppContext();
+	public boolean createStoredFile(Context context, String uriString) {
 		Uri uri = Uri.parse(uriString);
 
-		ContentResolver resolver = appContext.getContentResolver();
+		ContentResolver resolver = context.getContentResolver();
 		String mimeType = resolver.getType(uri);
 		MimeTypeMap mime = MimeTypeMap.getSingleton();
 		String extension = mime.getExtensionFromMimeType(mimeType);
@@ -108,8 +107,8 @@ public class FileMessage extends Message {
 		InputStream is = null;
 		CountingOutputStream cos = null;
 		try {
-			is = new BufferedInputStream(Apptentive.getContentResolver().openInputStream(uri));
-			cos = new CountingOutputStream(new BufferedOutputStream(appContext.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
+			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+			cos = new CountingOutputStream(new BufferedOutputStream(context.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
 			System.gc();
 			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_STORED_IMAGE_EDGE, MAX_STORED_IMAGE_EDGE, null);
 			// TODO: Is JPEG what we want here?
@@ -135,12 +134,12 @@ public class FileMessage extends Message {
 		storedFile.setOriginalUri(uri.toString());
 		storedFile.setLocalFilePath(localFile.getPath());
 		storedFile.setMimeType(mimeType);
-		FileStore db = Apptentive.getDatabase();
+		FileStore db = Apptentive.getDatabase(context);
 		return db.putStoredFile(storedFile);
 	}
 
-	public StoredFile getStoredFile() {
-		FileStore fileStore = Apptentive.getDatabase();
+	public StoredFile getStoredFile(Context context) {
+		FileStore fileStore = Apptentive.getDatabase(context);
 		StoredFile storedFile = fileStore.getStoredFile(getStoredFileId());
 		return storedFile;
 	}

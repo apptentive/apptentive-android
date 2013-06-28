@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.comm;
 
-import com.apptentive.android.sdk.Apptentive;
+import android.content.Context;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
@@ -89,7 +89,7 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse postMessage(Message message) {
+	public static ApptentiveHttpResponse postMessage(Context context, Message message) {
 		switch (message.getType()) {
 			case TextMessage:
 				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
@@ -97,8 +97,8 @@ public class ApptentiveClient {
 				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case FileMessage:
 				FileMessage fileMessage = (FileMessage) message;
-				StoredFile storedFile = fileMessage.getStoredFile();
-				return performMultipartFilePost(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
+				StoredFile storedFile = fileMessage.getStoredFile(context);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
 			case unknown:
 				break;
 		}
@@ -204,7 +204,7 @@ public class ApptentiveClient {
 		return ret;
 	}
 
-	private static ApptentiveHttpResponse performMultipartFilePost(String oauthToken, String uri, String postBody, StoredFile storedFile) {
+	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
 		Log.d("Performing multipart request to %s", uri);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -227,7 +227,7 @@ public class ApptentiveClient {
 		InputStream is = null;
 
 		try {
-			is = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
+			is = context.openFileInput(storedFile.getLocalFilePath());
 
 			// Set up the request.
 			URL url = new URL(uri);

@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
+import android.content.Context;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
@@ -25,8 +26,10 @@ public class PayloadSendWorker {
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
 
 	private static boolean running;
+	private static Context appContext;
 
-	public static synchronized void start() {
+	public static synchronized void start(Context context) {
+		appContext = context.getApplicationContext();
 		if (!running) {
 			Log.i("Starting PayloadRunner.");
 			running = true;
@@ -34,15 +37,18 @@ public class PayloadSendWorker {
 		}
 	}
 
-	private static PayloadStore getPayloadStore() {
-		return Apptentive.getDatabase();
+	private static PayloadStore getPayloadStore(Context context) {
+		return Apptentive.getDatabase(context);
 	}
 
 	private static class PayloadRunner extends Thread {
 		public void run() {
 			try {
 				synchronized (this) {
-					PayloadStore db = getPayloadStore();
+					if(appContext == null) {
+						return;
+					}
+					PayloadStore db = getPayloadStore(appContext);
 					while (true) {
 						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
 							pause(NO_TOKEN_SLEEP);
@@ -61,8 +67,8 @@ public class PayloadSendWorker {
 
 						switch (payload.getBaseType()) {
 							case message:
-								response = ApptentiveClient.postMessage((Message) payload);
-								MessageManager.onSentMessage((Message) payload, response);
+								response = ApptentiveClient.postMessage(appContext, (Message) payload);
+								MessageManager.onSentMessage(appContext, (Message) payload, response);
 								break;
 							case event:
 								response = ApptentiveClient.postEvent((Event) payload);

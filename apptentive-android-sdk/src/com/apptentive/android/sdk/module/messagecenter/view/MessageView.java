@@ -25,7 +25,7 @@ public abstract class MessageView<T extends Message> extends FrameLayout {
 	protected Context context;
 	protected T message;
 
-	public MessageView(Context context, final T message) {
+	public MessageView(final Context context, final T message) {
 		super(context);
 		this.context = context;
 		init(message);
@@ -34,11 +34,11 @@ public abstract class MessageView<T extends Message> extends FrameLayout {
 			message.setRead(true);
 			Map<String, String> data = new HashMap<String, String>();
 			data.put("message_id", message.getId());
-			MetricModule.sendMetric(Event.EventLabel.message_center__read, null, data);
+			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
 			post(new Runnable() {
 				public void run() {
-					MessageManager.updateMessage(message);
-					Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());
+					MessageManager.updateMessage(context, message);
+					Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
 				}
 			});
 		}

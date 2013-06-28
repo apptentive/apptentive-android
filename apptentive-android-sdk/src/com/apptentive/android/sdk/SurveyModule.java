@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -163,7 +163,7 @@ public class SurveyModule {
 		} else {
 			skipButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					onBackPressed();
+					onBackPressed(activity);
 					activity.finish();
 				}
 			});
@@ -191,7 +191,7 @@ public class SurveyModule {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
 					public void onAnswered(TextSurveyQuestionView view) {
-						sendMetricForQuestion(question);
+						sendMetricForQuestion(activity, question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -200,7 +200,7 @@ public class SurveyModule {
 				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
 					public void onAnswered(MultichoiceSurveyQuestionView view) {
-						sendMetricForQuestion(question);
+						sendMetricForQuestion(activity, question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -209,7 +209,7 @@ public class SurveyModule {
 				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
 					public void onAnswered(MultiselectSurveyQuestionView view) {
-						sendMetricForQuestion(question);
+						sendMetricForQuestion(activity, question);
 						sendView.setEnabled(isCompleted());
 					}
 				});
@@ -218,7 +218,7 @@ public class SurveyModule {
 				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity, (StackrankQuestion) question);
 				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered(Object view) {
-						sendMetricForQuestion(question);
+						sendMetricForQuestion(activity, question);
 						// TODO: This.
 					}
 				});
@@ -231,9 +231,9 @@ public class SurveyModule {
 		sendView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(Event.EventLabel.survey__submit, null, data);
+				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
 
-				getSurveyStore().addPayload(new SurveyPayload(surveyDefinition));
+				getSurveyStore(activity).addPayload(new SurveyPayload(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyFinishedListener != null) {
 					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
@@ -259,28 +259,28 @@ public class SurveyModule {
 		sendView.setEnabled(isCompleted());
 		questionList.addView(sendView);
 
-		MetricModule.sendMetric(Event.EventLabel.survey__launch, null, data);
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
 
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
 	}
 
-	void sendMetricForQuestion(Question question) {
+	void sendMetricForQuestion(Context context, Question question) {
 		if(!question.isMetricSent() && question.isAnswered()) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
-			MetricModule.sendMetric(Event.EventLabel.survey__question_response, null, answerData);
+			MetricModule.sendMetric(context, Event.EventLabel.survey__question_response, null, answerData);
 			question.setMetricSent(true);
 		}
 	}
 
-	private static PayloadStore getSurveyStore() {
-		return Apptentive.getDatabase();
+	private static PayloadStore getSurveyStore(Context context) {
+		return Apptentive.getDatabase(context);
 	}
 
-	void onBackPressed() {
-		MetricModule.sendMetric(Event.EventLabel.survey__cancel, null, data);
+	void onBackPressed(Context context) {
+		MetricModule.sendMetric(context, Event.EventLabel.survey__cancel, null, data);
 		if(SurveyModule.this.onSurveyFinishedListener != null) {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}

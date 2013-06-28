@@ -19,7 +19,6 @@ import android.provider.MediaStore;
 import android.view.*;
 import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
@@ -96,7 +95,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		if(canTakeScreenshot) {
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(Event.EventLabel.message_center__attach);
+					MetricModule.sendMetric(context, Event.EventLabel.message_center__attach);
 					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 					intent.setType("image/*");
 					context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
@@ -141,7 +140,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		InputStream is = null;
 		final Bitmap thumbnail;
 		try {
-			is = Apptentive.getContentResolver().openInputStream(data);
+			is = context.getContentResolver().openInputStream(data);
 			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null);
 		} catch (FileNotFoundException e) {
 			// TODO: Error toast?
@@ -185,7 +184,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
-		setMessages(MessageManager.getMessages());
+		setMessages(MessageManager.getMessages(context));
 	}
 
 	public void scrollMessageListViewToBottom() {
