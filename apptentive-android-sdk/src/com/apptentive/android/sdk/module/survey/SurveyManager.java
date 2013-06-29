@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SurveyModule;
@@ -30,12 +29,12 @@ public class SurveyManager {
 
 	private static final String KEY_SURVEYS = "surveys";
 
-	public static void asynchFetchAndStoreSurveysIfCacheExpired() {
-		if (hasCacheExpired()) {
+	public static void asynchFetchAndStoreSurveysIfCacheExpired(final Context context) {
+		if (hasCacheExpired(context)) {
 			Log.d("Survey cache has expired. Fetching new surveys.");
 			new Thread() {
 				public void run() {
-					fetchAndStoreSurveys();
+					fetchAndStoreSurveys(context);
 				}
 			}.start();
 		} else {
@@ -43,7 +42,7 @@ public class SurveyManager {
 		}
 	}
 
-	public static void fetchAndStoreSurveys() {
+	public static void fetchAndStoreSurveys(Context context) {
 		if (GlobalInfo.conversationToken == null) {
 			return;
 		}
@@ -57,13 +56,13 @@ public class SurveyManager {
 			if (cacheSeconds == null) {
 				cacheSeconds = Constants.CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS;
 			}
-			updateCacheExpiration(cacheSeconds);
-			storeSurveys(surveysString);
+			updateCacheExpiration(context, cacheSeconds);
+			storeSurveys(context, surveysString);
 		}
 	}
 
-	private static boolean hasCacheExpired() {
-		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static boolean hasCacheExpired(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		long expiration = prefs.getLong(Constants.PREF_KEY_SURVEYS_CACHE_EXPIRATION, 0);
 		return expiration < System.currentTimeMillis();
 	}
@@ -73,9 +72,9 @@ public class SurveyManager {
 	 *
 	 * @param duration The cache duration in seconds.
 	 */
-	private static void updateCacheExpiration(long duration) {
+	private static void updateCacheExpiration(Context context, long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
-		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putLong(Constants.PREF_KEY_SURVEYS_CACHE_EXPIRATION, expiration).commit();
 	}
 
@@ -112,9 +111,9 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static List<SurveyDefinition> loadSurveys() {
+	private static List<SurveyDefinition> loadSurveys(Context context) {
 		Log.d("Loading surveys.");
-		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String surveyString = prefs.getString(Constants.PREF_KEY_SURVEYS, null);
 		if (surveyString != null) {
 			return parseSurveysString(surveyString);
@@ -122,27 +121,27 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static void storeSurveys(List<SurveyDefinition> surveys) {
+	private static void storeSurveys(Context context, List<SurveyDefinition> surveys) {
 		String surveysString = marshallSurveys(surveys);
 		if (surveysString == null) {
 			return;
 		}
-		storeSurveys(surveysString);
+		storeSurveys(context, surveysString);
 	}
 
-	private static void storeSurveys(String surveysString) {
+	private static void storeSurveys(Context context, String surveysString) {
 		Log.v("Storing surveys: " + surveysString);
-		SharedPreferences prefs = Apptentive.getAppContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_SURVEYS, surveysString).commit();
 	}
 
-	public static boolean isSurveyAvailable(String... tags) {
-		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(tags);
+	public static boolean isSurveyAvailable(Context context, String... tags) {
+		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(context, tags);
 		return surveyDefinition != null;
 	}
 
 	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, boolean useDialog, String... tags) {
-		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(tags);
+		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(context, tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
 			if(useDialog) {
@@ -156,8 +155,8 @@ public class SurveyManager {
 		return false;
 	}
 
-	private static SurveyDefinition getFirstMatchingSurvey(String... tags) {
-		List<SurveyDefinition> surveys = loadSurveys();
+	private static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
+		List<SurveyDefinition> surveys = loadSurveys(context);
 		if (surveys == null || surveys.size() == 0) {
 			return null;
 		}

@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -24,7 +23,6 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -45,8 +43,6 @@ import java.util.*;
  */
 public class Apptentive {
 
-	private static Context appContext = null;
-	private static ApptentiveDatabase db;
 	private static UnreadMessagesListener unreadMessagesListener;
 	private static Map<String, String> customData;
 
@@ -70,8 +66,7 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
-		appContext = activity.getApplicationContext();
-		init();
+		init(activity);
 		ActivityLifecycleManager.activityStarted(activity);
 	}
 
@@ -145,9 +140,11 @@ public class Apptentive {
 	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
 	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
 	 * is time to run the rating flow.
+	 *
+	 * @param context The context from which this method is called.
 	 */
-	public static void logSignificantEvent() {
-		RatingModule.getInstance().logSignificantEvent();
+	public static void logSignificantEvent(Context context) {
+		RatingModule.getInstance().logSignificantEvent(context);
 	}
 
 	/**
@@ -214,8 +211,8 @@ public class Apptentive {
 	 *             at least one tag.
 	 * @return True if a survey can be shown, else false.
 	 */
-	public static boolean isSurveyAvailableWithTags(String... tags) {
-		return SurveyManager.isSurveyAvailable(tags);
+	public static boolean isSurveyAvailableWithTags(Context context, String... tags) {
+		return SurveyManager.isSurveyAvailable(context, tags);
 	}
 
 	/**
@@ -241,22 +238,21 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
-	private static void init() {
+	private static void init(final Context context) {
 
 		//
 		// First, initialize data relies on synchronous reads from local resources.
 		//
 
 		if(!GlobalInfo.initialized) {
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			db = new ApptentiveDatabase(appContext);
+			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			NetworkStateReceiver.clearListeners();
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
 			String apiKey = null;
 			try {
-				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
+				ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 				if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
 					apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
 				}
@@ -279,26 +275,22 @@ public class Apptentive {
 			GlobalInfo.apiKey = apiKey;
 
 			// Grab app info we need to access later on.
-			GlobalInfo.appPackage = appContext.getPackageName();
-			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-			// Initialize modules.
-			RatingModule.getInstance().setContext(appContext);
-			MetricModule.setContext(appContext);
+			GlobalInfo.appPackage = context.getPackageName();
+			GlobalInfo.androidId = Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
 			// Check the host app version, and notify modules if it's changed.
 			try {
-				PackageManager packageManager = appContext.getPackageManager();
-				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
+				PackageManager packageManager = context.getPackageManager();
+				PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
 				int currentVersionCode = packageInfo.versionCode;
 				if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
 					int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
 					if(previousVersionCode != currentVersionCode) {
-						onVersionChanged(previousVersionCode, currentVersionCode);
+						onVersionChanged(context, previousVersionCode, currentVersionCode);
 					}
 				} else {
 					// First start.
-					onVersionChanged(-1, currentVersionCode);
+					onVersionChanged(context, -1, currentVersionCode);
 				}
 				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
 
@@ -313,7 +305,7 @@ public class Apptentive {
 				public void stateChanged(NetworkInfo networkInfo) {
 					if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
 						Log.v("Network connected.");
-						PayloadSendWorker.start();
+						PayloadSendWorker.start(context);
 					}
 					if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
 						Log.v("Network disconnected.");
@@ -336,56 +328,58 @@ public class Apptentive {
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
 		if(GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
-			asyncFetchConversationToken();
+			asyncFetchConversationToken(context);
 		} else {
-			asyncFetchAppConfiguration();
-			SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired();
+			asyncFetchAppConfiguration(context);
+			SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired(context);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(appContext, customData);
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context, customData);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			Apptentive.getDatabase().addPayload(deviceInfo);
+			getDatabase(context).addPayload(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
 
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff(appContext);
+		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
 		if(sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			Apptentive.getDatabase().addPayload(sdk);
+			getDatabase(context).addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
 
-		Person person = PersonManager.storePersonAndReturnDiff(appContext);
+		Person person = PersonManager.storePersonAndReturnDiff(context);
 		if(person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			Apptentive.getDatabase().addPayload(person);
+			getDatabase(context).addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
 		}
 
+		Log.d("Default Locale: %s", Locale.getDefault().toString());
+
 		// Finally, ensure the send worker is running.
-		PayloadSendWorker.start();
+		PayloadSendWorker.start(context);
 	}
 
-	private static void onVersionChanged(int previousVersion, int currentVersion) {
-		RatingModule.getInstance().onAppVersionChanged();
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(Apptentive.getAppContext());
-		getDatabase().addPayload(appRelease);
+	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
+		RatingModule.getInstance().onAppVersionChanged(context);
+		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
+		getDatabase(context).addPayload(appRelease);
 	}
 
-	private synchronized static void asyncFetchConversationToken() {
+	private synchronized static void asyncFetchConversationToken(final Context context) {
 		new Thread() {
 			@Override
 			public void run() {
-				fetchConversationToken();
+				fetchConversationToken(context);
 			}
 		}.start();
 	}
@@ -394,7 +388,7 @@ public class Apptentive {
 	 * First looks to see if we've saved the ConversationToken in memory, then in SharedPreferences, and finally tries to get one
 	 * from the server.
 	 */
-	private static void fetchConversationToken() {
+	private static void fetchConversationToken(Context context) {
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
 		// TODO: Allow host app to send a user id, if available.
@@ -408,7 +402,7 @@ public class Apptentive {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
 				Log.d("ConversationToken: " + conversationToken);
-				SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				if (conversationToken != null && !conversationToken.equals("")) {
 					GlobalInfo.conversationToken = conversationToken;
 					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
@@ -420,8 +414,8 @@ public class Apptentive {
 					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
-				asyncFetchAppConfiguration();
-				SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired();
+				asyncFetchAppConfiguration(context);
+				SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -433,8 +427,8 @@ public class Apptentive {
 	 * @param force If true, will always fetch configuration. If false, only fetches configuration if the cached
 	 *              configuration has expired.
 	 */
-	private static void fetchAppConfiguration(boolean force) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void fetchAppConfiguration(Context context, boolean force) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if(!force) {
@@ -460,16 +454,16 @@ public class Apptentive {
 			}
 			Configuration config = new Configuration(response.getContent());
 			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-			config.save(appContext);
+			config.save(context);
 		} catch (JSONException e) {
 			Log.e("Error parsing app configuration from server.", e);
 		}
 	}
 
-	private static void asyncFetchAppConfiguration() {
+	private static void asyncFetchAppConfiguration(final Context context) {
 		new Thread() {
 			public void run() {
-				fetchAppConfiguration(GlobalInfo.isAppDebuggable);
+				fetchAppConfiguration(context, GlobalInfo.isAppDebuggable);
 			}
 		}.start();
 	}
@@ -480,22 +474,15 @@ public class Apptentive {
 	 * @param forced True if opened manually. False if opened from ratings flow.
 	 */
 	static void showMessageCenter(Activity activity, boolean forced) {
-		MessageManager.createMessageCenterAutoMessage(forced);
+		MessageManager.createMessageCenterAutoMessage(activity, forced);
 		ApptentiveMessageCenter.show(activity, forced);
 	}
 
 	/**
 	 * Internal use only.
 	 */
-	public static ApptentiveDatabase getDatabase() {
-		return db;
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static ContentResolver getContentResolver() {
-		return appContext.getContentResolver();
+	public static ApptentiveDatabase getDatabase(Context context) {
+		return new ApptentiveDatabase(context);
 	}
 
 	/**
@@ -511,18 +498,11 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static Context getAppContext() {
-		return appContext;
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static void onAppLaunch() {
-		RatingModule.getInstance().logUse();
-		MessageManager.asyncFetchAndStoreMessages(new MessageManager.MessagesUpdatedListener() {
+	public static void onAppLaunch(final Context context) {
+		RatingModule.getInstance().logUse(context);
+		MessageManager.asyncFetchAndStoreMessages(context, new MessageManager.MessagesUpdatedListener() {
 			public void onMessagesUpdated() {
-				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount());
+				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
 			}
 		});
 	}

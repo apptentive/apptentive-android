@@ -59,7 +59,6 @@ public class DevActivity extends ApptentiveActivity {
 						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
 					}
 				});
-
 			}
 		});
 
@@ -84,36 +83,36 @@ public class DevActivity extends ApptentiveActivity {
 
 	public void runTests(View view) {
 		Intent testsIntent = new Intent();
-		testsIntent.setClass(DevActivity.this, TestsActivity.class);
+		testsIntent.setClass(this, TestsActivity.class);
 		startActivity(testsIntent);
 	}
 
 	public void reinstall(View view) {
-		DevDebugHelper.resetRatingFlow();
+		DevDebugHelper.resetRatingFlow(this);
 	}
 
 	public void logSignificantEvent(View view) {
-		Apptentive.logSignificantEvent();
+		Apptentive.logSignificantEvent(this);
 	}
 
 	public void logDay(View view) {
-		DevDebugHelper.logDay();
+		DevDebugHelper.logDay(this);
 	}
 
 	public void showChoice(View view) {
-		DevDebugHelper.forceShowEnjoymentDialog(DevActivity.this);
+		DevDebugHelper.forceShowEnjoymentDialog(this);
 	}
 
 	public void showRating(View view) {
-		DevDebugHelper.showRatingDialog(DevActivity.this);
+		DevDebugHelper.showRatingDialog(this);
 	}
 
 	public void showFeedback(View view) {
-		DevDebugHelper.forceShowIntroDialog(DevActivity.this);
+		DevDebugHelper.forceShowIntroDialog(this);
 	}
 
 	public void showMessageCenter(View view) {
-		Apptentive.showMessageCenter(DevActivity.this);
+		Apptentive.showMessageCenter(this);
 	}
 
 	public void showSurveyDialog(View view) {

@@ -159,10 +159,10 @@ public class Util {
 				return email;
 			}
 		}
-		return "";
+		return null;
 	}
 
-	public static String getEmail(Context context) {
+	private static String getEmail(Context context) {
 		AccountManager accountManager = AccountManager.get(context);
 		Account account = getAccount(accountManager);
 		if (account == null) {
@@ -253,5 +253,9 @@ public class Util {
 			}
 		}
 		return null;
+	}
+
+	public static boolean isEmailValid(String email) {
+		return email.matches("^[^\\s@]+@[^\\s@]+$");
 	}
 }
