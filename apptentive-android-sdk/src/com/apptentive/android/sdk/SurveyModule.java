@@ -125,9 +125,9 @@ public class SurveyModule {
 			public void onSurveySubmitted() {
 				Log.e("Survey Submitted.");
 				Util.hideSoftKeyboard((Activity) context, dialog.getCurrentFocus());
-				MetricModule.sendMetric(Event.EventLabel.survey__submit, null, data);
+				MetricModule.sendMetric(context, Event.EventLabel.survey__submit, null, data);
 
-				getSurveyStore().addPayload(new SurveyPayload(surveyDefinition));
+				getSurveyStore(context).addPayload(new SurveyPayload(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyFinishedListener != null) {
 					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
@@ -159,7 +159,7 @@ public class SurveyModule {
 
 			@Override
 			public void onQuestionAnswered(Question question) {
-				sendMetricForQuestion(question);
+				sendMetricForQuestion(context, question);
 			}
 		};
 		dialog.setOnActionPerformedListener(listener);
