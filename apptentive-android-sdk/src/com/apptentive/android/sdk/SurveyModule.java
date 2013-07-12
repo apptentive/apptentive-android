@@ -214,6 +214,7 @@ public class SurveyModule {
 		questionList.addView(sendView);
 
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
+		SurveyHistory.recordSurveyDisplay(activity, surveyDefinition.getId(), System.currentTimeMillis());
 
 		// Force the top of the survey to be shown first.
 		surveyTitle.requestFocus();
