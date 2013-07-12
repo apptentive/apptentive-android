@@ -146,7 +146,7 @@ You can change the conditions necessary for the ratings flow to be shown by loog
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
 days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
 
-<pre><code><strong>Apttentive.logSignificantEvent(this);</strong></code></pre>
+<pre><code><strong>Apptentive.logSignificantEvent(this);</strong></code></pre>
 
 ### Message Center
 You can add a button that will show the Message Center when pressed. Here is an example button click handler:
