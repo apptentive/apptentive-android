@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,6 +49,7 @@ public class SurveyManager {
 		}
 		ApptentiveHttpResponse response = ApptentiveClient.getSurveys();
 		if (response != null && response.isSuccessful()) {
+
 			String surveysString = response.getContent();
 
 			// Store new survey cache expiration.
@@ -57,7 +59,19 @@ public class SurveyManager {
 				cacheSeconds = Constants.CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS;
 			}
 			updateCacheExpiration(context, cacheSeconds);
-			storeSurveys(context, surveysString);
+
+			// Prune out surveys that have met serving requirements already.
+			List<SurveyDefinition> surveyList = parseSurveysString(surveysString);
+			Iterator<SurveyDefinition> surveyIterator = surveyList.iterator();
+			while (surveyIterator.hasNext()) {
+				SurveyDefinition next =  surveyIterator.next();
+				// Filter out surveys that have met of exceeded the number of allowed displays per time period.
+				if(SurveyHistory.isSurveyLimitMet(context, next)) {
+					Log.d("Removing survey: " + next.getName());
+					surveyList.remove(next);
+				}
+			}
+			storeSurveys(context, surveyList);
 		}
 	}
 
@@ -165,13 +179,17 @@ public class SurveyManager {
 			List<String> surveyTags = survey.getTags();
 			if (tags.length == 0) { // Case: Need untagged survey.
 				if (surveyTags == null || surveyTags.size() == 0) {
-					return survey;
+					if(!SurveyHistory.isSurveyLimitMet(context, survey)) {
+						return survey;
+					}
 				}
 			} else { // Case: Need tagged survey.
 				if (surveyTags != null) {
 					for (String tag : tags) {
 						if (surveyTags.contains(tag)) {
-							return survey;
+							if(!SurveyHistory.isSurveyLimitMet(context, survey)) {
+								return survey;
+							}
 						}
 					}
 				}

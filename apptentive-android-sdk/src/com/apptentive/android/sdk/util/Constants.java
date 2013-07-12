@@ -51,6 +51,7 @@ public class Constants {
 
 	public static final String PREF_KEY_SURVEYS = "surveys";
 	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
+	public static final String PREF_KEY_SURVEYS_HISTORY = "surveyHistory";
 
 
 	public static final int CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
