@@ -137,7 +137,7 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        <strong>Apttentive.showRatingFlowIfConditionsAreMet(this);</strong>
+        <strong>Apptentive.showRatingFlowIfConditionsAreMet(this);</strong>
     }
 }
 </code></pre>
