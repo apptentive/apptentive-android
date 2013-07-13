@@ -103,8 +103,6 @@ public class SurveyModule {
 	/**
 	 * Shows a survey embedded in a dialog.
 	 * @param context The Activity context from which this method is called.
-	 * @param surveyDefinition
-	 * @param onSurveyFinishedListener
 	 */
 	public void showSurveyAsDialog(final Context context, final SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
 		this.surveyDefinition = surveyDefinition;
@@ -163,6 +161,9 @@ public class SurveyModule {
 			}
 		};
 		dialog.setOnActionPerformedListener(listener);
+
+		MetricModule.sendMetric(context, Event.EventLabel.survey__launch, null, data);
+		SurveyHistory.recordSurveyDisplay(context, surveyDefinition.getId(), System.currentTimeMillis());
 		dialog.show();
 	}
 
