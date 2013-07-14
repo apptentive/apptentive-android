@@ -25,7 +25,7 @@
         <activity android:name="com.apptentive.android.dev.TestsActivity"/>
         <meta-data android:name="apptentive_api_key" android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
-                  android:configChanges="orientation|keyboardHidden"/>
+                  android:theme="@style/Apptentive.Theme.Transparent"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
