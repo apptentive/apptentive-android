@@ -52,9 +52,11 @@ public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQu
 				String questionId = question.getId();
 				SurveyState state = SurveyModule.getInstance().getSurveyState();
 				Set<String> answers = state.getAnswers(questionId);
-				if (!answers.isEmpty() && !answers.contains(editable.toString())) {
+				if (answers.isEmpty() || (!answers.isEmpty() && !answers.contains(editable.toString()))) {
 					state.clearAnswers(questionId);
-					state.addAnswer(questionId, editable.toString());
+					if(editable.length() != 0) {
+						state.addAnswer(questionId, editable.toString());
+					}
 					updateValidationState();
 					fireListener();
 				}
