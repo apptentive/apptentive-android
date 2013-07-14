@@ -44,7 +44,12 @@ public class MultichoiceSurveyQuestionView2 extends BaseSurveyQuestionView<Multi
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
 			final CheckboxChoice choice = new CheckboxChoice(context, answerDefinition.getValue());
 			if (answers.contains(answerDefinition.getId())) {
-				choice.toggle();
+				choice.post(new Runnable() {
+					@Override
+					public void run() {
+						choice.toggle();
+					}
+				});
 			}
 			choice.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
@@ -72,8 +77,6 @@ public class MultichoiceSurveyQuestionView2 extends BaseSurveyQuestionView<Multi
 
 	/**
 	 * Override to change the behavior of clicking this.
-	 *
-	 * @param choice
 	 */
 	protected void choiceClicked(CheckboxChoice choice) {
 		if (countSelectedChoices() != 0) {

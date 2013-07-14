@@ -113,7 +113,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 
 	protected void fireListener() {
 		if (listener != null) {
-			listener.onAnswered(this);
+			listener.onAnswered();
 		}
 	}
 

@@ -29,13 +29,16 @@ import com.apptentive.android.sdk.util.Util;
 abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
 
 	protected Q question;
-	protected LinearLayout container;
 
 	protected OnSurveyQuestionAnsweredListener listener;
 
 	protected BaseSurveyQuestionView(Context context, Q question) {
 		super(context);
 		this.question = question;
+
+		// Required to remove focus from any EditTexts.
+		setFocusable(true);
+		setFocusableInTouchMode(true);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_survey_dialog_question_base, this);
@@ -83,11 +86,13 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 	protected void fireListener() {
 		if (listener != null) {
-			listener.onAnswered(this);
+			listener.onAnswered();
 		}
 	}
 
 	protected void updateValidationState() {
+		// Request focus so that any previously focused EditTexts do not regain focus after updating validation state.
+		requestFocus();
 		Resources resources = getContext().getResources();
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);

@@ -17,7 +17,10 @@ import android.widget.*;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
+import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView2;
+import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView2;
 import com.apptentive.android.sdk.module.survey.view.SurveyDialog;
+import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView2;
 import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
@@ -53,7 +56,6 @@ public class SurveyModule {
 
 	private SurveyDefinition surveyDefinition;
 	private SurveyState surveyState;
-	private SurveySendView sendView;
 	private Map<String, String> data;
 	private OnSurveyFinishedListener onSurveyFinishedListener;
 
@@ -168,90 +170,30 @@ public class SurveyModule {
 	}
 
 	void doShow(final Activity activity) {
+		activity.setContentView(R.layout.apptentive_survey_dialog);
+
 		if (surveyDefinition == null) {
 			return;
 		}
-		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
-		surveyTitle.setFocusable(true);
-		surveyTitle.setFocusableInTouchMode(true);
-		surveyTitle.setText(surveyDefinition.getName());
 
-/*
-		// TODO: Put this into the onBackButtonPressed method.
-		Button skipButton = (Button) activity.findViewById(R.id.apptentive_survey_button_skip);
-		if (surveyDefinition.isRequired()) {
-			((RelativeLayout) skipButton.getParent()).removeView(skipButton);
+		TextView title = (TextView) activity.findViewById(R.id.title);
+		title.setFocusable(true);
+		title.setFocusableInTouchMode(true);
+		title.setText(surveyDefinition.getName());
+
+		String descriptionText = surveyDefinition.getDescription();
+		TextView description = (TextView) activity.findViewById(R.id.description);
+		if (descriptionText != null) {
+			description.setText(descriptionText);
 		} else {
-			skipButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					onBackPressed(activity);
-					activity.finish();
-				}
-			});
+			description.setVisibility(View.GONE);
 		}
-*/
 
-		View brandingButton = activity.findViewById(R.id.apptentive_branding_view);
-		brandingButton.setOnClickListener(new View.OnClickListener() {
+		final Button send = (Button) activity.findViewById(R.id.send);
+		send.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
-				AboutModule.getInstance().show(activity);
-			}
-		});
-
-		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
-
-		// Render the survey description
-		if (surveyDefinition.getDescription() != null) {
-			SurveyDescriptionView surveyDescription = new SurveyDescriptionView(activity);
-			surveyDescription.setTitleText(surveyDefinition.getDescription());
-			questionList.addView(surveyDescription);
-		}
-
-		// Then render all the questions
-		for (final Question question : surveyDefinition.getQuestions()) {
-			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
-					public void onAnswered(TextSurveyQuestionView view) {
-						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
-					}
-				});
-				questionList.addView(textQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
-					public void onAnswered(MultichoiceSurveyQuestionView view) {
-						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
-					}
-				});
-				questionList.addView(multichoiceQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
-					public void onAnswered(MultiselectSurveyQuestionView view) {
-						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
-					}
-				});
-				questionList.addView(multiselectQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
-				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity, (StackrankQuestion) question);
-				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered(Object view) {
-						sendMetricForQuestion(activity, question);
-						// TODO: This.
-					}
-				});
-				questionList.addView(questionView);
-			}
-		}
-
-		// Then render the send button.
-		sendView = new SurveySendView(activity);
-		sendView.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
+				Log.d("Survey Submitted.");
 				Util.hideSoftKeyboard(activity, view);
 				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
 
@@ -278,14 +220,54 @@ public class SurveyModule {
 				}
 			}
 		});
-		sendView.setEnabled(isCompleted());
-		questionList.addView(sendView);
 
+		View about = activity.findViewById(R.id.apptentive_branding_view);
+		about.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				AboutModule.getInstance().show(activity);
+			}
+		});
+
+		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
+
+		// Then render all the questions
+		for (final Question question : surveyDefinition.getQuestions()) {
+			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
+				TextSurveyQuestionView2 textQuestionView = new TextSurveyQuestionView2(activity, (SinglelineQuestion) question);
+				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
+						sendMetricForQuestion(activity, question);
+						send.setEnabled(isCompleted());
+					}
+				});
+				questions.addView(textQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
+				MultichoiceSurveyQuestionView2 multichoiceQuestionView = new MultichoiceSurveyQuestionView2(activity, (MultichoiceQuestion) question);
+				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
+						sendMetricForQuestion(activity, question);
+						send.setEnabled(isCompleted());
+					}
+				});
+				questions.addView(multichoiceQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+				MultiselectSurveyQuestionView2 multiselectQuestionView = new MultiselectSurveyQuestionView2(activity, (MultiselectQuestion) question);
+				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
+						sendMetricForQuestion(activity, question);
+						send.setEnabled(isCompleted());
+					}
+				});
+				questions.addView(multiselectQuestionView);
+			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
+				// TODO: This.
+			}
+		}
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
 		SurveyHistory.recordSurveyDisplay(activity, surveyDefinition.getId(), System.currentTimeMillis());
 
 		// Force the top of the survey to be shown first.
-		surveyTitle.requestFocus();
+		title.requestFocus();
 	}
 
 	void sendMetricForQuestion(Context context, Question question) {

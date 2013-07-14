@@ -51,10 +51,13 @@ public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQu
 			public void afterTextChanged(Editable editable) {
 				String questionId = question.getId();
 				SurveyState state = SurveyModule.getInstance().getSurveyState();
-				state.clearAnswers(questionId);
-				state.addAnswer(questionId, editable.toString());
-				updateValidationState();
-				fireListener();
+				Set<String> answers = state.getAnswers(questionId);
+				if (!answers.isEmpty() && !answers.contains(editable.toString())) {
+					state.clearAnswers(questionId);
+					state.addAnswer(questionId, editable.toString());
+					updateValidationState();
+					fireListener();
+				}
 			}
 		});
 
@@ -67,6 +70,5 @@ public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQu
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}
-
 	}
 }

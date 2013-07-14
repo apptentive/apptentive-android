@@ -64,8 +64,8 @@ public class SurveyDialog extends ApptentiveBaseDialog {
 		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView2 textQuestionView = new TextSurveyQuestionView2(context, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView2>() {
-					public void onAnswered(TextSurveyQuestionView2 view) {
+				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						if(listener != null) {
 							listener.onQuestionAnswered(question);
 						}
@@ -75,8 +75,8 @@ public class SurveyDialog extends ApptentiveBaseDialog {
 				questions.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
 				MultichoiceSurveyQuestionView2 multichoiceQuestionView = new MultichoiceSurveyQuestionView2(context, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView2>() {
-					public void onAnswered(MultichoiceSurveyQuestionView2 view) {
+				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						if(listener != null) {
 							listener.onQuestionAnswered(question);
 						}
@@ -86,8 +86,8 @@ public class SurveyDialog extends ApptentiveBaseDialog {
 				questions.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 				MultiselectSurveyQuestionView2 multiselectQuestionView = new MultiselectSurveyQuestionView2(context, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView2>() {
-					public void onAnswered(MultiselectSurveyQuestionView2 view) {
+				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						if(listener != null) {
 							listener.onQuestionAnswered(question);
 						}
@@ -98,7 +98,7 @@ public class SurveyDialog extends ApptentiveBaseDialog {
 			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
 				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(context, (StackrankQuestion) question);
 				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered(Object view) {
+					public void onAnswered() {
 						if(listener != null) {
 							listener.onQuestionAnswered(question);
 						}

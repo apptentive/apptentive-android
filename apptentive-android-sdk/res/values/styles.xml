@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
 <resources>
 
     <style name="ApptentiveHeader" parent="ApptentiveHeader.Plain"/>
@@ -58,6 +64,15 @@
 
     <style name="ApptentiveMessageCenterDrawer.Denim">
         <item name="android:background">@drawable/apptentive_grey_denim</item>
+    </style>
+
+    <style name="Apptentive.Theme.Transparent" parent="android:Theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
     </style>
 
 </resources>
