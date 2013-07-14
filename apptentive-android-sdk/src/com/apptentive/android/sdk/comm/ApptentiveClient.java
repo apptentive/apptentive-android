@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.Header;
@@ -60,10 +60,8 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
-	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
-
-	// Old API
-	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
+	private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
+	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
 
 	// Deprecated API
 	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
@@ -123,12 +121,13 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
+	public static ApptentiveHttpResponse getSurveys() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SURVEYS_FETCH, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse getSurveys() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SURVEYS, Method.GET, null);
+	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
+		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
+		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {

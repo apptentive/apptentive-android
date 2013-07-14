@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.offline.SurveyPayload;
 import org.json.JSONException;
 
 /**
@@ -31,7 +30,7 @@ public class PayloadFactory {
 				return PersonFactory.fromJson(json);
 			case survey:
 				try {
-					return new SurveyPayload(json);
+					return new SurveyResponse(json);
 				} catch (JSONException e) {
 				}
 			case unknown:

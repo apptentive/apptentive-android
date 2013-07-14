@@ -15,7 +15,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.model.SurveyResponse;
 
 /**
  * @author Sky Kelsey
@@ -86,7 +86,7 @@ public class PayloadSendWorker {
 								response = ApptentiveClient.putPerson((Person) payload);
 								break;
 							case survey:
-								response = ApptentiveClient.postSurvey((SurveyPayload) payload);
+								response = ApptentiveClient.postSurvey((SurveyResponse) payload);
 								break;
 							default:
 								Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
