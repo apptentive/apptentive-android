@@ -15,9 +15,9 @@ import android.view.View;
 import android.widget.*;
 
 import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
-import com.apptentive.android.sdk.offline.SurveyPayload;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -187,7 +187,7 @@ public class SurveyModule {
 				Util.hideSoftKeyboard(activity, view);
 				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
 
-				getSurveyStore(activity).addPayload(new SurveyPayload(surveyDefinition));
+				getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
 
 				if(SurveyModule.this.onSurveyFinishedListener != null) {
 					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
