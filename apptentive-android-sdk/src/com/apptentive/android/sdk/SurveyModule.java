@@ -197,7 +197,7 @@ public class SurveyModule {
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
 					builder.setTitle(view.getContext().getString(R.string.apptentive_survey_success_title));
-					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_survey_positive_button), new DialogInterface.OnClickListener() {
+					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							cleanup();
 							activity.finish();
