@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -48,7 +48,9 @@ public class AboutModule {
 	}
 
 	void doShow(final Activity activity) {
-		TextView links = (TextView) activity.findViewById(R.id.apptentive_about_links);
-		links.setMovementMethod(LinkMovementMethod.getInstance());
+		TextView information = (TextView) activity.findViewById(R.id.apptentive_about_more_information);
+		information.setMovementMethod(LinkMovementMethod.getInstance());
+		TextView privacy = (TextView) activity.findViewById(R.id.apptentive_about_privacy);
+		privacy.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 }

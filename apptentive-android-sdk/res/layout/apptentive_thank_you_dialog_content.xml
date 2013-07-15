@@ -19,7 +19,7 @@
               android:layout_marginBottom="16dp"
               android:textColor="@color/apptentive_dialog_title_text"
               android:textSize="@dimen/apptentive_text_large"
-              android:text="@string/apptentive_thank_you_dialog_title"/>
+              android:text="@string/apptentive_thanks"/>
     <TextView android:id="@+id/body"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
