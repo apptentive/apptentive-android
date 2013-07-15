@@ -53,7 +53,7 @@ public class AutomatedMessage extends TextMessage {
 	public static AutomatedMessage createWelcomeMessage(Context context) {
 		AutomatedMessage message = new AutomatedMessage();
 		Resources resources = context.getResources();
-		message.setTitle(resources.getString(R.string.apptentive_message_auto_title_manual));
+		message.setTitle(resources.getString(R.string.apptentive_hi_there));
 		message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
 		return message;
 	}
@@ -61,7 +61,7 @@ public class AutomatedMessage extends TextMessage {
 	public static AutomatedMessage createNoLoveMessage(Context context) {
 		AutomatedMessage message = new AutomatedMessage();
 		Resources resources = context.getResources();
-		message.setTitle(resources.getString(R.string.apptentive_message_auto_title_no_love));
+		message.setTitle(resources.getString(R.string.apptentive_were_sorry));
 		message.setBody(resources.getString(R.string.apptentive_message_auto_body_no_love));
 		return message;
 	}

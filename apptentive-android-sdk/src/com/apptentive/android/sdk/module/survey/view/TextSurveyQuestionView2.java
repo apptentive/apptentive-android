@@ -33,7 +33,7 @@ public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQu
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_survey_dialog_question_singleline, getAnswerContainer());
 
-		String instructionsText = question.isRequired() ? context.getString(R.string.apptentive_survey_required) : context.getString(R.string.apptentive_survey_optional);
+		String instructionsText = question.isRequired() ? context.getString(R.string.apptentive_required) : context.getString(R.string.apptentive_optional);
 		setInstructions(instructionsText);
 
 		EditText answer = (EditText) findViewById(R.id.answer_text);

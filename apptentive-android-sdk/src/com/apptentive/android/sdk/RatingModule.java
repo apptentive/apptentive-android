@@ -178,7 +178,7 @@ public class RatingModule {
 	void showEnjoymentDialog(final Activity activity, Trigger reason) {
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final EnjoymentDialog dialog = new EnjoymentDialog(activity);
-		String title = String.format(activity.getString(R.string.apptentive_enjoyment_message_fs), GlobalInfo.appDisplayName);
+		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), GlobalInfo.appDisplayName);
 		dialog.setTitle(title);
 		dialog.setCancelable(false);
 
@@ -214,7 +214,7 @@ public class RatingModule {
 		final RatingDialog dialog = new RatingDialog(activity);
 
 		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, GlobalInfo.appDisplayName));
-		dialog.setRateButtonText(activity.getString(R.string.apptentive_rating_rate, GlobalInfo.appDisplayName));
+		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, GlobalInfo.appDisplayName));
 
 		dialog.setOnChoiceMadeListener(new RatingDialog.OnChoiceMadeListener() {
 			@Override

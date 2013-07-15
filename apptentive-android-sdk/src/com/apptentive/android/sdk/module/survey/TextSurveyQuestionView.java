@@ -34,7 +34,7 @@ public class TextSurveyQuestionView extends SurveyItemView<SinglelineQuestion> {
 	@Override
 	protected void initView() {
 		super.initView();
-		instructionsTextView.setText(question.isRequired() ? appContext.getString(R.string.apptentive_survey_required) : appContext.getString(R.string.apptentive_survey_optional));
+		instructionsTextView.setText(question.isRequired() ? appContext.getString(R.string.apptentive_required) : appContext.getString(R.string.apptentive_optional));
 
 		addSeparator();
 		answerText = new EditText(appContext);

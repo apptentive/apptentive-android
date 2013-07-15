@@ -20,7 +20,7 @@
                   android:layout_height="wrap_content"
                   android:gravity="center"
                   style="@style/ApptentiveHeaderText"
-                  android:text="@string/apptentive_message_center_header_title"/>
+                  android:text="@string/apptentive_message_center_title"/>
     </LinearLayout>
     <ListView android:id="@+id/apptentive_message_center_list"
               android:layout_width="fill_parent"

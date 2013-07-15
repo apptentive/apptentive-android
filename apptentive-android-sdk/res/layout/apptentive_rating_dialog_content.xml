@@ -20,7 +20,7 @@
               android:textColor="@color/apptentive_dialog_title_text"
               android:textStyle="bold"
               android:textSize="@dimen/apptentive_text_large"
-              android:text="@string/apptentive_rating_title"/>
+              android:text="@string/apptentive_thank_you"/>
     <TextView android:id="@+id/body"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
@@ -49,5 +49,5 @@
             android:background="@drawable/apptentive_dialog_negative_button"
             android:textColor="@drawable/apptentive_dialog_negative_button_text"
             android:textSize="@dimen/apptentive_text_medium"
-            android:text="@string/apptentive_rating_no"/>
+            android:text="@string/apptentive_no_thanks"/>
 </LinearLayout>
