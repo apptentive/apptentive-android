@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -40,7 +40,6 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To send extra about the app to the server.
 		Map<String, String> customData = new HashMap<String, String>();
 		customData.put("user-id", "1234567890");
-		customData.put("user-email", "sky@apptentive.com");
 		Apptentive.setCustomData(customData);
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
@@ -48,6 +47,8 @@ public class DevActivity extends ApptentiveActivity {
 
 		// *** END APPTENTIVE INITIALIZATION
 
+
+		// Set up buttons used to test parts of the SDK.
 
 		Button testsButton = (Button) findViewById(R.id.button_tests);
 		testsButton.setOnClickListener(new View.OnClickListener() {
@@ -60,19 +61,19 @@ public class DevActivity extends ApptentiveActivity {
 		Button resetButton = (Button) findViewById(R.id.button_reset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
+				DevDebugHelper.resetRatingFlow(DevActivity.this);
 			}
 		});
 		Button eventButton = (Button) findViewById(R.id.button_event);
 		eventButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				Apptentive.logSignificantEvent();
+				Apptentive.logSignificantEvent(DevActivity.this);
 			}
 		});
 		Button dayButton = (Button) findViewById(R.id.button_day);
 		dayButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				DevDebugHelper.resetRatingFlow();
+				DevDebugHelper.logDay(DevActivity.this);
 			}
 		});
 		Button choiceButton = (Button) findViewById(R.id.button_choice);
@@ -85,6 +86,12 @@ public class DevActivity extends ApptentiveActivity {
 		ratingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				DevDebugHelper.showRatingDialog(DevActivity.this);
+			}
+		});
+		Button feedbackButton = (Button) findViewById(R.id.button_feedback);
+		feedbackButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				DevDebugHelper.forceShowIntroDialog(DevActivity.this);
 			}
 		});
 		Button messageCenterButton = (Button) findViewById(R.id.button_message_center);

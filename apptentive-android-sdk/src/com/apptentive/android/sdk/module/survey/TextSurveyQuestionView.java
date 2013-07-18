@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -28,7 +28,7 @@ public class TextSurveyQuestionView extends SurveyItemView<BaseQuestion> {
 	@Override
 	protected void initView() {
 		super.initView();
-		instructionsTextView.setText(question.isRequired() ? appContext.getString(R.string.apptentive_survey_required) : appContext.getString(R.string.apptentive_survey_optional));
+		instructionsTextView.setText(question.isRequired() ? appContext.getString(R.string.apptentive_required) : appContext.getString(R.string.apptentive_optional));
 
 		addSeparator();
 		answerText = new EditText(appContext);

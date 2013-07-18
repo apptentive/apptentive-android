@@ -18,7 +18,7 @@ import android.view.animation.TranslateAnimation;
 public class Constants {
 
 	// Don't ever use "1.0". I prematurely incremented to 1.0, so we should skip over it.
-	public static final String APPTENTIVE_SDK_VERSION = "1.0.1";
+	public static final String APPTENTIVE_SDK_VERSION = "1.0.2";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
@@ -31,8 +31,7 @@ public class Constants {
 	public static final String PREF_KEY_DEVICE = "device";
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
-
-	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
+	public static final String PREF_KEY_PERSON = "person";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
@@ -45,9 +44,9 @@ public class Constants {
 
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
+	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
-	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
@@ -66,6 +65,11 @@ public class Constants {
 
 	private static final int SCREEN_ANIMATION_DURATION = 300;
 	private static final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
+
+	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
+	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
+	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
+
 
 	public static Animation inFromRightAnimation() {
 		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);

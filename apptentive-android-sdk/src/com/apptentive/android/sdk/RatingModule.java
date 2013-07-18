@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,18 +13,11 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.text.format.DateUtils;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
@@ -32,6 +25,8 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
+import com.apptentive.android.sdk.module.rating.view.EnjoymentDialog;
+import com.apptentive.android.sdk.module.rating.view.RatingDialog;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -63,7 +58,6 @@ public class RatingModule {
 	// ********************************************* Private *******************************************
 	// *************************************************************************************************
 
-	private SharedPreferences prefs;
 	private IRatingProvider selectedRatingProvider = null;
 
 	private Map<String, String> ratingProviderArgs;
@@ -74,9 +68,9 @@ public class RatingModule {
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
-	private boolean ratingPeriodElapsed() {
+	private boolean ratingPeriodElapsed(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
-		RatingState state = getState();
+		RatingState state = getState(prefs);
 		long days;
 		switch (state) {
 			case REMIND:
@@ -87,54 +81,54 @@ public class RatingModule {
 				break;
 		}
 		long now = new Date().getTime();
-		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
+		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
 		return now > periodEnd;
 	}
 
-	private boolean eventThresholdReached() {
+	private boolean eventThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
-		return getEvents() >= significantEventsBeforePrompt;
+		return getEvents(prefs) >= significantEventsBeforePrompt;
 	}
 
-	private boolean usesThresholdReached() {
+	private boolean usesThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
-		return getUses() >= usesBeforePrompt;
+		return getUses(prefs) >= usesBeforePrompt;
 	}
 
-	private long getStartOfRatingPeriod() {
-		if(!prefs.contains(Constants.PREF_KEY_START_OF_RATING_PERIOD)) {
-			setStartOfRatingPeriod(new Date().getTime());
+	private long getStartOfRatingPeriod(SharedPreferences prefs) {
+		if (!prefs.contains(Constants.PREF_KEY_START_OF_RATING_PERIOD)) {
+			setStartOfRatingPeriod(prefs, new Date().getTime());
 		}
 		return prefs.getLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, new Date().getTime());
 	}
 
-	private void setStartOfRatingPeriod(long startOfRatingPeriod) {
+	private void setStartOfRatingPeriod(SharedPreferences prefs, long startOfRatingPeriod) {
 		prefs.edit().putLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, startOfRatingPeriod).commit();
 	}
 
-	private RatingState getState() {
+	private RatingState getState(SharedPreferences prefs) {
 		return RatingState.valueOf(prefs.getString(Constants.PREF_KEY_RATING_STATE, RatingState.START.toString()));
 	}
 
-	private void setState(RatingState state) {
+	private void setState(SharedPreferences prefs, RatingState state) {
 		prefs.edit().putString(Constants.PREF_KEY_RATING_STATE, state.name()).commit();
 	}
 
-	private int getEvents() {
+	private int getEvents(SharedPreferences prefs) {
 		return prefs.getInt(Constants.PREF_KEY_RATING_EVENTS, 0);
 	}
 
-	private void setEvents(int events) {
+	private void setEvents(SharedPreferences prefs, int events) {
 		prefs.edit().putInt(Constants.PREF_KEY_RATING_EVENTS, events).commit();
 	}
 
-	private int getUses() {
+	private int getUses(SharedPreferences prefs) {
 		return prefs.getInt(Constants.PREF_KEY_RATING_USES, 0);
 	}
 
-	private void setUses(int uses) {
+	private void setUses(SharedPreferences prefs, int uses) {
 		prefs.edit().putInt(Constants.PREF_KEY_RATING_USES, uses).commit();
 	}
 
@@ -142,17 +136,14 @@ public class RatingModule {
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
-	void setContext(Context context) {
-		this.prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-	}
-
-	void onAppVersionChanged() {
+	void onAppVersionChanged(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration config = Configuration.load(prefs);
-		if(config.isRatingsClearOnUpgrade()) {
-			setState(RatingState.START);
-			setStartOfRatingPeriod(new Date().getTime());
-			setEvents(0);
-			setUses(1);
+		if (config.isRatingsClearOnUpgrade()) {
+			setState(prefs, RatingState.START);
+			setStartOfRatingPeriod(prefs, new Date().getTime());
+			setEvents(prefs, 0);
+			setUses(prefs, 1);
 		}
 	}
 
@@ -167,9 +158,9 @@ public class RatingModule {
 	 * If there are any pieces of data your {@link IRatingProvider} needs, add them here.
 	 * Default keys already included are: [name, package].
 	 *
-	 * @param key The argument name the the chosen {@link IRatingProvider} needs.
+	 * @param key   The argument name the the chosen {@link IRatingProvider} needs.
 	 * @param value The value of the argument.
- 	 */
+	 */
 	void putRatingProviderArg(String key, String value) {
 		this.ratingProviderArgs.put(key, value);
 	}
@@ -185,8 +176,31 @@ public class RatingModule {
 		showEnjoymentDialog(activity, Trigger.forced);
 	}
 
-	void showEnjoymentDialog(Activity activity, Trigger reason) {
-		this.new EnjoymentDialog(activity).show(reason);
+	void showEnjoymentDialog(final Activity activity, Trigger reason) {
+		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		final EnjoymentDialog dialog = new EnjoymentDialog(activity);
+		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), GlobalInfo.appDisplayName);
+		dialog.setTitle(title);
+		dialog.setCancelable(false);
+
+		dialog.setOnChoiceMadeListener(new EnjoymentDialog.OnChoiceMadeListener() {
+			@Override
+			public void onNo() {
+				setState(prefs, RatingState.POSTPONE);
+				MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__no);
+				dialog.dismiss();
+				Apptentive.showMessageCenter(activity, false);
+			}
+
+			@Override
+			public void onYes() {
+				MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__yes);
+				dialog.dismiss();
+				forceShowRatingDialog(activity);
+			}
+		});
+		MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__launch, reason.name());
+		dialog.show();
 	}
 
 	/**
@@ -194,10 +208,70 @@ public class RatingModule {
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
 	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
 	 *
-	 * @param activity The acvitity from which this method was called.
+	 * @param activity The activity from which this method was called.
 	 */
-	void forceShowRatingDialog(Activity activity) {
-		this.new RatingDialog(activity).show();
+	void forceShowRatingDialog(final Activity activity) {
+		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		final RatingDialog dialog = new RatingDialog(activity);
+
+		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, GlobalInfo.appDisplayName));
+		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, GlobalInfo.appDisplayName));
+
+		dialog.setOnChoiceMadeListener(new RatingDialog.OnChoiceMadeListener() {
+			@Override
+			public void onRate() {
+				dialog.dismiss();
+				String errorMessage = activity.getString(R.string.apptentive_rating_error);
+				try {
+					MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__rate);
+					// Send user to app rating page
+					if (RatingModule.this.selectedRatingProvider == null) {
+						// Default to the Android Market provider, if none has been specified
+						RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
+					}
+					errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activity);
+					RatingModule.this.selectedRatingProvider.startRating(activity, RatingModule.this.ratingProviderArgs);
+					setState(prefs, RatingState.RATED);
+				} catch (ActivityNotFoundException e) {
+					displayError(errorMessage);
+				} catch (InsufficientRatingArgumentsException e) {
+					// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
+					displayError(activity.getString(R.string.apptentive_rating_error));
+				} finally {
+					dialog.dismiss();
+				}
+			}
+
+			private void displayError(String message) {
+				final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+				alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
+				alertDialog.setMessage(message);
+				alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogInterface, int i) {
+						alertDialog.dismiss();
+					}
+				});
+				alertDialog.show();
+			}
+
+			@Override
+			public void onRemind() {
+				dialog.dismiss();
+				MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__remind);
+				setState(prefs, RatingState.REMIND);
+				setStartOfRatingPeriod(prefs, new Date().getTime());
+			}
+
+			@Override
+			public void onNo() {
+				dialog.dismiss();
+				MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__decline);
+				setState(prefs, RatingState.POSTPONE);
+			}
+		});
+		MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__launch);
+		dialog.setCancelable(false);
+		dialog.show();
 	}
 
 	/**
@@ -208,25 +282,26 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	void run(Activity activity) {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration config = Configuration.load(prefs);
-		if(!config.isRatingsEnabled()) {
+		if (!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");
 			return;
 		}
-		if(!Util.isNetworkConnectionPresent(activity)) {
+		if (!Util.isNetworkConnectionPresent(activity)) {
 			Log.d("Ratings can't be shown because the network is not available. Try again later.");
 			return;
 		}
-		switch (getState()) {
+		switch (getState(prefs)) {
 			case START:
-				boolean canShow = canShowRatingFlow();
-				if(canShow) {
+				boolean canShow = canShowRatingFlow(prefs);
+				if (canShow) {
 					// TODO: Trigger no longer makes sense with boolean logic expressions. Axe it.
 					showEnjoymentDialog(activity, Trigger.events);
 				}
 				break;
 			case REMIND:
-				if (ratingPeriodElapsed()) {
+				if (ratingPeriodElapsed(prefs)) {
 					forceShowRatingDialog(activity);
 				}
 				break;
@@ -239,50 +314,51 @@ public class RatingModule {
 		}
 	}
 
-	private boolean canShowRatingFlow(){
+	private boolean canShowRatingFlow(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		String ratingsPromptLogic = config.getRatingsPromptLogic();
-		try{
-			return logic(new JSONObject(ratingsPromptLogic));
-		}catch(JSONException e){
+		try {
+			return logic(prefs, new JSONObject(ratingsPromptLogic));
+		} catch (JSONException e) {
 			// Fall back to old logic.
-			return ratingPeriodElapsed() && (eventThresholdReached() || usesThresholdReached());
+			return ratingPeriodElapsed(prefs) && (eventThresholdReached(prefs) || usesThresholdReached(prefs));
 		}
 	}
 
 	/**
 	 * Apply the rules from the logic expression.
+	 *
 	 * @param obj
 	 * @return True it the logic expression is true.
 	 * @throws JSONException
 	 */
-	private boolean logic(Object obj) throws JSONException {
+	private boolean logic(SharedPreferences prefs, Object obj) throws JSONException {
 		boolean ret = false;
 		if (obj instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) obj;
-			String key = (String)jsonObject.keys().next(); // Should be one array per logic statement.
+			String key = (String) jsonObject.keys().next(); // Should be one array per logic statement.
 			if ("and".equals(key)) {
 				JSONArray and = jsonObject.getJSONArray("and");
 				ret = true;
 				for (int i = 0; i < and.length(); i++) {
-					boolean prev = logic(and.get(i));
+					boolean prev = logic(prefs, and.get(i));
 					ret = ret && prev;
 				}
 			} else if ("or".equals(key)) {
 				JSONArray or = jsonObject.getJSONArray("or");
 				for (int i = 0; i < or.length(); i++) {
-					ret = ret || logic(or.get(i));
+					ret = ret || logic(prefs, or.get(i));
 				}
 			} else {
-				return logic(key);
+				return logic(prefs, key);
 			}
-		} else if(obj instanceof String){
-			if("uses".equals(obj)) {
-				return usesThresholdReached();
-			} else if("days".equals(obj)) {
-				return ratingPeriodElapsed();
-			} else if("events".equals(obj)) {
-				return eventThresholdReached();
+		} else if (obj instanceof String) {
+			if ("uses".equals(obj)) {
+				return usesThresholdReached(prefs);
+			} else if ("days".equals(obj)) {
+				return ratingPeriodElapsed(prefs);
+			} else if ("events".equals(obj)) {
+				return eventThresholdReached(prefs);
 			}
 		} else {
 			Log.w("Unknown logic token: " + obj);
@@ -294,17 +370,19 @@ public class RatingModule {
 	 * Resets the Rating Module metrics such as significant events, start of rating period, and number of uses.
 	 * If you would like each new version of your app to be rated, you can call this method upon app upgrade.
 	 */
-	void reset() {
-		if (RatingState.RATED != getState()) {
-			setState(RatingState.START);
-			setStartOfRatingPeriod(new Date().getTime());
-			setEvents(0);
-			setUses(0);
+	void reset(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (RatingState.RATED != getState(prefs)) {
+			setState(prefs, RatingState.START);
+			setStartOfRatingPeriod(prefs, new Date().getTime());
+			setEvents(prefs, 0);
+			setUses(prefs, 0);
 		}
 	}
 
-	void logSignificantEvent() {
-		setEvents(getEvents() + 1);
+	void logSignificantEvent(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		setEvents(prefs, getEvents(prefs) + 1);
 	}
 
 	/**
@@ -314,15 +392,17 @@ public class RatingModule {
 	 * time the app is switched back to, after another app has been brought to the foreground.
 	 * <p>Internal use only. We handle calls to this method.</p>
 	 */
-	void logUse() {
-		setUses(getUses() + 1);
+	void logUse(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		setUses(prefs, getUses(prefs) + 1);
 	}
 
 	/**
 	 * This method is for debugging purposes only. It will move the rating start date one day into the past.
 	 */
-	void logDay() {
-		setStartOfRatingPeriod(getStartOfRatingPeriod() - DateUtils.DAY_IN_MILLIS);
+	void logDay(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		setStartOfRatingPeriod(prefs, getStartOfRatingPeriod(prefs) - DateUtils.DAY_IN_MILLIS);
 	}
 
 	// *************************************************************************************************
@@ -357,11 +437,11 @@ public class RatingModule {
 	/**
 	 * This method is for debugging purposed only.
 	 */
-	void logRatingFlowState() {
+	void logRatingFlowState(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		String ratingsPromptLogic = config.getRatingsPromptLogic();
 
-		RatingState state = getState();
+		RatingState state = getState(prefs);
 		long days;
 		switch (state) {
 			case REMIND:
@@ -372,151 +452,12 @@ public class RatingModule {
 				break;
 		}
 		long now = new Date().getTime();
-		long periodEnd = getStartOfRatingPeriod() + (DateUtils.DAY_IN_MILLIS * days);
+		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
 		boolean elapsed = now > periodEnd;
 
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
 
-		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(), usesBeforePrompt, getEvents(), significantEventsBeforePrompt));
-	}
-
-	private final class EnjoymentDialog extends Dialog {
-
-		private Activity activity;
-
-		public EnjoymentDialog(Activity activity) {
-			super(activity);
-			this.activity = activity;
-		}
-
-		public void show(Trigger reason) {
-			LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View content = inflater.inflate(R.layout.apptentive_choice, null, false);
-
-			setContentView(content);
-
-			String title = String.format(activity.getString(R.string.apptentive_enjoyment_message_fs), GlobalInfo.appDisplayName);
-			setTitle(title);
-			Button yes = (Button) findViewById(R.id.apptentive_choice_yes);
-			yes.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					dismiss();
-					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__yes);
-					forceShowRatingDialog(activity);
-					dismiss();
-				}
-			});
-			Button no = (Button) findViewById(R.id.apptentive_choice_no);
-			no.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__no);
-					setState(RatingState.POSTPONE);
-
-					Apptentive.showMessageCenter(activity, false);
-					dismiss();
-				}
-			});
-
-			MetricModule.sendMetric(Event.EventLabel.enjoyment_dialog__launch, reason.name());
-			setCancelable(false);
-			super.show();
-		}
-	}
-
-
-	private final class RatingDialog extends Dialog {
-
-		private Context activityContext;
-
-		public RatingDialog(Activity activity) {
-			super(activity);
-			this.activityContext = activity;
-		}
-
-		public void show() {
-			LayoutInflater inflater = (LayoutInflater) activityContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View content = inflater.inflate(R.layout.apptentive_rating, null, false);
-
-			setContentView(content);
-			setTitle(activityContext.getString(R.string.apptentive_rating_title));
-
-			Display display = ((WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
-			int width = new Float(display.getWidth() * 0.8f).intValue();
-
-			TextView message = (TextView) findViewById(R.id.apptentive_rating_message);
-			message.setWidth(width);
-			message.setText(String.format(activityContext.getString(R.string.apptentive_rating_message_fs), GlobalInfo.appDisplayName));
-			Button rate = (Button) findViewById(R.id.apptentive_rating_rate);
-			rate.setText(String.format(activityContext.getString(R.string.apptentive_rating_rate), GlobalInfo.appDisplayName));
-			Button later = (Button) findViewById(R.id.apptentive_rating_later);
-			Button no = (Button) findViewById(R.id.apptentive_rating_no);
-
-			rate.setOnClickListener(
-					new View.OnClickListener() {
-						public void onClick(View view) {
-							dismiss();
-							String errorMessage = activityContext.getString(R.string.apptentive_rating_error);
-							try {
-								MetricModule.sendMetric(Event.EventLabel.rating_dialog__rate);
-								// Send user to app rating page
-								if (RatingModule.this.selectedRatingProvider == null) {
-									// Default to the Android Market provider, if none has been specified
-									RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
-								}
-								errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activityContext);
-								RatingModule.this.selectedRatingProvider.startRating(activityContext, RatingModule.this.ratingProviderArgs);
-								setState(RatingState.RATED);
-							} catch (ActivityNotFoundException e) {
-								displayError(errorMessage);
-							} catch (InsufficientRatingArgumentsException e) {
-								// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
-								displayError(activityContext.getString(R.string.apptentive_rating_error));
-							} finally {
-								dismiss();
-							}
-						}
-
-						@SuppressLint("NewApi")
-						private void displayError(String message) {
-							final AlertDialog alertDialog = new AlertDialog.Builder(activityContext).create();
-							alertDialog.setTitle(activityContext.getString(R.string.apptentive_oops));
-							alertDialog.setMessage(message);
-							alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activityContext.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialogInterface, int i) {
-									alertDialog.dismiss();
-								}
-							});
-							alertDialog.show();
-						}
-					}
-			);
-
-			later.setOnClickListener(
-					new View.OnClickListener() {
-						public void onClick(View view) {
-							dismiss();
-							MetricModule.sendMetric(Event.EventLabel.rating_dialog__remind);
-							setState(RatingState.REMIND);
-							setStartOfRatingPeriod(new Date().getTime());
-						}
-					}
-			);
-
-			no.setOnClickListener(
-					new View.OnClickListener() {
-						public void onClick(View view) {
-							dismiss();
-							MetricModule.sendMetric(Event.EventLabel.rating_dialog__decline);
-							setState(RatingState.POSTPONE);
-						}
-					}
-			);
-
-			MetricModule.sendMetric(Event.EventLabel.rating_dialog__launch);
-			setCancelable(false);
-			super.show();
-		}
+		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(prefs), usesBeforePrompt, getEvents(prefs), significantEventsBeforePrompt));
 	}
 }

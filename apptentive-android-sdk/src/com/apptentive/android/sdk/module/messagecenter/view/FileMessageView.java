@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -56,14 +55,14 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 		if (newMessage == null) {
 			return;
 		}
-		StoredFile storedFile = newMessage.getStoredFile();
+		StoredFile storedFile = newMessage.getStoredFile(context);
 		if (storedFile == null || storedFile.getLocalFilePath() == null) {
 			return;
 		}
 
 		StoredFile oldStoredFile = null;
 		if (oldMessage != null) {
-			oldStoredFile = oldMessage.getStoredFile();
+			oldStoredFile = oldMessage.getStoredFile(context);
 		}
 
 		boolean hasNoOldFilePath = oldMessage == null || oldStoredFile.getLocalFilePath() == null;
@@ -115,7 +114,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 				FileInputStream fis = null;
 				final Bitmap imageBitmap;
 				try {
-					fis = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
+					fis = context.openFileInput(storedFile.getLocalFilePath());
 					Point point = Util.getScreenSize(context);
 					int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 					int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
@@ -148,7 +147,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 		Point ret = null;
 		FileInputStream fis = null;
 		try {
-			fis = Apptentive.getAppContext().openFileInput(storedFile.getLocalFilePath());
+			fis = context.openFileInput(storedFile.getLocalFilePath());
 
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;

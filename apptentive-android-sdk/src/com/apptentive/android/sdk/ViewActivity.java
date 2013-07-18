@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -19,7 +19,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
- * For internal use only. Used to launch Apptentive Feedback, Survey, and Message Center views.
+ * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
  * @author Sky Kelsey
  */
 public class ViewActivity extends ApptentiveActivity {
@@ -88,10 +88,10 @@ public class ViewActivity extends ApptentiveActivity {
 			case ABOUT:
 				break;
 			case SURVEY:
-				SurveyModule.getInstance().onBackPressed();
+				SurveyModule.getInstance().onBackPressed(this);
 				break;
 			case MESSAGE_CENTER:
-				ApptentiveMessageCenter.onBackPressed();
+				ApptentiveMessageCenter.onBackPressed(this);
 				break;
 			default:
 				break;

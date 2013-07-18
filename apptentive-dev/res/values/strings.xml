@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
 <resources>
-    <string name="app_name">Apptentive Dev App</string>
+    <string name="app_name">Apptentive Dev</string>
     <string name="button_feedback_text">Feedback</string>
     <string name="button_ratings_text">Rating</string>
     <string name="button_choice_text">Choice</string>

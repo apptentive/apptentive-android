@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
@@ -22,7 +21,7 @@ public class AppReleaseManager {
 
 	public static AppRelease storeAppReleaseAndReturnDiff(Context context) {
 		AppRelease original = getStoredAppRelease(context);
-		AppRelease current = generateCurrentAppRelease();
+		AppRelease current = generateCurrentAppRelease(context);
 		AppRelease diff = diffAppRelease(original, current);
 		if(diff != null) {
 			storeAppRelease(context, current);
@@ -31,10 +30,9 @@ public class AppReleaseManager {
 		return null;
 	}
 
-	private static AppRelease generateCurrentAppRelease() {
+	private static AppRelease generateCurrentAppRelease(Context context) {
 		AppRelease appRelease = new AppRelease();
 
-		Context context = Apptentive.getAppContext();
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);
@@ -87,28 +85,32 @@ public class AppReleaseManager {
 
 	/**
 	 * A convenience method.
-	 * @param old
-	 * @param newer
+	 *
 	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
 	 */
 	private static String chooseLatest(String old, String newer) {
-		if(old == null || old.equals("")) {
+		if (old == null || old.equals("")) {
 			old = null;
 		}
-		if(newer == null || newer.equals("")) {
+		if (newer == null || newer.equals("")) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
+		if (old != null && newer != null && !old.equals(newer)) {
 			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
+		if (old != null && newer == null) {
 			return "";
+		}
+
+		if (old == null && newer != null) {
+			return newer;
 		}
 
 		// Do nothing.
 		return null;
-	}}
+	}
+}

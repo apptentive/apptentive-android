@@ -6,8 +6,8 @@
 
 package com.apptentive.android.sdk.model;
 
+import android.content.Context;
 import android.content.res.Resources;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import org.json.JSONException;
@@ -50,18 +50,18 @@ public class AutomatedMessage extends TextMessage {
 		}
 	}
 
-	public static AutomatedMessage createWelcomeMessage() {
+	public static AutomatedMessage createWelcomeMessage(Context context) {
 		AutomatedMessage message = new AutomatedMessage();
-		Resources resources = Apptentive.getAppContext().getResources();
-		message.setTitle(resources.getString(R.string.apptentive_message_auto_title_manual));
+		Resources resources = context.getResources();
+		message.setTitle(resources.getString(R.string.apptentive_hi_there));
 		message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
 		return message;
 	}
 
-	public static AutomatedMessage createNoLoveMessage() {
+	public static AutomatedMessage createNoLoveMessage(Context context) {
 		AutomatedMessage message = new AutomatedMessage();
-		Resources resources = Apptentive.getAppContext().getResources();
-		message.setTitle(resources.getString(R.string.apptentive_message_auto_title_no_love));
+		Resources resources = context.getResources();
+		message.setTitle(resources.getString(R.string.apptentive_were_sorry));
 		message.setBody(resources.getString(R.string.apptentive_message_auto_body_no_love));
 		return message;
 	}

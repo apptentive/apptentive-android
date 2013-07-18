@@ -1,20 +1,9 @@
-
 # Android intermediate build artifacts
-apptentive-android-sdk/gen/*
-apptentive-android-sdk/out/*
-apptentive-dev/gen/*
-apptentive-dev/out/*
-apptentive-example/gen/*
-apptentive-example/out/*
-apptentive-example-alternate/gen/*
-apptentive-example-alternate/out/*
-out/*
+gen/
+out/
 
 # IntelliJ noise
-*.ipr
-*.iml
 *.iws
+*.ipr
 
-# My local stuff
-todo.txt
-apptentive-android-sdk/bin
+.DS_Store

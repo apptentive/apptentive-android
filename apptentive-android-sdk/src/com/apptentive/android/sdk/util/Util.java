@@ -117,9 +117,14 @@ public class Util {
 		return false;
 	}
 
+	public static int pixelsToDips(Context context, int px) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		return Math.round(px / scale);
+	}
+
 	public static int dipsToPixels(Context context, int dp) {
 		final float scale = context.getResources().getDisplayMetrics().density;
-		return ((int) (dp * scale + 0.5f));
+		return Math.round(dp * scale);
 	}
 
 	public static float dipsToPixelsFloat(Context context, int dp) {
@@ -154,10 +159,10 @@ public class Util {
 				return email;
 			}
 		}
-		return "";
+		return null;
 	}
 
-	public static String getEmail(Context context) {
+	private static String getEmail(Context context) {
 		AccountManager accountManager = AccountManager.get(context);
 		Account account = getAccount(accountManager);
 		if (account == null) {
@@ -173,7 +178,8 @@ public class Util {
 		try {
 			Account[] accounts = accountManager.getAccountsByType("com.google");
 			if (accounts.length > 0) {
-				account = accounts[0];
+				// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
+				account = accounts[accounts.length - 1];
 			}
 		} catch (VerifyError e) {
 			// Ignore here because the phone is on a pre API Level 5 SDK.
@@ -209,12 +215,24 @@ public class Util {
 		WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = windowManager.getDefaultDisplay();
 		// TODO: getWidth(), getHeight(), and getOrientation() are deprecated in API 13 in favor of getSize() and getRotation().
-		int orientation = display.getOrientation();
-		if(orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-			ret.set(display.getWidth(), display.getHeight());
-		} else {
-			ret.set(display.getHeight(), display.getWidth());
-		}
+		ret.set(display.getWidth(), display.getHeight());
 		return ret;
+	}
+
+	public static void printDebugInfo(Context context) {
+		// Print screen dimensions.
+		// Huawei Comet: Port: PX=240x320  DP=320x427, Land: PX=320x240 DP=427x320
+		// Galaxy Nexus: Port: PX=720x1184 DP=360x592, Land: PX=1196x720 DP=598x360
+		// Nexus 7:      Port: PX=800x1205 DP=601x905, Land: PX=1280x736 DP=962x553
+		Point point = Util.getScreenSize(context);
+		Log.e("Screen size: PX=%dx%d DP=%dx%d", point.x, point.y, Util.pixelsToDips(context, point.x), Util.pixelsToDips(context, point.y));
+	}
+
+	public static boolean isEmpty(String theString) {
+		return theString == null || theString.length() == 0;
+	}
+
+	public static boolean isEmailValid(String email) {
+		return email.matches("^[^\\s@]+@[^\\s@]+$");
 	}
 }
