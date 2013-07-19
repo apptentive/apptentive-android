@@ -14,19 +14,17 @@
     <string name="apptentive_you">You</string>
     <string name="apptentive_them">Them</string>
 	<string name="apptentive_oops">Oops!</string>
-    <string name="apptentive_nope">Nope.</string>
-    <string name="apptentive_send">Send.</string>
+    <string name="apptentive_send">Send</string>
     <string name="apptentive_hi_there">Hi There!</string>
-    <string name="apptentive_love_it">Love it!</string>
     <string name="apptentive_thanks">Thanks!</string>
-    <string name="apptentive_no_thanks">No thanks.</string>
-    <string name="apptentive_thank_you">Thank You!</string>
+    <string name="apptentive_no_thanks">No thanks</string>
+    <string name="apptentive_thank_you">Thank You</string>
     <string name="apptentive_were_sorry">We\'re Sorry!</string>
     <string name="apptentive_required">Required</string>
     <string name="apptentive_optional">Optional</string>
     <string name="apptentive_sending">Sending&#8230;</string>
 
-	<string name="apptentive_edittext_hint_email">Your Email</string>
+	<string name="apptentive_edittext_hint_email">Your Email Address</string>
 
     <string name="apptentive_feedback_powered_by_apptentive">Feedback Powered By Apptentive</string>
     <string name="apptentive_about_sdk">This application is using Apptentive in-app feedback service in order to listen to you more effectively.</string>
