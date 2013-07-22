@@ -30,7 +30,7 @@
                 android:background="@drawable/apptentive_dialog_negative_button"
                 android:textColor="@drawable/apptentive_dialog_negative_button_text"
                 android:textSize="@dimen/apptentive_text_medium"
-                android:text="@string/apptentive_nope"/>
+                android:text="@string/apptentive_no"/>
         <Button android:id="@+id/yes"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
@@ -39,6 +39,6 @@
                 android:background="@drawable/apptentive_dialog_positive_button"
                 android:textColor="@drawable/apptentive_dialog_positive_button_text"
                 android:textSize="@dimen/apptentive_text_medium"
-                android:text="@string/apptentive_love_it"/>
+                android:text="@string/apptentive_yes"/>
     </LinearLayout>
 </LinearLayout>

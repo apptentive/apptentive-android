@@ -24,6 +24,8 @@ public class SurveyDefinition extends JSONObject {
 	private static final String KEY_REQUIRED = "required";
 	private static final String KEY_VIEW_COUNT = "view_count";
 	private static final String KEY_VIEW_PERIOD = "view_period";
+	private static final String KEY_START_TIME = "start_time";
+	private static final String KEY_END_TIME = "end_time";
 	private static final String KEY_SUCCESS_MESSAGE = "success_message";
 	private static final String KEY_SHOW_SUCCESS_MESSAGE = "show_success_message";
 	private static final String KEY_TAGS = "tags";
@@ -95,6 +97,26 @@ public class SurveyDefinition extends JSONObject {
 		try {
 			if (!isNull(KEY_VIEW_PERIOD)) {
 				return getDouble(KEY_VIEW_PERIOD);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public String getStartTime() {
+		try {
+			if (!isNull(KEY_START_TIME)) {
+				return getString(KEY_START_TIME);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public String getEndTime() {
+		try {
+			if (!isNull(KEY_END_TIME)) {
+				return getString(KEY_END_TIME);
 			}
 		} catch (JSONException e) {
 		}

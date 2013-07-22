@@ -1,3 +1,74 @@
+2013--13 skykelsey v1.0.2
+---------------------------
+
+Updated localization strings.
+
+Bugs Fixed:
+
+* ANDROID-130 Lower part of message center is transparent.
+
+2013--13 skykelsey v1.0.2
+---------------------------
+
+Major changes:
+
+* Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active netrwork. App users can send messages and attach screenshots, and receive a reply in-app. If they shoose to specify an email address, they can also be contacted through email.
+
+2013--13 skykelsey v0.6.5
+---------------------------
+
+Bugs fixed:
+
+* Fix XML examples in README.
+* ANDROID-82 Populate the feedback source field with "enjoyment_dialog" when launched from the ratings prompt
+
+2013--13 skykelsey v0.6.4
+---------------------------
+
+Bugs Fixed:
+
+* ANDROID-114 Rating Dialog comes up twice.
+
+2013--13 skykelsey v0.6.3
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-112 Bug in rating flow.
+* ANDROID-113 Bug in rating flow.
+
+2012-12-14 skykelsey v0.6.2
+---------------------------
+
+Bugs fixed:
+
+* ANDROID-109 Google Play opens up on top of host application when rating app
+* ANDROID-110 Ratings prompt doesn't respect zero value settings.
+
+Added some tests as well.
+
+2012-10-10 skykelsey v0.6.1
+---------------------------
+
+ Bugs fixed:
+
+ * ANDROID-95 Come up with a new way to detect app starts and stops
+ * ANDROID-96 Crash on pre API 5 phones
+
+App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
+
+2013--13 skykelsey v0.6.0
+---------------------------
+
+* Added README.md
+* Testing work
+
+Bugs fixed:
+
+* ANDROID-95 Move to a queue and timer based solution instead of an event based one. Tear out the old stuff.
+* ANDROID-96 Fix two bugs. Add an android for a resource that needed it, and allow pre API level 5 devices to work.
+* ANDROID-97 Starting appes takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
+
 2012-09-13 skykelsey v0.5.2
 ---------------------------
 

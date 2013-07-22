@@ -12,12 +12,12 @@
     <style name="ApptentiveMainArea" parent="ApptentiveMainArea.Plain"/>
     <style name="ApptentiveMessageCenterDrawer" parent="ApptentiveMessageCenterDrawer.Plain"/>
 
-<!--
-    <style name="ApptentiveHeader" parent="ApptentiveHeader.Denim"/>
-    <style name="ApptentiveHeaderText" parent="ApptentiveHeaderText.Denim"/>
-    <style name="ApptentiveMainArea" parent="ApptentiveMainArea.Denim"/>
-    <style name="ApptentiveMessageCenterDrawer" parent="ApptentiveMessageCenterDrawer.Denim"/>
--->
+    <!--
+        <style name="ApptentiveHeader" parent="ApptentiveHeader.Denim"/>
+        <style name="ApptentiveHeaderText" parent="ApptentiveHeaderText.Denim"/>
+        <style name="ApptentiveMainArea" parent="ApptentiveMainArea.Denim"/>
+        <style name="ApptentiveMessageCenterDrawer" parent="ApptentiveMessageCenterDrawer.Denim"/>
+    -->
 
 
     <style name="ApptentiveHeader.Plain">

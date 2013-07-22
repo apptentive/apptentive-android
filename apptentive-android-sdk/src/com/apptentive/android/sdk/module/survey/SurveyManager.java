@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.survey;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.format.Time;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SurveyModule;
@@ -64,9 +65,9 @@ public class SurveyManager {
 			List<SurveyDefinition> surveyList = parseSurveysString(surveysString);
 			Iterator<SurveyDefinition> surveyIterator = surveyList.iterator();
 			while (surveyIterator.hasNext()) {
-				SurveyDefinition next =  surveyIterator.next();
+				SurveyDefinition next = surveyIterator.next();
 				// Filter out surveys that have met of exceeded the number of allowed displays per time period.
-				if(SurveyHistory.isSurveyLimitMet(context, next)) {
+				if (SurveyHistory.isSurveyLimitMet(context, next)) {
 					Log.d("Removing survey: " + next.getName());
 					surveyList.remove(next);
 				}
@@ -179,7 +180,7 @@ public class SurveyManager {
 			List<String> surveyTags = survey.getTags();
 			if (tags.length == 0) { // Case: Need untagged survey.
 				if (surveyTags == null || surveyTags.size() == 0) {
-					if(!SurveyHistory.isSurveyLimitMet(context, survey)) {
+					if (isSurveyValid(context, survey)) {
 						return survey;
 					}
 				}
@@ -187,7 +188,7 @@ public class SurveyManager {
 				if (surveyTags != null) {
 					for (String tag : tags) {
 						if (surveyTags.contains(tag)) {
-							if(!SurveyHistory.isSurveyLimitMet(context, survey)) {
+							if (isSurveyValid(context, survey)) {
 								return survey;
 							}
 						}
@@ -196,5 +197,30 @@ public class SurveyManager {
 			}
 		}
 		return null;
+	}
+
+	private static boolean isSurveyValid(Context context, SurveyDefinition survey) {
+		boolean expired = false;
+		String endTimeString = survey.getEndTime();
+		if (endTimeString != null) {
+			Time endTime = new Time();
+			try {
+				long now = System.currentTimeMillis();
+				Time currentTime = new Time();
+				currentTime.set(now);
+				Log.e("Current time: " + currentTime.format3339(false));
+				Log.e("End Time: " + currentTime.format3339(false));
+				endTime.parse3339(endTimeString);
+				long expirationTime = endTime.normalize(false);
+				if (expirationTime < System.currentTimeMillis()) {
+					expired = true;
+				}
+			} catch (NumberFormatException e) {
+				Log.w("Error parsing end time for survey: %s", e, survey.getId());
+			}
+		}
+		boolean ret =  !expired && !SurveyHistory.isSurveyLimitMet(context, survey);
+		Log.e("Survey is valid: " + ret);
+		return ret;
 	}
 }
