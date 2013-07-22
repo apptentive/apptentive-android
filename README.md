@@ -82,7 +82,9 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 
         <strong>&lt;!-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
             notified when the internet connection comes up, so we can handle sending and receiving message reliably -->
-        &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"/>
+        &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"
+                  android:theme="@style/Apptentive.Theme.Transparent"/>
+
         &lt;receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             &lt;intent-filter>
                 &lt;action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
