@@ -45,7 +45,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 		setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View view, MotionEvent motionEvent) {
-				if(getContext() instanceof Activity) {
+				if (getContext() instanceof Activity) {
 					Util.hideSoftKeyboard((Activity) getContext(), BaseSurveyQuestionView.this);
 				}
 				return false;
@@ -65,7 +65,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	protected void setInstructions(String instructionsText) {
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		FrameLayout topSeparator = (FrameLayout) findViewById(R.id.question_top_separater);
-		if(instructionsText != null && instructionsText.length() > 0) {
+		if (instructionsText != null && instructionsText.length() > 0) {
 			instructions.setText(instructionsText);
 			topSeparator.setVisibility(View.GONE);
 			instructions.setVisibility(View.VISIBLE);
@@ -91,12 +91,10 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	}
 
 	protected void updateValidationState() {
-		// Request focus so that any previously focused EditTexts do not regain focus after updating validation state.
-		requestFocus();
 		Resources resources = getContext().getResources();
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);
-		if(question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
+		if (question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
 			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_text_invalid));
 			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_background_invalid));
 			instructions.setTypeface(Typeface.DEFAULT_BOLD);

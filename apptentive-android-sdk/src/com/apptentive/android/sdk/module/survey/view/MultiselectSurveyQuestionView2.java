@@ -30,18 +30,20 @@ public class MultiselectSurveyQuestionView2 extends MultichoiceSurveyQuestionVie
 
 	/**
 	 * Override to change the behavior of clicking this.
+	 *
 	 * @param choice
 	 */
 	protected void choiceClicked(CheckboxChoice choice) {
 		choice.toggle();
 		Set<String> checkedChoices = new HashSet<String>();
 		for (String id : answersChoices.keySet()) {
-			if(answersChoices.get(id).isChecked()) {
+			if (answersChoices.get(id).isChecked()) {
 				checkedChoices.add(id);
 			}
 		}
 		SurveyModule.getInstance().getSurveyState().setAnswers(question.getId(), checkedChoices);
 		updateValidationState();
+		requestFocus();
 		fireListener();
 	}
 }

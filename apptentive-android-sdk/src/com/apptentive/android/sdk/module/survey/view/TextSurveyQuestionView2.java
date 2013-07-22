@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.survey.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -54,7 +55,7 @@ public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQu
 				Set<String> answers = state.getAnswers(questionId);
 				if (answers.isEmpty() || (!answers.isEmpty() && !answers.contains(editable.toString()))) {
 					state.clearAnswers(questionId);
-					if(editable.length() != 0) {
+					if (editable.length() != 0) {
 						state.addAnswer(questionId, editable.toString());
 					}
 					updateValidationState();
