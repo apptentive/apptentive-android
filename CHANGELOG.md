@@ -1,6 +1,15 @@
 2013--13 skykelsey v1.0.2
 ---------------------------
 
+Updated localization strings.
+
+Bugs Fixed:
+
+* ANDROID-130 Lower part of message center is transparent.
+
+2013--13 skykelsey v1.0.2
+---------------------------
+
 Major changes:
 
 * Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active netrwork. App users can send messages and attach screenshots, and receive a reply in-app. If they shoose to specify an email address, they can also be contacted through email.
