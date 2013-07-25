@@ -135,7 +135,7 @@ public class SurveyModule {
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
 					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle(context.getString(R.string.apptentive_survey_success_title));
+					builder.setTitle(context.getString(R.string.apptentive_thanks));
 					builder.setPositiveButton(context.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							cleanup();
