@@ -53,7 +53,7 @@ public class AutomatedMessage extends TextMessage {
 	public static AutomatedMessage createWelcomeMessage(Context context) {
 		AutomatedMessage message = new AutomatedMessage();
 		Resources resources = context.getResources();
-		message.setTitle(resources.getString(R.string.apptentive_hi_there));
+		message.setTitle(resources.getString(R.string.apptentive_give_feedback));
 		message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
 		return message;
 	}

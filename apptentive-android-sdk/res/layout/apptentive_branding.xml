@@ -28,6 +28,6 @@
 		          android:shadowDx="0"
 		          android:shadowDy="1"
 		          android:shadowRadius="1"
-                  android:text="@string/apptentive_feedback_powered_by_apptentive"/>
+                  android:text="@string/apptentive_powered_by_apptentive"/>
 	</LinearLayout>
 </FrameLayout>
