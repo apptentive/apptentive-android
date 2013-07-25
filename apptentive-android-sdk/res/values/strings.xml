@@ -15,18 +15,18 @@
     <string name="apptentive_them">Them</string>
     <string name="apptentive_oops">Oops!</string>
     <string name="apptentive_send">Send</string>
-    <string name="apptentive_hi_there">Hi There!</string>
+    <string name="apptentive_give_feedback">Give Feedback</string>
     <string name="apptentive_thanks">Thanks!</string>
     <string name="apptentive_no_thanks">No thanks</string>
     <string name="apptentive_thank_you">Thank You</string>
     <string name="apptentive_were_sorry">We\'re Sorry!</string>
     <string name="apptentive_required">Required</string>
     <string name="apptentive_optional">Optional</string>
-    <string name="apptentive_sending">Sending&#8230;</string>
+    <string name="apptentive_sending">Sending…</string>
 
     <string name="apptentive_edittext_hint_email">Your Email Address</string>
 
-    <string name="apptentive_feedback_powered_by_apptentive">Feedback Powered by Apptentive</string>
+    <string name="apptentive_powered_by_apptentive">Powered by Apptentive</string>
     <string name="apptentive_about_sdk">Apptentive is a feedback and communication service which allows the people who make this app to quickly get your feedback and better listen to you.</string>
     <string name="apptentive_about_privacy">Your feedback is hosted by Apptentive and is subject to Apptentive\'s <a href="http://www.apptentive.com/privacy">privacy policy</a> and your developer\'s privacy policy.</string>
     <string name="apptentive_about_apptentive_link">For more information, please visit <a href="http://www.apptentive.com">apptentive.com</a>.</string>
@@ -38,7 +38,7 @@
     <string name="apptentive_rating_remind">Remind Me Later</string>
     <string name="apptentive_rating_error">We\'re unable to find this app in the store. Please visit the store to find and rate it.</string>
 
-    <string name="apptentive_intro_dialog_title_no_love">We\'re sorry to hear that.</string>
+    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
     <string name="apptentive_intro_dialog_title_default">Thanks for your feedback!</string>
     <string name="apptentive_intro_dialog_body">Please let us know how to make %s better for you!</string>
     <string name="apptentive_intro_dialog_edittext_hint">Tell us how we can help. (required)</string>
@@ -51,19 +51,18 @@
     <string name="apptentive_dialog_email_validation_failed_body">Please enter a valid email address.</string>
 
     <string name="apptentive_survey_header">Survey</string>
-    <string name="apptentive_survey_singleline_hint">Enter an answer&#8230;</string>
+    <string name="apptentive_survey_singleline_hint">Enter an answer…</string>
     <string name="apptentive_survey_send_response">Send Response</string>
-    <string name="apptentive_survey_success_title">Survey Completed</string>
 
     <string name="apptentive_message_center_title">Message Center</string>
-    <string name="apptentive_message_center_compose_hint">Type a message&#8230;</string>
-    <string name="apptentive_message_center_attachment_title">Send attachment?</string>
+    <string name="apptentive_message_center_compose_hint">Type a message…</string>
+    <string name="apptentive_message_center_attachment_title">Send image?</string>
 
     <!-- This is a Java format. -->
     <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
 
     <string name="apptentive_message_auto_body_manual">This is our Message Center. If you have questions, suggestions, concerns, or just want to get in touch, please send us a message. We love talking with our customers!</string>
-    <string name="apptentive_message_auto_body_no_love">If you don\'t love this app, we\'ve done something wrong. We\'d love to hear from you. If you take a second to tell us why, we\'ll be able to improve it to suit your needs.</string>
+    <string name="apptentive_message_auto_body_no_love">What can we do to ensure that you love our app? We appreciate your constructive feedback.</string>
 
     <string name="apptentive_rating_provider_no_google_play">Google Play was not found. Please install Google Play before rating this app.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore was not found. Please install Amazon Appstore before rating this app.</string>
