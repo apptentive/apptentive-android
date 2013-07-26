@@ -10,7 +10,7 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:background="@drawable/apptentive_survey_dialog_background">
+              android:background="@drawable/apptentive_survey_background">
     <TextView android:id="@+id/title"
               android:layout_width="fill_parent"
               android:layout_height="64dp"

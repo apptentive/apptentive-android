@@ -98,7 +98,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_invalid));
 			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_invalid));
 			instructions.setTypeface(Typeface.DEFAULT_BOLD);
-			validationFrame.setBackgroundDrawable(resources.getDrawable(R.drawable.apptentive_survey_dialog_question_background_invalid));
+			validationFrame.setBackgroundDrawable(resources.getDrawable(R.drawable.apptentive_survey_question_background_invalid));
 		} else {
 			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_valid));
 			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_valid));
