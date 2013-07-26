@@ -91,9 +91,7 @@ public class SurveyModule {
 
 	public boolean isSurveyValid() {
 		for (Question question : surveyDefinition.getQuestions()) {
-			boolean required = question.isRequired();
-			boolean answered = surveyState.isQuestionValid(question);
-			if (required && !answered) {
+			if (!surveyState.isQuestionValid(question)) {
 				return false;
 			}
 		}
@@ -196,6 +194,8 @@ public class SurveyModule {
 		}
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
 		SurveyHistory.recordSurveyDisplay(activity, surveyDefinition.getId(), System.currentTimeMillis());
+
+		send.setEnabled(isSurveyValid());
 
 		// Force the top of the survey to be shown first.
 		title.requestFocus();
