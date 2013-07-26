@@ -223,15 +223,7 @@ public class Apptentive {
 	 * @return True if a survey was shown, else false.
 	 */
 	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
-		return SurveyManager.showSurvey(context, listener, false, tags);
-	}
-
-	public static boolean showSurveyDialog(Context context, OnSurveyFinishedListener listener) {
-		return SurveyManager.showSurvey(context, listener, true);
-	}
-
-	public static boolean showSurveyDialog(Context context, OnSurveyFinishedListener listener, String... tags) {
-		return SurveyManager.showSurvey(context, listener, true, tags);
+		return SurveyManager.showSurvey(context, listener, tags);
 	}
 
 	// ****************************************************************************************

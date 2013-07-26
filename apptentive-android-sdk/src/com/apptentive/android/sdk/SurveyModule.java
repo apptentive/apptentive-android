@@ -20,7 +20,6 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView2;
 import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView2;
-import com.apptentive.android.sdk.module.survey.view.SurveyDialog;
 import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView2;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
@@ -100,73 +99,6 @@ public class SurveyModule {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * Shows a survey embedded in a dialog.
-	 * @param context The Activity context from which this method is called.
-	 */
-	public void showSurveyAsDialog(final Context context, final SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
-		this.surveyDefinition = surveyDefinition;
-		this.surveyState = new SurveyState(surveyDefinition);
-		this.onSurveyFinishedListener = onSurveyFinishedListener;
-		data = new HashMap<String, String>();
-		data.put("id", surveyDefinition.getId());
-
-		final SurveyDialog dialog = new SurveyDialog(context, surveyDefinition);
-		SurveyDialog.OnActionPerformedListener listener = new SurveyDialog.OnActionPerformedListener() {
-			@Override
-			public void onAboutApptentiveButtonPressed() {
-				// TODO
-				Log.e("About button pressed.");
-			}
-
-			@Override
-			public void onSurveySubmitted() {
-				Log.e("Survey Submitted.");
-				Util.hideSoftKeyboard((Activity) context, dialog.getCurrentFocus());
-				MetricModule.sendMetric(context, Event.EventLabel.survey__submit, null, data);
-
-				getSurveyStore(context).addPayload(new SurveyResponse(surveyDefinition));
-
-				if(SurveyModule.this.onSurveyFinishedListener != null) {
-					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
-				}
-				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle(context.getString(R.string.apptentive_thanks));
-					builder.setPositiveButton(context.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialogInterface, int i) {
-							cleanup();
-						}
-					});
-					builder.show();
-				} else {
-					cleanup();
-				}
-
-				dialog.dismiss();
-			}
-
-			@Override
-			public void onSurveySkipped() {
-				dialog.dismiss();
-				if(SurveyModule.this.onSurveyFinishedListener != null) {
-					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
-				}
-			}
-
-			@Override
-			public void onQuestionAnswered(Question question) {
-				sendMetricForQuestion(context, question);
-			}
-		};
-		dialog.setOnActionPerformedListener(listener);
-
-		MetricModule.sendMetric(context, Event.EventLabel.survey__launch, null, data);
-		SurveyHistory.recordSurveyDisplay(context, surveyDefinition.getId(), System.currentTimeMillis());
-		dialog.show();
 	}
 
 	void doShow(final Activity activity) {

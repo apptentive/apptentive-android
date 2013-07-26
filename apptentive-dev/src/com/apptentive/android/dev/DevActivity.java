@@ -115,24 +115,6 @@ public class DevActivity extends ApptentiveActivity {
 		Apptentive.showMessageCenter(this);
 	}
 
-	public void showSurveyDialog(View view) {
-		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
-			public void onSurveyFinished(boolean completed) {
-				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
-			}
-		};
-
-		boolean ret;
-		if (selectedTag != null) {
-			ret = Apptentive.showSurveyDialog(this, listener, selectedTag);
-		} else {
-			ret = Apptentive.showSurveyDialog(this, listener);
-		}
-		if (!ret) {
-			Toast.makeText(this, "No matching survey found.", Toast.LENGTH_SHORT).show();
-		}
-	}
-
 	public void showSurvey(View view) {
 		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
 			public void onSurveyFinished(boolean completed) {

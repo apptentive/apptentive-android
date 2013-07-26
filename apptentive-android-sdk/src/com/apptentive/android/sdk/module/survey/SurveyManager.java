@@ -155,15 +155,11 @@ public class SurveyManager {
 		return surveyDefinition != null;
 	}
 
-	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, boolean useDialog, String... tags) {
+	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
 		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(context, tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
-			if(useDialog) {
-				SurveyModule.getInstance().showSurveyAsDialog(context, surveyDefinition, listener);
-			} else {
-				SurveyModule.getInstance().show(context, surveyDefinition, listener);
-			}
+			SurveyModule.getInstance().show(context, surveyDefinition, listener);
 			return true;
 		}
 		Log.d("No matching survey available.");
@@ -208,8 +204,6 @@ public class SurveyManager {
 				long now = System.currentTimeMillis();
 				Time currentTime = new Time();
 				currentTime.set(now);
-				Log.e("Current time: " + currentTime.format3339(false));
-				Log.e("End Time: " + currentTime.format3339(false));
 				endTime.parse3339(endTimeString);
 				long expirationTime = endTime.normalize(false);
 				if (expirationTime < System.currentTimeMillis()) {
@@ -219,8 +213,8 @@ public class SurveyManager {
 				Log.w("Error parsing end time for survey: %s", e, survey.getId());
 			}
 		}
-		boolean ret =  !expired && !SurveyHistory.isSurveyLimitMet(context, survey);
-		Log.e("Survey is valid: " + ret);
+		boolean ret = !expired && !SurveyHistory.isSurveyLimitMet(context, survey);
+		Log.d("Survey is valid: " + ret);
 		return ret;
 	}
 }
