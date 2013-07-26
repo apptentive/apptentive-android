@@ -55,11 +55,12 @@ public class SurveyState {
 		questionToAnswersMap.put(questionId, new HashSet<String>());
 	}
 
-	public boolean isAnswered(String questionId) {
+	public boolean isQuestionValid(Question question) {
+		String questionId = question.getId();
 		int min = questionToMinAnswersMap.get(questionId);
 		int max = questionToMaxAnswersMap.get(questionId);
 		int size = questionToAnswersMap.get(questionId).size();
-		return (min == -1 || size >= min) && (max == -1 || size <= max );
+		return (!question.isRequired() && size == 0) || (size >= min) && (size <= max );
 	}
 
 	public boolean isMetricSent(String questionId) {

@@ -31,11 +31,11 @@ public class MultichoiceQuestion extends BaseQuestion {
 	}
 
 	public int getMinSelections() {
-		return optInt(KEY_MIN_SELECTIONS, -1);
+		return optInt(KEY_MIN_SELECTIONS, 1);
 	}
 
 	public int getMaxSelections() {
-		return optInt(KEY_MAX_SELECTIONS, -1);
+		return optInt(KEY_MAX_SELECTIONS, 1);
 	}
 
 	public List<AnswerDefinition> getAnswerChoices() {

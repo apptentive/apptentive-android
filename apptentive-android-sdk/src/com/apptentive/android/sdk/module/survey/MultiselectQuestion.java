@@ -20,4 +20,12 @@ public class MultiselectQuestion extends MultichoiceQuestion {
 	public int getType() {
 		return QUESTION_TYPE_MULTISELECT;
 	}
+
+	public int getMinSelections() {
+		return optInt(KEY_MIN_SELECTIONS, 0);
+	}
+
+	public int getMaxSelections() {
+		return optInt(KEY_MAX_SELECTIONS, getAnswerChoices().size());
+	}
 }

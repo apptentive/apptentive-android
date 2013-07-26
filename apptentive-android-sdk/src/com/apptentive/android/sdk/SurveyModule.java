@@ -89,11 +89,10 @@ public class SurveyModule {
 		return this.surveyState;
 	}
 
-	public boolean isCompleted() {
+	public boolean isSurveyValid() {
 		for (Question question : surveyDefinition.getQuestions()) {
-			String questionId = question.getId();
 			boolean required = question.isRequired();
-			boolean answered = surveyState.isAnswered(questionId);
+			boolean answered = surveyState.isQuestionValid(question);
 			if (required && !answered) {
 				return false;
 			}
@@ -169,7 +168,7 @@ public class SurveyModule {
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(textQuestionView);
@@ -178,7 +177,7 @@ public class SurveyModule {
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multichoiceQuestionView);
@@ -187,7 +186,7 @@ public class SurveyModule {
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multiselectQuestionView);
@@ -204,7 +203,7 @@ public class SurveyModule {
 
 	void sendMetricForQuestion(Context context, Question question) {
 		String questionId = question.getId();
-		if(!surveyState.isMetricSent(questionId) && surveyState.isAnswered(questionId)) {
+		if(!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());

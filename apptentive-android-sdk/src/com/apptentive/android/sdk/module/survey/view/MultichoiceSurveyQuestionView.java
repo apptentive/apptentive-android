@@ -27,10 +27,12 @@ import java.util.*;
 public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> {
 
 	protected Map<String, CheckboxChoice> answersChoices;
+	protected Map<CheckboxChoice, String> answersChoicesReverse;
 
 	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
 		super(context, question);
 		answersChoices = new HashMap<String, CheckboxChoice>();
+		answersChoicesReverse = new HashMap<CheckboxChoice, String>();
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
@@ -60,6 +62,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				}
 			});
 			answersChoices.put(answerDefinition.getId(), choice);
+			answersChoicesReverse.put(choice, answerDefinition.getId());
 			choiceContainer.addView(choice);
 /*
 			if(i != answerDefinitions.size() - 1) {
@@ -79,10 +82,19 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	 * Override to change the behavior of clicking this.
 	 */
 	protected void choiceClicked(CheckboxChoice choice) {
-		if (countSelectedChoices() != 0) {
-			clearAllChoices();
+
+		String clickedId = answersChoicesReverse.get(choice);
+
+		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
+		boolean alreadyAnswered = answers != null && answers.contains(clickedId);
+		if (alreadyAnswered) {
+			choice.toggle();
+		} else {
+			if (countSelectedChoices() != 0) {
+				clearAllChoices();
+			}
+			choice.toggle();
 		}
-		choice.toggle();
 		Set<String> checkedChoices = new HashSet<String>();
 		for (String id : answersChoices.keySet()) {
 			if (answersChoices.get(id).isChecked()) {

@@ -94,7 +94,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		Resources resources = getContext().getResources();
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);
-		if (question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isAnswered(question.getId())) {
+		if (question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isQuestionValid(question)) {
 			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_text_invalid));
 			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_background_invalid));
 			instructions.setTypeface(Typeface.DEFAULT_BOLD);
