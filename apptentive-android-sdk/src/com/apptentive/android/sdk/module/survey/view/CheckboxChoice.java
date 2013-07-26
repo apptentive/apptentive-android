@@ -25,7 +25,7 @@ public class CheckboxChoice extends FrameLayout {
 		super(context);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_dialog_question_multichoice_choice, this);
+		inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
 
 		TextView text = (TextView) findViewById(R.id.choice_text);
 		checkbox = (CheckBox) findViewById(R.id.checkbox);

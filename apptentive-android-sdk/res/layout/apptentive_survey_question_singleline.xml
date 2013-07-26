@@ -15,7 +15,7 @@
               android:layout_height="wrap_content"
               android:paddingTop="16dp"
               android:paddingBottom="16dp"
-              android:textColor="@color/apptentive_survey_dialog_answer_text"
+              android:textColor="@color/apptentive_survey_answer_text"
               android:textSize="@dimen/apptentive_text_small"
               android:hint="@string/apptentive_survey_dialog_singleline_hint"
               android:background="@drawable/android_textfield_activated_holo_light"/>

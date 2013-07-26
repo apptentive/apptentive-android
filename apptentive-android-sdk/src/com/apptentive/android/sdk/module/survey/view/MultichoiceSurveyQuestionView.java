@@ -39,7 +39,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_dialog_question_multichoice, getAnswerContainer());
+		inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
 		LinearLayout choiceContainer = (LinearLayout) findViewById(R.id.choice_container);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
@@ -72,7 +72,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			if (i != answerDefinitions.size() - 1) {
 				FrameLayout sep = new FrameLayout(context);
 				sep.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 1));
-				sep.setBackgroundColor(context.getResources().getColor(R.color.apptentive_survey_dialog_question_separator));
+				sep.setBackgroundColor(context.getResources().getColor(R.color.apptentive_survey_question_separator));
 				choiceContainer.addView(sep);
 			}
 		}

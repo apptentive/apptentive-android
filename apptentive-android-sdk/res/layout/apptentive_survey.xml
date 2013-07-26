@@ -17,6 +17,6 @@
                  android:layout_height="wrap_content"
                  android:paddingTop="0dp"
                  android:paddingBottom="0dp">
-        <include layout="@layout/apptentive_survey_dialog_content"/>
+        <include layout="@layout/apptentive_survey_content"/>
     </FrameLayout>
 </ScrollView>

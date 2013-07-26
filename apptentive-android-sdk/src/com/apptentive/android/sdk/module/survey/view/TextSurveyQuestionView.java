@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.survey.view;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Rect;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -32,7 +31,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		super(context, question);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_dialog_question_singleline, getAnswerContainer());
+		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer());
 
 		String instructionsText = question.isRequired() ? context.getString(R.string.apptentive_required) : context.getString(R.string.apptentive_optional);
 		setInstructions(instructionsText);

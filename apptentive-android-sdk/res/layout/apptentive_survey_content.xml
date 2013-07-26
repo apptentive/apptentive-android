@@ -17,7 +17,7 @@
               android:gravity="center_vertical|left"
               android:paddingLeft="16dp"
               android:paddingRight="16dp"
-              android:textColor="@color/apptentive_survey_dialog_title_text"
+              android:textColor="@color/apptentive_survey_title_text"
               android:textStyle="bold"
               android:textSize="@dimen/apptentive_text_large"/>
     <LinearLayout android:layout_width="fill_parent"
@@ -26,14 +26,14 @@
                   android:gravity="center_vertical"
                   android:paddingLeft="16dp"
                   android:paddingRight="16dp"
-                  android:background="@color/apptentive_survey_dialog_content_background">
+                  android:background="@color/apptentive_survey_content_background">
         <TextView android:id="@+id/description"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center_vertical|left"
                   android:paddingTop="16dp"
                   android:textSize="@dimen/apptentive_text_medium"
-                  android:textColor="@color/apptentive_survey_dialog_question_instruction_text"/>
+                  android:textColor="@color/apptentive_survey_question_instruction_text"/>
         <LinearLayout android:id="@+id/questions"
                       android:layout_width="fill_parent"
                       android:layout_height="fill_parent"

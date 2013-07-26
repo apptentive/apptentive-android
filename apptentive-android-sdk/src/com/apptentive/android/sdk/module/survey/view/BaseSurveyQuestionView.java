@@ -41,7 +41,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		setFocusableInTouchMode(true);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_dialog_question_base, this);
+		inflater.inflate(R.layout.apptentive_survey_question_base, this);
 
 		setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -95,13 +95,13 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);
 		if (question != null && question.isRequired() && !SurveyModule.getInstance().getSurveyState().isQuestionValid(question)) {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_text_invalid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_background_invalid));
+			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_invalid));
+			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_invalid));
 			instructions.setTypeface(Typeface.DEFAULT_BOLD);
 			validationFrame.setBackgroundDrawable(resources.getDrawable(R.drawable.apptentive_survey_dialog_question_background_invalid));
 		} else {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_text_valid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_dialog_question_instruction_background_valid));
+			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_valid));
+			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_valid));
 			instructions.setTypeface(Typeface.DEFAULT);
 			validationFrame.setBackgroundColor(Color.TRANSPARENT);
 		}
