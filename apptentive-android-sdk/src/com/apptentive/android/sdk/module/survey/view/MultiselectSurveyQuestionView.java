@@ -16,12 +16,12 @@ import java.util.Set;
 /**
  * @author Sky Kelsey.
  */
-public class MultiselectSurveyQuestionView2 extends MultichoiceSurveyQuestionView2 {
+public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView {
 
 	protected int minSelections;
 	protected int maxSelections;
 
-	public MultiselectSurveyQuestionView2(Context context, MultiselectQuestion question) {
+	public MultiselectSurveyQuestionView(Context context, MultiselectQuestion question) {
 		super(context, question);
 		this.minSelections = question.getMinSelections();
 		this.maxSelections = question.getMaxSelections();

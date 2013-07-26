@@ -24,11 +24,11 @@ import java.util.*;
 /**
  * @author Sky Kelsey.
  */
-public class MultichoiceSurveyQuestionView2 extends BaseSurveyQuestionView<MultichoiceQuestion> {
+public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> {
 
 	protected Map<String, CheckboxChoice> answersChoices;
 
-	public MultichoiceSurveyQuestionView2(Context context, MultichoiceQuestion question) {
+	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
 		super(context, question);
 		answersChoices = new HashMap<String, CheckboxChoice>();
 
@@ -54,7 +54,7 @@ public class MultichoiceSurveyQuestionView2 extends BaseSurveyQuestionView<Multi
 			choice.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					if (getContext() instanceof Activity) {
-						Util.hideSoftKeyboard((Activity) getContext(), MultichoiceSurveyQuestionView2.this);
+						Util.hideSoftKeyboard((Activity) getContext(), MultichoiceSurveyQuestionView.this);
 					}
 					choiceClicked(choice);
 				}

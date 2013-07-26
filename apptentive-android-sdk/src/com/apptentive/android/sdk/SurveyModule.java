@@ -18,9 +18,9 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
-import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView2;
-import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView2;
-import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView2;
+import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -165,7 +165,7 @@ public class SurveyModule {
 		// Then render all the questions
 		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				TextSurveyQuestionView2 textQuestionView = new TextSurveyQuestionView2(activity, (SinglelineQuestion) question);
+				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
@@ -174,7 +174,7 @@ public class SurveyModule {
 				});
 				questions.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceSurveyQuestionView2 multichoiceQuestionView = new MultichoiceSurveyQuestionView2(activity, (MultichoiceQuestion) question);
+				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
@@ -183,7 +183,7 @@ public class SurveyModule {
 				});
 				questions.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectSurveyQuestionView2 multiselectQuestionView = new MultiselectSurveyQuestionView2(activity, (MultiselectQuestion) question);
+				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);

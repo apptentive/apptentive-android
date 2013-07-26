@@ -26,9 +26,9 @@ import java.util.Set;
 /**
  * @author Sky Kelsey.
  */
-public class TextSurveyQuestionView2 extends BaseSurveyQuestionView<SinglelineQuestion> {
+public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> {
 
-	public TextSurveyQuestionView2(Context context, final SinglelineQuestion question) {
+	public TextSurveyQuestionView(Context context, final SinglelineQuestion question) {
 		super(context, question);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
