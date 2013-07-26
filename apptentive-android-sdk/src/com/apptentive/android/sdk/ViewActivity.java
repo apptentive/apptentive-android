@@ -51,7 +51,7 @@ public class ViewActivity extends ApptentiveActivity {
 				ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);
 				contentView.removeAllViews();
 
-				inflater.inflate(R.layout.apptentive_survey, contentView);
+				setContentView(R.layout.apptentive_survey_dialog);
 
 				SurveyModule.getInstance().doShow(this);
 				break;

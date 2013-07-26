@@ -102,8 +102,6 @@ public class SurveyModule {
 	}
 
 	void doShow(final Activity activity) {
-		activity.setContentView(R.layout.apptentive_survey_dialog);
-
 		if (surveyDefinition == null) {
 			return;
 		}
