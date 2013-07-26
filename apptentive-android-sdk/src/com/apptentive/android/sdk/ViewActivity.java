@@ -10,8 +10,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
@@ -46,13 +44,6 @@ public class ViewActivity extends ApptentiveActivity {
 				AboutModule.getInstance().doShow(this);
 				break;
 			case SURVEY:
-				setContentView(R.layout.apptentive_activity);
-				LayoutInflater inflater = getLayoutInflater();
-				ViewGroup contentView = (ViewGroup) findViewById(R.id.apptentive_activity_content_view);
-				contentView.removeAllViews();
-
-				setContentView(R.layout.apptentive_survey_dialog);
-
 				SurveyModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
