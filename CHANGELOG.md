@@ -1,4 +1,4 @@
-2013-??-?? skykelsey current
+2013-??-?? skykelsey next
 ---------------------------
 
 Updated localization strings.
@@ -6,6 +6,7 @@ Updated localization strings.
 Bugs Fixed:
 
 * ANDROID-131 Survey clipping background.
+* ANDROID-132 Radio Version is not being set in Device object
 
 2013-07-19 skykelsey v1.0.3
 ---------------------------
