@@ -17,7 +17,8 @@
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
-                      android:paddingTop="8dp">
+                      android:paddingTop="8dp"
+                      android:paddingBottom="2dp">
             <TextView android:id="@+id/question_title"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
