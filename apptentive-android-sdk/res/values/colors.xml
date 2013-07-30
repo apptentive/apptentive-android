@@ -46,13 +46,14 @@
 
     <color name="apptentive_survey_background">#FFFFFF</color>
     <color name="apptentive_survey_title_text">#000000</color>
-    <color name="apptentive_survey_content_background">#E7E7E7</color>
+    <color name="apptentive_survey_separator">#56B8D8</color>
+    <color name="apptentive_survey_content_background">#D7D7D7</color>
     <color name="apptentive_survey_question_background">#FFFFFF</color>
     <color name="apptentive_survey_question_instruction_text">#000000</color>
-    <color name="apptentive_survey_question_instruction_text_valid">#668888</color>
-    <color name="apptentive_survey_question_instruction_background_valid">#E7F7F7</color>
+    <color name="apptentive_survey_question_instruction_text_valid">#56B8D8</color>
+    <color name="apptentive_survey_question_instruction_background_valid">#D6E9F0</color>
     <color name="apptentive_survey_question_instruction_text_invalid">#BB6F6F</color>
-    <color name="apptentive_survey_question_instruction_background_invalid">#FFF7F7</color>
+    <color name="apptentive_survey_question_instruction_background_invalid">#EEDDDD</color>
     <color name="apptentive_survey_question_text">#000000</color>
     <color name="apptentive_survey_question_answer_text">#000000</color>
     <color name="apptentive_survey_question_separator">#DDDDDD</color>
