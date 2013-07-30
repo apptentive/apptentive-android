@@ -1,3 +1,5 @@
+* ANDROID-132 Radio Version is not being set in Device object
+
 2013--13 skykelsey v1.0.2
 ---------------------------
 
