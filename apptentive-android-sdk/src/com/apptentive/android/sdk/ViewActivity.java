@@ -40,7 +40,6 @@ public class ViewActivity extends ApptentiveActivity {
 		super.onStart();
 		switch (activeModule) {
 			case ABOUT:
-				setContentView(R.layout.apptentive_about);
 				AboutModule.getInstance().doShow(this);
 				break;
 			case SURVEY:
@@ -77,6 +76,7 @@ public class ViewActivity extends ApptentiveActivity {
 	public void onBackPressed() {
 		switch(activeModule) {
 			case ABOUT:
+				AboutModule.getInstance().onBackPressed(this);
 				break;
 			case SURVEY:
 				SurveyModule.getInstance().onBackPressed(this);

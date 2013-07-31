@@ -16,6 +16,6 @@
                  android:layout_height="wrap_content"
                  android:paddingTop="@dimen/apptentive_activity_vertical_padding_360dp_land"
                  android:paddingBottom="@dimen/apptentive_activity_vertical_padding_360dp_land">
-        <include layout="@layout/apptentive_survey_content"/>
+        <include layout="@layout/apptentive_about_content"/>
     </FrameLayout>
 </ScrollView>

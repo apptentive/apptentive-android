@@ -42,9 +42,9 @@
     <color name="apptentive_dialog_button_positive_pressed_text">#000000</color>
     <color name="apptentive_dialog_button_positive_border_focused">#00769D</color>
 
-    <color name="apptentive_activity_background">#99000000</color>
+    <color name="apptentive_activity_frame">#99000000</color>
+    <color name="apptentive_activity_background">#FFFFFF</color>
 
-    <color name="apptentive_survey_background">#FFFFFF</color>
     <color name="apptentive_survey_title_text">#000000</color>
     <color name="apptentive_survey_separator">#56B8D8</color>
     <color name="apptentive_survey_content_background">#D7D7D7</color>
@@ -61,6 +61,11 @@
     <color name="apptentive_survey_footer_background">@android:color/transparent</color>
 
     <color name="apptentive_branding_text">#000000</color>
+
+    <color name="apptentive_about_title">#000000</color>
+    <color name="apptentive_about_text">#000000</color>
+    <color name="apptentive_about_link">#004444</color>
+    <color name="apptentive_about_version">#AAAAAA</color>
 
     <!-- TODO: Remove these colors, or do something better with them. -->
     <color name="apptentive_dark_blue">#FF2EA0E6</color>

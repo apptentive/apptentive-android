@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.survey;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.Time;
@@ -155,11 +156,11 @@ public class SurveyManager {
 		return surveyDefinition != null;
 	}
 
-	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
-		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(context, tags);
+	public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags) {
+		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(activity, tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
-			SurveyModule.getInstance().show(context, surveyDefinition, listener);
+			SurveyModule.getInstance().show(activity, surveyDefinition, listener);
 			return true;
 		}
 		Log.d("No matching survey available.");

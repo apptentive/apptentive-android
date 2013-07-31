@@ -72,7 +72,7 @@ public class SurveyModule {
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
-	public void show(Context context, SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
+	public void show(Activity activity, SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
 		this.surveyDefinition = surveyDefinition;
 		this.surveyState = new SurveyState(surveyDefinition);
 		this.onSurveyFinishedListener = onSurveyFinishedListener;
@@ -80,9 +80,10 @@ public class SurveyModule {
 		data.put("id", surveyDefinition.getId());
 
 		Intent intent = new Intent();
-		intent.setClass(context, ViewActivity.class);
+		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
-		context.startActivity(intent);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
 	public SurveyState getSurveyState() {
@@ -216,11 +217,13 @@ public class SurveyModule {
 		return Apptentive.getDatabase(context);
 	}
 
-	void onBackPressed(Context context) {
-		MetricModule.sendMetric(context, Event.EventLabel.survey__cancel, null, data);
+	void onBackPressed(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__cancel, null, data);
 		if(SurveyModule.this.onSurveyFinishedListener != null) {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}
 		cleanup();
+		activity.finish();
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 }

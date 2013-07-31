@@ -211,7 +211,7 @@ public class Apptentive {
 	 *             at least one tag.
 	 * @return True if a survey can be shown, else false.
 	 */
-	public static boolean isSurveyAvailableWithTags(Context context, String... tags) {
+	public static boolean isSurveyAvailable(Context context, String... tags) {
 		return SurveyManager.isSurveyAvailable(context, tags);
 	}
 
@@ -222,8 +222,8 @@ public class Apptentive {
 	 * @param tags An optional array of tags that correspond to tags applied to the surveys you create on www.apptentive.com.
 	 * @return True if a survey was shown, else false.
 	 */
-	public static boolean showSurvey(Context context, OnSurveyFinishedListener listener, String... tags) {
-		return SurveyManager.showSurvey(context, listener, tags);
+	public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags) {
+		return SurveyManager.showSurvey(activity, listener, tags);
 	}
 
 	// ****************************************************************************************

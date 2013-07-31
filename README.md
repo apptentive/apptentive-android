@@ -171,24 +171,25 @@ Do this in your main Activity's onCreate() method:
 </code></pre>
 
 ### Survey
-Surveys currently require a fetch and then show operation. The easiest way to show a survey is to pass a listener into
-the survey fetch method, and then show a survey when the listener gets a callback. You can also pass a listener into the
-survey show method, and be notified of successful survey completions.
+Surveys are fetched from the server when the app starts, so you don't ahve to worry about managing them. To show a
+survey, simply call <code>Apptentive.showSurvey()</code>. You can optionally passing in a set of tags to match against. Tags are defined
+when you create a survey on www.apptentive.com. You can also pass in a listener, and be notified when the user submits
+or skips a survey.
 
-<pre><code>Apptentive.getSurveyModule().fetchSurvey(new OnSurveyFetchedListener() {
-    public void onSurveyFetched(final boolean success) {
-        Apptentive.getSurveyModule().show(this, new OnSurveyCompletedListener() {
-            public void onSurveyCompletedListener() {
-                // Code that runs when the survey was successfully completed.
-            }
-        });
+<pre><code>Apptentive.showSurvey(this,
+  new OnSurveyCompletedListener() {
+    public void onSurveyCompletedListener() {
+      // Code that runs when the survey was successfully completed.
     }
+  });
 });
 </code></pre>
 
+To first check to see if a survey can be shown, call <code>Apptentive.isSurveyAvailable()</code>.
+
 ##4. Extra configuration (Optional)
 
-These steps must all be performed in your main Activity's **onCreate()** method.
+These steps must all be performed in your main Activity's **<code>onCreate()</code>** method.
 
 #### Support for Amazon Appstore (Optional)
 

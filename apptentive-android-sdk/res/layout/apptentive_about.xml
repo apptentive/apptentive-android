@@ -6,61 +6,16 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical">
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:gravity="center"
-                  android:background="@drawable/apptentive_message_center_header_denim">
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:gravity="center"
-                  android:paddingTop="8dp"
-                  android:paddingBottom="8dp"
-                  android:textSize="24sp"
-                  android:textStyle="bold"
-                  android:textColor="@android:color/white"
-                  android:shadowColor="#000000"
-                  android:shadowDx="0"
-                  android:shadowDy="-1"
-                  android:shadowRadius="1"
-                  android:drawableLeft="@drawable/apptentive_icon_small"
-                  android:drawablePadding="5dp"
-                  android:text="Apptentive"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:orientation="vertical"
-                  android:background="@drawable/apptentive_message_center_background_denim">
-        <TextView android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:paddingTop="10dp"
-                  android:paddingLeft="30dp"
-                  android:paddingRight="30dp"
-                  android:textSize="7pt"
-                  android:textColor="#000000"
-                  android:text="@string/apptentive_about_sdk"/>
-        <TextView android:id="@+id/apptentive_about_privacy"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:paddingTop="10dp"
-                  android:paddingLeft="30dp"
-                  android:paddingRight="30dp"
-                  android:textColor="#004444"
-                  android:textSize="6pt"
-                  android:textStyle="bold"
-                  android:text="@string/apptentive_about_privacy"/>
-        <TextView android:id="@+id/apptentive_about_more_information"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:paddingTop="10dp"
-                  android:paddingLeft="30dp"
-                  android:paddingRight="30dp"
-                  android:textColor="#004444"
-                  android:textSize="6pt"
-                  android:textStyle="bold"
-                  android:text="@string/apptentive_about_apptentive_link"/>
-    </LinearLayout>
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingLeft="@dimen/apptentive_activity_side_padding"
+            android:paddingRight="@dimen/apptentive_activity_side_padding"
+            android:fadingEdge="none">
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+                 android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
+        <include layout="@layout/apptentive_about_content"/>
+    </FrameLayout>
+</ScrollView>

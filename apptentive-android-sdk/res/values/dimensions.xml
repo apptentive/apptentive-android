@@ -12,4 +12,20 @@
     <dimen name="apptentive_text_small">14sp</dimen>
     <dimen name="apptentive_text_small_tiny">12sp</dimen>
     <dimen name="apptentive_text_tiny">10sp</dimen>
+
+    <dimen name="apptentive_activity_side_padding">0dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
+
+    <dimen name="apptentive_activity_side_padding_360dp_land">96dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding_360dp_land">16dp</dimen>
+
+    <dimen name="apptentive_activity_side_padding_360dp_port">16dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding_360dp_port">16dp</dimen>
+
+    <dimen name="apptentive_activity_side_padding_600dp_land">192dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding_600dp_land">16dp</dimen>
+
+    <dimen name="apptentive_activity_side_padding_600dp_port">48dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding_600dp_port">16dp</dimen>
+
 </resources>
