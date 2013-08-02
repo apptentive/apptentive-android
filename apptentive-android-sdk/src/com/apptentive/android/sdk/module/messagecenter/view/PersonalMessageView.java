@@ -58,7 +58,7 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		String name = message.getSenderUsername();
 		if (name == null || name.equals("")) {
 			Resources resources = context.getResources();
-			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_them);
+			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_developer);
 		}
 		nameView.setText(name);
 
