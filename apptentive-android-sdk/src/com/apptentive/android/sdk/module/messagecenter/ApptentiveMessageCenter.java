@@ -53,6 +53,7 @@ public class ApptentiveMessageCenter {
 			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
 			activity.startActivity(intent);
+			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		}
 	}
 
@@ -247,8 +248,11 @@ public class ApptentiveMessageCenter {
 		pollForMessages = false;
 	}
 
-	public static void onBackPressed(Context context) {
-		MetricModule.sendMetric(context, Event.EventLabel.message_center__close);
+	public static void onBackPressed(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
+		activity.finish();
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+
 	}
 
 	enum Trigger {
