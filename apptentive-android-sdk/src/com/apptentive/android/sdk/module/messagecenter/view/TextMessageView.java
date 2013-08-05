@@ -34,6 +34,5 @@ public class TextMessageView extends PersonalMessageView<TextMessage> {
 		// Set content
 		TextView textView = (TextView) findViewById(R.id.apptentive_text_message_text);
 		textView.setText(newMessage.getBody());
-//		invalidate();
 	}
 }
