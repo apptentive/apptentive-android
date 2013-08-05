@@ -9,7 +9,8 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.text.method.LinkMovementMethod;
+import android.net.Uri;
+import android.view.View;
 import android.widget.TextView;
 
 /**
@@ -48,9 +49,22 @@ public class AboutModule {
 	}
 
 	void doShow(final Activity activity) {
-		TextView information = (TextView) activity.findViewById(R.id.apptentive_about_more_information);
-		information.setMovementMethod(LinkMovementMethod.getInstance());
-		TextView privacy = (TextView) activity.findViewById(R.id.apptentive_about_privacy);
-		privacy.setMovementMethod(LinkMovementMethod.getInstance());
+		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
+		information.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com"));
+				activity.startActivity(browserIntent);
+			}
+		});
+
+		TextView privacy = (TextView) activity.findViewById(R.id.privacy_link);
+		privacy.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com/privacy"));
+				activity.startActivity(browserIntent);
+			}
+		});
 	}
 }

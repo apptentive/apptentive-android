@@ -41,8 +41,8 @@
                   android:paddingRight="30dp"
                   android:textSize="7pt"
                   android:textColor="#000000"
-                  android:text="@string/apptentive_about_sdk"/>
-        <TextView android:id="@+id/apptentive_about_privacy"
+                  android:text="@string/apptentive_about_description"/>
+        <TextView android:id="@+id/about_description_link"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:paddingTop="10dp"
@@ -51,8 +51,16 @@
                   android:textColor="#004444"
                   android:textSize="6pt"
                   android:textStyle="bold"
+                  android:text="@string/apptentive_about_description_link"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:paddingTop="10dp"
+                  android:paddingLeft="30dp"
+                  android:paddingRight="30dp"
+                  android:textSize="7pt"
+                  android:textColor="#000000"
                   android:text="@string/apptentive_about_privacy"/>
-        <TextView android:id="@+id/apptentive_about_more_information"
+        <TextView android:id="@+id/privacy_link"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:paddingTop="10dp"
@@ -61,6 +69,6 @@
                   android:textColor="#004444"
                   android:textSize="6pt"
                   android:textStyle="bold"
-                  android:text="@string/apptentive_about_apptentive_link"/>
+                  android:text="@string/apptentive_about_privacy_link"/>
     </LinearLayout>
 </LinearLayout>

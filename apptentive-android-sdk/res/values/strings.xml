@@ -12,7 +12,7 @@
     <string name="apptentive_no">No</string>
     <string name="apptentive_skip">Skip</string>
     <string name="apptentive_you">You</string>
-    <string name="apptentive_them">Them</string>
+    <string name="apptentive_developer">Developer</string>
     <string name="apptentive_oops">Oops!</string>
     <string name="apptentive_send">Send</string>
     <string name="apptentive_give_feedback">Give Feedback</string>
@@ -23,13 +23,16 @@
     <string name="apptentive_required">Required</string>
     <string name="apptentive_optional">Optional</string>
     <string name="apptentive_sending">Sending…</string>
+    <string name="apptentive_version">Apptentive Version %s</string>
 
     <string name="apptentive_edittext_hint_email">Your Email Address</string>
 
     <string name="apptentive_powered_by_apptentive">Powered by Apptentive</string>
-    <string name="apptentive_about_sdk">Apptentive is a feedback and communication service which allows the people who make this app to quickly get your feedback and better listen to you.</string>
-    <string name="apptentive_about_privacy">Your feedback is hosted by Apptentive and is subject to Apptentive\'s <a href="http://www.apptentive.com/privacy">privacy policy</a> and your developer\'s privacy policy.</string>
-    <string name="apptentive_about_apptentive_link">For more information, please visit <a href="http://www.apptentive.com">apptentive.com</a>.</string>
+    <string name="apptentive_about_title">About Apptentive</string>
+    <string name="apptentive_about_description">Apptentive is a feedback and communication service which allows the people who make this app to quickly get your feedback and better listen to you.</string>
+    <string name="apptentive_about_description_link">Find out more at apptentive.com</string>
+    <string name="apptentive_about_privacy">Your feedback is hosted by Apptentive and is subject to Apptentive\'s privacy policy and the privacy policy of the developer of this app.</string>
+    <string name="apptentive_about_privacy_link">Visit Apptentive\'s Privacy Policy</string>
 
     <string name="apptentive_do_you_love_this_app">Do you love %s?</string>
 
