@@ -36,7 +36,7 @@
                   android:textSize="@dimen/apptentive_text_medium"
                   android:textColor="@color/apptentive_about_text"
                   android:text="@string/apptentive_about_description"/>
-        <TextView android:id="@+id/apptentive_about_link"
+        <TextView android:id="@+id/about_description_link"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center"
@@ -51,7 +51,7 @@
                   android:textColor="@color/apptentive_about_text"
                   android:textSize="@dimen/apptentive_text_medium"
                   android:text="@string/apptentive_about_privacy"/>
-        <TextView android:id="@+id/apptentive_about_privacy_link"
+        <TextView android:id="@+id/privacy_link"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:gravity="center"
