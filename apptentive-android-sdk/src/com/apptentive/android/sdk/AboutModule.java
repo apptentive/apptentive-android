@@ -52,7 +52,7 @@ public class AboutModule {
 	void doShow(final Activity activity) {
 		activity.setContentView(R.layout.apptentive_about);
 
-		TextView information = (TextView) activity.findViewById(R.id.apptentive_about_link);
+		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
 		information.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -61,7 +61,7 @@ public class AboutModule {
 			}
 		});
 
-		TextView privacy = (TextView) activity.findViewById(R.id.apptentive_about_privacy_link);
+		TextView privacy = (TextView) activity.findViewById(R.id.privacy_link);
 		privacy.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
