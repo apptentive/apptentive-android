@@ -26,8 +26,8 @@
   <string name="apptentive_about_privacy">I tuoi commenti sono raccolti da Apptentive e sono soggetti all\'Informativa sulla privacy di Apptentive e all\'Informativa sulla privacy dello sviluppatore di questa app.</string>
   <string name="apptentive_about_privacy_link">Consulta l\'Informativa sulla privacy di Apptentive</string>
   <string name="apptentive_do_you_love_this_app">Adori %s?</string>
-  <string name="apptentive_rating_message_fs">Siamo veramente contenti di sapere che adori %s! Ti saremmo infinitamente grati se volessi valutarci. Ti ringraziamo per il tempo che ci hai dedicato.</string>
-  <string name="apptentive_rate_this_app">Valuta %s</string>
+  <string name="apptentive_rating_message_fs">Siamo veramente contenti di sapere che adori %s! Ti saremmo infinitamente grati se volessi classificarci. Ti ringraziamo per il tempo che ci hai dedicato.</string>
+  <string name="apptentive_rate_this_app">Classifica %s</string>
   <string name="apptentive_rating_remind">Visualizza in seguito</string>
   <string name="apptentive_rating_error">Non è possibile trovare questa app nello store. Visita lo store per trovarla e valutarla.</string>
   <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
@@ -48,7 +48,7 @@
   <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
   <string name="apptentive_message_auto_body_manual">Questo è il nostro Centro messaggi. Se hai domande, dubbi, suggerimenti o desideri semplicemente contattarci, inviaci un messaggio. Siamo lieti di parlare con i nostri clienti!</string>
   <string name="apptentive_message_auto_body_no_love">Che cosa possiamo fare affinché tu possa apprezzare al meglio la nostra app? Contiamo sui tuoi preziosi commenti.</string>
-  <string name="apptentive_rating_provider_no_google_play">Google Play non trovato. Installa Google Play prima di valutare questa app.</string>
-  <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore non trovato. Installa Amazon Appstore prima di valutare questa app.</string>
-  <string name="apptentive_rating_provider_no_mikandi">MiKandi Market non trovato. Installa MiKandi Market prima di valutare questa app.</string>
+  <string name="apptentive_rating_provider_no_google_play">Google Play non trovato. Installa Google Play prima di classificare questa app.</string>
+  <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore non trovato. Installa Amazon Appstore prima di classificare questa app.</string>
+  <string name="apptentive_rating_provider_no_mikandi">MiKandi Market non trovato. Installa MiKandi Market prima di classificare questa app.</string>
 </resources>
