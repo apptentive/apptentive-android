@@ -16,7 +16,7 @@
   <string name="apptentive_were_sorry">很抱歉！</string>
   <string name="apptentive_required">必填</string>
   <string name="apptentive_optional">選填</string>
-  <string name="apptentive_sending">正在傳送......</string>
+  <string name="apptentive_sending">正在傳送……</string>
   <string name="apptentive_version">Apptentive 版本%s</string>
   <string name="apptentive_edittext_hint_email">您的電子郵件</string>
   <string name="apptentive_powered_by_apptentive">由 Apptentive 提供</string>
@@ -40,10 +40,10 @@
   <string name="apptentive_dialog_email_validation_failed_title">無效的電子郵件地址</string>
   <string name="apptentive_dialog_email_validation_failed_body">請輸入一個有效的電子郵件地址。</string>
   <string name="apptentive_survey_header">調查</string>
-  <string name="apptentive_survey_singleline_hint">請輸入回答......</string>
+  <string name="apptentive_survey_singleline_hint">請輸入回答……</string>
   <string name="apptentive_survey_send_response">傳送回應</string>
   <string name="apptentive_message_center_title">訊息中心</string>
-  <string name="apptentive_message_center_compose_hint">輸入一條訊息......</string>
+  <string name="apptentive_message_center_compose_hint">輸入一條訊息……</string>
   <string name="apptentive_message_center_attachment_title">傳送圖像嗎？</string>
   <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
   <string name="apptentive_message_auto_body_manual">這是我們的訊息中心。若您有任何問題、建議、疑慮或只是想與我們聯絡，請留言給我們。我們熱愛與我們的客戶互動！</string>
