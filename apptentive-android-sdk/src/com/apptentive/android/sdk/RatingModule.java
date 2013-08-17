@@ -81,19 +81,19 @@ public class RatingModule {
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		return now > periodEnd;
+		return days != 0 && now > periodEnd;
 	}
 
 	private boolean eventThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
-		return getEvents(prefs) >= significantEventsBeforePrompt;
+		return significantEventsBeforePrompt != 0 && getEvents(prefs) >= significantEventsBeforePrompt;
 	}
 
 	private boolean usesThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
-		return getUses(prefs) >= usesBeforePrompt;
+		return usesBeforePrompt != 0 && getUses(prefs) >= usesBeforePrompt;
 	}
 
 	private long getStartOfRatingPeriod(SharedPreferences prefs) {
@@ -452,7 +452,7 @@ public class RatingModule {
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		boolean elapsed = now > periodEnd;
+		boolean elapsed = days != 0 && now > periodEnd;
 
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
