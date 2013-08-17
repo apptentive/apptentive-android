@@ -1,6 +1,15 @@
-* ANDROID-132 Radio Version is not being set in Device object
+2013-08-16 skykelsey 1.0.4
+---------------------------
 
-2013--13 skykelsey v1.0.2
+Updated localization strings.
+
+Bugs Fixed:
+
+* ANDROID-131 Survey clipping background.
+* ANDROID-132 Radio Version is not being set in Device object
+* ANDROID-134 Rating logic does not respect 0 values
+
+2013-07-19 skykelsey 1.0.3
 ---------------------------
 
 Updated localization strings.
@@ -9,14 +18,14 @@ Bugs Fixed:
 
 * ANDROID-130 Lower part of message center is transparent.
 
-2013--13 skykelsey v1.0.2
+2013-06-28 skykelsey 1.0.2
 ---------------------------
 
 Major changes:
 
 * Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active netrwork. App users can send messages and attach screenshots, and receive a reply in-app. If they shoose to specify an email address, they can also be contacted through email.
 
-2013--13 skykelsey v0.6.5
+2013-04-10 skykelsey v0.6.5
 ---------------------------
 
 Bugs fixed:
@@ -31,7 +40,7 @@ Bugs Fixed:
 
 * ANDROID-114 Rating Dialog comes up twice.
 
-2013--13 skykelsey v0.6.3
+2012-12-18 skykelsey v0.6.3
 ---------------------------
 
 Bugs fixed:
@@ -59,7 +68,7 @@ Added some tests as well.
 
 App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
 
-2013--13 skykelsey v0.6.0
+2012-10-10 skykelsey v0.6.0
 ---------------------------
 
 * Added README.md
