@@ -205,7 +205,7 @@ public class RatingModule {
 	/**
 	 * Internal use only.
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
-	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
+	 * It will be called automatically if the user chooses "Yes" in the "Are you enjoying this app?" dialog.
 	 *
 	 * @param activity The activity from which this method was called.
 	 */
