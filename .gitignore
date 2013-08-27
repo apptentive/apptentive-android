@@ -1,6 +1,7 @@
 # Android intermediate build artifacts
 gen/
 out/
+bin/
 
 # IntelliJ noise
 *.iws
