@@ -1,9 +1,9 @@
-# Android intermediate build artifacts
+.DS_Store
+
+# Android
 gen/
 out/
 
-# IntelliJ noise
+# IntelliJ
 *.iws
 *.ipr
-
-.DS_Store
