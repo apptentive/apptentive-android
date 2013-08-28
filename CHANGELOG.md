@@ -1,6 +1,10 @@
 2013-??-?? skykelsey next
 ---------------------------
 
+Major changes:
+
+* Added abiltity to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
+
 2013-08-16 skykelsey 1.0.4
 ---------------------------
 
