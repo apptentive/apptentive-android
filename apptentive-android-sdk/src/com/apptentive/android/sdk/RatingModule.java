@@ -63,7 +63,6 @@ public class RatingModule {
 
 	private RatingModule() {
 		ratingProviderArgs = new HashMap<String, String>();
-		ratingProviderArgs.put("name", GlobalInfo.appDisplayName);
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
@@ -178,7 +177,8 @@ public class RatingModule {
 	void showEnjoymentDialog(final Activity activity, Trigger reason) {
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final EnjoymentDialog dialog = new EnjoymentDialog(activity);
-		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), GlobalInfo.appDisplayName);
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
+		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), appDisplayName);
 		dialog.setTitle(title);
 		dialog.setCancelable(false);
 
@@ -213,8 +213,9 @@ public class RatingModule {
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final RatingDialog dialog = new RatingDialog(activity);
 
-		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, GlobalInfo.appDisplayName));
-		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, GlobalInfo.appDisplayName));
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
+		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, appDisplayName));
+		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, appDisplayName));
 
 		dialog.setOnChoiceMadeListener(new RatingDialog.OnChoiceMadeListener() {
 			@Override
@@ -229,7 +230,12 @@ public class RatingModule {
 						RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
 					}
 					errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activity);
-					RatingModule.this.selectedRatingProvider.startRating(activity, RatingModule.this.ratingProviderArgs);
+
+					String appDisplayName = Configuration.load(activity).getAppDisplayName();
+					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(RatingModule.this.ratingProviderArgs);
+					finalRatingProviderArgs.put("name", appDisplayName);
+
+					RatingModule.this.selectedRatingProvider.startRating(activity, finalRatingProviderArgs);
 					setState(prefs, RatingState.RATED);
 				} catch (ActivityNotFoundException e) {
 					displayError(errorMessage);
