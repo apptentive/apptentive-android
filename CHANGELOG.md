@@ -1,14 +1,18 @@
 2013-??-?? skykelsey next
 ---------------------------
 
+2013-08-16 skykelsey 1.0.4
+---------------------------
+
 Updated localization strings.
 
 Bugs Fixed:
 
 * ANDROID-131 Survey clipping background.
 * ANDROID-132 Radio Version is not being set in Device object
+* ANDROID-134 Rating logic does not respect 0 values
 
-2013-07-19 skykelsey v1.0.3
+2013-07-19 skykelsey 1.0.3
 ---------------------------
 
 Updated localization strings.
@@ -17,7 +21,7 @@ Bugs Fixed:
 
 * ANDROID-130 Lower part of message center is transparent.
 
-2013-06-28 skykelsey v1.0.2
+2013-06-28 skykelsey 1.0.2
 ---------------------------
 
 Major changes:

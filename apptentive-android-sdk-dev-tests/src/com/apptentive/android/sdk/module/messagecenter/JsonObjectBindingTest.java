@@ -26,33 +26,48 @@ public class JsonObjectBindingTest extends TestCase {
 	}
 
 	public void testParsingTextMessageResponse() {
-		String exampleResponse = "{\"messages\":[{\"id\":\"507c6c270aa2420005000006\",\"created_at\":1350331427.0,\"type\":\"text_message\",\"body\":\"test\",\"display\":\"message_center\",\"sender_id\":\"507c6c0c0aa242000e000001\",\"app_id\":\"4de48c13668800000100000c\"},{\"id\":\"507c70650aa2420005000007\",\"created_at\":1350332511.0,\"type\":\"text_message\",\"body\":\"more\",\"display\":\"message_center\",\"sender_id\":\"507c6c0c0aa242000e000001\",\"app_id\":\"4de48c13668800000100000c\"},{\"id\":\"507c70670aa242000b000001\",\"created_at\":1350332516.0,\"type\":\"text_message\",\"body\":\"blah\",\"display\":\"message_center\",\"sender_id\":\"507c6c0c0aa242000e000001\",\"app_id\":\"4de48c13668800000100000c\"}],\"location\":null}";
+		String exampleResponse = "{\"items\":[{\"id\":\"520a86f24712c76b7000000d\",\"nonce\":\"520a74bf4712c76b700000044de48b8266880000010000071376421617273\",\"type\":\"TextMessage\",\"created_at\":1376421618.004,\"sender\":{\"name\":\"Sky Kelsey\",\"id\":\"4de48b826688000001000007\",\"profile_photo\":\"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"},\"body\":\"Test reply via website.\"},{\"id\":\"520a84fe4712c71b65000005\",\"nonce\":\"33b042735704283c0407f22e6d6f8c6fcb0d2f073bf964f76d36ef176ec26472\",\"type\":\"TextMessage\",\"client_created_at\":1376421112.0,\"client_created_at_utc_offset\":-25200,\"created_at\":1376421118.499,\"sender\":{\"name\":\"Sky Kelsey\",\"id\":\"4de48b826688000001000007\",\"profile_photo\":\"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"},\"body\":\"Test reply via email.\"},{\"id\":\"520a75ac4712c7b622000009\",\"nonce\":\"8f2271b4-db04-48a8-b99c-404048f5f7a6\",\"type\":\"FileMessage\",\"client_created_at\":1376417178.828,\"client_created_at_utc_offset\":-25200,\"created_at\":1376417196.878,\"sender\":{\"name\":null,\"id\":\"520a74bf4712c76b70000005\",\"profile_photo\":\"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"},\"url\":\"https://s3.amazonaws.com/apptentive_staging/520a75ac4712c7b622000009?AWSAccessKeyId=1FG0SNS81VAX9NRE5M02&Expires=1376425813&Signature=6iHjtR0sJ8z%2BVmW1Z3pmyQKBm5w%3D\",\"content_type\":\"image/jpeg\",\"icon_url\":\"https://s3.amazonaws.com/apptentive_staging/520a75ac4712c7b622000009?AWSAccessKeyId=1FG0SNS81VAX9NRE5M02&Expires=1376425813&Signature=6iHjtR0sJ8z%2BVmW1Z3pmyQKBm5w%3D\"},{\"id\":\"520a75794712c7b622000003\",\"nonce\":\"6758696e-e474-431e-a8e4-ae56f3ccc855\",\"type\":\"TextMessage\",\"client_created_at\":1376417136.348,\"client_created_at_utc_offset\":-25200,\"created_at\":1376417145.687,\"sender\":{\"name\":null,\"id\":\"520a74bf4712c76b70000005\",\"profile_photo\":\"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"},\"body\":\"Test message.\"},{\"id\":\"520a756e4712c7afb7000003\",\"nonce\":\"9afbeec2-786e-435e-9eb2-d3c431ccd23b\",\"type\":\"AutomatedMessage\",\"client_created_at\":1376417122.487,\"client_created_at_utc_offset\":-25200,\"created_at\":1376417134.838,\"sender\":{\"name\":null,\"id\":\"520a74bf4712c76b70000005\",\"profile_photo\":\"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"},\"body\":\"What can we do to ensure that you love our app? We appreciate your constructive feedback.\",\"title\":\"We're Sorry!\"}],\"has_more\":false}";
 		List<Message> messages = null;
 		try {
 			messages = MessageManager.parseMessagesString(exampleResponse);
 		} catch (JSONException e) {
 		}
 		assertNotNull(messages);
-		assertEquals(messages.size(), 3);
+		assertEquals(messages.size(), 5);
 	}
 
 	public void testTextMessageRoundTrip() {
-		String exampleMessage = "{\"id\":\"507c6c270aa2420005000006\",\"created_at\":1350331427.0,\"type\":\"text_message\",\"body\":\"test\",\"display\":\"message_center\",\"sender_id\":\"507c6c0c0aa242000e000001\",\"app_id\":\"4de48c13668800000100000c\"}";
+		String exampleMessage = "{\n" +
+				"            \"id\": \"520a84fe4712c71b65000005\",\n" +
+				"            \"nonce\": \"33b042735704283c0407f22e6d6f8c6fcb0d2f073bf964f76d36ef176ec26472\",\n" +
+				"            \"type\": \"TextMessage\",\n" +
+				"            \"client_created_at\": 1376421112,\n" +
+				"            \"client_created_at_utc_offset\": -25200,\n" +
+				"            \"created_at\": 1376421118.499,\n" +
+				"            \"sender\": {\n" +
+				"                \"name\": \"Sky Kelsey\",\n" +
+				"                \"id\": \"4de48b826688000001000007\",\n" +
+				"                \"profile_photo\": \"https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG\"\n" +
+				"            },\n" +
+				"            \"body\": \"Test reply via email.\"\n" +
+				"        }";
 		TextMessage message = null;
 		try {
 			message = new TextMessage(exampleMessage);
 		} catch (JSONException e) {
 
 		}
-		String recoveredMessage = message.toString();
 		assertNotNull(message);
-		assertEquals(true, recoveredMessage.contains("\"id\":\"507c6c270aa2420005000006\""));
-		assertEquals(true, recoveredMessage.contains("\"created_at\":1350331427")); // Will come back without .0
-		assertEquals(true, recoveredMessage.contains("\"type\":\"text_message\""));
-		assertEquals(true, recoveredMessage.contains("\"body\":\"test\""));
-		assertEquals(true, recoveredMessage.contains("\"display\":\"message_center\""));
-		assertEquals(true, recoveredMessage.contains("\"sender_id\":\"507c6c0c0aa242000e000001\""));
-		assertEquals(true, recoveredMessage.contains("\"app_id\":\"4de48c13668800000100000c\""));
+		String recoveredMessage = message.toString();
+		assertEquals(true, recoveredMessage.contains("\"id\":\"520a84fe4712c71b65000005\""));
+		assertEquals(true, recoveredMessage.contains("\"nonce\":\"33b042735704283c0407f22e6d6f8c6fcb0d2f073bf964f76d36ef176ec26472\""));
+		assertEquals(true, recoveredMessage.contains("\"created_at\":1.376421118499E9"));
+		assertEquals(true, recoveredMessage.contains("\"client_created_at\":1376421112"));
+		assertEquals(true, recoveredMessage.contains("\"client_created_at_utc_offset\":-25200"));
+		assertEquals(true, recoveredMessage.contains("\"type\":\"TextMessage\""));
+		assertEquals(true, recoveredMessage.contains("\"name\":\"Sky Kelsey\""));
+		assertEquals(true, recoveredMessage.contains("\"id\":\"4de48b826688000001000007\""));
+		assertEquals(true, recoveredMessage.contains("\"body\":\"Test reply via email.\""));
 	}
 
 

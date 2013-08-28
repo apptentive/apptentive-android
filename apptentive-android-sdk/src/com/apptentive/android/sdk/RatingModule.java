@@ -63,7 +63,6 @@ public class RatingModule {
 
 	private RatingModule() {
 		ratingProviderArgs = new HashMap<String, String>();
-		ratingProviderArgs.put("name", GlobalInfo.appDisplayName);
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
@@ -81,19 +80,19 @@ public class RatingModule {
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		return now > periodEnd;
+		return days != 0 && now > periodEnd;
 	}
 
 	private boolean eventThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
-		return getEvents(prefs) >= significantEventsBeforePrompt;
+		return significantEventsBeforePrompt != 0 && getEvents(prefs) >= significantEventsBeforePrompt;
 	}
 
 	private boolean usesThresholdReached(SharedPreferences prefs) {
 		Configuration config = Configuration.load(prefs);
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
-		return getUses(prefs) >= usesBeforePrompt;
+		return usesBeforePrompt != 0 && getUses(prefs) >= usesBeforePrompt;
 	}
 
 	private long getStartOfRatingPeriod(SharedPreferences prefs) {
@@ -178,7 +177,8 @@ public class RatingModule {
 	void showEnjoymentDialog(final Activity activity, Trigger reason) {
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final EnjoymentDialog dialog = new EnjoymentDialog(activity);
-		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), GlobalInfo.appDisplayName);
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
+		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), appDisplayName);
 		dialog.setTitle(title);
 		dialog.setCancelable(false);
 
@@ -205,7 +205,7 @@ public class RatingModule {
 	/**
 	 * Internal use only.
 	 * Shows the "Would you please rate this app?" dialog that is the second dialog in the rating flow.
-	 * It will be called automatically if the user shooses "Yes" in the "Are you enjoyin this app?" dialog.
+	 * It will be called automatically if the user chooses "Yes" in the "Are you enjoying this app?" dialog.
 	 *
 	 * @param activity The activity from which this method was called.
 	 */
@@ -213,8 +213,9 @@ public class RatingModule {
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final RatingDialog dialog = new RatingDialog(activity);
 
-		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, GlobalInfo.appDisplayName));
-		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, GlobalInfo.appDisplayName));
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
+		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, appDisplayName));
+		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, appDisplayName));
 
 		dialog.setOnChoiceMadeListener(new RatingDialog.OnChoiceMadeListener() {
 			@Override
@@ -229,7 +230,12 @@ public class RatingModule {
 						RatingModule.this.selectedRatingProvider = new GooglePlayRatingProvider();
 					}
 					errorMessage = RatingModule.this.selectedRatingProvider.activityNotFoundMessage(activity);
-					RatingModule.this.selectedRatingProvider.startRating(activity, RatingModule.this.ratingProviderArgs);
+
+					String appDisplayName = Configuration.load(activity).getAppDisplayName();
+					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(RatingModule.this.ratingProviderArgs);
+					finalRatingProviderArgs.put("name", appDisplayName);
+
+					RatingModule.this.selectedRatingProvider.startRating(activity, finalRatingProviderArgs);
 					setState(prefs, RatingState.RATED);
 				} catch (ActivityNotFoundException e) {
 					displayError(errorMessage);
@@ -452,7 +458,7 @@ public class RatingModule {
 		}
 		long now = new Date().getTime();
 		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		boolean elapsed = now > periodEnd;
+		boolean elapsed = days != 0 && now > periodEnd;
 
 		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
 		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();

@@ -223,14 +223,15 @@ public class ApptentiveMessageCenter {
 			}
 		});
 
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
 		switch (reason) {
 			case enjoyment_dialog:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_no_love);
-				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, GlobalInfo.appDisplayName));
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, appDisplayName));
 				break;
 			case message_center:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_default);
-				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, GlobalInfo.appDisplayName));
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, appDisplayName));
 				break;
 			default:
 				return;

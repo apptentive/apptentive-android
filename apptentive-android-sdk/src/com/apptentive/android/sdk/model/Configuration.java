@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
@@ -23,8 +24,9 @@ public class Configuration extends JSONObject {
 	private static final String KEY_RATINGS_DAYS_BETWEEN_PROMPTS = "ratings_days_between_prompts";
 	private static final String KEY_RATINGS_PROMPT_LOGIC = "ratings_prompt_logic";
 	private static final String KEY_RATINGS_CLEAR_ON_UPGRADE = "ratings_clear_on_upgrade";
-	private static final String KEY_RATINGS_ENABLED = "ratings_enabled";
 	private static final String KEY_METRICS_ENABLED = "metrics_enabled";
+	private static final String KEY_RATINGS_ENABLED = "ratings_enabled";
+	private static final String KEY_APP_DISPLAY_NAME = "app_display_name";
 	private static final String KEY_MESSAGE_CENTER = "message_center";
 	private static final String KEY_MESSAGE_CENTER_TITLE = "title";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
@@ -122,6 +124,16 @@ public class Configuration extends JSONObject {
 		return false;
 	}
 
+	public boolean isMetricsEnabled() {
+		try {
+			if (!isNull(KEY_METRICS_ENABLED)) {
+				return getBoolean(KEY_METRICS_ENABLED);
+			}
+		} catch (JSONException e) {
+		}
+		return true;
+	}
+
 	public boolean isRatingsEnabled() {
 		try {
 			if (!isNull(KEY_RATINGS_ENABLED)) {
@@ -132,14 +144,14 @@ public class Configuration extends JSONObject {
 		return true;
 	}
 
-	public boolean isMetricsEnabled() {
+	public String getAppDisplayName() {
 		try {
-			if (!isNull(KEY_METRICS_ENABLED)) {
-				return getBoolean(KEY_METRICS_ENABLED);
+			if (!isNull(KEY_APP_DISPLAY_NAME)) {
+				return getString(KEY_APP_DISPLAY_NAME);
 			}
 		} catch (JSONException e) {
 		}
-		return true;
+		return GlobalInfo.appDisplayName;
 	}
 
 	private JSONObject getMessageCenter() {
