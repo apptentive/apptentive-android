@@ -1,12 +1,15 @@
-2013-??-?? skykelsey next
----------------------------
+2013-??-?? skykelsey 1.1.0
+--------------------------
 
 Major changes:
 
+* Support new enterprise survey features: tagged surveys, rate limiting, delivery capping, and time range constraining.
+* New clean UI fro survey display.
+* New clean UI for about page.
 * Added abiltity to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
 
 2013-08-16 skykelsey 1.0.4
----------------------------
+--------------------------
 
 Updated localization strings.
 
@@ -17,7 +20,7 @@ Bugs Fixed:
 * ANDROID-134 Rating logic does not respect 0 values
 
 2013-07-19 skykelsey 1.0.3
----------------------------
+--------------------------
 
 Updated localization strings.
 
@@ -26,7 +29,7 @@ Bugs Fixed:
 * ANDROID-130 Lower part of message center is transparent.
 
 2013-06-28 skykelsey 1.0.2
----------------------------
+--------------------------
 
 Major changes:
 
@@ -40,7 +43,7 @@ Bugs fixed:
 * Fix XML examples in README.
 * ANDROID-82 Populate the feedback source field with "enjoyment_dialog" when launched from the ratings prompt
 
-2013--13 skykelsey v0.6.4
+2013-12-19 skykelsey v0.6.4
 ---------------------------
 
 Bugs Fixed:
