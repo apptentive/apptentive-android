@@ -1,4 +1,4 @@
-2013-??-?? skykelsey 1.1.0
+2013-08-29 skykelsey 1.1.0
 --------------------------
 
 Major changes:
@@ -6,12 +6,14 @@ Major changes:
 * Support new enterprise survey features: tagged surveys, rate limiting, delivery capping, and time range constraining.
 * New clean UI fro survey display.
 * New clean UI for about page.
-* Added abiltity to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
+* Added ability to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
 
 2013-08-16 skykelsey 1.0.4
 --------------------------
 
-Updated localization strings.
+Major changes:
+
+* First release of a localized SDK. See README for supported languages.
 
 Bugs Fixed:
 
@@ -21,8 +23,6 @@ Bugs Fixed:
 
 2013-07-19 skykelsey 1.0.3
 --------------------------
-
-Updated localization strings.
 
 Bugs Fixed:
 
@@ -46,7 +46,7 @@ Bugs fixed:
 2013-12-19 skykelsey v0.6.4
 ---------------------------
 
-Bugs Fixed:
+Bugs fixed:
 
 * ANDROID-114 Rating Dialog comes up twice.
 
@@ -66,17 +66,17 @@ Bugs fixed:
 * ANDROID-109 Google Play opens up on top of host application when rating app
 * ANDROID-110 Ratings prompt doesn't respect zero value settings.
 
-Added some tests as well.
-
 2012-10-10 skykelsey v0.6.1
 ---------------------------
 
- Bugs fixed:
+Major changes:
 
- * ANDROID-95 Come up with a new way to detect app starts and stops
- * ANDROID-96 Crash on pre API 5 phones
+* App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
 
-App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
+Bugs fixed:
+
+* ANDROID-95 Come up with a new way to detect app starts and stops
+* ANDROID-96 Crash on pre API 5 phones
 
 2012-10-10 skykelsey v0.6.0
 ---------------------------
@@ -104,10 +104,8 @@ Bugs fixed:
 
 Major changes:
 
-There was a problem with how we initialize our SDK that could lead to NPEs if the main Activity had been garbage collected,
-and interfered with unit testing individual child Activities. Fixed that.
-
-Fixed a problem with how we check for app uses. Now we keep track of each Activity instead of the Application as a whole.
+* There was a problem with how we initialize our SDK that could lead to NPEs if the main Activity had been garbage collected, and interfered with unit testing individual child Activities. Fixed that.
+* Fixed a problem with how we check for app uses. Now we keep track of each Activity instead of the Application as a whole.
 
 Bugs fixed:
 
@@ -119,16 +117,9 @@ Bugs fixed:
 
 Major changes:
 
-Updated what counts as a "use". Before, we were incrementing uses on app launch, defined as a call to the main Activity's
-onCreate() method. That is not very useful, since hitting home screen backgrounds the app, but won't increment uses upon
-return. So instead, we figure out when the app is put into the background, and when it comes back.
-
-Updated app integration process. Instead of making a bunch of Apptentive API calls, you can now inherit from our
-ApptentiveActivity or ApptentiveListActivity. These classes allow you to save time integrating. You can also delegate
-your Activity's event handlers into Apptentive manually if you can't inherit from us.
-
-Redid the example apps. The previous "Demo" app was not really a demo, but a testing app. Renamed it accordingly.
-Also added two new "Example" apps: one using inheritance for integration, and the other using delegation.
+* Updated what counts as a "use". Before, we were incrementing uses on app launch, defined as a call to the main Activity's onCreate() method. That is not very useful, since hitting home screen backgrounds the app, but won't increment uses upon return. So instead, we figure out when the app is put into the background, and when it comes back.
+* Updated app integration process. Instead of making a bunch of Apptentive API calls, you can now inherit from our ApptentiveActivity or ApptentiveListActivity. These classes allow you to save time integrating. You can also delegate your Activity's event handlers into Apptentive manually if you can't inherit from us.
+* Redid the example apps. The previous "Demo" app was not really a demo, but a testing app. Renamed it accordingly. Also added two new "Example" apps: one using inheritance for integration, and the other using delegation.
 
 
 Bugs fixed:
