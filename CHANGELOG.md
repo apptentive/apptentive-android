@@ -1,3 +1,10 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-141 Simplified Chinese strings file contains Traditional Chinese
+
 2013-08-29 skykelsey 1.1.0
 --------------------------
 
