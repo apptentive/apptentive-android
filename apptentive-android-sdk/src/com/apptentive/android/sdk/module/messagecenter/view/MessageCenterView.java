@@ -16,6 +16,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
@@ -44,6 +46,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	ListView messageListView;
 	MessageAdapter<Message> messageAdapter;
 
+	/**
+	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
+	 */
+	private static CharSequence message;
+
 	EditText messageEditText;
 
 	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
@@ -60,7 +67,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 		TextView titleTextView = (TextView) findViewById(R.id.apptentive_message_center_header_title);
 		String titleText = Configuration.load(context).getMessageCenterTitle();
-		if(titleText != null) {
+		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
 
@@ -69,6 +76,25 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 		messageEditText = (EditText) findViewById(R.id.apptentive_message_center_message);
 
+		if (message != null) {
+			messageEditText.setText(message);
+			messageEditText.setSelection(message.length());
+		}
+
+		messageEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				message = editable.toString();
+			}
+		});
 		View send = findViewById(R.id.apptentive_message_center_send);
 		send.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
@@ -78,6 +104,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				}
 				messageEditText.setText("");
 				onSendMessageListener.onSendTextMessage(text);
+				message = null;
 				Util.hideSoftKeyboard(context, view);
 			}
 		});
@@ -92,7 +119,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
 		// Android devices can't take screenshots until version 4+
 		boolean canTakeScreenshot = Build.VERSION.RELEASE.matches("^4.*");
-		if(canTakeScreenshot) {
+		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					MetricModule.sendMetric(context, Event.EventLabel.message_center__attach);
@@ -148,7 +175,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		} finally {
 			Util.ensureClosed(is);
 		}
-		if(thumbnail == null) {
+		if (thumbnail == null) {
 			return;
 		}
 
@@ -182,7 +209,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		void onSendFileMessage(Uri uri);
 	}
 
-	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goes into.
+	@SuppressWarnings("unchecked")
+	// We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
 		setMessages(MessageManager.getMessages(context));
 	}
