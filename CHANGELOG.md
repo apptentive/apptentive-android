@@ -40,7 +40,7 @@ Bugs Fixed:
 
 Major changes:
 
-* Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active netrwork. App users can send messages and attach screenshots, and receive a reply in-app. If they shoose to specify an email address, they can also be contacted through email.
+* Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active network. App users can send messages and attach screenshots, and receive a reply in-app. If they choose to specify an email address, they can also be contacted through email.
 
 2013-04-10 skykelsey v0.6.5
 ---------------------------
