@@ -17,6 +17,6 @@
                  android:layout_height="wrap_content"
                  android:paddingTop="@dimen/apptentive_activity_vertical_padding_600dp_port"
                  android:paddingBottom="@dimen/apptentive_activity_vertical_padding_600dp_port">
-        <include layout="@layout/apptentive_survey_content"/>
+        <include layout="@layout/apptentive_message_center_content"/>
     </FrameLayout>
 </ScrollView>
