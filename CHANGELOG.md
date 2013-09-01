@@ -1,9 +1,11 @@
-2013-??-?? skykelsey next
+2013-08-31 skykelsey 1.1.1
 --------------------------
 
 Bugs fixed:
 
 * ANDROID-141 Simplified Chinese strings file contains Traditional Chinese
+* ANDROID-142 Save the text entered in Message Center if the user closes it.
+* ANDROID-145 Dev app can crash in tablet portrate mode.
 
 2013-08-29 skykelsey 1.1.0
 --------------------------
