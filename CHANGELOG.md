@@ -1,3 +1,10 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Major changes:
+
+* Send app's TargetSdkVersion with app_release, and OS's API Level with device.
+
 2013-08-31 skykelsey 1.1.1
 --------------------------
 

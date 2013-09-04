@@ -25,6 +25,7 @@ public class Device extends Payload {
 	private static final String KEY_OS_NAME = "os_name";
 	private static final String KEY_OS_VERSION = "os_version";
 	private static final String KEY_OS_BUILD = "os_build";
+	private static final String KEY_OS_API_LEVEL = "os_api_level";
 	private static final String KEY_MANUFACTURER = "manufacturer";
 	private static final String KEY_MODEL = "model";
 	private static final String KEY_BOARD = "board";
@@ -126,6 +127,24 @@ public class Device extends Payload {
 			put(KEY_OS_BUILD, osBuild);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Device.", KEY_OS_BUILD);
+		}
+	}
+
+	public String getOsApiLevel() {
+		try {
+			if(!isNull(KEY_OS_API_LEVEL)) {
+				return getString(KEY_OS_API_LEVEL);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setOsApiLevel(String osApiLevel) {
+		try {
+			put(KEY_OS_API_LEVEL, osApiLevel);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_OS_API_LEVEL);
 		}
 	}
 

@@ -45,6 +45,7 @@ public class DeviceManager {
 		device.setOsName("Android");
 		device.setOsVersion(Build.VERSION.RELEASE);
 		device.setOsBuild(Build.VERSION.INCREMENTAL);
+		device.setOsApiLevel(""+Build.VERSION.SDK_INT);
 		device.setManufacturer(Build.MANUFACTURER);
 		device.setModel(Build.MODEL);
 		device.setBoard(Build.BOARD);
@@ -122,6 +123,11 @@ public class DeviceManager {
 		String osBuild = chooseLatest(older.getOsBuild(), newer.getOsBuild());
 		if (osBuild != null) {
 			ret.setOsBuild(osBuild);
+		}
+
+		String osApiLevel = chooseLatest(older.getOsApiLevel(), newer.getOsApiLevel());
+		if (osApiLevel != null) {
+			ret.setOsApiLevel(osApiLevel);
 		}
 
 		String manufacturer = chooseLatest(older.getManufacturer(), newer.getManufacturer());
