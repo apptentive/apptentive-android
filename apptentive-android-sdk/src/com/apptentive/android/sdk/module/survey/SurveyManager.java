@@ -94,7 +94,7 @@ public class SurveyManager {
 		prefs.edit().putLong(Constants.PREF_KEY_SURVEYS_CACHE_EXPIRATION, expiration).commit();
 	}
 
-	protected static List<SurveyDefinition> parseSurveysString(String surveyString) {
+	public static List<SurveyDefinition> parseSurveysString(String surveyString) {
 		try {
 			JSONObject root = new JSONObject(surveyString);
 			if (!root.isNull(KEY_SURVEYS)) {
@@ -137,7 +137,7 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static void storeSurveys(Context context, List<SurveyDefinition> surveys) {
+	public static void storeSurveys(Context context, List<SurveyDefinition> surveys) {
 		String surveysString = marshallSurveys(surveys);
 		if (surveysString == null) {
 			return;
@@ -160,6 +160,7 @@ public class SurveyManager {
 		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(activity, tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
+			recordShow(activity, surveyDefinition);
 			SurveyModule.getInstance().show(activity, surveyDefinition, listener);
 			return true;
 		}
@@ -167,7 +168,11 @@ public class SurveyManager {
 		return false;
 	}
 
-	private static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
+	public static void recordShow(Context context, SurveyDefinition surveyDefinition) {
+		SurveyHistory.recordSurveyDisplay(context, surveyDefinition.getId(), System.currentTimeMillis());
+	}
+
+	public static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
 		List<SurveyDefinition> surveys = loadSurveys(context);
 		if (surveys == null || surveys.size() == 0) {
 			return null;
@@ -196,7 +201,7 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static boolean isSurveyValid(Context context, SurveyDefinition survey) {
+		public static boolean isSurveyValid(Context context, SurveyDefinition survey) {
 		boolean expired = false;
 		String endTimeString = survey.getEndTime();
 		if (endTimeString != null) {

@@ -194,7 +194,6 @@ public class SurveyModule {
 			}
 		}
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
-		SurveyHistory.recordSurveyDisplay(activity, surveyDefinition.getId(), System.currentTimeMillis());
 
 		send.setEnabled(isSurveyValid());
 
