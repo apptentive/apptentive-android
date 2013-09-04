@@ -235,9 +235,9 @@ public class Util {
 	public static Integer parseCacheControlHeader(String cacheControlHeader) {
 		if (cacheControlHeader != null) {
 			String[] cacheControlParts = cacheControlHeader.split(",");
-			for(String part : cacheControlParts) {
+			for (String part : cacheControlParts) {
 				part = part.trim();
-				if(part.startsWith("max-age=")) {
+				if (part.startsWith("max-age=")) {
 					String[] maxAgeParts = part.split("=");
 					if (maxAgeParts.length == 2) {
 						String expiration = null;
@@ -257,5 +257,13 @@ public class Util {
 
 	public static boolean isEmailValid(String email) {
 		return email.matches("^[^\\s@]+@[^\\s@]+$");
+	}
+
+	public static boolean getPackageMetaDataBoolean(Context context, String key) {
+		try {
+			return context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData.getBoolean(key, false);
+		} catch (PackageManager.NameNotFoundException e) {
+			return false;
+		}
 	}
 }

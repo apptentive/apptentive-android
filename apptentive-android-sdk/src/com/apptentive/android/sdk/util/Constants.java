@@ -64,6 +64,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
 
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_DISABLE_MESSAGE_CENTER = "apptentive_disable_message_center";
 
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

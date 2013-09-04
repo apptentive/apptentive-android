@@ -10,8 +10,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
+import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -27,28 +30,39 @@ public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
+		boolean disableMessageCenter = Util.getPackageMetaDataBoolean(getContext(), Constants.MANIFEST_KEY_DISABLE_MESSAGE_CENTER);
+
 		final Button close = (Button) findViewById(R.id.close);
 		final Button viewMessages = (Button) findViewById(R.id.view_messages);
+		final TextView body = (TextView) findViewById(R.id.body);
+
+		if (disableMessageCenter) {
+			body.setText(getContext().getResources().getText(R.string.apptentive_thank_you_dialog_body_message_center_disabled));
+		}
 
 		close.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				cancel();
-				if(onChoiceMadeListener != null) {
+				if (onChoiceMadeListener != null) {
 					onChoiceMadeListener.onNo();
 				}
 			}
 		});
 
-		viewMessages.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				dismiss();
-				if(onChoiceMadeListener != null) {
-					onChoiceMadeListener.onYes();
+		if (disableMessageCenter) {
+			viewMessages.setVisibility(View.GONE);
+		} else {
+			viewMessages.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					dismiss();
+					if (onChoiceMadeListener != null) {
+						onChoiceMadeListener.onYes();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	public void setOnChoiceMadeListener(OnChoiceMadeListener onChoiceMadeListener) {
