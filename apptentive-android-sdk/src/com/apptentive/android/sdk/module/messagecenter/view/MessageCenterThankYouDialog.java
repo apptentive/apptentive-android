@@ -12,9 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
-import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -30,13 +29,13 @@ public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		boolean disableMessageCenter = Util.getPackageMetaDataBoolean(getContext(), Constants.MANIFEST_KEY_DISABLE_MESSAGE_CENTER);
+		boolean enableMessageCenter = Configuration.load(getContext()).getMessageCenterEnabled();
 
 		final Button close = (Button) findViewById(R.id.close);
 		final Button viewMessages = (Button) findViewById(R.id.view_messages);
 		final TextView body = (TextView) findViewById(R.id.body);
 
-		if (disableMessageCenter) {
+		if (!enableMessageCenter) {
 			body.setText(getContext().getResources().getText(R.string.apptentive_thank_you_dialog_body_message_center_disabled));
 		}
 
@@ -50,7 +49,7 @@ public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 			}
 		});
 
-		if (disableMessageCenter) {
+		if (!enableMessageCenter) {
 			viewMessages.setVisibility(View.GONE);
 		} else {
 			viewMessages.setOnClickListener(new View.OnClickListener() {

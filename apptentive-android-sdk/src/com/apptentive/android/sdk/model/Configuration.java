@@ -32,6 +32,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
 	// This one is not sent in JSON, but as a header form the server.
 	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
+	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 
 
 	public Configuration() {
@@ -55,7 +56,7 @@ public class Configuration extends JSONObject {
 	public static Configuration load(SharedPreferences prefs) {
 		String json = prefs.getString(Constants.PREF_KEY_APP_CONFIG_JSON, null);
 		try {
-			if(json != null) {
+			if (json != null) {
 				return new Configuration(json);
 			}
 		} catch (JSONException e) {
@@ -167,7 +168,7 @@ public class Configuration extends JSONObject {
 	public String getMessageCenterTitle() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
-			if(messageCenter != null) {
+			if (messageCenter != null) {
 				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_TITLE)) {
 					return messageCenter.getString(KEY_MESSAGE_CENTER_TITLE);
 				}
@@ -180,7 +181,7 @@ public class Configuration extends JSONObject {
 	public int getMessageCenterFgPoll() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
-			if(messageCenter != null) {
+			if (messageCenter != null) {
 				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_FG_POLL)) {
 					return messageCenter.getInt(KEY_MESSAGE_CENTER_FG_POLL);
 				}
@@ -206,5 +207,15 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 		}
+	}
+
+	public boolean getMessageCenterEnabled() {
+		try {
+			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
+				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
+			}
+		} catch (JSONException e) {
+		}
+		return Constants.CONFIG_MESSAGE_CENTER_ENABLED;
 	}
 }
