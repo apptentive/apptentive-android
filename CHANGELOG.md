@@ -1,3 +1,10 @@
+2013-09-15 skykelsey 1.1.2
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-155 Message Center can't scroll
+
 2013-08-31 skykelsey 1.1.1
 --------------------------
 
