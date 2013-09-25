@@ -6,6 +6,13 @@ Major changes:
 * Send app's TargetSdkVersion with app_release, and OS's API Level with device.
 * Add manifest setting to disable Message Center, if so desired.
 
+2013-09-15 skykelsey 1.1.2
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-155 Message Center can't scroll
+
 2013-08-31 skykelsey 1.1.1
 --------------------------
 
