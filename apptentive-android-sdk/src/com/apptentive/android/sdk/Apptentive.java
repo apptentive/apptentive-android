@@ -44,7 +44,7 @@ import java.util.*;
 public class Apptentive {
 
 	private static UnreadMessagesListener unreadMessagesListener;
-	private static Map<String, String> customData;
+	private static Map<String, String> customDeviceData;
 
 	private Apptentive() {
 	}
@@ -129,7 +129,7 @@ public class Apptentive {
 	 * @deprecated in favor of {@link #setCustomDeviceData(Map)}
 	 */
 	public static void setCustomData(Map<String, String> customData) {
-		Apptentive.customData = customData;
+		Apptentive.customDeviceData = customData;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class Apptentive {
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
 	public static void setCustomDeviceData(Map<String, String> customDeviceData) {
-		Apptentive.customData = customData;
+		Apptentive.customDeviceData = customDeviceData;
 	}
 
 	/**
@@ -146,10 +146,10 @@ public class Apptentive {
 	 * @param value The value of the data.
 	 */
 	public static void addCustomDeviceData(String key, String value) {
-		if(Apptentive.customData == null) {
-			Apptentive.customData = new HashMap<String, String>();
+		if(Apptentive.customDeviceData == null) {
+			Apptentive.customDeviceData = new HashMap<String, String>();
 		}
-		Apptentive.customData.put(key, value);
+		Apptentive.customDeviceData.put(key, value);
 	}
 
 	/**
@@ -157,8 +157,8 @@ public class Apptentive {
 	 * @param key The key to store the data under.
 	 */
 	public static void removeCustomDeviceData(String key) {
-		if(Apptentive.customData != null) {
-			Apptentive.customData.remove(key);
+		if(Apptentive.customDeviceData != null) {
+			Apptentive.customDeviceData.remove(key);
 		}
 	}
 
@@ -229,6 +229,15 @@ public class Apptentive {
 	 */
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
 		unreadMessagesListener = listener;
+	}
+
+	/**
+	 * Returns the number of unread messages in the Message Center.
+	 * @param context The Context from which this method is called.
+	 * @return The number of unread messages.
+	 */
+	public static int getUnreadMessageCount(Context context) {
+		return MessageManager.getUnreadMessageCount(context);
 	}
 
 	// ****************************************************************************************
@@ -359,7 +368,7 @@ public class Apptentive {
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context, customData);
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context, customDeviceData);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());

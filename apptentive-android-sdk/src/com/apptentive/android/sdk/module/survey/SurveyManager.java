@@ -21,9 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Sky Kelsey
@@ -172,7 +170,17 @@ public class SurveyManager {
 		SurveyHistory.recordSurveyDisplay(context, surveyDefinition.getId(), System.currentTimeMillis());
 	}
 
-	public static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
+	private static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
+		Set<String> tagsSet = new HashSet<String>();
+		// Remove duplicates
+		for (String tag : tags) {
+			tag = tag.trim();
+			// Remove empty strings.
+			if (tag.length() > 0) {
+				tagsSet.add(tag);
+			}
+		}
+
 		List<SurveyDefinition> surveys = loadSurveys(context);
 		if (surveys == null || surveys.size() == 0) {
 			return null;
@@ -180,7 +188,7 @@ public class SurveyManager {
 
 		for (SurveyDefinition survey : surveys) {
 			List<String> surveyTags = survey.getTags();
-			if (tags.length == 0) { // Case: Need untagged survey.
+			if (tagsSet.size() == 0) { // Case: Need untagged survey.
 				if (surveyTags == null || surveyTags.size() == 0) {
 					if (isSurveyValid(context, survey)) {
 						return survey;
@@ -188,7 +196,7 @@ public class SurveyManager {
 				}
 			} else { // Case: Need tagged survey.
 				if (surveyTags != null) {
-					for (String tag : tags) {
+					for (String tag : tagsSet.toArray(new String[]{})) {
 						if (surveyTags.contains(tag)) {
 							if (isSurveyValid(context, survey)) {
 								return survey;
