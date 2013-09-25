@@ -42,7 +42,7 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To send extra about the app to the server.
 		Map<String, String> customData = new HashMap<String, String>();
 		customData.put("user-id", "1234567890");
-		Apptentive.setCustomData(customData);
+		Apptentive.setCustomDeviceData(customData);
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
