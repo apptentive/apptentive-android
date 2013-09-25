@@ -126,9 +126,40 @@ public class Apptentive {
 	/**
 	 * Allows you to pass arbitrary string data to the server along with this device's info.
 	 * @param customData A Map of key/value pairs to send to the server.
+	 * @deprecated in favor of {@link #setCustomDeviceData(Map)}
 	 */
 	public static void setCustomData(Map<String, String> customData) {
 		Apptentive.customData = customData;
+	}
+
+	/**
+	 * Allows you to pass arbitrary string data to the server along with this device's info.
+	 * @param customDeviceData A Map of key/value pairs to send to the server.
+	 */
+	public static void setCustomDeviceData(Map<String, String> customDeviceData) {
+		Apptentive.customData = customData;
+	}
+
+	/**
+	 * Add a piece of custom data to the device's info. This info will be sent to the server.
+	 * @param key The key to store the data under.
+	 * @param value The value of the data.
+	 */
+	public static void addCustomDeviceData(String key, String value) {
+		if(Apptentive.customData == null) {
+			Apptentive.customData = new HashMap<String, String>();
+		}
+		Apptentive.customData.put(key, value);
+	}
+
+	/**
+	 * Remove a piece of custom data to the device's info.
+	 * @param key The key to store the data under.
+	 */
+	public static void removeCustomDeviceData(String key) {
+		if(Apptentive.customData != null) {
+			Apptentive.customData.remove(key);
+		}
 	}
 
 
