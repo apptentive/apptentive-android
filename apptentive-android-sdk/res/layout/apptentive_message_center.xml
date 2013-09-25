@@ -6,17 +6,12 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:paddingLeft="@dimen/apptentive_activity_side_padding"
-            android:paddingRight="@dimen/apptentive_activity_side_padding"
-            android:fadingEdge="none"
-            android:fillViewport="true">
-    <FrameLayout android:layout_width="fill_parent"
-                 android:layout_height="wrap_content"
-                 android:paddingTop="@dimen/apptentive_activity_vertical_padding"
-                 android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
-        <include layout="@layout/apptentive_message_center_content"/>
-    </FrameLayout>
-</ScrollView>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:paddingLeft="@dimen/apptentive_activity_side_padding"
+             android:paddingRight="@dimen/apptentive_activity_side_padding"
+             android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+             android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
+    <include layout="@layout/apptentive_message_center_content"/>
+</FrameLayout>

@@ -17,7 +17,7 @@ import android.view.animation.TranslateAnimation;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.1.1";
+	public static final String APPTENTIVE_SDK_VERSION = "1.1.2";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
