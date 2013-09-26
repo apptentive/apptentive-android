@@ -48,6 +48,7 @@
 
     <string name="apptentive_thank_you_dialog_body">Your response has been saved in the Message Center, where you\'ll be able to view replies and send us other messages.</string>
     <string name="apptentive_thank_you_dialog_body_message_center_disabled">Thank you for your feedback!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">We\'ll be in touch via email.</string>
     <string name="apptentive_thank_you_dialog_close">Close</string>
     <string name="apptentive_thank_you_dialog_view_messages">View Messages</string>
 
