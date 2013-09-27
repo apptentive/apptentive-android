@@ -45,7 +45,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:onClick="showFeedback"
-            android:text="Force Feedback"/>
+            android:text="Force Intro Dialog"/>
     <Button android:id="@+id/button_message_center"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
