@@ -152,6 +152,22 @@ public class Util {
 */
 
 
+	public static String[] getAllUserAccountEmailAddresses(Context context) {
+		List<String> emails = new ArrayList<String>();
+		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+			AccountManager accountManager = AccountManager.get(context);
+			try {
+				Account[] accounts = accountManager.getAccountsByType("com.google");
+				for (Account account : accounts) {
+					emails.add(account.name);
+				}
+			} catch (VerifyError e) {
+				// Ignore here because the phone is on a pre API Level 5 SDK.
+			}
+		}
+		return emails.toArray(new String[emails.size()]);
+	}
+
 	public static String getUserEmail(Context context) {
 		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
 			String email = getEmail(context);
@@ -172,7 +188,7 @@ public class Util {
 		}
 	}
 
-	// TODO: Use reflection to load this so we can drop 2.1 API requirement.
+	// TODO: Use reflection to load this so we can drop 2.1 API requirement?
 	private static Account getAccount(AccountManager accountManager) {
 		Account account = null;
 		try {

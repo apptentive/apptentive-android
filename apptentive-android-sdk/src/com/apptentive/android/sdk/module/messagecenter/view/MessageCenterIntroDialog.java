@@ -10,10 +10,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.*;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
 import com.apptentive.android.sdk.util.Util;
@@ -37,11 +36,21 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final EditText emailText = (EditText) findViewById(R.id.email);
+		final AutoCompleteTextView emailText = (AutoCompleteTextView) findViewById(R.id.email);
 		final EditText messageText = (EditText) findViewById(R.id.message);
 		final Button noThanksButton = (Button) findViewById(R.id.no_thanks);
 		final Button sendButton = (Button) findViewById(R.id.send);
 
+		// Pre-populate a list of possible emails based on those pulled from the phone.
+		ArrayAdapter<String> emailAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, Util.getAllUserAccountEmailAddresses(getContext()));
+		emailText.setAdapter(emailAdapter);
+		emailText.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				emailText.showDropDown();
+				return false;
+			}
+		});
 		emailText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -96,6 +105,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 				}
 			}
 		});
+		validateForm(sendButton);
 	}
 
 	@Override
@@ -135,10 +145,17 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 	public void prePopulateEmail(String email) {
 		EditText emailEditText = (EditText) findViewById(R.id.email);
 		emailEditText.setText(email);
+		this.email = email;
 	}
 
 	public void setEmailRequired(boolean emailRequired) {
 		this.emailRequired = emailRequired;
+		final AutoCompleteTextView emailText = (AutoCompleteTextView) findViewById(R.id.email);
+		if(emailRequired) {
+			emailText.setHint(R.string.apptentive_edittext_hint_email_required);
+		} else {
+			emailText.setHint(R.string.apptentive_edittext_hint_email);
+		}
 	}
 
 	private void validateForm(Button sendButton) {

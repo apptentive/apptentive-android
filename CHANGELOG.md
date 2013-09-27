@@ -4,7 +4,9 @@
 Major changes:
 
 * Send app's TargetSdkVersion with app_release, and OS's API Level with device.
-* Add manifest setting to disable Message Center, if so desired.
+* Use the server setting "Require Email" so that feedback can only be submitted if the user supplies a valid email.
+* Get list of available Google account emails and provide them in an AutoCompleteTextView.
+* Some minor tweaks to make the IntroDialog look great.
 
 2013-09-15 skykelsey 1.1.2
 --------------------------

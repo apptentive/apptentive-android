@@ -15,7 +15,7 @@
     <color name="apptentive_message_auto_separator">#BBBBBB</color>
     <color name="apptentive_message_auto_text">#000000</color>
 
-    <color name="apptentive_dialog_background">#EAEEEE</color>
+    <color name="apptentive_dialog_background">#FFFFFF</color>
     <color name="apptentive_dialog_title_background">#333333</color>
     <color name="apptentive_dialog_title_text">#000000</color>
     <color name="apptentive_dialog_body_text">#444444</color>

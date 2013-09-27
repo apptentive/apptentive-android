@@ -8,7 +8,7 @@ within your app, and more. The SDK
 # About the SDK
 
 ## Supported Versions
-The Apptentive SDK works on **Android 2.1 (API Level 7)** and newer.
+The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use newer XML syntax for forward compatibility.
 
 ## Supported Languages
 <table>
@@ -121,12 +121,16 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
     &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
 
-    <strong>&lt;!-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive
-        UI elements look great! -->
+    <strong>&lt;!-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive UI elements look great! --></strong>
     &lt;supports-screens android:largeScreens="true"
                       android:normalScreens="true"
                       android:smallScreens="true"
                       android:anyDensity="true"/></strong>
+
+    <strong>&lt;!-- minSDKVersion must be at least 7 --></strong>
+    &lt;uses-sdk android:minSdkVersion="7"
+              android:maxSdkVersion="18"
+              android:targetSdkVersion="18"/>
 
     &lt;application android:label="@string/app_name" android:icon="@drawable/icon">
         &lt;activity android:name=".ExampleActivity"
