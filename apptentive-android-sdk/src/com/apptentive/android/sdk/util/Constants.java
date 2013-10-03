@@ -28,6 +28,7 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_ID = "personId";
 
 	public static final String PREF_KEY_DEVICE = "device";
+	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";

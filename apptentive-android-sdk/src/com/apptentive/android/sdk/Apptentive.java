@@ -44,7 +44,6 @@ import java.util.*;
 public class Apptentive {
 
 	private static UnreadMessagesListener unreadMessagesListener;
-	private static Map<String, String> customDeviceData;
 
 	private Apptentive() {
 	}
@@ -124,41 +123,52 @@ public class Apptentive {
 	}
 
 	/**
-	 * Allows you to pass arbitrary string data to the server along with this device's info.
-	 * @param customData A Map of key/value pairs to send to the server.
-	 * @deprecated in favor of {@link #setCustomDeviceData(Map)}
-	 */
-	public static void setCustomData(Map<String, String> customData) {
-		Apptentive.customDeviceData = customData;
-	}
-
-	/**
-	 * Allows you to pass arbitrary string data to the server along with this device's info.
+	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
+	 * custom device data that you have set for this app.</p>
+	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
+	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
+	 * @param context The context from which this method was called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
-	public static void setCustomDeviceData(Map<String, String> customDeviceData) {
-		Apptentive.customDeviceData = customDeviceData;
+	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
+		try {
+			DeviceData deviceData = new DeviceData();
+			for (String key : customDeviceData.keySet()) {
+				deviceData.put(key, customDeviceData.get(key));
+			}
+			DeviceManager.storeCustomDeviceData(context, deviceData);
+		} catch (JSONException e) {
+			Log.e("Unable to set custom device data.", e);
+		}
 	}
 
 	/**
 	 * Add a piece of custom data to the device's info. This info will be sent to the server.
+	 * @param context The context from which this method was called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
 	 */
-	public static void addCustomDeviceData(String key, String value) {
-		if(Apptentive.customDeviceData == null) {
-			Apptentive.customDeviceData = new HashMap<String, String>();
+	public static void addCustomDeviceData(Context context, String key, String value) {
+		DeviceData deviceData = DeviceManager.loadCustomDeviceData(context);
+		if(deviceData != null) {
+			try {
+				deviceData.put(key, value);
+				DeviceManager.storeCustomDeviceData(context, deviceData);
+			} catch (JSONException e) {
+			}
 		}
-		Apptentive.customDeviceData.put(key, value);
 	}
 
 	/**
 	 * Remove a piece of custom data to the device's info.
+	 * @param context The context from which this method was called.
 	 * @param key The key to store the data under.
 	 */
-	public static void removeCustomDeviceData(String key) {
-		if(Apptentive.customDeviceData != null) {
-			Apptentive.customDeviceData.remove(key);
+	public static void removeCustomDeviceData(Context context, String key) {
+		DeviceData deviceData = DeviceManager.loadCustomDeviceData(context);
+		if(deviceData != null) {
+			deviceData.remove(key);
+			DeviceManager.storeCustomDeviceData(context, deviceData);
 		}
 	}
 
@@ -368,7 +378,7 @@ public class Apptentive {
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context, customDeviceData);
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());

@@ -39,10 +39,9 @@ public class DevActivity extends ApptentiveActivity {
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
 
-		// OPTIONAL: To send extra about the app to the server.
-		Map<String, String> customData = new HashMap<String, String>();
-		customData.put("user-id", "1234567890");
-		Apptentive.setCustomDeviceData(customData);
+		// OPTIONAL: To send extra about the device to the server.
+		Apptentive.addCustomDeviceData(this, "user-id", "1234567890");
+		Apptentive.addCustomDeviceData(this, "user-name", "John Doe");
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());

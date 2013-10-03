@@ -27,4 +27,37 @@
             android:layout_height="wrap_content"
             android:text="Test NullPointerException"
             android:onClick="throwNpe"/>
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:background="#AAAAAA">
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <Button android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="addCustomDeviceData"
+                    android:text="Add Custom Device Data"/>
+            <EditText android:id="@+id/add_custom_device_data_key"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"/>
+            <EditText android:id="@+id/add_custom_device_data_value"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </FrameLayout>
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:background="#AAAAAA">
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <Button android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="removeCustomDeviceData"
+                    android:text="Remove Custom Device Data"/>
+            <EditText android:id="@+id/remove_custom_device_data_key"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
