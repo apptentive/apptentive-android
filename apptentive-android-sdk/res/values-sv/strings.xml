@@ -33,7 +33,7 @@
     <string name="apptentive_about_description">Apptentive är en återkoppling- och kommunikationstjänst som gör det möjligt för människorna bakom app att snabbt få feedback och bättre kunna lyssna på dig.</string>
     <string name="apptentive_about_description_link">Läs mer på apptentive.com</string>
     <string name="apptentive_about_privacy">Din feedback lagras hos Apptentive. Apptentives integritetspolicy och utvecklarens sekretesspolicy gäller.</string>
-    <string name="apptentive_about_privacy_link">Gå till Apptentive's sekretesspolicy</string>
+    <string name="apptentive_about_privacy_link">Gå till Apptentive\'s sekretesspolicy</string>
 
     <string name="apptentive_do_you_love_this_app">Älskar du %s?</string>
 
