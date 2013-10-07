@@ -53,6 +53,10 @@ The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer
     <td>Russian</td>
   </tr>
   <tr>
+    <td>sv</td>
+    <td>Swedish</td>
+  </tr>
+  <tr>
     <td>zh</td>
     <td>Chinese (Traditional)</td>
   </tr>

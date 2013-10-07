@@ -19,6 +19,7 @@
   <string name="apptentive_sending">送信中。。。</string>
   <string name="apptentive_version">Apptentive バージョン %s</string>
   <string name="apptentive_edittext_hint_email">あなたの Eメールアドレス</string>
+  <string name="apptentive_edittext_hint_email_required">メールアドレス（必須）</string>
   <string name="apptentive_powered_by_apptentive">Apptentive によって供給されています</string>
   <string name="apptentive_about_title">Apptentive について</string>
   <string name="apptentive_about_description">Apptentive は、お客様の声をこのアプリの作成者に迅速に伝えて、貴重なご意見により耳を傾けやすくするフィードバック及びコミュニケーションサービスです。</string>
@@ -35,6 +36,8 @@
   <string name="apptentive_intro_dialog_body">どうすれば %s がもっとよくなるか教えて下さい！</string>
   <string name="apptentive_intro_dialog_edittext_hint">どうしたら力になれるか教えて下さい。（必須）</string>
   <string name="apptentive_thank_you_dialog_body">お客様の回答は、返信を見たり別のメッセージを送ったりできるメッセージセンターに保存されました。</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled">ご意見をいただきありがとうございます！</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Eメールでご連絡します。</string>
   <string name="apptentive_thank_you_dialog_close">閉じる</string>
   <string name="apptentive_thank_you_dialog_view_messages">メッセージを表示</string>
   <string name="apptentive_dialog_email_validation_failed_title">Eメールアドレスが無効です</string>

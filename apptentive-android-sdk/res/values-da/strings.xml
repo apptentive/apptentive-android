@@ -19,6 +19,7 @@
   <string name="apptentive_sending">Sender…</string>
   <string name="apptentive_version">Apptentive version %s</string>
   <string name="apptentive_edittext_hint_email">Din e-mailadresse</string>
+  <string name="apptentive_edittext_hint_email_required">E-mailadresse (påkrævet)</string>
   <string name="apptentive_powered_by_apptentive">Leveret af Apptentive</string>
   <string name="apptentive_about_title">Om Apptentive</string>
   <string name="apptentive_about_description">Apptentive er en feedback- og kommunikationstjeneste, som sætter de folk, som står bag denne app, i stand til hurtigere at få din feedback og bedre at lytte til dig.</string>
@@ -35,6 +36,8 @@
   <string name="apptentive_intro_dialog_body">Fortæl os, hvordan vi kan gøre %s bedre for dig!</string>
   <string name="apptentive_intro_dialog_edittext_hint">Fortæl os, hvordan vi kan hjælpe. (påkrævet)</string>
   <string name="apptentive_thank_you_dialog_body">Din besvarelse er blevet gemt i Beskeder, hvor du kan se svar og sende os andre beskeder.</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled">Tak for din feedback!</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Vi kontakter dig via e-mail.</string>
   <string name="apptentive_thank_you_dialog_close">Luk</string>
   <string name="apptentive_thank_you_dialog_view_messages">Se beskeder</string>
   <string name="apptentive_dialog_email_validation_failed_title">Ugyldig e-mailadresse</string>
