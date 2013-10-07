@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
-import com.apptentive.android.sdk.model.DeviceData;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 import org.json.JSONException;
@@ -30,8 +30,8 @@ public class DeviceManager {
 		Device stored = loadOldDevice(context);
 
 		Device current = generateNewDevice(context);
-		DeviceData customDeviceData = loadCustomDeviceData(context);
-		current.setCustomData(customDeviceData);
+		CustomData customData = loadCustomDeviceData(context);
+		current.setCustomData(customData);
 
 		Device diff = diffDevice(stored, current);
 		if(diff != null) {
@@ -41,24 +41,24 @@ public class DeviceManager {
 		return null;
 	}
 
-	public static DeviceData loadCustomDeviceData(Context context) {
+	public static CustomData loadCustomDeviceData(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
+		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
 		try {
-			return new DeviceData(deviceString);
+			return new CustomData(deviceDataString);
 		} catch (Exception e) {
 		}
 		try {
-			return new DeviceData();
+			return new CustomData();
 		} catch (JSONException e) {
 		}
 		return null;
 	}
 
-	public static void storeCustomDeviceData(Context context, DeviceData deviceData) {
+	public static void storeCustomDeviceData(Context context, CustomData deviceData) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String deviceString = deviceData.toString();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceString).commit();
+		String deviceDataString = deviceData.toString();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).commit();
 	}
 
 	private static Device generateNewDevice(Context context) {
@@ -223,9 +223,9 @@ public class DeviceManager {
 			ret.setRadioVersion(radioVersion);
 		}
 
-		DeviceData customDeviceData = chooseLatest(old.getCustomData(), newer.getCustomData());
-		if(customDeviceData != null) {
-			ret.setCustomData(customDeviceData);
+		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
+		if(customData != null) {
+			ret.setCustomData(customData);
 		}
 
 		String localeCountryCode = chooseLatest(old.getLocaleCountryCode(), newer.getLocaleCountryCode());
@@ -258,8 +258,7 @@ public class DeviceManager {
 
 	/**
 	 * A convenience method.
-	 * @param old
-	 * @param newer
+	 *
 	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
 	 */
 	private static String chooseLatest(String old, String newer) {
@@ -288,7 +287,7 @@ public class DeviceManager {
 		return null;
 	}
 
-	private static DeviceData chooseLatest(DeviceData old, DeviceData newer) {
+	private static CustomData chooseLatest(CustomData old, CustomData newer) {
 		if(old == null || old.length() == 0) {
 			old = null;
 		}
@@ -304,7 +303,7 @@ public class DeviceManager {
 		// Clear existing value.
 		if(old != null && newer == null) {
 			try {
-				return new DeviceData();
+				return new CustomData();
 			} catch (JSONException e) {
 				return null;
 			}

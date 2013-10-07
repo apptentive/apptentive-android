@@ -32,32 +32,87 @@
                  android:background="#AAAAAA">
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      android:orientation="vertical">
-            <Button android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="addCustomDeviceData"
-                    android:text="Add Custom Device Data"/>
-            <EditText android:id="@+id/add_custom_device_data_key"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"/>
-            <EditText android:id="@+id/add_custom_device_data_value"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"/>
-        </LinearLayout>
-    </FrameLayout>
-    <FrameLayout android:layout_width="fill_parent"
-                 android:layout_height="wrap_content"
-                 android:background="#AAAAAA">
-        <LinearLayout android:layout_width="fill_parent"
+                      android:orientation="vertical"
+                      android:background="#000000">
+            <TextView android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      android:orientation="vertical">
-            <Button android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="removeCustomDeviceData"
-                    android:text="Remove Custom Device Data"/>
-            <EditText android:id="@+id/remove_custom_device_data_key"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"/>
+                      android:text="Custom Device Data"/>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+                <Button android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:onClick="addCustomDeviceData"
+                        android:text="Add"/>
+                <EditText android:id="@+id/add_custom_device_data_key"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Key…"/>
+                <EditText android:id="@+id/add_custom_device_data_value"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Value…"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <Button android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:onClick="removeCustomDeviceData"
+                        android:text="Remove"/>
+                <EditText android:id="@+id/remove_custom_device_data_key"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Key…"/>
+                <FrameLayout android:layout_width="0dp"
+                             android:layout_height="wrap_content"
+                             android:layout_weight="3"/>
+            </LinearLayout>
+            <TextView android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Custom Person Data"/>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+                <Button android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:onClick="addCustomPersonData"
+                        android:text="Add"/>
+                <EditText android:id="@+id/add_custom_person_data_key"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Key…"/>
+                <EditText android:id="@+id/add_custom_person_data_value"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Key…"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+                <Button android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:onClick="removeCustomPersonData"
+                        android:text="Remove"/>
+                <EditText android:id="@+id/remove_custom_person_data_key"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="3"
+                          android:hint="Key…"/>
+                <FrameLayout android:layout_width="0dp"
+                             android:layout_height="wrap_content"
+                             android:layout_weight="3"/>
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

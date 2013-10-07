@@ -84,4 +84,21 @@ public class TestsActivity extends ApptentiveActivity {
 		keyText.setText(null);
 		Apptentive.removeCustomDeviceData(this, key);
 	}
+
+	public void addCustomPersonData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.add_custom_person_data_key);
+		EditText valueText = (EditText) findViewById(R.id.add_custom_person_data_value);
+		String key = (keyText).getText().toString().trim();
+		String value = (valueText).getText().toString().trim();
+		keyText.setText(null);
+		valueText.setText(null);
+		Apptentive.addCustomPersonData(this, key, value);
+	}
+
+	public void removeCustomPersonData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.remove_custom_person_data_key);
+		String key = (keyText).getText().toString().trim();
+		keyText.setText(null);
+		Apptentive.removeCustomPersonData(this, key);
+	}
 }

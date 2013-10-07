@@ -25,6 +25,7 @@ public class Person extends Payload {
 	private static final String KEY_ZIP = "zip";
 	private static final String KEY_COUNTRY = "country";
 	private static final String KEY_BIRTHDAY = "birthday";
+	private static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public Person() {
 		super();
@@ -197,6 +198,25 @@ public class Person extends Payload {
 			put(KEY_BIRTHDAY, birthday);
 		} catch (JSONException e) {
 			Log.e("Unable to set field " + KEY_BIRTHDAY + " of " + KEY);
+		}
+	}
+
+	@SuppressWarnings("unchecked") // We check it coming in.
+	public CustomData getCustomData() {
+		if(!isNull(KEY_CUSTOM_DATA)) {
+			try {
+				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
+			} catch (JSONException e) {
+			}
+		}
+		return null;
+	}
+
+	public void setCustomData(CustomData customData) {
+		try {
+			put(KEY_CUSTOM_DATA, customData);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
 		}
 	}
 }

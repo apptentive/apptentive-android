@@ -9,24 +9,24 @@ import java.util.*;
 /**
  * @author Sky Kelsey
  */
-public class DeviceData extends JSONObject {
+public class CustomData extends JSONObject {
 
 
-	public DeviceData() throws JSONException {
+	public CustomData() throws JSONException {
 		super();
 	}
 
-	public DeviceData(String json) throws JSONException {
+	public CustomData(String json) throws JSONException {
 		super(json);
 	}
 
-	public DeviceData(JSONObject object) throws JSONException {
+	public CustomData(JSONObject object) throws JSONException {
 		super(object.toString());
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof DeviceData) {
+		if (o instanceof CustomData) {
 			if (this == o) {
 				return true;
 			}

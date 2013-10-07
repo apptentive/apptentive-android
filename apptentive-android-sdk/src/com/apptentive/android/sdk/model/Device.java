@@ -396,19 +396,19 @@ public class Device extends Payload {
 	}
 
 	@SuppressWarnings("unchecked") // We check it coming in.
-	public DeviceData getCustomData() {
+	public CustomData getCustomData() {
 		if(!isNull(KEY_CUSTOM_DATA)) {
 			try {
-				return new DeviceData(getJSONObject(KEY_CUSTOM_DATA));
+				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
 			} catch (JSONException e) {
 			}
 		}
 		return null;
 	}
 
-	public void setCustomData(DeviceData customDeviceData) {
+	public void setCustomData(CustomData customData) {
 		try {
-			put(KEY_CUSTOM_DATA, customDeviceData);
+			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
 		}

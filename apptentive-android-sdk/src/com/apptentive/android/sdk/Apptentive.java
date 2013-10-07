@@ -132,13 +132,13 @@ public class Apptentive {
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
 		try {
-			DeviceData deviceData = new DeviceData();
+			CustomData customData = new CustomData();
 			for (String key : customDeviceData.keySet()) {
-				deviceData.put(key, customDeviceData.get(key));
+				customData.put(key, customDeviceData.get(key));
 			}
-			DeviceManager.storeCustomDeviceData(context, deviceData);
+			DeviceManager.storeCustomDeviceData(context, customData);
 		} catch (JSONException e) {
-			Log.e("Unable to set custom device data.", e);
+			Log.w("Unable to set custom device data.", e);
 		}
 	}
 
@@ -149,26 +149,86 @@ public class Apptentive {
 	 * @param value The value of the data.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
-		DeviceData deviceData = DeviceManager.loadCustomDeviceData(context);
-		if(deviceData != null) {
+		if(key == null || key.trim().length() == 0) {
+			return;
+		}
+		CustomData customData = DeviceManager.loadCustomDeviceData(context);
+		if(customData != null) {
 			try {
-				deviceData.put(key, value);
-				DeviceManager.storeCustomDeviceData(context, deviceData);
+				customData.put(key, value);
+				DeviceManager.storeCustomDeviceData(context, customData);
 			} catch (JSONException e) {
+				Log.w("Unable to add custom device data.", e);
 			}
 		}
 	}
 
 	/**
-	 * Remove a piece of custom data to the device's info.
+	 * Remove a piece of custom data from the device's info.
 	 * @param context The context from which this method was called.
-	 * @param key The key to store the data under.
+	 * @param key The key to remove.
 	 */
 	public static void removeCustomDeviceData(Context context, String key) {
-		DeviceData deviceData = DeviceManager.loadCustomDeviceData(context);
-		if(deviceData != null) {
-			deviceData.remove(key);
-			DeviceManager.storeCustomDeviceData(context, deviceData);
+		CustomData customData = DeviceManager.loadCustomDeviceData(context);
+		if(customData != null) {
+			customData.remove(key);
+			DeviceManager.storeCustomDeviceData(context, customData);
+		}
+	}
+
+	/**
+	 * <p>Allows you to pass arbitrary string data to the server along with this person's info. This method will replace all
+	 * custom person data that you have set for this app.</p>
+	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
+	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
+	 * @param context The context from which this method was called.
+	 * @param customPersonData A Map of key/value pairs to send to the server.
+	 */
+	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
+		Log.w("Setting custom person data: %s", customPersonData.toString());
+		try {
+			CustomData customData = new CustomData();
+			for (String key : customPersonData.keySet()) {
+				customData.put(key, customPersonData.get(key));
+			}
+			PersonManager.storeCustomPersonData(context, customData);
+		} catch (JSONException e) {
+			Log.e("Unable to set custom person data.", e);
+		}
+	}
+
+
+	/**
+	 * Add a piece of custom data to the person's info. This info will be sent to the server.
+	 * @param context The context from which this method was called.
+	 * @param key The key to store the data under.
+	 * @param value The value of the data.
+	 */
+	public static void addCustomPersonData(Context context, String key, String value) {
+		if(key == null || key.trim().length() == 0) {
+			return;
+		}
+		CustomData customData = PersonManager.loadCustomPersonData(context);
+		if(customData != null) {
+			try {
+				customData.put(key, value);
+				PersonManager.storeCustomPersonData(context, customData);
+			} catch (JSONException e) {
+				Log.w("Unable to add custom person data.", e);
+			}
+		}
+	}
+
+	/**
+	 * Remove a piece of custom data from the person's info.
+	 * @param context The context from which this method was called.
+	 * @param key The key to remove.
+	 */
+	public static void removeCustomPersonData(Context context, String key) {
+		CustomData customData = PersonManager.loadCustomPersonData(context);
+		if(customData != null) {
+			customData.remove(key);
+			PersonManager.storeCustomPersonData(context, customData);
 		}
 	}
 
