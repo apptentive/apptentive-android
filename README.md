@@ -85,23 +85,7 @@ Our code can be accessed in two ways.
 
 -
 
-### Setup Android Workspace
-
-#### Using Eclipse
-
-These instructions were tested for the Juno Eclipse release.
-
-1. From the menu bar, click `File` -> `Import`
-2. Under `General`, select `Existing Projects into Workspace`
-3. Click `Next`
-4. In the Package Explorer, select your project
-5. From the menu bar, click `Project` -> `Properties`
-6. On the left side, click `Android`
-7. Under the `Library` section, click `Add`
-8. Select `apptentive-android-sdk`
-9. Click `OK`
-
-The your Android app now references the Apptentive Android SDK.
+### Set up Android Workspace
 
 #### Using IntelliJ IDEA
 
@@ -117,6 +101,22 @@ These instructions were tested for IntelliJ IDEA 12.1.6
 7. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane
 8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
 9. Click `OK` to save and close the settings
+
+The your Android app now references the Apptentive Android SDK.
+
+#### Using Eclipse
+
+These instructions were tested for the Juno Eclipse release.
+
+1. From the menu bar, click `File` -> `Import`
+2. Under `General`, select `Existing Projects into Workspace`
+3. Click `Next`
+4. In the Package Explorer, select your project
+5. From the menu bar, click `Project` -> `Properties`
+6. On the left side, click `Android`
+7. Under the `Library` section, click `Add`
+8. Select `apptentive-android-sdk`
+9. Click `OK`
 
 The your Android app now references the Apptentive Android SDK.
 
@@ -161,11 +161,10 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
             &lt;/intent-filter>
         &lt;/activity>
 
-        <strong>&lt;!-- Include your App's Apptentive API key. This is available in your app's "settings" page on www.apptentive.com -->
+        <strong>&lt;!-- Include your App's Apptentive API key from your app's "settings" page on www.apptentive.com -->
         &lt;meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/></strong>
 
-        <strong>&lt;!-- Copy in this code. It sets up the single Activity we use to launch our views, and allows us to be
-            notified when the internet connection comes up, so we can handle sending and receiving message reliably -->
+        <strong>&lt;!-- Add a reference to Apptentive's ViewActivity and NetworkStateReceiver -->
         &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/Apptentive.Theme.Transparent"/>
 
@@ -185,12 +184,12 @@ Note: Be sure to input your Apptentive API Key where it says "YOUR_API_KEY_GOES_
 #### Integrate your Activities with Apptentive
 
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
-There are two ways of doing this: Inheritence, and Delegation. Inheritence is the easiest method, while delegation is
+There are two ways of doing this: Inheritance, and Delegation. Inheritance is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities. 
 
 Add one of the following code snippets to ALL of the Activities you define in your manifest (mix and match is OK too).
 
-##### Inheritence
+##### Inheritance
 
 <pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
 
@@ -220,6 +219,12 @@ public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
 
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
 
+##### Method
+
+```Apptentive.showMessageCenter(Activity activity);```
+
+##### Example
+
 <pre><code>Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
 messageCenterButton.setOnClickListener(new View.OnClickListener(){
     public void onClick(View v) {
@@ -229,6 +234,12 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
 Do this in your main Activity's onCreate() method:
+
+##### Method
+
+```Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);```
+
+##### Example
 
 <pre><code>Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
     public void onUnreadMessageCountChanged(final int unreadMessages) {
@@ -242,19 +253,29 @@ Apptentive can ask users to rate your app after a set of conditions are met. Tho
 Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
 have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity:
 
-<pre><code>@Override
+##### Method
+
+```Apptentive.showRatingFlowIfConditionsAreMet(this);```
+
+##### Example
+
+```
+@Override
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
         <strong>Apptentive.showRatingFlowIfConditionsAreMet(this);</strong>
     }
-}</code></pre>
+}
+```
 
 You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](http:s//apptentive.com) account.
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
 days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
 
-<pre><code><strong>Apttentive.logSignificantEvent(this);</strong></code></pre>
+##### Method
+
+```Apptentive.logSignificantEvent(Context context);```
 
 #### Surveys
 
