@@ -212,8 +212,7 @@ public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
     protected void onStop() {
         super.onStop();
         <strong>Apptentive.onStop(this);</strong>
-    }
-</code></pre>
+    }</code></pre>
 
 #### Message Center
 
@@ -221,7 +220,7 @@ You can add a button that will show the Apptentive feedback UI when pressed. Her
 
 ##### Method
 
-```Apptentive.showMessageCenter(Activity activity);```
+<pre><code>public static void Apptentive.showMessageCenter(Activity activity);</code></pre>
 
 ##### Example
 
@@ -237,7 +236,7 @@ Do this in your main Activity's onCreate() method:
 
 ##### Method
 
-```Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);```
+<pre><code>public static void Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);</code></pre>
 
 ##### Example
 
@@ -251,23 +250,21 @@ Do this in your main Activity's onCreate() method:
 
 Apptentive can ask users to rate your app after a set of conditions are met. Those conditions can be specified in your
 Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
-have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity:
+have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity.
 
 ##### Method
 
-```Apptentive.showRatingFlowIfConditionsAreMet(this);```
+<pre><code>public static void Apptentive.showRatingFlowIfConditionsAreMet(this);</code></pre>
 
 ##### Example
 
-```
-@Override
+<pre><code>@Override
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
         <strong>Apptentive.showRatingFlowIfConditionsAreMet(this);</strong>
     }
-}
-```
+}</code></pre>
 
 You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](http:s//apptentive.com) account.
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
@@ -275,7 +272,7 @@ days and uses for you, but you will need to tell us each time the user performs 
 
 ##### Method
 
-```Apptentive.logSignificantEvent(Context context);```
+<pre><code>public static void Apptentive.logSignificantEvent(Context context);</code></pre>
 
 #### Surveys
 
@@ -286,23 +283,23 @@ or skips a survey.
 
 ##### Method
 
-```
-showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags);
-```
+<pre><code>public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags);</code></pre>
 
 ##### Example
 
-```
-Apptentive.showSurvey(this,
+<pre><code>Apptentive.showSurvey(this,
   new OnSurveyCompletedListener() {
     public void onSurveyCompletedListener() {
       // Code that runs when the survey was successfully completed.
     }
   });
-});
-```
+});</code></pre>
 
 To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailable()`.
+
+##### Method
+
+<pre><code>public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);</code></pre>
 
 #### Extra Configuration (Optional)
 
