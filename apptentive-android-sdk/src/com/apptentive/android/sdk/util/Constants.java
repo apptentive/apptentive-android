@@ -7,10 +7,6 @@
 package com.apptentive.android.sdk.util;
 
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 
 /**
  * @author Sky Kelsey
@@ -74,69 +70,9 @@ public class Constants {
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-	private static final int SCREEN_ANIMATION_DURATION = 300;
-	private static final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
-
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
-
-
-	public static Animation inFromRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
 
 	/**
 	 * A list of mobile carrier network types as Strings.
