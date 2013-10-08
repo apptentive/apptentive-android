@@ -189,14 +189,14 @@ provided if you can't or don't want to inherit from our Activities.
 
 Add one of the following code snippets to ALL of the Activities you define in your manifest (mix and match is OK too).
 
-##### Inheritance
+###### Inheritance
 
 <pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
 
 public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
 </code></pre>
 
-##### Delegation
+###### Delegation
 
 <pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
 
@@ -218,11 +218,11 @@ public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
 
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
 
-##### Method
+###### Method
 
 <pre><code>public static void Apptentive.showMessageCenter(Activity activity);</code></pre>
 
-##### Example
+###### Example
 
 <pre><code>Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
 messageCenterButton.setOnClickListener(new View.OnClickListener(){
@@ -234,11 +234,11 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
 Do this in your main Activity's onCreate() method:
 
-##### Method
+###### Method
 
 <pre><code>public static void Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);</code></pre>
 
-##### Example
+###### Example
 
 <pre><code>Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
     public void onUnreadMessageCountChanged(final int unreadMessages) {
@@ -252,11 +252,11 @@ Apptentive can ask users to rate your app after a set of conditions are met. Tho
 Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
 have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity.
 
-##### Method
+###### Method
 
 <pre><code>public static void Apptentive.showRatingFlowIfConditionsAreMet(this);</code></pre>
 
-##### Example
+###### Example
 
 <pre><code>@Override
 public void onWindowFocusChanged(boolean hasFocus) {
@@ -270,7 +270,7 @@ You can change the conditions necessary for the ratings flow to be shown by logg
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
 days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
 
-##### Method
+###### Method
 
 <pre><code>public static void Apptentive.logSignificantEvent(Context context);</code></pre>
 
@@ -281,29 +281,29 @@ survey, simply call `Apptentive.showSurvey()`. You can optionally passing in a s
 when you create a survey on [Apptentive](http://apptentive.com). You can also pass in a listener and be notified when the user submits
 or skips a survey.
 
-##### Method
+###### Method
 
 <pre><code>public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags);</code></pre>
 
-##### Example
+###### Example
 
-<pre><code>Apptentive.showSurvey(this,
+<pre><code>Apptentive.showSurvey(
+  this,
   new OnSurveyCompletedListener() {
     public void onSurveyCompletedListener() {
       // Code that runs when the survey was successfully completed.
     }
-  });
-});</code></pre>
+  },
+  "completed_level_ten"
+);</code></pre>
 
 To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailable()`.
 
-##### Method
+###### Method
 
 <pre><code>public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);</code></pre>
 
 #### Extra Configuration (Optional)
-
-These steps must all be performed in your main Activity's `onCreate()` method.
 
 ##### Support for Amazon Appstore
 
