@@ -297,32 +297,13 @@ the user does not respond in-app, your message can still get to them through ema
 
 <pre><code>Apptentive.setUserEmail("user_email@example.com");</code></pre>
 
-<<<<<<< HEAD
-#### Send custom device data to apptentive.com
-
-This data is associated with the person's device. It will show up when you view the profile of the person who sent you
-feedback. It is especially useful for specifying any internal user IDs that you use to identify users.
-=======
 ##### Send Custom Data to Apptentive
->>>>>>> next
 
-<pre><code>Apptentive.setCustomData(Context context, String key, String value);
+<pre><code>Apptentive.addCustomData(Context context, String key, String value);
 </code></pre>
 
 <pre><code>Apptentive.removeCustomData(Context context, String key);
 </code></pre>
 
-<<<<<<< HEAD
 <pre><code>Apptentive.setCustomData(Context context, Map&lt;String, String&gt; customData);
 </code></pre>
-
-
-## Done
-That's it. If you have any questions or concerns, please email <strong>sky@apptentive.com</strong>.
-<br/>
-<br/>
-=======
-<pre><code>Map&lt;String, String&gt; customData = new HashMap&lt;String, String&gt;();
-customData.put("user-id", "1234567890");
-Apptentive.setCustomData(customData);</code></pre>
->>>>>>> next
