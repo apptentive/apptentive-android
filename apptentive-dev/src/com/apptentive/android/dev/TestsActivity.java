@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.storage.PersonManager;
 
 import java.util.List;
 
@@ -100,5 +101,12 @@ public class TestsActivity extends ApptentiveActivity {
 		String key = (keyText).getText().toString().trim();
 		keyText.setText(null);
 		Apptentive.removeCustomPersonData(this, key);
+	}
+
+	public void setInitialPersonEmail(View view) {
+		EditText emailText = (EditText) findViewById(R.id.set_initial_person_email);
+		String email = (emailText).getText().toString().trim();
+		emailText.setText(null);
+		PersonManager.storeInitialPersonEmail(this, email);
 	}
 }

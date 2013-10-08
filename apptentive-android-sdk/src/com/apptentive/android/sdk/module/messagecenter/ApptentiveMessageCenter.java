@@ -161,12 +161,12 @@ public class ApptentiveMessageCenter {
 		final MessageCenterIntroDialog dialog = new MessageCenterIntroDialog(activity);
 		dialog.setEmailRequired(emailRequired);
 
-		String email = Util.getUserEmail(activity);
-		Person storedPerson = PersonManager.getStoredPerson(activity);
-		if (storedPerson != null && Util.isEmpty(storedPerson.getEmail())) {
-			if (email != null) {
+		String personEnteredEmail = PersonManager.loadPersonEmail(activity);
+		String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
+		if (Util.isEmpty(personEnteredEmail)) {
+			if(!Util.isEmpty(personInitialEmail)) {
 				dialog.setEmailFieldHidden(false);
-				dialog.prePopulateEmail(email);
+				dialog.prePopulateEmail(personInitialEmail);
 			}
 		} else {
 			dialog.setEmailFieldHidden(true);
@@ -189,7 +189,7 @@ public class ApptentiveMessageCenter {
 				// Save the email.
 				if (dialog.isEmailFieldVisible()) {
 					if (email != null && email.length() != 0) {
-						Apptentive.setUserEmail(email);
+						PersonManager.storePersonEmail(activity, email);
 						Person person = PersonManager.storePersonAndReturnDiff(activity);
 						if(person != null) {
 							Log.d("Person was updated.");

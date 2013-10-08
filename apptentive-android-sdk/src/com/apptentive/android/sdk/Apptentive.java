@@ -112,21 +112,24 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Sets the user email address. This email address will be sent to the Apptentive server to allow out of app
+	 * Sets the initial user email address. This email address will be sent to the Apptentive server to allow out of app
 	 * communication, and to help provide more context about this user. This email will be the definitive email address
-	 * for this user.
+	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
+	 * idempotent.
 	 *
+	 * @param context The context from which this method was called.
 	 * @param email The user's email address.
 	 */
-	public static void setUserEmail(String email) {
-		GlobalInfo.userEmail = email;
+	public static void setInitialUserEmail(Context context, String email) {
+		PersonManager.storeInitialPersonEmail(context, email);
 	}
 
 	/**
 	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
-	 * custom device data that you have set for this app.</p>
+	 * custom device data that you have set for this app. Calls to this method are idempotent.</p>
 	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
 	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
+	 *
 	 * @param context The context from which this method was called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
@@ -143,7 +146,9 @@ public class Apptentive {
 	}
 
 	/**
-	 * Add a piece of custom data to the device's info. This info will be sent to the server.
+	 * Add a piece of custom data to the device's info. This info will be sent to the server.  Calls to this method are
+	 * idempotent.
+	 *
 	 * @param context The context from which this method was called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
@@ -164,7 +169,7 @@ public class Apptentive {
 	}
 
 	/**
-	 * Remove a piece of custom data from the device's info.
+	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
 	 * @param context The context from which this method was called.
 	 * @param key The key to remove.
 	 */
@@ -178,9 +183,10 @@ public class Apptentive {
 
 	/**
 	 * <p>Allows you to pass arbitrary string data to the server along with this person's info. This method will replace all
-	 * custom person data that you have set for this app.</p>
+	 * custom person data that you have set for this app. Calls to this method are idempotent.</p>
 	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
 	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
+	 *
 	 * @param context The context from which this method was called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
 	 */
@@ -199,7 +205,9 @@ public class Apptentive {
 
 
 	/**
-	 * Add a piece of custom data to the person's info. This info will be sent to the server.
+	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
+	 * idempotent.
+	 *
 	 * @param context The context from which this method was called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
@@ -220,7 +228,8 @@ public class Apptentive {
 	}
 
 	/**
-	 * Remove a piece of custom data from the person's info.
+	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
+	 *
 	 * @param context The context from which this method was called.
 	 * @param key The key to remove.
 	 */

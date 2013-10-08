@@ -18,9 +18,6 @@ import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Sky Kelsey
  */
