@@ -1,6 +1,6 @@
 # Apptentive Android SDK
 
-The Apptentive Android SDK lets you provide a powerful and simple channel to your customers. With it, you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at specific points within your app, and more.
+The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it, you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at specific points within your app, and more.
 
 Note: For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
 
@@ -91,28 +91,34 @@ Our code can be accessed in two ways.
 
 These instructions were tested for the Juno Eclipse release.
 
-1. From the menu bar, click `File` -> `Import`. Under `General`, select `Existing Projects into Workspace`. Click `Next`.
-2. In the Package Explorer, select your project.
-3. From the menu bar, click `Project` -> `Properties`.
-4. On the left side, click `Android`. Then, under the `Library` section, click `Add`.
-5. Select `apptentive-android-sdk`, and click `OK`.
+1. From the menu bar, click `File` -> `Import`
+2. Under `General`, select `Existing Projects into Workspace`
+3. Click `Next`
+4. In the Package Explorer, select your project
+5. From the menu bar, click `Project` -> `Properties`
+6. On the left side, click `Android`
+7. Under the `Library` section, click `Add`
+8. Select `apptentive-android-sdk`
+9. Click `OK`
 
-The Apptentive SDK is now available in your Eclipse project.
+The your Android app now references the Apptentive Android SDK.
 
 #### Using IntelliJ IDEA
 
-These instructions were tested for IntelliJ IDEA 12.1.
+These instructions were tested for IntelliJ IDEA 12.1.6
 
-1. From the menu bar, click `File` -> `Import Module`.
-2. Select the apptentive-android-sdk directory.
-3. Click the `Create module from existing sources` radio button, and click `Next` until finished.
-4. From the menu bar, click `File` -> `Project Structure...`.
-5. Under `Project Settings` click `Modules`, and then select your app's module.
-6. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane.
-7. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`.
-8. Click `OK` to save and close the settings.
+1. From the menu bar, click `File` -> `Import Module`
+2. Select the `apptentive-android-sdk` directory
+3. Click the `Create module from existing sources` radio button
+4. Click `Next` until finished
+5. From the menu bar, click `File` -> `Project Structure...`
+6. Under `Project Settings` click `Modules`
+7. Select your Android app's module
+7. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane
+8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
+9. Click `OK` to save and close the settings
 
-The Apptentive SDK is now available in your IntelliJ IDEA project.
+The your Android app now references the Apptentive Android SDK.
 
 -
 
