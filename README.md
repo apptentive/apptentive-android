@@ -4,6 +4,8 @@ The Apptentive Android SDK lets you provide a powerful and simple channel to you
 
 Note: For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
 
+-------------------------------------------------
+
 The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use newer XML syntax for forward compatibility.
 
 The following languages are supported:
