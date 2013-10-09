@@ -317,17 +317,55 @@ If you omit this line, ratings will go to Google Play.
 ##### Specifying the User's Email Address
 
 If you are authorized to access the user's email address, you may specify it during initialization so that in the event
-the user does not respond in-app, your message can still get to them through email.
+the user does not respond in-app, your message can still get to them via email. Note that if ths user updates their
+email through an Apptentive UI, we will use that instead.
 
-<pre><code>Apptentive.setUserEmail("user_email@example.com");</code></pre>
+###### Method
 
-##### Send Custom Data to Apptentive
+<pre><code>public static void Apptentive.setInitialUserEmail(Context context, String email);</code></pre>
 
-<pre><code>Apptentive.addCustomData(Context context, String key, String value);
-</code></pre>
+###### Example
 
-<pre><code>Apptentive.removeCustomData(Context context, String key);
-</code></pre>
+<pre><code>Apptentive.setUserEmail("johndoe@example.com");</code></pre>
 
-<pre><code>Apptentive.setCustomData(Context context, Map&lt;String, String&gt; customData);
-</code></pre>
+##### Send Custom Device Data to Apptentive
+
+You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
+key/value string pairs.
+
+###### Method
+
+<pre><code>public static void Apptentive.addCustomDeviceData(Context context, String key, String value);</code></pre>
+
+###### Example
+
+<pre><code>Apptentive.addCustomData(this, "myDeviceId", "1234567890");</code></pre>
+
+###### Method
+
+<pre><code>public static void Apptentive.removeCustomDeviceData(Context context, String key);</code></pre>
+
+###### Example
+
+<pre><code>Apptentive.removeCustomDeviceData(this, "myDeviceId");</code></pre>
+
+##### Send Custom Person Data to Apptentive
+
+You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
+Data must be key/value string pairs.
+
+###### Method
+
+<pre><code>public static void Apptentive.addCustomPersonData(Context context, String key, String value);</code></pre>
+
+###### Example
+
+<pre><code>Apptentive.addCustomPersonData(this, "myUserId", "1234567890");</code></pre>
+
+###### Method
+
+<pre><code>public static void Apptentive.removeCustomPersonData(Context context, String key);</code></pre>
+
+###### Example
+
+<pre><code>Apptentive.removeCustomPersonData(this, "myUserId");</code></pre>
