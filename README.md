@@ -70,7 +70,7 @@ This walk-through will guide you through the installation and configuration of t
 out below are instructions that will allow you to ask users to rate your app, give and receive feedback about app performance, and
 show surveys to your users.
 
-Note: The installation instructions are also presented to you on [Apptentive](http://www.apptentive.com) when you add an app. This document is kept in sync with our web documentation.
+Note: These installation instructions are also presented to you on [Apptentive](https://www.apptentive.com) when you add an app. This document is kept in sync with our web documentation.
 
 -
 
@@ -262,7 +262,7 @@ public void onWindowFocusChanged(boolean hasFocus) {
     }
 }</code></pre>
 
-You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](http:s//apptentive.com) account.
+You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](https://www.apptentive.com) account.
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
 days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
 
@@ -274,7 +274,7 @@ days and uses for you, but you will need to tell us each time the user performs 
 
 Surveys are fetched from the server when the app starts, so you don't have to worry about managing them. To show a
 survey, simply call `Apptentive.showSurvey()`. You can optionally passing in a set of tags to match against. Tags are defined
-when you create a survey on [Apptentive](http://apptentive.com). You can also pass in a listener and be notified when the user submits
+when you create a survey on [Apptentive](https://www.apptentive.com). You can also pass in a listener and be notified when the user submits
 or skips a survey.
 
 ###### Method
