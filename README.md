@@ -102,8 +102,6 @@ These instructions were tested for IntelliJ IDEA 12.1.6
 8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
 9. Click `OK` to save and close the settings
 
-The your Android app now references the Apptentive Android SDK.
-
 #### Using Eclipse
 
 These instructions were tested for the Juno Eclipse release.
@@ -117,8 +115,6 @@ These instructions were tested for the Juno Eclipse release.
 7. Under the `Library` section, click `Add`
 8. Select `apptentive-android-sdk`
 9. Click `OK`
-
-The your Android app now references the Apptentive Android SDK.
 
 -
 
@@ -134,12 +130,13 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
           android:versionCode="1"
           android:versionName="1.0">
 
-    <strong>&lt;!-- All permissions required except GET_ACCOUNTS, which is only need to pull user email -->
+    <strong>&lt;!-- Required permissions. -->
     &lt;uses-permission android:name="android.permission.INTERNET"/>
     &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    &lt;!-- Optional permissions. GET_ACCOUNTS is used to pre-populate user email in form fields. -->
     &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
 
-    <strong>&lt;!-- This is not part of the integration, but make sure you are supporting high resolution screens so Apptentive UI elements look great! --></strong>
+    <strong>&lt;!-- Make sure you are supporting high resolution screens so Apptentive UI elements look great! --></strong>
     &lt;supports-screens android:largeScreens="true"
                       android:normalScreens="true"
                       android:smallScreens="true"
@@ -147,7 +144,6 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 
     <strong>&lt;!-- minSDKVersion must be at least 7 --></strong>
     &lt;uses-sdk android:minSdkVersion="7"
-              android:maxSdkVersion="18"
               android:targetSdkVersion="18"/>
 
     &lt;application android:label="@string/app_name" android:icon="@drawable/icon">
