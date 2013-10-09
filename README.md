@@ -236,11 +236,13 @@ Do this in your main Activity's onCreate() method:
 
 ###### Example
 
-<pre><code>Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
-    public void onUnreadMessageCountChanged(final int unreadMessages) {
-        // Use the updated count.
+<pre><code>Apptentive.setUnreadMessagesListener(
+    new UnreadMessagesListener() {
+        public void onUnreadMessageCountChanged(final int unreadMessages) {
+            // Use the updated count.
+        }
     }
-});</code></pre>
+);</code></pre>
 
 #### Ratings
 
@@ -250,7 +252,7 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 
 ###### Method
 
-<pre><code>public static void Apptentive.showRatingFlowIfConditionsAreMet(this);</code></pre>
+<pre><code>public static void Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);</code></pre>
 
 ###### Example
 
@@ -322,7 +324,7 @@ email through an Apptentive UI, we will use that instead.
 
 ###### Example
 
-<pre><code>Apptentive.setUserEmail("johndoe@example.com");</code></pre>
+<pre><code>Apptentive.setUserEmail(this, "johndoe@example.com");</code></pre>
 
 ##### Send Custom Device Data to Apptentive
 
