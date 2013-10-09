@@ -282,4 +282,31 @@ public class Util {
 			return false;
 		}
 	}
+
+	public static Object getPackageMetaData(Context context, String key) {
+		try {
+			return context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData.get(key);
+		} catch (PackageManager.NameNotFoundException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * <p>This method will allow you to pass in literal strings. You must wrap the string in single quotes in order to ensure it is not modified
+	 * by Android. Android will try to coerce the string to a float, Integer, etc., if it looks like one.</p>
+	 *
+	 * <p>Example: <code>&lt;meta-data android:name="sdk_distribution" android:value="'1.00'"/></code></p>
+	 * <p>This will evaluate to a String "1.00". If you leave off the single quotes, this method will just cast to a String, so the result would be a String "1.0".</p>
+	 */
+	public static String getPackageMetaDataSingleQuotedString(Context context, String key) {
+		Object object = getPackageMetaData(context, key);
+		String ret = object.toString();
+		if (ret.endsWith("'")) {
+			ret = ret.substring(0, ret.length() - 1);
+		}
+		if (ret.startsWith("'")) {
+			ret = ret.substring(1, ret.length());
+		}
+		return ret;
+	}
 }

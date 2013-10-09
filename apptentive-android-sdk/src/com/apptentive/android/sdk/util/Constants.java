@@ -66,6 +66,8 @@ public class Constants {
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "sdk_distribution";
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "sdk_distribution_version";
 
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
