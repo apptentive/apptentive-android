@@ -38,11 +38,11 @@ public class SdkManager {
 
 		// Distribution and distribution version are optionally set in the manifest by the wrapping platform (trigger, etc.)
 		Object distribution = Util.getPackageMetaDataSingleQuotedString(context, Constants.MANIFEST_KEY_SDK_DISTRIBUTION);
-		if(distribution != null) {
+		if(distribution != null && distribution.toString().length() != 0) {
 			sdk.setDistribution(distribution.toString());
 		}
 		Object distributionVersion = Util.getPackageMetaDataSingleQuotedString(context, Constants.MANIFEST_KEY_SDK_DISTRIBUTION_VERSION);
-		if(distributionVersion != null) {
+		if(distributionVersion != null && distributionVersion.toString().length() != 0) {
 			sdk.setDistributionVersion(distributionVersion.toString());
 		}
 

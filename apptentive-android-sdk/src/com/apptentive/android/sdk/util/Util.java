@@ -300,6 +300,9 @@ public class Util {
 	 */
 	public static String getPackageMetaDataSingleQuotedString(Context context, String key) {
 		Object object = getPackageMetaData(context, key);
+		if (object == null) {
+			return null;
+		}
 		String ret = object.toString();
 		if (ret.endsWith("'")) {
 			ret = ret.substring(0, ret.length() - 1);

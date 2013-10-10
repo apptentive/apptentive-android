@@ -364,15 +364,17 @@ public class Apptentive {
 			String apiKey = null;
 			try {
 				ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-				if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
-					apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-				}
-				if(ai != null && ((ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)) {
-					GlobalInfo.isAppDebuggable = true;
-				}
+				Bundle metaData = ai.metaData;
+				apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+
+				boolean debugFlagSet = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+				boolean apptentiveDebugSet = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
+					GlobalInfo.isAppDebuggable = debugFlagSet || apptentiveDebugSet;
 			} catch(Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
 			}
+
+			Log.i("Debug mode enabled? %b" , GlobalInfo.isAppDebuggable);
 
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
@@ -384,6 +386,8 @@ public class Apptentive {
 				}
 			}
 			GlobalInfo.apiKey = apiKey;
+
+			Log.i("API Key: %s" , GlobalInfo.apiKey);
 
 			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = context.getPackageName();

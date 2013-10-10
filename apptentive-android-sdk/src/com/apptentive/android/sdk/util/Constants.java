@@ -65,6 +65,7 @@ public class Constants {
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 
+	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
