@@ -333,7 +333,7 @@ public class RatingModule {
 	/**
 	 * Apply the rules from the logic expression.
 	 *
-	 * @param obj
+	 * @param obj The node to analyze. Type determines how we treat the node.
 	 * @return True it the logic expression is true.
 	 * @throws JSONException
 	 */

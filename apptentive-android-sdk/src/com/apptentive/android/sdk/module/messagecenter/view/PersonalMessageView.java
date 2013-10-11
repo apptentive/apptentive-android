@@ -26,8 +26,6 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 
 	/**
 	 * Perform any view initialization here. Make sure to call super.init() first to initialise the parent hierarchy.
-	 *
-	 * @param message
 	 */
 	protected void init(T message) {
 		super.init(message);

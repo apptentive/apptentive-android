@@ -46,7 +46,8 @@ public class FileMessage extends Message {
 
 	/**
 	 * FileMessages are sent using a multipart form encoded request, so they are handled differently here.
-	 * @return
+	 *
+	 * @return A String containing just the meta data about the FileMessage.
 	 */
 	@Override
 	public String marshallForSending() {
@@ -56,7 +57,7 @@ public class FileMessage extends Message {
 	public String getFileName() {
 		try {
 			return getString(KEY_FILE_NAME);
-		}catch (JSONException e) {
+		} catch (JSONException e) {
 		}
 		return null;
 	}

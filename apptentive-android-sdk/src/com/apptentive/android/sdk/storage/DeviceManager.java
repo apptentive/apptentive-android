@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
@@ -16,6 +22,7 @@ import java.util.TimeZone;
 
 /**
  * A helper class with static methods for getting, storing, retrieving, and diffing information about the current device.
+ *
  * @author Sky Kelsey
  */
 public class DeviceManager {
@@ -23,7 +30,8 @@ public class DeviceManager {
 	/**
 	 * If any device setting has changed, return only the changed fields in a new Device object. If a field's value was
 	 * cleared, set that value to null in the Device. The first time this is called, all Device will be returned.
-	 * @return
+	 *
+	 * @return A Device containing diff data which, when added to the last sent Device, yields the new Device.
 	 */
 	public static Device storeDeviceAndReturnDiff(Context context) {
 
@@ -34,7 +42,7 @@ public class DeviceManager {
 		current.setCustomData(customData);
 
 		Device diff = diffDevice(stored, current);
-		if(diff != null) {
+		if (diff != null) {
 			storeDevice(context, current);
 			return diff;
 		}
@@ -68,7 +76,7 @@ public class DeviceManager {
 		device.setOsName("Android");
 		device.setOsVersion(Build.VERSION.RELEASE);
 		device.setOsBuild(Build.VERSION.INCREMENTAL);
-		device.setOsApiLevel(""+Build.VERSION.SDK_INT);
+		device.setOsApiLevel("" + Build.VERSION.SDK_INT);
 		device.setManufacturer(Build.MANUFACTURER);
 		device.setModel(Build.MODEL);
 		device.setBoard(Build.BOARD);
@@ -93,7 +101,7 @@ public class DeviceManager {
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
 		device.setLocaleRaw(Locale.getDefault().toString());
-		device.setUtcOffset(""+(TimeZone.getDefault().getRawOffset() / 1000));
+		device.setUtcOffset("" + (TimeZone.getDefault().getRawOffset() / 1000));
 		return device;
 	}
 
@@ -116,12 +124,11 @@ public class DeviceManager {
 	 * Creates a new Device object with the values from newer where they are different from older. If a value exists
 	 * in older but not newer, an empty string is set for that key, which tells the server to clear the value. A null
 	 * values for a key will not be written so that this method only returns a strict diff of older and newer.
-	 * @param old
-	 * @param newer
+	 *
 	 * @return A new Device object if there were any differences, else null.
 	 */
 	private static Device diffDevice(Device old, Device newer) {
-		if(old == null) {
+		if (old == null) {
 			return newer;
 		}
 
@@ -224,7 +231,7 @@ public class DeviceManager {
 		}
 
 		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
-		if(customData != null) {
+		if (customData != null) {
 			ret.setCustomData(customData);
 		}
 
@@ -250,7 +257,7 @@ public class DeviceManager {
 
 
 		// If there were no differences, return null.
-		if(ret.length() <= baseEntries) {
+		if (ret.length() <= baseEntries) {
 			return null;
 		}
 		return ret;
@@ -262,24 +269,24 @@ public class DeviceManager {
 	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
 	 */
 	private static String chooseLatest(String old, String newer) {
-		if(old == null || old.equals("")) {
+		if (old == null || old.equals("")) {
 			old = null;
 		}
-		if(newer == null || newer.equals("")) {
+		if (newer == null || newer.equals("")) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
-		 	return newer;
+		if (old != null && newer != null && !old.equals(newer)) {
+			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
+		if (old != null && newer == null) {
 			return "";
 		}
 
-		if(old == null && newer != null) {
+		if (old == null && newer != null) {
 			return newer;
 		}
 
@@ -288,20 +295,20 @@ public class DeviceManager {
 	}
 
 	private static CustomData chooseLatest(CustomData old, CustomData newer) {
-		if(old == null || old.length() == 0) {
+		if (old == null || old.length() == 0) {
 			old = null;
 		}
-		if(newer == null || newer.length() == 0) {
+		if (newer == null || newer.length() == 0) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
+		if (old != null && newer != null && !old.equals(newer)) {
 			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
+		if (old != null && newer == null) {
 			try {
 				return new CustomData();
 			} catch (JSONException e) {
@@ -309,7 +316,7 @@ public class DeviceManager {
 			}
 		}
 
-		if(old == null && newer != null) {
+		if (old == null && newer != null) {
 			return newer;
 		}
 
