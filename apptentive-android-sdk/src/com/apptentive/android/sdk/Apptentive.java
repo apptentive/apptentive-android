@@ -455,7 +455,7 @@ public class Apptentive {
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			getDatabase(context).addPayload(deviceInfo);
+			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -464,7 +464,7 @@ public class Apptentive {
 		if(sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			getDatabase(context).addPayload(sdk);
+			ApptentiveDatabase.getInstance(context).addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -473,7 +473,7 @@ public class Apptentive {
 		if(person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			getDatabase(context).addPayload(person);
+			ApptentiveDatabase.getInstance(context).addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
 		}
@@ -487,7 +487,7 @@ public class Apptentive {
 	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
-		getDatabase(context).addPayload(appRelease);
+		ApptentiveDatabase.getInstance(context).addPayload(appRelease);
 	}
 
 	private synchronized static void asyncFetchConversationToken(final Context context) {
@@ -591,13 +591,6 @@ public class Apptentive {
 	static void showMessageCenter(Activity activity, boolean forced) {
 		MessageManager.createMessageCenterAutoMessage(activity, forced);
 		ApptentiveMessageCenter.show(activity, forced);
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static ApptentiveDatabase getDatabase(Context context) {
-		return new ApptentiveDatabase(context);
 	}
 
 	/**

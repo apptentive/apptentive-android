@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -38,7 +37,7 @@ public class PayloadSendWorker {
 	}
 
 	private static PayloadStore getPayloadStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	private static class PayloadRunner extends Thread {

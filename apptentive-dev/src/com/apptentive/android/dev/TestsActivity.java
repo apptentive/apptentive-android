@@ -32,20 +32,14 @@ public class TestsActivity extends ApptentiveActivity {
 		setContentView(R.layout.tests);
 	}
 
-	public void back(View view) {
-		finish();
-	}
-
-	public void testTweet(View view) {
-		try {
+	public void testTweet(@SuppressWarnings("unused") View view) {
+		try{
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.putExtra(Intent.EXTRA_TEXT, "Testing...");
 			intent.setType("text/plain");
 			final PackageManager pm = getPackageManager();
-			final List<?> activityList = pm.queryIntentActivities(intent, 0);
-			int len = activityList.size();
-			for (int i = 0; i < len; i++) {
-				final ResolveInfo app = (ResolveInfo) activityList.get(i);
+			final List<ResolveInfo> activityList = pm.queryIntentActivities(intent, 0);
+			for (ResolveInfo app : activityList) {
 				if ("com.twitter.android.PostActivity".equals(app.activityInfo.name)) {
 					final ActivityInfo activityInfo = app.activityInfo;
 					final ComponentName name = new ComponentName(activityInfo.applicationInfo.packageName, activityInfo.name);
@@ -61,12 +55,12 @@ public class TestsActivity extends ApptentiveActivity {
 		}
 	}
 
-	public void throwNpe(View view) {
-		//throw new NullPointerException("This is just an exception that will crash the app, to test out how the SDK handles it when it resumes.");
+	public void throwNpe(@SuppressWarnings("unused") View view) {
+		//throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
 	}
 
-	public void deleteStoredMessages(View view) {
-		MessageManager.deleteAllRecords(TestsActivity.this);
+	public void deleteStoredMessages(@SuppressWarnings("unused") View view) {
+		MessageManager.deleteAllMessages(TestsActivity.this);
 	}
 
 	public void addCustomDeviceData(View view) {

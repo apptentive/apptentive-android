@@ -11,6 +11,10 @@ Major changes:
 * Added Swedish translation, updated translations for other languages.
 * Restyled the screenshot confirmation dialog to match the other dialogs.
 
+Bugs fixed:
+
+* ANDROID-178 ConcurrentModificationException in survey code
+
 2013-09-15 skykelsey 1.1.2
 --------------------------
 

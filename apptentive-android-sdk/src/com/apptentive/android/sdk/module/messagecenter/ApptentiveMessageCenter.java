@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterIntroDi
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterThankYouDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -194,7 +195,7 @@ public class ApptentiveMessageCenter {
 						if(person != null) {
 							Log.d("Person was updated.");
 							Log.v(person.toString());
-							Apptentive.getDatabase(activity).addPayload(person);
+							ApptentiveDatabase.getInstance(activity).addPayload(person);
 						} else {
 							Log.d("Person was not updated.");
 						}

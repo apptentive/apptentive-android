@@ -68,7 +68,7 @@ public class SurveyManager {
 				// Filter out surveys that have met of exceeded the number of allowed displays per time period.
 				if (SurveyHistory.isSurveyLimitMet(context, next)) {
 					Log.d("Removing survey: " + next.getName());
-					surveyList.remove(next);
+					surveyIterator.remove();
 				}
 			}
 			storeSurveys(context, surveyList);
