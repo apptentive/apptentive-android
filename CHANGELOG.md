@@ -1,3 +1,10 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-178 ConcurrentModificationException in survey code
+
 2013-09-15 skykelsey 1.1.2
 --------------------------
 
