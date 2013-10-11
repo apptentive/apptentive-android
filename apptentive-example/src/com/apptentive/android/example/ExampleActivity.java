@@ -40,13 +40,11 @@ public class ExampleActivity extends ApptentiveActivity {
 		surveySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-				if (i != 0) {
-					if (i == 0) {
-						selectedTag = null;
-					} else {
-						String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
-						selectedTag = tagsArray[i];
-					}
+				if (i == 0) {
+					selectedTag = null;
+				} else {
+					String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
+					selectedTag = tagsArray[i];
 				}
 			}
 
@@ -64,11 +62,11 @@ public class ExampleActivity extends ApptentiveActivity {
 		}
 	}
 
-	public void onMessageCenterButtonPressed(View view) {
+	public void onMessageCenterButtonPressed(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
 	}
 
-	public void onShowSurveyButtonPressed(View view) {
+	public void onShowSurveyButtonPressed(@SuppressWarnings("unused") View view) {
 		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
 			public void onSurveyFinished(boolean completed) {
 				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));

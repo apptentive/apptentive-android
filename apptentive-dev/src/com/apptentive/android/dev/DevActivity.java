@@ -77,41 +77,41 @@ public class DevActivity extends ApptentiveActivity {
 		});
 	}
 
-	public void runTests(View view) {
+	public void runTests(@SuppressWarnings("unused") View view) {
 		Intent testsIntent = new Intent();
 		testsIntent.setClass(this, TestsActivity.class);
 		startActivity(testsIntent);
 	}
 
-	public void reinstall(View view) {
+	public void reinstall(@SuppressWarnings("unused") View view) {
 		DevDebugHelper.resetRatingFlow(this);
 	}
 
-	public void logSignificantEvent(View view) {
+	public void logSignificantEvent(@SuppressWarnings("unused") View view) {
 		Apptentive.logSignificantEvent(this);
 	}
 
-	public void logDay(View view) {
+	public void logDay(@SuppressWarnings("unused") View view) {
 		DevDebugHelper.logDay(this);
 	}
 
-	public void showChoice(View view) {
+	public void showChoice(@SuppressWarnings("unused") View view) {
 		DevDebugHelper.forceShowEnjoymentDialog(this);
 	}
 
-	public void showRating(View view) {
+	public void showRating(@SuppressWarnings("unused") View view) {
 		DevDebugHelper.showRatingDialog(this);
 	}
 
-	public void showFeedback(View view) {
+	public void showFeedback(@SuppressWarnings("unused") View view) {
 		DevDebugHelper.forceShowIntroDialog(this);
 	}
 
-	public void showMessageCenter(View view) {
+	public void showMessageCenter(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
 	}
 
-	public void showSurvey(View view) {
+	public void showSurvey(@SuppressWarnings("unused") View view) {
 		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
 			public void onSurveyFinished(boolean completed) {
 				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));

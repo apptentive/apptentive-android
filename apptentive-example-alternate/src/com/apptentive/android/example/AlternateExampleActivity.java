@@ -76,11 +76,11 @@ public class AlternateExampleActivity extends Activity {
 		super.onStop();
 	}
 
-	public void onMessageCenterButtonPressed(View view) {
+	public void onMessageCenterButtonPressed(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
 	}
 
-	public void onShowSurveyButtonPressed(View view) {
+	public void onShowSurveyButtonPressed(@SuppressWarnings("unused") View view) {
 		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
 			public void onSurveyFinished(boolean completed) {
 				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
