@@ -24,7 +24,6 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 
 	private OnSendListener onSendListener;
 	private boolean emailRequired = false;
-	private boolean messageRequired = true;
 	private CharSequence email;
 	private CharSequence message;
 
@@ -160,13 +159,11 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 
 	private void validateForm(Button sendButton) {
 		boolean passedEmail = true;
-		boolean passedMessage = true;
 		if (emailRequired) {
 			passedEmail = !(email == null || email.length() == 0);
 		}
-		if (messageRequired) {
-			passedMessage = !(message == null || message.length() == 0);
-		}
+		boolean passedMessage = !(message == null || message.length() == 0);
+
 		sendButton.setEnabled(passedEmail && passedMessage);
 	}
 
