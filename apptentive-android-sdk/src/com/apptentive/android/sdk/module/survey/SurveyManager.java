@@ -196,7 +196,7 @@ public class SurveyManager {
 				}
 			} else { // Case: Need tagged survey.
 				if (surveyTags != null) {
-					for (String tag : tagsSet.toArray(new String[]{})) {
+					for (String tag : tagsSet.toArray(new String[tagsSet.size()])) {
 						if (surveyTags.contains(tag)) {
 							if (isSurveyValid(context, survey)) {
 								return survey;
@@ -209,7 +209,7 @@ public class SurveyManager {
 		return null;
 	}
 
-		public static boolean isSurveyValid(Context context, SurveyDefinition survey) {
+	public static boolean isSurveyValid(Context context, SurveyDefinition survey) {
 		boolean expired = false;
 		String endTimeString = survey.getEndTime();
 		if (endTimeString != null) {

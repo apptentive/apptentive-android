@@ -165,7 +165,7 @@ public class ApptentiveMessageCenter {
 		String personEnteredEmail = PersonManager.loadPersonEmail(activity);
 		String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
 		if (Util.isEmpty(personEnteredEmail)) {
-			if(!Util.isEmpty(personInitialEmail)) {
+			if (!Util.isEmpty(personInitialEmail)) {
 				dialog.setEmailFieldHidden(false);
 				dialog.prePopulateEmail(personInitialEmail);
 			}
@@ -192,7 +192,7 @@ public class ApptentiveMessageCenter {
 					if (email != null && email.length() != 0) {
 						PersonManager.storePersonEmail(activity, email);
 						Person person = PersonManager.storePersonAndReturnDiff(activity);
-						if(person != null) {
+						if (person != null) {
 							Log.d("Person was updated.");
 							Log.v(person.toString());
 							ApptentiveDatabase.getInstance(activity).addPayload(person);
@@ -210,7 +210,7 @@ public class ApptentiveMessageCenter {
 				dialog.dismiss();
 
 				final MessageCenterThankYouDialog messageCenterThankYouDialog = new MessageCenterThankYouDialog(activity);
-				messageCenterThankYouDialog.setValidEmailProvided(email != null && Util.isEmailValid(email.toString()));
+				messageCenterThankYouDialog.setValidEmailProvided(email != null && Util.isEmailValid(email));
 				messageCenterThankYouDialog.setOnChoiceMadeListener(new MessageCenterThankYouDialog.OnChoiceMadeListener() {
 					@Override
 					public void onNo() {
@@ -249,7 +249,7 @@ public class ApptentiveMessageCenter {
 		messageCenterView.scrollMessageListViewToBottom();
 	}
 
-	public static void onStop(Context context) {
+	public static void onStop(@SuppressWarnings("unused") Context context) {
 		pollForMessages = false;
 	}
 
