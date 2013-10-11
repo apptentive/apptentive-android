@@ -8,7 +8,14 @@
 
 <resources>
     <string name="app_name">Apptentive Dev</string>
-    <string name="button_feedback_text">Feedback</string>
-    <string name="button_ratings_text">Rating</string>
-    <string name="button_choice_text">Choice</string>
+    <string name="button_tests">Tests</string>
+    <string name="button_reset_rating_flow">Reset Rating Flow</string>
+    <string name="button_trigger_event">Trigger Event</string>
+    <string name="button_subtract_a_day">Subtract a Day</string>
+    <string name="button_force_choice">Force Choice</string>
+    <string name="button_force_rating">Force Rating</string>
+    <string name="button_force_intro_dialog">Force Intro</string>
+    <string name="button_message_center">Message Center</string>
+    <string name="button_show_survey">Show Survey</string>
+    <string name="text_with_tag">with tag:</string>
 </resources>

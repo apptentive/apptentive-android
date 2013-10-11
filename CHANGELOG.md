@@ -121,7 +121,7 @@ Bugs fixed:
 
 * ANDROID-95 Move to a queue and timer based solution instead of an event based one. Tear out the old stuff.
 * ANDROID-96 Fix two bugs. Add an android for a resource that needed it, and allow pre API level 5 devices to work.
-* ANDROID-97 Starting appes takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
+* ANDROID-97 Starting apps takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
 
 2012-09-13 skykelsey v0.5.2
 ---------------------------
