@@ -27,7 +27,7 @@
   <string name="apptentive_about_privacy">Din feedback lagras hos Apptentive. Apptentives integritetspolicy och utvecklarens sekretesspolicy gäller.</string>
   <string name="apptentive_about_privacy_link">Gå till Apptentive\'s sekretesspolicy</string>
   <string name="apptentive_do_you_love_this_app">Älskar du %s?</string>
-  <string name="apptentive_rating_message_fs">Vi är väldigt glada att höra att du gillar %! Det skulle vara riktigt användbart om du betygsatt oss. Tack på förhand.</string>
+  <string name="apptentive_rating_message_fs">Vi är väldigt glada att höra att du gillar %s! Det skulle vara riktigt användbart om du betygsatt oss. Tack på förhand.</string>
   <string name="apptentive_rate_this_app">Betygsätt %s</string>
   <string name="apptentive_rating_remind">Påminn mig senare</string>
   <string name="apptentive_rating_error">Vi kunde inte hitta denna app i butiken. Besök butiken för att hitta och betygsätta den.</string>
