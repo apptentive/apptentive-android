@@ -130,7 +130,7 @@ public class SurveyModule {
 
 				getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
 
-				if(SurveyModule.this.onSurveyFinishedListener != null) {
+				if (SurveyModule.this.onSurveyFinishedListener != null) {
 					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
 				}
 
@@ -190,8 +190,8 @@ public class SurveyModule {
 					}
 				});
 				questions.addView(multiselectQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
-				// TODO: This.
+//		} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
+//			// TODO: This.
 			}
 		}
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
@@ -204,7 +204,7 @@ public class SurveyModule {
 
 	void sendMetricForQuestion(Context context, Question question) {
 		String questionId = question.getId();
-		if(!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
+		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
@@ -219,7 +219,7 @@ public class SurveyModule {
 
 	void onBackPressed(Activity activity) {
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__cancel, null, data);
-		if(SurveyModule.this.onSurveyFinishedListener != null) {
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}
 		cleanup();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -33,18 +33,19 @@ public class ActivityUtil {
 	 * <p/> Call this from Activity.onPause(), and it will tell you if the Application is being backgrounded so another
 	 * Application can run.
 	 * <p/>Requires permission: android.permission.GET_TASKS
+	 *
 	 * @param activity The activity you are calling from.
-	 * @deprecated Marking this deprecated simply so you read this whole javadoc before trying to use this method.
 	 * @return true: if another Application is coming to the foreground.<p/>
 	 *         false: if the Activity is merely giving way to another Activity defined in the same Application.
+	 * @deprecated Marking this deprecated simply so you read this whole javadoc before trying to use this method.
 	 */
 	public static boolean isApplicationBroughtToBackground(final Activity activity) {
 		ActivityManager activityManager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
-		List<ActivityManager.RunningTaskInfo> tasks = null;
+		List<ActivityManager.RunningTaskInfo> tasks;
 		try {
 			tasks = activityManager.getRunningTasks(1);
 		} catch (SecurityException e) {
-			if(GlobalInfo.isAppDebuggable) {
+			if (GlobalInfo.isAppDebuggable) {
 				throw e;
 			} else {
 				Log.e("Missing required permission: \"android.permission.GET_TASKS\".", e);
@@ -56,11 +57,11 @@ public class ActivityUtil {
 			try {
 				PackageInfo pi = activity.getPackageManager().getPackageInfo(activity.getPackageName(), PackageManager.GET_ACTIVITIES);
 				for (ActivityInfo activityInfo : pi.activities) {
-					if(topActivity.getClassName().equals(activityInfo.name)) {
+					if (topActivity.getClassName().equals(activityInfo.name)) {
 						return false;
 					}
 				}
-			} catch( PackageManager.NameNotFoundException e) {
+			} catch (PackageManager.NameNotFoundException e) {
 				Log.e("Package name not found: %s", e, activity.getPackageName());
 				return false; // Never happens.
 			}
@@ -72,6 +73,7 @@ public class ActivityUtil {
 	 * Tells you whether the currentActivity is the main Activity of the app. The side effect is that this will register
 	 * the first Activity is is called form as the main Activity, so make sure it's called from the main Activity before
 	 * any others.
+	 *
 	 * @param currentActivity The Activity from which this method is called.
 	 * @return true iff currentActivity is the Application's main Activity.
 	 */
@@ -82,7 +84,7 @@ public class ActivityUtil {
 		String mainActivityName = prefs.getString(Constants.PREF_KEY_APP_MAIN_ACTIVITY_NAME, null);
 
 		// The first time this runs, it will be from the main Activity, guaranteed.
-		if(mainActivityName == null) {
+		if (mainActivityName == null) {
 			mainActivityName = currentActivityName;
 			prefs.edit().putString(Constants.PREF_KEY_APP_MAIN_ACTIVITY_NAME, mainActivityName).commit();
 		}

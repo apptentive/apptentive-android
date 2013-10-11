@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class JsonObjectBindingTest extends TestCase {
 
-	private final static String TAG = "JsonObjectBindingTest";
-
 	public JsonObjectBindingTest() {
 		super();
 	}
@@ -71,8 +69,10 @@ public class JsonObjectBindingTest extends TestCase {
 	}
 
 
+/*
 	public void testParseConfiguration() {
 		String exampleConfig = "{\"_id\":\"4f7f453f1a387e00070000cd\",\"metrics_enabled\":true,\"ratings_clear_on_upgrade\":true,\"ratings_days_before_prompt\":10,\"ratings_days_between_prompts\":3,\"ratings_enabled\":true,\"ratings_events_before_prompt\":2,\"ratings_prompt_logic\":{\"or\":[\"uses\",\"days\",\"events\"]},\"ratings_uses_before_prompt\":5,\"cache-expiration\":\"2012-10-17T02:02:44+00:00\"}";
 		// TODO: Make an object for this, and then test parsing.
 	}
+*/
 }
