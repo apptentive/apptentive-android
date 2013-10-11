@@ -103,6 +103,26 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		return instance;
 	}
 
+	public static void ensureClosed(SQLiteDatabase db) {
+		try {
+			if (db != null) {
+				db.close();
+			}
+		} catch (Exception e) {
+			Log.w("Error closing SQLite database.", e);
+		}
+	}
+
+	public static void ensureClosed(Cursor cursor) {
+		try {
+			if (cursor != null) {
+				cursor.close();
+			}
+		} catch (Exception e) {
+			Log.w("Error closing SQLite cursor.", e);
+		}
+	}
+
 	private ApptentiveDatabase(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -140,48 +160,65 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * a new message is added.
 	 */
 	public synchronized void addPayload(Payload... payloads) {
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = null;
 
-		db.beginTransaction();
-		for (Payload payload : payloads) {
-			ContentValues values = new ContentValues();
-			values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
-			values.put(PAYLOAD_KEY_JSON, payload.toString());
-			db.insert(TABLE_PAYLOAD, null, values);
+		try {
+			db = getWritableDatabase();
+			db.beginTransaction();
+			for (Payload payload : payloads) {
+				ContentValues values = new ContentValues();
+				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
+				values.put(PAYLOAD_KEY_JSON, payload.toString());
+				db.insert(TABLE_PAYLOAD, null, values);
+			}
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		} finally {
+			ensureClosed(db);
 		}
-		db.setTransactionSuccessful();
-		db.endTransaction();
-		db.close();
 	}
 
 	public synchronized void deletePayload(Payload payload) {
 		if (payload != null) {
-			SQLiteDatabase db = getWritableDatabase();
-			db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
-			db.close();
+			SQLiteDatabase db = null;
+			try {
+				db = getWritableDatabase();
+				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
+			} finally {
+				ensureClosed(db);
+			}
 		}
 	}
 
 	public synchronized void deleteAllPayloads() {
-		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_PAYLOAD, "", null);
-		db.close();
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			db.delete(TABLE_PAYLOAD, "", null);
+		} finally {
+			ensureClosed(db);
+		}
 	}
 
 	public synchronized Payload getOldestUnsentPayload() {
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-		Payload payload = null;
-		if (cursor.moveToFirst()) {
-			long databaseId = Long.parseLong(cursor.getString(0));
-			Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
-			String json = cursor.getString(2);
-			payload = PayloadFactory.fromJson(json, baseType);
-			payload.setDatabaseId(databaseId);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = getWritableDatabase();
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
+			Payload payload = null;
+			if (cursor.moveToFirst()) {
+				long databaseId = Long.parseLong(cursor.getString(0));
+				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
+				String json = cursor.getString(2);
+				payload = PayloadFactory.fromJson(json, baseType);
+				payload.setDatabaseId(databaseId);
+			}
+			return payload;
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
 		}
-		cursor.close();
-		db.close();
-		return payload;
 	}
 
 
@@ -191,153 +228,190 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * Saves the message into the message table, and also into the payload table so it can be sent to the server.
 	 */
 	public synchronized void addOrUpdateMessages(Message... messages) {
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = null;
 		try {
+			db = getWritableDatabase();
 			for (Message message : messages) {
-				Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_BY_NONCE, new String[]{message.getNonce()});
-				if (cursor.moveToFirst()) {
-					// Update
-					String databaseId = cursor.getString(0);
-					ContentValues messageValues = new ContentValues();
-					messageValues.put(MESSAGE_KEY_ID, message.getId());
-					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
-					if(message.isRead()) { // A message can't be unread after being read.
-						messageValues.put(MESSAGE_KEY_READ, TRUE);
+				Cursor cursor = null;
+				try {
+					cursor = db.rawQuery(QUERY_MESSAGE_GET_BY_NONCE, new String[]{message.getNonce()});
+					if (cursor.moveToFirst()) {
+						// Update
+						String databaseId = cursor.getString(0);
+						ContentValues messageValues = new ContentValues();
+						messageValues.put(MESSAGE_KEY_ID, message.getId());
+						messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+						if (message.isRead()) { // A message can't be unread after being read.
+							messageValues.put(MESSAGE_KEY_READ, TRUE);
+						}
+						messageValues.put(MESSAGE_KEY_JSON, message.toString());
+						db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
+					} else {
+						// Insert
+						db.beginTransaction();
+						ContentValues messageValues = new ContentValues();
+						messageValues.put(MESSAGE_KEY_ID, message.getId());
+						messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
+						messageValues.put(MESSAGE_KEY_NONCE, message.getNonce());
+						messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
+						messageValues.put(MESSAGE_KEY_READ, message.isRead() ? TRUE : FALSE);
+						messageValues.put(MESSAGE_KEY_JSON, message.toString());
+						db.insert(TABLE_MESSAGE, null, messageValues);
+						db.setTransactionSuccessful();
+						db.endTransaction();
 					}
-					messageValues.put(MESSAGE_KEY_JSON, message.toString());
-					db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
-				} else {
-					// Insert
-					db.beginTransaction();
-					ContentValues messageValues = new ContentValues();
-					messageValues.put(MESSAGE_KEY_ID, message.getId());
-					messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
-					messageValues.put(MESSAGE_KEY_NONCE, message.getNonce());
-					messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
-					messageValues.put(MESSAGE_KEY_READ, message.isRead() ? TRUE : FALSE);
-					messageValues.put(MESSAGE_KEY_JSON, message.toString());
-					db.insert(TABLE_MESSAGE, null, messageValues);
-					db.setTransactionSuccessful();
-					db.endTransaction();
+				} finally {
+					ensureClosed(cursor);
 				}
-				cursor.close();
 			}
 		} finally {
-			db.close();
+			ensureClosed(db);
 		}
 	}
 
 	public synchronized void updateMessage(Message message) {
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = null;
 		try {
+			db = this.getWritableDatabase();
 			db.beginTransaction();
 			ContentValues values = new ContentValues();
 			values.put(MESSAGE_KEY_ID, message.getId());
 			values.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
 			values.put(MESSAGE_KEY_NONCE, message.getNonce());
 			values.put(MESSAGE_KEY_STATE, message.getState().name());
-			if(message.isRead()) { // A message can't be unread after being read.
+			if (message.isRead()) { // A message can't be unread after being read.
 				values.put(MESSAGE_KEY_READ, TRUE);
 			}
 			values.put(MESSAGE_KEY_JSON, message.toString());
 			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{message.getNonce()});
 			db.setTransactionSuccessful();
 		} finally {
-			db.endTransaction();
-			db.close();
+			if (db != null) {
+				db.endTransaction();
+			}
+			ensureClosed(db);
 		}
 	}
 
 	public synchronized List<Message> getAllMessages() {
 		List<Message> messages = new ArrayList<Message>();
-		SQLiteDatabase db = this.getReadableDatabase();
-
-		Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
-
-		if (cursor.moveToFirst()) {
-			do {
-				String json = cursor.getString(6);
-				Message message = MessageFactory.fromJson(json);
-				if (message == null) {
-					Log.e("Error parsing Record json from database: %s", json);
-					continue;
-				}
-				message.setDatabaseId(cursor.getLong(0));
-				message.setState(Message.State.parse(cursor.getString(4)));
-				message.setRead(cursor.getInt(5) == TRUE);
-				messages.add(message);
-			} while (cursor.moveToNext());
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = this.getReadableDatabase();
+			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
+			if (cursor.moveToFirst()) {
+				do {
+					String json = cursor.getString(6);
+					Message message = MessageFactory.fromJson(json);
+					if (message == null) {
+						Log.e("Error parsing Record json from database: %s", json);
+						continue;
+					}
+					message.setDatabaseId(cursor.getLong(0));
+					message.setState(Message.State.parse(cursor.getString(4)));
+					message.setRead(cursor.getInt(5) == TRUE);
+					messages.add(message);
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
 		}
-		cursor.close();
-		db.close();
 		return messages;
 	}
 
 	public synchronized String getLastReceivedMessageId() {
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_MESSAGE_GET_LAST_ID, null);
-		String ret = null;
-		if (cursor.moveToFirst()) {
-			ret = cursor.getString(0);
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery(QUERY_MESSAGE_GET_LAST_ID, null);
+			String ret = null;
+			if (cursor.moveToFirst()) {
+				ret = cursor.getString(0);
+			}
+			return ret;
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
 		}
-		cursor.close();
-		db.close();
-		return ret;
 	}
 
 	public synchronized int getUnreadMessageCount() {
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
-		int ret = cursor.getCount();
-		cursor.close();
-		db.close();
-		return ret;
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
+			return cursor.getCount();
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
+		}
 	}
+
+	public synchronized void deleteAllMessages() {
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			db.delete(TABLE_MESSAGE, "", null);
+		} finally {
+			ensureClosed(db);
+		}
+	}
+
 
 	//
 	// File Store
 	//
 
 	public synchronized StoredFile getStoredFile(String id) {
-		StoredFile ret = null;
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
-		if (cursor.moveToFirst()) {
-			ret = new StoredFile();
-			ret.setId(id);
-			ret.setMimeType(cursor.getString(1));
-			ret.setOriginalUri(cursor.getString(2));
-			ret.setLocalFilePath(cursor.getString(3));
-			ret.setApptentiveUri(cursor.getString(4));
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
+			StoredFile ret = null;
+			if (cursor.moveToFirst()) {
+				ret = new StoredFile();
+				ret.setId(id);
+				ret.setMimeType(cursor.getString(1));
+				ret.setOriginalUri(cursor.getString(2));
+				ret.setLocalFilePath(cursor.getString(3));
+				ret.setApptentiveUri(cursor.getString(4));
+			}
+			return ret;
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
 		}
-		cursor.close();
-		db.close();
-		return ret;
 	}
 
 	public synchronized boolean putStoredFile(StoredFile storedFile) {
-		long ret;
-		SQLiteDatabase db = getWritableDatabase();
-		ContentValues values = new ContentValues();
-		values.put(FILESTORE_KEY_ID, storedFile.getId());
-		values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
-		values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUri());
-		values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
-		values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = getWritableDatabase();
 
-		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
-		boolean doUpdate = cursor.moveToFirst();
-		cursor.close();
-		if (doUpdate) {
-			ret = db.update(TABLE_FILESTORE, values, FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
-		} else {
-			ret = db.insert(TABLE_FILESTORE, null, values);
+			ContentValues values = new ContentValues();
+			values.put(FILESTORE_KEY_ID, storedFile.getId());
+			values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
+			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUri());
+			values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
+			values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
+			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
+			boolean doUpdate = cursor.moveToFirst();
+			long ret;
+			if (doUpdate) {
+				ret = db.update(TABLE_FILESTORE, values, FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
+			} else {
+				ret = db.insert(TABLE_FILESTORE, null, values);
+			}
+			return ret != -1;
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
 		}
-		cursor.close();
-		db.close();
-		return ret != -1;
-	}
-
-	private void upgrade1to2() {
 	}
 }

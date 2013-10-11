@@ -44,9 +44,6 @@ public class MessageManager {
 
 	/**
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
-	 *
-	 * @param context
-	 * @param listener
 	 */
 	public static void fetchAndStoreMessages(Context context, MessagesUpdatedListener listener) {
 		if (GlobalInfo.conversationToken == null) {
@@ -89,11 +86,10 @@ public class MessageManager {
 
 	/**
 	 * This doesn't need to be run during normal program execution. Testing only.
-	 * @param context
 	 */
-	public static void deleteAllRecords(Context context) {
+	public static void deleteAllMessages(Context context) {
 		Log.e("Deleting all messages.");
-		getMessageStore(context).deleteAllPayloads();
+		getMessageStore(context).deleteAllMessages();
 	}
 
 	private static List<Message> fetchMessages(String after_id) {
@@ -163,9 +159,11 @@ public class MessageManager {
 				internalSentMessageListener.onSentMessage(message);
 			}
 		}
+/*
 		if(response.isBadpayload()) {
 			// TODO: Tell the user that this message failed to send. It will be deleted by the record send worker.
 		}
+*/
 	}
 
 	public interface OnSentMessageListener {

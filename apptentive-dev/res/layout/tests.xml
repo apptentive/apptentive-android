@@ -17,7 +17,7 @@
             android:onClick="testTweet"/>
     <Button android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Delete StoredMessages"
+            android:text="Delete All Messages"
             android:onClick="deleteStoredMessages"/>
     <Button android:layout_width="fill_parent"
             android:layout_height="wrap_content"
