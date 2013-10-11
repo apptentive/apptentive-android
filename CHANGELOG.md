@@ -8,6 +8,10 @@ Major changes:
 * Get list of available Google account emails and provide them in an AutoCompleteTextView.
 * Some minor tweaks to make the IntroDialog look great.
 
+Bugs fixed:
+
+* ANDROID-178 ConcurrentModificationException in survey code
+
 2013-09-15 skykelsey 1.1.2
 --------------------------
 

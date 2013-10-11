@@ -244,7 +244,7 @@ You can change the conditions necessary for the ratings flow to be shown by logg
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
 days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
 
-<pre><code><strong>Apttentive.logSignificantEvent(this);</strong></code></pre>
+<pre><code><strong>Apptentive.logSignificantEvent(this);</strong></code></pre>
 
 #### Surveys
 

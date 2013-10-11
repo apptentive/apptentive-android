@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -213,7 +214,7 @@ public class SurveyModule {
 	}
 
 	private static PayloadStore getSurveyStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	void onBackPressed(Activity activity) {
