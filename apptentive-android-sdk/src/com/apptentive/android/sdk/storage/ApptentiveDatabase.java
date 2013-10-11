@@ -94,7 +94,16 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					");";
 
 
-	public ApptentiveDatabase(Context context) {
+	private static ApptentiveDatabase instance;
+
+	public static ApptentiveDatabase getInstance(Context context) {
+		if (instance == null) {
+			instance = new ApptentiveDatabase(context);
+		}
+		return instance;
+	}
+
+	private ApptentiveDatabase(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 

@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.messagecenter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -16,6 +15,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.util.Constants;
@@ -83,7 +83,7 @@ public class MessageManager {
 
 	public static void sendMessage(Context context, Message message) {
 		getMessageStore(context).addOrUpdateMessages(message);
-		Apptentive.getDatabase(context).addPayload(message);
+		ApptentiveDatabase.getInstance(context).addPayload(message);
 		PayloadSendWorker.start(context);
 	}
 
@@ -135,7 +135,7 @@ public class MessageManager {
 	}
 
 	private static MessageStore getMessageStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	public interface MessagesUpdatedListener {
@@ -205,7 +205,7 @@ public class MessageManager {
 			}
 			if(message != null) {
 				getMessageStore(context).addOrUpdateMessages(message);
-				Apptentive.getDatabase(context).addPayload(message);
+				ApptentiveDatabase.getInstance(context).addPayload(message);
 			}
 		}
 	}

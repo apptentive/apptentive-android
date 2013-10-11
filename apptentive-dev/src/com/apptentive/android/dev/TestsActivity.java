@@ -29,10 +29,6 @@ public class TestsActivity extends ApptentiveActivity {
 		setContentView(R.layout.tests);
 	}
 
-	public void back(View view) {
-		finish();
-	}
-
 	public void testTweet(View view) {
 		try{
 			Intent intent = new Intent(Intent.ACTION_SEND);

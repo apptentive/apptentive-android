@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.EventStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 
@@ -17,7 +17,7 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 public class EventManager {
 
 	private static EventStore getEventStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	public static void sendEvent(Context context, Event event) {
