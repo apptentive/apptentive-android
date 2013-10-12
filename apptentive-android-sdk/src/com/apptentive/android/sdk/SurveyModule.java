@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +19,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.SurveyThankYouDialog;
 import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PayloadStore;
@@ -124,30 +124,20 @@ public class SurveyModule {
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.d("Survey Submitted.");
 				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
-
-				getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
-
-				if (SurveyModule.this.onSurveyFinishedListener != null) {
-					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
-				}
 
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle(view.getContext().getString(R.string.apptentive_thanks));
-					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialogInterface, int i) {
-							cleanup();
-							activity.finish();
+					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
+					dialog.setMessage(surveyDefinition.getSuccessMessage());
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialogInterface) {
+							finishSurvey(activity);
 						}
 					});
-					builder.show();
+					dialog.show();
 				} else {
-					cleanup();
-					activity.finish();
+					finishSurvey(activity);
 				}
 			}
 		});
@@ -200,6 +190,17 @@ public class SurveyModule {
 
 		// Force the top of the survey to be shown first.
 		title.requestFocus();
+	}
+
+	private void finishSurvey(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
+		getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
+		Log.d("Survey Submitted.");
+		cleanup();
+		activity.finish();
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
+			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
+		}
 	}
 
 	void sendMetricForQuestion(Context context, Question question) {

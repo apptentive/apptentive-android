@@ -56,6 +56,7 @@
     <color name="apptentive_survey_question_separator">#DDDDDD</color>
     <color name="apptentive_survey_answer_text">#000000</color>
     <color name="apptentive_survey_footer_background">@android:color/transparent</color>
+    <color name="apptentive_survey_thank_you_dialog_border">#56B8D8</color>
 
     <color name="apptentive_branding_text">#000000</color>
 

@@ -11,5 +11,5 @@
              android:layout_height="fill_parent"
              android:paddingLeft="16dp"
              android:paddingRight="16dp">
-    <include layout="@layout/apptentive_message_center_thank_you_dialog_content"/>
+    <include layout="@layout/apptentive_survey_thank_you_dialog_content"/>
 </FrameLayout>

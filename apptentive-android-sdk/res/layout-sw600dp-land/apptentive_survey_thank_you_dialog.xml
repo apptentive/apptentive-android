@@ -9,7 +9,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent"
-             android:paddingLeft="96dp"
-             android:paddingRight="96dp">
-    <include layout="@layout/apptentive_message_center_thank_you_dialog_content"/>
+             android:paddingLeft="192dp"
+             android:paddingRight="192dp">
+    <include layout="@layout/apptentive_survey_thank_you_dialog_content"/>
 </FrameLayout>
