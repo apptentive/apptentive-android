@@ -1,4 +1,4 @@
-2013-??-?? skykelsey next
+2013-??-?? skykelsey 1.2.0
 --------------------------
 
 Major changes:
@@ -10,10 +10,12 @@ Major changes:
 * Added new methods for adding and removing custom data set on the device and person objects. These methods can now be called anywhere in the app's lifecycle, and their values will be picked up the next time an activity starts.
 * Added Swedish translation, updated translations for other languages.
 * Restyled the screenshot confirmation dialog to match the other dialogs.
+* Restyled Thank You dialog shown when surveys are completed, if so specified.
 
 Bugs fixed:
 
 * ANDROID-178 ConcurrentModificationException in survey code
+* ANDROID-181 Surveys can be sent twice
 
 2013-09-15 skykelsey 1.1.2
 --------------------------
