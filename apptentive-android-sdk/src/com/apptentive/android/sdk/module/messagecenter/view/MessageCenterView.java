@@ -7,15 +7,13 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
 import com.apptentive.android.sdk.AboutModule;
@@ -27,11 +25,8 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -44,12 +39,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	ListView messageListView;
 	MessageAdapter<Message> messageAdapter;
 
+	/**
+	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
+	 */
+	private static CharSequence message;
+
 	EditText messageEditText;
 
 	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
 		super(context);
 		this.context = context;
-		this.onSendMessageListener = onSendMessageListener;
+		MessageCenterView.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
 		setup(); // TODO: Move this into a configurationchange handler?
 	}
@@ -60,7 +60,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 		TextView titleTextView = (TextView) findViewById(R.id.apptentive_message_center_header_title);
 		String titleText = Configuration.load(context).getMessageCenterTitle();
-		if(titleText != null) {
+		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
 
@@ -69,6 +69,25 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 		messageEditText = (EditText) findViewById(R.id.apptentive_message_center_message);
 
+		if (message != null) {
+			messageEditText.setText(message);
+			messageEditText.setSelection(message.length());
+		}
+
+		messageEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				message = editable.toString();
+			}
+		});
 		View send = findViewById(R.id.apptentive_message_center_send);
 		send.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
@@ -78,6 +97,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				}
 				messageEditText.setText("");
 				onSendMessageListener.onSendTextMessage(text);
+				message = null;
 				Util.hideSoftKeyboard(context, view);
 			}
 		});
@@ -92,7 +112,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
 		// Android devices can't take screenshots until version 4+
 		boolean canTakeScreenshot = Build.VERSION.RELEASE.matches("^4.*");
-		if(canTakeScreenshot) {
+		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					MetricModule.sendMetric(context, Event.EventLabel.message_center__attach);
@@ -133,44 +153,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			Log.d("No attachment found.");
 			return;
 		}
-		AlertDialog dialog = new AlertDialog.Builder(context).create();
-		ImageView imageView = new ImageView(context);
-
-		// Show a thumbnail version of the image.
-		InputStream is = null;
-		final Bitmap thumbnail;
-		try {
-			is = context.getContentResolver().openInputStream(data);
-			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null);
-		} catch (FileNotFoundException e) {
-			// TODO: Error toast?
-			return;
-		} finally {
-			Util.ensureClosed(is);
-		}
-		if(thumbnail == null) {
-			return;
-		}
-
-		imageView.setImageBitmap(thumbnail);
-		dialog.setView(imageView);
-		Resources resources = context.getResources();
-		dialog.setTitle(resources.getString(R.string.apptentive_message_center_attachment_title));
-		dialog.setButton(resources.getString(R.string.apptentive_yes), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialogInterface, int i) {
-				Log.v("Yes, send attachment.");
+		AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
+		dialog.setImage(data);
+		dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
+			@Override
+			public void onAttachmentAccepted() {
 				onSendMessageListener.onSendFileMessage(data);
-			}
-		});
-		dialog.setButton2(resources.getString(R.string.apptentive_no), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialogInterface, int i) {
-				Log.v("Don't send attachment.");
-			}
-		});
-		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface dialogInterface) {
-				thumbnail.recycle();
-				System.gc();
 			}
 		});
 		dialog.show();
@@ -182,7 +170,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		void onSendFileMessage(Uri uri);
 	}
 
-	@SuppressWarnings("unchecked") // We should never get a message passed in that is not appropriate for the view it goes into.
+	@SuppressWarnings("unchecked")
+	// We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
 		setMessages(MessageManager.getMessages(context));
 	}

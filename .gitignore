@@ -1,11 +1,9 @@
-# Android intermediate build artifacts
+.DS_Store
+
+# Android
 gen/
 out/
+bin/
 
-# IntelliJ noise
+# IntelliJ
 *.iws
-*.ipr
-
-.DS_Store
-local.properties
-apptentive-android-sdk/bin

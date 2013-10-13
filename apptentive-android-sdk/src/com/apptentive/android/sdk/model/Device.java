@@ -8,11 +8,6 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -25,6 +20,7 @@ public class Device extends Payload {
 	private static final String KEY_OS_NAME = "os_name";
 	private static final String KEY_OS_VERSION = "os_version";
 	private static final String KEY_OS_BUILD = "os_build";
+	private static final String KEY_OS_API_LEVEL = "os_api_level";
 	private static final String KEY_MANUFACTURER = "manufacturer";
 	private static final String KEY_MODEL = "model";
 	private static final String KEY_BOARD = "board";
@@ -126,6 +122,24 @@ public class Device extends Payload {
 			put(KEY_OS_BUILD, osBuild);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Device.", KEY_OS_BUILD);
+		}
+	}
+
+	public String getOsApiLevel() {
+		try {
+			if(!isNull(KEY_OS_API_LEVEL)) {
+				return getString(KEY_OS_API_LEVEL);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setOsApiLevel(String osApiLevel) {
+		try {
+			put(KEY_OS_API_LEVEL, osApiLevel);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_OS_API_LEVEL);
 		}
 	}
 
@@ -382,47 +396,21 @@ public class Device extends Payload {
 	}
 
 	@SuppressWarnings("unchecked") // We check it coming in.
-	public Map<String, String> getCustomData() {
-		Map<String, String> customData = null;
+	public CustomData getCustomData() {
 		if(!isNull(KEY_CUSTOM_DATA)) {
-			customData = new HashMap<String, String>();
 			try {
-				JSONObject existingCustomData = getJSONObject(KEY_CUSTOM_DATA);
-				Iterator<String> iterator = (Iterator<String>) existingCustomData.keys();
-				while (iterator.hasNext()) {
-					String key =  (String)iterator.next();
-					customData.put(key, existingCustomData.getString(key));
-				}
+				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
 			} catch (JSONException e) {
-
 			}
 		}
-		return customData;
+		return null;
 	}
 
-	public void setCustomData(Map<String, String> customData) {
-		JSONObject existingCustomData = null;
+	public void setCustomData(CustomData customData) {
 		try {
-			existingCustomData = getJSONObject(KEY_CUSTOM_DATA);
+			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
-			existingCustomData = new JSONObject();
-			try {
-				put(KEY_CUSTOM_DATA, existingCustomData);
-			} catch (JSONException ee) {
-				Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
-			}
-		}
-		if(existingCustomData != null) {
-			if(customData == null) {
-				return;
-			}
-			try {
-				for(String key : customData.keySet()) {
-					existingCustomData.put(key, customData.get(key));
-				}
-			} catch (JSONException e) {
-				Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
-			}
+			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
 		}
 	}
 

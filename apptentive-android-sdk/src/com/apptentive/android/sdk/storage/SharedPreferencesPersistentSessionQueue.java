@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.SessionEvent;
-import com.apptentive.android.sdk.storage.PersistentSessionQueue;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.ArrayList;
@@ -66,8 +65,7 @@ public class SharedPreferencesPersistentSessionQueue implements PersistentSessio
 	public List<SessionEvent> getAllEvents() {
 		String[] queue = getPrefs().getString(Constants.PREF_KEY_APP_ACTIVITY_STATE_QUEUE, "").split(";");
 		List<SessionEvent> events = new ArrayList<SessionEvent>(queue.length);
-		for (int i = 0; i < queue.length; i++) {
-			String eventString = queue[i];
+		for (String eventString : queue) {
 			if (!eventString.equals("")) { // Needed because we always Append a semi-colon to the queue.
 				events.add(parseStorableEventString(eventString));
 			}

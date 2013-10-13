@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -18,19 +18,12 @@ import java.util.List;
  */
 public class MultichoiceQuestion extends BaseQuestion {
 
-	protected int minSelections;
-	protected int maxSelections;
-	protected List<AnswerDefinition> answerChoices = null;
+	protected static final String KEY_MIN_SELECTIONS = "min_selections";
+	protected static final String KEY_MAX_SELECTIONS = "max_selections";
+	private static final String KEY_ANSWER_CHOICES = "answer_choices";
 
-	protected MultichoiceQuestion(JSONObject question) throws JSONException {
-		super(question);
-		this.minSelections = 1;
-		this.maxSelections = 1;
-		this.answerChoices = new ArrayList<AnswerDefinition>();
-		JSONArray multichoiceChoices = question.getJSONArray("answer_choices");
-		for (int i = 0; i < multichoiceChoices.length(); i++) {
-			this.answerChoices.add(new AnswerDefinition((JSONObject) multichoiceChoices.get(i)));
-		}
+	protected MultichoiceQuestion(String json) throws JSONException {
+		super(json);
 	}
 
 	public int getType() {
@@ -38,14 +31,26 @@ public class MultichoiceQuestion extends BaseQuestion {
 	}
 
 	public int getMinSelections() {
-		return minSelections;
+		return optInt(KEY_MIN_SELECTIONS, 1);
 	}
 
 	public int getMaxSelections() {
-		return maxSelections;
+		return optInt(KEY_MAX_SELECTIONS, 1);
 	}
 
 	public List<AnswerDefinition> getAnswerChoices() {
+		List<AnswerDefinition> answerChoices = new ArrayList<AnswerDefinition>();
+		try {
+			JSONArray multichoiceChoices = getJSONArray(KEY_ANSWER_CHOICES);
+			for (int i = 0; i < multichoiceChoices.length(); i++) {
+				JSONObject answer = multichoiceChoices.optJSONObject(i);
+				if (answer != null) {
+					answerChoices.add(new AnswerDefinition(answer.toString()));
+				}
+			}
+			return answerChoices;
+		} catch (JSONException e) {
+		}
 		return answerChoices;
 	}
 }

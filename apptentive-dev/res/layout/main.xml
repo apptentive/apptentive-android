@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -11,61 +11,62 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:id="@+id/app_root">
-    <Button android:id="@+id/button_tests"
-            android:layout_width="fill_parent"
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Tests"/>
-    <Button android:id="@+id/button_reset"
-            android:layout_width="fill_parent"
+            android:onClick="runTests"
+            android:text="@string/button_tests"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Reinstall"/>
-    <Button android:id="@+id/button_event"
-            android:layout_width="fill_parent"
+            android:onClick="reinstall"
+            android:text="@string/button_reset_rating_flow"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Trigger Event"/>
-    <Button android:id="@+id/button_day"
-            android:layout_width="fill_parent"
+            android:onClick="logSignificantEvent"
+            android:text="@string/button_trigger_event"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Subtract a Day"/>
-    <Button android:id="@+id/button_choice"
-            android:layout_width="fill_parent"
+            android:onClick="logDay"
+            android:text="@string/button_subtract_a_day"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Force Choice"/>
-    <Button android:id="@+id/button_ratings"
-            android:layout_width="fill_parent"
+            android:onClick="showChoice"
+            android:text="@string/button_force_choice"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Force Rating"/>
-    <Button android:id="@+id/button_feedback"
-            android:layout_width="fill_parent"
+            android:onClick="showRating"
+            android:text="@string/button_force_rating"/>
+    <Button android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Force Feedback"/>
+            android:onClick="showFeedback"
+            android:text="@string/button_force_intro_dialog"/>
     <Button android:id="@+id/button_message_center"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Message Center"/>
+            android:onClick="showMessageCenter"
+            android:text="@string/button_message_center"/>
     <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="0dp"
                   android:layout_weight="1"
                   android:orientation="horizontal">
-        <Button android:id="@+id/button_survey_fetch"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:text="Fetch Survey"/>
-        <Button android:id="@+id/button_survey_show"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:text="Show Survey"
-                android:enabled="false"/>
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showSurvey"
+                android:text="@string/button_show_survey"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/text_with_tag"/>
+        <Spinner android:id="@+id/survey_spinner"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:entries="@array/survey_tags"/>
     </LinearLayout>
 </LinearLayout>
 

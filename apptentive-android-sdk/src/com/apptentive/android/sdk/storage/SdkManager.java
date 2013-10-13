@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -18,7 +19,7 @@ public class SdkManager {
 
 	public static Sdk storeSdkAndReturnDiff(Context context) {
 		Sdk original = getStoredSdk(context);
-		Sdk current = generateCurrentSdk();
+		Sdk current = generateCurrentSdk(context);
 		Sdk diff = diffSdk(original, current);
 		if(diff != null) {
 			storeSdk(context, current);
@@ -27,12 +28,23 @@ public class SdkManager {
 		return null;
 	}
 
-	private static Sdk generateCurrentSdk() {
+	private static Sdk generateCurrentSdk(Context context) {
 		Sdk sdk = new Sdk();
 
 		// First, get all the information we can load from static resources.
 		sdk.setVersion(Constants.APPTENTIVE_SDK_VERSION);
 		sdk.setPlatform("Android");
+
+
+		// Distribution and distribution version are optionally set in the manifest by the wrapping platform (trigger, etc.)
+		Object distribution = Util.getPackageMetaDataSingleQuotedString(context, Constants.MANIFEST_KEY_SDK_DISTRIBUTION);
+		if(distribution != null && distribution.toString().length() != 0) {
+			sdk.setDistribution(distribution.toString());
+		}
+		Object distributionVersion = Util.getPackageMetaDataSingleQuotedString(context, Constants.MANIFEST_KEY_SDK_DISTRIBUTION_VERSION);
+		if(distributionVersion != null && distributionVersion.toString().length() != 0) {
+			sdk.setDistributionVersion(distributionVersion.toString());
+		}
 
 		return sdk;
 	}
@@ -88,6 +100,11 @@ public class SdkManager {
 		String distribution = chooseLatest(older.getDistribution(), newer.getDistribution());
 		if (distribution != null) {
 			ret.setDistribution(distribution);
+		}
+
+		String distributionVersion = chooseLatest(older.getDistributionVersion(), newer.getDistributionVersion());
+		if (distributionVersion != null) {
+			ret.setDistributionVersion(distributionVersion);
 		}
 
 		// If there were no differences, return null.

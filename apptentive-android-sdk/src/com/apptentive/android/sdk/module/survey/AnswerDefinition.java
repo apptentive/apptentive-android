@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -12,29 +12,20 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class AnswerDefinition {
+public class AnswerDefinition extends JSONObject {
 
-	private String id;
-	private String value;
+	private static final String KEY_ID = "id";
+	private static final String KEY_VALUE = "value";
 
-	public AnswerDefinition(JSONObject answer) throws JSONException {
-		this.id = answer.getString("id");
-		this.value = answer.getString("value");
+	public AnswerDefinition(String json) throws JSONException {
+		super(json);
 	}
 
 	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
+		return optString(KEY_ID, null);
 	}
 
 	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
+		return optString(KEY_VALUE, null);
 	}
 }

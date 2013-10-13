@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.messagecenter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -16,6 +15,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.util.Constants;
@@ -44,9 +44,6 @@ public class MessageManager {
 
 	/**
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
-	 *
-	 * @param context
-	 * @param listener
 	 */
 	public static void fetchAndStoreMessages(Context context, MessagesUpdatedListener listener) {
 		if (GlobalInfo.conversationToken == null) {
@@ -83,17 +80,16 @@ public class MessageManager {
 
 	public static void sendMessage(Context context, Message message) {
 		getMessageStore(context).addOrUpdateMessages(message);
-		Apptentive.getDatabase(context).addPayload(message);
+		ApptentiveDatabase.getInstance(context).addPayload(message);
 		PayloadSendWorker.start(context);
 	}
 
 	/**
 	 * This doesn't need to be run during normal program execution. Testing only.
-	 * @param context
 	 */
-	public static void deleteAllRecords(Context context) {
+	public static void deleteAllMessages(Context context) {
 		Log.e("Deleting all messages.");
-		getMessageStore(context).deleteAllPayloads();
+		getMessageStore(context).deleteAllMessages();
 	}
 
 	private static List<Message> fetchMessages(String after_id) {
@@ -135,7 +131,7 @@ public class MessageManager {
 	}
 
 	private static MessageStore getMessageStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	public interface MessagesUpdatedListener {
@@ -163,9 +159,11 @@ public class MessageManager {
 				internalSentMessageListener.onSentMessage(message);
 			}
 		}
+/*
 		if(response.isBadpayload()) {
 			// TODO: Tell the user that this message failed to send. It will be deleted by the record send worker.
 		}
+*/
 	}
 
 	public interface OnSentMessageListener {
@@ -205,7 +203,7 @@ public class MessageManager {
 			}
 			if(message != null) {
 				getMessageStore(context).addOrUpdateMessages(message);
-				Apptentive.getDatabase(context).addPayload(message);
+				ApptentiveDatabase.getInstance(context).addPayload(message);
 			}
 		}
 	}

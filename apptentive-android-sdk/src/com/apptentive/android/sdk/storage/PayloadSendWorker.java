@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -15,7 +14,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.model.SurveyResponse;
 
 /**
  * @author Sky Kelsey
@@ -38,7 +37,7 @@ public class PayloadSendWorker {
 	}
 
 	private static PayloadStore getPayloadStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	private static class PayloadRunner extends Thread {
@@ -86,7 +85,7 @@ public class PayloadSendWorker {
 								response = ApptentiveClient.putPerson((Person) payload);
 								break;
 							case survey:
-								response = ApptentiveClient.postSurvey((SurveyPayload) payload);
+								response = ApptentiveClient.postSurvey((SurveyResponse) payload);
 								break;
 							default:
 								Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());

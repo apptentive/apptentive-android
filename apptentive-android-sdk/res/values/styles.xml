@@ -68,7 +68,7 @@
 
     <style name="Apptentive.Theme.Transparent" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/apptentive_activity_frame</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>

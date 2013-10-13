@@ -7,10 +7,11 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.text.method.LinkMovementMethod;
+import android.net.Uri;
+import android.view.View;
 import android.widget.TextView;
+import com.apptentive.android.sdk.util.Constants;
 
 /**
  * @author Sky Kelsey
@@ -40,17 +41,43 @@ public class AboutModule {
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
-	public void show(Context context) {
+	public void show(Activity activity) {
 		Intent intent = new Intent();
-		intent.setClass(context, ViewActivity.class);
+		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.ABOUT.toString());
-		context.startActivity(intent);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
 	void doShow(final Activity activity) {
-		TextView information = (TextView) activity.findViewById(R.id.apptentive_about_more_information);
-		information.setMovementMethod(LinkMovementMethod.getInstance());
-		TextView privacy = (TextView) activity.findViewById(R.id.apptentive_about_privacy);
-		privacy.setMovementMethod(LinkMovementMethod.getInstance());
+		activity.setContentView(R.layout.apptentive_about);
+
+		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
+		information.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com"));
+				activity.startActivity(browserIntent);
+			}
+		});
+
+		TextView privacy = (TextView) activity.findViewById(R.id.privacy_link);
+		privacy.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com/privacy"));
+				activity.startActivity(browserIntent);
+			}
+		});
+
+		TextView version = (TextView) activity.findViewById(R.id.version);
+		String versionString = activity.getResources().getString(R.string.apptentive_version);
+		version.setText(String.format(versionString, Constants.APPTENTIVE_SDK_VERSION));
 	}
+
+	void onBackPressed(Activity activity) {
+		activity.finish();
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+	}
+
 }

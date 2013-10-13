@@ -14,8 +14,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.storage.PersonManager;
 
 import java.util.List;
 
@@ -29,20 +32,14 @@ public class TestsActivity extends ApptentiveActivity {
 		setContentView(R.layout.tests);
 	}
 
-	public void back(View view) {
-		finish();
-	}
-
-	public void testTweet(View view) {
+	public void testTweet(@SuppressWarnings("unused") View view) {
 		try{
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.putExtra(Intent.EXTRA_TEXT, "Testing...");
 			intent.setType("text/plain");
 			final PackageManager pm = getPackageManager();
-			final List<?> activityList = pm.queryIntentActivities(intent, 0);
-			int len =  activityList.size();
-			for (int i = 0; i < len; i++) {
-				final ResolveInfo app = (ResolveInfo) activityList.get(i);
+			final List<ResolveInfo> activityList = pm.queryIntentActivities(intent, 0);
+			for (ResolveInfo app : activityList) {
 				if ("com.twitter.android.PostActivity".equals(app.activityInfo.name)) {
 					final ActivityInfo activityInfo = app.activityInfo;
 					final ComponentName name = new ComponentName(activityInfo.applicationInfo.packageName, activityInfo.name);
@@ -53,17 +50,57 @@ public class TestsActivity extends ApptentiveActivity {
 					break;
 				}
 			}
-		}
-		catch(final ActivityNotFoundException e) {
+		} catch (final ActivityNotFoundException e) {
 			android.util.Log.i("APPTENTIVE", "No native twitter app.", e);
 		}
 	}
 
-	public void throwNpe(View view) {
+	public void throwNpe(@SuppressWarnings("unused") View view) {
 		//throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
 	}
 
-	public void deleteStoredMessages(View view) {
-		MessageManager.deleteAllRecords(TestsActivity.this);
+	public void deleteStoredMessages(@SuppressWarnings("unused") View view) {
+		MessageManager.deleteAllMessages(TestsActivity.this);
+	}
+
+	public void addCustomDeviceData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.add_custom_device_data_key);
+		EditText valueText = (EditText) findViewById(R.id.add_custom_device_data_value);
+		String key = (keyText).getText().toString().trim();
+		String value = (valueText).getText().toString().trim();
+		keyText.setText(null);
+		valueText.setText(null);
+		Apptentive.addCustomDeviceData(this, key, value);
+	}
+
+	public void removeCustomDeviceData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.remove_custom_device_data_key);
+		String key = (keyText).getText().toString().trim();
+		keyText.setText(null);
+		Apptentive.removeCustomDeviceData(this, key);
+	}
+
+	public void addCustomPersonData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.add_custom_person_data_key);
+		EditText valueText = (EditText) findViewById(R.id.add_custom_person_data_value);
+		String key = (keyText).getText().toString().trim();
+		String value = (valueText).getText().toString().trim();
+		keyText.setText(null);
+		valueText.setText(null);
+		Apptentive.addCustomPersonData(this, key, value);
+	}
+
+	public void removeCustomPersonData(View view) {
+		EditText keyText = (EditText) findViewById(R.id.remove_custom_person_data_key);
+		String key = (keyText).getText().toString().trim();
+		keyText.setText(null);
+		Apptentive.removeCustomPersonData(this, key);
+	}
+
+	public void setInitialPersonEmail(View view) {
+		EditText emailText = (EditText) findViewById(R.id.set_initial_person_email);
+		String email = (emailText).getText().toString().trim();
+		emailText.setText(null);
+		PersonManager.storeInitialPersonEmail(this, email);
 	}
 }

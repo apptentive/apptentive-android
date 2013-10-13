@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterIntroDi
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterThankYouDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -42,8 +43,10 @@ public class ApptentiveMessageCenter {
 
 	public static void show(Activity activity, Trigger reason) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean emailRequired = false; // TODO: Get this from configuration.
-		boolean shouldShowIntroDialog = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, true);
+		Configuration conf = Configuration.load(activity);
+		boolean enableMessageCenter = conf.isMessageCenterEnabled();
+		boolean emailRequired = conf.isMessageCenterEmailRequired();
+		boolean shouldShowIntroDialog = !enableMessageCenter || prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, true);
 		// TODO: What if there is an incoming message that is unread? Shouldn't they see the Message Center right away?
 		if (shouldShowIntroDialog) {
 			showIntroDialog(activity, reason, emailRequired);
@@ -53,6 +56,7 @@ public class ApptentiveMessageCenter {
 			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
 			activity.startActivity(intent);
+			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		}
 	}
 
@@ -158,12 +162,12 @@ public class ApptentiveMessageCenter {
 		final MessageCenterIntroDialog dialog = new MessageCenterIntroDialog(activity);
 		dialog.setEmailRequired(emailRequired);
 
-		String email = Util.getUserEmail(activity);
-		Person storedPerson = PersonManager.getStoredPerson(activity);
-		if (storedPerson != null && Util.isEmpty(storedPerson.getEmail())) {
-			if (email != null) {
+		String personEnteredEmail = PersonManager.loadPersonEmail(activity);
+		String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
+		if (Util.isEmpty(personEnteredEmail)) {
+			if (!Util.isEmpty(personInitialEmail)) {
 				dialog.setEmailFieldHidden(false);
-				dialog.prePopulateEmail(email);
+				dialog.prePopulateEmail(personInitialEmail);
 			}
 		} else {
 			dialog.setEmailFieldHidden(true);
@@ -186,12 +190,12 @@ public class ApptentiveMessageCenter {
 				// Save the email.
 				if (dialog.isEmailFieldVisible()) {
 					if (email != null && email.length() != 0) {
-						Apptentive.setUserEmail(email);
+						PersonManager.storePersonEmail(activity, email);
 						Person person = PersonManager.storePersonAndReturnDiff(activity);
-						if(person != null) {
+						if (person != null) {
 							Log.d("Person was updated.");
 							Log.v(person.toString());
-							Apptentive.getDatabase(activity).addPayload(person);
+							ApptentiveDatabase.getInstance(activity).addPayload(person);
 						} else {
 							Log.d("Person was not updated.");
 						}
@@ -206,6 +210,7 @@ public class ApptentiveMessageCenter {
 				dialog.dismiss();
 
 				final MessageCenterThankYouDialog messageCenterThankYouDialog = new MessageCenterThankYouDialog(activity);
+				messageCenterThankYouDialog.setValidEmailProvided(email != null && Util.isEmailValid(email));
 				messageCenterThankYouDialog.setOnChoiceMadeListener(new MessageCenterThankYouDialog.OnChoiceMadeListener() {
 					@Override
 					public void onNo() {
@@ -223,14 +228,15 @@ public class ApptentiveMessageCenter {
 			}
 		});
 
+		String appDisplayName = Configuration.load(activity).getAppDisplayName();
 		switch (reason) {
 			case enjoyment_dialog:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_no_love);
-				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body_no_love, GlobalInfo.appDisplayName));
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, appDisplayName));
 				break;
 			case message_center:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_default);
-				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body_default, GlobalInfo.appDisplayName));
+				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, appDisplayName));
 				break;
 			default:
 				return;
@@ -243,12 +249,15 @@ public class ApptentiveMessageCenter {
 		messageCenterView.scrollMessageListViewToBottom();
 	}
 
-	public static void onStop(Context context) {
+	public static void onStop(@SuppressWarnings("unused") Context context) {
 		pollForMessages = false;
 	}
 
-	public static void onBackPressed(Context context) {
-		MetricModule.sendMetric(context, Event.EventLabel.message_center__close);
+	public static void onBackPressed(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
+		activity.finish();
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+
 	}
 
 	enum Trigger {

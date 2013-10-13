@@ -26,8 +26,6 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 
 	/**
 	 * Perform any view initialization here. Make sure to call super.init() first to initialise the parent hierarchy.
-	 *
-	 * @param message
 	 */
 	protected void init(T message) {
 		super.init(message);
@@ -58,7 +56,7 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		String name = message.getSenderUsername();
 		if (name == null || name.equals("")) {
 			Resources resources = context.getResources();
-			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_them);
+			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_developer);
 		}
 		nameView.setText(name);
 

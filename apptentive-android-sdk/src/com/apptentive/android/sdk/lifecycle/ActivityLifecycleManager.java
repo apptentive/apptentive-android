@@ -142,7 +142,6 @@ public class ActivityLifecycleManager {
 
 	/**
 	 * Internal use only.
-	 * @param activity
 	 */
 	public static void activityStopped(Activity activity) {
 		try {
@@ -167,7 +166,7 @@ public class ActivityLifecycleManager {
 
 		List<SessionEvent> events = queue.getAllEvents();
 		for (SessionEvent event : events) {
-			builder.append("\n  " + event.getDebugString());
+			builder.append("\n  ").append(event.getDebugString());
 		}
 		return builder.toString();
 	}

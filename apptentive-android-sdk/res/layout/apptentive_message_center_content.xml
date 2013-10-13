@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/apptentive_message_center_root"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  style="@style/ApptentiveHeader"
+                  android:gravity="center">
+        <TextView android:id="@+id/apptentive_message_center_header_title"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:gravity="center"
+                  style="@style/ApptentiveHeaderText"
+                  android:text="@string/apptentive_message_center_title"/>
+    </LinearLayout>
+    <ListView android:id="@+id/apptentive_message_center_list"
+              android:layout_width="fill_parent"
+              android:layout_height="0px"
+              android:layout_weight="1"
+              style="@style/ApptentiveMainArea"
+              android:cacheColorHint="@android:color/transparent"
+              android:listSelector="@android:color/transparent"
+              android:divider="@null"/>
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center_vertical"
+                  android:background="@android:color/black">
+        <ImageView android:id="@+id/apptentive_message_center_attach_button"
+                   android:layout_width="44dp"
+                   android:layout_height="44dp"
+                   android:scaleType="fitCenter"
+                   android:clickable="true"
+                   android:src="@drawable/android_ic_action_photo"/>
+        <EditText android:id="@+id/apptentive_message_center_message"
+                  android:layout_width="0px"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:layout_marginTop="2dp"
+                  android:singleLine="false"
+                  android:textColor="@android:color/black"
+                  android:textSize="14sp"
+                  android:background="@drawable/android_textfield_default"
+                  android:inputType="textCapSentences|textMultiLine"
+                  android:maxLines="3"
+                  android:hint="@string/apptentive_message_center_compose_hint"/>
+        <ImageView android:id="@+id/apptentive_message_center_send"
+                   android:layout_width="44dp"
+                   android:layout_height="44dp"
+                   android:scaleType="fitCenter"
+                   android:clickable="true"
+                   android:src="@drawable/android_ic_action_send"/>
+    </LinearLayout>
+    <FrameLayout android:id="@+id/apptentive_message_center_powered_by_apptentive"
+                 android:layout_width="fill_parent"
+                 android:layout_height="24dp"
+                 android:background="@android:color/black">
+        <RelativeLayout android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:gravity="bottom|center_horizontal">
+            <TextView android:id="@+id/apptentive_message_center_powered_by_text"
+                      android:layout_width="wrap_content"
+                      android:layout_height="fill_parent"
+                      android:gravity="bottom"
+                      android:paddingBottom="4dp"
+                      android:paddingRight="4dp"
+                      android:textSize="12sp"
+                      android:textColor="#CCCCCC"
+                      android:text="Powered by"/>
+            <ImageView android:layout_width="100dp"
+                       android:layout_height="fill_parent"
+                       android:src="@drawable/apptentive_logo_reverse"
+                       android:layout_toRightOf="@+id/apptentive_message_center_powered_by_text"/>
+        </RelativeLayout>
+    </FrameLayout>
+</LinearLayout>

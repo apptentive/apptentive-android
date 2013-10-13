@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:paddingBottom="4dp"
+              android:orientation="vertical">
+    <EditText android:id="@+id/answer_text"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:paddingTop="16dp"
+              android:paddingBottom="16dp"
+              android:textColor="@color/apptentive_survey_answer_text"
+              android:textSize="@dimen/apptentive_text_small"
+              android:hint="@string/apptentive_survey_singleline_hint"
+              android:background="@drawable/android_textfield_activated_holo_light"/>
+</LinearLayout>

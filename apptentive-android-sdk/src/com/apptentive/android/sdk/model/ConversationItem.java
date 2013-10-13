@@ -20,7 +20,6 @@ public abstract class ConversationItem extends Payload {
 
 	protected static final String KEY_NONCE = "nonce";
 	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
-	protected static final String KEY_CLIENT_CREATED_AT_TIMEZONE = "client_created_at_timezone";
 	protected static final String KEY_CLIENT_CREATED_AT_UTC_OFFSET = "client_created_at_utc_offset";
 
 	protected ConversationItem() {
@@ -35,7 +34,6 @@ public abstract class ConversationItem extends Payload {
 		int utcOffset = timezone.getOffset(now.getTime()) / 1000;
 
 		setClientCreatedAt(seconds);
-		setClientCreatedAtTimezone(timezone.getID());
 		setClientCreatedAtUtcOffset(utcOffset);
 
 	}
@@ -75,14 +73,6 @@ public abstract class ConversationItem extends Payload {
 			put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
 		} catch (JSONException e) {
 			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT);
-		}
-	}
-
-	private void setClientCreatedAtTimezone(String clientCreatedAtTimezone) {
-		try {
-			put(KEY_CLIENT_CREATED_AT_TIMEZONE, clientCreatedAtTimezone);
-		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_TIMEZONE);
 		}
 	}
 

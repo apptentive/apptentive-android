@@ -21,11 +21,6 @@ public class ImageUtil {
 
 	/**
 	 * From <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large Bitmaps Efficiently</a>
-	 *
-	 * @param options
-	 * @param reqWidth
-	 * @param reqHeight
-	 * @return
 	 */
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 		// Raw height and width of image
@@ -99,11 +94,11 @@ public class ImageUtil {
 	 * performs a scaling of this resulting bitmap to achieve the final size. It will create two bitmaps in memory while it
 	 * is running.
 	 *
-	 * @param is
-	 * @param maxWidth The maximum width to scale this image to, or 0 to ignore this parameter.
+	 * @param is        An InputStream from the image file.
+	 * @param maxWidth  The maximum width to scale this image to, or 0 to ignore this parameter.
 	 * @param maxHeight The maximum height to scale this image to, or 0 to ignore this parameter.
-	 * @param config
-	 * @return
+	 * @param config    A Bitmap.Config to apply to the Bitmap as it is read in.
+	 * @return A Bitmap scaled by maxWidth, maxHeight, and config.
 	 */
 	public static Bitmap createScaledBitmapFromStream(InputStream is, int maxWidth, int maxHeight, Bitmap.Config config) {
 

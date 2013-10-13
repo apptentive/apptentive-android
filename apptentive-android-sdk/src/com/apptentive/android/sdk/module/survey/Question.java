@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -22,10 +22,6 @@ public interface Question {
 	public boolean isRequired();
 	public String getInstructions();
 
-	public boolean isAnswered();
-
-	public String[] getAnswers();
-
-	public boolean isMetricSent();
-	public void setMetricSent(boolean metricSent);
+	public int getMinSelections();
+	public int getMaxSelections();
 }

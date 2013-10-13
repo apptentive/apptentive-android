@@ -11,8 +11,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.FileStore;
 import com.apptentive.android.sdk.util.CountingOutputStream;
 import com.apptentive.android.sdk.util.ImageUtil;
@@ -46,7 +46,8 @@ public class FileMessage extends Message {
 
 	/**
 	 * FileMessages are sent using a multipart form encoded request, so they are handled differently here.
-	 * @return
+	 *
+	 * @return A String containing just the meta data about the FileMessage.
 	 */
 	@Override
 	public String marshallForSending() {
@@ -56,7 +57,7 @@ public class FileMessage extends Message {
 	public String getFileName() {
 		try {
 			return getString(KEY_FILE_NAME);
-		}catch (JSONException e) {
+		} catch (JSONException e) {
 		}
 		return null;
 	}
@@ -134,12 +135,12 @@ public class FileMessage extends Message {
 		storedFile.setOriginalUri(uri.toString());
 		storedFile.setLocalFilePath(localFile.getPath());
 		storedFile.setMimeType(mimeType);
-		FileStore db = Apptentive.getDatabase(context);
+		FileStore db = ApptentiveDatabase.getInstance(context);
 		return db.putStoredFile(storedFile);
 	}
 
 	public StoredFile getStoredFile(Context context) {
-		FileStore fileStore = Apptentive.getDatabase(context);
+		FileStore fileStore = ApptentiveDatabase.getInstance(context);
 		StoredFile storedFile = fileStore.getStoredFile(getStoredFileId());
 		return storedFile;
 	}

@@ -81,7 +81,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 				imageView.setVisibility(View.INVISIBLE);
 
 				Point dimensions = getBitmapDimensions(storedFile);
-				if(dimensions == null) {
+				if (dimensions == null) {
 					Log.w("Unable to peek at image dimensions.");
 					return;
 				}
@@ -105,8 +105,8 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 	 * This method will load a bitmap from the StoredFile on another thread, and then update the ImageView with the
 	 * resulting bitmap on the UI thread.
 	 *
-	 * @param storedFile
-	 * @param imageView
+	 * @param storedFile The file to pull the bitmap from.
+	 * @param imageView  The ImageView to insert the bitmap into.
 	 */
 	private void loadImage(final StoredFile storedFile, final ImageView imageView) {
 		new Thread() {
@@ -125,7 +125,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 					imageView.post(new Runnable() {
 						public void run() {
 							imageView.setImageBitmap(imageBitmap);
-							imageView.setPadding(0,0,0,0);
+							imageView.setPadding(0, 0, 0, 0);
 							imageView.setVisibility(View.VISIBLE);
 						}
 					});
@@ -159,7 +159,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 			maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 			maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 			float scale = ImageUtil.calculateBitmapScaleFactor(options.outWidth, options.outHeight, maxImageWidth, maxImageHeight);
-			ret = new Point((int)(scale * options.outWidth), (int)(scale * options.outHeight));
+			ret = new Point((int) (scale * options.outWidth), (int) (scale * options.outHeight));
 		} catch (Exception e) {
 			Log.e("Error opening stored file.", e);
 		} finally {

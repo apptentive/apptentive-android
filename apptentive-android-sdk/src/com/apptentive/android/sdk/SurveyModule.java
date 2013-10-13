@@ -7,29 +7,30 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
 import android.widget.*;
 
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
-import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.SurveyThankYouDialog;
+import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
 /**
- * This module is responsible for fetching, displaying, and sending finished survey payloads to the apptentive server.
+ * This module is responsible for displaying Surveys.
  *
  * @author Sky Kelsey
  */
@@ -41,7 +42,7 @@ public class SurveyModule {
 
 	private static SurveyModule instance;
 
-	static SurveyModule getInstance() {
+	public static SurveyModule getInstance() {
 		if (instance == null) {
 			instance = new SurveyModule();
 		}
@@ -54,94 +55,45 @@ public class SurveyModule {
 	// *************************************************************************************************
 
 	private SurveyDefinition surveyDefinition;
-	private SurveySendView sendView;
-	private boolean fetching = false;
+	private SurveyState surveyState;
 	private Map<String, String> data;
 	private OnSurveyFinishedListener onSurveyFinishedListener;
 
 	private SurveyModule() {
-		surveyDefinition = null;
 	}
 
-	private void setSurvey(SurveyDefinition surveyDefinition) {
-		this.surveyDefinition = surveyDefinition;
-		data = new HashMap<String, String>();
-		data.put("id", surveyDefinition.getId());
+	private void cleanup() {
+		this.surveyDefinition = null;
+		this.surveyState = null;
+		this.onSurveyFinishedListener = null;
+		this.data = null;
 	}
-
 
 	// *************************************************************************************************
 	// ******************************************* Not Private *****************************************
 	// *************************************************************************************************
 
-	/**
-	 * Fetches a survey.
-	 *
-	 * @param onSurveyFetchedListener An optional {@link OnSurveyFetchedListener} that will be notified when the
-	 *                                survey has been fetched. Pass in null if you don't need to be notified.
-	 */
-	public synchronized void fetchSurvey(final OnSurveyFetchedListener onSurveyFetchedListener) {
-		if (fetching) {
-			Log.d("Already fetching survey");
-			return;
-		}
-		Log.d("Started survey fetch");
-		fetching = true;
-
-		new Thread() {
-			public void run() {
-				try {
-					ApptentiveHttpResponse response = ApptentiveClient.getSurvey();
-					if(response.isSuccessful()) {
-						SurveyDefinition definition = SurveyManager.parseSurvey(response.getContent());
-						if (definition != null) {
-							setSurvey(definition);
-						}
-						if (onSurveyFetchedListener != null) {
-							onSurveyFetchedListener.onSurveyFetched(definition != null);
-						}
-					}
-				} catch (JSONException e) {
-					Log.e("Exception parsing survey JSON.", e);
-				} finally {
-					fetching = false;
-				}
-			}
-		}.start();
-	}
-
-	public void show(Context context) {
-		show(context, null);
-	}
-
-	public void show(Context context, OnSurveyFinishedListener onSurveyFinishedListener) {
-		if (!isSurveyReady()) {
-			return;
-		}
+	public void show(Activity activity, SurveyDefinition surveyDefinition, OnSurveyFinishedListener onSurveyFinishedListener) {
+		this.surveyDefinition = surveyDefinition;
+		this.surveyState = new SurveyState(surveyDefinition);
 		this.onSurveyFinishedListener = onSurveyFinishedListener;
+		data = new HashMap<String, String>();
+		data.put("id", surveyDefinition.getId());
+
 		Intent intent = new Intent();
-		intent.setClass(context, ViewActivity.class);
+		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
-		context.startActivity(intent);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
-	/**
-	 * A method for querying whether a survey is downloaded and ready to show to the user.
-	 * @return true if a survey is ready, else false.
-	 */
-	public boolean isSurveyReady() {
-		return (surveyDefinition != null);
+	public SurveyState getSurveyState() {
+		return this.surveyState;
 	}
 
-	public void cleanup() {
-		this.surveyDefinition = null;
-	}
-
-	boolean isCompleted() {
+	public boolean isSurveyValid() {
 		for (Question question : surveyDefinition.getQuestions()) {
-			boolean required = question.isRequired();
-			boolean answered = question.isAnswered();
-			if (required && !answered) {
+			if (!surveyState.isQuestionValid(question)) {
 				return false;
 			}
 		}
@@ -149,141 +101,130 @@ public class SurveyModule {
 	}
 
 	void doShow(final Activity activity) {
+		activity.setContentView(R.layout.apptentive_survey);
+
 		if (surveyDefinition == null) {
 			return;
 		}
-		TextView surveyTitle = (TextView) activity.findViewById(R.id.apptentive_survey_title_text);
-		surveyTitle.setFocusable(true);
-		surveyTitle.setFocusableInTouchMode(true);
-		surveyTitle.setText(surveyDefinition.getName());
 
-		Button skipButton = (Button) activity.findViewById(R.id.apptentive_survey_button_skip);
-		if (surveyDefinition.isRequired()) {
-			((RelativeLayout) skipButton.getParent()).removeView(skipButton);
+		TextView title = (TextView) activity.findViewById(R.id.title);
+		title.setFocusable(true);
+		title.setFocusableInTouchMode(true);
+		title.setText(surveyDefinition.getName());
+
+		String descriptionText = surveyDefinition.getDescription();
+		TextView description = (TextView) activity.findViewById(R.id.description);
+		if (descriptionText != null) {
+			description.setText(descriptionText);
 		} else {
-			skipButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					onBackPressed(activity);
-					activity.finish();
-				}
-			});
+			description.setVisibility(View.GONE);
 		}
 
-		View brandingButton = activity.findViewById(R.id.apptentive_branding_view);
-		brandingButton.setOnClickListener(new View.OnClickListener() {
+		final Button send = (Button) activity.findViewById(R.id.send);
+		send.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Util.hideSoftKeyboard(activity, view);
+
+				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
+					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
+					dialog.setMessage(surveyDefinition.getSuccessMessage());
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialogInterface) {
+							finishSurvey(activity);
+						}
+					});
+					dialog.show();
+				} else {
+					finishSurvey(activity);
+				}
+			}
+		});
+
+		View about = activity.findViewById(R.id.apptentive_branding_view);
+		about.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				AboutModule.getInstance().show(activity);
 			}
 		});
 
-		LinearLayout questionList = (LinearLayout) activity.findViewById(R.id.aptentive_survey_question_list);
-
-		// Render the survey description
-		if (surveyDefinition.getDescription() != null) {
-			SurveyDescriptionView surveyDescription = new SurveyDescriptionView(activity);
-			surveyDescription.setTitleText(surveyDefinition.getDescription());
-			questionList.addView(surveyDescription);
-		}
+		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
 
 		// Then render all the questions
 		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<TextSurveyQuestionView>() {
-					public void onAnswered(TextSurveyQuestionView view) {
+				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
-				questionList.addView(textQuestionView);
+				questions.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
 				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultichoiceSurveyQuestionView>() {
-					public void onAnswered(MultichoiceSurveyQuestionView view) {
+				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
-				questionList.addView(multichoiceQuestionView);
+				questions.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<MultiselectSurveyQuestionView>() {
-					public void onAnswered(MultiselectSurveyQuestionView view) {
+				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						sendView.setEnabled(isCompleted());
+						send.setEnabled(isSurveyValid());
 					}
 				});
-				questionList.addView(multiselectQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
-				StackrankSurveyQuestionView questionView = new StackrankSurveyQuestionView(activity, (StackrankQuestion) question);
-				questionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered(Object view) {
-						sendMetricForQuestion(activity, question);
-						// TODO: This.
-					}
-				});
-				questionList.addView(questionView);
+				questions.addView(multiselectQuestionView);
+//		} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
+//			// TODO: This.
 			}
 		}
-
-		// Then render the send button.
-		sendView = new SurveySendView(activity);
-		sendView.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
-
-				getSurveyStore(activity).addPayload(new SurveyPayload(surveyDefinition));
-
-				if(SurveyModule.this.onSurveyFinishedListener != null) {
-					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
-				}
-
-				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle(view.getContext().getString(R.string.apptentive_survey_success_title));
-					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialogInterface, int i) {
-							cleanup();
-							activity.finish();
-						}
-					});
-					builder.show();
-				} else {
-					cleanup();
-					activity.finish();
-				}
-			}
-		});
-		sendView.setEnabled(isCompleted());
-		questionList.addView(sendView);
-
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
 
+		send.setEnabled(isSurveyValid());
+
 		// Force the top of the survey to be shown first.
-		surveyTitle.requestFocus();
+		title.requestFocus();
+	}
+
+	private void finishSurvey(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
+		getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
+		Log.d("Survey Submitted.");
+		cleanup();
+		activity.finish();
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
+			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
+		}
 	}
 
 	void sendMetricForQuestion(Context context, Question question) {
-		if(!question.isMetricSent() && question.isAnswered()) {
+		String questionId = question.getId();
+		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
 			MetricModule.sendMetric(context, Event.EventLabel.survey__question_response, null, answerData);
-			question.setMetricSent(true);
+			surveyState.markMetricSent(questionId);
 		}
 	}
 
 	private static PayloadStore getSurveyStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
-	void onBackPressed(Context context) {
-		MetricModule.sendMetric(context, Event.EventLabel.survey__cancel, null, data);
-		if(SurveyModule.this.onSurveyFinishedListener != null) {
+	void onBackPressed(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__cancel, null, data);
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}
 		cleanup();
+		activity.finish();
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 }

@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.offline.SurveyPayload;
+import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.Header;
@@ -34,9 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * TODO: When we drop API level 7 (2.1) support, we can start using AndroidHttpClient.
@@ -62,13 +60,11 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
-
-	// Old API
-	private static final String ENDPOINT_SURVEYS = ENDPOINT_BASE + "/surveys";
-	private static final String ENDPOINT_SURVEYS_ACTIVE = ENDPOINT_SURVEYS + "/active";
+	private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
+	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
 
 	// Deprecated API
-	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
+	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
@@ -125,12 +121,13 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postSurvey(SurveyPayload survey) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_RECORDS, Method.POST, survey.marshallForSending());
+	public static ApptentiveHttpResponse getSurveys() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SURVEYS_FETCH, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse getSurvey() {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_SURVEYS_ACTIVE, Method.GET, null);
+	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
+		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
+		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
@@ -188,11 +185,13 @@ public class ApptentiveClient {
 			}
 			HeaderIterator headerIterator = response.headerIterator();
 			if(headerIterator != null) {
-				List<Header> headers = new ArrayList<Header>();
+				Map<String, String> headers = new HashMap<String, String>();
 				while (headerIterator.hasNext()) {
 					Header header = (Header) headerIterator.next();
-					headers.add(header);
+					headers.put(header.getName(), header.getValue());
+					//Log.v("Header: %s = %s", header.getName(), header.getValue());
 				}
+				ret.setHeaders(headers);
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
@@ -249,17 +248,17 @@ public class ApptentiveClient {
 			StringBuilder requestText = new StringBuilder();
 
 			// Write form data
-			requestText.append(twoHyphens + boundary + lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"message\"" + lineEnd);
-			requestText.append("Content-Type: text/plain" + lineEnd);
+			requestText.append(twoHyphens).append(boundary).append(lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd);
+			requestText.append("Content-Type: text/plain").append(lineEnd);
 			requestText.append(lineEnd);
 			requestText.append(postBody);
 			requestText.append(lineEnd);
 
 			// Write file attributes.
-			requestText.append(twoHyphens + boundary + lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
-			requestText.append("Content-Type: " + storedFile.getMimeType() + lineEnd);
+			requestText.append(twoHyphens).append(boundary).append(lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"").append(lineEnd);
+			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 			requestText.append(lineEnd);
 
 			Log.d("Post body: " + requestText);

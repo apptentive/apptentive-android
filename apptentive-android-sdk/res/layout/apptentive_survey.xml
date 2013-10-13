@@ -1,66 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/feedback_survey_main_screen_layout"
-              android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:background="@drawable/apptentive_pinstripe_background">
-	<RelativeLayout android:id="@+id/apptentive_survey_action_bar"
-	                android:orientation="horizontal"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:background="@drawable/apptentive_header_background">
-		<TextView android:id="@+id/apptentive_survey_title_text"
-		          android:layout_width="wrap_content"
-		          android:layout_height="wrap_content"
-		          android:layout_centerInParent="true"
-		          android:textStyle="bold"
-		          android:textSize="20sp"
-		          android:textColor="#FFFFFF"
-		          android:shadowColor="#000000"
-		          android:shadowDx="0"
-		          android:shadowDy="-1"
-		          android:shadowRadius="1"
-		          android:text="Survey"/>
-		<Button android:id="@+id/apptentive_survey_button_skip"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_centerVertical="true"
-		        android:layout_alignParentRight="true"
-		        android:layout_marginRight="4dp"
-		        android:paddingLeft="10dp"
-		        android:paddingTop="6dp"
-		        android:paddingRight="10dp"
-		        android:paddingBottom="6dp"
-		        android:textColor="#EEEEEE"
-		        android:textSize="18sp"
-		        android:textStyle="bold"
-		        android:background="@drawable/apptentive_header_button"
-		        android:text="@string/apptentive_skip"/>
-	</RelativeLayout>
-	<ScrollView android:id="@+id/apptentive_survey_scrollview"
-                android:layout_width="fill_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1">
-		<LinearLayout android:layout_width="fill_parent"
-		              android:layout_height="fill_parent"
-		              android:orientation="vertical"
-		              android:paddingLeft="10dp"
-		              android:paddingRight="10dp">
-			<LinearLayout android:id="@+id/aptentive_survey_question_list"
-			              android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:orientation="vertical">
-				<!-- Survey questions will be rendered out into this area -->
-			</LinearLayout>
-		</LinearLayout>
-	</ScrollView>
-	<include layout="@layout/apptentive_branding"/>
+              android:gravity="center_vertical">
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding"
+                android:paddingRight="@dimen/apptentive_activity_side_padding"
+                android:fadingEdge="none">
+        <FrameLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+                     android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
+            <include layout="@layout/apptentive_survey_content"/>
+        </FrameLayout>
+    </ScrollView>
 </LinearLayout>

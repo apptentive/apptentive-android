@@ -1,11 +1,74 @@
-2013--13 skykelsey v1.0.2
----------------------------
+2013-??-?? skykelsey next
+--------------------------
 
 Major changes:
 
-* Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active netrwork. App users can send messages and attach screenshots, and receive a reply in-app. If they shoose to specify an email address, they can also be contacted through email.
+* Send app's TargetSdkVersion with app_release, and OS's API Level with device.
+* Use the server setting "Require Email" so that feedback can only be submitted if the user supplies a valid email.
+* Get list of available Google account emails and provide them in an AutoCompleteTextView.
+* Some minor tweaks to make the IntroDialog look great.
+* Added new methods for adding and removing custom data set on the device and person objects. These methods can now be called anywhere in the app's lifecycle, and their values will be picked up the next time an activity starts.
+* Added Swedish translation, updated translations for other languages.
+* Restyled the screenshot confirmation dialog to match the other dialogs.
 
-2013--13 skykelsey v0.6.5
+Bugs fixed:
+
+* ANDROID-178 ConcurrentModificationException in survey code
+
+2013-09-15 skykelsey 1.1.2
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-155 Message Center can't scroll
+
+2013-08-31 skykelsey 1.1.1
+--------------------------
+
+Bugs fixed:
+
+* ANDROID-141 Simplified Chinese strings file contains Traditional Chinese
+* ANDROID-142 Save the text entered in Message Center if the user closes it.
+* ANDROID-145 Dev app can crash in tablet portrait mode.
+
+2013-08-29 skykelsey 1.1.0
+--------------------------
+
+Major changes:
+
+* Support new enterprise survey features: tagged surveys, rate limiting, delivery capping, and time range constraining.
+* New clean UI fro survey display.
+* New clean UI for about page.
+* Added ability to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
+
+2013-08-16 skykelsey 1.0.4
+--------------------------
+
+Major changes:
+
+* First release of a localized SDK. See README for supported languages.
+
+Bugs Fixed:
+
+* ANDROID-131 Survey clipping background.
+* ANDROID-132 Radio Version is not being set in Device object
+* ANDROID-134 Rating logic does not respect 0 values
+
+2013-07-19 skykelsey 1.0.3
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-130 Lower part of message center is transparent.
+
+2013-06-28 skykelsey 1.0.2
+--------------------------
+
+Major changes:
+
+* Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active network. App users can send messages and attach screenshots, and receive a reply in-app. If they choose to specify an email address, they can also be contacted through email.
+
+2013-04-10 skykelsey v0.6.5
 ---------------------------
 
 Bugs fixed:
@@ -13,14 +76,14 @@ Bugs fixed:
 * Fix XML examples in README.
 * ANDROID-82 Populate the feedback source field with "enjoyment_dialog" when launched from the ratings prompt
 
-2013--13 skykelsey v0.6.4
+2013-12-19 skykelsey v0.6.4
 ---------------------------
 
-Bugs Fixed:
+Bugs fixed:
 
 * ANDROID-114 Rating Dialog comes up twice.
 
-2013--13 skykelsey v0.6.3
+2012-12-18 skykelsey v0.6.3
 ---------------------------
 
 Bugs fixed:
@@ -36,19 +99,19 @@ Bugs fixed:
 * ANDROID-109 Google Play opens up on top of host application when rating app
 * ANDROID-110 Ratings prompt doesn't respect zero value settings.
 
-Added some tests as well.
-
 2012-10-10 skykelsey v0.6.1
 ---------------------------
 
- Bugs fixed:
+Major changes:
 
- * ANDROID-95 Come up with a new way to detect app starts and stops
- * ANDROID-96 Crash on pre API 5 phones
+* App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
 
-App starts are now detected by looking for a 10 second gap where no App Activities are running. No major changes
+Bugs fixed:
 
-2013--13 skykelsey v0.6.0
+* ANDROID-95 Come up with a new way to detect app starts and stops
+* ANDROID-96 Crash on pre API 5 phones
+
+2012-10-10 skykelsey v0.6.0
 ---------------------------
 
 * Added README.md
@@ -58,7 +121,7 @@ Bugs fixed:
 
 * ANDROID-95 Move to a queue and timer based solution instead of an event based one. Tear out the old stuff.
 * ANDROID-96 Fix two bugs. Add an android for a resource that needed it, and allow pre API level 5 devices to work.
-* ANDROID-97 Starting appes takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
+* ANDROID-97 Starting apps takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
 
 2012-09-13 skykelsey v0.5.2
 ---------------------------
@@ -74,10 +137,8 @@ Bugs fixed:
 
 Major changes:
 
-There was a problem with how we initialize our SDK that could lead to NPEs if the main Activity had been garbage collected,
-and interfered with unit testing individual child Activities. Fixed that.
-
-Fixed a problem with how we check for app uses. Now we keep track of each Activity instead of the Application as a whole.
+* There was a problem with how we initialize our SDK that could lead to NPEs if the main Activity had been garbage collected, and interfered with unit testing individual child Activities. Fixed that.
+* Fixed a problem with how we check for app uses. Now we keep track of each Activity instead of the Application as a whole.
 
 Bugs fixed:
 
@@ -89,16 +150,9 @@ Bugs fixed:
 
 Major changes:
 
-Updated what counts as a "use". Before, we were incrementing uses on app launch, defined as a call to the main Activity's
-onCreate() method. That is not very useful, since hitting home screen backgrounds the app, but won't increment uses upon
-return. So instead, we figure out when the app is put into the background, and when it comes back.
-
-Updated app integration process. Instead of making a bunch of Apptentive API calls, you can now inherit from our
-ApptentiveActivity or ApptentiveListActivity. These classes allow you to save time integrating. You can also delegate
-your Activity's event handlers into Apptentive manually if you can't inherit from us.
-
-Redid the example apps. The previous "Demo" app was not really a demo, but a testing app. Renamed it accordingly.
-Also added two new "Example" apps: one using inheritance for integration, and the other using delegation.
+* Updated what counts as a "use". Before, we were incrementing uses on app launch, defined as a call to the main Activity's onCreate() method. That is not very useful, since hitting home screen backgrounds the app, but won't increment uses upon return. So instead, we figure out when the app is put into the background, and when it comes back.
+* Updated app integration process. Instead of making a bunch of Apptentive API calls, you can now inherit from our ApptentiveActivity or ApptentiveListActivity. These classes allow you to save time integrating. You can also delegate your Activity's event handlers into Apptentive manually if you can't inherit from us.
+* Redid the example apps. The previous "Demo" app was not really a demo, but a testing app. Renamed it accordingly. Also added two new "Example" apps: one using inheritance for integration, and the other using delegation.
 
 
 Bugs fixed:
