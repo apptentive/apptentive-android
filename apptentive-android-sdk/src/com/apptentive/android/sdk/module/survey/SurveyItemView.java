@@ -66,7 +66,6 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 		setPadding(0, tenDips, 0, 0);
 		container = new LinearLayout(appContext);
 		container.setOrientation(LinearLayout.VERTICAL);
-		container.setBackgroundResource(R.drawable.apptentive_question_item);
 		addView(container);
 
 		titleTextView = new TextView(appContext);
@@ -120,7 +119,7 @@ abstract public class SurveyItemView<Q extends Question> extends FrameLayout {
 	}
 
 	protected void updateInstructionsColor() {
-		if(question != null && question.isRequired() && !question.isAnswered()) {
+		if(question != null && question.isRequired()) {
 			instructionsTextView.setTextColor(Color.RED);
 		} else {
 			instructionsTextView.setTextColor(Color.GRAY);
