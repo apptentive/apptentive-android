@@ -30,8 +30,6 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 
 	/**
 	 * Override to change the behavior of clicking this.
-	 *
-	 * @param choice
 	 */
 	protected void choiceClicked(CheckboxChoice choice) {
 		choice.toggle();

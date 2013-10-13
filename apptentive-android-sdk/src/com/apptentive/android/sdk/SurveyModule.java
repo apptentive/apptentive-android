@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +19,9 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.view.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.survey.view.SurveyThankYouDialog;
 import com.apptentive.android.sdk.module.survey.view.TextSurveyQuestionView;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PayloadStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -123,30 +124,20 @@ public class SurveyModule {
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.d("Survey Submitted.");
 				Util.hideSoftKeyboard(activity, view);
-				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
-
-				getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
-
-				if(SurveyModule.this.onSurveyFinishedListener != null) {
-					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
-				}
 
 				if (surveyDefinition.isShowSuccessMessage() && surveyDefinition.getSuccessMessage() != null) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-					builder.setMessage(surveyDefinition.getSuccessMessage());
-					builder.setTitle(view.getContext().getString(R.string.apptentive_thanks));
-					builder.setPositiveButton(view.getContext().getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialogInterface, int i) {
-							cleanup();
-							activity.finish();
+					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
+					dialog.setMessage(surveyDefinition.getSuccessMessage());
+					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface dialogInterface) {
+							finishSurvey(activity);
 						}
 					});
-					builder.show();
+					dialog.show();
 				} else {
-					cleanup();
-					activity.finish();
+					finishSurvey(activity);
 				}
 			}
 		});
@@ -164,8 +155,8 @@ public class SurveyModule {
 		for (final Question question : surveyDefinition.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
+				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<View>() {
+					public void onAnswered(View view) {
 						sendMetricForQuestion(activity, question);
 						send.setEnabled(isSurveyValid());
 					}
@@ -173,8 +164,8 @@ public class SurveyModule {
 				questions.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
 				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
+				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<View>() {
+					public void onAnswered(View view) {
 						sendMetricForQuestion(activity, question);
 						send.setEnabled(isSurveyValid());
 					}
@@ -182,19 +173,18 @@ public class SurveyModule {
 				questions.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
+				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener<View>() {
+					public void onAnswered(View view) {
 						sendMetricForQuestion(activity, question);
 						send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multiselectQuestionView);
-			} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
-				// TODO: This.
+//		} else if (question.getType() == Question.QUESTION_TYPE_STACKRANK) {
+//			// TODO: This.
 			}
 		}
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
-		SurveyHistory.recordSurveyDisplay(activity, surveyDefinition.getId(), System.currentTimeMillis());
 
 		send.setEnabled(isSurveyValid());
 
@@ -202,9 +192,20 @@ public class SurveyModule {
 		title.requestFocus();
 	}
 
+	private void finishSurvey(Activity activity) {
+		MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
+		getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
+		Log.d("Survey Submitted.");
+		cleanup();
+		activity.finish();
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
+			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
+		}
+	}
+
 	void sendMetricForQuestion(Context context, Question question) {
 		String questionId = question.getId();
-		if(!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
+		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", surveyDefinition.getId());
@@ -214,12 +215,12 @@ public class SurveyModule {
 	}
 
 	private static PayloadStore getSurveyStore(Context context) {
-		return Apptentive.getDatabase(context);
+		return ApptentiveDatabase.getInstance(context);
 	}
 
 	void onBackPressed(Activity activity) {
 		MetricModule.sendMetric(activity, Event.EventLabel.survey__cancel, null, data);
-		if(SurveyModule.this.onSurveyFinishedListener != null) {
+		if (SurveyModule.this.onSurveyFinishedListener != null) {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}
 		cleanup();

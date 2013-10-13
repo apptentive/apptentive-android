@@ -49,6 +49,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/apptentive_survey_send_button"
+                android:textColor="@drawable/apptentive_survey_send_button_text"
                 android:textSize="@dimen/apptentive_text_medium"
                 android:text="@string/apptentive_survey_send_response"/>
     </LinearLayout>

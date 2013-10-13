@@ -4,6 +4,8 @@
           package="com.apptentive.android.dev.tests"
           android:versionCode="1"
           android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="7"
+              android:targetSdkVersion="18"/>
     <!-- We add an application tag here just so that we can indicate that
          this package needs to link against the android.test library,
          which is needed when building test cases. -->

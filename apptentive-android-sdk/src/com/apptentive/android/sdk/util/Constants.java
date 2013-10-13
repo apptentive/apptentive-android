@@ -7,10 +7,6 @@
 package com.apptentive.android.sdk.util;
 
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 
 /**
  * @author Sky Kelsey
@@ -28,9 +24,13 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_ID = "personId";
 
 	public static final String PREF_KEY_DEVICE = "device";
+	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
+	public static final String PREF_KEY_PERSON_DATA = "personData";
+	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
+	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
@@ -62,75 +62,20 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
 	public static final String CONFIG_DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
+	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
+	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 
+	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-	private static final int SCREEN_ANIMATION_DURATION = 300;
-	private static final Interpolator SCREEN_ANIMATION_INTERPOLATOR = new LinearInterpolator();
-
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
-
-
-	public static Animation inFromRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromLeftAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToRightAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation inFromTopAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
-
-	public static Animation outToBottomAnimation() {
-		Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f);
-		animation.setDuration(SCREEN_ANIMATION_DURATION);
-		animation.setInterpolator(SCREEN_ANIMATION_INTERPOLATOR);
-		return animation;
-	}
 
 	/**
 	 * A list of mobile carrier network types as Strings.

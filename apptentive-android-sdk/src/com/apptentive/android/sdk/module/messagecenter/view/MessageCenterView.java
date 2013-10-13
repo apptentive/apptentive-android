@@ -7,12 +7,8 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -29,11 +25,8 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -56,7 +49,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
 		super(context);
 		this.context = context;
-		this.onSendMessageListener = onSendMessageListener;
+		MessageCenterView.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
 		setup(); // TODO: Move this into a configurationchange handler?
 	}
@@ -160,44 +153,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			Log.d("No attachment found.");
 			return;
 		}
-		AlertDialog dialog = new AlertDialog.Builder(context).create();
-		ImageView imageView = new ImageView(context);
-
-		// Show a thumbnail version of the image.
-		InputStream is = null;
-		final Bitmap thumbnail;
-		try {
-			is = context.getContentResolver().openInputStream(data);
-			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null);
-		} catch (FileNotFoundException e) {
-			// TODO: Error toast?
-			return;
-		} finally {
-			Util.ensureClosed(is);
-		}
-		if (thumbnail == null) {
-			return;
-		}
-
-		imageView.setImageBitmap(thumbnail);
-		dialog.setView(imageView);
-		Resources resources = context.getResources();
-		dialog.setTitle(resources.getString(R.string.apptentive_message_center_attachment_title));
-		dialog.setButton(resources.getString(R.string.apptentive_yes), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialogInterface, int i) {
-				Log.v("Yes, send attachment.");
+		AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
+		dialog.setImage(data);
+		dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
+			@Override
+			public void onAttachmentAccepted() {
 				onSendMessageListener.onSendFileMessage(data);
-			}
-		});
-		dialog.setButton2(resources.getString(R.string.apptentive_no), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialogInterface, int i) {
-				Log.v("Don't send attachment.");
-			}
-		});
-		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface dialogInterface) {
-				thumbnail.recycle();
-				System.gc();
 			}
 		});
 		dialog.show();

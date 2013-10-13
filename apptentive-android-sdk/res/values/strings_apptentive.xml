@@ -26,6 +26,7 @@
     <string name="apptentive_version">Apptentive Version %s</string>
 
     <string name="apptentive_edittext_hint_email">Your Email Address</string>
+    <string name="apptentive_edittext_hint_email_required">Email Address (required)</string>
 
     <string name="apptentive_powered_by_apptentive">Powered by Apptentive</string>
     <string name="apptentive_about_title">About Apptentive</string>
@@ -47,6 +48,8 @@
     <string name="apptentive_intro_dialog_edittext_hint">Tell us how we can help. (required)</string>
 
     <string name="apptentive_thank_you_dialog_body">Your response has been saved in the Message Center, where you\'ll be able to view replies and send us other messages.</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled">Thank you for your feedback!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">We\'ll be in touch via email.</string>
     <string name="apptentive_thank_you_dialog_close">Close</string>
     <string name="apptentive_thank_you_dialog_view_messages">View Messages</string>
 

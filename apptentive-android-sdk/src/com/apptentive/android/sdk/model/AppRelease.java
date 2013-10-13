@@ -16,6 +16,7 @@ public class AppRelease extends Payload {
 
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_BUILD_NUMBER = "build_number";
+	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
 
 	public AppRelease(String json) throws JSONException {
 		super(json);
@@ -62,6 +63,24 @@ public class AppRelease extends Payload {
 			put(KEY_BUILD_NUMBER, buildNumber);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to AppRelease.", KEY_BUILD_NUMBER);
+		}
+	}
+
+	public String getTargetSdkVersion() {
+		try {
+			if(!isNull(KEY_TARGET_SDK_VERSION)) {
+				return getString(KEY_TARGET_SDK_VERSION);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setTargetSdkVersion(String targetSdkVersion) {
+		try {
+			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
 		}
 	}
 

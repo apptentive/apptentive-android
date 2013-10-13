@@ -1,3 +1,20 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Major changes:
+
+* Send app's TargetSdkVersion with app_release, and OS's API Level with device.
+* Use the server setting "Require Email" so that feedback can only be submitted if the user supplies a valid email.
+* Get list of available Google account emails and provide them in an AutoCompleteTextView.
+* Some minor tweaks to make the IntroDialog look great.
+* Added new methods for adding and removing custom data set on the device and person objects. These methods can now be called anywhere in the app's lifecycle, and their values will be picked up the next time an activity starts.
+* Added Swedish translation, updated translations for other languages.
+* Restyled the screenshot confirmation dialog to match the other dialogs.
+
+Bugs fixed:
+
+* ANDROID-178 ConcurrentModificationException in survey code
+
 2013-09-15 skykelsey 1.1.2
 --------------------------
 
@@ -12,7 +29,7 @@ Bugs fixed:
 
 * ANDROID-141 Simplified Chinese strings file contains Traditional Chinese
 * ANDROID-142 Save the text entered in Message Center if the user closes it.
-* ANDROID-145 Dev app can crash in tablet portrate mode.
+* ANDROID-145 Dev app can crash in tablet portrait mode.
 
 2013-08-29 skykelsey 1.1.0
 --------------------------
@@ -104,7 +121,7 @@ Bugs fixed:
 
 * ANDROID-95 Move to a queue and timer based solution instead of an event based one. Tear out the old stuff.
 * ANDROID-96 Fix two bugs. Add an android for a resource that needed it, and allow pre API level 5 devices to work.
-* ANDROID-97 Starting appes takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
+* ANDROID-97 Starting apps takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
 
 2012-09-13 skykelsey v0.5.2
 ---------------------------

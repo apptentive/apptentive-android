@@ -30,6 +30,10 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER = "message_center";
 	private static final String KEY_MESSAGE_CENTER_TITLE = "title";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
+	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
+	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
+	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
+
 	// This one is not sent in JSON, but as a header form the server.
 	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
 
@@ -55,7 +59,7 @@ public class Configuration extends JSONObject {
 	public static Configuration load(SharedPreferences prefs) {
 		String json = prefs.getString(Constants.PREF_KEY_APP_CONFIG_JSON, null);
 		try {
-			if(json != null) {
+			if (json != null) {
 				return new Configuration(json);
 			}
 		} catch (JSONException e) {
@@ -167,7 +171,7 @@ public class Configuration extends JSONObject {
 	public String getMessageCenterTitle() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
-			if(messageCenter != null) {
+			if (messageCenter != null) {
 				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_TITLE)) {
 					return messageCenter.getString(KEY_MESSAGE_CENTER_TITLE);
 				}
@@ -180,7 +184,7 @@ public class Configuration extends JSONObject {
 	public int getMessageCenterFgPoll() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
-			if(messageCenter != null) {
+			if (messageCenter != null) {
 				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_FG_POLL)) {
 					return messageCenter.getInt(KEY_MESSAGE_CENTER_FG_POLL);
 				}
@@ -188,6 +192,29 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
+	}
+
+	public boolean isMessageCenterEnabled() {
+		try {
+			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
+				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
+			}
+		} catch (JSONException e) {
+		}
+		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
+	}
+
+	public boolean isMessageCenterEmailRequired() {
+		try {
+			JSONObject messageCenter = getMessageCenter();
+			if (messageCenter != null) {
+				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_EMAIL_REQUIRED)) {
+					return messageCenter.getBoolean(KEY_MESSAGE_CENTER_EMAIL_REQUIRED);
+				}
+			}
+		} catch (JSONException e) {
+		}
+		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
 	}
 
 	public long getConfigurationCacheExpirationMillis() {

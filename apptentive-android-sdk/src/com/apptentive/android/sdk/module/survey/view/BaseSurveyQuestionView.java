@@ -86,7 +86,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 	protected void fireListener() {
 		if (listener != null) {
-			listener.onAnswered();
+			listener.onAnswered(this);
 		}
 	}
 

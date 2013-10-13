@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
@@ -5,17 +11,18 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
+import org.json.JSONException;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
  * A helper class with static methods for getting, storing, retrieving, and diffing information about the current device.
+ *
  * @author Sky Kelsey
  */
 public class DeviceManager {
@@ -23,28 +30,53 @@ public class DeviceManager {
 	/**
 	 * If any device setting has changed, return only the changed fields in a new Device object. If a field's value was
 	 * cleared, set that value to null in the Device. The first time this is called, all Device will be returned.
-	 * @return
+	 *
+	 * @return A Device containing diff data which, when added to the last sent Device, yields the new Device.
 	 */
-	public static Device storeDeviceAndReturnDiff(Context context, Map<String, String> customData) {
+	public static Device storeDeviceAndReturnDiff(Context context) {
 
-		Device original = getStoredDevice(context);
-		Device current = generateCurrentDevice(context);
+		Device stored = loadOldDevice(context);
+
+		Device current = generateNewDevice(context);
+		CustomData customData = loadCustomDeviceData(context);
 		current.setCustomData(customData);
-		Device diff = diffDevice(original, current);
-		if(diff != null) {
+
+		Device diff = diffDevice(stored, current);
+		if (diff != null) {
 			storeDevice(context, current);
 			return diff;
 		}
 		return null;
 	}
 
-	private static Device generateCurrentDevice(Context context) {
+	public static CustomData loadCustomDeviceData(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
+		try {
+			return new CustomData(deviceDataString);
+		} catch (Exception e) {
+		}
+		try {
+			return new CustomData();
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public static void storeCustomDeviceData(Context context, CustomData deviceData) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String deviceDataString = deviceData.toString();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).commit();
+	}
+
+	private static Device generateNewDevice(Context context) {
 		Device device = new Device();
 
 		// First, get all the information we can load from static resources.
 		device.setOsName("Android");
 		device.setOsVersion(Build.VERSION.RELEASE);
 		device.setOsBuild(Build.VERSION.INCREMENTAL);
+		device.setOsApiLevel("" + Build.VERSION.SDK_INT);
 		device.setManufacturer(Build.MANUFACTURER);
 		device.setModel(Build.MODEL);
 		device.setBoard(Build.BOARD);
@@ -69,11 +101,11 @@ public class DeviceManager {
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
 		device.setLocaleRaw(Locale.getDefault().toString());
-		device.setUtcOffset(""+(TimeZone.getDefault().getRawOffset() / 1000));
+		device.setUtcOffset("" + (TimeZone.getDefault().getRawOffset() / 1000));
 		return device;
 	}
 
-	private static Device getStoredDevice(Context context) {
+	private static Device loadOldDevice(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE, null);
 		try {
@@ -92,136 +124,140 @@ public class DeviceManager {
 	 * Creates a new Device object with the values from newer where they are different from older. If a value exists
 	 * in older but not newer, an empty string is set for that key, which tells the server to clear the value. A null
 	 * values for a key will not be written so that this method only returns a strict diff of older and newer.
-	 * @param older
-	 * @param newer
+	 *
 	 * @return A new Device object if there were any differences, else null.
 	 */
-	private static Device diffDevice(Device older, Device newer) {
-		if(older == null) {
+	private static Device diffDevice(Device old, Device newer) {
+		if (old == null) {
 			return newer;
 		}
 
 		Device ret = new Device();
 		int baseEntries = ret.length();
 
-		String uuid = chooseLatest(older.getUuid(), newer.getUuid());
+		String uuid = chooseLatest(old.getUuid(), newer.getUuid());
 		if (uuid != null) {
 			ret.setUuid(uuid);
 		}
 
-		String osName = chooseLatest(older.getOsName(), newer.getOsName());
+		String osName = chooseLatest(old.getOsName(), newer.getOsName());
 		if (osName != null) {
 			ret.setOsName(osName);
 		}
 
-		String osVersion = chooseLatest(older.getOsVersion(), newer.getOsVersion());
+		String osVersion = chooseLatest(old.getOsVersion(), newer.getOsVersion());
 		if (osVersion != null) {
 			ret.setOsVersion(osVersion);
 		}
 
-		String osBuild = chooseLatest(older.getOsBuild(), newer.getOsBuild());
+		String osBuild = chooseLatest(old.getOsBuild(), newer.getOsBuild());
 		if (osBuild != null) {
 			ret.setOsBuild(osBuild);
 		}
 
-		String manufacturer = chooseLatest(older.getManufacturer(), newer.getManufacturer());
+		String osApiLevel = chooseLatest(old.getOsApiLevel(), newer.getOsApiLevel());
+		if (osApiLevel != null) {
+			ret.setOsApiLevel(osApiLevel);
+		}
+
+		String manufacturer = chooseLatest(old.getManufacturer(), newer.getManufacturer());
 		if (manufacturer != null) {
 			ret.setManufacturer(manufacturer);
 		}
 
-		String model = chooseLatest(older.getModel(), newer.getModel());
+		String model = chooseLatest(old.getModel(), newer.getModel());
 		if (model != null) {
 			ret.setModel(model);
 		}
 
-		String board = chooseLatest(older.getBoard(), newer.getBoard());
+		String board = chooseLatest(old.getBoard(), newer.getBoard());
 		if (board != null) {
 			ret.setBoard(board);
 		}
 
-		String product = chooseLatest(older.getProduct(), newer.getProduct());
+		String product = chooseLatest(old.getProduct(), newer.getProduct());
 		if (product != null) {
 			ret.setProduct(product);
 		}
 
-		String brand = chooseLatest(older.getBrand(), newer.getBrand());
+		String brand = chooseLatest(old.getBrand(), newer.getBrand());
 		if (brand != null) {
 			ret.setBrand(brand);
 		}
 
-		String cpu = chooseLatest(older.getCpu(), newer.getCpu());
+		String cpu = chooseLatest(old.getCpu(), newer.getCpu());
 		if (cpu != null) {
 			ret.setCpu(cpu);
 		}
 
-		String device = chooseLatest(older.getDevice(), newer.getDevice());
+		String device = chooseLatest(old.getDevice(), newer.getDevice());
 		if (device != null) {
 			ret.setDevice(device);
 		}
 
-		String carrier = chooseLatest(older.getCarrier(), newer.getCarrier());
+		String carrier = chooseLatest(old.getCarrier(), newer.getCarrier());
 		if (carrier != null) {
 			ret.setCarrier(carrier);
 		}
 
-		String currentCarrier = chooseLatest(older.getCurrentCarrier(), newer.getCurrentCarrier());
+		String currentCarrier = chooseLatest(old.getCurrentCarrier(), newer.getCurrentCarrier());
 		if (currentCarrier != null) {
 			ret.setCurrentCarrier(currentCarrier);
 		}
 
-		String networkType = chooseLatest(older.getNetworkType(), newer.getNetworkType());
+		String networkType = chooseLatest(old.getNetworkType(), newer.getNetworkType());
 		if (networkType != null) {
 			ret.setNetworkType(networkType);
 		}
 
-		String buildType = chooseLatest(older.getBuildType(), newer.getBuildType());
+		String buildType = chooseLatest(old.getBuildType(), newer.getBuildType());
 		if (buildType != null) {
 			ret.setBuildType(buildType);
 		}
 
-		String buildId = chooseLatest(older.getBuildId(), newer.getBuildId());
+		String buildId = chooseLatest(old.getBuildId(), newer.getBuildId());
 		if (buildId != null) {
 			ret.setBuildId(buildId);
 		}
 
-		String bootloaderVersion = chooseLatest(older.getBootloaderVersion(), newer.getBootloaderVersion());
+		String bootloaderVersion = chooseLatest(old.getBootloaderVersion(), newer.getBootloaderVersion());
 		if (bootloaderVersion != null) {
 			ret.setBootloaderVersion(bootloaderVersion);
 		}
 
-		String radioVersion = chooseLatest(older.getRadioVersion(), newer.getRadioVersion());
+		String radioVersion = chooseLatest(old.getRadioVersion(), newer.getRadioVersion());
 		if (radioVersion != null) {
 			ret.setRadioVersion(radioVersion);
 		}
 
-		Map<String, String> customData = chooseLatest(older.getCustomData(), newer.getCustomData());
-		if(customData != null) {
+		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
+		if (customData != null) {
 			ret.setCustomData(customData);
 		}
 
-		String localeCountryCode = chooseLatest(older.getLocaleCountryCode(), newer.getLocaleCountryCode());
+		String localeCountryCode = chooseLatest(old.getLocaleCountryCode(), newer.getLocaleCountryCode());
 		if (localeCountryCode != null) {
 			ret.setLocaleCountryCode(localeCountryCode);
 		}
 
-		String localeLanguageCode = chooseLatest(older.getLocaleLanguageCode(), newer.getLocaleLanguageCode());
+		String localeLanguageCode = chooseLatest(old.getLocaleLanguageCode(), newer.getLocaleLanguageCode());
 		if (localeLanguageCode != null) {
 			ret.setLocaleLanguageCode(localeLanguageCode);
 		}
 
-		String localeRaw = chooseLatest(older.getLocaleRaw(), newer.getLocaleRaw());
+		String localeRaw = chooseLatest(old.getLocaleRaw(), newer.getLocaleRaw());
 		if (localeRaw != null) {
 			ret.setLocaleRaw(localeRaw);
 		}
 
-		String utcOffset = chooseLatest(older.getUtcOffset(), newer.getUtcOffset());
+		String utcOffset = chooseLatest(old.getUtcOffset(), newer.getUtcOffset());
 		if (utcOffset != null) {
 			ret.setUtcOffset(utcOffset);
 		}
 
 
 		// If there were no differences, return null.
-		if(ret.length() <= baseEntries) {
+		if (ret.length() <= baseEntries) {
 			return null;
 		}
 		return ret;
@@ -229,29 +265,28 @@ public class DeviceManager {
 
 	/**
 	 * A convenience method.
-	 * @param old
-	 * @param newer
+	 *
 	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
 	 */
 	private static String chooseLatest(String old, String newer) {
-		if(old == null || old.equals("")) {
+		if (old == null || old.equals("")) {
 			old = null;
 		}
-		if(newer == null || newer.equals("")) {
+		if (newer == null || newer.equals("")) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
-		 	return newer;
+		if (old != null && newer != null && !old.equals(newer)) {
+			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
+		if (old != null && newer == null) {
 			return "";
 		}
 
-		if(old == null && newer != null) {
+		if (old == null && newer != null) {
 			return newer;
 		}
 
@@ -259,25 +294,29 @@ public class DeviceManager {
 		return null;
 	}
 
-	private static Map<String, String> chooseLatest(Map<String, String> old, Map<String, String> newer) {
-		if(old == null || old.isEmpty()) {
+	private static CustomData chooseLatest(CustomData old, CustomData newer) {
+		if (old == null || old.length() == 0) {
 			old = null;
 		}
-		if(newer == null || newer.isEmpty()) {
+		if (newer == null || newer.length() == 0) {
 			newer = null;
 		}
 
 		// New value.
-		if(old != null && newer != null && !old.equals(newer)) {
+		if (old != null && newer != null && !old.equals(newer)) {
 			return newer;
 		}
 
 		// Clear existing value.
-		if(old != null && newer == null) {
-			return new HashMap<String, String>();
+		if (old != null && newer == null) {
+			try {
+				return new CustomData();
+			} catch (JSONException e) {
+				return null;
+			}
 		}
 
-		if(old == null && newer != null) {
+		if (old == null && newer != null) {
 			return newer;
 		}
 

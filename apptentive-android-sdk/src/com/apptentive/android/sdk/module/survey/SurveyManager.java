@@ -68,7 +68,7 @@ public class SurveyManager {
 				// Filter out surveys that have met of exceeded the number of allowed displays per time period.
 				if (SurveyHistory.isSurveyLimitMet(context, next)) {
 					Log.d("Removing survey: " + next.getName());
-					surveyList.remove(next);
+					surveyIterator.remove();
 				}
 			}
 			storeSurveys(context, surveyList);
@@ -92,7 +92,7 @@ public class SurveyManager {
 		prefs.edit().putLong(Constants.PREF_KEY_SURVEYS_CACHE_EXPIRATION, expiration).commit();
 	}
 
-	protected static List<SurveyDefinition> parseSurveysString(String surveyString) {
+	public static List<SurveyDefinition> parseSurveysString(String surveyString) {
 		try {
 			JSONObject root = new JSONObject(surveyString);
 			if (!root.isNull(KEY_SURVEYS)) {
@@ -135,7 +135,7 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static void storeSurveys(Context context, List<SurveyDefinition> surveys) {
+	public static void storeSurveys(Context context, List<SurveyDefinition> surveys) {
 		String surveysString = marshallSurveys(surveys);
 		if (surveysString == null) {
 			return;
@@ -158,11 +158,16 @@ public class SurveyManager {
 		SurveyDefinition surveyDefinition = getFirstMatchingSurvey(activity, tags);
 		if (surveyDefinition != null) {
 			Log.d("A matching survey was found.");
+			recordShow(activity, surveyDefinition);
 			SurveyModule.getInstance().show(activity, surveyDefinition, listener);
 			return true;
 		}
 		Log.d("No matching survey available.");
 		return false;
+	}
+
+	public static void recordShow(Context context, SurveyDefinition surveyDefinition) {
+		SurveyHistory.recordSurveyDisplay(context, surveyDefinition.getId(), System.currentTimeMillis());
 	}
 
 	private static SurveyDefinition getFirstMatchingSurvey(Context context, String... tags) {
@@ -191,7 +196,7 @@ public class SurveyManager {
 				}
 			} else { // Case: Need tagged survey.
 				if (surveyTags != null) {
-					for (String tag : tagsSet.toArray(new String[]{})) {
+					for (String tag : tagsSet.toArray(new String[tagsSet.size()])) {
 						if (surveyTags.contains(tag)) {
 							if (isSurveyValid(context, survey)) {
 								return survey;
@@ -204,7 +209,7 @@ public class SurveyManager {
 		return null;
 	}
 
-	private static boolean isSurveyValid(Context context, SurveyDefinition survey) {
+	public static boolean isSurveyValid(Context context, SurveyDefinition survey) {
 		boolean expired = false;
 		String endTimeString = survey.getEndTime();
 		if (endTimeString != null) {

@@ -35,7 +35,8 @@ public abstract class Payload extends JSONObject {
 
 	/**
 	 * Subclasses should override this method if there is any peculiarity in how they present or wrap json before sending.
-	 * @return
+	 *
+	 * @return A wrapper object containing the name of the object type, the value of which is the contents of this Object.
 	 */
 	public String marshallForSending() {
 		JSONObject wrapper = new JSONObject();
@@ -88,9 +89,7 @@ public abstract class Payload extends JSONObject {
 
 	/**
 	 * @deprecated Do not use this method to check for key existence. Instead us !isNull(KEY_NAME), as this works better
-	 * with keys with null values.
-	 * @param key
-	 * @return
+	 *             with keys with null values.
 	 */
 	@Override
 	public boolean has(String key) {

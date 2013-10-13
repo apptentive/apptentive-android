@@ -64,11 +64,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			answersChoices.put(answerDefinition.getId(), choice);
 			answersChoicesReverse.put(choice, answerDefinition.getId());
 			choiceContainer.addView(choice);
-/*
-			if(i != answerDefinitions.size() - 1) {
-				View view = inflater.inflate(R.layout.apptentive_survey_dialog_question_choice_separater, choiceContainer);
-			}
-*/
+
 			if (i != answerDefinitions.size() - 1) {
 				FrameLayout sep = new FrameLayout(context);
 				sep.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 1));

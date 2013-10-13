@@ -64,7 +64,7 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
 
 	// Deprecated API
-	private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
+	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
@@ -248,17 +248,17 @@ public class ApptentiveClient {
 			StringBuilder requestText = new StringBuilder();
 
 			// Write form data
-			requestText.append(twoHyphens + boundary + lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"message\"" + lineEnd);
-			requestText.append("Content-Type: text/plain" + lineEnd);
+			requestText.append(twoHyphens).append(boundary).append(lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd);
+			requestText.append("Content-Type: text/plain").append(lineEnd);
 			requestText.append(lineEnd);
 			requestText.append(postBody);
 			requestText.append(lineEnd);
 
 			// Write file attributes.
-			requestText.append(twoHyphens + boundary + lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"" + lineEnd);
-			requestText.append("Content-Type: " + storedFile.getMimeType() + lineEnd);
+			requestText.append(twoHyphens).append(boundary).append(lineEnd);
+			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"").append(lineEnd);
+			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 			requestText.append(lineEnd);
 
 			Log.d("Post body: " + requestText);

@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -44,7 +45,6 @@ import java.util.*;
 public class Apptentive {
 
 	private static UnreadMessagesListener unreadMessagesListener;
-	private static Map<String, String> customDeviceData;
 
 	private Apptentive() {
 	}
@@ -113,52 +113,132 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Sets the user email address. This email address will be sent to the Apptentive server to allow out of app
+	 * Sets the initial user email address. This email address will be sent to the Apptentive server to allow out of app
 	 * communication, and to help provide more context about this user. This email will be the definitive email address
-	 * for this user.
+	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
+	 * idempotent.
 	 *
+	 * @param context The context from which this method was called.
 	 * @param email The user's email address.
 	 */
-	public static void setUserEmail(String email) {
-		GlobalInfo.userEmail = email;
+	public static void setInitialUserEmail(Context context, String email) {
+		PersonManager.storeInitialPersonEmail(context, email);
 	}
 
 	/**
-	 * Allows you to pass arbitrary string data to the server along with this device's info.
-	 * @param customData A Map of key/value pairs to send to the server.
-	 * @deprecated in favor of {@link #setCustomDeviceData(Map)}
-	 */
-	public static void setCustomData(Map<String, String> customData) {
-		Apptentive.customDeviceData = customData;
-	}
-
-	/**
-	 * Allows you to pass arbitrary string data to the server along with this device's info.
+	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
+	 * custom device data that you have set for this app. Calls to this method are idempotent.</p>
+	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
+	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
+	 *
+	 * @param context The context from which this method was called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
-	public static void setCustomDeviceData(Map<String, String> customDeviceData) {
-		Apptentive.customDeviceData = customDeviceData;
+	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
+		try {
+			CustomData customData = new CustomData();
+			for (String key : customDeviceData.keySet()) {
+				customData.put(key, customDeviceData.get(key));
+			}
+			DeviceManager.storeCustomDeviceData(context, customData);
+		} catch (JSONException e) {
+			Log.w("Unable to set custom device data.", e);
+		}
 	}
 
 	/**
-	 * Add a piece of custom data to the device's info. This info will be sent to the server.
+	 * Add a piece of custom data to the device's info. This info will be sent to the server.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method was called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
 	 */
-	public static void addCustomDeviceData(String key, String value) {
-		if(Apptentive.customDeviceData == null) {
-			Apptentive.customDeviceData = new HashMap<String, String>();
+	public static void addCustomDeviceData(Context context, String key, String value) {
+		if(key == null || key.trim().length() == 0) {
+			return;
 		}
-		Apptentive.customDeviceData.put(key, value);
+		CustomData customData = DeviceManager.loadCustomDeviceData(context);
+		if(customData != null) {
+			try {
+				customData.put(key, value);
+				DeviceManager.storeCustomDeviceData(context, customData);
+			} catch (JSONException e) {
+				Log.w("Unable to add custom device data.", e);
+			}
+		}
 	}
 
 	/**
-	 * Remove a piece of custom data to the device's info.
-	 * @param key The key to store the data under.
+	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
+	 * @param context The context from which this method was called.
+	 * @param key The key to remove.
 	 */
-	public static void removeCustomDeviceData(String key) {
-		if(Apptentive.customDeviceData != null) {
-			Apptentive.customDeviceData.remove(key);
+	public static void removeCustomDeviceData(Context context, String key) {
+		CustomData customData = DeviceManager.loadCustomDeviceData(context);
+		if(customData != null) {
+			customData.remove(key);
+			DeviceManager.storeCustomDeviceData(context, customData);
+		}
+	}
+
+	/**
+	 * <p>Allows you to pass arbitrary string data to the server along with this person's info. This method will replace all
+	 * custom person data that you have set for this app. Calls to this method are idempotent.</p>
+	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
+	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
+	 *
+	 * @param context The context from which this method was called.
+	 * @param customPersonData A Map of key/value pairs to send to the server.
+	 */
+	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
+		Log.w("Setting custom person data: %s", customPersonData.toString());
+		try {
+			CustomData customData = new CustomData();
+			for (String key : customPersonData.keySet()) {
+				customData.put(key, customPersonData.get(key));
+			}
+			PersonManager.storeCustomPersonData(context, customData);
+		} catch (JSONException e) {
+			Log.e("Unable to set custom person data.", e);
+		}
+	}
+
+
+	/**
+	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method was called.
+	 * @param key The key to store the data under.
+	 * @param value The value of the data.
+	 */
+	public static void addCustomPersonData(Context context, String key, String value) {
+		if(key == null || key.trim().length() == 0) {
+			return;
+		}
+		CustomData customData = PersonManager.loadCustomPersonData(context);
+		if(customData != null) {
+			try {
+				customData.put(key, value);
+				PersonManager.storeCustomPersonData(context, customData);
+			} catch (JSONException e) {
+				Log.w("Unable to add custom person data.", e);
+			}
+		}
+	}
+
+	/**
+	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
+	 *
+	 * @param context The context from which this method was called.
+	 * @param key The key to remove.
+	 */
+	public static void removeCustomPersonData(Context context, String key) {
+		CustomData customData = PersonManager.loadCustomPersonData(context);
+		if(customData != null) {
+			customData.remove(key);
+			PersonManager.storeCustomPersonData(context, customData);
 		}
 	}
 
@@ -270,6 +350,7 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
+	@SuppressLint("NewApi")
 	private static void init(final Context context) {
 
 		//
@@ -285,15 +366,17 @@ public class Apptentive {
 			String apiKey = null;
 			try {
 				ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-				if(ai != null && ai.metaData != null && ai.metaData.containsKey(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY)) {
-					apiKey = ai.metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-				}
-				if(ai != null && ((ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)) {
-					GlobalInfo.isAppDebuggable = true;
-				}
+				Bundle metaData = ai.metaData;
+				apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+
+				boolean debugFlagSet = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+				boolean apptentiveDebugSet = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
+					GlobalInfo.isAppDebuggable = debugFlagSet || apptentiveDebugSet;
 			} catch(Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
 			}
+
+			Log.i("Debug mode enabled? %b" , GlobalInfo.isAppDebuggable);
 
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
@@ -305,6 +388,8 @@ public class Apptentive {
 				}
 			}
 			GlobalInfo.apiKey = apiKey;
+
+			Log.i("API Key: %s" , GlobalInfo.apiKey);
 
 			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = context.getPackageName();
@@ -368,11 +453,11 @@ public class Apptentive {
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context, customDeviceData);
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
 		if(deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			getDatabase(context).addPayload(deviceInfo);
+			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -381,7 +466,7 @@ public class Apptentive {
 		if(sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			getDatabase(context).addPayload(sdk);
+			ApptentiveDatabase.getInstance(context).addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -390,7 +475,7 @@ public class Apptentive {
 		if(person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			getDatabase(context).addPayload(person);
+			ApptentiveDatabase.getInstance(context).addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
 		}
@@ -404,7 +489,7 @@ public class Apptentive {
 	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
-		getDatabase(context).addPayload(appRelease);
+		ApptentiveDatabase.getInstance(context).addPayload(appRelease);
 	}
 
 	private synchronized static void asyncFetchConversationToken(final Context context) {
@@ -513,13 +598,6 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static ApptentiveDatabase getDatabase(Context context) {
-		return new ApptentiveDatabase(context);
-	}
-
-	/**
-	 * Internal use only.
-	 */
 	public static void notifyUnreadMessagesListener(int unreadMessages) {
 		Log.v("Notifying UnreadMessagesListener");
 		if(unreadMessagesListener != null) {
@@ -542,6 +620,5 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static void onAppDidExit() {
-	}
+	public static void onAppDidExit() {}
 }

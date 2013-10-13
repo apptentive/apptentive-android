@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -333,7 +334,7 @@ public class RatingModule {
 	/**
 	 * Apply the rules from the logic expression.
 	 *
-	 * @param obj
+	 * @param obj The node to analyze. Type determines how we treat the node.
 	 * @return True it the logic expression is true.
 	 * @throws JSONException
 	 */

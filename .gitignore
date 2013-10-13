@@ -3,6 +3,7 @@
 # Android
 gen/
 out/
+bin/
 
 # IntelliJ
 *.iws

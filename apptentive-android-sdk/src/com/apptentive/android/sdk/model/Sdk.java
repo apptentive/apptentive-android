@@ -14,6 +14,7 @@ public class Sdk extends Payload {
 	private static final String KEY_AUTHOR_EMAIL = "author_email";
 	private static final String KEY_PLATFORM = "platform";
 	private static final String KEY_DISTRIBUTION = "distribution";
+	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
 
 	public Sdk(String json) throws JSONException {
 		super(json);
@@ -132,6 +133,24 @@ public class Sdk extends Payload {
 			put(KEY_DISTRIBUTION, distribution);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
+		}
+	}
+
+	public String getDistributionVersion() {
+		try {
+			if(!isNull(KEY_DISTRIBUTION_VERSION)) {
+				return getString(KEY_DISTRIBUTION_VERSION);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setDistributionVersion(String distributionVersion) {
+		try {
+			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
 		}
 	}
 

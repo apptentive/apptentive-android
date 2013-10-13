@@ -19,6 +19,7 @@
   <string name="apptentive_sending">Versendung…</string>
   <string name="apptentive_version">Apptentive Version %s</string>
   <string name="apptentive_edittext_hint_email">Deine E-Mail-Adresse</string>
+  <string name="apptentive_edittext_hint_email_required">E-Mail-Adresse (erforderlich)</string>
   <string name="apptentive_powered_by_apptentive">Unterstützt von Apptentive</string>
   <string name="apptentive_about_title">Über Apptentive</string>
   <string name="apptentive_about_description">Apptentive  ist ein Feedback- und Kommunikations-Service, der es den Entwicklern dieser App ermöglicht, auf schnelle Weise dein Feedback zu erhalten und besser darauf zu reagieren.</string>
@@ -35,6 +36,8 @@
   <string name="apptentive_intro_dialog_body">Lass uns bitte wissen, wie wir %s für dich besser machen können!</string>
   <string name="apptentive_intro_dialog_edittext_hint">Sag uns, wie wir helfen können. (erforderlich)</string>
   <string name="apptentive_thank_you_dialog_body">Deine Antwort wurde in der Mitteilungszentrale gespeichert. Dort kannst du Erwiderungen einsehen und uns weitere Nachrichten senden.</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled">Vielen Dank für dein Feedback!</string>
+  <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Wir werden uns per E-Mail melden.</string>
   <string name="apptentive_thank_you_dialog_close">Schließen</string>
   <string name="apptentive_thank_you_dialog_view_messages">Nachrichten ansehen</string>
   <string name="apptentive_dialog_email_validation_failed_title">Ungültige E-Mail-Adresse</string>

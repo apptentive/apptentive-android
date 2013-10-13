@@ -37,6 +37,7 @@ public class AppReleaseManager {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);
 			appRelease.setBuildNumber(""+packageInfo.versionCode);
+			appRelease.setTargetSdkVersion(""+packageInfo.applicationInfo.targetSdkVersion);
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Can't load PackageInfo.", e);
 		}
@@ -74,6 +75,11 @@ public class AppReleaseManager {
 		String buildNumber = chooseLatest(older.getBuildNumber(), newer.getBuildNumber());
 		if (buildNumber != null) {
 			ret.setBuildNumber(buildNumber);
+		}
+
+		String targetSdkVersion = chooseLatest(older.getTargetSdkVersion(), newer.getTargetSdkVersion());
+		if (targetSdkVersion != null) {
+			ret.setTargetSdkVersion(targetSdkVersion);
 		}
 
 		// If there were no differences, return null.
