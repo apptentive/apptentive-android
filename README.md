@@ -367,3 +367,11 @@ Data must be key/value string pairs.
 ###### Example
 
 <pre><code>Apptentive.removeCustomPersonData(this, "myUserId");</code></pre>
+
+-
+
+### Building from the command line and with CI
+
+#### Building with ant
+
+The Apptentive SDK can be built using the `ant` based build tools bundled with the Android SDK. In order to prepare Apptentive for automated builds with ant, you will need to prepare the project for builds using the `android` tool packaged with the Android SDK. Open a shell and run `android update project -p ./ -t android-18` in the apptentive/apptentive-android-sdk directory. The target, `android-18` in the example, can be any version of android greater than or equal to 3.1 (`android-12`).
