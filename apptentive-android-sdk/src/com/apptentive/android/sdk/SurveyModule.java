@@ -101,11 +101,12 @@ public class SurveyModule {
 	}
 
 	void doShow(final Activity activity) {
-		activity.setContentView(R.layout.apptentive_survey);
-
 		if (surveyDefinition == null) {
+			activity.finish();
 			return;
 		}
+
+		activity.setContentView(R.layout.apptentive_survey);
 
 		TextView title = (TextView) activity.findViewById(R.id.title);
 		title.setFocusable(true);
@@ -132,13 +133,22 @@ public class SurveyModule {
 					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 						@Override
 						public void onDismiss(DialogInterface dialogInterface) {
-							finishSurvey(activity);
+							activity.finish();
 						}
 					});
 					dialog.show();
 				} else {
-					finishSurvey(activity);
+					activity.finish();
 				}
+
+				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
+				getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
+				Log.d("Survey Submitted.");
+
+				if (SurveyModule.this.onSurveyFinishedListener != null) {
+					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
+				}
+				cleanup();
 			}
 		});
 
@@ -190,17 +200,6 @@ public class SurveyModule {
 
 		// Force the top of the survey to be shown first.
 		title.requestFocus();
-	}
-
-	private void finishSurvey(Activity activity) {
-		MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
-		getSurveyStore(activity).addPayload(new SurveyResponse(surveyDefinition));
-		Log.d("Survey Submitted.");
-		cleanup();
-		activity.finish();
-		if (SurveyModule.this.onSurveyFinishedListener != null) {
-			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
-		}
 	}
 
 	void sendMetricForQuestion(Context context, Question question) {
