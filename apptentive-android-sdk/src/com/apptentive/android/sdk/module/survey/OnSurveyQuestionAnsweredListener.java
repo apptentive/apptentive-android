@@ -10,6 +10,5 @@ package com.apptentive.android.sdk.module.survey;
  * @author Sky Kelsey.
  */
 public interface OnSurveyQuestionAnsweredListener {
-	@SuppressWarnings("unchecked")
 	public void onAnswered();
 }
