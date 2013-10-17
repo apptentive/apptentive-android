@@ -11,7 +11,7 @@
               android:layout_height="wrap_content"
               android:orientation="vertical"
               android:padding="16dp"
-              android:background="@drawable/apptentive_dialog_background">
+              android:background="@drawable/apptentive_dialog_background_with_border">
     <TextView android:id="@+id/title"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
