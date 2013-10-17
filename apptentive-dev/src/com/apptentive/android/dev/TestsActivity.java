@@ -56,7 +56,7 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void throwNpe(@SuppressWarnings("unused") View view) {
-		//throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
+		throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
 	}
 
 	public void deleteStoredMessages(@SuppressWarnings("unused") View view) {

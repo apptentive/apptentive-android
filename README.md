@@ -288,13 +288,13 @@ or skips a survey.
 ###### Example
 
 <pre><code>Apptentive.showSurvey(
-  this,
-  new OnSurveyCompletedListener() {
-    public void onSurveyCompletedListener() {
-      // Code that runs when the survey was successfully completed.
-    }
-  },
-  "completed_level_ten"
+    this,
+    new OnSurveyCompletedListener() {
+        public void onSurveyCompletedListener() {
+            // Code that runs when the survey was successfully completed.
+        }
+    },
+    "completed_level_ten"
 );</code></pre>
 
 To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailable()`.
@@ -379,3 +379,11 @@ Data must be key/value string pairs.
 The Apptentive SDK can be built using the `ant` based build tools bundled with the Android SDK. In order to prepare Apptentive for automated builds with ant, you will need to prepare the project for builds using the `android` tool packaged with the Android SDK. Open a shell and run `android update project -p ./ -t android-18` in the apptentive/apptentive-android-sdk directory. The target, `android-18` in the example, can be any version of android greater than or equal to 3.1 (`android-12`).
 
 Once you have initialized the build files, Apptentive will build automatically as part of your ant based build system. In the event that you update your Android SDK or Android Build Tools, you may need to re-run the `update project` command to generate new build files.
+
+### ProGuard Configuration
+
+Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
+
+<pre><code>-keepattributes SourceFile,LineNumberTable
+-keep class com.apptentive.android.sdk.** { *; }
+</code></pre>
