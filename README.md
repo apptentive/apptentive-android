@@ -2,8 +2,9 @@
 
 The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it, you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at specific points within your app, and more.
 
-Note: For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
+<strong>Note:</strong> For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
 
+<strong>Note:</strong> API changes between versions are tracked [here](docs/APIChanges.md).
 -------------------------------------------------
 
 The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use newer XML syntax for forward compatibility.

@@ -1,5 +1,26 @@
 This document tracks changes to the API between versions.
 
+# 1.2.0
+
+To improve the quality of the Apptentive SDK, and to make it easier to integrate, the following API method signatures of `Apptentive.java` have been changed or added.
+
+###### Changes
+<table>
+    <tr><th>Old Method Signature</th><th>New Method Signature</th></tr>
+    <tr><td><code><pre>public static void setUserEmail(String email)</pre></code></td><td><code><pre>public static void setInitialUserEmail(Context context, String email)</pre></code></td></tr>
+    <tr><td><code><pre>public static void setCustomData(Map<String, String> customData)</pre></code></td><td><code><pre>public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData)</pre></code></td></tr>
+</table>
+
+###### Additions
+<table>
+    <tr><th>New Method Signature</th></tr>
+    <tr><td><code><pre>public static void addCustomDeviceData(Context context, String key, String value)</pre></code></td></tr>
+    <tr><td><code><pre>public static void removeCustomDeviceData(Context context, String key)</pre></code></td></tr>
+    <tr><td><code><pre>public static void setCustomPersonData(Context context, Map<String, String> customPersonData)</pre></code></td></tr>
+    <tr><td><code><pre>public static void addCustomPersonData(Context context, String key, String value)</pre></code></td></tr>
+    <tr><td><code><pre>public static void removeCustomPersonData(Context context, String key)</pre></code></td></tr>
+    <tr><td><code><pre>public static int getUnreadMessageCount(Context context)</pre></code></td></tr>
+</table>
 
 # 1.0
 
