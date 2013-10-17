@@ -36,8 +36,7 @@ General setup:
 
 with
 
-<pre><code>
-Map<String, String> customData = new HashMap<String, String>();
+<pre><code>Map<String, String> customData = new HashMap<String, String>();
 customData.put("username", "Sky Kelsey");
 Apptentive.setCustomData(customData);
 </code></pre>
