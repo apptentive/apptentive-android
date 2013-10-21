@@ -487,7 +487,10 @@ public class Apptentive {
 	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
-		ApptentiveDatabase.getInstance(context).addPayload(appRelease);
+		if (appRelease != null) {
+			Log.d("App release was updated.");
+			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
+		}
 	}
 
 	private synchronized static void asyncFetchConversationToken(final Context context) {
