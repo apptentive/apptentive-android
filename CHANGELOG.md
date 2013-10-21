@@ -1,3 +1,10 @@
+2013-10-21 skykelsey 1.2.1
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-188 Rating logic doesn't respect 0 values with OR
+
 2013-10-17 skykelsey 1.2.0
 --------------------------
 
