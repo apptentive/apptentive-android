@@ -6,8 +6,7 @@
 
 package com.apptentive.android.sdk.util;
 
-import android.util.Log;
-import junit.framework.TestCase;
+import android.test.AndroidTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +14,7 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public class TestDateConversion extends TestCase {
-
-	private static final String TAG = "TestDateConversion";
+public class TestDateConversion extends AndroidTestCase {
 
 	public void testIso8601Conversion() {
 		Map<String, Long> values = new HashMap<String, Long>();

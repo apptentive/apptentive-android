@@ -66,67 +66,38 @@ public class RatingModule {
 		ratingProviderArgs.put("package", GlobalInfo.appPackage);
 	}
 
-	private boolean ratingPeriodElapsed(SharedPreferences prefs) {
-		Configuration config = Configuration.load(prefs);
-		RatingState state = getState(prefs);
-		long days;
-		switch (state) {
-			case REMIND:
-				days = config.getRatingsDaysBetweenPrompts();
-				break;
-			default:
-				days = config.getRatingsDaysBeforePrompt();
-				break;
-		}
-		long now = new Date().getTime();
-		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		return days != 0 && now > periodEnd;
-	}
-
-	private boolean eventThresholdReached(SharedPreferences prefs) {
-		Configuration config = Configuration.load(prefs);
-		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
-		return significantEventsBeforePrompt != 0 && getEvents(prefs) >= significantEventsBeforePrompt;
-	}
-
-	private boolean usesThresholdReached(SharedPreferences prefs) {
-		Configuration config = Configuration.load(prefs);
-		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
-		return usesBeforePrompt != 0 && getUses(prefs) >= usesBeforePrompt;
-	}
-
-	private long getStartOfRatingPeriod(SharedPreferences prefs) {
+	private static long getStartOfRatingPeriod(SharedPreferences prefs) {
 		if (!prefs.contains(Constants.PREF_KEY_START_OF_RATING_PERIOD)) {
 			setStartOfRatingPeriod(prefs, new Date().getTime());
 		}
 		return prefs.getLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, new Date().getTime());
 	}
 
-	private void setStartOfRatingPeriod(SharedPreferences prefs, long startOfRatingPeriod) {
+	private static void setStartOfRatingPeriod(SharedPreferences prefs, long startOfRatingPeriod) {
 		prefs.edit().putLong(Constants.PREF_KEY_START_OF_RATING_PERIOD, startOfRatingPeriod).commit();
 	}
 
-	private RatingState getState(SharedPreferences prefs) {
+	private static RatingState getState(SharedPreferences prefs) {
 		return RatingState.valueOf(prefs.getString(Constants.PREF_KEY_RATING_STATE, RatingState.START.toString()));
 	}
 
-	private void setState(SharedPreferences prefs, RatingState state) {
+	private static void setState(SharedPreferences prefs, RatingState state) {
 		prefs.edit().putString(Constants.PREF_KEY_RATING_STATE, state.name()).commit();
 	}
 
-	private int getEvents(SharedPreferences prefs) {
+	private static int getEvents(SharedPreferences prefs) {
 		return prefs.getInt(Constants.PREF_KEY_RATING_EVENTS, 0);
 	}
 
-	private void setEvents(SharedPreferences prefs, int events) {
+	private static void setEvents(SharedPreferences prefs, int events) {
 		prefs.edit().putInt(Constants.PREF_KEY_RATING_EVENTS, events).commit();
 	}
 
-	private int getUses(SharedPreferences prefs) {
+	private static int getUses(SharedPreferences prefs) {
 		return prefs.getInt(Constants.PREF_KEY_RATING_USES, 0);
 	}
 
-	private void setUses(SharedPreferences prefs, int uses) {
+	private static void setUses(SharedPreferences prefs, int uses) {
 		prefs.edit().putInt(Constants.PREF_KEY_RATING_USES, uses).commit();
 	}
 
@@ -297,78 +268,28 @@ public class RatingModule {
 			Log.d("Ratings can't be shown because the network is not available. Try again later.");
 			return;
 		}
-		switch (getState(prefs)) {
-			case START:
-				boolean canShow = canShowRatingFlow(prefs);
-				if (canShow) {
+		Logic logic = new Logic();
+		logic.load(prefs);
+
+		RatingState state = getState(prefs);
+		boolean canShow = logic.evaluate();
+		if (canShow) {
+			switch (state) {
+				case START:
 					// TODO: Trigger no longer makes sense with boolean logic expressions. Axe it.
 					showEnjoymentDialog(activity, Trigger.events);
-				}
-				break;
-			case REMIND:
-				if (ratingPeriodElapsed(prefs)) {
+					break;
+				case REMIND:
 					forceShowRatingDialog(activity);
-				}
-				break;
-			case POSTPONE:
-				break;
-			case RATED:
-				break;
-			default:
-				break;
-		}
-	}
-
-	private boolean canShowRatingFlow(SharedPreferences prefs) {
-		Configuration config = Configuration.load(prefs);
-		String ratingsPromptLogic = config.getRatingsPromptLogic();
-		try {
-			return logic(prefs, new JSONObject(ratingsPromptLogic));
-		} catch (JSONException e) {
-			// Fall back to old logic.
-			return ratingPeriodElapsed(prefs) && (eventThresholdReached(prefs) || usesThresholdReached(prefs));
-		}
-	}
-
-	/**
-	 * Apply the rules from the logic expression.
-	 *
-	 * @param obj The node to analyze. Type determines how we treat the node.
-	 * @return True it the logic expression is true.
-	 * @throws JSONException
-	 */
-	private boolean logic(SharedPreferences prefs, Object obj) throws JSONException {
-		boolean ret = false;
-		if (obj instanceof JSONObject) {
-			JSONObject jsonObject = (JSONObject) obj;
-			String key = (String) jsonObject.keys().next(); // Should be one array per logic statement.
-			if ("and".equals(key)) {
-				JSONArray and = jsonObject.getJSONArray("and");
-				ret = true;
-				for (int i = 0; i < and.length(); i++) {
-					boolean prev = logic(prefs, and.get(i));
-					ret = ret && prev;
-				}
-			} else if ("or".equals(key)) {
-				JSONArray or = jsonObject.getJSONArray("or");
-				for (int i = 0; i < or.length(); i++) {
-					ret = ret || logic(prefs, or.get(i));
-				}
-			} else {
-				return logic(prefs, key);
+					break;
+				case POSTPONE:
+					break;
+				case RATED:
+					break;
+				default:
+					break;
 			}
-		} else if (obj instanceof String) {
-			if ("uses".equals(obj)) {
-				return usesThresholdReached(prefs);
-			} else if ("days".equals(obj)) {
-				return ratingPeriodElapsed(prefs);
-			} else if ("events".equals(obj)) {
-				return eventThresholdReached(prefs);
-			}
-		} else {
-			Log.w("Unknown logic token: " + obj);
 		}
-		return ret;
 	}
 
 	/**
@@ -414,7 +335,211 @@ public class RatingModule {
 	// ***************************************** Inner Classes *****************************************
 	// *************************************************************************************************
 
-	enum RatingState {
+	public static class Logic {
+		private RatingState state;
+		private String logic;
+		private int daysBeforePrompt;
+		private long startOfRatingPeriod;
+		private int usesBeforePrompt;
+		private int usesElapsed;
+		private int significantEventsBeforePrompt;
+		private int significantEventsElapsed;
+		private int daysBetweenPrompts;
+
+		private Long currentTime; // For Testing only.
+
+		public void load(SharedPreferences prefs) {
+			Configuration config = Configuration.load(prefs);
+			state = getState(prefs);
+			logic = config.getRatingsPromptLogic();
+			daysBeforePrompt = config.getRatingsDaysBeforePrompt();
+			startOfRatingPeriod = getStartOfRatingPeriod(prefs);
+			usesBeforePrompt = config.getRatingsUsesBeforePrompt();
+			usesElapsed = getUses(prefs);
+			significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
+			significantEventsElapsed = getEvents(prefs);
+			daysBetweenPrompts = config.getRatingsDaysBetweenPrompts();
+		}
+
+		public boolean evaluate() {
+			switch (state) {
+				case START:
+					try {
+						return logic(new JSONObject(logic));
+					} catch (JSONException e) {
+						// Fallback logic.
+						Boolean ratingPeriodElapsed = ratingPeriodElapsed();
+						if (ratingPeriodElapsed == null) {
+							ratingPeriodElapsed = true;
+						}
+						Boolean usesThresholdReached = usesThresholdReached();
+						if (usesThresholdReached == null) {
+							usesThresholdReached = false;
+						}
+						Boolean eventThresholdReached = eventThresholdReached();
+						if (eventThresholdReached == null) {
+							eventThresholdReached = false;
+						}
+						return ratingPeriodElapsed && (eventThresholdReached || usesThresholdReached);
+					}
+				case REMIND:
+					Boolean ratingPeriodElapsed = ratingPeriodElapsed();
+					if(ratingPeriodElapsed == null) {
+						ratingPeriodElapsed = false;
+					}
+					return ratingPeriodElapsed;
+				case POSTPONE:
+					break;
+				case RATED:
+					break;
+				default:
+					break;
+			}
+			return false;
+		}
+
+		private Boolean logic(Object obj) throws JSONException {
+			boolean ret = false;
+			if (obj instanceof JSONObject) {
+				JSONObject jsonObject = (JSONObject) obj;
+				String key = (String) jsonObject.keys().next(); // Should be one array per logic statement.
+				if ("and".equals(key)) {
+					JSONArray and = jsonObject.getJSONArray("and");
+					ret = true;
+					for (int i = 0; i < and.length(); i++) {
+						Boolean prev = logic(and.get(i));
+						if (prev == null) {
+							prev = true;
+						}
+						ret = ret && prev;
+					}
+				} else if ("or".equals(key)) {
+					JSONArray or = jsonObject.getJSONArray("or");
+					for (int i = 0; i < or.length(); i++) {
+						Boolean arg = logic(or.get(i));
+						if (arg == null) {
+							arg = false;
+						}
+						ret = ret || arg;
+					}
+				} else {
+					return logic(key);
+				}
+			} else if (obj instanceof String) {
+				if ("uses".equals(obj)) {
+					return usesThresholdReached();
+				} else if ("days".equals(obj)) {
+					return ratingPeriodElapsed();
+				} else if ("events".equals(obj)) {
+					return eventThresholdReached();
+				}
+			} else {
+				Log.w("Unknown logic token: " + obj);
+			}
+			return ret;
+		}
+
+		/**
+		 * @return True if elapsed, false if not, null if disabled by setting daysBeforePrompt to 0.
+		 */
+		private Boolean ratingPeriodElapsed() {
+			long days;
+			switch (state) {
+				case REMIND:
+					days = daysBetweenPrompts;
+					break;
+				default:
+					days = daysBeforePrompt;
+					break;
+			}
+			if (days == 0) {
+				return null;
+			}
+			long now = getCurrentTime();
+			long periodEnd = startOfRatingPeriod + (DateUtils.DAY_IN_MILLIS * days);
+			return now > periodEnd;
+		}
+
+		/**
+		 * @return True if elapsed, false if not, null if disabled by setting usesBeforePrompt to 0.
+		 */
+		private Boolean usesThresholdReached() {
+			if (usesBeforePrompt == 0) {
+				return null;
+			} else {
+				return usesElapsed >= usesBeforePrompt;
+			}
+		}
+
+		/**
+		 * @return True if elapsed, false if not, null if disabled by setting significantEventsBeforePrompt to 0.
+		 */
+		private Boolean eventThresholdReached() {
+			if (significantEventsBeforePrompt == 0) {
+				return null;
+			} else {
+				return significantEventsElapsed >= significantEventsBeforePrompt;
+			}
+		}
+
+		public void setRatingState(RatingState state) {
+			this.state = state;
+		}
+
+		public void setLogicString(String logic) {
+			this.logic = logic;
+		}
+
+		public void setDaysBeforePrompt(int daysBeforePrompt) {
+			this.daysBeforePrompt = daysBeforePrompt;
+		}
+
+		public void setStartOfRatingPeriod(long startOfRatingPeriod) {
+			this.startOfRatingPeriod = startOfRatingPeriod;
+		}
+
+		public void setUsesBeforePrompt(int usesBeforePrompt) {
+			this.usesBeforePrompt = usesBeforePrompt;
+		}
+
+		public void setUsesElapsed(int usesElapsed) {
+			this.usesElapsed = usesElapsed;
+		}
+
+		public void setSignificantEventsBeforePrompt(int significantEventsBeforePrompt) {
+			this.significantEventsBeforePrompt = significantEventsBeforePrompt;
+		}
+
+		public void setSignificantEventsElapsed(int significantEventsElapsed) {
+			this.significantEventsElapsed = significantEventsElapsed;
+		}
+
+		public void setDaysBetweenPrompts(int daysBetweenPrompts) {
+			this.daysBetweenPrompts = daysBetweenPrompts;
+		}
+
+		public long getCurrentTime() {
+			if (currentTime != null) {
+				return currentTime;
+			}
+			return System.currentTimeMillis();
+		}
+
+		public void setCurrentTime(long currentTime) {
+			this.currentTime = currentTime;
+		}
+
+		@SuppressWarnings({"unused", "EmptyCatchBlock"})
+		public void logRatingFlowState() {
+			try {
+				Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d, Returned: %b", logic, state.name(), ratingPeriodElapsed(), usesElapsed, usesBeforePrompt, significantEventsElapsed, significantEventsBeforePrompt, logic(new JSONObject(logic))));
+			} catch (JSONException e) {
+			}
+		}
+
+	}
+
+	public enum RatingState {
 		/**
 		 * Initial state after first install.
 		 */
@@ -437,32 +562,5 @@ public class RatingModule {
 		uses,
 		events,
 		forced
-	}
-
-	/**
-	 * This method is for debugging purposed only.
-	 */
-	void logRatingFlowState(SharedPreferences prefs) {
-		Configuration config = Configuration.load(prefs);
-		String ratingsPromptLogic = config.getRatingsPromptLogic();
-
-		RatingState state = getState(prefs);
-		long days;
-		switch (state) {
-			case REMIND:
-				days = config.getRatingsDaysBetweenPrompts();
-				break;
-			default:
-				days = config.getRatingsDaysBeforePrompt();
-				break;
-		}
-		long now = new Date().getTime();
-		long periodEnd = getStartOfRatingPeriod(prefs) + (DateUtils.DAY_IN_MILLIS * days);
-		boolean elapsed = days != 0 && now > periodEnd;
-
-		int usesBeforePrompt = config.getRatingsUsesBeforePrompt();
-		int significantEventsBeforePrompt = config.getRatingsEventsBeforePrompt();
-
-		Log.e(String.format("Ratings Prompt\nLogic: %s\nState: %s, Days met: %b, Uses: %d/%d, Events: %d/%d", ratingsPromptLogic, state.name(), elapsed, getUses(prefs), usesBeforePrompt, getEvents(prefs), significantEventsBeforePrompt));
 	}
 }
