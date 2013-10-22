@@ -2,69 +2,30 @@
 
 The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it, you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at specific points within your app, and more.
 
-<strong>Note:</strong> For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
+**Note:** For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
 
-<strong>Note:</strong> API changes between versions are tracked [here](docs/APIChanges.md).
+**Note:** API changes between versions are tracked [here](docs/APIChanges.md).
 
 -------------------------------------------------
 
 The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use newer XML syntax for forward compatibility.
 
 The following languages are supported:
-<table>
-  <tr>
-    <th>Locale Qualifier</th>
-    <th>Language Name</th>
-  </tr>
-  <tr>
-    <td>en</td>
-    <td>English</td>
-  </tr>
-  <tr>
-    <td>da</td>
-    <td>Danish</td>
-  </tr>
-  <tr>
-    <td>de</td>
-    <td>German</td>
-  </tr>
-  <tr>
-    <td>es</td>
-    <td>Spanish</td>
-  </tr>
-  <tr>
-    <td>fr</td>
-    <td>French</td>
-  </tr>
-  <tr>
-    <td>it</td>
-    <td>Italian</td>
-  </tr>
-  <tr>
-    <td>ja</td>
-    <td>Japanese</td>
-  </tr>
-  <tr>
-    <td>nl</td>
-    <td>Dutch</td>
-  </tr>
-  <tr>
-    <td>ru</td>
-    <td>Russian</td>
-  </tr>
-  <tr>
-    <td>sv</td>
-    <td>Swedish</td>
-  </tr>
-  <tr>
-    <td>zh</td>
-    <td>Chinese (Traditional)</td>
-  </tr>
-  <tr>
-    <td>zh-rCN</td>
-    <td>Chinese (Simplified)</td>
-  </tr>
-</table>
+
+| Locale Qualifier | Language Name |
+| ---------------- | ------------- |
+| `en`             |  English      |
+| `da`             |  Danish       |
+| `de`             |  German       |
+| `es`             |  Spanish      |
+| `fr`             |  French       |
+| `it`             |  Italian      |
+| `ja`             |  Japanese     |
+| `nl`             |  Dutch        |
+| `ru`             |  Russian      |
+| `sv`             |  Swedish      |
+| `zh`             |  Chinese (Traditional) |
+| `zh-rCN`         |  Chinese (Simplified)  |
 
 ## Install Guide
 
@@ -126,58 +87,57 @@ These instructions were tested for the Juno Eclipse release.
 
 You will need to copy in the bold text below into your AndroidManifest.xml. Comments note the required and optional changes.
 
-<pre><code>&lt;?xml version="1.0" encoding="utf-8"?>
-&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.apptentive.android.example"
           android:versionCode="1"
           android:versionName="1.0">
+    <!-- Required permissions. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Optional permissions. GET_ACCOUNTS is used to pre-populate user email in form fields. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
-    <strong>&lt;!-- Required permissions. -->
-    &lt;uses-permission android:name="android.permission.INTERNET"/>
-    &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    &lt;!-- Optional permissions. GET_ACCOUNTS is used to pre-populate user email in form fields. -->
-    &lt;uses-permission android:name="android.permission.GET_ACCOUNTS"/></strong>
-
-    <strong>&lt;!-- Make sure you are supporting high resolution screens so Apptentive UI elements look great! --></strong>
-    &lt;supports-screens android:largeScreens="true"
+    <!-- Make sure you are supporting high resolution screens so Apptentive UI elements look great! -->
+    <supports-screens android:largeScreens="true"
                       android:normalScreens="true"
                       android:smallScreens="true"
-                      android:anyDensity="true"/></strong>
+                      android:anyDensity="true"/>
 
-    <strong>&lt;!-- minSDKVersion must be at least 7 --></strong>
-    &lt;uses-sdk android:minSdkVersion="7"
+    <!-- minSDKVersion must be at least 7 -->
+    <uses-sdk android:minSdkVersion="7"
               android:targetSdkVersion="18"/>
 
-    &lt;application android:label="@string/app_name" android:icon="@drawable/icon">
-        &lt;activity android:name=".ExampleActivity"
+    <application android:label="@string/app_name" android:icon="@drawable/icon">
+        <activity android:name=".ExampleActivity"
                   android:label="@string/app_name"
                   android:configChanges="orientation|keyboardHidden"
                   android:launchMode="singleTop">
-            &lt;intent-filter>
-                &lt;action android:name="android.intent.action.MAIN"/>
-                &lt;category android:name="android.intent.category.LAUNCHER"/>
-            &lt;/intent-filter>
-        &lt;/activity>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
-        <strong>&lt;!-- Include your App's Apptentive API key from your app's "settings" page on www.apptentive.com -->
-        &lt;meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/></strong>
+        <!-- Include your App's Apptentive API key from your app's "settings" page on www.apptentive.com -->
+        <meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/>
 
-        <strong>&lt;!-- Add a reference to Apptentive's ViewActivity and NetworkStateReceiver -->
-        &lt;activity android:name="com.apptentive.android.sdk.ViewActivity"
+        <!-- Add a reference to Apptentive's ViewActivity and NetworkStateReceiver -->
+        <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/Apptentive.Theme.Transparent"/>
 
-        &lt;receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
-            &lt;intent-filter>
-                &lt;action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                &lt;action android:name="android.intent.action.PACKAGE_RESTARTED"/>
-            &lt;/intent-filter>
-        &lt;/receiver></strong>
+        <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
+```
 
-    &lt;/application>
-&lt;/manifest>
-</code></pre>
-
-Note: Be sure to input your Apptentive API Key where it says "YOUR_API_KEY_GOES_HERE".
+Note: Be sure to input your Apptentive API Key where it says `YOUR_API_KEY_GOES_HERE`.
 
 #### Integrate your Activities with Apptentive
 
@@ -189,28 +149,31 @@ Add one of the following code snippets to ALL of the Activities you define in yo
 
 ###### Inheritance
 
-<pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
+```java
+import com.apptentive.android.sdk.ApptentiveActivity;
 
-public class ExampleActivity <strong>extends ApptentiveActivity</strong> {
-</code></pre>
+public class ExampleActivity extends ApptentiveActivity {
+```
 
 ###### Delegation
 
-<pre><code><strong>import com.apptentive.android.sdk.ApptentiveActivity;</strong>
+```java
+import com.apptentive.android.sdk.ApptentiveActivity;
 
-    &#8942
+    ...
 
     @Override
     protected void onStart() {
         super.onStart();
-        <strong>Apptentive.onStart(this);</strong>
+        Apptentive.onStart(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        <strong>Apptentive.onStop(this);</strong>
-    }</code></pre>
+        Apptentive.onStop(this);
+    }
+```
 
 #### Message Center
 
@@ -218,33 +181,41 @@ You can add a button that will show the Apptentive feedback UI when pressed. Her
 
 ###### Method
 
-<pre><code>public static void Apptentive.showMessageCenter(Activity activity);</code></pre>
+```java
+public static void Apptentive.showMessageCenter(Activity activity);
+```
 
 ###### Example
 
-<pre><code>Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
+```java
+Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
 messageCenterButton.setOnClickListener(new View.OnClickListener(){
     public void onClick(View v) {
-        <strong>Apptentive.showMessageCenter(YourActivity.this);</strong>
+        Apptentive.showMessageCenter(YourActivity.this);
     }
-});</code></pre>
+});
+```
 
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
-Do this in your main Activity's onCreate() method:
+Do this in your main Activity's `onCreate()` method:
 
 ###### Method
 
-<pre><code>public static void Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);</code></pre>
+```java
+public static void Apptentive.setUnreadMessagesListener(UnreadMessageListener listener);
+```
 
 ###### Example
 
-<pre><code>Apptentive.setUnreadMessagesListener(
+```java
+Apptentive.setUnreadMessagesListener(
     new UnreadMessagesListener() {
         public void onUnreadMessageCountChanged(final int unreadMessages) {
             // Use the updated count.
         }
     }
-);</code></pre>
+);
+```
 
 #### Ratings
 
@@ -254,17 +225,21 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 
 ###### Method
 
-<pre><code>public static void Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);</code></pre>
+```java
+public static void Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);
+```
 
 ###### Example
 
-<pre><code>@Override
+```java
+@Override
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        <strong>Apptentive.showRatingFlowIfConditionsAreMet(this);</strong>
+        Apptentive.showRatingFlowIfConditionsAreMet(this);
     }
-}</code></pre>
+}
+```
 
 You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](https://www.apptentive.com) account.
 Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
@@ -272,7 +247,9 @@ days and uses for you, but you will need to tell us each time the user performs 
 
 ###### Method
 
-<pre><code>public static void Apptentive.logSignificantEvent(Context context);</code></pre>
+```java
+public static void Apptentive.logSignificantEvent(Context context);
+```
 
 #### Surveys
 
@@ -283,11 +260,14 @@ or skips a survey.
 
 ###### Method
 
-<pre><code>public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags);</code></pre>
+```java
+public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags);
+```
 
 ###### Example
 
-<pre><code>Apptentive.showSurvey(
+```java
+Apptentive.showSurvey(
     this,
     new OnSurveyCompletedListener() {
         public void onSurveyCompletedListener() {
@@ -295,22 +275,27 @@ or skips a survey.
         }
     },
     "completed_level_ten"
-);</code></pre>
+);
+```
 
 To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailable()`.
 
 ###### Method
 
-<pre><code>public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);</code></pre>
+```java
+public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
+```
 
 #### Extra Configuration (Optional)
 
 ##### Support for Amazon Appstore
 
 If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
-there instead of to Google Play. To do this, simply add the following line in onCreate(). 
+there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
 
-<pre><code>Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());</code></pre>
+```java
+Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
+```
 
 If you omit this line, ratings will go to Google Play.
 
@@ -322,11 +307,15 @@ email through an Apptentive UI, we will use that instead.
 
 ###### Method
 
-<pre><code>public static void Apptentive.setInitialUserEmail(Context context, String email);</code></pre>
+```java
+public static void Apptentive.setInitialUserEmail(Context context, String email);
+```
 
 ###### Example
 
-<pre><code>Apptentive.setUserEmail(this, "johndoe@example.com");</code></pre>
+```java
+Apptentive.setUserEmail(this, "johndoe@example.com");
+```
 
 ##### Send Custom Device Data to Apptentive
 
@@ -335,19 +324,27 @@ key/value string pairs.
 
 ###### Method
 
-<pre><code>public static void Apptentive.addCustomDeviceData(Context context, String key, String value);</code></pre>
+```java
+public static void Apptentive.addCustomDeviceData(Context context, String key, String value);
+```
 
 ###### Example
 
-<pre><code>Apptentive.addCustomData(this, "myDeviceId", "1234567890");</code></pre>
+```java
+Apptentive.addCustomData(this, "myDeviceId", "1234567890");
+```
 
 ###### Method
 
-<pre><code>public static void Apptentive.removeCustomDeviceData(Context context, String key);</code></pre>
+```java
+public static void Apptentive.removeCustomDeviceData(Context context, String key);
+```
 
 ###### Example
 
-<pre><code>Apptentive.removeCustomDeviceData(this, "myDeviceId");</code></pre>
+```java
+Apptentive.removeCustomDeviceData(this, "myDeviceId");
+```
 
 ##### Send Custom Person Data to Apptentive
 
@@ -356,19 +353,27 @@ Data must be key/value string pairs.
 
 ###### Method
 
-<pre><code>public static void Apptentive.addCustomPersonData(Context context, String key, String value);</code></pre>
+```java
+public static void Apptentive.addCustomPersonData(Context context, String key, String value);
+```
 
 ###### Example
 
-<pre><code>Apptentive.addCustomPersonData(this, "myUserId", "1234567890");</code></pre>
+```java
+Apptentive.addCustomPersonData(this, "myUserId", "1234567890");
+```
 
 ###### Method
 
-<pre><code>public static void Apptentive.removeCustomPersonData(Context context, String key);</code></pre>
+```java
+public static void Apptentive.removeCustomPersonData(Context context, String key);
+```
 
 ###### Example
 
-<pre><code>Apptentive.removeCustomPersonData(this, "myUserId");</code></pre>
+```java
+Apptentive.removeCustomPersonData(this, "myUserId");
+```
 
 -
 
@@ -384,6 +389,7 @@ Once you have initialized the build files, Apptentive will build automatically a
 
 Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
 
-<pre><code>-keepattributes SourceFile,LineNumberTable
+```
+-keepattributes SourceFile,LineNumberTable
 -keep class com.apptentive.android.sdk.** { *; }
-</code></pre>
+```
