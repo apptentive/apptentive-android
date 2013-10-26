@@ -35,7 +35,7 @@ show surveys to your users.
 
 Note: These installation instructions are also presented to you on [Apptentive](https://www.apptentive.com) when you add an app. This document is kept in sync with our web documentation.
 
--
+---
 
 ### Get Apptentive 
 
@@ -46,7 +46,7 @@ Our code can be accessed in two ways.
 * Download the latest release [here](https://github.com/apptentive/apptentive-android/tags).
 * Alternatively, you can clone our Android SDK using git: `git clone https://github.com/apptentive/apptentive-android.git`
 
--
+---
 
 ### Set up Android Workspace
 
@@ -79,7 +79,7 @@ These instructions were tested for the Juno Eclipse release.
 8. Select `apptentive-android-sdk`
 9. Click `OK`
 
--
+---
 
 ### Implement Apptentive
 
@@ -375,7 +375,7 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
--
+---
 
 ### Building from the command line and with CI
 
@@ -389,7 +389,7 @@ Once you have initialized the build files, Apptentive will build automatically a
 
 Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
 
-```
+```java
 -keepattributes SourceFile,LineNumberTable
 -keep class com.apptentive.android.sdk.** { *; }
 ```
