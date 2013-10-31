@@ -97,6 +97,7 @@ public class Apptentive {
 	 */
 	public static void onStop(Activity activity) {
 		ActivityLifecycleManager.activityStopped(activity);
+		NetworkStateReceiver.clearListeners();
 	}
 
 	/**
