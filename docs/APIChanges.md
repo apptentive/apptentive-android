@@ -1,5 +1,13 @@
 This document tracks changes to the API between versions.
 
+# 1.2.1
+
+###### Additions
+<table>
+    <tr><th>New Methods</th></tr>
+    <tr><td><code>public static void showMessageCenter(Activity activity, Map<String, String> customData)</code></td></tr>
+</table>
+
 # 1.2.0
 
 To improve the quality of the Apptentive SDK, and to make it easier to integrate, the following API method signatures of `Apptentive.java` have been changed or added.

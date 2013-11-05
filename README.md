@@ -196,6 +196,23 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 });
 ```
 
+Alternatively, you can supply custom key/value pairs that will be sent in the next message that the user sends while the Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of `Joe's Pizza`.
+
+###### Method
+
+```java
+public static void Apptentive.showMessageCenter(Activity activity, Map<String, String> customData);
+```
+
+###### Example
+
+```java
+    Map<String, String> customData = new HashMap<String, String>();
+    customData.put("restaurant", "Joe's Pizza");
+    Apptentive.showMessageCenter(YourActivity.this, customData);
+```
+
+
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
 Do this in your main Activity's `onCreate()` method:
 

@@ -1,3 +1,10 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Major changes:
+
+* Add method to API. New way of opening Message Center allowing you to include custom data to be sent with the next message the user sends while the message center is open.
+
 2013-10-21 skykelsey 1.2.1
 --------------------------
 

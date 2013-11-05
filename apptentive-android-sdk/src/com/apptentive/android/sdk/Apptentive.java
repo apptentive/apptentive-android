@@ -300,7 +300,19 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		showMessageCenter(activity, true);
+		showMessageCenter(activity, true, null);
+	}
+
+	/**
+	 * Opens the Apptentive Message Center UI Activity, and allows custom data to be sent with the next message the user
+	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
+	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
+	 *
+	 * @param activity The Activity from which to launch the Message Center
+	 * @param customData A Map of key/value Strings that will be sent with the next message.
+	 */
+	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
+		showMessageCenter(activity, true, customData);
 	}
 
 	/**
@@ -592,9 +604,9 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 * @param forced True if opened manually. False if opened from ratings flow.
 	 */
-	static void showMessageCenter(Activity activity, boolean forced) {
+	static void showMessageCenter(Activity activity, boolean forced, Map<String, String> customData) {
 		MessageManager.createMessageCenterAutoMessage(activity, forced);
-		ApptentiveMessageCenter.show(activity, forced);
+		ApptentiveMessageCenter.show(activity, forced, customData);
 	}
 
 	/**
