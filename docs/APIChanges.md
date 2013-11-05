@@ -3,10 +3,9 @@ This document tracks changes to the API between versions.
 # 1.2.1
 
 ###### Additions
-<table>
-    <tr><th>New Methods</th></tr>
-    <tr><td><code>public static void showMessageCenter(Activity activity, Map<String, String> customData)</code></td></tr>
-</table>
+| New Methods |
+| ----------- |
+| `public static void showMessageCenter(Activity activity, Map<String, String> customData)` |
 
 # 1.2.0
 
