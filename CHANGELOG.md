@@ -1,3 +1,10 @@
+2013-11-05 skykelsey 1.2.2
+--------------------------
+
+Bugs Fixed:
+
+* Fix memory leak cause by hanging on to Activity context in database code.
+
 2013-10-21 skykelsey 1.2.1
 --------------------------
 
