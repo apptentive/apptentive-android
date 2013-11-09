@@ -1,3 +1,9 @@
+2013-??-?? skykelsey  next
+--------------------------
+
+New Features:
+* Ability to pass Apptentive custom integration details. For instance, you can pass in the app's Urban Airship App ID, allowing us to send push notifications to your device.
+
 2013-11-05 skykelsey 1.2.2
 --------------------------
 

@@ -43,6 +43,9 @@ import java.util.*;
  */
 public class Apptentive {
 
+	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
+	public static final String INTEGRATION_URBAN_AIRSHIP_TOKEN = "token";
+
 	private static UnreadMessagesListener unreadMessagesListener;
 
 	private Apptentive() {
@@ -242,6 +245,45 @@ public class Apptentive {
 		}
 	}
 
+
+	/**
+	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
+	 * of the SDK is published is listed below.
+	 * @param context The Context from which this method was called.
+	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
+	 * @param config A String to String Map of key/value pairs representing all necessary configuration data Apptentive needs
+	 *               to use the specific third party integration.
+	 * <pre>
+	 * <strong>Example</strong><br/><br/>
+	 * String  appId = PushManager.shared().getAPID();<br/>
+	 * if (appId != null) {<br/>
+	 *   Map<String, String> config = new HashMap<String, String>;<br/>
+	 *   config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_TOKEN, appId);<br/>
+	 *   Apptentive.addIntegration(this, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);<br/>
+	 * }<br/>
+	 * </pre>
+	 */
+	public static void addIntegration(Context context, String integration, Map<String, String> config) {
+		if (integration == null || config == null)  {
+			return;
+		}
+		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
+		try {
+			JSONObject configJson = null;
+			if (!integrationConfig.isNull(integration)) {
+				configJson = integrationConfig.getJSONObject(integration);
+			} else {
+				configJson = new JSONObject();
+				integrationConfig.put(integration, configJson);
+			}
+			for (String key : config.keySet()) {
+				configJson.put(key, config.get(key));
+			}
+			DeviceManager.storeIntegrationConfig(context, integrationConfig);
+		} catch (JSONException e) {
+			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
+		}
+	}
 
 	// ****************************************************************************************
 	// RATINGS

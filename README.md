@@ -375,6 +375,28 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
+##### Urban Airship Integration
+If you would like Apptentive to send a push notification when there are unread messages waiting for your user, pass
+Apptentive the Urban Airship App ID token received from `PushManager.shared().getAPID()`. This method should ideally be
+called in your main Activity's `onCreate()` method.
+
+*Note: Check this token for null before passing it in.
+
+###### Method
+```java
+Apptentive.addIntegration(Context context, String integration, Map<String, String> config);
+```
+
+###### Example
+```java
+String  appId = PushManager.shared().getAPID();
+if (appId != null) {
+    Map<String, String> config = new HashMap<String, String>;
+    config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_TOKEN, appId);
+    Apptentive.addIntegration(this, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
+}
+```
+
 ---
 
 ### Building from the command line and with CI

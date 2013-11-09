@@ -18,6 +18,9 @@ import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Sky Kelsey
  */
@@ -42,6 +45,17 @@ public class DevActivity extends ApptentiveActivity {
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
+
+		// OPTIONAL: Pass third party integration details. In this case, Urban Airship.
+		/*
+		String  appId = PushManager.shared().getAPID();
+		if (appId != null) {
+			Map<String, String> config = new HashMap<String, String>;
+			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_TOKEN, appId);
+			Apptentive.addIntegration(this, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
+		}
+		*/
+
 
 		// *** END APPTENTIVE INITIALIZATION
 

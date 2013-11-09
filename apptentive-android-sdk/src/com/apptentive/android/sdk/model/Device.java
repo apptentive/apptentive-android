@@ -40,6 +40,8 @@ public class Device extends Payload {
 	private static final String KEY_LOCALE_LANGUAGE_CODE = "locale_language_code";
 	private static final String KEY_LOCALE_RAW = "locale_raw";
 	private static final String KEY_UTC_OFFSET = "utc_offset";
+	private static final String KEY_INTEGRATION_CONFIG = "integration_config";
+
 
 	public Device() {
 		super();
@@ -411,6 +413,25 @@ public class Device extends Payload {
 			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
 			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
+		}
+	}
+
+	@SuppressWarnings("unchecked") // We check it coming in.
+	public CustomData getIntegrationConfig() {
+		if(!isNull(KEY_INTEGRATION_CONFIG)) {
+			try {
+				return new CustomData(getJSONObject(KEY_INTEGRATION_CONFIG));
+			} catch (JSONException e) {
+			}
+		}
+		return null;
+	}
+
+	public void setIntegrationConfig(CustomData integrationConfig) {
+		try {
+			put(KEY_INTEGRATION_CONFIG, integrationConfig);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to Device.", KEY_INTEGRATION_CONFIG);
 		}
 	}
 
