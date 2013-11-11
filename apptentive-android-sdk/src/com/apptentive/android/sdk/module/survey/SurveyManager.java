@@ -15,6 +15,8 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SurveyModule;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -62,6 +64,15 @@ public class SurveyManager {
 
 			// Prune out surveys that have met serving requirements already.
 			List<SurveyDefinition> surveyList = parseSurveysString(surveysString);
+			// If a null survey list is returned, notify the server. This shouldn't ever happen.
+			if (surveyList == null) {
+				Map<String, String> errorMap = new HashMap<String, String>();
+				errorMap.put("source", "SurveyManager.fetchAndStoreSurveys()");
+				errorMap.put("sdk-version", Constants.APPTENTIVE_SDK_VERSION);
+				errorMap.put("message", surveysString);
+				MetricModule.sendMetric(context, Event.EventLabel.error, null, errorMap);
+				return;
+			}
 			Iterator<SurveyDefinition> surveyIterator = surveyList.iterator();
 			while (surveyIterator.hasNext()) {
 				SurveyDefinition next = surveyIterator.next();
