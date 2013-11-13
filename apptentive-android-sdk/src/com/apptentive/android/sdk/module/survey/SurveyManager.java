@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SurveyModule;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -30,14 +31,24 @@ public class SurveyManager {
 
 	private static final String KEY_SURVEYS = "surveys";
 
-	public static void asynchFetchAndStoreSurveysIfCacheExpired(final Context context) {
+	public static void asyncFetchAndStoreSurveysIfCacheExpired(final Context context) {
 		if (hasCacheExpired(context)) {
 			Log.d("Survey cache has expired. Fetching new surveys.");
-			new Thread() {
+			Thread thread = new Thread() {
 				public void run() {
 					fetchAndStoreSurveys(context);
 				}
-			}.start();
+			};
+			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(Thread thread, Throwable throwable) {
+					Log.w("UncaughtException in SurveyManager.", throwable);
+					MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+				}
+			};
+			thread.setUncaughtExceptionHandler(handler);
+			thread.setName("Apptentive-FetchSurveys");
+			thread.start();
 		} else {
 			Log.d("Survey cache has not expired. Using existing surveys.");
 		}
@@ -62,6 +73,11 @@ public class SurveyManager {
 
 			// Prune out surveys that have met serving requirements already.
 			List<SurveyDefinition> surveyList = parseSurveysString(surveysString);
+			// If a null survey list is returned, notify the server. This shouldn't ever happen.
+			if (surveyList == null) {
+				MetricModule.sendError(context, null, "Survey list returned null because of possible parsing error.", surveysString);
+				return;
+			}
 			Iterator<SurveyDefinition> surveyIterator = surveyList.iterator();
 			while (surveyIterator.hasNext()) {
 				SurveyDefinition next = surveyIterator.next();

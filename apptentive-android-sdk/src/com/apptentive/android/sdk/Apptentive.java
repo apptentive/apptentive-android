@@ -24,6 +24,7 @@ import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.SurveyManager;
@@ -65,30 +66,13 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
-		init(activity);
-		ActivityLifecycleManager.activityStarted(activity);
-	}
-
-	/**
-	 * Reserved for future use.
-	 * @param activity The Activity from which this method is called.
-	 */
-	public static void onResume(Activity activity) {
-	}
-
-	/**
-	 * Reserved for future use.
-	 * @param activity The Activity from which this method is called.
-	 * @param hasFocus true if the activity is coming into focus, else false.
-	 */
-	public static void onWindowFocusChanged(Activity activity, boolean hasFocus) {
-	}
-
-	/**
-	 * Reserved for future use.
-	 * @param activity The Activity from which this method is called.
-	 */
-	public static void onPause(Activity activity) {
+		try {
+			init(activity);
+			ActivityLifecycleManager.activityStarted(activity);
+		} catch (Exception e) {
+			Log.w("Error starting Apptentive Activity.", e);
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
 	}
 
 	/**
@@ -96,15 +80,13 @@ public class Apptentive {
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStop(Activity activity) {
-		ActivityLifecycleManager.activityStopped(activity);
-		NetworkStateReceiver.clearListeners();
-	}
-
-	/**
-	 * Reserved for future use.
-	 * @param activity The Activity from which this method is called.
-	 */
-	public static void onDestroy(Activity activity) {
+		try {
+			ActivityLifecycleManager.activityStopped(activity);
+			NetworkStateReceiver.clearListeners();
+		} catch (Exception e) {
+			Log.w("Error stopping Apptentive Activity.", e);
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
 	}
 
 
@@ -284,9 +266,15 @@ public class Apptentive {
 	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
 	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
 	 * @param activity The activity from which this set of dialogs is launched.
+	 * @return True if the rating flow was shown, else false.
 	 */
-	public static void showRatingFlowIfConditionsAreMet(Activity activity) {
-		RatingModule.getInstance().run(activity);
+	public static boolean showRatingFlowIfConditionsAreMet(Activity activity) {
+		try {
+			return RatingModule.getInstance().run(activity);
+		} catch (Exception e) {
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
+		return false;
 	}
 
 	// ****************************************************************************************
@@ -312,7 +300,12 @@ public class Apptentive {
 	 * @param customData A Map of key/value Strings that will be sent with the next message.
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
-		showMessageCenter(activity, true, customData);
+		try {
+			showMessageCenter(activity, true, customData);
+		} catch (Exception e) {
+			Log.w("Error starting Apptentive Activity.", e);
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
 	}
 
 	/**
@@ -329,7 +322,12 @@ public class Apptentive {
 	 * @return The number of unread messages.
 	 */
 	public static int getUnreadMessageCount(Context context) {
-		return MessageManager.getUnreadMessageCount(context);
+		try {
+			return MessageManager.getUnreadMessageCount(context);
+		} catch (Exception e) {
+			MetricModule.sendError(context.getApplicationContext(), e, null, null);
+		}
+		return 0;
 	}
 
 	// ****************************************************************************************
@@ -344,7 +342,12 @@ public class Apptentive {
 	 * @return True if a survey can be shown, else false.
 	 */
 	public static boolean isSurveyAvailable(Context context, String... tags) {
-		return SurveyManager.isSurveyAvailable(context, tags);
+		try {
+			return SurveyManager.isSurveyAvailable(context, tags);
+		} catch (Exception e) {
+			MetricModule.sendError(context.getApplicationContext(), e, null, null);
+		}
+		return false;
 	}
 
 	/**
@@ -355,7 +358,12 @@ public class Apptentive {
 	 * @return True if a survey was shown, else false.
 	 */
 	public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags) {
-		return SurveyManager.showSurvey(activity, listener, tags);
+		try {
+			return SurveyManager.showSurvey(activity, listener, tags);
+		} catch (Exception e) {
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
+		return false;
 	}
 
 	// ****************************************************************************************
@@ -459,7 +467,7 @@ public class Apptentive {
 			asyncFetchConversationToken(context);
 		} else {
 			asyncFetchAppConfiguration(context);
-			SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired(context);
+			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
@@ -497,7 +505,7 @@ public class Apptentive {
 		PayloadSendWorker.start(context);
 	}
 
-	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
+	private static void onVersionChanged(Context context, @SuppressWarnings("unused") int previousVersion, @SuppressWarnings("unused") int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
@@ -507,12 +515,22 @@ public class Apptentive {
 	}
 
 	private synchronized static void asyncFetchConversationToken(final Context context) {
-		new Thread() {
+		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				fetchConversationToken(context);
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-FetchConversationToken");
+		thread.start();
 	}
 
 	/**
@@ -546,7 +564,7 @@ public class Apptentive {
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
-				SurveyManager.asynchFetchAndStoreSurveysIfCacheExpired(context);
+				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -592,11 +610,21 @@ public class Apptentive {
 	}
 
 	private static void asyncFetchAppConfiguration(final Context context) {
-		new Thread() {
+		Thread thread = new Thread() {
 			public void run() {
 				fetchAppConfiguration(context, GlobalInfo.isAppDebuggable);
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-FetchAppConfiguration");
+		thread.start();
 	}
 
 	/**

@@ -42,6 +42,18 @@ public class Event extends ConversationItem {
 		}
 	}
 
+	public Event(String label, JSONObject data) {
+		super();
+		try {
+			put(KEY_LABEL, label);
+			if (data != null) {
+				put(KEY_DATA, data);
+			}
+		} catch (JSONException e) {
+			Log.e("Unable to construct Event.", e);
+		}
+	}
+
 	public Event(String label, String trigger) {
 		this(label, (Map<String, String>) null);
 		Map<String, String> data = new HashMap<String, String>();

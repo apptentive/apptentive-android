@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
@@ -34,12 +35,22 @@ public class MessageManager {
 	private static OnSentMessageListener internalSentMessageListener;
 
 	public static void asyncFetchAndStoreMessages(final Context context, final MessagesUpdatedListener listener) {
-		new Thread() {
+		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				MessageManager.fetchAndStoreMessages(context, listener);
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in MessageManager.", throwable);
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-MessageManagerFetchMessages");
+		thread.start();
 	}
 
 	/**

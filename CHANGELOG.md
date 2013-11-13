@@ -4,6 +4,18 @@
 Major changes:
 
 * Add method to API. New way of opening Message Center allowing you to include custom data to be sent with the next message the user sends while the message center is open.
+* Implemented an internal error reporting system. Exceptions in Apptentive code are now caught and logged to our server so we can maintain a reliable app experience and proactively fix hard to reproduce bugs.
+
+Bugs Fixed:
+
+* Fixed a potential crash in survey fetching code.
+
+2013-11-05 skykelsey 1.2.2
+--------------------------
+
+Bugs Fixed:
+
+* Fix memory leak cause by hanging on to Activity context in database code.
 
 2013-10-21 skykelsey 1.2.1
 --------------------------

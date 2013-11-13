@@ -19,9 +19,7 @@ import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import com.apptentive.android.sdk.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -311,5 +309,12 @@ public class Util {
 			ret = ret.substring(1, ret.length());
 		}
 		return ret;
+	}
+
+	public static String stackTraceAsString(Throwable throwable) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		throwable.printStackTrace(pw);
+		return sw.toString();
 	}
 }

@@ -135,7 +135,8 @@ public class DevActivity extends ApptentiveActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			Apptentive.showRatingFlowIfConditionsAreMet(DevActivity.this);
+			boolean ret = Apptentive.showRatingFlowIfConditionsAreMet(DevActivity.this);
+			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
 		}
 	}
 }
