@@ -1,5 +1,10 @@
 This document tracks changes to the API between versions.
 
+# next
+| Old Method Signature | New Method Signature |
+| -------------------- | -------------------- |
+| `public static void showRatingFlowIfConditionsAreMet(Activity activity)` | `public static boolean showRatingFlowIfConditionsAreMet(Activity activity)`
+
 # 1.2.0
 
 To improve the quality of the Apptentive SDK, and to make it easier to integrate, the following API method signatures of `Apptentive.java` have been changed or added.

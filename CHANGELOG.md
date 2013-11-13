@@ -1,3 +1,14 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Major changes:
+
+* Implemented an internal error reporting system. Exceptions in Apptentive code are now caught and logged to our server so we can maintain a reliable app experience and proactively fix hard to reproduce bugs.
+
+Bugs Fixed:
+
+* Fixed a potential crash in survey fetching code.
+
 2013-11-05 skykelsey 1.2.2
 --------------------------
 

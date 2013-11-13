@@ -226,7 +226,7 @@ have to do is call the ratings module when you want to show the dialog. Here is 
 ###### Method
 
 ```java
-public static void Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);
+public static boolean Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);
 ```
 
 ###### Example
@@ -236,7 +236,7 @@ public static void Apptentive.showRatingFlowIfConditionsAreMet(Activity activity
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        Apptentive.showRatingFlowIfConditionsAreMet(this);
+        boolean ret = Apptentive.showRatingFlowIfConditionsAreMet(this);
     }
 }
 ```

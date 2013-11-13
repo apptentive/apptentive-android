@@ -266,13 +266,15 @@ public class Apptentive {
 	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
 	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
 	 * @param activity The activity from which this set of dialogs is launched.
+	 * @return True if the rating flow was shown, else false.
 	 */
-	public static void showRatingFlowIfConditionsAreMet(Activity activity) {
+	public static boolean showRatingFlowIfConditionsAreMet(Activity activity) {
 		try {
-			RatingModule.getInstance().run(activity);
+			return RatingModule.getInstance().run(activity);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
+		return false;
 	}
 
 	// ****************************************************************************************
@@ -491,7 +493,7 @@ public class Apptentive {
 		PayloadSendWorker.start(context);
 	}
 
-	private static void onVersionChanged(Context context, int previousVersion, int currentVersion) {
+	private static void onVersionChanged(Context context, @SuppressWarnings("unused") int previousVersion, @SuppressWarnings("unused") int currentVersion) {
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
