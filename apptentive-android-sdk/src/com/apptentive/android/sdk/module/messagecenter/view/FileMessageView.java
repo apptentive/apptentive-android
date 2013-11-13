@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.FileMessage;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -87,16 +88,6 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 				}
 				imageView.setPadding(dimensions.x, dimensions.y, 0, 0);
 				loadImage(storedFile, imageView);
-			} else {
-				// TODO: We aren't creating other FileMessage types than image yet. This isn't tested.
-				TextView textView = (TextView) findViewById(R.id.apptentive_file_message_text);
-				textView.setVisibility(View.VISIBLE);
-				if (mimeType.contains("text")) {
-					// Set content
-					// TODO: Populate this view with the file contents. Truncate to just a few hundred characters maybe?
-				} else {
-					textView.setText(newMessage.getMimeType());
-				}
 			}
 		}
 	}
@@ -109,7 +100,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 	 * @param imageView  The ImageView to insert the bitmap into.
 	 */
 	private void loadImage(final StoredFile storedFile, final ImageView imageView) {
-		new Thread() {
+		Thread thread = new Thread() {
 			public void run() {
 				FileInputStream fis = null;
 				final Bitmap imageBitmap;
@@ -140,7 +131,17 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 					Util.ensureClosed(fis);
 				}
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in FileMessageView.", throwable);
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-FileMessageViewLoadImage");
+		thread.start();
 	}
 
 	private Point getBitmapDimensions(StoredFile storedFile) {

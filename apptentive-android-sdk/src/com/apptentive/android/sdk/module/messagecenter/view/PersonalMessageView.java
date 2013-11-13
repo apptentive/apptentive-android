@@ -11,8 +11,10 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -43,7 +45,7 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 	 *
 	 * @param newMessage The new message whose contents we want to display.
 	 */
-	public void updateMessage(T newMessage) {
+	public void updateMessage(final T newMessage) {
 		T oldMessage = message;
 		super.updateMessage(newMessage);
 
@@ -66,7 +68,7 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
 		if (avatarNeedsUpdate) {
 			// Perform the fetch on a new thread, and the UI update on the UI thread so we don't block everything.
-			new Thread() {
+			Thread thread = new Thread() {
 				public void run() {
 					final AvatarView avatar = new AvatarView(context, message.getSenderProfilePhoto());
 					post(new Runnable() {
@@ -75,7 +77,17 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 						}
 					});
 				}
-			}.start();
+			};
+			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(Thread thread, Throwable throwable) {
+					Log.w("UncaughtException in PersonalMessageView.", throwable);
+					MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+				}
+			};
+			thread.setUncaughtExceptionHandler(handler);
+			thread.setName("Apptentive-MessageViewLoadAvatar");
+			thread.start();
 		}
 	}
 

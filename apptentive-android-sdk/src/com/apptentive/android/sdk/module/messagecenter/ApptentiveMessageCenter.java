@@ -138,7 +138,7 @@ public class ApptentiveMessageCenter {
 		final int fgPoll = configuration.getMessageCenterFgPoll() * 1000;
 		Log.d("Starting Message Center polling every %d millis", fgPoll);
 		pollForMessages = true;
-		new Thread() {
+		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				while (pollForMessages) {
@@ -153,7 +153,17 @@ public class ApptentiveMessageCenter {
 				}
 				Log.d("Stopping Message Center polling thread.");
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in Message Center fetch thread.", throwable);
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-MessageCenterFetchMessages");
+		thread.start();
 
 		scrollToBottom();
 	}
