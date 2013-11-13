@@ -1,7 +1,7 @@
 This document tracks changes to the API between versions.
 
 
-# next
+# 1.2.3
 
 ###### Changes
 | Old Method Signature | New Method Signature |
