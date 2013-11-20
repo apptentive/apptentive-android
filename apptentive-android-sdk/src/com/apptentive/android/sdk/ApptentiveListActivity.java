@@ -38,9 +38,4 @@ public class ApptentiveListActivity extends ListActivity {
 		super.onStop();
 		Apptentive.onStop(this);
 	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Apptentive.onDestroy(this);
-	}}
+}

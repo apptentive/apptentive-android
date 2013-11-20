@@ -21,7 +21,13 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Context context, Event event) {
+		sendEvent(context, event, true);
+	}
+
+	public static void sendEvent(Context context, Event event, boolean startPayloadSendWorker) {
 		getEventStore(context).addPayload(event);
-		PayloadSendWorker.start(context);
+		if (startPayloadSendWorker) {
+			PayloadSendWorker.start(context);
+		}
 	}
 }

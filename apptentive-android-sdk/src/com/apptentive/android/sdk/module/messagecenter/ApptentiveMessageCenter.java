@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -36,12 +37,15 @@ public class ApptentiveMessageCenter {
 	protected static MessageCenterView messageCenterView;
 	private static boolean pollForMessages = false;
 	private static Trigger trigger;
+	private static Map<String, String> customData;
 
-	public static void show(Activity activity, boolean forced) {
-		show(activity, forced ? Trigger.message_center : Trigger.enjoyment_dialog);
+	public static void show(Activity activity, boolean forced, Map<String, String> customData) {
+		ApptentiveMessageCenter.trigger = (forced ? Trigger.message_center : Trigger.enjoyment_dialog);
+		ApptentiveMessageCenter.customData = customData;
+		show(activity);
 	}
 
-	public static void show(Activity activity, Trigger reason) {
+	protected static void show(Activity activity) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration conf = Configuration.load(activity);
 		boolean enableMessageCenter = conf.isMessageCenterEnabled();
@@ -49,9 +53,8 @@ public class ApptentiveMessageCenter {
 		boolean shouldShowIntroDialog = !enableMessageCenter || prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, true);
 		// TODO: What if there is an incoming message that is unread? Shouldn't they see the Message Center right away?
 		if (shouldShowIntroDialog) {
-			showIntroDialog(activity, reason, emailRequired);
+			showIntroDialog(activity, emailRequired);
 		} else {
-			ApptentiveMessageCenter.trigger = reason;
 			Intent intent = new Intent();
 			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
@@ -76,6 +79,8 @@ public class ApptentiveMessageCenter {
 				final TextMessage message = new TextMessage();
 				message.setBody(text);
 				message.setRead(true);
+				message.setCustomData(customData);
+				customData = null;
 				MessageManager.sendMessage(context, message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
@@ -91,6 +96,8 @@ public class ApptentiveMessageCenter {
 				boolean successful = message.createStoredFile(context, uri.toString());
 				if (successful) {
 					message.setRead(true);
+					message.setCustomData(customData);
+					customData = null;
 					// Finally, send out the message.
 					MessageManager.sendMessage(context, message);
 					messageCenterView.post(new Runnable() {
@@ -138,7 +145,7 @@ public class ApptentiveMessageCenter {
 		final int fgPoll = configuration.getMessageCenterFgPoll() * 1000;
 		Log.d("Starting Message Center polling every %d millis", fgPoll);
 		pollForMessages = true;
-		new Thread() {
+		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				while (pollForMessages) {
@@ -153,12 +160,32 @@ public class ApptentiveMessageCenter {
 				}
 				Log.d("Stopping Message Center polling thread.");
 			}
-		}.start();
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in Message Center fetch thread.", throwable);
+				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-MessageCenterFetchMessages");
+		thread.start();
 
 		scrollToBottom();
 	}
 
-	static void showIntroDialog(final Activity activity, final Trigger reason, boolean emailRequired) {
+	/**
+	 * Provided only for debugging.
+	 * @param activity
+	 * @param emailRequired
+	 */
+	static void showIntroDialog(final Activity activity, Trigger trigger, boolean emailRequired) {
+		ApptentiveMessageCenter.trigger = trigger;
+		showIntroDialog(activity, emailRequired);
+	}
+
+	static void showIntroDialog(final Activity activity, boolean emailRequired) {
 		final MessageCenterIntroDialog dialog = new MessageCenterIntroDialog(activity);
 		dialog.setEmailRequired(emailRequired);
 
@@ -205,6 +232,8 @@ public class ApptentiveMessageCenter {
 				final TextMessage textMessage = new TextMessage();
 				textMessage.setBody(message);
 				textMessage.setRead(true);
+				textMessage.setCustomData(customData);
+				customData = null;
 				MessageManager.sendMessage(activity, textMessage);
 				MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__send);
 				dialog.dismiss();
@@ -220,7 +249,7 @@ public class ApptentiveMessageCenter {
 					@Override
 					public void onYes() {
 						MetricModule.sendMetric(activity, Event.EventLabel.message_center__thank_you__messages);
-						show(activity, reason);
+						show(activity);
 					}
 				});
 				MetricModule.sendMetric(activity, Event.EventLabel.message_center__thank_you__launch);
@@ -229,7 +258,7 @@ public class ApptentiveMessageCenter {
 		});
 
 		String appDisplayName = Configuration.load(activity).getAppDisplayName();
-		switch (reason) {
+		switch (trigger) {
 			case enjoyment_dialog:
 				dialog.setTitle(R.string.apptentive_intro_dialog_title_no_love);
 				dialog.setBody(activity.getResources().getString(R.string.apptentive_intro_dialog_body, appDisplayName));
@@ -241,7 +270,7 @@ public class ApptentiveMessageCenter {
 			default:
 				return;
 		}
-		MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__launch, reason.name());
+		MetricModule.sendMetric(activity, Event.EventLabel.message_center__intro__launch, trigger.name());
 		dialog.show();
 	}
 

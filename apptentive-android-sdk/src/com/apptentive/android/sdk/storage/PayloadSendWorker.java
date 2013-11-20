@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 
 /**
  * @author Sky Kelsey
@@ -32,7 +33,16 @@ public class PayloadSendWorker {
 		if (!running) {
 			Log.i("Starting PayloadRunner.");
 			running = true;
-			new PayloadRunner().start();
+			Thread payloadRunner = new PayloadRunner();
+			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(Thread thread, Throwable throwable) {
+					MetricModule.sendError(appContext, throwable, null, null);
+				}
+			};
+			payloadRunner.setUncaughtExceptionHandler(handler);
+			payloadRunner.setName("Apptentive-PayloadSendWorker");
+			payloadRunner.start();
 		}
 	}
 

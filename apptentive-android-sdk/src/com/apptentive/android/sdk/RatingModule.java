@@ -159,7 +159,7 @@ public class RatingModule {
 				setState(prefs, RatingState.POSTPONE);
 				MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__no);
 				dialog.dismiss();
-				Apptentive.showMessageCenter(activity, false);
+				Apptentive.showMessageCenter(activity, false, null);
 			}
 
 			@Override
@@ -257,16 +257,16 @@ public class RatingModule {
 	 *
 	 * @param activity The activityContext from which this method was called.
 	 */
-	void run(Activity activity) {
+	boolean run(Activity activity) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration config = Configuration.load(prefs);
 		if (!config.isRatingsEnabled()) {
 			Log.d("Skipped showing ratings because they are disabled.");
-			return;
+			return false;
 		}
 		if (!Util.isNetworkConnectionPresent(activity)) {
 			Log.d("Ratings can't be shown because the network is not available. Try again later.");
-			return;
+			return false;
 		}
 		Logic logic = new Logic();
 		logic.load(prefs);
@@ -278,10 +278,10 @@ public class RatingModule {
 				case START:
 					// TODO: Trigger no longer makes sense with boolean logic expressions. Axe it.
 					showEnjoymentDialog(activity, Trigger.events);
-					break;
+					return true;
 				case REMIND:
 					forceShowRatingDialog(activity);
-					break;
+					return true;
 				case POSTPONE:
 					break;
 				case RATED:
@@ -290,6 +290,7 @@ public class RatingModule {
 					break;
 			}
 		}
+		return false;
 	}
 
 	/**

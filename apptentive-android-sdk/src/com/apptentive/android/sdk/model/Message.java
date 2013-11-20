@@ -11,6 +11,8 @@ import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 /**
  * @author Sky Kelsey
  */
@@ -19,6 +21,7 @@ public abstract class Message extends ConversationItem {
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
 	public static final String KEY_TYPE = "type";
+	public static final String KEY_CUSTOM_DATA = "custom_data";
 
 	// State and Read are not stored in JSON, only in DB.
 	private State state;
@@ -95,6 +98,24 @@ public abstract class Message extends ConversationItem {
 			put(KEY_TYPE, type.name());
 		} catch (JSONException e) {
 			Log.e("Exception setting Message's %s field.", e, KEY_TYPE);
+		}
+	}
+
+	public void setCustomData(Map<String, String> customData) {
+		if (customData == null || customData.size() == 0) {
+			if (!isNull(KEY_CUSTOM_DATA)) {
+				remove(KEY_CUSTOM_DATA);
+			}
+			return;
+		}
+		try {
+			JSONObject customDataJson = new JSONObject();
+			for (String key : customData.keySet()) {
+				customDataJson.put(key, customData.get(key));
+			}
+			put(KEY_CUSTOM_DATA, customDataJson);
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_CUSTOM_DATA);
 		}
 	}
 

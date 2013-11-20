@@ -127,6 +127,28 @@
                           android:inputType="textEmailAddress"
                           android:hint="Email…"/>
             </LinearLayout>
+            <TextView android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Message Center with Custom Data"/>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+                <Button android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:onClick="launchMessageCenterWithCustomData"
+                        android:text="Launch"/>
+                <EditText android:id="@+id/message_center_custom_data_key"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="6"
+                          android:hint="Key…"/>
+                <EditText android:id="@+id/message_center_custom_data_value"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="6"
+                          android:hint="Value…"/>
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

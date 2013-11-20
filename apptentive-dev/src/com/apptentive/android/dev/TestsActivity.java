@@ -20,7 +20,9 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.storage.PersonManager;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -33,7 +35,7 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void testTweet(@SuppressWarnings("unused") View view) {
-		try{
+		try {
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.putExtra(Intent.EXTRA_TEXT, "Testing...");
 			intent.setType("text/plain");
@@ -63,7 +65,7 @@ public class TestsActivity extends ApptentiveActivity {
 		MessageManager.deleteAllMessages(TestsActivity.this);
 	}
 
-	public void addCustomDeviceData(View view) {
+	public void addCustomDeviceData(@SuppressWarnings("unused") View view) {
 		EditText keyText = (EditText) findViewById(R.id.add_custom_device_data_key);
 		EditText valueText = (EditText) findViewById(R.id.add_custom_device_data_value);
 		String key = (keyText).getText().toString().trim();
@@ -73,14 +75,14 @@ public class TestsActivity extends ApptentiveActivity {
 		Apptentive.addCustomDeviceData(this, key, value);
 	}
 
-	public void removeCustomDeviceData(View view) {
+	public void removeCustomDeviceData(@SuppressWarnings("unused") View view) {
 		EditText keyText = (EditText) findViewById(R.id.remove_custom_device_data_key);
 		String key = (keyText).getText().toString().trim();
 		keyText.setText(null);
 		Apptentive.removeCustomDeviceData(this, key);
 	}
 
-	public void addCustomPersonData(View view) {
+	public void addCustomPersonData(@SuppressWarnings("unused") View view) {
 		EditText keyText = (EditText) findViewById(R.id.add_custom_person_data_key);
 		EditText valueText = (EditText) findViewById(R.id.add_custom_person_data_value);
 		String key = (keyText).getText().toString().trim();
@@ -90,17 +92,32 @@ public class TestsActivity extends ApptentiveActivity {
 		Apptentive.addCustomPersonData(this, key, value);
 	}
 
-	public void removeCustomPersonData(View view) {
+	public void removeCustomPersonData(@SuppressWarnings("unused") View view) {
 		EditText keyText = (EditText) findViewById(R.id.remove_custom_person_data_key);
 		String key = (keyText).getText().toString().trim();
 		keyText.setText(null);
 		Apptentive.removeCustomPersonData(this, key);
 	}
 
-	public void setInitialPersonEmail(View view) {
+	public void setInitialPersonEmail(@SuppressWarnings("unused") View view) {
 		EditText emailText = (EditText) findViewById(R.id.set_initial_person_email);
 		String email = (emailText).getText().toString().trim();
 		emailText.setText(null);
 		PersonManager.storeInitialPersonEmail(this, email);
+	}
+
+	public void launchMessageCenterWithCustomData(@SuppressWarnings("unused") View view) {
+		EditText keyText = (EditText) findViewById(R.id.message_center_custom_data_key);
+		EditText valueText = (EditText) findViewById(R.id.message_center_custom_data_value);
+		String key = (keyText).getText().toString().trim();
+		String value = (valueText).getText().toString().trim();
+		keyText.setText(null);
+		valueText.setText(null);
+		Map<String, String> customData = null;
+		if (key != null && key.length() != 0) {
+			customData = new HashMap<String, String>();
+			customData.put(key, value);
+		}
+		Apptentive.showMessageCenter(this, customData);
 	}
 }
