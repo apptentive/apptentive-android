@@ -565,6 +565,8 @@ public class Apptentive {
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
 				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+				ApptentiveHttpResponse interactionsResponse = ApptentiveClient.getInteractions();
+				Log.e("Got interactions.");
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
