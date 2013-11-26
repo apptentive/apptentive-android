@@ -366,6 +366,26 @@ public class Apptentive {
 		return false;
 	}
 
+	/**
+	 * This method takes a unique code point string, stores a record of that code point having been visited, figures out
+	 * if there is an interaction that is able to run for this code point, and then runs it. If more than one interaction
+	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
+	 * invocation of this method.
+	 *
+	 * @param activity  The Activity from which this method is called.
+	 * @param codePoint A unique String representing the line this method is called on. For instance, you may want to have
+	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @return true if the an interaction was shown, else false.
+	 */
+	public static boolean engage(Activity activity, String codePoint) {
+		CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
+		InteractionManager.loadInteraction(activity.getApplicationContext(), codePoint);
+		// TODO: Return the proper value.
+		return false;
+	}
+
+
 	// ****************************************************************************************
 	// INTERNAL METHODS
 	// ****************************************************************************************
@@ -468,6 +488,7 @@ public class Apptentive {
 		} else {
 			asyncFetchAppConfiguration(context);
 			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+			InteractionManager.asyncFetchAndStoreInteractions(context);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
@@ -565,8 +586,7 @@ public class Apptentive {
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
 				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
-				ApptentiveHttpResponse interactionsResponse = ApptentiveClient.getInteractions();
-				Log.e("Got interactions.");
+				InteractionManager.asyncFetchAndStoreInteractions(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}

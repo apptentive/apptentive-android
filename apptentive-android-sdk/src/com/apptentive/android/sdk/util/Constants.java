@@ -52,7 +52,11 @@ public class Constants {
 	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
 	public static final String PREF_KEY_SURVEYS_HISTORY = "surveyHistory";
 
+	public static final String PREF_KEY_INTERACTIONS = "interactions";
+	public static final String PREF_KEY_INTERACTIONS_CACHE_EXPIRATION = "interactionsCacheExpiration";
+	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 
+	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
 	public static final int CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours

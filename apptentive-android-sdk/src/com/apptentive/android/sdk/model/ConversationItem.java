@@ -7,10 +7,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -26,12 +25,8 @@ public abstract class ConversationItem extends Payload {
 		super();
 		setNonce(UUID.randomUUID().toString());
 
-		long millis = new Date().getTime();
-		double point = (double)millis;
-		double seconds = point / 1000;
-		TimeZone timezone = TimeZone.getDefault();
-		Date now = new Date();
-		int utcOffset = timezone.getOffset(now.getTime()) / 1000;
+		double seconds = Util.getCurrentTime();
+		int utcOffset = Util.getUtcOffset();
 
 		setClientCreatedAt(seconds);
 		setClientCreatedAtUtcOffset(utcOffset);

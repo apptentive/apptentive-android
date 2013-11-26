@@ -317,4 +317,31 @@ public class Util {
 		throwable.printStackTrace(pw);
 		return sw.toString();
 	}
+
+	public static String getAppVersionName(Context context) {
+		try {
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			return packageInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) {
+			Log.e("Error getting app version name.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Converts the current time to a double representing seconds, instead of milliseconds. It will have millisecond
+	 * precision as fractional seconds. This is the default time format used throughout the Apptentive SDK.
+	 * @return A double representing the current time in seconds.
+	 */
+	public static double getCurrentTime() {
+		long millis = System.currentTimeMillis();
+		double point = (double)millis;
+		return point / 1000;
+	}
+
+	public static int getUtcOffset() {
+		TimeZone timezone = TimeZone.getDefault();
+		return timezone.getOffset(System.currentTimeMillis()) / 1000;
+	}
 }
