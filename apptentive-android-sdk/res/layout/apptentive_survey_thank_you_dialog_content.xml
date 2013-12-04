@@ -24,6 +24,7 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:gravity="left"
+              android:autoLink="all"
               android:layout_marginBottom="24dp"
               android:textColor="@color/apptentive_dialog_body_text"
               android:textSize="@dimen/apptentive_text_medium"
