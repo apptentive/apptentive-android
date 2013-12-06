@@ -1,3 +1,10 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-201 Survey targeting doesn't work until after survey cache expires.
+
 2013-11-13 skykelsey 1.2.3
 --------------------------
 

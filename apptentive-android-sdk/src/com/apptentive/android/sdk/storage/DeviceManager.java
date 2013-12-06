@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
+import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Reflection;
 import org.json.JSONException;
@@ -322,5 +323,11 @@ public class DeviceManager {
 
 		// Do nothing.
 		return null;
+	}
+
+	public static void onSentDeviceInfo(Context appContext) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putBoolean(Constants.PREF_KEY_DEVICE_DATA_SENT, true).commit();
+		SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(appContext);
 	}
 }

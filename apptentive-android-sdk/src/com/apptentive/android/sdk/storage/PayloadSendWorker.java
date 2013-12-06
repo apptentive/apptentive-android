@@ -84,6 +84,7 @@ public class PayloadSendWorker {
 								break;
 							case device:
 								response = ApptentiveClient.putDevice((Device) payload);
+								DeviceManager.onSentDeviceInfo(appContext);
 								break;
 							case sdk:
 								response = ApptentiveClient.putSdk((Sdk) payload);
