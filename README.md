@@ -392,6 +392,12 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
+
+##### Send Custom Message Data to Apptentive
+
+You can specify key/value pairs to send along with the next Message sent by your user. See the Message Center
+section above for instructions.
+
 ---
 
 ### Building from the command line and with CI
