@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -38,14 +39,11 @@ import org.json.JSONObject;
 import java.util.*;
 
 /**
- * The Apptentive class is responsible for general initialization, and access to each Apptentive Module.
+ * This class contains the complete API for accessing Apptentive features from within your app.
  *
  * @author Sky Kelsey
  */
 public class Apptentive {
-
-	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
-	public static final String INTEGRATION_URBAN_AIRSHIP_TOKEN = "token";
 
 	private static UnreadMessagesListener unreadMessagesListener;
 
@@ -65,7 +63,9 @@ public class Apptentive {
 
 
 	/**
-	 * Call this method from each of your Activity's onStart() methods. Must be called before using other Apptentive APIs.
+	 * Call this method from each of your Activities' onStart() methods. Must be called before using other Apptentive APIs
+	 * methods
+	 *
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStart(Activity activity) {
@@ -79,7 +79,8 @@ public class Apptentive {
 	}
 
 	/**
-	 * Call this method from each of your Activity's onStop() methods.
+	 * Call this method from each of your Activities' onStop() methods.
+	 *
 	 * @param activity The Activity from which this method is called.
 	 */
 	public static void onStop(Activity activity) {
@@ -103,7 +104,7 @@ public class Apptentive {
 	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
 	 * idempotent.
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param email The user's email address.
 	 */
 	public static void setInitialUserEmail(Context context, String email) {
@@ -116,7 +117,7 @@ public class Apptentive {
 	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
 	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
@@ -135,7 +136,7 @@ public class Apptentive {
 	 * Add a piece of custom data to the device's info. This info will be sent to the server.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
 	 */
@@ -156,7 +157,7 @@ public class Apptentive {
 
 	/**
 	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param key The key to remove.
 	 */
 	public static void removeCustomDeviceData(Context context, String key) {
@@ -173,7 +174,7 @@ public class Apptentive {
 	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
 	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
@@ -194,7 +195,7 @@ public class Apptentive {
 	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
 	 * idempotent.
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param key The key to store the data under.
 	 * @param value The value of the data.
 	 */
@@ -216,7 +217,7 @@ public class Apptentive {
 	/**
 	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
 	 *
-	 * @param context The context from which this method was called.
+	 * @param context The context from which this method is called.
 	 * @param key The key to remove.
 	 */
 	public static void removeCustomPersonData(Context context, String key) {
@@ -228,22 +229,28 @@ public class Apptentive {
 	}
 
 
+	// ****************************************************************************************
+	// THIRD PARTY INTEGRATIONS
+	// ****************************************************************************************
+
+	/**
+	 * The key to use to store a Map of Urban Airship configuration settings.
+	 */
+	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
+
+	/**
+	 * The key to use to specify the Urban Airship APID withing the Urban Airship configuration settings Map.
+	 */
+	public static final String INTEGRATION_URBAN_AIRSHIP_APID = "token";
+
 	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
-	 * @param context The Context from which this method was called.
+	 *
+	 * @param context The Context from which this method is called.
 	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
 	 * @param config A String to String Map of key/value pairs representing all necessary configuration data Apptentive needs
 	 *               to use the specific third party integration.
-	 * <pre>
-	 * <strong>Example</strong><br/><br/>
-	 * String  appId = PushManager.shared().getAPID();<br/>
-	 * if (appId != null) {<br/>
-	 *   Map<String, String> config = new HashMap<String, String>;<br/>
-	 *   config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_TOKEN, appId);<br/>
-	 *   Apptentive.addIntegration(this, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);<br/>
-	 * }<br/>
-	 * </pre>
 	 */
 	public static void addIntegration(Context context, String integration, Map<String, String> config) {
 		if (integration == null || config == null)  {
@@ -261,11 +268,115 @@ public class Apptentive {
 			for (String key : config.keySet()) {
 				configJson.put(key, config.get(key));
 			}
+			Log.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
 		} catch (JSONException e) {
 			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
 	}
+
+	/**
+	 * Configures Apptentive to work with Urban Airship push notifications. You must first set up your app to work with
+	 * Urban Airship to use this integration. This method must be called when you finish initializing Urban Airship. Since
+	 * Urban Airship creates an APID after it connects to its server, the APID may be null at first. The preferred method
+	 * of retrieving the APID is to listen to the <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your
+	 * {@link android.content.BroadcastReceiver}. You can alternately find the APID by calling
+	 * <code>PushManager.shared().getAPID()</code>.
+	 * <p/>
+	 * Note: Initializing Urban Airship may take a few seconds. You may need to close and reopen the app in order to force
+	 * the APID to be sent to our server. Push notifications will not be delivered to this app install until our server
+	 * receives the APID.
+	 *
+	 * @param context The Context from which this method is called.
+	 * @param apid    The Airship Push ID for (APID).
+	 */
+	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
+		if (apid != null) {
+			Map<String, String> config = new HashMap<String, String>();
+			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_APID, apid);
+			Apptentive.addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
+			Log.i("Setting Urban Airship APID: %s", apid);
+		}
+	}
+
+
+	// ****************************************************************************************
+	// PUSH NOTIFICATIONS
+	// ****************************************************************************************
+
+	private static final String PUSH_ACTION = "action";
+
+	private static enum PushAction {
+		pmc,       // Present Message Center.
+		unknown;   // Anything unknown will not be handled.
+
+		public static PushAction parse(String name) {
+			try {
+				return PushAction.valueOf(name);
+			} catch (IllegalArgumentException e) {
+				Log.d("Error parsing unknown PushAction: " + name);
+			}
+			return unknown;
+		}
+	}
+
+	/**
+	 * The key that is used to store extra data on an Apptentive push notification.
+	 */
+	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
+
+	/**
+	 * Launches Apptentive features based on a push notification Intent. A push notification Intent containing extra
+	 * string data with key {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY} will be processed. This extra data will be
+	 * be removed from the Intent when you call this method to avoid running it twice. Calling this method with other
+	 * Intents will have no affect.
+	 *
+	 * @param activity The Activity from which this method is called.
+	 * @param intent   The Intent you used to launch your app from the push notification.
+	 * @return True if a call to this method resulted in Apptentive displaying a View.
+	 */
+	public static boolean handleOpenedPushNotification(Activity activity, Intent intent) {
+		if (intent != null) {
+			Bundle extras = intent.getExtras();
+			if (extras != null) {
+				String pushData = extras.getString(APPTENTIVE_PUSH_EXTRA_KEY);
+				if (pushData != null) {
+					Log.i("Handling Apptentive Push Intent.");
+					try {
+						JSONObject pushJson = new JSONObject(pushData);
+						PushAction action = PushAction.unknown;
+						if (pushJson.has(PUSH_ACTION)) {
+							action = PushAction.parse(pushJson.getString(PUSH_ACTION));
+						}
+						switch (action) {
+							case pmc:
+								intent.removeExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY); // Remove our data so this won't run twice.
+								Apptentive.showMessageCenter(activity);
+								return true;
+							default:
+								Log.d("Unknown Push Notification Action \"%s\"", action.name());
+						}
+					} catch (JSONException e) {
+						Log.w("Error parsing JSON from push notification.", e);
+						MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Determines whether this push was sent by Apptentive. Apptentive push notifications will result in an Intent
+	 * containing a string extra key of {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY}.
+	 *
+	 * @param intent The intent you received in your BroadcastReceiver.
+	 * @return True if the Intent contains Apptentive push information.
+	 */
+	public static boolean isApptentivePushIntent(Intent intent) {
+		return intent != null && intent.getExtras() != null && intent.getExtras().getString(APPTENTIVE_PUSH_EXTRA_KEY) != null;
+	}
+
 
 	// ****************************************************************************************
 	// RATINGS
@@ -408,6 +519,7 @@ public class Apptentive {
 		return false;
 	}
 
+
 	// ****************************************************************************************
 	// INTERNAL METHODS
 	// ****************************************************************************************
@@ -545,6 +657,7 @@ public class Apptentive {
 
 		// Finally, ensure the send worker is running.
 		PayloadSendWorker.start(context);
+		Log.d("Conversation Token: %s", GlobalInfo.conversationToken);
 	}
 
 	private static void onVersionChanged(Context context, @SuppressWarnings("unused") int previousVersion, @SuppressWarnings("unused") int currentVersion) {

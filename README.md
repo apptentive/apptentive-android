@@ -303,9 +303,9 @@ To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailab
 public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
 ```
 
-#### Extra Configuration (Optional)
+### Optional Configuration
 
-##### Support for Amazon Appstore
+#### Support for Amazon Appstore
 
 If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
 there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
@@ -316,7 +316,7 @@ Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 If you omit this line, ratings will go to Google Play.
 
-##### Specifying the User's Email Address
+#### Specifying the User's Email Address
 
 If you are authorized to access the user's email address, you may specify it during initialization so that in the event
 the user does not respond in-app, your message can still get to them via email. Note that if ths user updates their
@@ -334,7 +334,7 @@ public static void Apptentive.setInitialUserEmail(Context context, String email)
 Apptentive.setUserEmail(this, "johndoe@example.com");
 ```
 
-##### Send Custom Device Data to Apptentive
+#### Send Custom Device Data to Apptentive
 
 You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
 key/value string pairs.
@@ -363,7 +363,7 @@ public static void Apptentive.removeCustomDeviceData(Context context, String key
 Apptentive.removeCustomDeviceData(this, "myDeviceId");
 ```
 
-##### Send Custom Person Data to Apptentive
+#### Send Custom Person Data to Apptentive
 
 You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
 Data must be key/value string pairs.
@@ -392,28 +392,66 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
-##### Urban Airship Integration
-If you would like Apptentive to send a push notification when there are unread messages waiting for your user, pass
-Apptentive the Urban Airship App ID token received from `PushManager.shared().getAPID()`. This method should ideally be
-called in your main Activity's `onCreate()` method.
+### Third Party Integrations
+Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
+Urban Airship is the only provider currently supported. A push notification is useful for notifying your users that they
+have received a new message while they are not using your app. Push notifications are optional, and messages will still
+be delivered when the user opens the app, even if you do not use them.
 
-*Note: Check this token for null before passing it in.
+#### Urban Airship Integration
+
+##### Sending the Urban Airship APID
+
+To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
+ initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
 
 ###### Method
 ```java
-Apptentive.addIntegration(Context context, String integration, Map<String, String> config);
+Apptentive.addUrbanAirshipPushIntegration(Context context, String apid);
 ```
 
 ###### Example
 ```java
-String  appId = PushManager.shared().getAPID();
-if (appId != null) {
-    Map<String, String> config = new HashMap<String, String>;
-    config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_TOKEN, appId);
-    Apptentive.addIntegration(this, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
+String  apid = PushManager.shared().getAPID();
+Apptentive.addUrbanAirshipPushIntegration(this, apid);
+```
+
+##### Constructing the Push Intent
+
+If a push notification was sent by Apptentive, the Intent you receive in your BroadcastReceiver when the user taps a it
+will contain an extra piece of data supplied by Apptentive. This data is stored under the key `APPTENTIVE_PUSH_EXTRA_KEY`.
+You will need to copy it from the Intent that you receive in your BroadcastReceiver to the Intent you create to launch
+your Activity.
+
+###### Example
+```java
+Bundle extras = receivedIntent.getExtras();
+if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
+    newIntent.putExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY));
 }
 ```
 
+##### Passing Apptentive the Push Intent
+
+Next, in the Activity that you launched, you will need to pass the Intent into Apptentive so that we can launch the
+appropriate UI.
+
+###### Method
+```
+public boolean Apptentive.handleOpenedPushNotification(Activity activity, Intent intent);
+```
+
+###### Example
+```
+@Override
+protected void onStart() {
+	super.onStart();
+	Intent intent = getIntent();
+	if (Apptentive.isApptentivePushIntent(intent)) {
+		Apptentive.handleOpenedPushNotification(this, intent);
+	}
+}
+```
 ---
 
 ### Building from the command line and with CI
