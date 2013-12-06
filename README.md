@@ -437,12 +437,12 @@ Next, in the Activity that you launched, you will need to pass the Intent into A
 appropriate UI.
 
 ###### Method
-```
+```java
 public boolean Apptentive.handleOpenedPushNotification(Activity activity, Intent intent);
 ```
 
 ###### Example
-```
+```java
 @Override
 protected void onStart() {
 	super.onStart();
