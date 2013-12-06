@@ -1,7 +1,15 @@
 This document tracks changes to the API between versions.
 
 
+# next
+
 # 1.2.3
+| New Methods |
+| ----------- |
+| `public static void addIntegration(Context context, String integration, Map<String, String> config)` |
+| `public static void addUrbanAirshipPushIntegration(Context context, String apid)` |
+| `public static void handleOpenedPushNotification(Activity activity, Intent intent)` |
+| `public static boolean isApptentivePushNotification(Intent intent)` |
 
 ###### Changes
 | Old Method Signature | New Method Signature |

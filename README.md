@@ -447,7 +447,7 @@ public boolean Apptentive.handleOpenedPushNotification(Activity activity, Intent
 protected void onStart() {
 	super.onStart();
 	Intent intent = getIntent();
-	if (Apptentive.isApptentivePushIntent(intent)) {
+	if (Apptentive.isApptentivePushNotification(intent)) {
 		Apptentive.handleOpenedPushNotification(this, intent);
 	}
 }

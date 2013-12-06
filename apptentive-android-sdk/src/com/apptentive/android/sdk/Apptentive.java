@@ -367,13 +367,13 @@ public class Apptentive {
 	}
 
 	/**
-	 * Determines whether this push was sent by Apptentive. Apptentive push notifications will result in an Intent
+	 * Determines whether a push was sent by Apptentive. Apptentive push notifications will result in an Intent
 	 * containing a string extra key of {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY}.
 	 *
-	 * @param intent The intent you received in your BroadcastReceiver.
+	 * @param intent The push notification Intent you received in your BroadcastReceiver.
 	 * @return True if the Intent contains Apptentive push information.
 	 */
-	public static boolean isApptentivePushIntent(Intent intent) {
+	public static boolean isApptentivePushNotification(Intent intent) {
 		return intent != null && intent.getExtras() != null && intent.getExtras().getString(APPTENTIVE_PUSH_EXTRA_KEY) != null;
 	}
 
