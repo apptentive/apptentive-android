@@ -325,6 +325,17 @@ public class Apptentive {
 	 */
 	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
 
+	public static void setPendingPushNotification(Context context, Intent intent) {
+		if (intent != null) {
+			Bundle extras = intent.getExtras();
+			if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
+				String extra = extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, extra).commit();
+			}
+		}
+	}
+
 	/**
 	 * Launches Apptentive features based on a push notification Intent. A push notification Intent containing extra
 	 * string data with key {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY} will be processed. This extra data will be
@@ -332,35 +343,30 @@ public class Apptentive {
 	 * Intents will have no affect.
 	 *
 	 * @param activity The Activity from which this method is called.
-	 * @param intent   The Intent you used to launch your app from the push notification.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
 	 */
-	public static boolean handleOpenedPushNotification(Activity activity, Intent intent) {
-		if (intent != null) {
-			Bundle extras = intent.getExtras();
-			if (extras != null) {
-				String pushData = extras.getString(APPTENTIVE_PUSH_EXTRA_KEY);
-				if (pushData != null) {
-					Log.i("Handling Apptentive Push Intent.");
-					try {
-						JSONObject pushJson = new JSONObject(pushData);
-						PushAction action = PushAction.unknown;
-						if (pushJson.has(PUSH_ACTION)) {
-							action = PushAction.parse(pushJson.getString(PUSH_ACTION));
-						}
-						switch (action) {
-							case pmc:
-								intent.removeExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY); // Remove our data so this won't run twice.
-								Apptentive.showMessageCenter(activity);
-								return true;
-							default:
-								Log.d("Unknown Push Notification Action \"%s\"", action.name());
-						}
-					} catch (JSONException e) {
-						Log.w("Error parsing JSON from push notification.", e);
-						MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
-					}
+	public static boolean handleOpenedPushNotification(Activity activity) {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
+		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
+		if (pushData != null) {
+			Log.i("Handling Apptentive Push Intent.");
+			try {
+				JSONObject pushJson = new JSONObject(pushData);
+				PushAction action = PushAction.unknown;
+				if (pushJson.has(PUSH_ACTION)) {
+					action = PushAction.parse(pushJson.getString(PUSH_ACTION));
 				}
+				switch (action) {
+					case pmc:
+						Apptentive.showMessageCenter(activity);
+						return true;
+					default:
+						Log.v("Unknown Push Notification Action \"%s\"", action.name());
+				}
+			} catch (JSONException e) {
+				Log.w("Error parsing JSON from push notification.", e);
+				MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
 			}
 		}
 		return false;
