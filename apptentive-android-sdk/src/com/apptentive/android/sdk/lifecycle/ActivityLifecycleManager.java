@@ -34,13 +34,16 @@ import java.util.*;
  * time since that stop, we decide the new start constitutes a new app use.
  * <p/>
  * The logic is further complicated because the order that Activities call their onStart() and onStop() can not be
- * relied on. Sometimes is may be A.onStart(), A.onStop(), B.onStart(), B.onStop(), and sometimes it mey be A.onStart(),
+ * relied on. Sometimes it may be A.onStart(), A.onStop(), B.onStart(), B.onStop(), and sometimes it mey be A.onStart(),
  * B.onStart(), A.onStop(), B.onStop().
  * <p/>
  * Additionally, we have to provide a way to detect when the app has crashed, and reset the queue. But because of our
- * innability to be sure what the actual ordering of the events is, we can't tell an app has crashed until the second
+ * inability to be sure what the actual ordering of the events is, we can't tell an app has crashed until the second
  * time an Activity.onStart() is called after the crash. We need to see that there are two onStart() calls
- * that are missing their correspongin onStop() calls (one from before the crash, one from after).
+ * that are missing their corresponding onStop() calls (one from before the crash, one from after). Caveat: If a push
+ * notification for this app is opened while the app is running, a crash will be detected. This is due to the fact that
+ * certain Activity start/stop behavior is ambiguous. Erring on the side of this case being a crash is necessary so that
+ * when the app is operating normally without crashes and push notifications, we can trust the data.
  * <p/>
  * There are two implementations for queue storage. One is backed by SQLite, but it was too slow. The one we use is
  * backed by SharedPreferences, and is much faster.
