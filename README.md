@@ -416,40 +416,36 @@ String  apid = PushManager.shared().getAPID();
 Apptentive.addUrbanAirshipPushIntegration(this, apid);
 ```
 
-##### Constructing the Push Intent
-
-If a push notification was sent by Apptentive, the Intent you receive in your BroadcastReceiver when the user taps a it
-will contain an extra piece of data supplied by Apptentive. This data is stored under the key `APPTENTIVE_PUSH_EXTRA_KEY`.
-You will need to copy it from the Intent that you receive in your BroadcastReceiver to the Intent you create to launch
-your Activity.
-
-###### Example
-```java
-Bundle extras = receivedIntent.getExtras();
-if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
-    newIntent.putExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY));
-}
-```
-
 ##### Passing Apptentive the Push Intent
 
-Next, in the Activity that you launched, you will need to pass the Intent into Apptentive so that we can launch the
-appropriate UI.
+When the user opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always pass
+that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
 
 ###### Method
 ```java
-public boolean Apptentive.handleOpenedPushNotification(Activity activity, Intent intent);
+public static void setPendingPushNotification(Context context, Intent intent);
+```
+
+##### Running the Apptentive Push UI
+
+Next, in the Activity that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
+push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
+met, then we will perform an action. This is generally to show a UI, such as Message Center. If we show a UI, this
+method will return true, else false. This method is a noop if the push notification was not from Apptentive.
+
+###### Method
+```java
+public boolean Apptentive.handleOpenedPushNotification(Activity activity);
 ```
 
 ###### Example
 ```java
 @Override
-protected void onStart() {
-	super.onStart();
-	Intent intent = getIntent();
-	if (Apptentive.isApptentivePushNotification(intent)) {
-		Apptentive.handleOpenedPushNotification(this, intent);
-	}
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        boolean ranApptentive = Apptentive.handleOpenedPushNotification(this);
+    }
 }
 ```
 ---

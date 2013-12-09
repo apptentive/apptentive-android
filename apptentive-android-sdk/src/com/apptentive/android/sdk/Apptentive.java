@@ -325,6 +325,14 @@ public class Apptentive {
 	 */
 	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
 
+	/**
+	 * Saves Apptentive specific data form a push notification Intent. In your BroadcastReceiver, if the push notification
+	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
+	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
+	 * notification did not come from Apptentive, this method has no effect.
+	 * @param context The Context from which this method is called.
+	 * @param intent The Intent that you received when the user opened a push notification.
+	 */
 	public static void setPendingPushNotification(Context context, Intent intent) {
 		if (intent != null) {
 			Bundle extras = intent.getExtras();
@@ -337,10 +345,11 @@ public class Apptentive {
 	}
 
 	/**
-	 * Launches Apptentive features based on a push notification Intent. A push notification Intent containing extra
-	 * string data with key {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY} will be processed. This extra data will be
-	 * be removed from the Intent when you call this method to avoid running it twice. Calling this method with other
-	 * Intents will have no affect.
+	 * Launches Apptentive features based on a push notification Intent. Before you call this, you must call
+	 * {@link Apptentive#setPendingPushNotification(Context, Intent)} in your Broadcast receiver when a push notification
+	 * is opened by the user. Call this method must be called from the Activity that you launched from the
+	 * BroadcastReceiver. This method will only handle Apptentive originated push notifications, so call is anytime you
+	 * receive a push.
 	 *
 	 * @param activity The Activity from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
