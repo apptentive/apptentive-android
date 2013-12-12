@@ -94,6 +94,7 @@ public class Event extends ConversationItem {
 		enjoyment_dialog__launch("enjoyment_dialog.launch"),
 		enjoyment_dialog__yes("enjoyment_dialog.yes"),
 		enjoyment_dialog__no("enjoyment_dialog.no"),
+		enjoyment_dialog__cancel("enjoyment_dialog.cancel"),
 
 		rating_dialog__launch("rating_dialog.launch"),
 		rating_dialog__rate("rating_dialog.rate"),

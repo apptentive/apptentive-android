@@ -151,7 +151,16 @@ public class RatingModule {
 		String appDisplayName = Configuration.load(activity).getAppDisplayName();
 		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), appDisplayName);
 		dialog.setTitle(title);
-		dialog.setCancelable(false);
+		dialog.setCancelable(true);
+		dialog.setCanceledOnTouchOutside(false);
+
+		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialogInterface) {
+				setState(prefs, RatingState.POSTPONE);
+				MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__cancel);
+			}
+		});
 
 		dialog.setOnChoiceMadeListener(new EnjoymentDialog.OnChoiceMadeListener() {
 			@Override
