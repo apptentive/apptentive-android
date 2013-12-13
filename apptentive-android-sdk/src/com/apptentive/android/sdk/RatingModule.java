@@ -43,7 +43,9 @@ public class RatingModule {
 	// ********************************************* Static ********************************************
 	// *************************************************************************************************
 
-	private static RatingModule instance = null;
+	private static boolean ratingFlowVisible;
+
+	private static RatingModule instance;
 
 	static RatingModule getInstance() {
 		if (instance == null) {
@@ -146,12 +148,23 @@ public class RatingModule {
 	}
 
 	void showEnjoymentDialog(final Activity activity, Trigger reason) {
+		ratingFlowVisible = true;
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final EnjoymentDialog dialog = new EnjoymentDialog(activity);
 		String appDisplayName = Configuration.load(activity).getAppDisplayName();
 		String title = String.format(activity.getString(R.string.apptentive_do_you_love_this_app), appDisplayName);
 		dialog.setTitle(title);
-		dialog.setCancelable(false);
+
+		dialog.setCancelable(true);
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialogInterface) {
+				setState(prefs, RatingState.POSTPONE);
+				MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__cancel);
+				ratingFlowVisible = false;
+			}
+		});
 
 		dialog.setOnChoiceMadeListener(new EnjoymentDialog.OnChoiceMadeListener() {
 			@Override
@@ -181,12 +194,32 @@ public class RatingModule {
 	 * @param activity The activity from which this method was called.
 	 */
 	void forceShowRatingDialog(final Activity activity) {
+		ratingFlowVisible = true;
 		final SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		final RatingDialog dialog = new RatingDialog(activity);
 
 		String appDisplayName = Configuration.load(activity).getAppDisplayName();
 		dialog.setBody(activity.getString(R.string.apptentive_rating_message_fs, appDisplayName));
 		dialog.setRateButtonText(activity.getString(R.string.apptentive_rate_this_app, appDisplayName));
+
+		dialog.setCancelable(true);
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialogInterface) {
+				ratingFlowVisible = false;
+				MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__cancel);
+				setState(prefs, RatingState.POSTPONE);
+			}
+		});
+
+		// Called no matter how this dialog is exited.
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialogInterface) {
+				ratingFlowVisible = false;
+			}
+		});
 
 		dialog.setOnChoiceMadeListener(new RatingDialog.OnChoiceMadeListener() {
 			@Override
@@ -246,7 +279,6 @@ public class RatingModule {
 			}
 		});
 		MetricModule.sendMetric(activity, Event.EventLabel.rating_dialog__launch);
-		dialog.setCancelable(false);
 		dialog.show();
 	}
 
@@ -258,6 +290,11 @@ public class RatingModule {
 	 * @param activity The activityContext from which this method was called.
 	 */
 	boolean run(Activity activity) {
+		// If the dialog is already being shown, return true so we don't make the host app think otherwise.
+		if (ratingFlowVisible) {
+			Log.e("Duplicate call to Apptentive.showRatingFlowIfConditionsAreMet().");
+			return true;
+		}
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration config = Configuration.load(prefs);
 		if (!config.isRatingsEnabled()) {
