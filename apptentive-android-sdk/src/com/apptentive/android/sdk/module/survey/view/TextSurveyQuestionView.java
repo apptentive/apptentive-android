@@ -55,7 +55,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 				if (answers.isEmpty() || (!answers.isEmpty() && !answers.contains(editable.toString()))) {
 					state.clearAnswers(questionId);
 					if (editable.length() != 0) {
-						state.addAnswer(questionId, editable.toString());
+						state.addAnswer(questionId, editable.toString().trim());
 					}
 					updateValidationState();
 					fireListener();
