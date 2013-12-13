@@ -1,3 +1,15 @@
+2013-??-?? skykelsey next
+--------------------------
+
+Major changes:
+
+Slightly modified the behavior of the rating flow. The user can now close the rating flow by pressing the back button. This should create a less intrusive experience for the people using your app.
+Bugs Fixed:
+
+* ANDROID-201 Survey targeting doesn't work until after survey cache expires.
+* ANDROID-223 Trim Survey text responses
+* Fixed a bug where the rating flow could launch twice, especially on devices running KitKat.
+
 2013-11-13 skykelsey 1.2.3
 --------------------------
 

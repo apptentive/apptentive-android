@@ -13,7 +13,7 @@ import android.view.ViewGroup;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.2.3";
+	public static final String APPTENTIVE_SDK_VERSION = "1.2.4";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
@@ -25,6 +25,7 @@ public class Constants {
 
 	public static final String PREF_KEY_DEVICE = "device";
 	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
+	public static final String PREF_KEY_DEVICE_DATA_SENT = "deviceDataSent"; // Keeps track of whether we have ever sent device data.
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
