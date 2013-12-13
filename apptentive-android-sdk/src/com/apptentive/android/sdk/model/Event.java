@@ -100,6 +100,7 @@ public class Event extends ConversationItem {
 		rating_dialog__rate("rating_dialog.rate"),
 		rating_dialog__remind("rating_dialog.remind"),
 		rating_dialog__decline("rating_dialog.decline"),
+		rating_dialog__cancel("rating_dialog.cancel"),
 
 		survey__launch("survey.launch"),
 		survey__cancel("survey.cancel"),
