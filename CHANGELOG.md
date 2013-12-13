@@ -13,6 +13,7 @@ Major changes:
 Major changes:
 
 Slightly modified the behavior of the rating flow. The user can now close the rating flow by pressing the back button. This should create a less intrusive experience for the people using your app.
+
 Bugs Fixed:
 
 * ANDROID-201 Survey targeting doesn't work until after survey cache expires.
