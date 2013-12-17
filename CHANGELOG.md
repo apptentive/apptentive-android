@@ -1,4 +1,4 @@
-2013-??-?? skykelsey  ua
+2013-12-17 skykelsey  1.2.5
 --------------------------
 
 Major changes:
@@ -7,7 +7,7 @@ Major changes:
 * Add the ability to pass push notification intents into Apptentive code, and have Apptentive perform actions. Push integration currently supports Urban Airship, and can be configured in your app settings.
 * ANDROID-224 Allow survey thank you dialog to contain links.
 
-2013-??-?? skykelsey next
+2013-12-12 skykelsey 1.2.4
 --------------------------
 
 Major changes:
