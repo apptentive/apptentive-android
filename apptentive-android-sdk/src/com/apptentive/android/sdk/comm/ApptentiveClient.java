@@ -63,6 +63,8 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
 
+	private static final String ENDPOINT_INTERACTIONS = ENDPOINT_BASE + "/interactions";
+
 	// Deprecated API
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 
@@ -128,6 +130,10 @@ public class ApptentiveClient {
 	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
 		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
+	}
+
+	public static ApptentiveHttpResponse getInteractions() {
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
