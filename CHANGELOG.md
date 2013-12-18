@@ -1,4 +1,4 @@
-2013-??-?? skykelsey next
+2013-12-12 skykelsey 1.2.4
 --------------------------
 
 Major changes:
