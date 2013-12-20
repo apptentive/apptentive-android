@@ -120,4 +120,8 @@ public class TestsActivity extends ApptentiveActivity {
 		}
 		Apptentive.showMessageCenter(this, customData);
 	}
+
+	public void testEngage(@SuppressWarnings("unused") View view) {
+		Apptentive.engage(this, "test_code_point");
+	}
 }

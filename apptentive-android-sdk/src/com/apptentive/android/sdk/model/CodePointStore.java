@@ -15,8 +15,9 @@ import org.json.JSONObject;
  */
 public class CodePointStore extends JSONObject {
 
-	private static final String KEY_TOTAL = "total";
-	private static final String KEY_LAST_OCCURED = "last_occured";
+	private static final String KEY_LAST = "last"; // The last time this codepoint was seen.
+	private static final String KEY_VERSION = "version";
+	private static final String KEY_BUILD = "build";
 
 	private static CodePointStore instance;
 
@@ -59,39 +60,60 @@ public class CodePointStore extends JSONObject {
 
 	public static synchronized void storeCodePointForCurrentAppVersion(Context context, String name) {
 		String version = Util.getAppVersionName(context);
-		storeCodePoint(context, name, version);
+		int build = Util.getAppVersionCode(context);
+		storeCodePoint(context, name, version, build);
 	}
 
-	public static synchronized void storeCodePoint(Context context, String name, String version) {
+	public static synchronized void storeCodePoint(Context context, String name, String version, int build) {
+		String buildString = String.valueOf(build);
 		CodePointStore store = getInstance(context);
 		if (store != null && name != null && version != null) {
 			try {
-				// If the code point name is unknown, create it.
-				JSONObject codePointsForName = null;
-				if (store.isNull(name)) {
-					codePointsForName = new JSONObject();
-					store.put(name, codePointsForName);
+				// Get or create code point object.
+				JSONObject codePointJson = null;
+				if (!store.isNull(name)) {
+					codePointJson = store.getJSONObject(name);
+				} else {
+					codePointJson = new JSONObject();
+					store.put(name, codePointJson);
 				}
-				codePointsForName = store.getJSONObject(name);
 
-				// If the code point version is unknown, create it.
-				JSONObject codePointsForNameAndVersion = null;
-				if (codePointsForName.isNull(version)) {
-					codePointsForNameAndVersion = new JSONObject();
-					codePointsForName.put(version, codePointsForNameAndVersion);
+				// Set the last time this code point was seen to the current time.
+				codePointJson.put(KEY_LAST, Util.getCurrentTime());
+
+				// Get or create version object.
+				JSONObject versionJson = null;
+				if (!codePointJson.isNull(KEY_VERSION)) {
+					versionJson = codePointJson.getJSONObject(KEY_VERSION);
+				} else {
+					versionJson = new JSONObject();
+					codePointJson.put(KEY_VERSION, versionJson);
 				}
-				codePointsForNameAndVersion = codePointsForName.getJSONObject(version);
 
-				// Set the actual information for this code point. Total and last update.
-				int total = 0;
-				if (!codePointsForNameAndVersion.isNull(KEY_TOTAL)) {
-					total = codePointsForNameAndVersion.getInt(KEY_TOTAL);
+				// Set count for current version.
+				int existingVersionCount = 0;
+				if (!versionJson.isNull(version)) {
+					existingVersionCount = versionJson.getInt(version);
 				}
-				codePointsForNameAndVersion.put(KEY_TOTAL, total + 1);
+				versionJson.put(version, existingVersionCount + 1);
 
-				codePointsForNameAndVersion.put(KEY_LAST_OCCURED, Util.getCurrentTime());
+				// Get or create build object.
+				JSONObject buildJson = null;
+				if (!codePointJson.isNull(KEY_BUILD)) {
+					buildJson = codePointJson.getJSONObject(KEY_BUILD);
+				} else {
+					buildJson = new JSONObject();
+					codePointJson.put(KEY_BUILD, buildJson);
+				}
+
+				// Set count for the current build
+				int existingBuildCount = 0;
+				if (!buildJson.isNull(buildString)) {
+					existingBuildCount = buildJson.getInt(buildString);
+				}
+				buildJson.put(buildString, existingBuildCount + 1);
+
 				save(context);
-				// TODO: Test this out.
 			} catch (JSONException e) {
 				Log.w("Unable to store code point %s.", e, name);
 			}
@@ -99,4 +121,8 @@ public class CodePointStore extends JSONObject {
 	}
 
 	// TODO: Methods for retrieving metrics for a given code point.
+
+	public static void printDebug(Context context) {
+		Log.e("CodePointStore:  %s", getInstance(context).toString());
+	}
 }

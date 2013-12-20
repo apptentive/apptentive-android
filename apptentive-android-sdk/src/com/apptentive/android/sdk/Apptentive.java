@@ -378,10 +378,11 @@ public class Apptentive {
 	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static boolean engage(Activity activity, String codePoint) {
+	public static synchronized boolean engage(Activity activity, String codePoint) {
 		CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-		InteractionManager.loadInteraction(activity.getApplicationContext(), codePoint);
-		// TODO: Return the proper value.
+		CodePointStore.printDebug(activity.getApplicationContext());
+		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
+		// TODO: Use the interaction, and return the proper value.
 		return false;
 	}
 

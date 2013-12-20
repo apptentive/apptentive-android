@@ -42,7 +42,7 @@ public class InteractionBindingTest extends AndroidTestCase {
 		Interactions interactionsList = null;
 		try {
 			interactionsList = new Interactions(INTERACTIONS_WITH_SINGLE_UPGRADEMESSAGE);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractions("app.launch");
+			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
 			assertNotNull("Failed to parse Interactions with single UpgradeMessage.", interactionsList);
 			for (Interaction interaction : interactionsForCodePoint) {
 				String id = interaction.getId();

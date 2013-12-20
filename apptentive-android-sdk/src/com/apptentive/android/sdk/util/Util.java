@@ -329,6 +329,17 @@ public class Util {
 		return null;
 	}
 
+	public static int getAppVersionCode(Context context) {
+		try {
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			return packageInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			Log.e("Error getting app version code.", e);
+		}
+		return -1;
+	}
+
 	/**
 	 * Converts the current time to a double representing seconds, instead of milliseconds. It will have millisecond
 	 * precision as fractional seconds. This is the default time format used throughout the Apptentive SDK.

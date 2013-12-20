@@ -18,10 +18,11 @@ public class Interactions extends JSONObject {
 		super(json);
 	}
 
-	public List<Interaction> getInteractions(String codePoint) {
+	public List<Interaction> getInteractionList(String codePoint) {
 		List<Interaction> ret = new ArrayList<Interaction>();
 		try {
 			JSONObject interactions = getJSONObject(KEY_INTERACTIONS);
+			Log.e("Interactions for %: %s", codePoint, interactions.toString());
 			if(!interactions.isNull(codePoint)) {
 				JSONArray interactionsForCodePoint = interactions.getJSONArray(codePoint);
 				for (int i = 0; i < interactionsForCodePoint.length(); i++) {

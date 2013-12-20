@@ -17,7 +17,6 @@ import org.json.JSONException;
  */
 public class InteractionManager {
 
-
 	public static void asyncFetchAndStoreInteractions(final Context context) {
 
 		if (hasCacheExpired(context)) {
@@ -48,6 +47,8 @@ public class InteractionManager {
 		if (response != null && response.isSuccessful()) {
 			String interactionsString = response.getContent();
 
+			Log.d("Interactions: %s", interactionsString);
+
 			// Store new integration cache expiration.
 			String cacheControl = response.getHeaders().get("Cache-Control");
 			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
@@ -58,18 +59,20 @@ public class InteractionManager {
 			storeInteractions(context, interactionsString);		}
 	}
 
-	public static Interaction loadInteraction(Context context, String codePoint) {
+	public static Interaction getApplicableInteraction(Context context, String codePoint) {
+		Interactions interactions = loadInteractions(context);
+        // TODO
 		return null;
 	}
 
-	public static void recordInteraction(String interaction) {
-
+	private static String loadInteractionsString(Context context) {
+		Log.d("Loading interactions.");
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		return prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 	}
 
 	private static Interactions loadInteractions(Context context) {
-		Log.d("Loading interactions.");
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String interactionsString = prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
+		String interactionsString = loadInteractionsString(context);
 		if (interactionsString != null) {
 			try {
 				return new Interactions(interactionsString);
