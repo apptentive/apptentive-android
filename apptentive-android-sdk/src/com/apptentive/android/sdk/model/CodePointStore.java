@@ -15,6 +15,8 @@ import org.json.JSONObject;
  */
 public class CodePointStore extends JSONObject {
 
+	private static final String KEY_CODE_POINT = "code_point";
+	private static final String KEY_INTERACTION = "interaction";
 	private static final String KEY_LAST = "last"; // The last time this codepoint was seen.
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_BUILD = "build";
@@ -59,23 +61,40 @@ public class CodePointStore extends JSONObject {
 	}
 
 	public static synchronized void storeCodePointForCurrentAppVersion(Context context, String name) {
-		String version = Util.getAppVersionName(context);
-		int build = Util.getAppVersionCode(context);
-		storeCodePoint(context, name, version, build);
+		storeRecordForCurrentAppVersion(context, false, name);
 	}
 
-	public static synchronized void storeCodePoint(Context context, String name, String version, int build) {
+	public static synchronized void storeInteractionForCurrentAppVersion(Context context, String name) {
+		storeRecordForCurrentAppVersion(context, false, name);
+	}
+
+	private static void storeRecordForCurrentAppVersion(Context context, boolean interaction, String name) {
+		String version = Util.getAppVersionName(context);
+		int build = Util.getAppVersionCode(context);
+		storeRecord(context, interaction, name, version, build);
+	}
+
+	private static void storeRecord(Context context, boolean interaction, String name, String version, int build) {
 		String buildString = String.valueOf(build);
 		CodePointStore store = getInstance(context);
 		if (store != null && name != null && version != null) {
 			try {
+				String recordTypeKey = interaction ? KEY_INTERACTION : KEY_CODE_POINT;
+				JSONObject recordType = null;
+				if (!store.isNull(recordTypeKey)) {
+					recordType = store.getJSONObject(recordTypeKey);
+				} else {
+					recordType = new JSONObject();
+					store.put(recordTypeKey, recordType);
+				}
+
 				// Get or create code point object.
 				JSONObject codePointJson = null;
-				if (!store.isNull(name)) {
-					codePointJson = store.getJSONObject(name);
+				if (!recordType.isNull(name)) {
+					codePointJson = recordType.getJSONObject(name);
 				} else {
 					codePointJson = new JSONObject();
-					store.put(name, codePointJson);
+					recordType.put(name, codePointJson);
 				}
 
 				// Set the last time this code point was seen to the current time.

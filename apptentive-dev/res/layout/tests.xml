@@ -156,7 +156,11 @@
                 <Button android:layout_width="fill_parent"
                         android:layout_height="48dp"
                         android:onClick="testEngage"
-                        android:text="Call engage(): 'test_code_point'"/>
+                        android:text="Trigger Code Point"/>
+                <Button android:layout_width="fill_parent"
+                        android:layout_height="48dp"
+                        android:onClick="storeInteraction"
+                        android:text="Trigger Interaction"/>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

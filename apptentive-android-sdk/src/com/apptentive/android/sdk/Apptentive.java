@@ -380,7 +380,6 @@ public class Apptentive {
 	 */
 	public static synchronized boolean engage(Activity activity, String codePoint) {
 		CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-		CodePointStore.printDebug(activity.getApplicationContext());
 		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
 		// TODO: Use the interaction, and return the proper value.
 		return false;

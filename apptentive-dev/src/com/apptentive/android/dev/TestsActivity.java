@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.EditText;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.storage.PersonManager;
 
@@ -122,6 +124,18 @@ public class TestsActivity extends ApptentiveActivity {
 	}
 
 	public void testEngage(@SuppressWarnings("unused") View view) {
+		long start = System.currentTimeMillis();
 		Apptentive.engage(this, "test_code_point");
+		long end = System.currentTimeMillis();
+		Log.e("Code point storage took %d millis", end - start);
+		CodePointStore.printDebug(getApplicationContext());
+	}
+
+	public void storeInteraction(@SuppressWarnings("unused") View view) {
+		long start = System.currentTimeMillis();
+		CodePointStore.storeInteractionForCurrentAppVersion(this, "test_interaction");
+		long end = System.currentTimeMillis();
+		Log.e("Interaction storage took %d millis", end - start);
+		CodePointStore.printDebug(getApplicationContext());
 	}
 }
