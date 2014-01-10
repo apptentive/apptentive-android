@@ -290,9 +290,11 @@ public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedL
 ```java
 Apptentive.showSurvey(
     this,
-    new OnSurveyCompletedListener() {
-        public void onSurveyCompletedListener() {
-            // Code that runs when the survey was successfully completed.
+    new OnSurveyFinishedListener() {
+        public void onSurveyFinishedListener(boolean completed) {
+            if (completed) {
+                // Code that runs when the survey was successfully completed.
+            }
         }
     },
     "completed_level_ten"
