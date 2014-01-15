@@ -5,12 +5,15 @@ import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.model.InteractionCriteria;
 import com.apptentive.android.sdk.model.Interactions;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
+
+import java.util.List;
 
 /**
  * @author Sky Kelsey
@@ -47,7 +50,7 @@ public class InteractionManager {
 		if (response != null && response.isSuccessful()) {
 			String interactionsString = response.getContent();
 
-			Log.d("Interactions: %s", interactionsString);
+			Log.d("Fetched interactions: %s", interactionsString);
 
 			// Store new integration cache expiration.
 			String cacheControl = response.getHeaders().get("Cache-Control");
@@ -56,17 +59,25 @@ public class InteractionManager {
 				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
 			}
 			updateCacheExpiration(context, cacheSeconds);
-			storeInteractions(context, interactionsString);		}
+			storeInteractions(context, interactionsString);
+		}
 	}
 
 	public static Interaction getApplicableInteraction(Context context, String codePoint) {
 		Interactions interactions = loadInteractions(context);
-        // TODO
+		if (interactions != null) {
+			List<Interaction> list = interactions.getInteractionList(codePoint);
+			for (Interaction interaction : list) {
+				InteractionCriteria criteria = interaction.getCriteria();
+				if (criteria.shouldRun(context)) {
+					return interaction;
+				}
+			}
+		}
 		return null;
 	}
 
 	private static String loadInteractionsString(Context context) {
-		Log.d("Loading interactions.");
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		return prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 	}
@@ -83,7 +94,10 @@ public class InteractionManager {
 		return null;
 	}
 
-	private static void storeInteractions(Context context, String interactionsString) {
+	/**
+	 * Made public for testing. There is no other reason to use this method directly.
+	 */
+	public static void storeInteractions(Context context, String interactionsString) {
 		Log.v("Storing interactions: " + interactionsString);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactionsString).commit();

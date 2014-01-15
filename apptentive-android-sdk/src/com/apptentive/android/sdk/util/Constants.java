@@ -36,6 +36,7 @@ public class Constants {
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
 	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
+	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
 	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
 	public static final String PREF_KEY_START_OF_RATING_PERIOD = "startOfRatingPeriod";
 	public static final String PREF_KEY_RATING_STATE = "ratingState";
@@ -53,10 +54,14 @@ public class Constants {
 	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
 	public static final String PREF_KEY_SURVEYS_HISTORY = "surveyHistory";
 
+	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
+
+	// Engagement
 	public static final String PREF_KEY_INTERACTIONS = "interactions";
 	public static final String PREF_KEY_INTERACTIONS_CACHE_EXPIRATION = "interactionsCacheExpiration";
 	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 
+	// Config Defaults
 	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
 	public static final int CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
@@ -70,11 +75,13 @@ public class Constants {
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 
+	// Manifest keys
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 
+	// View layout shortcuts
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 

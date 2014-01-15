@@ -1,6 +1,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,12 +25,21 @@ public class Interactions extends JSONObject {
 		List<Interaction> ret = new ArrayList<Interaction>();
 		try {
 			JSONObject interactions = getJSONObject(KEY_INTERACTIONS);
-			Log.e("Interactions for %: %s", codePoint, interactions.toString());
 			if(!interactions.isNull(codePoint)) {
 				JSONArray interactionsForCodePoint = interactions.getJSONArray(codePoint);
 				for (int i = 0; i < interactionsForCodePoint.length(); i++) {
-					Interaction interaction = new Interaction(interactionsForCodePoint.getJSONObject(i).toString());
-					ret.add(interaction);
+					String interactionString = interactionsForCodePoint.getJSONObject(i).toString();
+					Interaction.Type type = Interaction.getTypeForInteractionString(interactionString);
+					switch (type) {
+						case UpgradeMessage:
+							ret.add(new UpgradeMessageInteraction(interactionString));
+							break;
+						case RatingDialog:
+							ret.add(new RatingDialogInteraction(interactionString));
+							break;
+						case unknown:
+							break;
+					}
 				}
 			}
 		} catch (JSONException e) {
@@ -35,5 +47,4 @@ public class Interactions extends JSONObject {
 		}
 		return ret;
 	}
-
 }

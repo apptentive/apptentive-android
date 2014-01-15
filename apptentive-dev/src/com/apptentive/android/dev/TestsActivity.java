@@ -15,6 +15,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
@@ -123,19 +124,25 @@ public class TestsActivity extends ApptentiveActivity {
 		Apptentive.showMessageCenter(this, customData);
 	}
 
-	public void testEngage(@SuppressWarnings("unused") View view) {
+	public void engage(@SuppressWarnings("unused") View view) {
+		Spinner codePointSpinner = (Spinner) findViewById(R.id.code_point_spinner);
+		String codePoint = (String) codePointSpinner.getSelectedItem();
+		Log.e("Testing engage(%s)", codePoint);
 		long start = System.currentTimeMillis();
-		Apptentive.engage(this, "test_code_point");
+		Apptentive.engage(this, codePoint);
 		long end = System.currentTimeMillis();
 		Log.e("Code point storage took %d millis", end - start);
-		CodePointStore.printDebug(getApplicationContext());
+		Log.e(CodePointStore.toString(getApplicationContext()));
 	}
 
-	public void storeInteraction(@SuppressWarnings("unused") View view) {
+	public void interaction(@SuppressWarnings("unused") View view) {
+		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
+		String interaction = (String) interactionsSpinner.getSelectedItem();
+		Log.e("Testing engage(%s)", interaction);
 		long start = System.currentTimeMillis();
-		CodePointStore.storeInteractionForCurrentAppVersion(this, "test_interaction");
+		Apptentive.engage(this, interaction);
 		long end = System.currentTimeMillis();
 		Log.e("Interaction storage took %d millis", end - start);
-		CodePointStore.printDebug(getApplicationContext());
+		Log.e(CodePointStore.toString(getApplicationContext()));
 	}
 }

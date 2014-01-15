@@ -12,4 +12,12 @@
         <item>test_tag_2</item>
         <item>test_tag_3</item>
     </string-array>
+
+    <string-array name="code_points">
+        <item>app.launch</item>
+    </string-array>
+
+    <string-array name="interactions">
+        <item>none</item>
+    </string-array>
 </resources>

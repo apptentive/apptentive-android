@@ -1,13 +1,16 @@
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.app.Activity;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.InteractionConfiguration;
+import com.apptentive.android.sdk.model.InteractionCriteria;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * @author Sky Kelsey
  */
-public class Interaction extends JSONObject {
+public abstract class Interaction extends JSONObject {
 
 	private static final String KEY_ID = "id";
 	private static final String KEY_TYPE = "type";
@@ -20,6 +23,8 @@ public class Interaction extends JSONObject {
 	public Interaction(String json) throws JSONException {
 		super(json);
 	}
+
+	public abstract boolean run(Activity activity);
 
 	public String getId() {
 		try {
@@ -93,7 +98,7 @@ public class Interaction extends JSONObject {
 
 	public static enum Type {
 		UpgradeMessage,
-		EnjoymentDialog,
+		RatingDialog,
 		unknown;
 
 		public static Type parse(String type) {
@@ -106,4 +111,14 @@ public class Interaction extends JSONObject {
 		}
 	}
 
+	public static Type getTypeForInteractionString(String interactionString) {
+		try {
+			JSONObject interaction = new JSONObject(interactionString);
+			if (interaction.has(KEY_TYPE)) {
+				return Type.parse(interaction.getString(KEY_TYPE));
+			}
+		} catch (JSONException e) {
+		}
+		return Type.unknown;
+	}
 }

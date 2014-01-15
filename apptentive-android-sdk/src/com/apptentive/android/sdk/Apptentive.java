@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -379,12 +380,25 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String codePoint) {
-		CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
-		// TODO: Use the interaction, and return the proper value.
-		return false;
+		return engage(activity, codePoint, true);
 	}
 
+	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
+		Interaction interaction = null;
+		try {
+			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
+			if (runInteraction) {
+				interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
+				if (interaction != null) {
+					Log.e("Running interaction.");
+					return interaction.run(activity);
+				}
+			}
+		} catch (Exception e) {
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
+		return false;
+	}
 
 	// ****************************************************************************************
 	// INTERNAL METHODS
@@ -438,15 +452,15 @@ public class Apptentive {
 			try {
 				PackageManager packageManager = context.getPackageManager();
 				PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-				int currentVersionCode = packageInfo.versionCode;
+				Integer currentVersionCode = packageInfo.versionCode;
+				Integer previousVersionCode = null;
 				if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
-					int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
-					if(previousVersionCode != currentVersionCode) {
-						onVersionChanged(context, previousVersionCode, currentVersionCode);
-					}
-				} else {
-					// First start.
-					onVersionChanged(context, -1, currentVersionCode);
+					previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
+				}
+				String previousVersionName = prefs.getString(Constants.PREF_KEY_APP_VERSION_NAME, null);
+				String currentVersionName = packageInfo.versionName;
+				if(previousVersionName != null && !previousVersionCode.equals(currentVersionCode)) {
+					onVersionChanged(context, previousVersionCode, currentVersionCode, previousVersionName, currentVersionName);
 				}
 				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
 
@@ -526,7 +540,9 @@ public class Apptentive {
 		PayloadSendWorker.start(context);
 	}
 
-	private static void onVersionChanged(Context context, @SuppressWarnings("unused") int previousVersion, @SuppressWarnings("unused") int currentVersion) {
+	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
+		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+		VersionHistoryStore.updateVersionHistory(context, (long)currentVersionCode, currentVersionName);
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
@@ -672,13 +688,14 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static void onAppLaunch(final Context context) {
-		RatingModule.getInstance().logUse(context);
-		MessageManager.asyncFetchAndStoreMessages(context, new MessageManager.MessagesUpdatedListener() {
+	public static void onAppLaunch(final Activity activity) {
+		RatingModule.getInstance().logUse(activity);
+		MessageManager.asyncFetchAndStoreMessages(activity, new MessageManager.MessagesUpdatedListener() {
 			public void onMessagesUpdated() {
-				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
+				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
 			}
 		});
+		Apptentive.engage(activity, "app.launch");
 	}
 
 	/**
