@@ -29,16 +29,9 @@ public class Interactions extends JSONObject {
 				JSONArray interactionsForCodePoint = interactions.getJSONArray(codePoint);
 				for (int i = 0; i < interactionsForCodePoint.length(); i++) {
 					String interactionString = interactionsForCodePoint.getJSONObject(i).toString();
-					Interaction.Type type = Interaction.getTypeForInteractionString(interactionString);
-					switch (type) {
-						case UpgradeMessage:
-							ret.add(new UpgradeMessageInteraction(interactionString));
-							break;
-						case RatingDialog:
-							ret.add(new RatingDialogInteraction(interactionString));
-							break;
-						case unknown:
-							break;
+					Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
+					if (interaction != null) {
+						ret.add(interaction);
 					}
 				}
 			}

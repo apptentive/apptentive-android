@@ -12,6 +12,8 @@ import org.json.JSONObject;
  */
 public abstract class Interaction extends JSONObject {
 
+	public static final String KEY_NAME = "interaction";
+
 	private static final String KEY_ID = "id";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION = "version";
@@ -43,7 +45,7 @@ public abstract class Interaction extends JSONObject {
 			}
 		} catch (JSONException e) {
 		}
-		return null;
+		return Type.unknown;
 	}
 
 	public Integer getVersion() {
@@ -111,14 +113,25 @@ public abstract class Interaction extends JSONObject {
 		}
 	}
 
-	public static Type getTypeForInteractionString(String interactionString) {
-		try {
-			JSONObject interaction = new JSONObject(interactionString);
-			if (interaction.has(KEY_TYPE)) {
-				return Type.parse(interaction.getString(KEY_TYPE));
+	public static class Factory {
+		public static Interaction parseInteraction(String interactionString) {
+			try {
+				Interaction.Type type = Type.unknown;
+				JSONObject interaction = new JSONObject(interactionString);
+				if (interaction.has(KEY_TYPE)) {
+					type = Type.parse(interaction.getString(KEY_TYPE));
+				}
+				switch (type) {
+					case UpgradeMessage:
+						return new UpgradeMessageInteraction(interactionString);
+					case RatingDialog:
+						return new RatingDialogInteraction(interactionString);
+					case unknown:
+						break;
+				}
+			} catch (JSONException e) {
 			}
-		} catch (JSONException e) {
+			return null;
 		}
-		return Type.unknown;
 	}
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterIntroDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterThankYouDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
@@ -57,7 +58,7 @@ public class ApptentiveMessageCenter {
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(activity, ViewActivity.class);
-			intent.putExtra("module", ViewActivity.Module.MESSAGE_CENTER.toString());
+			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
 			activity.startActivity(intent);
 			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		}
@@ -177,8 +178,6 @@ public class ApptentiveMessageCenter {
 
 	/**
 	 * Provided only for debugging.
-	 * @param activity
-	 * @param emailRequired
 	 */
 	static void showIntroDialog(final Activity activity, Trigger trigger, boolean emailRequired) {
 		ApptentiveMessageCenter.trigger = trigger;

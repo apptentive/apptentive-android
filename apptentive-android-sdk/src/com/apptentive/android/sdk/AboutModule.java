@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
@@ -44,7 +45,7 @@ public class AboutModule {
 	public void show(Activity activity) {
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
-		intent.putExtra("module", ViewActivity.Module.ABOUT.toString());
+		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
