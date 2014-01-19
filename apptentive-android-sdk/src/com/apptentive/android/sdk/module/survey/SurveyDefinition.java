@@ -22,6 +22,7 @@ public class SurveyDefinition extends JSONObject {
 	private static final String KEY_NAME = "name";
 	private static final String KEY_DESCRIPTION = "description";
 	private static final String KEY_REQUIRED = "required";
+	private static final String KEY_MULTIPLE_RESPONSES = "multiple_responses";
 	private static final String KEY_VIEW_COUNT = "view_count";
 	private static final String KEY_VIEW_PERIOD = "view_period";
 	private static final String KEY_START_TIME = "start_time";
@@ -77,6 +78,16 @@ public class SurveyDefinition extends JSONObject {
 		try {
 			if (!isNull(KEY_REQUIRED)) {
 				return getBoolean(KEY_REQUIRED);
+			}
+		} catch (JSONException e) {
+		}
+		return false;
+	}
+
+	public boolean isMultipleResponses() {
+		try {
+			if (!isNull(KEY_MULTIPLE_RESPONSES)) {
+				return getBoolean(KEY_MULTIPLE_RESPONSES);
 			}
 		} catch (JSONException e) {
 		}
