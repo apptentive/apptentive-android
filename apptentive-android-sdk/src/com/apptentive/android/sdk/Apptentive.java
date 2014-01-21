@@ -20,8 +20,8 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionModule;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -387,7 +387,7 @@ public class Apptentive {
 	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
 		try {
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-			return InteractionModule.engage(activity, codePoint);
+			return EngagementModule.engage(activity, codePoint);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}

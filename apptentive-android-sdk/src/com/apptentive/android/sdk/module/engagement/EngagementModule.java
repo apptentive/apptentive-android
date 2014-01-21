@@ -1,4 +1,4 @@
-package com.apptentive.android.sdk.module.engagement.interaction;
+package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,12 +6,13 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
 /**
  * @author Sky Kelsey
  */
-public class InteractionModule {
+public class EngagementModule {
 
 	public static boolean engage(Activity activity, String codePoint) {
 		// TODO: Also check with the interaction to make sure it is able to run. Perhaps during lookup process.

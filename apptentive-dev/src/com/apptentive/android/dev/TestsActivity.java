@@ -21,7 +21,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionModule;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -173,7 +173,7 @@ public class TestsActivity extends ApptentiveActivity {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_INTERACTION);
 			}
 			if (interaction != null) {
-				InteractionModule.launchInteraction((Activity) view.getContext(), interaction);
+				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
 			}
 		} catch (JSONException e) {
 		}
