@@ -1,7 +1,20 @@
 This document tracks changes to the API between versions.
 
 
-# next
+# 1.2.7
+
+###### Changes
+
+# 1.2.5
+
+| New Methods |
+| ----------- |
+| `public static void Apptentive.addUrbanAirshipPushIntegration(Context context, String apid)` |
+| `public static void setPendingPushNotification(Context context, Intent intent)` |
+| `public boolean handleOpenedPushNotification(Activity activity)` |
+| `public static void setPendingPushNotification(Context context, Intent intent)` |
+
+Please remove the line `<action android:name="android.intent.action.PACKAGE_RESTARTED"/>` action from Apptentive's NetworkStateReceiver in your manifest. This is not needed, and may cause excessive battery drain.
 
 # 1.2.3
 | New Methods |

@@ -130,7 +130,6 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
             </intent-filter>
         </receiver>
     </application>

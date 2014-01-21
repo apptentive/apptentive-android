@@ -106,16 +106,64 @@ public class SurveyHistory {
 				}
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to record Survey Display.", e);
+			Log.e("Unable to retrieve Survey Displays within window.", e);
+		}
+		Log.v("Survey %s has been displayed %d times in the current view period.", surveyId, count);
+		return count;
+	}
+
+	private static int getTotalSurveyDisplays(Context context, String surveyId) {
+		int count = 0;
+		String json = load(context);
+		try {
+			JSONObject root;
+			if (json == null || json.length() == 0) {
+				root = new JSONObject();
+			} else {
+				root = new JSONObject(json);
+			}
+			JSONArray surveys = root.optJSONArray(KEY_SURVEYS);
+			if (surveys != null) {
+				JSONObject survey = null;
+				for (int i = 0; i < surveys.length(); i++) {
+					JSONObject temp = surveys.getJSONObject(i);
+					String id = temp.optString(KEY_SURVEY_ID);
+					if (id != null && id.equals(surveyId)) {
+						survey = temp;
+						break;
+					}
+				}
+				if (survey != null) {
+					JSONArray displays = survey.optJSONArray(KEY_SURVEY_DISPLAYS);
+					if (displays != null) {
+						for (int j = 0; j < displays.length(); j++) {
+							if (!displays.isNull(j)) {
+								count++;
+							}
+						}
+					}
+				}
+			}
+		} catch (JSONException e) {
+			Log.e("Unable to retrieve total Survey Displays.", e);
 		}
 		Log.v("Survey %s has been displayed %d times in the current view period.", surveyId, count);
 		return count;
 	}
 
 	public static boolean isSurveyLimitMet(Context context, SurveyDefinition survey) {
+		// Can survey be shown multiple times?
+		if (!survey.isMultipleResponses()) {
+			int actualViewCountTotal = SurveyHistory.getTotalSurveyDisplays(context, survey.getId());
+			if (actualViewCountTotal > 0) {
+				return true;
+			}
+		}
+
+		// Has the survey exceeded rate limiting?
 		if (survey.getViewCount() != null && survey.getViewPeriod() != null) {
-			int actualViewCount = SurveyHistory.getSurveyDisplaysWithinWindow(context, survey.getId(), survey.getViewPeriod());
-			if (actualViewCount >= survey.getViewCount()) {
+			int actualViewCountWithinWindow = SurveyHistory.getSurveyDisplaysWithinWindow(context, survey.getId(), survey.getViewPeriod());
+			if (actualViewCountWithinWindow >= survey.getViewCount()) {
 				return true;
 			}
 		}
