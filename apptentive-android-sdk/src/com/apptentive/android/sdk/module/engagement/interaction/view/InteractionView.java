@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.ActivityContent;
 
 /**
@@ -14,5 +15,8 @@ public abstract class InteractionView<T> extends ActivityContent {
 		this.interaction = interaction;
 	}
 
-	public abstract void show(Activity activity);
+	public void show(Activity activity) {
+		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		activity.setContentView(R.layout.apptentive_interaction_dialog);
+	}
 }

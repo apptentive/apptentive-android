@@ -5,7 +5,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import com.apptentive.android.sdk.Log;
@@ -23,17 +25,19 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 	@Override
 	public void show(Activity activity) {
 		Log.e("Showing view.");
-		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-		activity.setContentView(R.layout.apptentive_upgrade_message_interaction_dialog);
+		super.show(activity);
+		ViewGroup container = (ViewGroup) activity.findViewById(R.id.interaction_content);
+		LayoutInflater inflater = activity.getLayoutInflater();
+		View root = inflater.inflate(R.layout.apptentive_upgrade_message_interaction_content, container);
 
-		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
+		ImageView iconView = (ImageView) root.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
 		if (icon != null) {
 			iconView.setImageDrawable(icon);
 		} else {
 			iconView.setVisibility(View.GONE);
 		}
-		WebView webview = (WebView) activity.findViewById(R.id.webview);
+		WebView webview = (WebView) root.findViewById(R.id.webview);
 		webview.loadData(interaction.getBody(), "text/html", "UTF-8");
 		webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
 	}
