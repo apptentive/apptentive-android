@@ -1,3 +1,10 @@
+2013-01-20 skykelsey 1.2.7
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-239 PACKAGE_RESTARTED permission causes app to wake often
+
 2013-01-19 skykelsey 1.2.6
 --------------------------
 
