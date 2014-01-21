@@ -1,7 +1,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import android.app.Activity;
-import com.apptentive.android.sdk.model.InteractionConfiguration;
 import org.json.JSONException;
 
 /**

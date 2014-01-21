@@ -1,4 +1,4 @@
-package com.apptentive.android.sdk.storage;
+package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,8 +6,8 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.model.InteractionCriteria;
-import com.apptentive.android.sdk.model.Interactions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;

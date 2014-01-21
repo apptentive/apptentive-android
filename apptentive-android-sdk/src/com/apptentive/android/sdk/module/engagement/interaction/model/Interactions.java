@@ -1,4 +1,4 @@
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
