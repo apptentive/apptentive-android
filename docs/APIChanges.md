@@ -4,9 +4,10 @@ This document tracks changes to the API between versions.
 # 1.2.7
 
 ###### Changes
+Please remove the line `<action android:name="android.intent.action.PACKAGE_RESTARTED"/>` action from Apptentive's NetworkStateReceiver in your manifest. This is not needed, and may cause excessive battery drain.
+
 
 # 1.2.5
-
 | New Methods |
 | ----------- |
 | `public static void Apptentive.addUrbanAirshipPushIntegration(Context context, String apid)` |
@@ -14,7 +15,6 @@ This document tracks changes to the API between versions.
 | `public boolean handleOpenedPushNotification(Activity activity)` |
 | `public static void setPendingPushNotification(Context context, Intent intent)` |
 
-Please remove the line `<action android:name="android.intent.action.PACKAGE_RESTARTED"/>` action from Apptentive's NetworkStateReceiver in your manifest. This is not needed, and may cause excessive battery drain.
 
 # 1.2.3
 | New Methods |
@@ -31,7 +31,6 @@ Please remove the line `<action android:name="android.intent.action.PACKAGE_REST
 
 
 # 1.2.1
-
 ###### Additions
 | New Methods |
 | ----------- |
@@ -39,7 +38,6 @@ Please remove the line `<action android:name="android.intent.action.PACKAGE_REST
 
 
 # 1.2.0
-
 To improve the quality of the Apptentive SDK, and to make it easier to integrate, the following API method signatures of `Apptentive.java` have been changed or added.
 
 ###### Changes
@@ -60,7 +58,6 @@ To improve the quality of the Apptentive SDK, and to make it easier to integrate
 
 
 # 1.0
-
 The following changes from the 0.6.x series were made.
 
 We are moving over to a unified message center, which is an expansion of the feedback API. We have decided to take the opportunity to clean up the ratings flow API, and simplify how you interact with the SDK in general. Below are detailed changes that have been made to the API, but from a simple perspective, you'll want to:
