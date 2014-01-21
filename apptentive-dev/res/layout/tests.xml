@@ -185,7 +185,10 @@
                              android:layout_height="fill_parent"
                             android:entries="@array/interactions"/>
                 </LinearLayout>
-
+                <Button android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:onClick="fetchInteractions"
+                        android:text="Fetch Interactions"/>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

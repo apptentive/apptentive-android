@@ -3,6 +3,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.webkit.WebView;
@@ -34,6 +35,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 		}
 		WebView webview = (WebView) activity.findViewById(R.id.webview);
 		webview.loadData(interaction.getBody(), "text/html", "UTF-8");
+		webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
 	}
 
 	@Override

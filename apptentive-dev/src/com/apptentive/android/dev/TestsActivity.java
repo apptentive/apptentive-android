@@ -22,6 +22,7 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -180,5 +181,9 @@ public class TestsActivity extends ApptentiveActivity {
 		long end = System.currentTimeMillis();
 		Log.e("Interaction storage took %d millis", end - start);
 		Log.e(CodePointStore.toString(getApplicationContext()));
+	}
+
+	public void fetchInteractions(View view) {
+		InteractionManager.fetchAndStoreInteractions(view.getContext());
 	}
 }
