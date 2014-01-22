@@ -205,24 +205,15 @@ public class Util {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
-
-	public static void ensureClosed(InputStream inputStream) {
-		if (inputStream != null) {
-			try {
-				inputStream.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
-	public static void ensureClosed(OutputStream outputStream) {
-		if (outputStream != null) {
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-			}
-		}
-	}
+	
+	public static void ensureClosed(Closeable stream) {
+      if (stream != null) {
+         try {
+            stream.close();
+         } catch (IOException e) {
+         }
+      }
+   }
 
 	public static Point getScreenSize(Context context) {
 		Point ret = new Point();
