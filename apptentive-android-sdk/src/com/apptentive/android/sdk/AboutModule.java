@@ -52,6 +52,7 @@ public class AboutModule {
 
 	void doShow(final Activity activity) {
 		activity.setContentView(R.layout.apptentive_about);
+		activity.findViewById(R.id.apptentive_branding_view).setClickable(false); // Don't let the about view launch itself.
 
 		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
 		information.setOnClickListener(new View.OnClickListener() {

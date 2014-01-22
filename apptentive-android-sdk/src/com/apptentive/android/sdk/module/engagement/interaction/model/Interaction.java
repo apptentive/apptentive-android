@@ -83,7 +83,7 @@ public abstract class Interaction extends JSONObject {
 			}
 		} catch (JSONException e) {
 		}
-		return null;
+		return new InteractionConfiguration();
 	}
 
 	public InteractionCriteria getCriteria() {

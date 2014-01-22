@@ -18,6 +18,7 @@
     </string-array>
 
     <string-array name="interactions">
-        <item>UpgradeMessage</item>
+        <item>UpgradeMessage Branding</item>
+        <item>UpgradeMessage No Branding</item>
     </string-array>
 </resources>

@@ -65,16 +65,7 @@
                             android:textSize="@dimen/apptentive_text_medium"
                             android:text="@string/apptentive_survey_send_response"/>
                 </LinearLayout>
-                <FrameLayout android:layout_width="fill_parent"
-                             android:layout_height="4dp"
-                             android:background="@color/apptentive_survey_separator"/>
-                <FrameLayout android:layout_width="fill_parent"
-                             android:layout_height="wrap_content"
-                             android:background="@color/apptentive_survey_footer_background"
-                             android:paddingTop="8dp"
-                             android:paddingBottom="8dp">
-                    <include layout="@layout/apptentive_branding"/>
-                </FrameLayout>
+                <include layout="@layout/apptentive_branding"/>
             </LinearLayout>
         </FrameLayout>
     </ScrollView>

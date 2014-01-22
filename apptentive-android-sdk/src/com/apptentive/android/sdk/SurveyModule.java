@@ -153,13 +153,6 @@ public class SurveyModule {
 			}
 		});
 
-		View about = activity.findViewById(R.id.apptentive_branding_view);
-		about.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				AboutModule.getInstance().show(activity);
-			}
-		});
-
 		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
 
 		// Then render all the questions
