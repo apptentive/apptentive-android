@@ -6,8 +6,8 @@
   -->
 
 <resources>
-    <dimen name="apptentive_activity_side_padding">96dp</dimen>
-    <dimen name="apptentive_activity_vertical_padding">16dp</dimen>
+    <dimen name="apptentive_activity_side_padding">130dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">96dp</dimen>
-    <dimen name="apptentive_dialog_vertical_padding">16dp</dimen>
+    <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
 </resources>
