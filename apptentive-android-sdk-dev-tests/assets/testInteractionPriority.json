@@ -1,0 +1,48 @@
+{
+    "interactions": {
+        "code.point.1": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 3,
+                "criteria": {
+                    "interactions/526fe2836dd8bf546a00000c/invokes/version": 0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            },
+            {
+                "id": "526fe2836dd8bf546a00000a",
+                "priority": 1,
+                "criteria": {
+                    "interactions/526fe2836dd8bf546a00000a/invokes/version": 0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            },
+            {
+                "id": "526fe2836dd8bf546a00000b",
+                "priority": 2,
+                "criteria": {
+                    "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ]
+    }
+}

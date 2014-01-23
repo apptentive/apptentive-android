@@ -14,7 +14,7 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public abstract class Interaction extends JSONObject {
+public abstract class Interaction extends JSONObject implements Comparable {
 
 	public static final String KEY_NAME = "interaction";
 
@@ -152,5 +152,17 @@ public abstract class Interaction extends JSONObject {
 			}
 			return null;
 		}
+	}
+
+	/**
+	 * Compares two Interactions based on priority. Lower values are considered higher priority.
+	 * @param interaction The other Interaction to compare to this Interaction.
+	 * @return -1 if this Interaction is higher priority than the passed Interaction.<p/>
+	 * 0 if this Interaction is of equal priority to the passed Interaction.<p/>
+	 * 1 if this Interaction is of lower priority than the passed Interaction.<p/>
+	 */
+	@Override
+	public int compareTo(Object interaction) {
+		return getPriority().compareTo(((Interaction)interaction).getPriority());
 	}
 }
