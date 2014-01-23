@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import android.content.Context;
@@ -16,7 +22,7 @@ public class InteractionCriteria extends JSONObject {
 		super(json);
 	}
 
-	public boolean shouldRun (Context context) {
+	public boolean isMet(Context context) {
 		try {
 			Predicate criteria = Predicate.parse(context, null, this);
 			return criteria.apply(context);

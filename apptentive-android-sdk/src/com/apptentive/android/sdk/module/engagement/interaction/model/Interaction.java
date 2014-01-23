@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.app.Activity;
+import android.content.Context;
 import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +30,22 @@ public abstract class Interaction extends JSONObject {
 		super(json);
 	}
 
-	public abstract boolean run(Activity activity);
+	/**
+	 * Override this method if the subclass has certain restrictions other than Criteria that it needs to evaluate in
+	 * order to know if it can run. Example: Interactions that will require an internet connection must override and check
+	 * for network availability.
+	 *
+	 * @param context The Context from which this method is called.
+	 * @return true if this interaction can run.
+	 */
+	protected boolean isInRunnableState(Context context) {
+		return true;
+	}
+
+	public boolean canRun(Context context) {
+		InteractionCriteria criteria = getCriteria();
+		return isInRunnableState(context) && criteria != null && criteria.isMet(context);
+	}
 
 	public String getId() {
 		try {

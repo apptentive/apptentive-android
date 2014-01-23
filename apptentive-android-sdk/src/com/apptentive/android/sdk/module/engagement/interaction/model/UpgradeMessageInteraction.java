@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.app.Activity;
 import org.json.JSONException;
 
 /**
@@ -15,11 +20,6 @@ public class UpgradeMessageInteraction extends Interaction {
 
 	public UpgradeMessageInteraction(String json) throws JSONException {
 		super(json);
-	}
-
-	public boolean run(Activity activity) {
-		// TODO: Implement this.
-		return false;
 	}
 
 	public boolean isActive() {

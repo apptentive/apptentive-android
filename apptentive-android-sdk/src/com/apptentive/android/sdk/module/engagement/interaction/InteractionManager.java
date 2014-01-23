@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.Context;
@@ -6,7 +12,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -68,8 +73,7 @@ public class InteractionManager {
 		if (interactions != null) {
 			List<Interaction> list = interactions.getInteractionList(codePoint);
 			for (Interaction interaction : list) {
-				InteractionCriteria criteria = interaction.getCriteria();
-				if (criteria.shouldRun(context)) {
+				if (interaction.canRun(context)) {
 					return interaction;
 				}
 			}

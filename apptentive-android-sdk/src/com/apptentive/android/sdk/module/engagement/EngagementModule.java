@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
@@ -5,6 +11,7 @@ import android.content.Intent;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -15,9 +22,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 public class EngagementModule {
 
 	public static boolean engage(Activity activity, String codePoint) {
-		// TODO: Also check with the interaction to make sure it is able to run. Perhaps during lookup process.
 		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
 		if (interaction != null) {
+			CodePointStore.storeInteractionForCurrentAppVersion(activity, codePoint);
 			launchInteraction(activity, interaction);
 			return true;
 		}
@@ -36,5 +43,4 @@ public class EngagementModule {
 			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		}
 	}
-
 }

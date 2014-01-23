@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.model;
 
 import android.content.Context;
@@ -99,7 +105,7 @@ public class CodePointStore extends JSONObject {
 	}
 
 	public static synchronized void storeInteractionForCurrentAppVersion(Context context, String name) {
-		storeRecordForCurrentAppVersion(context, false, name);
+		storeRecordForCurrentAppVersion(context, true, name);
 	}
 
 	private static void storeRecordForCurrentAppVersion(Context context, boolean interaction, String name) {
