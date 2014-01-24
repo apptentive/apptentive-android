@@ -1,0 +1,164 @@
+{
+    "interactions": {
+        "code.point.1": [
+            {
+                "id": "526fe2836dd8bf546a00000a",
+                "priority": 3,
+                "criteria": {
+                    "application_version": null
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.2": [
+            {
+                "id": "526fe2836dd8bf546a00000a",
+                "priority": 1,
+                "criteria": {
+                    "application_version": 4.0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.3": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "application_build": null
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.4": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "application_build": "4"
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.5": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_install": null
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.6": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_install": "0"
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.7": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_install": 0.0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.8": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_upgrade": null
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.9": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_upgrade": "0"
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ],
+        "code.point.10": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "priority": 2,
+                "criteria": {
+                    "days_since_upgrade": 0.0
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ]
+    }
+}
