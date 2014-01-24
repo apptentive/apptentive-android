@@ -22,7 +22,7 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 		activity.setContentView(R.layout.apptentive_interaction_dialog);
 
 		// If branding is not desired, turn the view off.
-		if (!interaction.getConfiguration().isShowPoweredBy()) {
+		if (!interaction.isShowPoweredBy()) {
 			activity.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
 		}
 	}

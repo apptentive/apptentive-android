@@ -22,9 +22,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_PRIORITY = "priority";
-	private static final String KEY_ACTIVE = "active";
-	private static final String KEY_CONFIGURATION = "configuration";
 	private static final String KEY_CRITERIA = "criteria";
+	private static final String KEY_CONFIGURATION = "configuration";
 
 	public Interaction(String json) throws JSONException {
 		super(json);
@@ -45,6 +44,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 	/**
 	 * An interaction can run if local state is conducive to it running, and criteria is met. Interactions that are
 	 * missing criteria, or where criteria is null or missing can also run, as they essentially have no constraint.
+	 *
 	 * @return true iff the interaction can be run.
 	 */
 	public boolean canRun(Context context) {
@@ -92,14 +92,14 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		return null;
 	}
 
-	public boolean getActive() {
+	public InteractionCriteria getCriteria() {
 		try {
-			if (!isNull(KEY_ACTIVE)) {
-				return getBoolean(KEY_ACTIVE);
+			if (!isNull(KEY_CRITERIA)) {
+				return new InteractionCriteria(getJSONObject(KEY_CRITERIA).toString());
 			}
 		} catch (JSONException e) {
 		}
-		return false;
+		return null;
 	}
 
 	public InteractionConfiguration getConfiguration() {
@@ -112,14 +112,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		return new InteractionConfiguration();
 	}
 
-	public InteractionCriteria getCriteria() {
-		try {
-			if (!isNull(KEY_CRITERIA)) {
-				return new InteractionCriteria(getJSONObject(KEY_CRITERIA).toString());
-			}
-		} catch (JSONException e) {
-		}
-		return null;
+	public boolean isShowPoweredBy() {
+		return getConfiguration().isShowPoweredBy();
 	}
 
 	public static enum Type {
@@ -161,13 +155,14 @@ public abstract class Interaction extends JSONObject implements Comparable {
 
 	/**
 	 * Compares two Interactions based on priority. Lower values are considered higher priority.
+	 *
 	 * @param interaction The other Interaction to compare to this Interaction.
 	 * @return -1 if this Interaction is higher priority than the passed Interaction.<p/>
-	 * 0 if this Interaction is of equal priority to the passed Interaction.<p/>
-	 * 1 if this Interaction is of lower priority than the passed Interaction.<p/>
+	 *         0 if this Interaction is of equal priority to the passed Interaction.<p/>
+	 *         1 if this Interaction is of lower priority than the passed Interaction.<p/>
 	 */
 	@Override
 	public int compareTo(Object interaction) {
-		return getPriority().compareTo(((Interaction)interaction).getPriority());
+		return getPriority().compareTo(((Interaction) interaction).getPriority());
 	}
 }

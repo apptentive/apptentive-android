@@ -29,7 +29,7 @@ public class Interactions extends JSONObject {
 		List<Interaction> list = new ArrayList<Interaction>();
 		try {
 			JSONObject interactions = getJSONObject(KEY_INTERACTIONS);
-			if(!interactions.isNull(codePoint)) {
+			if (!interactions.isNull(codePoint)) {
 				JSONArray interactionsForCodePoint = interactions.getJSONArray(codePoint);
 				for (int i = 0; i < interactionsForCodePoint.length(); i++) {
 					String interactionString = interactionsForCodePoint.getJSONObject(i).toString();
