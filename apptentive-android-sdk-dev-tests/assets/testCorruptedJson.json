@@ -1,0 +1,19 @@
+{
+    "interactions": {
+        "code.point.1": [
+            {
+                "id": "526fe2836dd8bf546a00000a",
+                "priority": 3,
+                "criteria": {
+                    "application_version": null
+                },
+                "type": "RatingDialog",
+                "version": null,
+                "active": true,
+                "configuration": {
+                    "active": true,
+                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
+                }
+            }
+        ]
+    }

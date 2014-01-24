@@ -86,7 +86,7 @@ public class InteractionManager {
 		return prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 	}
 
-	private static Interactions loadInteractions(Context context) {
+	public static Interactions loadInteractions(Context context) {
 		String interactionsString = loadInteractionsString(context);
 		if (interactionsString != null) {
 			try {
