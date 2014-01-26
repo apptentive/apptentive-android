@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ApptentiveDev" parent="android:Theme.Holo.NoActionBar">
+    <style name="ApptentiveDevTheme" parent="android:Theme.Holo.NoActionBar">
         <item name="android:buttonStyle">@style/ButtonStyle</item>
     </style>
 
