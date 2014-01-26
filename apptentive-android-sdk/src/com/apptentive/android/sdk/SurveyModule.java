@@ -15,6 +15,7 @@ import android.widget.*;
 
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.*;
 import com.apptentive.android.sdk.module.survey.view.MultichoiceSurveyQuestionView;
@@ -82,7 +83,7 @@ public class SurveyModule {
 
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
-		intent.putExtra("module", ViewActivity.Module.SURVEY.toString());
+		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.SURVEY.toString());
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
@@ -149,13 +150,6 @@ public class SurveyModule {
 					SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(true);
 				}
 				cleanup();
-			}
-		});
-
-		View about = activity.findViewById(R.id.apptentive_branding_view);
-		about.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				AboutModule.getInstance().show(activity);
 			}
 		});
 

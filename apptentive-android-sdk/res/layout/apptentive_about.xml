@@ -19,7 +19,66 @@
                      android:layout_height="wrap_content"
                      android:paddingTop="@dimen/apptentive_activity_vertical_padding"
                      android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
-            <include layout="@layout/apptentive_about_content"/>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:background="@drawable/apptentive_activity_background">
+                <TextView android:layout_width="fill_parent"
+                          android:layout_height="48dp"
+                          android:gravity="center"
+                          android:textColor="@color/apptentive_about_title"
+                          android:textStyle="bold"
+                          android:textSize="@dimen/apptentive_text_large"
+                          android:text="@string/apptentive_about_title"/>
+                <FrameLayout android:layout_width="fill_parent"
+                             android:layout_height="4dp"
+                             android:background="@color/apptentive_survey_separator"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:paddingLeft="16dp"
+                              android:paddingRight="16dp"
+                              android:paddingTop="16dp"
+                              android:paddingBottom="16dp"
+                              android:orientation="vertical">
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:paddingBottom="16dp"
+                              android:textSize="@dimen/apptentive_text_medium"
+                              android:textColor="@color/apptentive_about_text"
+                              android:text="@string/apptentive_about_description"/>
+                    <TextView android:id="@+id/about_description_link"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:gravity="center"
+                              android:paddingBottom="16dp"
+                              android:textColor="@color/apptentive_about_link"
+                              android:textSize="@dimen/apptentive_text_medium_small"
+                              android:textStyle="bold"
+                              android:text="@string/apptentive_about_description_link"/>
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:paddingBottom="16dp"
+                              android:textColor="@color/apptentive_about_text"
+                              android:textSize="@dimen/apptentive_text_medium"
+                              android:text="@string/apptentive_about_privacy"/>
+                    <TextView android:id="@+id/privacy_link"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:gravity="center"
+                              android:paddingBottom="16dp"
+                              android:textColor="@color/apptentive_about_link"
+                              android:textSize="@dimen/apptentive_text_medium_small"
+                              android:textStyle="bold"
+                              android:text="@string/apptentive_about_privacy_link"/>
+                    <TextView android:id="@+id/version"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:gravity="center"
+                              android:textSize="@dimen/apptentive_text_small_tiny"
+                              android:textColor="@color/apptentive_about_version"/>
+                </LinearLayout>
+                <include layout="@layout/apptentive_branding"/>
+            </LinearLayout>
         </FrameLayout>
     </ScrollView>
 </LinearLayout>

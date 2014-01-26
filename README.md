@@ -130,7 +130,6 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
             </intent-filter>
         </receiver>
     </application>
@@ -290,9 +289,11 @@ public static boolean Apptentive.showSurvey(Activity activity, OnSurveyFinishedL
 ```java
 Apptentive.showSurvey(
     this,
-    new OnSurveyCompletedListener() {
-        public void onSurveyCompletedListener() {
-            // Code that runs when the survey was successfully completed.
+    new OnSurveyFinishedListener() {
+        public void onSurveyFinishedListener(boolean completed) {
+            if (completed) {
+                // Code that runs when the survey was successfully completed.
+            }
         }
     },
     "completed_level_ten"

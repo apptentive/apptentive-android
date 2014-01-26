@@ -1,3 +1,17 @@
+2013-01-20 skykelsey 1.2.7
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-239 PACKAGE_RESTARTED permission causes app to wake often
+
+2013-01-19 skykelsey 1.2.6
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-238 Survey module doesn't respect "multiple_responses" flag
+
 2013-12-12 skykelsey 1.2.4
 --------------------------
 

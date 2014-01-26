@@ -63,15 +63,15 @@ public class ActivityLifecycleManager {
 	private static Context appContext = null;
 	private static PersistentSessionQueue queue = null;
 
-	private static void sendEvent(Context context, SessionEvent event) {
+	private static void sendEvent(Activity activity, SessionEvent event) {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
-				MetricModule.sendMetric(context, Event.EventLabel.app__launch);
-				Apptentive.onAppLaunch(context);
+				MetricModule.sendMetric(activity, Event.EventLabel.app__launch);
+				Apptentive.onAppLaunch(activity);
 				break;
 			case STOP:
-				MetricModule.sendMetric(context, Event.EventLabel.app__exit);
+				MetricModule.sendMetric(activity, Event.EventLabel.app__exit);
 				Apptentive.onAppDidExit();
 				break;
 			default:

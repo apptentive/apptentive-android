@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
@@ -44,13 +45,14 @@ public class AboutModule {
 	public void show(Activity activity) {
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
-		intent.putExtra("module", ViewActivity.Module.ABOUT.toString());
+		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
 	void doShow(final Activity activity) {
 		activity.setContentView(R.layout.apptentive_about);
+		activity.findViewById(R.id.apptentive_branding_view).setClickable(false); // Don't let the about view launch itself.
 
 		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
 		information.setOnClickListener(new View.OnClickListener() {

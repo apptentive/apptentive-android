@@ -20,6 +20,8 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.comm.NetworkStateListener;
 import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -366,6 +368,32 @@ public class Apptentive {
 		return false;
 	}
 
+	/**
+	 * This method takes a unique code point string, stores a record of that code point having been visited, figures out
+	 * if there is an interaction that is able to run for this code point, and then runs it. If more than one interaction
+	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
+	 * invocation of this method.
+	 *
+	 * @param activity  The Activity from which this method is called.
+	 * @param codePoint A unique String representing the line this method is called on. For instance, you may want to have
+	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @return true if the an interaction was shown, else false.
+	 */
+	public static synchronized boolean engage(Activity activity, String codePoint) {
+		return engage(activity, codePoint, true);
+	}
+
+	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
+		try {
+			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
+			return EngagementModule.engage(activity, codePoint);
+		} catch (Exception e) {
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+		}
+		return false;
+	}
+
 	// ****************************************************************************************
 	// INTERNAL METHODS
 	// ****************************************************************************************
@@ -418,15 +446,15 @@ public class Apptentive {
 			try {
 				PackageManager packageManager = context.getPackageManager();
 				PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-				int currentVersionCode = packageInfo.versionCode;
+				Integer currentVersionCode = packageInfo.versionCode;
+				Integer previousVersionCode = null;
 				if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
-					int previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
-					if(previousVersionCode != currentVersionCode) {
-						onVersionChanged(context, previousVersionCode, currentVersionCode);
-					}
-				} else {
-					// First start.
-					onVersionChanged(context, -1, currentVersionCode);
+					previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
+				}
+				String previousVersionName = prefs.getString(Constants.PREF_KEY_APP_VERSION_NAME, null);
+				String currentVersionName = packageInfo.versionName;
+				if(previousVersionName != null && !previousVersionCode.equals(currentVersionCode)) {
+					onVersionChanged(context, previousVersionCode, currentVersionCode, previousVersionName, currentVersionName);
 				}
 				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
 
@@ -468,6 +496,7 @@ public class Apptentive {
 		} else {
 			asyncFetchAppConfiguration(context);
 			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+			InteractionManager.asyncFetchAndStoreInteractions(context);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
@@ -505,7 +534,9 @@ public class Apptentive {
 		PayloadSendWorker.start(context);
 	}
 
-	private static void onVersionChanged(Context context, @SuppressWarnings("unused") int previousVersion, @SuppressWarnings("unused") int currentVersion) {
+	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
+		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+		VersionHistoryStore.updateVersionHistory(context, (long)currentVersionCode, currentVersionName);
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
@@ -565,6 +596,7 @@ public class Apptentive {
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
 				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+				InteractionManager.asyncFetchAndStoreInteractions(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -650,13 +682,14 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static void onAppLaunch(final Context context) {
-		RatingModule.getInstance().logUse(context);
-		MessageManager.asyncFetchAndStoreMessages(context, new MessageManager.MessagesUpdatedListener() {
+	public static void onAppLaunch(final Activity activity) {
+		RatingModule.getInstance().logUse(activity);
+		MessageManager.asyncFetchAndStoreMessages(activity, new MessageManager.MessagesUpdatedListener() {
 			public void onMessagesUpdated() {
-				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
+				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
 			}
 		});
+		Apptentive.engage(activity, "app.launch");
 	}
 
 	/**

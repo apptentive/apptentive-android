@@ -83,10 +83,6 @@ public class DevActivity extends ApptentiveActivity {
 		startActivity(testsIntent);
 	}
 
-	public void reinstall(@SuppressWarnings("unused") View view) {
-		DevDebugHelper.resetRatingFlow(this);
-	}
-
 	public void logSignificantEvent(@SuppressWarnings("unused") View view) {
 		Apptentive.logSignificantEvent(this);
 	}

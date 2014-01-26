@@ -1,6 +1,13 @@
 This document tracks changes to the API between versions.
 
 
+# 1.2.7
+
+###### Changes
+
+Please remove the line `<action android:name="android.intent.action.PACKAGE_RESTARTED"/>` action from Apptentive's NetworkStateReceiver in your manifest. This is not needed, and may cause excessive battery drain.
+
+
 # 1.2.3
 
 ###### Changes
