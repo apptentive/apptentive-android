@@ -12,12 +12,22 @@ Bugs Fixed:
 
 * ANDROID-238 Survey module doesn't respect "multiple_responses" flag
 
+2013-12-17 skykelsey  1.2.5
+--------------------------
+
+Major changes:
+
+* Ability to pass Apptentive custom integration details. For instance, you can pass in the app's Urban Airship App ID, allowing us to send push notifications to your device.
+* Add the ability to pass push notification intents into Apptentive code, and have Apptentive perform actions. Push integration currently supports Urban Airship, and can be configured in your app settings.
+* ANDROID-224 Allow survey thank you dialog to contain links.
+
 2013-12-12 skykelsey 1.2.4
 --------------------------
 
 Major changes:
 
 Slightly modified the behavior of the rating flow. The user can now close the rating flow by pressing the back button. This should create a less intrusive experience for the people using your app.
+
 Bugs Fixed:
 
 * ANDROID-201 Survey targeting doesn't work until after survey cache expires.

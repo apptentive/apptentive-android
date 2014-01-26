@@ -308,9 +308,9 @@ To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailab
 public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
 ```
 
-#### Extra Configuration (Optional)
+### Optional Configuration
 
-##### Support for Amazon Appstore
+#### Support for Amazon Appstore
 
 If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
 there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
@@ -321,7 +321,7 @@ Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 If you omit this line, ratings will go to Google Play.
 
-##### Specifying the User's Email Address
+#### Specifying the User's Email Address
 
 If you are authorized to access the user's email address, you may specify it during initialization so that in the event
 the user does not respond in-app, your message can still get to them via email. Note that if ths user updates their
@@ -339,7 +339,7 @@ public static void Apptentive.setInitialUserEmail(Context context, String email)
 Apptentive.setUserEmail(this, "johndoe@example.com");
 ```
 
-##### Send Custom Device Data to Apptentive
+#### Send Custom Device Data to Apptentive
 
 You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
 key/value string pairs.
@@ -368,7 +368,7 @@ public static void Apptentive.removeCustomDeviceData(Context context, String key
 Apptentive.removeCustomDeviceData(this, "myDeviceId");
 ```
 
-##### Send Custom Person Data to Apptentive
+#### Send Custom Person Data to Apptentive
 
 You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
 Data must be key/value string pairs.
@@ -397,6 +397,62 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
+### Third Party Integrations
+Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
+Urban Airship is the only provider currently supported. A push notification is useful for notifying your users that they
+have received a new message while they are not using your app. Push notifications are optional, and messages will still
+be delivered when the user opens the app, even if you do not use them.
+
+#### Urban Airship Integration
+
+##### Sending the Urban Airship APID
+
+To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
+ initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
+
+###### Method
+```java
+Apptentive.addUrbanAirshipPushIntegration(Context context, String apid);
+```
+
+###### Example
+```java
+String  apid = PushManager.shared().getAPID();
+Apptentive.addUrbanAirshipPushIntegration(this, apid);
+```
+
+##### Passing Apptentive the Push Intent
+
+When the user opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always pass
+that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
+
+###### Method
+```java
+public static void setPendingPushNotification(Context context, Intent intent);
+```
+
+##### Running the Apptentive Push UI
+
+Next, in the Activity that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
+push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
+met, then we will perform an action. This is generally to show a UI, such as Message Center. If we show a UI, this
+method will return true, else false. This method is a noop if the push notification was not from Apptentive.
+
+###### Method
+```java
+public boolean Apptentive.handleOpenedPushNotification(Activity activity);
+```
+
+###### Example
+```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        boolean ranApptentive = Apptentive.handleOpenedPushNotification(this);
+    }
+}
+```
 ---
 
 ### Building from the command line and with CI

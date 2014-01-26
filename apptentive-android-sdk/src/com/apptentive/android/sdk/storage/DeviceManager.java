@@ -41,6 +41,8 @@ public class DeviceManager {
 		Device current = generateNewDevice(context);
 		CustomData customData = loadCustomDeviceData(context);
 		current.setCustomData(customData);
+		CustomData integrationConfig = loadIntegrationConfig(context);
+		current.setIntegrationConfig(integrationConfig);
 
 		Device diff = diffDevice(stored, current);
 		if (diff != null) {
@@ -61,13 +63,33 @@ public class DeviceManager {
 			return new CustomData();
 		} catch (JSONException e) {
 		}
-		return null;
+		return null; // This should never happen.
 	}
 
 	public static void storeCustomDeviceData(Context context, CustomData deviceData) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String deviceDataString = deviceData.toString();
 		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).commit();
+	}
+
+	public static CustomData loadIntegrationConfig(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String integrationConfigString = prefs.getString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, null);
+		try {
+			return new CustomData(integrationConfigString);
+		} catch (Exception e) {
+		}
+		try {
+			return new CustomData();
+		} catch (JSONException e) {
+		}
+		return null; // This should never happen.
+	}
+
+	public static void storeIntegrationConfig(Context context, CustomData integrationConfig) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String integrationConfigString = integrationConfig.toString();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, integrationConfigString).commit();
 	}
 
 	private static Device generateNewDevice(Context context) {
@@ -234,6 +256,11 @@ public class DeviceManager {
 		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
 		if (customData != null) {
 			ret.setCustomData(customData);
+		}
+
+		CustomData integrationConfig = chooseLatest(old.getIntegrationConfig(), newer.getIntegrationConfig());
+		if (integrationConfig != null) {
+			ret.setIntegrationConfig(integrationConfig);
 		}
 
 		String localeCountryCode = chooseLatest(old.getLocaleCountryCode(), newer.getLocaleCountryCode());
