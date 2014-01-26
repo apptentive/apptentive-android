@@ -24,7 +24,7 @@ public class EngagementModule {
 	public static boolean engage(Activity activity, String codePoint) {
 		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
 		if (interaction != null) {
-			CodePointStore.storeInteractionForCurrentAppVersion(activity, codePoint);
+			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);
 			return true;
 		}

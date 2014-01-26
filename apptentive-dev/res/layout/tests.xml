@@ -9,37 +9,54 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/blur_2"
             android:focusable="true"
             android:focusableInTouchMode="true">
     <requestFocus/>
     <LinearLayout android:orientation="vertical"
                   android:layout_width="fill_parent"
-                  android:layout_height="wrap_content">
+                  android:layout_height="wrap_content"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+                  android:paddingBottom="16dp">
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="48dp"
+                  android:paddingTop="8dp"
+                  android:paddingBottom="8dp"
+                  android:gravity="center"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="Tests"/>
         <Button android:id="@+id/test_tweet"
                 android:layout_width="fill_parent"
                 android:layout_height="48dp"
-                android:text="Test Tweet"
-                android:onClick="testTweet"/>
+                android:layout_marginTop="4dp"
+                android:onClick="testTweet"
+                android:text="Test Tweet"/>
         <Button android:layout_width="fill_parent"
                 android:layout_height="48dp"
-                android:text="Delete All Messages"
-                android:onClick="deleteStoredMessages"/>
+                android:layout_marginTop="4dp"
+                android:onClick="resetDevice"
+                android:text="Reset Device"/>
         <Button android:layout_width="fill_parent"
                 android:layout_height="48dp"
-                android:text="Test NullPointerException"
-                android:onClick="throwNpe"/>
+                android:layout_marginTop="4dp"
+                android:onClick="throwNpe"
+                android:text="Test NullPointerException"/>
         <FrameLayout android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:background="#AAAAAA">
+                     android:layout_height="wrap_content">
             <LinearLayout android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:orientation="vertical"
-                          android:background="#000000">
+                          android:orientation="vertical">
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Custom Device Data"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -59,6 +76,7 @@
                 </LinearLayout>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -75,10 +93,14 @@
                                  android:layout_weight="3"/>
                 </LinearLayout>
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Custom Person Data"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -98,6 +120,7 @@
                 </LinearLayout>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -114,10 +137,14 @@
                                  android:layout_weight="3"/>
                 </LinearLayout>
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Initial Person Email"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -132,10 +159,14 @@
                               android:hint="Email…"/>
                 </LinearLayout>
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Message Center with Custom Data"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -154,10 +185,14 @@
                               android:hint="Value…"/>
                 </LinearLayout>
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Trigger code point"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -165,15 +200,20 @@
                             android:onClick="engage"
                             android:text="Trigger"/>
                     <Spinner android:id="@+id/code_point_spinner"
-                             android:layout_width="fill_parent"
+                             android:layout_width="0dp"
                              android:layout_height="fill_parent"
-                            android:entries="@array/code_points"/>
+                             android:layout_weight="6"
+                             android:entries="@array/code_points"/>
                 </LinearLayout>
                 <TextView android:layout_width="fill_parent"
-                          android:layout_height="16dp"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
                           android:text="Trigger interaction"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
                               android:orientation="horizontal">
                     <Button android:layout_width="0dp"
                             android:layout_height="fill_parent"
@@ -181,12 +221,14 @@
                             android:onClick="interaction"
                             android:text="Trigger"/>
                     <Spinner android:id="@+id/interaction_spinner"
-                             android:layout_width="fill_parent"
+                             android:layout_width="0dp"
                              android:layout_height="fill_parent"
-                            android:entries="@array/interactions"/>
+                             android:layout_weight="6"
+                             android:entries="@array/interactions"/>
                 </LinearLayout>
                 <Button android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
                         android:onClick="fetchInteractions"
                         android:text="Fetch Interactions"/>
             </LinearLayout>

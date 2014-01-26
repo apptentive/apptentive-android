@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="button_body">#40A0A0A0</color>
+    <color name="button_border">#40FFFFFF</color>
+
+    <color name="button_body_selected">#50303030</color>
+    <color name="button_border_selected">#70808080</color>
+
+    <color name="button_body_pressed">#50706050</color>
+    <color name="button_border_pressed">#70808080</color>
+
+
+</resources>
