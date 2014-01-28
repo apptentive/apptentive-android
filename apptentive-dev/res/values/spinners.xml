@@ -18,7 +18,8 @@
     </string-array>
 
     <string-array name="interactions">
-        <item>UpgradeMessage Branding</item>
-        <item>UpgradeMessage No Branding</item>
+        <item>UpgradeMessage real example</item>
+        <item>UpgradeMessage exercise with branding</item>
+        <item>UpgradeMessage exercise no branding</item>
     </string-array>
 </resources>
