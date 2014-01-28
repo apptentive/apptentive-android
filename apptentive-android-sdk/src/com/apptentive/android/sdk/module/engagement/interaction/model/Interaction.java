@@ -43,13 +43,14 @@ public abstract class Interaction extends JSONObject implements Comparable {
 
 	/**
 	 * An interaction can run if local state is conducive to it running, and criteria is met. Interactions that are
-	 * missing criteria, or where criteria is null or missing can also run, as they essentially have no constraint.
+	 * missing criteria, or where criteria is null cannot run. There must at least be a criteria object on an
+	 * interaction in order for it to run.
 	 *
 	 * @return true iff the interaction can be run.
 	 */
 	public boolean canRun(Context context) {
 		InteractionCriteria criteria = getCriteria();
-		return isInRunnableState(context) && (criteria == null || criteria.isMet(context));
+		return criteria != null && isInRunnableState(context) && criteria.isMet(context);
 	}
 
 	public String getId() {
