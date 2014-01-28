@@ -1401,12 +1401,10 @@ public class InteractionTest extends InstrumentationTestCase {
 		InteractionManager.storeInteractions(getTargetContext(), json);
 
 		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
-		assertNotNull(interaction);
-		assertTrue(interaction.canRun(getTargetContext()));
+		assertNull(interaction);
 
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
-		assertNotNull(interaction);
-		assertTrue(interaction.canRun(getTargetContext()));
+		assertNull(interaction);
 
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.3");
 		assertNotNull(interaction);
