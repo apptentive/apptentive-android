@@ -55,8 +55,6 @@ public class InteractionManager {
 		if (response != null && response.isSuccessful()) {
 			String interactionsString = response.getContent();
 
-			Log.d("Fetched interactions: %s", interactionsString);
-
 			// Store new integration cache expiration.
 			String cacheControl = response.getHeaders().get("Cache-Control");
 			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
@@ -102,7 +100,6 @@ public class InteractionManager {
 	 * Made public for testing. There is no other reason to use this method directly.
 	 */
 	public static void storeInteractions(Context context, String interactionsString) {
-		Log.v("Storing interactions: " + interactionsString);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactionsString).commit();
 	}

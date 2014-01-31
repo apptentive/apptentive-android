@@ -67,11 +67,18 @@ public class ActivityLifecycleManager {
 	private static PersistentSessionQueue queue = null;
 
 	private static void sendEvent(Activity activity, SessionEvent event) {
+		sendEvent(activity, event, false);
+	}
+
+	private static void sendEvent(Activity activity, SessionEvent event, boolean crash) {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
 				MetricModule.sendMetric(activity, Event.EventLabel.app__launch);
-				Apptentive.onAppLaunch(activity);
+				if (!crash) {
+					// Don't trigger a launch in this case, to prevent possible looping crashes.
+					Apptentive.onAppLaunch(activity);
+				}
 				break;
 			case STOP:
 				MetricModule.sendMetric(activity, Event.EventLabel.app__exit);
@@ -113,7 +120,7 @@ public class ActivityLifecycleManager {
 			} else if (pairs == 0 && starts == 2) {
 				Log.i("Starting new session after crash. (1)");
 				removeAllEvents();
-				sendEvent(activity, lastStart != null ? lastStart : start);
+				sendEvent(activity, lastStart != null ? lastStart : start, true);
 				addEvents(lastStart, start);
 			} else if (pairs == 1 && starts == 1) {
 				long expiration = lastStop.getTime() + (SESSION_TIMEOUT_SECONDS * 1000);
@@ -131,7 +138,7 @@ public class ActivityLifecycleManager {
 				addEvents(start);
 			} else if (pairs == 1 && starts == 3) {
 				Log.i("Starting new session after crash. (2)");
-				sendEvent(activity, lastStart != null ? lastStart : start);
+				sendEvent(activity, lastStart != null ? lastStart : start, true);
 				// Reconstruct Queue.
 				removeAllEvents();
 				addEvents(lastStart, start);
