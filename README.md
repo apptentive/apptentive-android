@@ -52,18 +52,14 @@ Our code can be accessed in two ways.
 
 #### Using IntelliJ IDEA
 
-These instructions were tested for IntelliJ IDEA 12.1.6
+These instructions were tested for IntelliJ IDEA 13.0
 
-1. From the menu bar, click `File` -> `Import Module`
-2. Select the `apptentive-android-sdk` directory
-3. Click the `Create module from existing sources` radio button
-4. Click `Next` until finished
-5. From the menu bar, click `File` -> `Project Structure...`
-6. Under `Project Settings` click `Modules`
-7. Select your Android app's module
-7. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane
-8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
-9. Click `OK` to save and close the settings
+1. From the menu bar, click `File` -> `Project Structure`
+2. Select the `apptentive-android-sdk.iml` file within the `apptentive-android-sdk` directory and hit `OK`
+3. Select your Android app's module
+4. Click the `Dependencies` tab, and then click the small `+` button in the lower left corner of that pane
+5. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
+6. Click `OK` to save and close the settings
 
 #### Using Eclipse
 
