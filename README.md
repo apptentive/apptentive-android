@@ -205,7 +205,7 @@ see them. Customers with devices running Android 4+ will also be able to send sc
 ![Message Center Reply Received](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_default_reply_received.png)
 
 Here is what the other side of the conversation looks like.
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/website_conversations_default_reply.png)
+![Website Conversation View](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/website_conversation_default_reply.png)
 
 ##### Showing Message Center
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
