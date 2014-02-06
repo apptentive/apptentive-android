@@ -178,6 +178,24 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 
 #### Message Center
 
+The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
+
+The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
+
+![Intro Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/intro_dialog_sorry_blank.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Intro Dialog Completed](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/intro_dialog_sorry_filled.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Thank You Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/thank_you_dialog.png)
+
+The Message Center displays all messages sent between the customer and you, as well as the times they were sent, and who they were sent by. Your replies will show up in the Message Center, and the customer will not have to leave your app to see them. Customers with devices running Android 4+ will also be able to send screenshots.
+
+![Message Center Sent](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_sent.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Message Center Screenshot Sent](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_screenshot_sent.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Message Center Reply Received](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_reply_received.png)
+
 ##### Showing Message Center
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
 
