@@ -259,6 +259,13 @@ Apptentive.setUnreadMessagesListener(
 
 #### Ratings
 
+Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do you love this app?" If the answer is "Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
+
+![Enjoyment Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/enjoyment_dialog.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Rating Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/rating_dialog.png)
+
+
 Apptentive can ask users to rate your app after a set of conditions are met. Those conditions can be specified in your
 Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
 have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity.
