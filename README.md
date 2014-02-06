@@ -46,6 +46,8 @@ Our code can be accessed in two ways.
 * Download the latest release [here](https://github.com/apptentive/apptentive-android/tags).
 * Alternatively, you can clone our Android SDK using git: `git clone https://github.com/apptentive/apptentive-android.git`
 
+**Note:** Please make sure to watch and star our github repo so you can be notified when there are updates to the SDK.
+
 ---
 
 ### Set up Android Workspace
@@ -107,7 +109,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 
     <!-- minSDKVersion must be at least 7 -->
     <uses-sdk android:minSdkVersion="7"
-              android:targetSdkVersion="18"/>
+              android:targetSdkVersion="19"/>
 
     <application android:label="@string/app_name" android:icon="@drawable/icon">
         <activity android:name=".ExampleActivity"
