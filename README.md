@@ -1,6 +1,8 @@
 # Apptentive Android SDK
 
-The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it, you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at specific points within your app, and more.
+The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it,
+you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at
+specific points within your app, and more.
 
 **Note:** For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
 
@@ -8,7 +10,9 @@ The Apptentive Android SDK lets you provide a powerful and simple channel to com
 
 -------------------------------------------------
 
-The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use newer XML syntax for forward compatibility.
+The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against
+Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use
+newer XML syntax for forward compatibility.
 
 The following languages are supported:
 
@@ -178,9 +182,11 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 
 #### Message Center
 
-The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
+The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The
+customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
 
-The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
+The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
+submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
 
 ![Intro Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/intro_dialog_default_blank.png)
 ![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
@@ -188,7 +194,9 @@ The if the Message Center is being opened for the first time, the Intro Dialog w
 ![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
 ![Thank You Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/thank_you_dialog.png)
 
-The Message Center displays all messages sent between the customer and you, as well as the times they were sent, and who they were sent by. Your replies will show up in the Message Center, and the customer will not have to leave your app to see them. Customers with devices running Android 4+ will also be able to send screenshots.
+The Message Center displays all messages sent between the customer and you, as well as the times they were sent, and who
+they were sent by. Your replies will show up in the Message Center, and the customer will not have to leave your app to
+see them. Customers with devices running Android 4+ will also be able to send screenshots.
 
 ![Message Center Sent](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_default_sent.png)
 ![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
@@ -218,7 +226,9 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 
 ##### Showing Message Center and Passing in Custom Message Data
 
-Alternatively, you can supply custom key/value pairs that will be sent in the next message that the user sends while the Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of `Joe's Pizza`.
+Alternatively, you can supply custom key/value pairs that will be sent in the next message that the user sends while the
+Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
+`Joe's Pizza`. If the user sends a more than one message, only the first message will include this custom data.
 
 ###### Method
 
@@ -259,7 +269,10 @@ Apptentive.setUnreadMessagesListener(
 
 #### Ratings
 
-Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do you love this app?" If the answer is "Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
+Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your
+app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do you love this app?" If the answer is
+"Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center
+Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
 
 ![Enjoyment Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/enjoyment_dialog.png)
 ![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
@@ -300,10 +313,23 @@ public static void Apptentive.logSignificantEvent(Context context);
 
 #### Surveys
 
-Surveys are fetched from the server when the app starts, so you don't have to worry about managing them. To show a
-survey, simply call `Apptentive.showSurvey()`. You can optionally passing in a set of tags to match against. Tags are defined
-when you create a survey on [Apptentive](https://www.apptentive.com). You can also pass in a listener and be notified when the user submits
-or skips a survey.
+Surveys are a great tool to learn about your customers. You can create surveys that have multiple types of questions:
+multiple select, single select, and free text. You can also choose the audience your survey is shown to by choosing to
+send it only to devices which match certain criteria. Finally, you can chose to limit how often and how many times a
+survey can be shown to each person, or to the entire customer base.
+
+![Survey Incomplete](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/survey_incomplete.png)
+![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
+![Survey Complete](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/survey_complete.png)
+
+Surveys are fetched from the server when the app starts, so you don't have to worry about managing them. They are cached
+for 24 hours. To show a survey, simply call `Apptentive.showSurvey()`. You can optionally pass in a set of tags to match
+against. Tags are arbitrary strings that represent the place in your code that you are calling the survey API. You can
+call the survey from multiple places in your code. Then, later on, you can create a survey using one of those tags, and
+that survey will only be shown at that tagged API call. You can also pass in a listener and be notified when the user
+submits or skips a survey.
+
+**Note:** If you are unable to show surveys during testing, you may have installed your app before the survey was put live on our server. Just clear or reinstall your app to see surveys.
 
 ###### Method
 
