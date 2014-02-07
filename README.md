@@ -33,9 +33,11 @@ The following languages are supported:
 
 ## Install Guide
 
+This walk-through will guide you through the installation and configuration of the Apptentive SDK in your Android apps. This video will help to get you started, and the rest of this document embody a complete reference of the Apptentive Android SDK API.
+
 [![Apptentive Android SDK Install Guide](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/apptentive_android_video_screenshot.png)](http://vimeo.com/85495302)
 
-This walk-through will guide you through the installation and configuration of the Apptentive SDK in your Android apps. Laid
+Laid
 out below are instructions that will allow you to ask users to rate your app, give and receive feedback about app performance, and
 show surveys to your users.
 
