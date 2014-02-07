@@ -120,7 +120,7 @@ public class CodePointStore extends JSONObject {
 		if (store != null && name != null && version != null) {
 			try {
 				String recordTypeKey = interaction ? KEY_INTERACTIONS : KEY_CODE_POINT;
-				JSONObject recordType = null;
+				JSONObject recordType;
 				if (!store.isNull(recordTypeKey)) {
 					recordType = store.getJSONObject(recordTypeKey);
 				} else {
@@ -129,7 +129,7 @@ public class CodePointStore extends JSONObject {
 				}
 
 				// Get or create code point object.
-				JSONObject codePointJson = null;
+				JSONObject codePointJson;
 				if (!recordType.isNull(name)) {
 					codePointJson = recordType.getJSONObject(name);
 				} else {
@@ -140,7 +140,7 @@ public class CodePointStore extends JSONObject {
 				// Set the last time this code point was seen to the current time.
 				codePointJson.put(KEY_LAST, Util.getCurrentTime());
 
-				// Set the total times this code point was seen to the current time.
+				// Increment the total times this code point was seen.
 				int total = 0;
 				if (codePointJson.has(KEY_TOTAL)) {
 					total = codePointJson.getInt(KEY_TOTAL);
@@ -148,7 +148,7 @@ public class CodePointStore extends JSONObject {
 				codePointJson.put(KEY_TOTAL, total + 1);
 
 				// Get or create version object.
-				JSONObject versionJson = null;
+				JSONObject versionJson;
 				if (!codePointJson.isNull(KEY_VERSION)) {
 					versionJson = codePointJson.getJSONObject(KEY_VERSION);
 				} else {
@@ -164,7 +164,7 @@ public class CodePointStore extends JSONObject {
 				versionJson.put(version, existingVersionCount + 1);
 
 				// Get or create build object.
-				JSONObject buildJson = null;
+				JSONObject buildJson;
 				if (!codePointJson.isNull(KEY_BUILD)) {
 					buildJson = codePointJson.getJSONObject(KEY_BUILD);
 				} else {
