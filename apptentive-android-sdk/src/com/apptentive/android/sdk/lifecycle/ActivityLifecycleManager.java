@@ -74,7 +74,6 @@ public class ActivityLifecycleManager {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
-				MetricModule.sendMetric(activity, Event.EventLabel.app__launch);
 				if (!crash) {
 					// Don't trigger a launch in this case, to prevent possible looping crashes.
 					Apptentive.onAppLaunch(activity);
@@ -82,7 +81,6 @@ public class ActivityLifecycleManager {
 				break;
 			case STOP:
 				MetricModule.sendMetric(activity, Event.EventLabel.app__exit);
-				Apptentive.onAppDidExit();
 				break;
 			default:
 				break;

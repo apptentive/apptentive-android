@@ -555,6 +555,7 @@ public class Apptentive {
 	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
 		try {
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(codePoint, (Map<String, String>) null));
 			return EngagementModule.engage(activity, codePoint);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -858,12 +859,6 @@ public class Apptentive {
 				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
 			}
 		});
-		Apptentive.engage(activity, "app.launch");
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static void onAppDidExit() {
+		Apptentive.engage(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }
