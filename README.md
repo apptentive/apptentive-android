@@ -533,3 +533,21 @@ Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptent
 -keepattributes SourceFile,LineNumberTable
 -keep class com.apptentive.android.sdk.** { *; }
 ```
+
+### Known Issues
+
+* If you are using the [OkHttp](http://square.github.io/okhttp/) library, you will need to apply the following workaround. There is a severe [known issue]() preventing normal use of SSL connections when OkHttp is in use. A [workaraound](https://github.com/square/okhttp/issues/184#issuecomment-18772733) is as follows:
+
+Call this during app initialiation.
+
+```
+OkHttpClient okHttpClient = new OkHttpClient();
+SSLContext sslContext;
+try {
+  sslContext = SSLContext.getInstance("TLS");
+  sslContext.init(null, null, null);
+} catch (GeneralSecurityException e) {
+  throw new AssertionError(); // The system has no TLS. Just give up.
+}
+okHttpClient.setSslSocketFactory(sslContext.getSocketFactory());
+```
