@@ -39,8 +39,6 @@ public class Constants {
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
-	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
-	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
 	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
 	public static final String PREF_KEY_START_OF_RATING_PERIOD = "startOfRatingPeriod";
 	public static final String PREF_KEY_RATING_STATE = "ratingState";
@@ -94,6 +92,8 @@ public class Constants {
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
+	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
+	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
 
 	/**
 	 * A list of mobile carrier network types as Strings.

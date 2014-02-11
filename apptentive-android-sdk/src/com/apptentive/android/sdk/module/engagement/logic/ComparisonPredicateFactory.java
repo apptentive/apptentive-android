@@ -30,10 +30,9 @@ public class ComparisonPredicateFactory {
 				return new NumberComparisonPredicate(key, (double) Util.getAppVersionCode(context), condition);
 			case days_since_install: {
 				long value = 0l;
-				List<VersionHistoryStore.VersionHistoryEntry> versionHistory = VersionHistoryStore.getVersionHistory(context);
-				if (versionHistory != null && versionHistory.size() != 0) {
-					VersionHistoryStore.VersionHistoryEntry entry = versionHistory.get(0); // Get the first version.
-					Double seconds = entry.seconds;
+				VersionHistoryStore.VersionHistoryEntry latestEntry = VersionHistoryStore.getLastVersionSeen(context);
+				if (latestEntry != null) {
+					Double seconds = latestEntry.seconds;
 					long elapsed = System.currentTimeMillis() - (long) (seconds * 1000);
 					value = elapsed / DateUtils.DAY_IN_MILLIS; // Integer division on purpose
 				}
@@ -41,10 +40,9 @@ public class ComparisonPredicateFactory {
 			}
 			case days_since_upgrade:
 				long value = 0l;
-				List<VersionHistoryStore.VersionHistoryEntry> versionHistory = VersionHistoryStore.getVersionHistory(context);
-				if (versionHistory != null && versionHistory.size() != 0) {
-					VersionHistoryStore.VersionHistoryEntry entry = versionHistory.get(versionHistory.size() - 1); // Get the most recent version.
-					Double seconds = entry.seconds;
+				VersionHistoryStore.VersionHistoryEntry latestEntry = VersionHistoryStore.getLastVersionSeen(context);
+				if (latestEntry != null) {
+					Double seconds = latestEntry.seconds;
 					long elapsed = System.currentTimeMillis() - (long) (seconds * 1000);
 					value = elapsed / DateUtils.DAY_IN_MILLIS; // Integer division on purpose
 				}

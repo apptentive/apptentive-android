@@ -2,6 +2,7 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.format.DateUtils;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -21,11 +22,11 @@ public class VersionHistoryStore {
 	 * timestamp. Each entry ends with a ';' to separate it from subsequent entries. A list is stored for both the
 	 * version name and version code.
 	 */
-	public static void updateVersionHistory(Context context, Long newVersionCode, String newVersionName) {
+	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName) {
 		updateVersionHistory(context, newVersionCode, newVersionName, System.currentTimeMillis());
 	}
 
-	public static void updateVersionHistory(Context context, Long newVersionCode, String newVersionName, long date) {
+	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, long date) {
 		Log.d("Updating version info: %d, %s @%d", newVersionCode, newVersionName, date);
 		Double now = (double) date / 1000;
 		List<VersionHistoryEntry> versionHistory = getVersionHistory(context);
@@ -36,6 +37,14 @@ public class VersionHistoryStore {
 		}
 		versionHistory.add(new VersionHistoryEntry(now, newVersionCode, newVersionName));
 		saveVersionHistory(context, versionHistory);
+	}
+
+	public static VersionHistoryEntry getLastVersionSeen(Context context) {
+		List<VersionHistoryEntry> entries = getVersionHistory(context);
+		if (entries != null && !entries.isEmpty()) {
+			return entries.get(entries.size() - 1);
+		}
+		return null;
 	}
 
 	/**
@@ -68,7 +77,7 @@ public class VersionHistoryStore {
 
 	public static class VersionHistoryEntry {
 		public Double seconds;
-		public Long versionCode;
+		public Integer versionCode;
 		public String versionName;
 
 		public VersionHistoryEntry(String encoded) {
@@ -76,12 +85,12 @@ public class VersionHistoryStore {
 				// Remove entry separator and split on field separator.
 				String[] parts = encoded.replace(ENTRY_SEP, "").split(FIELD_SEP);
 				seconds = Double.valueOf(parts[0]);
-				versionCode = Long.parseLong(parts[1]);
+				versionCode = Integer.parseInt(parts[1]);
 				versionName = parts[2];
 			}
 		}
 
-		public VersionHistoryEntry(Double seconds, Long versionCode, String versionName) {
+		public VersionHistoryEntry(Double seconds, Integer versionCode, String versionName) {
 			this.seconds = seconds;
 			this.versionCode = versionCode;
 			this.versionName = versionName;

@@ -615,20 +615,20 @@ public class Apptentive {
 			try {
 				PackageManager packageManager = context.getPackageManager();
 				PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+
 				Integer currentVersionCode = packageInfo.versionCode;
-				Integer previousVersionCode = null;
-				if(prefs.contains(Constants.PREF_KEY_APP_VERSION_CODE)) {
-					previousVersionCode = prefs.getInt(Constants.PREF_KEY_APP_VERSION_CODE, 0);
-				}
-				String previousVersionName = prefs.getString(Constants.PREF_KEY_APP_VERSION_NAME, null);
 				String currentVersionName = packageInfo.versionName;
-				if(previousVersionName != null && !previousVersionCode.equals(currentVersionCode)) {
-					onVersionChanged(context, previousVersionCode, currentVersionCode, previousVersionName, currentVersionName);
+				VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(context);
+				if (lastVersionEntrySeen == null) {
+					onVersionChanged(context, null, currentVersionCode, null, currentVersionName);
+				} else {
+					if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
+						onVersionChanged(context, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
+					}
 				}
-				prefs.edit().putInt(Constants.PREF_KEY_APP_VERSION_CODE, currentVersionCode).commit();
 
 				GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
-			} catch(PackageManager.NameNotFoundException e) {
+			} catch (PackageManager.NameNotFoundException e) {
 				// Nothing we can do then.
 				GlobalInfo.appDisplayName = "this app";
 			}
@@ -706,7 +706,7 @@ public class Apptentive {
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
 		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		VersionHistoryStore.updateVersionHistory(context, (long)currentVersionCode, currentVersionName);
+		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
 		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {

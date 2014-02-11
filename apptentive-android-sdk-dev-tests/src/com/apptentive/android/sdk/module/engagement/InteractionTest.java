@@ -143,17 +143,17 @@ public class InteractionTest extends InstrumentationTestCase {
 			assertFalse(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
 			canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
 			canRun = interaction.canRun(getTargetContext());
 			assertTrue(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
 			canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 		} catch (JSONException e) {
@@ -204,30 +204,30 @@ public class InteractionTest extends InstrumentationTestCase {
 			boolean canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
 			canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
 			canRun = interaction.canRun(getTargetContext());
 			assertTrue(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
 			canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 0l, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 0, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
 			canRun = interaction.canRun(getTargetContext());
 			assertTrue(canRun);
 
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 0l, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 7));
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 1l, "1.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 0, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 7));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 1, "1.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 5));
+			VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));
 			canRun = interaction.canRun(getTargetContext());
 			assertFalse(canRun);
 		} catch (JSONException e) {
@@ -330,50 +330,19 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Finished test.");
 	}
 
-	/**
-	 * Tests app application_version. Runs.
-	 */
-	private static final String TEST_CRITERIA__APPLICATION_VERSION_3 =
-			"{\n" +
-					"    \"interactions\": {\n" +
-					"        \"app.launch\": [\n" +
-					"            {\n" +
-					"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"                \"priority\": 1,\n" +
-					"                \"criteria\": {\n" +
-					"                    \"application_version\": \"4.0\"\n" +
-					"                },\n" +
-					"                \"type\": \"UpgradeMessage\",\n" +
-					"                \"version\": null,\n" +
-					"                \"active\": true,\n" +
-					"                \"configuration\": {\n" +
-					"                    \"active\": true,\n" +
-					"                    \"app_version\": \"2\",\n" +
-					"                    \"show_app_icon\": true,\n" +
-					"                    \"show_powered_by\": true,\n" +
-					"                    \"body\": \"\"\n" +
-					"                }\n" +
-					"            }\n" +
-					"        ]\n" +
-					"    }\n" +
-					"}";
-
 	public void testCriteriaApplicationVersion3() {
 		Log.e("Running test: testCriteriaApplicationVersion3()\n\n");
 		resetDevice();
-		Interactions interactionsList = null;
-		try {
-			interactionsList = new Interactions(TEST_CRITERIA__APPLICATION_VERSION_3);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-			assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), "testCriteriaApplicationBuild2.json");
+		InteractionManager.storeInteractions(getTargetContext(), json);
+		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
+		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
+		assertNotNull("Failed to parse Interactions.", interactionsList);
 
-			Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction = interactionsForCodePoint.get(0);
 
-			boolean canRun = interaction.canRun(getTargetContext());
-			assertTrue(canRun);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
+		boolean canRun = interaction.canRun(getTargetContext());
+		assertTrue(canRun);
 		Log.e("Finished test.");
 	}
 
@@ -424,49 +393,20 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Finished test.");
 	}
 
-	/**
-	 * Tests application_build. Runs.
-	 */
-	private static final String TEST_CRITERIA__APPLICATION_BUILD_2 =
-			"{\n" +
-					"    \"interactions\": {\n" +
-					"        \"app.launch\": [\n" +
-					"            {\n" +
-					"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"                \"priority\": 1,\n" +
-					"                \"criteria\": {\n" +
-					"                    \"application_build\": 4\n" +
-					"                },\n" +
-					"                \"type\": \"UpgradeMessage\",\n" +
-					"                \"version\": null,\n" +
-					"                \"active\": true,\n" +
-					"                \"configuration\": {\n" +
-					"                    \"active\": true,\n" +
-					"                    \"app_version\": \"2\",\n" +
-					"                    \"show_app_icon\": true,\n" +
-					"                    \"show_powered_by\": true,\n" +
-					"                    \"body\": \"\"\n" +
-					"                }\n" +
-					"            }\n" +
-					"        ]\n" +
-					"    }\n" +
-					"}";
-
 	public void testCriteriaApplicationBuild2() {
 		Log.e("Running test: testCriteriaApplicationBuild2()\n\n");
 		resetDevice();
-		try {
-			Interactions interactionsList = new Interactions(TEST_CRITERIA__APPLICATION_BUILD_2);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-			assertNotNull("Failed to parse Interactions.", interactionsList);
 
-			Interaction interaction = interactionsForCodePoint.get(0);
+		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), "testCriteriaApplicationBuild2.json");
+		InteractionManager.storeInteractions(getTargetContext(), json);
+		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
+		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
+		assertNotNull("Failed to parse Interactions.", interactionsList);
 
-			boolean canRun = interaction.canRun(getTargetContext());
-			assertTrue(canRun);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
+		Interaction interaction = interactionsForCodePoint.get(0);
+
+		boolean canRun = interaction.canRun(getTargetContext());
+		assertTrue(canRun);
 		Log.e("Finished test.");
 	}
 
@@ -1227,15 +1167,15 @@ public class InteractionTest extends InstrumentationTestCase {
 		assertTrue(canRun);
 
 		// Allow conditions to be met.
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 0l, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 10)); // 10 days ago
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 1l, "1.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 8));  //  8 days ago
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 2l, "1.2", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));  //  6 days ago
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3l, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));  //  4 days ago
+		VersionHistoryStore.updateVersionHistory(getTargetContext(), 0, "1.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 10)); // 10 days ago
+		VersionHistoryStore.updateVersionHistory(getTargetContext(), 1, "1.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 8));  //  8 days ago
+		VersionHistoryStore.updateVersionHistory(getTargetContext(), 2, "1.2", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 6));  //  6 days ago
+		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "2.0", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 4));  //  4 days ago
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
 		canRun = interaction.canRun(getTargetContext());
 		assertFalse(canRun);
 
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4l, "2.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 2));  //  2 days ago
+		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.1", System.currentTimeMillis() - (DateUtils.DAY_IN_MILLIS * 2));  //  2 days ago
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
 		canRun = interaction.canRun(getTargetContext());
 		assertTrue(canRun);
