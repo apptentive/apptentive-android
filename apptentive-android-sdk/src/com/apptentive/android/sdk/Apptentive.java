@@ -107,7 +107,7 @@ public class Apptentive {
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
-	 * @param email The user's email address.
+	 * @param email   The user's email address.
 	 */
 	public static void setInitialUserEmail(Context context, String email) {
 		PersonManager.storeInitialPersonEmail(context, email);
@@ -119,7 +119,7 @@ public class Apptentive {
 	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
 	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
 	 *
-	 * @param context The context from which this method is called.
+	 * @param context          The context from which this method is called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
@@ -139,15 +139,15 @@ public class Apptentive {
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
-	 * @param key The key to store the data under.
-	 * @param value The value of the data.
+	 * @param key     The key to store the data under.
+	 * @param value   The value of the data.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
-		if(key == null || key.trim().length() == 0) {
+		if (key == null || key.trim().length() == 0) {
 			return;
 		}
 		CustomData customData = DeviceManager.loadCustomDeviceData(context);
-		if(customData != null) {
+		if (customData != null) {
 			try {
 				customData.put(key, value);
 				DeviceManager.storeCustomDeviceData(context, customData);
@@ -159,12 +159,13 @@ public class Apptentive {
 
 	/**
 	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
+	 *
 	 * @param context The context from which this method is called.
-	 * @param key The key to remove.
+	 * @param key     The key to remove.
 	 */
 	public static void removeCustomDeviceData(Context context, String key) {
 		CustomData customData = DeviceManager.loadCustomDeviceData(context);
-		if(customData != null) {
+		if (customData != null) {
 			customData.remove(key);
 			DeviceManager.storeCustomDeviceData(context, customData);
 		}
@@ -176,7 +177,7 @@ public class Apptentive {
 	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
 	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
 	 *
-	 * @param context The context from which this method is called.
+	 * @param context          The context from which this method is called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
@@ -198,15 +199,15 @@ public class Apptentive {
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
-	 * @param key The key to store the data under.
-	 * @param value The value of the data.
+	 * @param key     The key to store the data under.
+	 * @param value   The value of the data.
 	 */
 	public static void addCustomPersonData(Context context, String key, String value) {
-		if(key == null || key.trim().length() == 0) {
+		if (key == null || key.trim().length() == 0) {
 			return;
 		}
 		CustomData customData = PersonManager.loadCustomPersonData(context);
-		if(customData != null) {
+		if (customData != null) {
 			try {
 				customData.put(key, value);
 				PersonManager.storeCustomPersonData(context, customData);
@@ -220,11 +221,11 @@ public class Apptentive {
 	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
 	 *
 	 * @param context The context from which this method is called.
-	 * @param key The key to remove.
+	 * @param key     The key to remove.
 	 */
 	public static void removeCustomPersonData(Context context, String key) {
 		CustomData customData = PersonManager.loadCustomPersonData(context);
-		if(customData != null) {
+		if (customData != null) {
 			customData.remove(key);
 			PersonManager.storeCustomPersonData(context, customData);
 		}
@@ -249,13 +250,13 @@ public class Apptentive {
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
 	 *
-	 * @param context The Context from which this method is called.
+	 * @param context     The Context from which this method is called.
 	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
-	 * @param config A String to String Map of key/value pairs representing all necessary configuration data Apptentive needs
-	 *               to use the specific third party integration.
+	 * @param config      A String to String Map of key/value pairs representing all necessary configuration data Apptentive needs
+	 *                    to use the specific third party integration.
 	 */
 	public static void addIntegration(Context context, String integration, Map<String, String> config) {
-		if (integration == null || config == null)  {
+		if (integration == null || config == null) {
 			return;
 		}
 		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
@@ -332,8 +333,9 @@ public class Apptentive {
 	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
 	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
 	 * notification did not come from Apptentive, this method has no effect.
+	 *
 	 * @param context The Context from which this method is called.
-	 * @param intent The Intent that you received when the user opened a push notification.
+	 * @param intent  The Intent that you received when the user opened a push notification.
 	 */
 	public static void setPendingPushNotification(Context context, Intent intent) {
 		if (intent != null) {
@@ -424,7 +426,8 @@ public class Apptentive {
 	/**
 	 * If there are any properties that your {@link IRatingProvider} implementation requires, populate them here. This
 	 * is not currently needed with the Google Play and Amazon Appstore IRatingProviders.
-	 * @param key A String
+	 *
+	 * @param key   A String
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
@@ -435,6 +438,7 @@ public class Apptentive {
 	 * If you want to launch the ratings flow when conditions are met, call this at an appropriate place in your code.
 	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
 	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
+	 *
 	 * @param activity The activity from which this set of dialogs is launched.
 	 * @return True if the rating flow was shown, else false.
 	 */
@@ -466,7 +470,7 @@ public class Apptentive {
 	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
-	 * @param activity The Activity from which to launch the Message Center
+	 * @param activity   The Activity from which to launch the Message Center
 	 * @param customData A Map of key/value Strings that will be sent with the next message.
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
@@ -480,6 +484,7 @@ public class Apptentive {
 
 	/**
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
+	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
 	 */
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
@@ -488,6 +493,7 @@ public class Apptentive {
 
 	/**
 	 * Returns the number of unread messages in the Message Center.
+	 *
 	 * @param context The Context from which this method is called.
 	 * @return The number of unread messages.
 	 */
@@ -524,7 +530,7 @@ public class Apptentive {
 	 * Shows a survey if one is available that has no tags associated with it.
 	 *
 	 * @param listener An {@link OnSurveyFinishedListener} that is called when the survey is dismissed.
-	 * @param tags An optional array of tags that correspond to tags applied to the surveys you create on www.apptentive.com.
+	 * @param tags     An optional array of tags that correspond to tags applied to the surveys you create on www.apptentive.com.
 	 * @return True if a survey was shown, else false.
 	 */
 	public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags) {
@@ -573,7 +579,7 @@ public class Apptentive {
 		// First, initialize data relies on synchronous reads from local resources.
 		//
 
-		if(!GlobalInfo.initialized) {
+		if (!GlobalInfo.initialized) {
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			NetworkStateReceiver.clearListeners();
 
@@ -587,17 +593,17 @@ public class Apptentive {
 
 				boolean debugFlagSet = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 				boolean apptentiveDebugSet = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-					GlobalInfo.isAppDebuggable = debugFlagSet || apptentiveDebugSet;
-			} catch(Exception e) {
+				GlobalInfo.isAppDebuggable = debugFlagSet || apptentiveDebugSet;
+			} catch (Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
 			}
 
-			Log.i("Debug mode enabled? %b" , GlobalInfo.isAppDebuggable);
+			Log.i("Debug mode enabled? %b", GlobalInfo.isAppDebuggable);
 
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
-			if((apiKey == null || apiKey.equals(""))) {
-				if(GlobalInfo.isAppDebuggable) {
+			if ((apiKey == null || apiKey.equals(""))) {
+				if (GlobalInfo.isAppDebuggable) {
 					throw new RuntimeException(errorString);
 				} else {
 					Log.e(errorString);
@@ -605,7 +611,7 @@ public class Apptentive {
 			}
 			GlobalInfo.apiKey = apiKey;
 
-			Log.i("API Key: %s" , GlobalInfo.apiKey);
+			Log.i("API Key: %s", GlobalInfo.apiKey);
 
 			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = context.getPackageName();
@@ -636,11 +642,11 @@ public class Apptentive {
 			// Listen for network state changes.
 			NetworkStateListener networkStateListener = new NetworkStateListener() {
 				public void stateChanged(NetworkInfo networkInfo) {
-					if(networkInfo.getState() == NetworkInfo.State.CONNECTED){
+					if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
 						Log.v("Network connected.");
 						PayloadSendWorker.start(context);
 					}
-					if(networkInfo.getState() == NetworkInfo.State.DISCONNECTED){
+					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
 						Log.v("Network disconnected.");
 					}
 				}
@@ -648,7 +654,7 @@ public class Apptentive {
 			NetworkStateReceiver.addListener(networkStateListener);
 
 			// Grab the conversation token from shared preferences.
-			if(prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
+			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
 				GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 				GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
 			}
@@ -660,7 +666,7 @@ public class Apptentive {
 		}
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if(GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
+		if (GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
 			asyncFetchConversationToken(context);
 		} else {
 			asyncFetchAppConfiguration(context);
@@ -671,7 +677,7 @@ public class Apptentive {
 		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
 		// See if the device info has changed.
 		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
-		if(deviceInfo != null) {
+		if (deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
@@ -680,7 +686,7 @@ public class Apptentive {
 		}
 
 		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
-		if(sdk != null) {
+		if (sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(sdk);
@@ -689,7 +695,7 @@ public class Apptentive {
 		}
 
 		Person person = PersonManager.storePersonAndReturnDiff(context);
-		if(person != null) {
+		if (person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(person);
@@ -747,7 +753,7 @@ public class Apptentive {
 			Log.w("Got null response fetching ConversationToken.");
 			return;
 		}
-		if(response.isSuccessful()) {
+		if (response.isSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
@@ -775,6 +781,7 @@ public class Apptentive {
 
 	/**
 	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
+	 *
 	 * @param force If true, will always fetch configuration. If false, only fetches configuration if the cached
 	 *              configuration has expired.
 	 */
@@ -782,10 +789,10 @@ public class Apptentive {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
 		// Don't get the app configuration unless forced, or the cache has expired.
-		if(!force) {
+		if (!force) {
 			Configuration config = Configuration.load(prefs);
 			Long expiration = config.getConfigurationCacheExpirationMillis();
-			if(System.currentTimeMillis() < expiration){
+			if (System.currentTimeMillis() < expiration) {
 				Log.v("Using cached configuration.");
 				return;
 			}
@@ -793,14 +800,14 @@ public class Apptentive {
 
 		Log.v("Fetching new configuration.");
 		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
-		if(!response.isSuccessful()) {
+		if (!response.isSuccessful()) {
 			return;
 		}
 
 		try {
 			String cacheControl = response.getHeaders().get("Cache-Control");
 			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if(cacheSeconds == null) {
+			if (cacheSeconds == null) {
 				cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 			}
 			Configuration config = new Configuration(response.getContent());
@@ -831,8 +838,9 @@ public class Apptentive {
 
 	/**
 	 * Internal use only.
+	 *
 	 * @param activity The Activity from which to launch the Message Center
-	 * @param forced True if opened manually. False if opened from ratings flow.
+	 * @param forced   True if opened manually. False if opened from ratings flow.
 	 */
 	static void showMessageCenter(Activity activity, boolean forced, Map<String, String> customData) {
 		MessageManager.createMessageCenterAutoMessage(activity, forced);
@@ -844,7 +852,7 @@ public class Apptentive {
 	 */
 	public static void notifyUnreadMessagesListener(int unreadMessages) {
 		Log.v("Notifying UnreadMessagesListener");
-		if(unreadMessagesListener != null) {
+		if (unreadMessagesListener != null) {
 			unreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
 		}
 	}
