@@ -3,7 +3,7 @@ package com.apptentive.android.sdk.module.engagement.logic;
 import org.json.JSONException;
 
 /**
- * Used for performing predicate conditional logic on Numbers. Takes only Doubles, sense all reasonably small numbers
+ * Used for performing predicate conditional logic on Numbers. Takes only Doubles, since all reasonably small numbers
  * can be cast to Double.
  * @author Sky Kelsey
  */

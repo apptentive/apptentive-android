@@ -45,8 +45,7 @@ public abstract class Predicate {
 			try {
 				return Operation.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				// This will happen on old clients if we extend the logic syntax, so log at a low level.
-				Log.d("Error parsing unknown Predicate.Operation: " + name);
+				// This will happen on old clients if we extend the logic syntax, so don't log.
 			}
 			return unknown;
 		}

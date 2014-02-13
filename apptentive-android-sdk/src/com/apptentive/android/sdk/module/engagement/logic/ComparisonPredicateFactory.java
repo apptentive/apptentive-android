@@ -47,17 +47,19 @@ public class ComparisonPredicateFactory {
 					}
 					return new NumberComparisonPredicate(key, seconds, condition);
 				} else if (key.startsWith(KEY_IS_UPDATE)) {
-					ValueSubFilterType subFilterType = ValueSubFilterType.parse(key.replace(KEY_TIME_SINCE_INSTALL + "/", ""));
+					ValueSubFilterType subFilterType = ValueSubFilterType.parse(key.replace(KEY_IS_UPDATE + "/", ""));
+					Boolean isUpdate = false;
 					switch (subFilterType) {
-						case total:
-							break;
 						case version:
+							isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.version);
 							break;
 						case build:
+							isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.build);
 							break;
 						default:
 							Log.w("Unsupported sub filter type \"%s\" for key \"%s\"", subFilterType.name(), key);
 					}
+					return new BooleanComparisonPredicate(key, isUpdate, condition);
 				} else {
 					// Must be a code point / interaction
 					String[] parts = key.split("/");

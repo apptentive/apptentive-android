@@ -7,7 +7,9 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Sky Kelsey
@@ -50,22 +52,23 @@ public class VersionHistoryStore {
 		List<VersionHistoryEntry> entries = getVersionHistory(context);
 		VersionHistoryEntry matchingEntry = null;
 		if (entries != null) {
+			outer_loop:
 			for (VersionHistoryEntry entry : entries) {
 				switch (selector) {
 					case total:
-						// If null, grab the first entry.
+						// Grab the first entry.
 						matchingEntry = entry;
-						break;
+						break outer_loop;
 					case version:
 						if (entry.versionName.equals(Util.getAppVersionName(context))) {
 							matchingEntry = entry;
-							break;
+							break outer_loop;
 						}
 						continue;
 					case build:
 						if (entry.versionCode.equals(Util.getAppVersionCode(context))) {
 							matchingEntry = entry;
-							break;
+							break outer_loop;
 						}
 						continue;
 					default:
@@ -77,6 +80,33 @@ public class VersionHistoryStore {
 			return Util.currentTimeSeconds() - matchingEntry.seconds;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns true if the current version or build is not the first version or build that we have seen. Basically, it just
+	 * looks for two or more versions or builds.
+	 *
+	 * @param selector - The type of version entry we are looking for: version, or build.
+	 * @return True if there are records with more than one version or build, depending on the value of selector.
+	 */
+	public static boolean isUpdate(Context context, Selector selector) {
+		List<VersionHistoryEntry> entries = getVersionHistory(context);
+		Set uniques = new HashSet();
+		if (entries != null) {
+			for (VersionHistoryEntry entry : entries) {
+				switch (selector) {
+					case version:
+						uniques.add(entry.versionName);
+						break;
+					case build:
+						uniques.add(entry.versionName);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		return uniques.size() > 1;
 	}
 
 	public static VersionHistoryEntry getLastVersionSeen(Context context) {

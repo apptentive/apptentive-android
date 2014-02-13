@@ -42,7 +42,8 @@ public class ComparisonPredicate<T extends Comparable> extends Predicate {
 	}
 
 	/**
-	 * Ensures that all operands are coerced to Doubles if the value is a Double, and Strings if the value is a String.
+	 * Ensures that all operands are coerced to Doubles if the value is a Double, Strings if the value is a String, and
+	 * Boolean if the value is a Boolean.
 	 */
 	private T ensureType(T value, Object condition) {
 		if (!value.getClass().equals(condition.getClass())) {
@@ -59,6 +60,10 @@ public class ComparisonPredicate<T extends Comparable> extends Predicate {
 					return (T) (Double) ((Integer) condition).doubleValue();
 				} else if (condition instanceof Long) {
 					return (T) (Double) ((Long) condition).doubleValue();
+				}
+			} else if (value instanceof Boolean) {
+				if (condition instanceof Boolean) {
+					return (T) condition;
 				}
 			}
 		} else {
