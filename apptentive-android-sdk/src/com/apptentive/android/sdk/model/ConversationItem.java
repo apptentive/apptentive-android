@@ -25,7 +25,7 @@ public abstract class ConversationItem extends Payload {
 		super();
 		setNonce(UUID.randomUUID().toString());
 
-		double seconds = Util.getCurrentTime();
+		double seconds = Util.currentTimeSeconds();
 		int utcOffset = Util.getUtcOffset();
 
 		setClientCreatedAt(seconds);

@@ -28,6 +28,8 @@ public class InteractionCriteria extends JSONObject {
 			return criteria.apply(context);
 		} catch (JSONException e) {
 			Log.w("Error parsing and running InteractionCriteria predicate logic.", e);
+		} catch (Exception e) {
+			Log.w("Error parsing and running InteractionCriteria predicate logic.", e);
 		}
 		return false;
 	}

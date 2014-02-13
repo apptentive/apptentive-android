@@ -138,7 +138,7 @@ public class CodePointStore extends JSONObject {
 				}
 
 				// Set the last time this code point was seen to the current time.
-				codePointJson.put(KEY_LAST, Util.getCurrentTime());
+				codePointJson.put(KEY_LAST, Util.currentTimeSeconds());
 
 				// Increment the total times this code point was seen.
 				int total = 0;

@@ -5,8 +5,8 @@
                 "id": "526fe2836dd8bf546a00000c",
                 "priority": 2,
                 "criteria": {
-                    "days_since_upgrade": {
-                        "$lt": 3
+                    "time_since_install/total": {
+                        "$lt": 259200
                     },
                     "code_point/app.launch/invokes/total": 2,
                     "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
@@ -41,8 +41,8 @@
                 "criteria": {
                     "$or": [
                         {
-                            "days_since_upgrade": {
-                                "$lt": 3
+                            "time_since_install/total": {
+                                "$lt": 259200
                             }
                         },
                         {
@@ -69,8 +69,8 @@
                 "criteria": {
                     "$or": [
                         {
-                            "days_since_upgrade": {
-                                "$lt": 3
+                            "time_since_install/version": {
+                                "$lt": 259200
                             }
                         },
                         {

@@ -334,11 +334,12 @@ public class Util {
 	/**
 	 * Converts the current time to a double representing seconds, instead of milliseconds. It will have millisecond
 	 * precision as fractional seconds. This is the default time format used throughout the Apptentive SDK.
+	 *
 	 * @return A double representing the current time in seconds.
 	 */
-	public static double getCurrentTime() {
+	public static double currentTimeSeconds() {
 		long millis = System.currentTimeMillis();
-		double point = (double)millis;
+		double point = (double) millis;
 		return point / 1000;
 	}
 

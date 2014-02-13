@@ -2,9 +2,9 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.format.DateUtils;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,20 +23,60 @@ public class VersionHistoryStore {
 	 * version name and version code.
 	 */
 	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName) {
-		updateVersionHistory(context, newVersionCode, newVersionName, System.currentTimeMillis());
+		updateVersionHistory(context, newVersionCode, newVersionName, Util.currentTimeSeconds());
 	}
 
-	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, long date) {
-		Log.d("Updating version info: %d, %s @%d", newVersionCode, newVersionName, date);
-		Double now = (double) date / 1000;
+	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, double date) {
+		Log.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
 		List<VersionHistoryEntry> versionHistory = getVersionHistory(context);
 		for (VersionHistoryEntry entry : versionHistory) {
 			if (newVersionCode.equals(entry.versionCode)) {
 				return; // Already recorded.
 			}
 		}
-		versionHistory.add(new VersionHistoryEntry(now, newVersionCode, newVersionName));
+		versionHistory.add(new VersionHistoryEntry(date, newVersionCode, newVersionName));
 		saveVersionHistory(context, versionHistory);
+	}
+
+
+	/**
+	 * Returns the number of seconds since the first time we saw this release of the app. Since the version entries are
+	 * always stored in order, the first matching entry happened first.
+	 *
+	 * @param selector - The type of version entry we are looking for: total, version, or build.
+	 * @return A Double representing the number of seconds since we first saw the desired app release entry. Null if never seen.
+	 */
+	public static Double getTimeSinceVersionFirstSeen(Context context, Selector selector) {
+		List<VersionHistoryEntry> entries = getVersionHistory(context);
+		VersionHistoryEntry matchingEntry = null;
+		if (entries != null) {
+			for (VersionHistoryEntry entry : entries) {
+				switch (selector) {
+					case total:
+						// If null, grab the first entry.
+						matchingEntry = entry;
+						break;
+					case version:
+						if (entry.versionName.equals(Util.getAppVersionName(context))) {
+							matchingEntry = entry;
+							break;
+						}
+						continue;
+					case build:
+						if (entry.versionCode.equals(Util.getAppVersionCode(context))) {
+							matchingEntry = entry;
+							break;
+						}
+						continue;
+					default:
+						return null;
+				}
+			}
+		}
+		if (matchingEntry != null) {
+			return Util.currentTimeSeconds() - matchingEntry.seconds;
+		}
+		return null;
 	}
 
 	public static VersionHistoryEntry getLastVersionSeen(Context context) {
@@ -99,6 +139,21 @@ public class VersionHistoryStore {
 		@Override
 		public String toString() {
 			return String.valueOf(seconds) + FIELD_SEP + String.valueOf(versionCode) + FIELD_SEP + versionName;
+		}
+	}
+
+	public enum Selector {
+		total,
+		version,
+		build,
+		other;
+
+		public static Selector parse(String name) {
+			try {
+				return Selector.valueOf(name);
+			} catch (IllegalArgumentException e) {
+			}
+			return other;
 		}
 	}
 }

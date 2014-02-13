@@ -69,7 +69,7 @@
                 "id": "526fe2836dd8bf546a00000c",
                 "priority": 2,
                 "criteria": {
-                    "days_since_install": null
+                    "time_since_install/total": null
                 },
                 "type": "RatingDialog",
                 "version": null,
@@ -85,71 +85,7 @@
                 "id": "526fe2836dd8bf546a00000c",
                 "priority": 2,
                 "criteria": {
-                    "days_since_install": "0"
-                },
-                "type": "RatingDialog",
-                "version": null,
-                "active": true,
-                "configuration": {
-                    "active": true,
-                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
-                }
-            }
-        ],
-        "code.point.7": [
-            {
-                "id": "526fe2836dd8bf546a00000c",
-                "priority": 2,
-                "criteria": {
-                    "days_since_install": 0.0
-                },
-                "type": "RatingDialog",
-                "version": null,
-                "active": true,
-                "configuration": {
-                    "active": true,
-                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
-                }
-            }
-        ],
-        "code.point.8": [
-            {
-                "id": "526fe2836dd8bf546a00000c",
-                "priority": 2,
-                "criteria": {
-                    "days_since_upgrade": null
-                },
-                "type": "RatingDialog",
-                "version": null,
-                "active": true,
-                "configuration": {
-                    "active": true,
-                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
-                }
-            }
-        ],
-        "code.point.9": [
-            {
-                "id": "526fe2836dd8bf546a00000c",
-                "priority": 2,
-                "criteria": {
-                    "days_since_upgrade": "0"
-                },
-                "type": "RatingDialog",
-                "version": null,
-                "active": true,
-                "configuration": {
-                    "active": true,
-                    "question_text": "Do you love Jelly Bean GO SMS Pro?"
-                }
-            }
-        ],
-        "code.point.10": [
-            {
-                "id": "526fe2836dd8bf546a00000c",
-                "priority": 2,
-                "criteria": {
-                    "days_since_upgrade": 0.0
+                    "time_since_install/total": "0"
                 },
                 "type": "RatingDialog",
                 "version": null,
