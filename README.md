@@ -393,12 +393,6 @@ email through an Apptentive UI, we will use that instead.
 public static void Apptentive.setInitialUserEmail(Context context, String email);
 ```
 
-###### Example
-
-```java
-Apptentive.setUserEmail(this, "johndoe@example.com");
-```
-
 #### Send Custom Device Data to Apptentive
 
 You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
@@ -410,22 +404,10 @@ key/value string pairs.
 public static void Apptentive.addCustomDeviceData(Context context, String key, String value);
 ```
 
-###### Example
-
-```java
-Apptentive.addCustomData(this, "myDeviceId", "1234567890");
-```
-
 ###### Method
 
 ```java
 public static void Apptentive.removeCustomDeviceData(Context context, String key);
-```
-
-###### Example
-
-```java
-Apptentive.removeCustomDeviceData(this, "myDeviceId");
 ```
 
 #### Send Custom Person Data to Apptentive
@@ -439,22 +421,10 @@ Data must be key/value string pairs.
 public static void Apptentive.addCustomPersonData(Context context, String key, String value);
 ```
 
-###### Example
-
-```java
-Apptentive.addCustomPersonData(this, "myUserId", "1234567890");
-```
-
 ###### Method
 
 ```java
 public static void Apptentive.removeCustomPersonData(Context context, String key);
-```
-
-###### Example
-
-```java
-Apptentive.removeCustomPersonData(this, "myUserId");
 ```
 
 ### Third Party Integrations
