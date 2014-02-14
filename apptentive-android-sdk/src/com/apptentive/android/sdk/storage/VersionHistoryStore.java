@@ -31,13 +31,21 @@ public class VersionHistoryStore {
 	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, double date) {
 		Log.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
 		List<VersionHistoryEntry> versionHistory = getVersionHistory(context);
+		boolean alreadySawVersionCode = false;
+		boolean alreadySawVersionName = false;
 		for (VersionHistoryEntry entry : versionHistory) {
 			if (newVersionCode.equals(entry.versionCode)) {
-				return; // Already recorded.
+				alreadySawVersionCode = true;
+			}
+			if (newVersionName.equals(entry.versionName)) {
+				alreadySawVersionName = true;
 			}
 		}
-		versionHistory.add(new VersionHistoryEntry(date, newVersionCode, newVersionName));
-		saveVersionHistory(context, versionHistory);
+		// If either the versionCode or versionName are new, record a new update.
+		if (!alreadySawVersionCode || !alreadySawVersionName) {
+			versionHistory.add(new VersionHistoryEntry(date, newVersionCode, newVersionName));
+			saveVersionHistory(context, versionHistory);
+		}
 	}
 
 
