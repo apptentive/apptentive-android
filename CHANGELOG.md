@@ -1,4 +1,4 @@
-2013-02-21 skykelsey next
+2014-02-24 skykelsey 1.3.0
 --------------------------
 
 Major changes:
@@ -7,14 +7,14 @@ Major changes:
 * Added the ability to send Upgrade Messages to your users. Now you can notify users of new features targeted to specific builds or versions of your app, even if they have opted to auto-update your app in the app store.
 * Added the ability to send hidden attachments to the server. You can now send texts, logs, images, and other files to the server to help provide better support. These files are visible to you in teh conversation view, but are not shown to the end user.
 
-2013-01-20 skykelsey 1.2.7
+2014-01-20 skykelsey 1.2.7
 --------------------------
 
 Bugs Fixed:
 
 * ANDROID-239 PACKAGE_RESTARTED permission causes app to wake often
 
-2013-01-19 skykelsey 1.2.6
+2014-01-19 skykelsey 1.2.6
 --------------------------
 
 Bugs Fixed:
