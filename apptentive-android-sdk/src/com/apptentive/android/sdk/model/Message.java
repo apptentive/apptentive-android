@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -21,6 +21,7 @@ public abstract class Message extends ConversationItem {
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
 	public static final String KEY_TYPE = "type";
+	public static final String KEY_HIDDEN = "hidden";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 
 	// State and Read are not stored in JSON, only in DB.
@@ -98,6 +99,22 @@ public abstract class Message extends ConversationItem {
 			put(KEY_TYPE, type.name());
 		} catch (JSONException e) {
 			Log.e("Exception setting Message's %s field.", e, KEY_TYPE);
+		}
+	}
+
+	public boolean isHidden() {
+		try {
+			return getBoolean(KEY_HIDDEN);
+		} catch (JSONException e) {
+		}
+		return false;
+	}
+
+	public void setHidden(boolean hidden) {
+		try {
+			put(KEY_HIDDEN, hidden);
+		} catch (JSONException e) {
+			Log.e("Exception setting Message's %s field.", e, KEY_HIDDEN);
 		}
 	}
 

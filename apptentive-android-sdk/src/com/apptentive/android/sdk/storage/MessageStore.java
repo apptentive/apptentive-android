@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,4 +26,6 @@ public interface MessageStore extends PayloadStore {
 	public int getUnreadMessageCount();
 
 	public void deleteAllMessages();
+
+	public void deleteMessage(String nonce);
 }

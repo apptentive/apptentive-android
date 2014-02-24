@@ -274,6 +274,27 @@ Apptentive.setUnreadMessagesListener(
 );
 ```
 
+##### Sending Attachments
+
+You can send attachments to the server. We provide methods for sending text and file messages that are hidden
+from the end user, but visible to you in the conversation view on the server. There are three ways to send a FileMessage,
+so that you can easily send files: Using a local URI, an InputStream, or a byte array. Messages sent in this fashion are
+diplayed as hidden in the conversation view on the server, so you can differentiate them from messages sent by the customer.
+
+###### Methods
+```java
+public static void sendAttachmentText(Context context, String text);
+```
+```java
+public static void sendAttachmentFile(Context context, String uri);
+```
+```java
+public static void sendAttachmentFile(Context context, byte[] content, String mimeType);
+```
+```java
+public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
+```
+
 #### Ratings
 
 Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your
@@ -317,6 +338,14 @@ days and uses for you, but you will need to tell us each time the user performs 
 ```java
 public static void Apptentive.logSignificantEvent(Context context);
 ```
+
+#### Upgrade Messages
+
+You can display a message to customers when they upgrade to a newer version of your app. Configure which version name
+or version code of your app each message is targeted to, and the message will be shown when that release is launched by
+the user. The best part is you don't need to make any code changes to take advantage of Upgrade Messages! Upgrade Messages
+are shown when we detect an app launch. To use this feature, login to [Apptentive](www.apptentive.com) and click on
+*Interactions*.
 
 #### Surveys
 

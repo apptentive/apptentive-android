@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,13 +16,13 @@ public class ApptentiveHttpResponse {
 	private String reason;
 	private Map<String, String> headers;
 	private int code;
-	private boolean badpayload;
+	private boolean badPayload;
 
 	public ApptentiveHttpResponse() {
 		content = null;
 		reason = null;
 		code = -1;
-		badpayload = false;
+		badPayload = false;
 	}
 
 	public boolean isSuccessful() {
@@ -69,11 +69,11 @@ public class ApptentiveHttpResponse {
 		this.code = code;
 	}
 
-	public boolean isBadpayload() {
-		return badpayload;
+	public boolean isBadPayload() {
+		return badPayload;
 	}
 
 	public void setBadPayload(boolean badPayload) {
-		this.badpayload = badPayload;
+		this.badPayload = badPayload;
 	}
 }

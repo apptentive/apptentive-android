@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -38,6 +38,8 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -506,6 +508,107 @@ public class Apptentive {
 		return 0;
 	}
 
+	/**
+	 * Sends a text message to the server. This message will be visible in the conversation view on the server, but will
+	 * not be shown in the client's Message Center.
+	 *
+	 * @param context The Context from which this method is called.
+	 * @param text    The message you wish to send.
+	 */
+	public static void sendAttachmentText(Context context, String text) {
+		try {
+			TextMessage message = new TextMessage();
+			message.setBody(text);
+			message.setHidden(true);
+			MessageManager.sendMessage(context, message);
+		} catch (Exception e) {
+			Log.w("Error sending attachment text.", e);
+			MetricModule.sendError(context, e, null, null);
+		}
+	}
+
+	/**
+	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
+	 * point the temporary file will be deleted.
+	 *
+	 * @param context The Context from which this method was called.
+	 * @param uri     The URI of the local resource file.
+	 */
+	public static void sendAttachmentFile(Context context, String uri) {
+		try {
+			FileMessage message = new FileMessage();
+			message.setHidden(true);
+
+			boolean successful = message.createStoredFile(context, uri);
+			if (successful) {
+				message.setRead(true);
+				// Finally, send out the message.
+				MessageManager.sendMessage(context, message);
+			}
+		} catch (Exception e) {
+			Log.w("Error sending attachment file.", e);
+			MetricModule.sendError(context, e, null, null);
+		}
+	}
+
+	/**
+	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
+	 * point the temporary file will be deleted.
+	 *
+	 * @param context  The Context from which this method was called.
+	 * @param content  A byte array of the file contents.
+	 * @param mimeType The mime type of the file.
+	 */
+	public static void sendAttachmentFile(Context context, byte[] content, String mimeType) {
+		try {
+			FileMessage message = new FileMessage();
+			message.setHidden(true);
+
+			boolean successful = message.createStoredFile(context, content, mimeType);
+			if (successful) {
+				message.setRead(true);
+				// Finally, send out the message.
+				MessageManager.sendMessage(context, message);
+			}
+		} catch (Exception e) {
+			Log.w("Error sending attachment file.", e);
+			MetricModule.sendError(context, e, null, null);
+		}
+	}
+
+	/**
+	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
+	 * point the temporary file will be deleted.
+	 *
+	 * @param context  The Context from which this method was called.
+	 * @param is       An InputStream from the desired file.
+	 * @param mimeType The mime type of the file.
+	 */
+	public static void sendAttachmentFile(Context context, InputStream is, String mimeType) {
+		try {
+			FileMessage message = new FileMessage();
+			message.setHidden(true);
+
+			boolean successful = false;
+			try {
+				successful = message.createStoredFile(context, is, mimeType);
+			} catch (IOException e) {
+				Log.e("Error creating local copy of file attachment.");
+			}
+			if (successful) {
+				message.setRead(true);
+				// Finally, send out the message.
+				MessageManager.sendMessage(context, message);
+			}
+		} catch (Exception e) {
+			Log.w("Error sending attachment file.", e);
+			MetricModule.sendError(context, e, null, null);
+		}
+	}
+
 	// ****************************************************************************************
 	// SURVEYS
 	// ****************************************************************************************
@@ -758,10 +861,12 @@ public class Apptentive {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
 				Log.d("ConversationToken: " + conversationToken);
+				String conversationId = root.getString("id");
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				if (conversationToken != null && !conversationToken.equals("")) {
 					GlobalInfo.conversationToken = conversationToken;
 					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
+					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_ID, conversationId).commit();
 				}
 				String personId = root.getString("person_id");
 				Log.d("PersonId: " + personId);

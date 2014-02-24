@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -361,6 +361,17 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
+	public synchronized void deleteMessage(String nonce) {
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			int deleted = db.delete(TABLE_MESSAGE, MESSAGE_KEY_NONCE + " = ?", new String[]{nonce});
+			Log.d("Deleted %d messages.", deleted);
+		} finally {
+			ensureClosed(db);
+		}
+	}
+
 
 	//
 	// File Store
@@ -411,6 +422,17 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			return ret != -1;
 		} finally {
 			ensureClosed(cursor);
+			ensureClosed(db);
+		}
+	}
+
+	public synchronized void deleteStoredFile(String id) {
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			int deleted = db.delete(TABLE_FILESTORE, MESSAGE_KEY_ID + " = ?", new String[]{id});
+			Log.d("Deleted %d stored files.", deleted);
+		} finally {
 			ensureClosed(db);
 		}
 	}

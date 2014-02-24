@@ -28,7 +28,7 @@ public class EngagementModule {
 			launchInteraction(activity, interaction);
 			return true;
 		}
-		Log.e("No interaction to show.");
+		Log.d("No interaction to show.");
 		return false;
 	}
 

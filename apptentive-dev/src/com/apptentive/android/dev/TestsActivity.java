@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,13 +7,13 @@
 package com.apptentive.android.dev;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
-import android.content.Intent;
+import android.content.*;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -27,8 +27,12 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,7 +219,6 @@ public class TestsActivity extends ApptentiveActivity {
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
 		Log.e("Testing engage(%s)", interactionName);
 		long start = System.currentTimeMillis();
-		Apptentive.engage(this, interactionName);
 		try {
 			Interaction interaction = null;
 			if (interactionName.equals("UpgradeMessage exercise with branding")) {
@@ -238,4 +241,59 @@ public class TestsActivity extends ApptentiveActivity {
 	public void fetchInteractions(View view) {
 		InteractionManager.asyncFetchAndStoreInteractions(view.getContext());
 	}
+
+
+	public void sendAttachmentImage(View view) {
+		Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		intent.setType("image/*");
+		this.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+	}
+
+	public void sendAttachmentFile(View view) {
+		EditText text = (EditText) findViewById(R.id.attachment_file_content);
+		byte[] bytes = text.getText().toString().getBytes();
+		Apptentive.sendAttachmentFile(this, bytes, "text/plain");
+		text.setText("");
+	}
+
+	public void sendAttachmentText(View view) {
+		EditText text = (EditText) findViewById(R.id.attachment_text);
+		Apptentive.sendAttachmentText(this, text.getText().toString());
+		text.setText("");
+	}
+
+	public void doSendAttachment(Uri uri) {
+		Apptentive.sendAttachmentFile(this, uri.toString());
+	}
+
+	public void alternateDoSendAttachment(Context context, Uri uri) {
+
+		ContentResolver resolver = context.getContentResolver();
+		String mimeType = resolver.getType(uri);
+
+		InputStream is = null;
+		try {
+			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+			Apptentive.sendAttachmentFile(this, is, mimeType);
+		} catch (FileNotFoundException e) {
+			Log.e("Not found.", e);
+		} finally {
+			Util.ensureClosed(is);
+		}
+	}
+
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
+					doSendAttachment(data.getData());
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 }

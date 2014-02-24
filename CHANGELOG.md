@@ -1,3 +1,12 @@
+2013-02-21 skykelsey next
+--------------------------
+
+Major changes:
+
+* Added support for push notifications! If you are using a third party push notification provider, you can configure our server to send a push on your behalf when you reply to a customer. We currently support Urban Airship, but if you are using another provider, please let us know and we will add support.
+* Added the ability to send Upgrade Messages to your users. Now you can notify users of new features targeted to specific builds or versions of your app, even if they have opted to auto-update your app in the app store.
+* Added the ability to send hidden attachments to the server. You can now send texts, logs, images, and other files to the server to help provide better support. These files are visible to you in teh conversation view, but are not shown to the end user.
+
 2013-01-20 skykelsey 1.2.7
 --------------------------
 

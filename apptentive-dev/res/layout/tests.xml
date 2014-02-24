@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -231,6 +231,54 @@
                         android:layout_marginTop="4dp"
                         android:onClick="fetchInteractions"
                         android:text="Fetch Interactions"/>
+                <TextView android:layout_width="fill_parent"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
+                          android:text="Send Image Attachment"/>
+                <Button android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:onClick="sendAttachmentImage"
+                        android:text="Choose and Send Image"/>
+                <TextView android:layout_width="fill_parent"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
+                          android:text="Send File Attachment"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
+                              android:orientation="horizontal">
+                    <Button android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:onClick="sendAttachmentFile"
+                            android:text="Send"/>
+                    <EditText android:id="@+id/attachment_file_content"
+                              android:layout_width="fill_parent"
+                              android:layout_height="fill_parent"
+                              android:hint="Text File Contents…"/>
+                </LinearLayout>
+                <TextView android:layout_width="fill_parent"
+                          android:layout_height="32dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_medium"
+                          android:textColor="@android:color/white"
+                          android:text="Send Text Attachment"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="48dp"
+                              android:layout_marginTop="4dp"
+                              android:orientation="horizontal">
+                    <Button android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:onClick="sendAttachmentText"
+                            android:text="Text"/>
+                    <EditText android:id="@+id/attachment_text"
+                              android:layout_width="fill_parent"
+                              android:layout_height="fill_parent"
+                              android:hint="Message…"/>
+                </LinearLayout>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

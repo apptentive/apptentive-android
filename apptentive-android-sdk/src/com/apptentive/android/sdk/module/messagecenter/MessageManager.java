@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.AutomatedMessage;
+import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -151,9 +152,20 @@ public class MessageManager {
 
 	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
 		if (response == null || !response.isSuccessful()) {
+			if (message instanceof FileMessage) {
+				((FileMessage) message).deleteStoredFile(context);
+			}
 			return;
 		}
-		if(response.isSuccessful()) {
+		if (response.isSuccessful()) {
+			// Don't store hidden messages once sent. Delete them.
+			if (message.isHidden()) {
+				if (message instanceof FileMessage) {
+					((FileMessage) message).deleteStoredFile(context);
+				}
+				getMessageStore(context).deleteMessage(message.getNonce());
+				return;
+			}
 			try {
 				JSONObject responseJson = new JSONObject(response.getContent());
 				if (message.getState() == Message.State.sending) {
@@ -171,7 +183,7 @@ public class MessageManager {
 			}
 		}
 /*
-		if(response.isBadpayload()) {
+		if(response.isBadPayload()) {
 			// TODO: Tell the user that this message failed to send. It will be deleted by the record send worker.
 		}
 */

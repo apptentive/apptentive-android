@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -21,6 +21,7 @@ public class Constants {
 	public static final String PREF_NAME = "APPTENTIVE";
 
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
+	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
 	public static final String PREF_KEY_PERSON_ID = "personId";
 
 	public static final String PREF_KEY_DEVICE = "device";

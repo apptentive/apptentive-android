@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -90,7 +90,11 @@ public class FileMessage extends Message {
 		return "apptentive-file-" + getNonce();
 	}
 
-	public boolean createStoredFile(Context context, String uriString) {
+	/**
+	 * This method stores an image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
+	 * it to store an exact copy of the file in question.
+	 */
+	public boolean internalCreateStoredImage(Context context, String uriString) {
 		Uri uri = Uri.parse(uriString);
 
 		ContentResolver resolver = context.getContentResolver();
@@ -119,10 +123,10 @@ public class FileMessage extends Message {
 			smaller.recycle();
 			System.gc();
 		} catch (FileNotFoundException e) {
-			Log.e("File not found while storing file.", e);
+			Log.e("File not found while storing image.", e);
 			return false;
 		} catch (Exception e) {
-			Log.a("Error storing file.", e);
+			Log.a("Error storing image.", e);
 			return false;
 		} finally {
 			Util.ensureClosed(is);
@@ -139,9 +143,83 @@ public class FileMessage extends Message {
 		return db.putStoredFile(storedFile);
 	}
 
+	public boolean createStoredFile(Context context, String uriString) {
+		Uri uri = Uri.parse(uriString);
+
+		ContentResolver resolver = context.getContentResolver();
+		String mimeType = resolver.getType(uri);
+		MimeTypeMap mime = MimeTypeMap.getSingleton();
+		String extension = mime.getExtensionFromMimeType(mimeType);
+		setFileName(uri.getLastPathSegment() + "." + extension);
+		setMimeType(mimeType);
+
+		InputStream is = null;
+		try {
+			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+			return createStoredFile(context, is, mimeType);
+		} catch (FileNotFoundException e) {
+			Log.e("File not found while storing file.", e);
+		} catch (IOException e) {
+			Log.a("Error storing image.", e);
+		} finally {
+			Util.ensureClosed(is);
+		}
+		return false;
+	}
+
+	public boolean createStoredFile(Context context, byte[] content, String mimeType) {
+		ByteArrayInputStream is = null;
+		try {
+			is = new ByteArrayInputStream(content);
+			return createStoredFile(context, is, mimeType);
+		} catch (FileNotFoundException e) {
+			Log.e("File not found while storing file.", e);
+		} catch (IOException e) {
+			Log.a("Error storing file.", e);
+		} finally {
+			Util.ensureClosed(is);
+		}
+		return false;
+	}
+
+	public boolean createStoredFile(Context context, InputStream is, String mimeType) throws IOException {
+		setMimeType(mimeType);
+
+		// Create a file to save locally.
+		String localFileName = getStoredFileId();
+		File localFile = new File(localFileName);
+
+		// Copy the file contents over.
+		CountingOutputStream os = null;
+		try {
+			os = new CountingOutputStream(new BufferedOutputStream(context.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
+			byte[] buf = new byte[2048];
+			int count = 0;
+			while ((count = is.read(buf, 0, 2048)) != -1) {
+				os.write(buf, 0, count);
+			}
+			Log.d("File saved, size = " + (os.getBytesWritten() / 1024) + "k");
+		} finally {
+			Util.ensureClosed(os);
+		}
+
+		// Create a StoredFile database entry for this locally saved file.
+		StoredFile storedFile = new StoredFile();
+		storedFile.setId(getStoredFileId());
+		storedFile.setLocalFilePath(localFile.getPath());
+		storedFile.setMimeType(mimeType);
+		FileStore db = ApptentiveDatabase.getInstance(context);
+		return db.putStoredFile(storedFile);
+	}
+
 	public StoredFile getStoredFile(Context context) {
 		FileStore fileStore = ApptentiveDatabase.getInstance(context);
 		StoredFile storedFile = fileStore.getStoredFile(getStoredFileId());
 		return storedFile;
+	}
+
+	public void deleteStoredFile(Context context) {
+		FileStore fileStore = ApptentiveDatabase.getInstance(context);
+		fileStore.deleteStoredFile(getStoredFileId());
 	}
 }

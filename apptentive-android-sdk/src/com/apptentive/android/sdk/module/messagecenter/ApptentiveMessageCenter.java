@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -94,7 +94,7 @@ public class ApptentiveMessageCenter {
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
 				final FileMessage message = new FileMessage();
-				boolean successful = message.createStoredFile(context, uri.toString());
+				boolean successful = message.internalCreateStoredImage(context, uri.toString());
 				if (successful) {
 					message.setRead(true);
 					message.setCustomData(customData);

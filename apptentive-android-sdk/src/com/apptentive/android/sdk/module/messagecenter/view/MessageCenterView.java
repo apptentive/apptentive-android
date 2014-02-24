@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -140,6 +140,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	}
 
 	public void addMessage(Message message) {
+		if (message.isHidden()) {
+			return;
+		}
 		messageAdapter.add(message);
 		messageListView.post(new Runnable() {
 			public void run() {
