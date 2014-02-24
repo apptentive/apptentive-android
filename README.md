@@ -35,7 +35,7 @@ The following languages are supported:
 
 This walk-through will guide you through the installation and configuration of the Apptentive SDK in your Android apps. This video will help to get you started, and the rest of this document embody a complete reference of the Apptentive Android SDK API.
 
-[![Apptentive Android SDK Install Guide](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/apptentive_android_video_screenshot.png)](http://vimeo.com/85495302)
+[![Apptentive Android SDK Install Guide](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/apptentive_android_video_screenshot.png)](http://vimeo.com/85495302)
 
 Laid
 out below are instructions that will allow you to ask users to rate your app, give and receive feedback about app performance, and
@@ -192,24 +192,24 @@ customer stays in the app, and you are able to provide high quality support to m
 The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
 submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
 
-![Intro Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/intro_dialog_default_blank.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Intro Dialog Completed](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/intro_dialog_default_filled.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Thank You Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/thank_you_dialog.png)
+![Intro Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/intro_dialog_default_blank.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Intro Dialog Completed](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/intro_dialog_default_filled.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Thank You Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/thank_you_dialog.png)
 
 The Message Center displays all messages sent between the customer and you, as well as the times they were sent, and who
 they were sent by. Your replies will show up in the Message Center, and the customer will not have to leave your app to
 see them. Customers with devices running Android 4+ will also be able to send screenshots.
 
-![Message Center Sent](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_default_sent.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Message Center Screenshot Sent](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_default_screenshot_sent.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Message Center Reply Received](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/message_center_default_reply_received.png)
+![Message Center Sent](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/message_center_default_sent.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Message Center Screenshot Sent](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/message_center_default_screenshot_sent.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Message Center Reply Received](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/message_center_default_reply_received.png)
 
 Here is what the other side of the conversation looks like.
-![Website Conversation View](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/website_conversation_default_reply.png)
+![Website Conversation View](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/website_conversation_default_reply.png)
 
 ##### Showing Message Center
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
@@ -302,9 +302,9 @@ app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do y
 "Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center
 Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
 
-![Enjoyment Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/enjoyment_dialog.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Rating Dialog](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/rating_dialog.png)
+![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
 
 
 Apptentive can ask users to rate your app after a set of conditions are met. Those conditions can be specified in your
@@ -354,9 +354,9 @@ multiple select, single select, and free text. You can also choose the audience 
 send it only to devices which match certain criteria. Finally, you can chose to limit how often and how many times a
 survey can be shown to each person, or to the entire customer base.
 
-![Survey Incomplete](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/survey_incomplete.png)
-![spacer](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/10px.png)
-![Survey Complete](https://raw.github.com/skykelsey/apptentive-android/engagement_and_push/etc/screenshots/survey_complete.png)
+![Survey Incomplete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_incomplete.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Survey Complete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_complete.png)
 
 Surveys are fetched from the server when the app starts, so you don't have to worry about managing them. They are cached
 for 24 hours. To show a survey, simply call `Apptentive.showSurvey()`. You can optionally pass in a set of tags to match
