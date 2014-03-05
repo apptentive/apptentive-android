@@ -27,6 +27,7 @@ public abstract class ActivityContent {
 		MESSAGE_CENTER,
 		INTERACTION,
 		UpgradeMessageInteraction,
+		EnjoymentDialogInteraction,
 		unknown;
 
 		public static Type parse(String type) {

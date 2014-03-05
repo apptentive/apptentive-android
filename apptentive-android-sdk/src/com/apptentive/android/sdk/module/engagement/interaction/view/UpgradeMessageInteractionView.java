@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
@@ -5,9 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import com.apptentive.android.sdk.Log;
@@ -24,22 +28,24 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 
 	@Override
 	public void show(Activity activity) {
-		Log.e("Showing view.");
 		super.show(activity);
-		ViewGroup container = (ViewGroup) activity.findViewById(R.id.interaction_content);
-		LayoutInflater inflater = activity.getLayoutInflater();
-		View root = inflater.inflate(R.layout.apptentive_upgrade_message_interaction_content, container);
+		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
 
-		ImageView iconView = (ImageView) root.findViewById(R.id.icon);
+		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
 		if (icon != null) {
 			iconView.setImageDrawable(icon);
 		} else {
 			iconView.setVisibility(View.GONE);
 		}
-		WebView webview = (WebView) root.findViewById(R.id.webview);
+		WebView webview = (WebView) activity.findViewById(R.id.webview);
 		webview.loadData(interaction.getBody(), "text/html", "UTF-8");
 		webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
+
+		// If branding is not desired, turn the view off.
+		if (!interaction.isShowPoweredBy()) {
+			activity.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
+		}
 	}
 
 	@Override

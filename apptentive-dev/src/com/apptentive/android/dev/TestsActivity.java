@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.storage.PersonManager;
@@ -157,61 +158,76 @@ public class TestsActivity extends ApptentiveActivity {
 		Log.e(CodePointStore.toString(getApplicationContext()));
 	}
 
-	private static final String UPGRADE_MESSAGE_BRANDING_INTERACTION =
-			"{\n" +
-					"  \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"  \"priority\": 1,\n" +
-					"  \"criteria\": {\n" +
-					"    \"code_point/app.launch/invokes/version\": 1,\n" +
-					"    \"application_version\": \"4.0\"\n" +
-					"  },\n" +
-					"  \"type\": \"UpgradeMessage\",\n" +
-					"  \"version\": null,\n" +
-					"  \"active\": true,\n" +
-					"  \"configuration\": {\n" +
-					"    \"active\": true,\n" +
-					"    \"app_version\": \"4.0\",\n" +
-					"    \"show_app_icon\": true,\n" +
-					"    \"show_powered_by\": true,\n" +
-					"    \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p>Hello. A lot has happened since the last release. Here's a quick list of changes.</p><hr><ul><li>I built the thing you are seeing here. It will let me tell you about updates to this app.</li><li>It's super useful, since Google Play now downloads updates automatically, and you never see release notes otherwise.</li></ul><p>Some other things:</p><pre>I wrote a lot of code.</pre><p><strong>I made some bold statements.</strong></p><blockquote>I quoted some quotes.</blockquote><p><em>I italicized some itals.</em></p><p><del>I struck through some suckers.</del></p><p>Some plans for the future:</p><ol><li>Use the new Engagement Framework for Ratings as well.</li><li>Make sure everything is tested and documented before I release this to valentines.</li><li>Get everyone on the team to test it out :)</li></ol><p style=\\\"text-align: center;\\\">Center text</p><p style=\\\"text-align: right;\\\">Right aligned</p><p style=\\\"text-align: justify;\\\">Some justified text. What will this look like on a mobile device anyway? Will if look good, bad, ugly, beautiful, horrendously hideous, or possess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some unjustified text. What will it look like on a mobile device anyway?\\n Will if look good, bad, ugly, beautiful, horrendously hideous, or \\npossess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some</p><p style=\\\"margin-left: 20px;\\\">Indented</p><p style=\\\"margin-left: 40px;\\\">Text</p><p style=\\\"margin-left: 60px;\\\">Will</p><p style=\\\"margin-left: 80px;\\\">This</p><p style=\\\"margin-left: 100px;\\\">Work?</p></body></html>\"\n" +
-					"  }\n" +
-					"}";
+	private static final String UPGRADE_MESSAGE_BRANDING_INTERACTION = "" +
+		"{\n" +
+		"  \"id\": \"528d14854712c7bfd7000002\",\n" +
+		"  \"priority\": 1,\n" +
+		"  \"criteria\": {\n" +
+		"    \"code_point/app.launch/invokes/version\": 1,\n" +
+		"    \"application_version\": \"4.0\"\n" +
+		"  },\n" +
+		"  \"type\": \"UpgradeMessage\",\n" +
+		"  \"version\": null,\n" +
+		"  \"active\": true,\n" +
+		"  \"configuration\": {\n" +
+		"    \"active\": true,\n" +
+		"    \"app_version\": \"4.0\",\n" +
+		"    \"show_app_icon\": true,\n" +
+		"    \"show_powered_by\": true,\n" +
+		"    \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p>Hello. A lot has happened since the last release. Here's a quick list of changes.</p><hr><ul><li>I built the thing you are seeing here. It will let me tell you about updates to this app.</li><li>It's super useful, since Google Play now downloads updates automatically, and you never see release notes otherwise.</li></ul><p>Some other things:</p><pre>I wrote a lot of code.</pre><p><strong>I made some bold statements.</strong></p><blockquote>I quoted some quotes.</blockquote><p><em>I italicized some itals.</em></p><p><del>I struck through some suckers.</del></p><p>Some plans for the future:</p><ol><li>Use the new Engagement Framework for Ratings as well.</li><li>Make sure everything is tested and documented before I release this to valentines.</li><li>Get everyone on the team to test it out :)</li></ol><p style=\\\"text-align: center;\\\">Center text</p><p style=\\\"text-align: right;\\\">Right aligned</p><p style=\\\"text-align: justify;\\\">Some justified text. What will this look like on a mobile device anyway? Will if look good, bad, ugly, beautiful, horrendously hideous, or possess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some unjustified text. What will it look like on a mobile device anyway?\\n Will if look good, bad, ugly, beautiful, horrendously hideous, or \\npossess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some</p><p style=\\\"margin-left: 20px;\\\">Indented</p><p style=\\\"margin-left: 40px;\\\">Text</p><p style=\\\"margin-left: 60px;\\\">Will</p><p style=\\\"margin-left: 80px;\\\">This</p><p style=\\\"margin-left: 100px;\\\">Work?</p></body></html>\"\n" +
+		"  }\n" +
+		"}";
 
-	private static final String UPGRADE_MESSAGE_NO_BRANDING_INTERACTION =
-			"{\n" +
-					"  \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"  \"priority\": 1,\n" +
-					"  \"criteria\": {\n" +
-					"    \"code_point/app.launch/invokes/version\": 1,\n" +
-					"    \"application_version\": \"4.0\"\n" +
-					"  },\n" +
-					"  \"type\": \"UpgradeMessage\",\n" +
-					"  \"version\": null,\n" +
-					"  \"active\": true,\n" +
-					"  \"configuration\": {\n" +
-					"    \"active\": true,\n" +
-					"    \"app_version\": \"4.0\",\n" +
-					"    \"show_app_icon\": true,\n" +
-					"    \"show_powered_by\": false,\n" +
-					"    \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p>Hello. A lot has happened since the last release. Here's a quick list of changes.</p><hr><ul><li>I built the thing you are seeing here. It will let me tell you about updates to this app.</li><li>It's super useful, since Google Play now downloads updates automatically, and you never see release notes otherwise.</li></ul><p>Some other things:</p><pre>I wrote a lot of code.</pre><p><strong>I made some bold statements.</strong></p><blockquote>I quoted some quotes.</blockquote><p><em>I italicized some itals.</em></p><p><del>I struck through some suckers.</del></p><p>Some plans for the future:</p><ol><li>Use the new Engagement Framework for Ratings as well.</li><li>Make sure everything is tested and documented before I release this to valentines.</li><li>Get everyone on the team to test it out :)</li></ol><p style=\\\"text-align: center;\\\">Center text</p><p style=\\\"text-align: right;\\\">Right aligned</p><p style=\\\"text-align: justify;\\\">Some justified text. What will this look like on a mobile device anyway? Will if look good, bad, ugly, beautiful, horrendously hideous, or possess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some unjustified text. What will it look like on a mobile device anyway?\\n Will if look good, bad, ugly, beautiful, horrendously hideous, or \\npossess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some</p><p style=\\\"margin-left: 20px;\\\">Indented</p><p style=\\\"margin-left: 40px;\\\">Text</p><p style=\\\"margin-left: 60px;\\\">Will</p><p style=\\\"margin-left: 80px;\\\">This</p><p style=\\\"margin-left: 100px;\\\">Work?</p></body></html>\"\n" +
-					"  }\n" +
-					"}";
+	private static final String UPGRADE_MESSAGE_NO_BRANDING_INTERACTION = "" +
+		"{\n" +
+		"  \"id\": \"528d14854712c7bfd7000002\",\n" +
+		"  \"priority\": 1,\n" +
+		"  \"criteria\": {\n" +
+		"    \"code_point/app.launch/invokes/version\": 1,\n" +
+		"    \"application_version\": \"4.0\"\n" +
+		"  },\n" +
+		"  \"type\": \"UpgradeMessage\",\n" +
+		"  \"version\": null,\n" +
+		"  \"active\": true,\n" +
+		"  \"configuration\": {\n" +
+		"    \"active\": true,\n" +
+		"    \"app_version\": \"4.0\",\n" +
+		"    \"show_app_icon\": true,\n" +
+		"    \"show_powered_by\": false,\n" +
+		"    \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p>Hello. A lot has happened since the last release. Here's a quick list of changes.</p><hr><ul><li>I built the thing you are seeing here. It will let me tell you about updates to this app.</li><li>It's super useful, since Google Play now downloads updates automatically, and you never see release notes otherwise.</li></ul><p>Some other things:</p><pre>I wrote a lot of code.</pre><p><strong>I made some bold statements.</strong></p><blockquote>I quoted some quotes.</blockquote><p><em>I italicized some itals.</em></p><p><del>I struck through some suckers.</del></p><p>Some plans for the future:</p><ol><li>Use the new Engagement Framework for Ratings as well.</li><li>Make sure everything is tested and documented before I release this to valentines.</li><li>Get everyone on the team to test it out :)</li></ol><p style=\\\"text-align: center;\\\">Center text</p><p style=\\\"text-align: right;\\\">Right aligned</p><p style=\\\"text-align: justify;\\\">Some justified text. What will this look like on a mobile device anyway? Will if look good, bad, ugly, beautiful, horrendously hideous, or possess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some unjustified text. What will it look like on a mobile device anyway?\\n Will if look good, bad, ugly, beautiful, horrendously hideous, or \\npossess the qualities of an altogether different adjective? Your guess is as good as mine.</p><p>Some</p><p style=\\\"margin-left: 20px;\\\">Indented</p><p style=\\\"margin-left: 40px;\\\">Text</p><p style=\\\"margin-left: 60px;\\\">Will</p><p style=\\\"margin-left: 80px;\\\">This</p><p style=\\\"margin-left: 100px;\\\">Work?</p></body></html>\"\n" +
+		"  }\n" +
+		"}";
 
-	private static final String UPGRADE_MESSAGE_REAL_EXAMPLE =
-			"{\n" +
-					"    \"id\": \"52e8091f7724c5cf1f00007b\",\n" +
-					"    \"priority\": 2,\n" +
-					"    \"criteria\": {\n" +
-					"        \"code_point/app.launch/invokes/version\": 1,\n" +
-					"        \"application_version\": \"4.1\"\n" +
-					"    },\n" +
-					"    \"type\": \"UpgradeMessage\",\n" +
-					"    \"configuration\": {\n" +
-					"        \"show_app_icon\": true,\n" +
-					"        \"show_powered_by\": true,\n" +
-					"        \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p style=\\\"text-align: center;\\\"><strong>Apptentive SDK</strong></p><hr><p>New in version 1.2.8:</p><ul><li>A new system for sending engagements to the user.</li><li>A new engagement: Upgrade Messages!</li><li>Support for Push Notifications through Urban Airship.</li><li>Several bug fixes, and a nicer looking dev app.</li></ul><p>Enjoy!</p></body></html>\"\n" +
-					"    }\n" +
-					"}";
+	private static final String UPGRADE_MESSAGE_REAL_EXAMPLE = "" +
+		"{\n" +
+		"  \"id\": \"52e8091f7724c5cf1f00007b\",\n" +
+		"  \"priority\": 2,\n" +
+		"  \"criteria\": {\n" +
+		"  \"code_point/app.launch/invokes/version\": 1,\n" +
+		"  \"application_version\": \"4.1\"\n" +
+		"  },\n" +
+		"    \"type\": \"UpgradeMessage\",\n" +
+		"    \"configuration\": {\n" +
+		"    \"show_app_icon\": true,\n" +
+		"    \"show_powered_by\": true,\n" +
+		"    \"body\": \"<html><head><style>\\nbody {\\n\\tfont-family: \\\"Helvetica Neue\\\", Helvetica;\\n\\tcolor: #4d4d4d;\\n\\tfont-size: .875em;\\n\\tline-height: 1.36em;\\n\\t-webkit-text-size-adjust:none;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n\\tcolor: #000000;\\n\\tline-height: 1.25em;\\n\\ttext-align: center;\\n}\\n\\nh1 {font-size: 22px;}\\nh2 {font-size: 18px;}\\nh3 {font-size: 16px;}\\nh4 {font-size: 14px;}\\nh5, h6 {font-size: 12px;}\\nh6 {font-weight: normal;}\\n\\nblockquote {\\n\\tmargin: 1em 1.75em;\\n\\tfont-style: italic;\\n}\\n\\nul, ol {\\n\\tpadding-left: 1.75em;\\n}\\n\\ntable {\\n\\tborder-collapse: collapse;\\n\\tborder-spacing: 0;\\n\\tempty-cells: show;\\n}\\n\\ntable caption {\\n\\tpadding: 1em 0;\\n\\ttext-align: center;\\n}\\n\\ntable td,\\ntable th {\\n\\tborder-left: 1px solid #cbcbcb;\\n\\tborder-width: 0 0 0 1px;\\n\\tfont-size: inherit;\\n\\tmargin: 0;\\n\\tpadding: .25em .5em;\\n\\n}\\ntable td:first-child,\\ntable th:first-child {\\n\\tborder-left-width: 0;\\n}\\ntable th:first-child {\\n\\tborder-radius: 4px 0 0 4px;\\n}\\ntable th:last-child {\\n\\tborder-radius: 0 4px 4px 0;\\n}\\n\\ntable thead {\\n\\tbackground: #E5E5E5;\\n\\tcolor: #000;\\n\\ttext-align: left;\\n\\tvertical-align: bottom;\\n}\\n\\ntable td {\\n\\tbackground-color: transparent;\\n\\tborder-bottom: 1px solid #E5E5E5;\\n}\\n</style></head><body><p style=\\\"text-align: center;\\\"><strong>Apptentive SDK</strong></p><hr><p>New in version 1.2.8:</p><ul><li>A new system for sending engagements to the user.</li><li>A new engagement: Upgrade Messages!</li><li>Support for Push Notifications through Urban Airship.</li><li>Several bug fixes, and a nicer looking dev app.</li></ul><p>Enjoy!</p></body></html>\"\n" +
+		"  }\n" +
+		"}";
+
+	private static final String ENJOYMENT_DIALOG_INTERACTION = "" +
+		"{" +
+		"  \"priority\": 1," +
+		"  \"criteria\": {" +
+		"    \"interactions/enjoyment_dialog_interaction_1234567890/invokes/total\": 0" +
+		"  }," +
+		"  \"id\": \"enjoyment_dialog_interaction_1234567890\"," +
+		"  \"type\": \"EnjoymentDialog\"," +
+		"  \"configuration\": {" +
+		"    \"body\": \"Do you love Urbanspoon?\"," +
+		"    \"yes_text\": \"Yes\"," +
+		"    \"no_text\": \"No\"" +
+		"  }" +
+		"}";
 
 
 	public void interaction(@SuppressWarnings("unused") View view) {
@@ -227,11 +243,14 @@ public class TestsActivity extends ApptentiveActivity {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_NO_BRANDING_INTERACTION);
 			} else if (interactionName.equals("UpgradeMessage real example")) {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_REAL_EXAMPLE);
+			} else if (interactionName.equals("Enjoyment Dialog Interaction")) {
+				interaction = new EnjoymentDialogInteraction(ENJOYMENT_DIALOG_INTERACTION);
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
 			}
 		} catch (JSONException e) {
+			Log.e("Error loading test Interaction.", e);
 		}
 		long end = System.currentTimeMillis();
 		Log.e("Interaction storage took %d millis", end - start);

@@ -251,6 +251,12 @@ public class Apptentive {
 	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
+	 * <p/>
+	 * <ul>
+	 * <li>
+	 * Urban Airship push notifications
+	 * </li>
+	 * </ul>
 	 *
 	 * @param context     The Context from which this method is called.
 	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
