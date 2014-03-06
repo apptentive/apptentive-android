@@ -16,9 +16,11 @@ import android.view.WindowManager;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.EnjoymentDialogInteractionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.RatingDialogInteractionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.UpgradeMessageInteractionView;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
@@ -69,6 +71,9 @@ public class ViewActivity extends ApptentiveActivity {
 						break;
 					case EnjoymentDialog:
 						view = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
+						break;
+					case RatingDialog:
+						view = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
 						break;
 					default:
 						break;

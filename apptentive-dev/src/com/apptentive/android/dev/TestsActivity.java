@@ -229,6 +229,21 @@ public class TestsActivity extends ApptentiveActivity {
 		"  }" +
 		"}";
 
+	private static final String RATING_DIALOG_INTERACTION = "" +
+		"{" +
+		"  \"priority\": 1," +
+		"  \"criteria\": {" +
+		"  }," +
+		"  \"id\": \"rating_dialog_interaction_1234567890\"," +
+		"  \"type\": \"RatingDialog\"," +
+		"  \"configuration\": {" +
+		"    \"title\": \"Thank You\"," +
+		"    \"body\": \"We're so happy to hear that you love Urbanspoon! It'd be really helpful if you rated us. Thanks so much for spending some time with us.\"," +
+		"    \"rate_text\": \"Rate\"," +
+		"    \"remind_text\": \"Remind Me Later\"," +
+		"    \"no_text\": \"No Thanks\"" +
+		"  }" +
+		"}";
 
 	public void interaction(@SuppressWarnings("unused") View view) {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
@@ -245,6 +260,8 @@ public class TestsActivity extends ApptentiveActivity {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_REAL_EXAMPLE);
 			} else if (interactionName.equals("Enjoyment Dialog Interaction")) {
 				interaction = new EnjoymentDialogInteraction(ENJOYMENT_DIALOG_INTERACTION);
+			} else if (interactionName.equals("Rating Dialog Interaction")) {
+				interaction = new EnjoymentDialogInteraction(RATING_DIALOG_INTERACTION);
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);

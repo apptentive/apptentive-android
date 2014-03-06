@@ -18,6 +18,7 @@
     </string-array>
 
     <string-array name="interactions">
+        <item>Rating Dialog Interaction</item>
         <item>Enjoyment Dialog Interaction</item>
         <item>UpgradeMessage real example</item>
         <item>UpgradeMessage exercise with branding</item>

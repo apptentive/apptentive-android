@@ -13,6 +13,7 @@ public abstract class ActivityContent {
 	protected Type type;
 
 	public abstract void onStop();
+
 	public abstract void onBackPressed();
 
 	public abstract void show(Activity activity);
@@ -26,8 +27,6 @@ public abstract class ActivityContent {
 		SURVEY,
 		MESSAGE_CENTER,
 		INTERACTION,
-		UpgradeMessageInteraction,
-		EnjoymentDialogInteraction,
 		unknown;
 
 		public static Type parse(String type) {
@@ -38,6 +37,5 @@ public abstract class ActivityContent {
 			}
 			return unknown;
 		}
-
-		}
+	}
 }
