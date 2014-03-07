@@ -24,6 +24,7 @@ import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 import com.apptentive.android.sdk.storage.PersonManager;
@@ -245,6 +246,30 @@ public class TestsActivity extends ApptentiveActivity {
 		"  }" +
 		"}";
 
+	private static final String FEEDBACK_DIALOG_INTERACTION = "" +
+		"{" +
+		"  \"priority\": 1," +
+		"  \"criteria\": {" +
+		"  }," +
+		"  \"id\": \"<interaction_id>\"," +
+		"  \"type\": \"FeedbackDialog\"," +
+		"  \"configuration\": {" +
+		"    \"ask_for_email\": true," +
+		"    \"email_required\": false," +
+		"    \"enable_message_center\": true," +
+		"    \"title\": \"Thanks for your feedback!\"," +
+		"    \"body\": \"Please let us know how to make this app better for you!\"," +
+		"    \"email_hint_text\": \"Your Email Address\"," +
+		"    \"message_hint_text\": \"Tell us how we can help. (required)\"," +
+		"    \"no_text\": \"No Thanks\"," +
+		"    \"send_text\": \"Send\"," +
+		"    \"thank_you_title\": \"Thanks!\"," +
+		"    \"thank_you_body\": \"Your response has been saved in the Message Center, where you\\'ll be able to view replies and send us other messages.\"," +
+		"    \"thank_you_close_text\": \"Close\"," +
+		"    \"thank_you_view_messages_text\": \"View Messages\"" +
+		"  }" +
+		"}";
+
 	public void interaction(@SuppressWarnings("unused") View view) {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
@@ -258,10 +283,12 @@ public class TestsActivity extends ApptentiveActivity {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_NO_BRANDING_INTERACTION);
 			} else if (interactionName.equals("UpgradeMessage real example")) {
 				interaction = new UpgradeMessageInteraction(UPGRADE_MESSAGE_REAL_EXAMPLE);
-			} else if (interactionName.equals("Enjoyment Dialog Interaction")) {
+			} else if (interactionName.equals("Enjoyment Dialog")) {
 				interaction = new EnjoymentDialogInteraction(ENJOYMENT_DIALOG_INTERACTION);
-			} else if (interactionName.equals("Rating Dialog Interaction")) {
+			} else if (interactionName.equals("Rating Dialog")) {
 				interaction = new EnjoymentDialogInteraction(RATING_DIALOG_INTERACTION);
+			} else if (interactionName.equals("Feedback Dialog")) {
+				interaction = new FeedbackDialogInteraction(FEEDBACK_DIALOG_INTERACTION);
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
