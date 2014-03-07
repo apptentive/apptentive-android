@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -85,7 +85,7 @@ public class SurveyModule {
 		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.SURVEY.toString());
 		activity.startActivity(intent);
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+		activity.overridePendingTransition(R.anim.slide_up_in, 0);
 	}
 
 	public SurveyState getSurveyState() {
@@ -217,7 +217,5 @@ public class SurveyModule {
 			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
 		}
 		cleanup();
-		activity.finish();
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 }

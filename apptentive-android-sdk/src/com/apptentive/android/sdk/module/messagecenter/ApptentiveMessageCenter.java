@@ -283,9 +283,6 @@ public class ApptentiveMessageCenter {
 
 	public static void onBackPressed(Activity activity) {
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
-		activity.finish();
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
-
 	}
 
 	enum Trigger {

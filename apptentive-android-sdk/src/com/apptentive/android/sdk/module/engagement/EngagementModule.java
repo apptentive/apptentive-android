@@ -40,7 +40,7 @@ public class EngagementModule {
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
 			activity.startActivity(intent);
-			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+			activity.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
 	}
 }

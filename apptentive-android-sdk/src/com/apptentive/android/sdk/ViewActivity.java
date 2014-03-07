@@ -43,13 +43,15 @@ public class ViewActivity extends ApptentiveActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
 
-		getWindow().setFormat(PixelFormat.RGBA_8888);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
+
 		switch (activeContentType) {
 			case ABOUT:
 				AboutModule.getInstance().doShow(this);
@@ -133,6 +135,8 @@ public class ViewActivity extends ApptentiveActivity {
 			default:
 				break;
 		}
+		finish();
+		overridePendingTransition(0, R.anim.slide_down_out);
 		super.onBackPressed();
 	}
 
