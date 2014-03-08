@@ -22,7 +22,7 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 		this.interaction = interaction;
 	}
 
-	public void show(Activity activity) {
+	public void show(final Activity activity) {
 		Log.d("Showing interaction.");
 	}
 }

@@ -7,9 +7,11 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
 
@@ -23,7 +25,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	}
 
 	@Override
-	public void show(Activity activity) {
+	public void show(final Activity activity) {
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_feedback_dialog_interaction);
 
@@ -51,17 +53,34 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			messageView.setHint(messageHintText);
 		}
 
+		// No
+		Button noButton = (Button) activity.findViewById(R.id.no_thanks);
 		String no = interaction.getNoText();
 		if (no != null) {
-			Button noView = (Button) activity.findViewById(R.id.no_thanks);
-			noView.setText(no);
+			noButton.setText(no);
 		}
+		noButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, "feedback_dialog", "no");
+				activity.finish();
+			}
+		});
 
+
+		// Send
+		Button sendButton = (Button) activity.findViewById(R.id.send);
 		String send = interaction.getSendText();
 		if (send != null) {
-			Button sendView = (Button) activity.findViewById(R.id.send);
-			sendView.setText(send);
+			sendButton.setText(send);
 		}
+		sendButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, "feedback_dialog", "send");
+				activity.finish();
+			}
+		});
 
 	}
 
@@ -71,7 +90,8 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	}
 
 	@Override
-	public void onBackPressed() {
-
+	public void onBackPressed(Activity activity) {
+		Apptentive.engageInternal(activity, "feedback_dialog", "dismiss");
+		activity.finish();
 	}
 }

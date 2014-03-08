@@ -100,26 +100,26 @@ public class CodePointStore extends JSONObject {
 		return new CodePointStore();
 	}
 
-	public static synchronized void storeCodePointForCurrentAppVersion(Context context, String name) {
-		storeRecordForCurrentAppVersion(context, false, name);
+	public static synchronized void storeCodePointForCurrentAppVersion(Context context, String fullCodePoint) {
+		storeRecordForCurrentAppVersion(context, false, fullCodePoint);
 	}
 
-	public static synchronized void storeInteractionForCurrentAppVersion(Context context, String name) {
-		storeRecordForCurrentAppVersion(context, true, name);
+	public static synchronized void storeInteractionForCurrentAppVersion(Context context, String fullCodePoint) {
+		storeRecordForCurrentAppVersion(context, true, fullCodePoint);
 	}
 
-	private static void storeRecordForCurrentAppVersion(Context context, boolean interaction, String name) {
+	private static void storeRecordForCurrentAppVersion(Context context, boolean isInteraction, String fullCodePoint) {
 		String version = Util.getAppVersionName(context);
 		int build = Util.getAppVersionCode(context);
-		storeRecord(context, interaction, name, version, build);
+		storeRecord(context, isInteraction, fullCodePoint, version, build);
 	}
 
-	public static void storeRecord(Context context, boolean interaction, String name, String version, int build) {
+	public static synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build) {
 		String buildString = String.valueOf(build);
 		CodePointStore store = getInstance(context);
-		if (store != null && name != null && version != null) {
+		if (store != null && fullCodePoint != null && version != null) {
 			try {
-				String recordTypeKey = interaction ? KEY_INTERACTIONS : KEY_CODE_POINT;
+				String recordTypeKey = isInteraction ? KEY_INTERACTIONS : KEY_CODE_POINT;
 				JSONObject recordType;
 				if (!store.isNull(recordTypeKey)) {
 					recordType = store.getJSONObject(recordTypeKey);
@@ -130,11 +130,11 @@ public class CodePointStore extends JSONObject {
 
 				// Get or create code point object.
 				JSONObject codePointJson;
-				if (!recordType.isNull(name)) {
-					codePointJson = recordType.getJSONObject(name);
+				if (!recordType.isNull(fullCodePoint)) {
+					codePointJson = recordType.getJSONObject(fullCodePoint);
 				} else {
 					codePointJson = new JSONObject();
-					recordType.put(name, codePointJson);
+					recordType.put(fullCodePoint, codePointJson);
 				}
 
 				// Set the last time this code point was seen to the current time.
@@ -181,7 +181,7 @@ public class CodePointStore extends JSONObject {
 
 				save(context);
 			} catch (JSONException e) {
-				Log.w("Unable to store code point %s.", e, name);
+				Log.w("Unable to store code point %s.", e, fullCodePoint);
 			}
 		}
 	}

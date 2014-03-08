@@ -211,6 +211,12 @@
                           android:textSize="@dimen/apptentive_text_medium"
                           android:textColor="@android:color/white"
                           android:text="Trigger interaction"/>
+                <TextView android:layout_width="fill_parent"
+                          android:layout_height="24dp"
+                          android:gravity="left|bottom"
+                          android:textSize="@dimen/apptentive_text_small_tiny"
+                          android:textColor="@android:color/white"
+                          android:text="(replaces downloaded interactions)"/>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="48dp"
                               android:layout_marginTop="4dp"

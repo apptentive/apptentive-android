@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -47,7 +47,10 @@ public class RatingModule {
 
 	private static RatingModule instance;
 
-	static RatingModule getInstance() {
+	/**
+	 * Internal use only.
+	 */
+	public static RatingModule getInstance() {
 		if (instance == null) {
 			instance = new RatingModule();
 		}
@@ -59,9 +62,9 @@ public class RatingModule {
 	// ********************************************* Private *******************************************
 	// *************************************************************************************************
 
-	private IRatingProvider selectedRatingProvider = null;
+	public IRatingProvider selectedRatingProvider = null;
 
-	private Map<String, String> ratingProviderArgs;
+	public Map<String, String> ratingProviderArgs;
 
 	private RatingModule() {
 		ratingProviderArgs = new HashMap<String, String>();

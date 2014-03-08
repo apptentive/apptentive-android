@@ -21,8 +21,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
  */
 public class EngagementModule {
 
-	public static boolean engage(Activity activity, String codePoint) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), codePoint);
+	public static boolean engage(Activity activity, String fullCodePoint) {
+		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), fullCodePoint);
 		if (interaction != null) {
 			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);

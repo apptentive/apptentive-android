@@ -1,0 +1,71 @@
+{
+    "interactions": {
+        "local#app#interaction_test": [
+            {
+                "priority": 1,
+                "criteria": {
+                    "interactions/rating_flow_interaction/invokes/version": 0
+                },
+                "id": "rating_flow_interaction",
+                "type": "EnjoymentDialog",
+                "configuration": {
+                    "body": "Do you love Urbanspoon?",
+                    "yes_text": "Yes",
+                    "no_text": "No"
+                }
+            },
+            {
+                "priority": 2,
+                "criteria": {
+                    "code_point/com.apptentive#rating_dialog#remind/invokes/version": {
+                        "$gt": 0
+                    },
+                    "interactions/rating_interaction_remind/invokes/version": 0
+                },
+                "id": "rating_interaction_remind",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "Would you please take a second to rate Urbanspoon?",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "no_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#enjoyment_dialog#yes": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "rating_dialog",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "Would you please take a second to rate Urbanspoon?",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "no_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#enjoyment_dialog#no": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "feedback_dialog",
+                "type": "FeedbackDialog",
+                "configuration": {
+                    "ask_for_email": true,
+                    "email_required": false,
+                    "enable_message_center": true,
+                    "title": "Thanks for your feedback!",
+                    "body": "Please let us know how to make this app better for you!",
+                    "email_hint_text": "Your Email Address",
+                    "message_hint_text": "Tell us how we can help. (required)",
+                    "thank_you_title": "Thanks!",
+                    "thank_you_body": "Your response has been saved in the Message Center, where you\'ll be able to view replies and send us other messages.",
+                    "thank_you_close_text": "Close",
+                    "thank_you_view_messages_text": "View Messages"
+                }
+            }
+        ]
+    }
+}

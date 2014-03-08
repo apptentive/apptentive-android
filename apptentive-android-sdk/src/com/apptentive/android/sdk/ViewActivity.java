@@ -126,7 +126,7 @@ public class ViewActivity extends ApptentiveActivity {
 				break;
 			case INTERACTION:
 				if (activityContent != null) {
-					activityContent.onBackPressed();
+					activityContent.onBackPressed(this);
 				}
 				break;
 			default:

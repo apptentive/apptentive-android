@@ -40,6 +40,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -664,19 +665,30 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String codePoint) {
-		return engage(activity, codePoint, true);
+		return doEngage(activity, "local", "app", codePoint);
 	}
 
-	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
+	private static synchronized boolean doEngage(Activity activity, String vendor, String interaction, String codePointName) {
 		try {
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(codePoint, (Map<String, String>) null));
-			return EngagementModule.engage(activity, codePoint);
+			String fullCodePointName =  String.format("%s#%s#%s", URLEncoder.encode(vendor), URLEncoder.encode(interaction), URLEncoder.encode(codePointName));
+			Log.e("engage(%s)", fullCodePointName);
+
+			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), fullCodePointName);
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(fullCodePointName, (Map<String, String>) null));
+			return EngagementModule.engage(activity, fullCodePointName);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
 		return false;
 	}
+
+	/**
+	 * For internal use only.
+	 */
+	public static synchronized boolean engageInternal(Activity activity, String interaction, String codePoint) {
+		return doEngage(activity, "com.apptentive", interaction, codePoint);
+	}
+
 
 	// ****************************************************************************************
 	// INTERNAL METHODS
@@ -978,6 +990,6 @@ public class Apptentive {
 				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
 			}
 		});
-		Apptentive.engage(activity, Event.EventLabel.app__launch.getLabelName());
+		Apptentive.engageInternal(activity, "app", Event.EventLabel.app__launch.getLabelName());
 	}
 }

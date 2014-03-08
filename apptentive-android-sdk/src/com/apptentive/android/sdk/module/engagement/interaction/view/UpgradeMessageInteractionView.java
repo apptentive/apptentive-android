@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
@@ -53,7 +54,8 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 	}
 
 	@Override
-	public void onBackPressed() {
+	public void onBackPressed(Activity activity) {
+		Apptentive.engageInternal(activity, "upgrade_message", "dismiss");
 	}
 
 	private Drawable getIconDrawableResourceId(Activity activity) {

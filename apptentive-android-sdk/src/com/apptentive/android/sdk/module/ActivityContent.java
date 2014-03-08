@@ -14,7 +14,7 @@ public abstract class ActivityContent {
 
 	public abstract void onStop();
 
-	public abstract void onBackPressed();
+	public abstract void onBackPressed(Activity activity);
 
 	public abstract void show(Activity activity);
 

@@ -17,16 +17,14 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
+import com.apptentive.android.dev.util.FileUtil;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -289,6 +287,11 @@ public class TestsActivity extends ApptentiveActivity {
 				interaction = new EnjoymentDialogInteraction(RATING_DIALOG_INTERACTION);
 			} else if (interactionName.equals("Feedback Dialog")) {
 				interaction = new FeedbackDialogInteraction(FEEDBACK_DIALOG_INTERACTION);
+			} else if (interactionName.equals("Working Rating Flow")) {
+				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractions.json");
+				// Overwrites any existing interactions.
+				InteractionManager.storeInteractions(this, json);
+				Apptentive.engage(this, "interaction_test");
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);

@@ -18,6 +18,7 @@
     </string-array>
 
     <string-array name="interactions">
+        <item>Working Rating Flow</item>
         <item>Feedback Dialog</item>
         <item>Rating Dialog</item>
         <item>Enjoyment Dialog</item>

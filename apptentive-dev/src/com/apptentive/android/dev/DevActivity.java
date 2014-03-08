@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -42,6 +42,9 @@ public class DevActivity extends ApptentiveActivity {
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
+
+		// Impersonate an app for ratings.
+		//Apptentive.putRatingProviderArg("package", "your.package.name");
 
 		// *** END APPTENTIVE INITIALIZATION
 

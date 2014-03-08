@@ -7,11 +7,22 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.RatingModule;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
+import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -23,8 +34,9 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 	}
 
 	@Override
-	public void show(Activity activity) {
+	public void show(final Activity activity) {
 		super.show(activity);
+		// TODO: Send event
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
 
 		String title = interaction.getTitle();
@@ -40,24 +52,70 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		}
 		bodyView.setText(body);
 
-		Button rateView = (Button) activity.findViewById(R.id.rate);
+		// Rate
+		Button rateButton = (Button) activity.findViewById(R.id.rate);
 		String rate = interaction.getRateText();
 		if (rate == null) {
 			rate = String.format(activity.getResources().getString(R.string.apptentive_rate_this_app), Configuration.load(activity).getAppDisplayName());
 		}
-		rateView.setText(rate);
+		rateButton.setText(rate);
+		rateButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				String errorMessage = activity.getString(R.string.apptentive_rating_error);
+				try {
+					// TODO: Delete the RatingModule class altogether.
+					if (RatingModule.getInstance().selectedRatingProvider == null) {
+						// Default to the Android Market provider, if none has been specified
+						RatingModule.getInstance().selectedRatingProvider = new GooglePlayRatingProvider();
+					}
+					errorMessage = RatingModule.getInstance().selectedRatingProvider.activityNotFoundMessage(activity);
 
+					String appDisplayName = Configuration.load(activity).getAppDisplayName();
+					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(RatingModule.getInstance().ratingProviderArgs);
+					finalRatingProviderArgs.put("name", appDisplayName);
+
+					// Engage, then start the rating.
+					Apptentive.engageInternal(activity, "rating_dialog", "rate");
+					RatingModule.getInstance().selectedRatingProvider.startRating(activity, finalRatingProviderArgs);
+				} catch (ActivityNotFoundException e) {
+					displayError(activity, errorMessage);
+				} catch (InsufficientRatingArgumentsException e) {
+					// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
+					displayError(activity, activity.getString(R.string.apptentive_rating_error));
+				} finally {
+					activity.finish();
+				}
+			}
+		});
+
+		// Remind
+		Button remindButton = (Button) activity.findViewById(R.id.remind);
 		String remind = interaction.getRemindText();
 		if (remind != null) {
-			Button remindButton = (Button) activity.findViewById(R.id.remind);
 			remindButton.setText(remind);
 		}
+		remindButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, "rating_dialog", "remind");
+				activity.finish();
+			}
+		});
 
+		// No
+		Button noButton = (Button) activity.findViewById(R.id.no);
 		String no = interaction.getNoText();
 		if (no != null) {
-			Button noButton = (Button) activity.findViewById(R.id.no);
 			noButton.setText(no);
 		}
+		noButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, "rating_dialog", "no");
+				activity.finish();
+			}
+		});
 	}
 
 	@Override
@@ -65,6 +123,20 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 	}
 
 	@Override
-	public void onBackPressed() {
+	public void onBackPressed(Activity activity) {
+		Apptentive.engageInternal(activity, "rating_dialog", "dismiss");
 	}
+
+	private void displayError(Activity activity, String message) {
+		final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
+		alertDialog.setMessage(message);
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialogInterface, int i) {
+				alertDialog.dismiss();
+			}
+		});
+		alertDialog.show();
+	}
+
 }
