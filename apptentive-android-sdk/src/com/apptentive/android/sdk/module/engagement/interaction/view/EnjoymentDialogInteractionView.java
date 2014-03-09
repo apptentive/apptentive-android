@@ -19,7 +19,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentD
  */
 public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_DISMISS = "dismiss";
 	private static final String CODE_POINT_YES = "yes";
 	private static final String CODE_POINT_NO = "no";

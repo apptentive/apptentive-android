@@ -24,7 +24,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMes
  */
 public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessageInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_DISMISS = "dismiss";
 
 	public UpgradeMessageInteractionView(UpgradeMessageInteraction interaction) {

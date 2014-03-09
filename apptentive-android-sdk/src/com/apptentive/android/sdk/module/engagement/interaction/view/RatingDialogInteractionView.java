@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class RatingDialogInteractionView extends InteractionView<RatingDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_DISMISS = "dismiss";
 	private static final String CODE_POINT_RATE = "rate";
 	private static final String CODE_POINT_REMIND = "remind";
