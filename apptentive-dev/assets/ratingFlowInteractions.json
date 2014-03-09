@@ -32,7 +32,7 @@
                 }
             }
         ],
-        "com.apptentive#enjoyment_dialog#yes": [
+        "com.apptentive#EnjoymentDialog#yes": [
             {
                 "priority": 1,
                 "criteria": {},
@@ -46,7 +46,7 @@
                 }
             }
         ],
-        "com.apptentive#enjoyment_dialog#no": [
+        "com.apptentive#EnjoymentDialog#no": [
             {
                 "priority": 1,
                 "criteria": {},

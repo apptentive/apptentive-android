@@ -44,6 +44,8 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
 
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+
 		String title = interaction.getTitle();
 		if (title != null) {
 			TextView titleView = (TextView) activity.findViewById(R.id.title);

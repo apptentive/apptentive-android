@@ -33,6 +33,8 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
 
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+
 		String body = interaction.getBody();
 		if (body != null) {
 			TextView bodyView = (TextView) activity.findViewById(R.id.body);

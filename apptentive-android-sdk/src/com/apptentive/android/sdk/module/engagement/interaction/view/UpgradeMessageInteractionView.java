@@ -36,6 +36,8 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
 
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+
 		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
 		if (icon != null) {

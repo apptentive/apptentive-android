@@ -8,9 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.*;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
@@ -20,11 +18,13 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDi
  */
 public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_DISMISS = "dismiss";
 	private static final String CODE_POINT_NO = "no";
 	private static final String CODE_POINT_SEND = "send";
 	private static final String CODE_POINT_VIEW_MESSAGES = "view_messages"; // TODO: Use this.
+
+	private CharSequence email;
 
 	public FeedbackDialogInteractionView(FeedbackDialogInteraction interaction) {
 		super(interaction);
@@ -34,6 +34,8 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	public void show(final Activity activity) {
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_feedback_dialog_interaction);
+
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
 		String title = interaction.getTitle();
 		if (title != null) {
