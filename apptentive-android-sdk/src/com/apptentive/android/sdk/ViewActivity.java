@@ -74,6 +74,12 @@ public class ViewActivity extends ApptentiveActivity {
 					case FeedbackDialog:
 						view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
 						break;
+					case MessageCenter:
+						// For now, we use the old method.
+						getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+						finish();
+						Apptentive.showMessageCenter(this);
+						return;
 					default:
 						break;
 				}

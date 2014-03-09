@@ -7,11 +7,25 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Person;
+import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.view.EmailValidationFailedDialog;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
+import com.apptentive.android.sdk.storage.PersonManager;
+import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -22,9 +36,11 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	private static final String CODE_POINT_DISMISS = "dismiss";
 	private static final String CODE_POINT_NO = "no";
 	private static final String CODE_POINT_SEND = "send";
-	private static final String CODE_POINT_VIEW_MESSAGES = "view_messages"; // TODO: Use this.
+	private static final String CODE_POINT_SKIP_VIEW_MESSAGES = "skip_view_messages";
+	private static final String CODE_POINT_VIEW_MESSAGES = "view_messages";
 
 	private CharSequence email;
+	private CharSequence message;
 
 	public FeedbackDialogInteractionView(FeedbackDialogInteraction interaction) {
 		super(interaction);
@@ -38,31 +54,95 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
 		String title = interaction.getTitle();
+		final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
+		EditText messageView = (EditText) activity.findViewById(R.id.message);
+		Button noButton = (Button) activity.findViewById(R.id.no_thanks);
+		final Button sendButton = (Button) activity.findViewById(R.id.send);
+
+		// Title
 		if (title != null) {
 			TextView titleView = (TextView) activity.findViewById(R.id.title);
 			titleView.setText(title);
 		}
 
+		// Body
 		String body = interaction.getBody();
 		if (body != null) {
 			TextView bodyView = (TextView) activity.findViewById(R.id.body);
 			bodyView.setText(body);
 		}
 
-		EditText emailView = (EditText) activity.findViewById(R.id.email);
-		String emailHintText = interaction.getEmailHintText();
-		if (emailHintText != null) {
-			emailView.setHint(emailHintText);
+		// Email
+		String personEnteredEmail = PersonManager.loadPersonEmail(activity);
+		if (!interaction.isAskForEmail()) {
+			emailView.setVisibility(View.GONE);
+		} else if (!Util.isEmpty(personEnteredEmail)) {
+			emailView.setVisibility(View.GONE);
+			email = personEnteredEmail;
+		} else {
+			String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
+			if (!Util.isEmpty(personInitialEmail)) {
+				emailView.setText(personInitialEmail);
+				email = personInitialEmail;
+			}
+
+			String emailHintText = interaction.getEmailHintText();
+			if (emailHintText != null) {
+				emailView.setHint(emailHintText);
+			} else if (interaction.isEmailRequired()) {
+				emailView.setHint(R.string.apptentive_edittext_hint_email_required);
+			}
+
+			// Pre-populate a list of possible emails based on those pulled from the phone.
+			ArrayAdapter<String> emailAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line, Util.getAllUserAccountEmailAddresses(activity));
+			emailView.setAdapter(emailAdapter);
+			emailView.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					emailView.showDropDown();
+					return false;
+				}
+			});
+			emailView.addTextChangedListener(new TextWatcher() {
+				@Override
+				public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				}
+
+				@Override
+				public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+					email = charSequence;
+					validateForm(sendButton);
+				}
+
+				@Override
+				public void afterTextChanged(Editable editable) {
+				}
+			});
 		}
 
-		EditText messageView = (EditText) activity.findViewById(R.id.message);
+		// Message
 		String messageHintText = interaction.getMessageHintText();
 		if (messageHintText != null) {
 			messageView.setHint(messageHintText);
 		}
+		messageView.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				message = charSequence;
+				validateForm(sendButton);
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+			}
+		});
+
 
 		// No
-		Button noButton = (Button) activity.findViewById(R.id.no_thanks);
 		String no = interaction.getNoText();
 		if (no != null) {
 			noButton.setText(no);
@@ -75,9 +155,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			}
 		});
 
-
 		// Send
-		Button sendButton = (Button) activity.findViewById(R.id.send);
 		String send = interaction.getSendText();
 		if (send != null) {
 			sendButton.setText(send);
@@ -85,11 +163,100 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
+					EmailValidationFailedDialog dialog = new EmailValidationFailedDialog(activity);
+					dialog.show();
+					return;
+				}
+				sendMessage(activity);
+
 				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SEND);
+				activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
+				activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
+			}
+		});
+
+
+		// Thank You Title
+		TextView thankYouTitleView = (TextView) activity.findViewById(R.id.thank_you_title);
+		String thankYouTitle = interaction.getThankYouTitle();
+		if (thankYouTitle != null) {
+			thankYouTitleView.setText(thankYouTitle);
+		}
+
+		// Thank You Body
+		TextView thankYouBodyView = (TextView) activity.findViewById(R.id.thank_you_body);
+		String thankYouBody = interaction.getThankYouBody();
+		if (thankYouBody != null) {
+			thankYouBodyView.setText(thankYouBody);
+		}
+
+		// Thank You Close Button
+		Button thankYouCloseButton = (Button) activity.findViewById(R.id.thank_you_close);
+		String thankYouCloseText = interaction.getThankYouCloseText();
+		if (thankYouCloseText != null) {
+			thankYouCloseButton.setText(thankYouCloseText);
+		}
+		thankYouCloseButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SKIP_VIEW_MESSAGES);
 				activity.finish();
 			}
 		});
 
+		// Thank You View Messages Button
+		Button thankYouViewMessagesButton = (Button) activity.findViewById(R.id.thank_you_view_messages);
+		String thankYouViewMessages = interaction.getThankYouViewMessagesText();
+		if (thankYouViewMessages != null) {
+			thankYouViewMessagesButton.setText(thankYouViewMessages);
+		}
+		thankYouViewMessagesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
+				activity.finish();
+			}
+		});
+	}
+
+	private void sendMessage(final Activity activity) {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, false).commit();
+		// Save the email.
+		if (interaction.isAskForEmail()) {
+			if (email != null && email.length() != 0) {
+				PersonManager.storePersonEmail(activity, email.toString());
+				Person person = PersonManager.storePersonAndReturnDiff(activity);
+				if (person != null) {
+					Log.d("Person was updated.");
+					Log.v(person.toString());
+					ApptentiveDatabase.getInstance(activity).addPayload(person);
+				} else {
+					Log.d("Person was not updated.");
+				}
+			}
+		}
+		// Send the message.
+		final TextMessage textMessage = new TextMessage();
+		textMessage.setBody(message.toString());
+		textMessage.setRead(true);
+/*
+		// TODO: Figure out how to add custom data here.
+		textMessage.setCustomData(customData);
+		customData = null;
+*/
+		MessageManager.sendMessage(activity, textMessage);
+	}
+
+	private void validateForm(Button sendButton) {
+		boolean passedEmail = true;
+		if (interaction.isEmailRequired()) {
+			passedEmail = !(email == null || email.length() == 0);
+		}
+		boolean passedMessage = !(message == null || message.length() == 0);
+
+		sendButton.setEnabled(passedEmail && passedMessage);
 	}
 
 	@Override

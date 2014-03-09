@@ -122,6 +122,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		EnjoymentDialog,
 		RatingDialog,
 		FeedbackDialog,
+		MessageCenter,
 		unknown;
 
 		public static Type parse(String type) {
@@ -151,6 +152,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 						return new RatingDialogInteraction(interactionString);
 					case FeedbackDialog:
 						return new FeedbackDialogInteraction(interactionString);
+					case MessageCenter:
+						return new MessageCenterInteraction(interactionString);
 					case unknown:
 						break;
 				}

@@ -66,6 +66,16 @@
                     "thank_you_view_messages_text": "View Messages"
                 }
             }
+        ],
+        "com.apptentive#FeedbackDialog#view_messages": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "message_center",
+                "type": "MessageCenter",
+                "configuration": {
+                }
+            }
         ]
     }
 }
