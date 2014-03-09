@@ -20,6 +20,12 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDi
  */
 public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialogInteraction> {
 
+	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_DISMISS = "dismiss";
+	private static final String CODE_POINT_NO = "no";
+	private static final String CODE_POINT_SEND = "send";
+	private static final String CODE_POINT_VIEW_MESSAGES = "view_messages"; // TODO: Use this.
+
 	public FeedbackDialogInteractionView(FeedbackDialogInteraction interaction) {
 		super(interaction);
 	}
@@ -62,7 +68,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "feedback_dialog", "no");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
 				activity.finish();
 			}
 		});
@@ -77,7 +83,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "feedback_dialog", "send");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SEND);
 				activity.finish();
 			}
 		});
@@ -91,7 +97,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, "feedback_dialog", "dismiss");
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
 		activity.finish();
 	}
 }

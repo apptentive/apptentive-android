@@ -19,6 +19,10 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentD
  */
 public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDialogInteraction> {
 
+	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_DISMISS = "dismiss";
+	private static final String CODE_POINT_YES = "yes";
+	private static final String CODE_POINT_NO = "no";
 
 	public EnjoymentDialogInteractionView(EnjoymentDialogInteraction interaction) {
 		super(interaction);
@@ -27,7 +31,6 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 	@Override
 	public void show(final Activity activity) {
 		super.show(activity);
-		// TODO: Send proper metric // MetricModule.sendMetric(activity, Event.EventLabel.enjoyment_dialog__launch);
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
 
 		String body = interaction.getBody();
@@ -45,7 +48,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "enjoyment_dialog", "no");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
 				activity.finish();
 			}
 		});
@@ -59,7 +62,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		yesButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "enjoyment_dialog", "yes");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_YES);
 				activity.finish();
 			}
 		});
@@ -72,6 +75,6 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, "enjoyment_dialog", "dismiss");
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
 	}
 }

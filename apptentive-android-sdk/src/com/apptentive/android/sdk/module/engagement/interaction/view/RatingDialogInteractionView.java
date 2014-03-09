@@ -29,6 +29,12 @@ import java.util.Map;
  */
 public class RatingDialogInteractionView extends InteractionView<RatingDialogInteraction> {
 
+	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_DISMISS = "dismiss";
+	private static final String CODE_POINT_RATE = "rate";
+	private static final String CODE_POINT_REMIND = "remind";
+	private static final String CODE_POINT_NO = "no";
+
 	public RatingDialogInteractionView(RatingDialogInteraction interaction) {
 		super(interaction);
 	}
@@ -36,7 +42,6 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 	@Override
 	public void show(final Activity activity) {
 		super.show(activity);
-		// TODO: Send event
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
 
 		String title = interaction.getTitle();
@@ -76,7 +81,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 					finalRatingProviderArgs.put("name", appDisplayName);
 
 					// Engage, then start the rating.
-					Apptentive.engageInternal(activity, "rating_dialog", "rate");
+					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_RATE);
 					RatingModule.getInstance().selectedRatingProvider.startRating(activity, finalRatingProviderArgs);
 				} catch (ActivityNotFoundException e) {
 					displayError(activity, errorMessage);
@@ -98,7 +103,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		remindButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "rating_dialog", "remind");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_REMIND);
 				activity.finish();
 			}
 		});
@@ -112,7 +117,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, "rating_dialog", "no");
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
 				activity.finish();
 			}
 		});
@@ -124,7 +129,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, "rating_dialog", "dismiss");
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
 	}
 
 	private void displayError(Activity activity, String message) {

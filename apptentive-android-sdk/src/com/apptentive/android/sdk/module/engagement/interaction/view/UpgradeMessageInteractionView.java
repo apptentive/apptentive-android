@@ -23,6 +23,10 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMes
  * @author Sky Kelsey
  */
 public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessageInteraction> {
+
+	private static final String CODE_POINT_LAUNCH = "launch"; // TODO: Use this.
+	private static final String CODE_POINT_DISMISS = "dismiss";
+
 	public UpgradeMessageInteractionView(UpgradeMessageInteraction interaction) {
 		super(interaction);
 	}
@@ -55,7 +59,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, "upgrade_message", "dismiss");
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
 	}
 
 	private Drawable getIconDrawableResourceId(Activity activity) {
