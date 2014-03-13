@@ -28,7 +28,7 @@ public class PayloadSendWorker {
 	private static boolean running;
 	private static Context appContext;
 
-	public static synchronized void start(Context context) {
+	public static synchronized void doStart(Context context) {
 		appContext = context.getApplicationContext();
 		if (!running) {
 			Log.i("Starting PayloadRunner.");
@@ -58,7 +58,7 @@ public class PayloadSendWorker {
 						return;
 					}
 					PayloadStore db = getPayloadStore(appContext);
-					while (true) {
+					while (keepRunning) {
 						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
@@ -132,5 +132,16 @@ public class PayloadSendWorker {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 		}
+	}
+
+	private static boolean keepRunning = false;
+
+	public static void start(Context context) {
+		keepRunning = true;
+		doStart(context);
+	}
+
+	public static void stop() {
+		keepRunning = false;
 	}
 }

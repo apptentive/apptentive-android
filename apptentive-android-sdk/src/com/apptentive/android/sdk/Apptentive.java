@@ -76,6 +76,7 @@ public class Apptentive {
 		try {
 			init(activity);
 			ActivityLifecycleManager.activityStarted(activity);
+			PayloadSendWorker.start(activity.getApplicationContext());
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -91,6 +92,7 @@ public class Apptentive {
 		try {
 			ActivityLifecycleManager.activityStopped(activity);
 			NetworkStateReceiver.clearListeners();
+			PayloadSendWorker.stop();
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -751,6 +753,7 @@ public class Apptentive {
 					}
 					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
 						Log.v("Network disconnected.");
+						PayloadSendWorker.stop();
 					}
 				}
 			};
@@ -807,10 +810,8 @@ public class Apptentive {
 		}
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-
-		// Finally, ensure the send worker is running.
-		PayloadSendWorker.start(context);
-		Log.d("Conversation Token: %s", GlobalInfo.conversationToken);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
