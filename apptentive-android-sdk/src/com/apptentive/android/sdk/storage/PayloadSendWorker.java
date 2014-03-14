@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -58,10 +59,13 @@ public class PayloadSendWorker {
 						return;
 					}
 					PayloadStore db = getPayloadStore(appContext);
-					while (keepRunning) {
+					while (runningActivities > 0) {
 						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
+						}
+						if (!Util.isNetworkConnectionPresent(appContext)) {
+							break;
 						}
 						Payload payload;
 						payload = db.getOldestUnsentPayload();
@@ -134,14 +138,18 @@ public class PayloadSendWorker {
 		}
 	}
 
-	private static boolean keepRunning = false;
+	private static long runningActivities = 0;
 
-	public static void start(Context context) {
-		keepRunning = true;
+	public static void ensureRunning(Context context) {
 		doStart(context);
 	}
 
-	public static void stop() {
-		keepRunning = false;
+	public static void activityStarted(Context context) {
+		runningActivities++;
+		doStart(context);
+	}
+
+	public static void activityStopped() {
+		runningActivities--;
 	}
 }

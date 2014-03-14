@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -27,6 +27,8 @@ public class DevActivity extends ApptentiveActivity {
 
 	private String selectedTag;
 
+	private long lastUnreadMessageCount = 0;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -49,12 +51,18 @@ public class DevActivity extends ApptentiveActivity {
 		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {
 				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
-				DevActivity.this.runOnUiThread(new Runnable() {
+				runOnUiThread(new Runnable() {
 					public void run() {
 						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
-						messageCenterButton.setText("Message Center, unread = " + unreadMessages);
+						if (messageCenterButton != null) {
+							messageCenterButton.setText("Message Center, unread = " + unreadMessages);
+						}
+						if (lastUnreadMessageCount < unreadMessages) {
+							Toast.makeText(DevActivity.this, "You have " + unreadMessages + " unread messages.", Toast.LENGTH_SHORT).show();
+						}
 					}
 				});
+				lastUnreadMessageCount = unreadMessages;
 			}
 		});
 

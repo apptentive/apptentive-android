@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
@@ -33,33 +32,19 @@ import java.util.List;
  */
 public class MessageManager {
 
-	private static OnSentMessageListener internalSentMessageListener;
-
-	public static void asyncFetchAndStoreMessages(final Context context, final MessagesUpdatedListener listener) {
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				MessageManager.fetchAndStoreMessages(context, listener);
-			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("UncaughtException in MessageManager.", throwable);
-				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-MessageManagerFetchMessages");
-		thread.start();
-	}
+	private static OnSentMessageListener sentMessageListener;
+	private static OnNewMessagesListener internalNewMessagesListener;
+	private static UnreadMessagesListener hostUnreadMessagesListener;
 
 	/**
+	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
+	 *
+	 * @returns true if messages were returned, else false.
 	 */
-	public static void fetchAndStoreMessages(Context context, MessagesUpdatedListener listener) {
+	public static boolean fetchAndStoreMessages(Context context) {
 		if (GlobalInfo.conversationToken == null) {
-			return;
+			return false;
 		}
 		// Fetch the messages.
 		String lastId = getMessageStore(context).getLastReceivedMessageId();
@@ -72,18 +57,24 @@ public class MessageManager {
 			int incomingUnreadMessages = 0;
 			// Mark messages from server where sender is the app user as read.
 			for (Message message : messagesToSave) {
-				if(message.isOutgoingMessage()) {
+				if (message.isOutgoingMessage()) {
 					message.setRead(true);
 				} else {
 					incomingUnreadMessages++;
 				}
 			}
 			getMessageStore(context).addOrUpdateMessages(messagesToSave.toArray(new Message[messagesToSave.size()]));
-			// Signal listener
-			if(incomingUnreadMessages > 0) {
-				listener.onMessagesUpdated();
+
+			if (incomingUnreadMessages > 0) {
+				if (internalNewMessagesListener != null) {
+					internalNewMessagesListener.onMessagesUpdated();
+				}
 			}
+
+			notifyHostUnreadMessagesListener(getUnreadMessageCount(context));
+			return incomingUnreadMessages > 0;
 		}
+		return false;
 	}
 
 	public static List<Message> getMessages(Context context) {
@@ -93,7 +84,7 @@ public class MessageManager {
 	public static void sendMessage(Context context, Message message) {
 		getMessageStore(context).addOrUpdateMessages(message);
 		ApptentiveDatabase.getInstance(context).addPayload(message);
-		PayloadSendWorker.start(context);
+		PayloadSendWorker.ensureRunning(context);
 	}
 
 	/**
@@ -128,26 +119,18 @@ public class MessageManager {
 
 	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
 		List<Message> ret = new ArrayList<Message>();
-			JSONObject root = new JSONObject(messageString);
-			if (!root.isNull("items")) {
-				JSONArray items = root.getJSONArray("items");
-				for (int i = 0; i < items.length(); i++) {
-					String json = items.getJSONObject(i).toString();
-					Message message = MessageFactory.fromJson(json);
-					// Since these came back from the server, mark them saved before updating them in the DB.
-					message.setState(Message.State.saved);
-					ret.add(message);
-				}
+		JSONObject root = new JSONObject(messageString);
+		if (!root.isNull("items")) {
+			JSONArray items = root.getJSONArray("items");
+			for (int i = 0; i < items.length(); i++) {
+				String json = items.getJSONObject(i).toString();
+				Message message = MessageFactory.fromJson(json);
+				// Since these came back from the server, mark them saved before updating them in the DB.
+				message.setState(Message.State.saved);
+				ret.add(message);
 			}
+		}
 		return ret;
-	}
-
-	private static MessageStore getMessageStore(Context context) {
-		return ApptentiveDatabase.getInstance(context);
-	}
-
-	public interface MessagesUpdatedListener {
-		public void onMessagesUpdated();
 	}
 
 	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
@@ -178,8 +161,8 @@ public class MessageManager {
 			}
 			getMessageStore(context).updateMessage(message);
 
-			if(internalSentMessageListener != null) {
-				internalSentMessageListener.onSentMessage(message);
+			if (sentMessageListener != null) {
+				sentMessageListener.onSentMessage(message);
 			}
 		}
 /*
@@ -189,34 +172,23 @@ public class MessageManager {
 */
 	}
 
-	public interface OnSentMessageListener {
-		public void onSentMessage(Message message);
-	}
-
-	public static void setInternalSentMessageListener(OnSentMessageListener onSentMessageListener) {
-		internalSentMessageListener = onSentMessageListener;
-	}
-
-	public static int getUnreadMessageCount(Context context) {
-		return getMessageStore(context).getUnreadMessageCount();
-	}
-
 	/**
 	 * This method will show either a Welcome or a No Love AutomatedMessage. If a No Love message has been shown, no other
 	 * AutomatedMessage shall be shown, and no AutomatedMessage shall be shown twice.
+	 *
 	 * @param context The context from which this method is called.
-	 * @param forced If true, show a Welcome AutomatedMessage, else show a NoLove AutomatedMessage.
+	 * @param forced  If true, show a Welcome AutomatedMessage, else show a NoLove AutomatedMessage.
 	 */
-	public static void createMessageCenterAutoMessage(Context context,boolean forced) {
+	public static void createMessageCenterAutoMessage(Context context, boolean forced) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
 		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
 
 		AutomatedMessage message = null;
 
-		if(!shownNoLove) {
-			if(forced) {
-				if(!shownManual) {
+		if (!shownNoLove) {
+			if (forced) {
+				if (!shownManual) {
 					prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
 					message = AutomatedMessage.createWelcomeMessage(context);
 				}
@@ -224,10 +196,47 @@ public class MessageManager {
 				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
 				message = AutomatedMessage.createNoLoveMessage(context);
 			}
-			if(message != null) {
+			if (message != null) {
 				getMessageStore(context).addOrUpdateMessages(message);
 				ApptentiveDatabase.getInstance(context).addPayload(message);
 			}
+		}
+	}
+
+	private static MessageStore getMessageStore(Context context) {
+		return ApptentiveDatabase.getInstance(context);
+	}
+
+	public static int getUnreadMessageCount(Context context) {
+		return getMessageStore(context).getUnreadMessageCount();
+	}
+
+
+	// Listeners
+
+	public interface OnSentMessageListener {
+		public void onSentMessage(Message message);
+	}
+
+	public static void setSentMessageListener(OnSentMessageListener onSentMessageListener) {
+		sentMessageListener = onSentMessageListener;
+	}
+
+	public interface OnNewMessagesListener {
+		public void onMessagesUpdated();
+	}
+
+	public static void setInternalOnMessagesUpdatedListener(OnNewMessagesListener listener) {
+		internalNewMessagesListener = listener;
+	}
+
+	public static void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
+		hostUnreadMessagesListener = listener;
+	}
+
+	public static void notifyHostUnreadMessagesListener(int unreadMessages) {
+		if (hostUnreadMessagesListener != null) {
+			hostUnreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
 		}
 	}
 }
