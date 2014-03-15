@@ -674,7 +674,7 @@ public class Apptentive {
 	private static synchronized boolean doEngage(Activity activity, String vendor, String interaction, String codePointName) {
 		try {
 			String fullCodePointName =  String.format("%s#%s#%s", URLEncoder.encode(vendor), URLEncoder.encode(interaction), URLEncoder.encode(codePointName));
-			Log.e("engage(%s)", fullCodePointName);
+			Log.d("engage(%s)", fullCodePointName);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), fullCodePointName);
 			EventManager.sendEvent(activity.getApplicationContext(), new Event(fullCodePointName, (Map<String, String>) null));
