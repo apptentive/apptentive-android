@@ -869,6 +869,11 @@ public class Apptentive {
 	private static void fetchConversationToken(Context context) {
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
+
+		// Send the Device Info now, so it's available on the server from the start.
+		Device device = DeviceManager.storeDeviceAndReturnDiff(context);
+		request.setDevice(device);
+
 		// TODO: Allow host app to send a user id, if available.
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {

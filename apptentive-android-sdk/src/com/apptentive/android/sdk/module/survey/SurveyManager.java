@@ -33,28 +33,22 @@ public class SurveyManager {
 
 	public static void asyncFetchAndStoreSurveysIfCacheExpired(final Context context) {
 		if (hasCacheExpired(context)) {
-			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			boolean deviceDataSent = prefs.getBoolean(Constants.PREF_KEY_DEVICE_DATA_SENT, false);
 			Log.d("Survey cache has expired. Fetching new surveys.");
-			if (deviceDataSent) { // Don't allow survey fetches until Device info has been sent at least once.
-				Thread thread = new Thread() {
-					public void run() {
-						fetchAndStoreSurveys(context);
-					}
-				};
-				Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-					@Override
-					public void uncaughtException(Thread thread, Throwable throwable) {
-						Log.w("UncaughtException in SurveyManager.", throwable);
-						MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-					}
-				};
-				thread.setUncaughtExceptionHandler(handler);
-				thread.setName("Apptentive-FetchSurveys");
-				thread.start();
-			} else {
-				Log.d("Can't fetch surveys because Device info has not been sent.");
-			}
+			Thread thread = new Thread() {
+				public void run() {
+					fetchAndStoreSurveys(context);
+				}
+			};
+			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(Thread thread, Throwable throwable) {
+					Log.w("UncaughtException in SurveyManager.", throwable);
+					MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+				}
+			};
+			thread.setUncaughtExceptionHandler(handler);
+			thread.setName("Apptentive-FetchSurveys");
+			thread.start();
 		} else {
 			Log.d("Survey cache has not expired. Using existing surveys.");
 		}

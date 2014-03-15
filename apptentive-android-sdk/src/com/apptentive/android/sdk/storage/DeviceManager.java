@@ -353,8 +353,5 @@ public class DeviceManager {
 	}
 
 	public static void onSentDeviceInfo(Context appContext) {
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putBoolean(Constants.PREF_KEY_DEVICE_DATA_SENT, true).commit();
-		SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(appContext);
 	}
 }
