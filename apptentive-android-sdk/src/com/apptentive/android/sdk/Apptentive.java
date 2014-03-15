@@ -25,6 +25,7 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -49,8 +50,6 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Apptentive {
-
-	private static UnreadMessagesListener unreadMessagesListener;
 
 	private Apptentive() {
 	}
@@ -77,6 +76,8 @@ public class Apptentive {
 		try {
 			init(activity);
 			ActivityLifecycleManager.activityStarted(activity);
+			PayloadSendWorker.activityStarted(activity.getApplicationContext());
+			MessagePollingWorker.start(activity.getApplicationContext());
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -92,6 +93,8 @@ public class Apptentive {
 		try {
 			ActivityLifecycleManager.activityStopped(activity);
 			NetworkStateReceiver.clearListeners();
+			PayloadSendWorker.activityStopped();
+			MessagePollingWorker.stop();
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -497,7 +500,7 @@ public class Apptentive {
 	 * @param listener An UnreadMessageListener that you instantiate.
 	 */
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		unreadMessagesListener = listener;
+		MessageManager.setHostUnreadMessagesListener(listener);
 	}
 
 	/**
@@ -765,7 +768,7 @@ public class Apptentive {
 				public void stateChanged(NetworkInfo networkInfo) {
 					if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
 						Log.v("Network connected.");
-						PayloadSendWorker.start(context);
+						PayloadSendWorker.ensureRunning(context);
 					}
 					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
 						Log.v("Network disconnected.");
@@ -825,10 +828,8 @@ public class Apptentive {
 		}
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-
-		// Finally, ensure the send worker is running.
-		PayloadSendWorker.start(context);
-		Log.d("Conversation Token: %s", GlobalInfo.conversationToken);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
@@ -973,23 +974,8 @@ public class Apptentive {
 	/**
 	 * Internal use only.
 	 */
-	public static void notifyUnreadMessagesListener(int unreadMessages) {
-		Log.v("Notifying UnreadMessagesListener");
-		if (unreadMessagesListener != null) {
-			unreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
-		}
-	}
-
-	/**
-	 * Internal use only.
-	 */
 	public static void onAppLaunch(final Activity activity) {
 		RatingModule.getInstance().logUse(activity);
-		MessageManager.asyncFetchAndStoreMessages(activity, new MessageManager.MessagesUpdatedListener() {
-			public void onMessagesUpdated() {
-				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
-			}
-		});
-		Apptentive.engageInternal(activity, "app", Event.EventLabel.app__launch.getLabelName());
+		Apptentive.engage(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }
