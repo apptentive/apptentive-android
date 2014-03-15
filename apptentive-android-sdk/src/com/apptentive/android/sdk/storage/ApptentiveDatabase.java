@@ -155,13 +155,16 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	// PAYLOAD: This table is used to store all the Payloads we want to send to the server.
 
+	// Try not to hit the database unless we need to. This value is polled every few seconds.
+	private boolean payloadsDirty = true;
+
 	/**
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
 	public synchronized void addPayload(Payload... payloads) {
+		payloadsDirty = true;
 		SQLiteDatabase db = null;
-
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
@@ -179,6 +182,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized void deletePayload(Payload payload) {
+		payloadsDirty = true;
 		if (payload != null) {
 			SQLiteDatabase db = null;
 			try {
@@ -191,6 +195,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized void deleteAllPayloads() {
+		payloadsDirty = true;
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -201,6 +206,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized Payload getOldestUnsentPayload() {
+		if (!payloadsDirty) {
+			return null;
+		}
+
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
@@ -214,6 +223,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				payload = PayloadFactory.fromJson(json, baseType);
 				payload.setDatabaseId(databaseId);
 			}
+			payloadsDirty = false;
 			return payload;
 		} finally {
 			ensureClosed(cursor);
