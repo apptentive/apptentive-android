@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +47,10 @@ public class MessageManager {
 		if (GlobalInfo.conversationToken == null) {
 			return false;
 		}
+		if (!Util.isNetworkConnectionPresent(context)) {
+			return false;
+		}
+
 		// Fetch the messages.
 		String lastId = getMessageStore(context).getLastReceivedMessageId();
 		Log.d("Fetching messages after last id: " + lastId);

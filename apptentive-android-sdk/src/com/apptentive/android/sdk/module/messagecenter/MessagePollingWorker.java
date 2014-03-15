@@ -54,12 +54,13 @@ public class MessagePollingWorker {
 		public void run() {
 			try {
 				synchronized (this) {
-					if(appContext == null) {
+					if (appContext == null) {
 						return;
 					}
 					while (runningActivities > 0) {
-						long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
+						Log.d("Checking server for new messages.");
 						MessageManager.fetchAndStoreMessages(appContext);
+						long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
 						pause(pollingInterval);
 					}
 				}
@@ -80,13 +81,11 @@ public class MessagePollingWorker {
 
 	public static void start(Context context) {
 		runningActivities++;
-		Log.e("Start message polling. Running Activities = %d", runningActivities);
 		doStart(context);
 	}
 
 	public static void stop() {
 		runningActivities--;
-		Log.e("Stop message polling. Running Activities = %d", runningActivities);
 	}
 
 	public static void setForeground(boolean foreground) {

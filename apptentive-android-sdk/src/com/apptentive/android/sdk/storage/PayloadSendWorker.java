@@ -32,7 +32,7 @@ public class PayloadSendWorker {
 	public static synchronized void doStart(Context context) {
 		appContext = context.getApplicationContext();
 		if (!running) {
-			Log.i("Starting PayloadRunner.");
+			Log.i("Starting PayloadSendWorker.");
 			running = true;
 			Thread payloadRunner = new PayloadRunner();
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
@@ -60,13 +60,14 @@ public class PayloadSendWorker {
 					}
 					PayloadStore db = getPayloadStore(appContext);
 					while (runningActivities > 0) {
-						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
+						if (Util.isEmpty(GlobalInfo.conversationToken)) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
 						if (!Util.isNetworkConnectionPresent(appContext)) {
 							break;
 						}
+						Log.d("Checking for payloads to send.");
 						Payload payload;
 						payload = db.getOldestUnsentPayload();
 						if (payload == null) {
