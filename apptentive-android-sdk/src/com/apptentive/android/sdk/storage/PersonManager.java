@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,9 +8,11 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.JsonDiffer;
 import org.json.JSONException;
 
 /**
@@ -19,7 +21,7 @@ import org.json.JSONException;
 public class PersonManager {
 
 	public static Person storePersonAndReturnDiff(Context context) {
-		Person original = getStoredPerson(context);
+		Person stored = getStoredPerson(context);
 
 		Person current = generateCurrentPerson();
 		CustomData customData = loadCustomPersonData(context);
@@ -30,10 +32,14 @@ public class PersonManager {
 		}
 		current.setEmail(email);
 
-		Person diff = diffPerson(original, current);
-		if (diff != null) {
-			storePerson(context, current);
-			return diff;
+		Object diff = JsonDiffer.getDiff(stored, current);
+		if(diff != null) {
+			try {
+				storePerson(context, current);
+				return new Person(diff.toString());
+			} catch (JSONException e) {
+				Log.e("Error casting to Person.", e);
+			}
 		}
 
 		return null;
@@ -96,131 +102,5 @@ public class PersonManager {
 	private static void storePerson(Context context, Person Person) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_PERSON, Person.toString()).commit();
-	}
-
-	private static Person diffPerson(Person old, Person newer) {
-		if (old == null) {
-			return newer;
-		}
-
-		Person ret = new Person();
-		int baseEntries = ret.length();
-
-		String id = chooseLatest(old.getId(), newer.getId());
-		if (id != null) {
-			ret.setId(id);
-		}
-
-		String email = chooseLatest(old.getEmail(), newer.getEmail());
-		if (email != null) {
-			ret.setEmail(email);
-		}
-
-		String facebookId = chooseLatest(old.getFacebookId(), newer.getFacebookId());
-		if (facebookId != null) {
-			ret.setFacebookId(facebookId);
-		}
-
-		String phoneNumber = chooseLatest(old.getPhoneNumber(), newer.getPhoneNumber());
-		if (phoneNumber != null) {
-			ret.setPhoneNumber(phoneNumber);
-		}
-
-		String street = chooseLatest(old.getStreet(), newer.getStreet());
-		if (street != null) {
-			ret.setStreet(street);
-		}
-
-		String city = chooseLatest(old.getCity(), newer.getCity());
-		if (city != null) {
-			ret.setCity(city);
-		}
-
-		String zip = chooseLatest(old.getZip(), newer.getZip());
-		if (zip != null) {
-			ret.setZip(zip);
-		}
-
-		String country = chooseLatest(old.getCountry(), newer.getCountry());
-		if (country != null) {
-			ret.setCountry(country);
-		}
-
-		String birthday = chooseLatest(old.getBirthday(), newer.getBirthday());
-		if (birthday != null) {
-			ret.setBirthday(birthday);
-		}
-
-		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
-		if (customData != null) {
-			ret.setCustomData(customData);
-		}
-
-		// If there were no differences, return null.
-		if (ret.length() <= baseEntries) {
-			return null;
-		}
-		return ret;
-	}
-
-	/**
-	 * A convenience method.
-	 *
-	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
-	 */
-	private static String chooseLatest(String old, String newer) {
-		if (old == null || old.equals("")) {
-			old = null;
-		}
-		if (newer == null || newer.equals("")) {
-			newer = null;
-		}
-
-		// New value.
-		if (old != null && newer != null && !old.equals(newer)) {
-			return newer;
-		}
-
-		// Clear existing value.
-		if (old != null && newer == null) {
-			return "";
-		}
-
-		if (old == null && newer != null) {
-			return newer;
-		}
-
-		// Do nothing.
-		return null;
-	}
-
-	private static CustomData chooseLatest(CustomData old, CustomData newer) {
-		if (old == null || old.length() == 0) {
-			old = null;
-		}
-		if (newer == null || newer.length() == 0) {
-			newer = null;
-		}
-
-		// New value.
-		if (old != null && newer != null && !old.equals(newer)) {
-			return newer;
-		}
-
-		// Clear existing value.
-		if (old != null && newer == null) {
-			try {
-				return new CustomData();
-			} catch (JSONException e) {
-				return null;
-			}
-		}
-
-		if (old == null && newer != null) {
-			return newer;
-		}
-
-		// Do nothing.
-		return null;
 	}
 }

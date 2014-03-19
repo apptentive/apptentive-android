@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,10 +11,11 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
-import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.JsonDiffer;
 import com.apptentive.android.sdk.util.Reflection;
 import org.json.JSONException;
 
@@ -44,10 +45,14 @@ public class DeviceManager {
 		CustomData integrationConfig = loadIntegrationConfig(context);
 		current.setIntegrationConfig(integrationConfig);
 
-		Device diff = diffDevice(stored, current);
+		Object diff = JsonDiffer.getDiff(stored, current);
 		if (diff != null) {
-			storeDevice(context, current);
-			return diff;
+			try {
+				storeDevice(context, current);
+				return new Device(diff.toString());
+			} catch (JSONException e) {
+				Log.e("Error casting to Device.", e);
+			}
 		}
 		return null;
 	}
@@ -141,215 +146,6 @@ public class DeviceManager {
 	private static void storeDevice(Context context, Device device) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_DEVICE, device.toString()).commit();
-	}
-
-	/**
-	 * Creates a new Device object with the values from newer where they are different from older. If a value exists
-	 * in older but not newer, an empty string is set for that key, which tells the server to clear the value. A null
-	 * values for a key will not be written so that this method only returns a strict diff of older and newer.
-	 *
-	 * @return A new Device object if there were any differences, else null.
-	 */
-	private static Device diffDevice(Device old, Device newer) {
-		if (old == null) {
-			return newer;
-		}
-
-		Device ret = new Device();
-		int baseEntries = ret.length();
-
-		String uuid = chooseLatest(old.getUuid(), newer.getUuid());
-		if (uuid != null) {
-			ret.setUuid(uuid);
-		}
-
-		String osName = chooseLatest(old.getOsName(), newer.getOsName());
-		if (osName != null) {
-			ret.setOsName(osName);
-		}
-
-		String osVersion = chooseLatest(old.getOsVersion(), newer.getOsVersion());
-		if (osVersion != null) {
-			ret.setOsVersion(osVersion);
-		}
-
-		String osBuild = chooseLatest(old.getOsBuild(), newer.getOsBuild());
-		if (osBuild != null) {
-			ret.setOsBuild(osBuild);
-		}
-
-		String osApiLevel = chooseLatest(old.getOsApiLevel(), newer.getOsApiLevel());
-		if (osApiLevel != null) {
-			ret.setOsApiLevel(osApiLevel);
-		}
-
-		String manufacturer = chooseLatest(old.getManufacturer(), newer.getManufacturer());
-		if (manufacturer != null) {
-			ret.setManufacturer(manufacturer);
-		}
-
-		String model = chooseLatest(old.getModel(), newer.getModel());
-		if (model != null) {
-			ret.setModel(model);
-		}
-
-		String board = chooseLatest(old.getBoard(), newer.getBoard());
-		if (board != null) {
-			ret.setBoard(board);
-		}
-
-		String product = chooseLatest(old.getProduct(), newer.getProduct());
-		if (product != null) {
-			ret.setProduct(product);
-		}
-
-		String brand = chooseLatest(old.getBrand(), newer.getBrand());
-		if (brand != null) {
-			ret.setBrand(brand);
-		}
-
-		String cpu = chooseLatest(old.getCpu(), newer.getCpu());
-		if (cpu != null) {
-			ret.setCpu(cpu);
-		}
-
-		String device = chooseLatest(old.getDevice(), newer.getDevice());
-		if (device != null) {
-			ret.setDevice(device);
-		}
-
-		String carrier = chooseLatest(old.getCarrier(), newer.getCarrier());
-		if (carrier != null) {
-			ret.setCarrier(carrier);
-		}
-
-		String currentCarrier = chooseLatest(old.getCurrentCarrier(), newer.getCurrentCarrier());
-		if (currentCarrier != null) {
-			ret.setCurrentCarrier(currentCarrier);
-		}
-
-		String networkType = chooseLatest(old.getNetworkType(), newer.getNetworkType());
-		if (networkType != null) {
-			ret.setNetworkType(networkType);
-		}
-
-		String buildType = chooseLatest(old.getBuildType(), newer.getBuildType());
-		if (buildType != null) {
-			ret.setBuildType(buildType);
-		}
-
-		String buildId = chooseLatest(old.getBuildId(), newer.getBuildId());
-		if (buildId != null) {
-			ret.setBuildId(buildId);
-		}
-
-		String bootloaderVersion = chooseLatest(old.getBootloaderVersion(), newer.getBootloaderVersion());
-		if (bootloaderVersion != null) {
-			ret.setBootloaderVersion(bootloaderVersion);
-		}
-
-		String radioVersion = chooseLatest(old.getRadioVersion(), newer.getRadioVersion());
-		if (radioVersion != null) {
-			ret.setRadioVersion(radioVersion);
-		}
-
-		CustomData customData = chooseLatest(old.getCustomData(), newer.getCustomData());
-		if (customData != null) {
-			ret.setCustomData(customData);
-		}
-
-		CustomData integrationConfig = chooseLatest(old.getIntegrationConfig(), newer.getIntegrationConfig());
-		if (integrationConfig != null) {
-			ret.setIntegrationConfig(integrationConfig);
-		}
-
-		String localeCountryCode = chooseLatest(old.getLocaleCountryCode(), newer.getLocaleCountryCode());
-		if (localeCountryCode != null) {
-			ret.setLocaleCountryCode(localeCountryCode);
-		}
-
-		String localeLanguageCode = chooseLatest(old.getLocaleLanguageCode(), newer.getLocaleLanguageCode());
-		if (localeLanguageCode != null) {
-			ret.setLocaleLanguageCode(localeLanguageCode);
-		}
-
-		String localeRaw = chooseLatest(old.getLocaleRaw(), newer.getLocaleRaw());
-		if (localeRaw != null) {
-			ret.setLocaleRaw(localeRaw);
-		}
-
-		String utcOffset = chooseLatest(old.getUtcOffset(), newer.getUtcOffset());
-		if (utcOffset != null) {
-			ret.setUtcOffset(utcOffset);
-		}
-
-
-		// If there were no differences, return null.
-		if (ret.length() <= baseEntries) {
-			return null;
-		}
-		return ret;
-	}
-
-	/**
-	 * A convenience method.
-	 *
-	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
-	 */
-	private static String chooseLatest(String old, String newer) {
-		if (old == null || old.equals("")) {
-			old = null;
-		}
-		if (newer == null || newer.equals("")) {
-			newer = null;
-		}
-
-		// New value.
-		if (old != null && newer != null && !old.equals(newer)) {
-			return newer;
-		}
-
-		// Clear existing value.
-		if (old != null && newer == null) {
-			return "";
-		}
-
-		if (old == null && newer != null) {
-			return newer;
-		}
-
-		// Do nothing.
-		return null;
-	}
-
-	private static CustomData chooseLatest(CustomData old, CustomData newer) {
-		if (old == null || old.length() == 0) {
-			old = null;
-		}
-		if (newer == null || newer.length() == 0) {
-			newer = null;
-		}
-
-		// New value.
-		if (old != null && newer != null && !old.equals(newer)) {
-			return newer;
-		}
-
-		// Clear existing value.
-		if (old != null && newer == null) {
-			try {
-				return new CustomData();
-			} catch (JSONException e) {
-				return null;
-			}
-		}
-
-		if (old == null && newer != null) {
-			return newer;
-		}
-
-		// Do nothing.
-		return null;
 	}
 
 	public static void onSentDeviceInfo(Context appContext) {
