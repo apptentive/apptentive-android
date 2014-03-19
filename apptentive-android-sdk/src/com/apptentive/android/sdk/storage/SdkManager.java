@@ -36,6 +36,12 @@ public class SdkManager {
 		return null;
 	}
 
+	public static Sdk storeSdkAndReturnIt(Context context) {
+		Sdk current = generateCurrentSdk(context);
+		storeSdk(context, current);
+		return current;
+	}
+
 	private static Sdk generateCurrentSdk(Context context) {
 		Sdk sdk = new Sdk();
 

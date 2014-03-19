@@ -57,6 +57,20 @@ public class DeviceManager {
 		return null;
 	}
 
+	/**
+	 * Provided so we can be sure that the device we send during conversation creation is 100% accurate. Since we do not
+	 * queue this device up in the payload queue, it could otherwise be lost.
+	 */
+	public static Device storeDeviceAndReturnIt(Context context) {
+		Device current = generateNewDevice(context);
+		CustomData customData = loadCustomDeviceData(context);
+		current.setCustomData(customData);
+		CustomData integrationConfig = loadIntegrationConfig(context);
+		current.setIntegrationConfig(integrationConfig);
+		storeDevice(context, current);
+		return current;
+	}
+
 	public static CustomData loadCustomDeviceData(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
