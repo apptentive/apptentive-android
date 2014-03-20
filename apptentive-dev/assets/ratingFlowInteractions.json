@@ -21,6 +21,8 @@
                         "$gt": 0,
                         "$lt": 2
                     },
+                    "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
                         "$gte": 10
                     }
@@ -56,7 +58,7 @@
                 "id": "532b247c49f63bcd9900000d",
                 "type": "FeedbackDialog",
                 "configuration": {
-                    "title": "Thanks for your feedback!",
+                    "title": "We're Sorry!",
                     "body": "Please let us know how to make this app better for you!",
                     "email_hint_text": "Your Email Address",
                     "message_hint_text": "Tell us how we can help. (required)",

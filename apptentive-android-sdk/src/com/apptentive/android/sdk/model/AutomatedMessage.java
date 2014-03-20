@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -50,20 +50,25 @@ public class AutomatedMessage extends TextMessage {
 		}
 	}
 
-	public static AutomatedMessage createWelcomeMessage(Context context) {
+	public static AutomatedMessage createAutoMessage(String title, String body) {
 		AutomatedMessage message = new AutomatedMessage();
-		Resources resources = context.getResources();
-		message.setTitle(resources.getString(R.string.apptentive_give_feedback));
-		message.setBody(resources.getString(R.string.apptentive_message_auto_body_manual));
+		message.setTitle(title);
+		message.setBody(body);
 		return message;
 	}
 
-	public static AutomatedMessage createNoLoveMessage(Context context) {
-		AutomatedMessage message = new AutomatedMessage();
+	public static AutomatedMessage createWelcomeMessage(Context context) {
 		Resources resources = context.getResources();
-		message.setTitle(resources.getString(R.string.apptentive_were_sorry));
-		message.setBody(resources.getString(R.string.apptentive_message_auto_body_no_love));
-		return message;
+		String title = resources.getString(R.string.apptentive_give_feedback);
+		String body = resources.getString(R.string.apptentive_message_auto_body_manual);
+		return createAutoMessage(title, body);
+	}
+
+	public static AutomatedMessage createNoLoveMessage(Context context) {
+		Resources resources = context.getResources();
+		String title = resources.getString(R.string.apptentive_were_sorry);
+		String body = resources.getString(R.string.apptentive_message_auto_body_no_love);
+		return createAutoMessage(title, body);
 	}
 
 }

@@ -186,22 +186,29 @@ public class MessageManager {
 	 */
 	public static void createMessageCenterAutoMessage(Context context, boolean forced) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
+		boolean shownAutoMessage = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, false);
+
+		// Migrate old values if needed.
 		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
 		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
+		if (!shownAutoMessage) {
+			if (shownManual || shownNoLove) {
+				shownAutoMessage = true;
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
+			}
+		}
 
 		AutomatedMessage message = null;
 
-		if (!shownNoLove) {
+		if (!shownAutoMessage) {
 			if (forced) {
-				if (!shownManual) {
-					prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, true).commit();
-					message = AutomatedMessage.createWelcomeMessage(context);
-				}
+				message = AutomatedMessage.createWelcomeMessage(context);
 			} else {
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, true).commit();
 				message = AutomatedMessage.createNoLoveMessage(context);
 			}
 			if (message != null) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
 				getMessageStore(context).addOrUpdateMessages(message);
 				ApptentiveDatabase.getInstance(context).addPayload(message);
 			}
@@ -217,7 +224,7 @@ public class MessageManager {
 	}
 
 
-	// Listeners
+// Listeners
 
 	public interface OnSentMessageListener {
 		public void onSentMessage(Message message);

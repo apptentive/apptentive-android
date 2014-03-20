@@ -17,6 +17,7 @@ import android.widget.*;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
@@ -50,6 +51,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	public void show(final Activity activity) {
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_feedback_dialog_interaction);
+
+		// Legacy support: We can remove this when we switch over to 100% interaction based Message Center.
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, false).commit();
 
 		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
@@ -168,6 +173,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 					dialog.show();
 					return;
 				}
+
+				// Before we send this message, send an auto message.
+				createMessageCenterAutoMessage(activity);
+
 				sendMessage(activity);
 
 				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
@@ -218,6 +227,33 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				activity.finish();
 			}
 		});
+	}
+
+	public static void createMessageCenterAutoMessage(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean shownAutoMessage = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, false);
+
+		// Migrate old values if needed.
+		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
+		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
+		if (!shownAutoMessage) {
+			if (shownManual || shownNoLove) {
+				shownAutoMessage = true;
+				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
+			}
+		}
+
+		AutomatedMessage message = null;
+
+		if (!shownAutoMessage) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
+			message = AutomatedMessage.createWelcomeMessage(context);
+		}
+		if (message != null) {
+			ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+			db.addOrUpdateMessages(message);
+			db.addPayload(message);
+		}
 	}
 
 	private void sendMessage(final Activity activity) {
