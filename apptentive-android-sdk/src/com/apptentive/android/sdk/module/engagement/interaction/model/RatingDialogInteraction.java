@@ -17,7 +17,7 @@ public class RatingDialogInteraction extends Interaction {
 	private static final String KEY_BODY = "body";
 	private static final String KEY_RATE_TEXT = "rate_text";
 	private static final String KEY_REMIND_TEXT = "remind_text";
-	private static final String KEY_NO_TEXT = "no_text";
+	private static final String KEY_DECLINE_TEXT = "decline_text";
 
 	public RatingDialogInteraction(String json) throws JSONException {
 		super(json);
@@ -67,11 +67,11 @@ public class RatingDialogInteraction extends Interaction {
 		return null;
 	}
 
-	public String getNoText() {
+	public String getDeclineText() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_NO_TEXT)) {
-				return configuration.getString(KEY_NO_TEXT);
+			if (configuration != null && configuration.has(KEY_DECLINE_TEXT)) {
+				return configuration.getString(KEY_DECLINE_TEXT);
 			}
 		} catch (JSONException e) {
 		}

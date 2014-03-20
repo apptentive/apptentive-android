@@ -30,10 +30,10 @@ import java.util.Map;
 public class RatingDialogInteractionView extends InteractionView<RatingDialogInteraction> {
 
 	private static final String CODE_POINT_LAUNCH = "launch";
-	private static final String CODE_POINT_DISMISS = "dismiss";
+	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_RATE = "rate";
 	private static final String CODE_POINT_REMIND = "remind";
-	private static final String CODE_POINT_NO = "no";
+	private static final String CODE_POINT_DECLINE = "decline";
 
 	public RatingDialogInteractionView(RatingDialogInteraction interaction) {
 		super(interaction);
@@ -110,16 +110,16 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 			}
 		});
 
-		// No
-		Button noButton = (Button) activity.findViewById(R.id.no);
-		String no = interaction.getNoText();
-		if (no != null) {
-			noButton.setText(no);
+		// Decline
+		Button declineButton = (Button) activity.findViewById(R.id.decline);
+		String decline = interaction.getDeclineText();
+		if (decline != null) {
+			declineButton.setText(decline);
 		}
-		noButton.setOnClickListener(new View.OnClickListener() {
+		declineButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
 				activity.finish();
 			}
 		});
@@ -131,7 +131,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 	}
 
 	private void displayError(Activity activity, String message) {

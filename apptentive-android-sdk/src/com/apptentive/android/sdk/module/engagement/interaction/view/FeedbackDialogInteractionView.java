@@ -33,9 +33,9 @@ import com.apptentive.android.sdk.util.Util;
 public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialogInteraction> {
 
 	private static final String CODE_POINT_LAUNCH = "launch";
-	private static final String CODE_POINT_DISMISS = "dismiss";
-	private static final String CODE_POINT_NO = "no";
-	private static final String CODE_POINT_SEND = "send";
+	private static final String CODE_POINT_CANCEL = "cancel";
+	private static final String CODE_POINT_DECLINE = "decline";
+	private static final String CODE_POINT_SUBMIT = "submit";
 	private static final String CODE_POINT_SKIP_VIEW_MESSAGES = "skip_view_messages";
 	private static final String CODE_POINT_VIEW_MESSAGES = "view_messages";
 
@@ -56,8 +56,8 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		String title = interaction.getTitle();
 		final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
 		EditText messageView = (EditText) activity.findViewById(R.id.message);
-		Button noButton = (Button) activity.findViewById(R.id.no_thanks);
-		final Button sendButton = (Button) activity.findViewById(R.id.send);
+		Button noButton = (Button) activity.findViewById(R.id.decline);
+		final Button sendButton = (Button) activity.findViewById(R.id.submit);
 
 		// Title
 		if (title != null) {
@@ -143,20 +143,20 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 
 		// No
-		String no = interaction.getNoText();
+		String no = interaction.getDeclineText();
 		if (no != null) {
 			noButton.setText(no);
 		}
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
 				activity.finish();
 			}
 		});
 
 		// Send
-		String send = interaction.getSendText();
+		String send = interaction.getSubmitText();
 		if (send != null) {
 			sendButton.setText(send);
 		}
@@ -170,7 +170,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				}
 				sendMessage(activity);
 
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SEND);
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
 				activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
 				activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
 			}
@@ -266,7 +266,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 		activity.finish();
 	}
 }

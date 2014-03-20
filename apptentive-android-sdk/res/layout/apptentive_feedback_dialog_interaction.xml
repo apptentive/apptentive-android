@@ -75,7 +75,7 @@
                               android:orientation="horizontal"
                               android:layout_below="@id/message"
                               android:layout_alignParentRight="true">
-                    <Button android:id="@+id/no_thanks"
+                    <Button android:id="@+id/decline"
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_weight="1"
@@ -84,7 +84,7 @@
                             android:textColor="@drawable/apptentive_dialog_negative_button_text"
                             android:textSize="@dimen/apptentive_text_medium"
                             android:text="@string/apptentive_no_thanks"/>
-                    <Button android:id="@+id/send"
+                    <Button android:id="@+id/submit"
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_weight="1"

@@ -22,7 +22,7 @@
                         "$lte": 2
                     },
                     "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
-                        "$gte": 10
+                        "$gte": 864000
                     }
                 },
                 "id": "532b247b49f63bcd99000009",

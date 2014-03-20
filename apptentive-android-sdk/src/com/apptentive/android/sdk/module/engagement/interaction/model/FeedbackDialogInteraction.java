@@ -16,12 +16,13 @@ public class FeedbackDialogInteraction extends Interaction {
 	private static final String KEY_ASK_FOR_EMAIL = "ask_for_email";
 	private static final String KEY_EMAIL_REQUIRED = "email_required";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
+
 	private static final String KEY_TITLE = "title";
 	private static final String KEY_BODY = "body";
 	private static final String KEY_EMAIL_HINT_TEXT = "email_hint_text";
 	private static final String KEY_MESSAGE_HINT_TEXT = "message_hint_text";
-	private static final String KEY_NO_TEXT = "no_text";
-	private static final String KEY_SEND_TEXT = "send_text";
+	private static final String KEY_DECLINE_TEXT = "decline_text";
+	private static final String KEY_SUBMIT_TEXT = "submit_text";
 
 	private static final String KEY_THANK_YOU_TITLE = "thank_you_title";
 	private static final String KEY_THANK_YOU_BODY = "thank_you_body";
@@ -109,22 +110,22 @@ public class FeedbackDialogInteraction extends Interaction {
 		return null;
 	}
 
-	public String getNoText() {
+	public String getDeclineText() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_NO_TEXT)) {
-				return configuration.getString(KEY_NO_TEXT);
+			if (configuration != null && configuration.has(KEY_DECLINE_TEXT)) {
+				return configuration.getString(KEY_DECLINE_TEXT);
 			}
 		} catch (JSONException e) {
 		}
 		return null;
 	}
 
-	public String getSendText() {
+	public String getSubmitText() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_SEND_TEXT)) {
-				return configuration.getString(KEY_SEND_TEXT);
+			if (configuration != null && configuration.has(KEY_SUBMIT_TEXT)) {
+				return configuration.getString(KEY_SUBMIT_TEXT);
 			}
 		} catch (JSONException e) {
 		}

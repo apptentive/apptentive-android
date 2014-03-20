@@ -291,7 +291,7 @@ public class TestsActivity extends ApptentiveActivity {
 				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractions.json");
 				// Overwrites any existing interactions.
 				InteractionManager.storeInteractions(this, json);
-				Apptentive.engage(this, "interaction_test");
+				Apptentive.engage(this, "init");
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);

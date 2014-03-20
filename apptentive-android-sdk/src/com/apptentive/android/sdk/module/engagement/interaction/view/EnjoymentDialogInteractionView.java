@@ -20,7 +20,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentD
 public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDialogInteraction> {
 
 	private static final String CODE_POINT_LAUNCH = "launch";
-	private static final String CODE_POINT_DISMISS = "dismiss";
+	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_YES = "yes";
 	private static final String CODE_POINT_NO = "no";
 
@@ -35,9 +35,9 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
-		String body = interaction.getBody();
+		String body = interaction.getTitle();
 		if (body != null) {
-			TextView bodyView = (TextView) activity.findViewById(R.id.body);
+			TextView bodyView = (TextView) activity.findViewById(R.id.title);
 			bodyView.setText(body);
 		}
 
@@ -77,6 +77,6 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 	}
 }

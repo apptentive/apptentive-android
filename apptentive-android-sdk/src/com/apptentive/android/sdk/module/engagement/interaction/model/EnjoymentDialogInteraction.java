@@ -13,7 +13,7 @@ import org.json.JSONException;
  */
 public class EnjoymentDialogInteraction extends Interaction {
 
-	private static final String KEY_BODY = "body";
+	private static final String KEY_TITLE = "title";
 	private static final String KEY_YES_TEXT = "yes_text";
 	private static final String KEY_NO_TEXT = "no_text";
 
@@ -21,11 +21,11 @@ public class EnjoymentDialogInteraction extends Interaction {
 		super(json);
 	}
 
-	public String getBody() {
+	public String getTitle() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_BODY)) {
-				return configuration.getString(KEY_BODY);
+			if (configuration != null && configuration.has(KEY_TITLE)) {
+				return configuration.getString(KEY_TITLE);
 			}
 		} catch (JSONException e) {
 		}
