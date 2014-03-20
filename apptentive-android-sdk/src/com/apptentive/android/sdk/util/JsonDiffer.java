@@ -47,16 +47,10 @@ public class JsonDiffer {
 					}
 				} else if (oldValue instanceof JSONArray && newValue instanceof JSONArray) {
 					// Diff JSONArrays
-					if (isEmpty(newValue)) {
-						newValue = JSONObject.NULL;
-					}
 					// TODO: At least check for strict equality. Right now, we always send nested JSONArrays.
 					ret.put(key, newValue);
 				} else if (!oldValue.equals(newValue)) {
 					// Diff primitives
-					if (isEmpty(newValue)) {
-						newValue = JSONObject.NULL;
-					}
 					ret.put(key, newValue);
 				} else if (oldValue.equals(newValue)) {
 					// Do nothing.

@@ -19,7 +19,7 @@
                 "criteria": {
                     "interactions/532b247b49f63bcd99000009/invokes/total": {
                         "$gt": 0,
-                        "$lte": 2
+                        "$lt": 2
                     },
                     "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
                         "$gte": 10
