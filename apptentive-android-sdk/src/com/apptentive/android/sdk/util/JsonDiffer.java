@@ -85,7 +85,7 @@ public class JsonDiffer {
 
 	public static boolean areObjectsEqual(Object left, Object right) {
 		if (left == right) return true;
-		if (left == null) return false;
+		if (left == null || right == null) return false;
 
 		if (left instanceof JSONObject && right instanceof JSONObject) {
 			JSONObject leftJSONObject = (JSONObject) left;
