@@ -15,11 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.RatingModule;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
+import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
-import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,20 +70,17 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 			public void onClick(View view) {
 				String errorMessage = activity.getString(R.string.apptentive_rating_error);
 				try {
-					// TODO: Delete the RatingModule class altogether.
-					if (RatingModule.getInstance().selectedRatingProvider == null) {
-						// Default to the Android Market provider, if none has been specified
-						RatingModule.getInstance().selectedRatingProvider = new GooglePlayRatingProvider();
-					}
-					errorMessage = RatingModule.getInstance().selectedRatingProvider.activityNotFoundMessage(activity);
+					IRatingProvider ratingProvider = Apptentive.getRatingProvider();
+					errorMessage = ratingProvider.activityNotFoundMessage(activity);
 
 					String appDisplayName = Configuration.load(activity).getAppDisplayName();
-					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(RatingModule.getInstance().ratingProviderArgs);
+					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(Apptentive.getRatingProviderArgs());
+					finalRatingProviderArgs.put("package", activity.getPackageName());
 					finalRatingProviderArgs.put("name", appDisplayName);
 
 					// Engage, then start the rating.
 					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_RATE);
-					RatingModule.getInstance().selectedRatingProvider.startRating(activity, finalRatingProviderArgs);
+					ratingProvider.startRating(activity, finalRatingProviderArgs);
 				} catch (ActivityNotFoundException e) {
 					displayError(activity, errorMessage);
 				} catch (InsufficientRatingArgumentsException e) {

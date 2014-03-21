@@ -94,26 +94,6 @@ public class DevActivity extends ApptentiveActivity {
 		startActivity(testsIntent);
 	}
 
-	public void logSignificantEvent(@SuppressWarnings("unused") View view) {
-		Apptentive.logSignificantEvent(this);
-	}
-
-	public void logDay(@SuppressWarnings("unused") View view) {
-		DevDebugHelper.logDay(this);
-	}
-
-	public void showChoice(@SuppressWarnings("unused") View view) {
-		DevDebugHelper.forceShowEnjoymentDialog(this);
-	}
-
-	public void showRating(@SuppressWarnings("unused") View view) {
-		DevDebugHelper.showRatingDialog(this);
-	}
-
-	public void showFeedback(@SuppressWarnings("unused") View view) {
-		DevDebugHelper.forceShowIntroDialog(this);
-	}
-
 	public void showMessageCenter(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
 	}
@@ -142,7 +122,7 @@ public class DevActivity extends ApptentiveActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
-			boolean ret = Apptentive.showRatingFlowIfConditionsAreMet(DevActivity.this);
+			boolean ret = Apptentive.engage(this, "init");
 			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
 		}
 	}

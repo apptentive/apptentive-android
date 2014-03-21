@@ -30,6 +30,7 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
@@ -50,6 +51,9 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class Apptentive {
+
+	private static Map<String, String> ratingProviderArgs;
+	private static IRatingProvider ratingProvider;
 
 	private Apptentive() {
 	}
@@ -414,17 +418,6 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
-	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
-	 * is time to run the rating flow.
-	 *
-	 * @param context The context from which this method is called.
-	 */
-	public static void logSignificantEvent(Context context) {
-		RatingModule.getInstance().logSignificantEvent(context);
-	}
-
-	/**
 	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
 	 * that the app was downloaded from.
 	 *
@@ -432,7 +425,14 @@ public class Apptentive {
 	 */
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
-		RatingModule.getInstance().setRatingProvider(ratingProvider);
+		Apptentive.ratingProvider = ratingProvider;
+	}
+
+	public static IRatingProvider getRatingProvider() {
+		if (ratingProvider == null) {
+			ratingProvider = new GooglePlayRatingProvider();
+		}
+		return ratingProvider;
 	}
 
 	/**
@@ -443,24 +443,14 @@ public class Apptentive {
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
-		RatingModule.getInstance().putRatingProviderArg(key, value);
+		if (ratingProviderArgs == null) {
+			ratingProviderArgs = new HashMap<String, String>();
+		}
+		ratingProviderArgs.put(key, value);
 	}
 
-	/**
-	 * If you want to launch the ratings flow when conditions are met, call this at an appropriate place in your code.
-	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
-	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
-	 *
-	 * @param activity The activity from which this set of dialogs is launched.
-	 * @return True if the rating flow was shown, else false.
-	 */
-	public static boolean showRatingFlowIfConditionsAreMet(Activity activity) {
-		try {
-			return RatingModule.getInstance().run(activity);
-		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-		return false;
+	public static Map<String, String> getRatingProviderArgs() {
+		return ratingProviderArgs;
 	}
 
 	// ****************************************************************************************
@@ -656,19 +646,19 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method takes a unique code point string, stores a record of that code point having been visited, figures out
-	 * if there is an interaction that is able to run for this code point, and then runs it. If more than one interaction
+	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
 	 * @param activity  The Activity from which this method is called.
-	 * @param codePoint A unique String representing the line this method is called on. For instance, you may want to have
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
 	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String codePoint) {
-		return doEngage(activity, "local", "app", codePoint);
+	public static synchronized boolean engage(Activity activity, String event) {
+		return doEngage(activity, "local", "app", event);
 	}
 
 	private static synchronized boolean doEngage(Activity activity, String vendor, String interaction, String codePointName) {
@@ -690,6 +680,10 @@ public class Apptentive {
 	 */
 	public static synchronized boolean engageInternal(Activity activity, String interaction, String codePoint) {
 		return doEngage(activity, "com.apptentive", interaction, codePoint);
+	}
+
+	public static synchronized boolean engageInternal(Activity activity, String codePoint) {
+		return doEngage(activity, "com.apptentive", "app", codePoint);
 	}
 
 
@@ -835,7 +829,6 @@ public class Apptentive {
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
 		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
-		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
 			Log.d("App release was updated.");
@@ -982,7 +975,6 @@ public class Apptentive {
 	 * Internal use only.
 	 */
 	public static void onAppLaunch(final Activity activity) {
-		RatingModule.getInstance().logUse(activity);
-		Apptentive.engage(activity, Event.EventLabel.app__launch.getLabelName());
+		Apptentive.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }

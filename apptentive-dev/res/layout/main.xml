@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -50,32 +50,6 @@
               android:gravity="left|bottom"
               android:textSize="@dimen/apptentive_text_medium"
               android:textColor="@android:color/white"
-              android:text="Ratings"/>
-    <Button android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:onClick="logSignificantEvent"
-            android:text="@string/button_trigger_event"/>
-    <Button android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:onClick="logDay"
-            android:text="@string/button_subtract_a_day"/>
-    <Button android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:onClick="showChoice"
-            android:text="@string/button_force_choice"/>
-    <Button android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:onClick="showRating"
-            android:text="@string/button_force_rating"/>
-    <TextView android:layout_width="fill_parent"
-              android:layout_height="32dp"
-              android:gravity="left|bottom"
-              android:textSize="@dimen/apptentive_text_medium"
-              android:textColor="@android:color/white"
               android:text="Message Center"/>
     <Button android:id="@+id/button_message_center"
             android:layout_width="fill_parent"
@@ -83,11 +57,6 @@
             android:layout_marginTop="4dp"
             android:onClick="showMessageCenter"
             android:text="@string/button_message_center"/>
-    <Button android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:onClick="showFeedback"
-            android:text="@string/button_force_intro_dialog"/>
     <TextView android:layout_width="fill_parent"
               android:layout_height="32dp"
               android:gravity="left|bottom"
