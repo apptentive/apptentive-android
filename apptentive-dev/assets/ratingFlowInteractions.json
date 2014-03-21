@@ -4,9 +4,9 @@
             {
                 "priority": 8,
                 "criteria": {
-                    "interactions/532b247b49f63bcd99000006/invokes/total": 0
+                    "interactions/532b7a3549f63bc650000006/invokes/total": 0
                 },
-                "id": "532b247b49f63bcd99000006",
+                "id": "532b7a3549f63bc650000006",
                 "type": "EnjoymentDialog",
                 "configuration": {
                     "title": "Do you love Travel Keeper?",
@@ -17,9 +17,9 @@
             {
                 "priority": 9,
                 "criteria": {
-                    "interactions/532b247b49f63bcd99000009/invokes/total": {
+                    "interactions/532b7a3549f63bc650000009/invokes/version": {
                         "$gt": 0,
-                        "$lt": 2
+                        "$lte": 1
                     },
                     "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
@@ -27,7 +27,7 @@
                         "$gte": 10
                     }
                 },
-                "id": "532b247b49f63bcd99000009",
+                "id": "532b7a3549f63bc650000009",
                 "type": "RatingDialog",
                 "configuration": {
                     "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
@@ -41,7 +41,7 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b247b49f63bcd99000009",
+                "id": "532b7a3549f63bc650000009",
                 "type": "RatingDialog",
                 "configuration": {
                     "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
@@ -55,7 +55,7 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b247c49f63bcd9900000d",
+                "id": "532b7a3649f63bc65000000d",
                 "type": "FeedbackDialog",
                 "configuration": {
                     "title": "We're Sorry!",
@@ -78,7 +78,7 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b247c49f63bcd9900000f",
+                "id": "532b7a3649f63bc65000000f",
                 "type": "MessageCenter"
             }
         ]
