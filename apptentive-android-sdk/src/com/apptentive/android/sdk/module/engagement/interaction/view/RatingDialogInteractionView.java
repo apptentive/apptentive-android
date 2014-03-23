@@ -74,9 +74,20 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 					errorMessage = ratingProvider.activityNotFoundMessage(activity);
 
 					String appDisplayName = Configuration.load(activity).getAppDisplayName();
-					Map<String, String> finalRatingProviderArgs = new HashMap<String, String>(Apptentive.getRatingProviderArgs());
-					finalRatingProviderArgs.put("package", activity.getPackageName());
-					finalRatingProviderArgs.put("name", appDisplayName);
+					Map<String, String> ratingProviderArgs = Apptentive.getRatingProviderArgs();
+					Map<String, String> finalRatingProviderArgs;
+					if (ratingProviderArgs != null) {
+						finalRatingProviderArgs = new HashMap<String, String>(ratingProviderArgs);
+					} else {
+						finalRatingProviderArgs = new HashMap<String, String>();
+					}
+
+					if (!finalRatingProviderArgs.containsKey("package")) {
+						finalRatingProviderArgs.put("package", activity.getPackageName());
+					}
+					if (!finalRatingProviderArgs.containsKey("name")) {
+						finalRatingProviderArgs.put("name", appDisplayName);
+					}
 
 					// Engage, then start the rating.
 					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_RATE);

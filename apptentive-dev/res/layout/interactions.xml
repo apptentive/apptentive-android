@@ -49,6 +49,9 @@
                                               android:layout_width="0dp"
                                               android:layout_height="48dp"
                                               android:layout_weight="6"
+                                              android:cursorVisible="true"
+                                              android:inputType="textVisiblePassword"
+                                              android:completionThreshold="1"
                                               android:hint="Event Name…"/>
                     </LinearLayout>
                     <LinearLayout android:layout_width="fill_parent"
@@ -64,6 +67,9 @@
                                               android:layout_width="0dp"
                                               android:layout_height="48dp"
                                               android:layout_weight="6"
+                                              android:cursorVisible="true"
+                                              android:inputType="textVisiblePassword"
+                                              android:completionThreshold="1"
                                               android:hint="Internal Event Name…"/>
                     </LinearLayout>
                 </LinearLayout>
