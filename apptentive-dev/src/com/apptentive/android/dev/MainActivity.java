@@ -10,20 +10,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 
 /**
  * @author Sky Kelsey
  */
-public class DevActivity extends ApptentiveActivity {
+public class MainActivity extends ApptentiveActivity {
 
-	private static final String LOG_TAG = "Apptentive Dev App";
+	public static final String LOG_TAG = "Apptentive Dev App";
 
 	private String selectedTag;
 
@@ -61,59 +58,37 @@ public class DevActivity extends ApptentiveActivity {
 							messageCenterButton.setText("Message Center, unread = " + unreadMessages);
 						}
 						if (lastUnreadMessageCount < unreadMessages) {
-							Toast.makeText(DevActivity.this, "You have " + unreadMessages + " unread messages.", Toast.LENGTH_SHORT).show();
+							Toast.makeText(MainActivity.this, "You have " + unreadMessages + " unread messages.", Toast.LENGTH_SHORT).show();
 						}
 					}
 				});
 				lastUnreadMessageCount = unreadMessages;
 			}
 		});
-
-		// Set up a spinner to choose which tag we will use to show a survey.
-		Spinner surveySpinner = (Spinner) findViewById(R.id.survey_spinner);
-		surveySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-				if (i == 0) {
-					selectedTag = null;
-				} else {
-					String[] tagsArray = getResources().getStringArray(R.array.survey_tags);
-					selectedTag = tagsArray[i];
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> adapterView) {
-			}
-		});
 	}
 
-	public void runTests(@SuppressWarnings("unused") View view) {
-		Intent testsIntent = new Intent();
-		testsIntent.setClass(this, TestsActivity.class);
-		startActivity(testsIntent);
+	public void launchInteractionsActivity(@SuppressWarnings("unused") View view) {
+		startActivity(new Intent(this, InteractionsActivity.class));
+	}
+
+	public void launchMessageCenterActivity(@SuppressWarnings("unused") View view) {
+		startActivity(new Intent(this, MessageCenterActivity.class));
+	}
+
+	public void launchSurveysActivity(@SuppressWarnings("unused") View view) {
+		startActivity(new Intent(this, SurveysActivity.class));
+	}
+
+	public void launchTestsActivity(@SuppressWarnings("unused") View view) {
+		startActivity(new Intent(this, TestsActivity.class));
+	}
+
+	public void launchDataActivity(@SuppressWarnings("unused") View view) {
+		startActivity(new Intent(this, DataActivity.class));
 	}
 
 	public void showMessageCenter(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
-	}
-
-	public void showSurvey(@SuppressWarnings("unused") View view) {
-		OnSurveyFinishedListener listener = new OnSurveyFinishedListener() {
-			public void onSurveyFinished(boolean completed) {
-				Log.e(LOG_TAG, "A survey finished, and was " + (completed ? "completed" : "skipped"));
-			}
-		};
-
-		boolean ret;
-		if (selectedTag != null) {
-			ret = Apptentive.showSurvey(this, listener, selectedTag);
-		} else {
-			ret = Apptentive.showSurvey(this, listener);
-		}
-		if (!ret) {
-			Toast.makeText(this, "No matching survey found.", Toast.LENGTH_SHORT).show();
-		}
 	}
 
 	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window

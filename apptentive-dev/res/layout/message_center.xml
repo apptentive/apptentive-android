@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blur_2"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+    <requestFocus/>
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+                  android:orientation="vertical">
+        <include layout="@layout/header"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="center"
+                  android:textSize="@dimen/apptentive_text_large"
+                  android:textColor="@android:color/white"
+                  android:text="@string/message_center"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="@string/custom_data"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_small"
+                  android:textColor="@android:color/white"
+                  android:text="@string/message_center_custom_data_description"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="48dp"
+                      android:layout_marginTop="4dp"
+                      android:orientation="horizontal">
+            <Button android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:onClick="clearCustomData"
+                    android:text="@string/clear"/>
+            <EditText android:id="@+id/add_custom_device_data_key"
+                      android:layout_width="0dp"
+                      android:layout_height="fill_parent"
+                      android:layout_weight="3"
+                      android:hint="@string/key"/>
+            <EditText android:id="@+id/add_custom_device_data_value"
+                      android:layout_width="0dp"
+                      android:layout_height="fill_parent"
+                      android:layout_weight="3"
+                      android:hint="@string/value"/>
+        </LinearLayout>
+        <Button android:id="@+id/button_message_center"
+                android:layout_width="fill_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:onClick="showMessageCenter"
+                android:text="@string/show_message_center"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="Send Image Attachment"/>
+        <Button android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:onClick="sendAttachmentImage"
+                android:text="Choose and Send Image"/>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="Send File Attachment"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="48dp"
+                      android:layout_marginTop="4dp"
+                      android:orientation="horizontal">
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:onClick="sendAttachmentFile"
+                    android:text="Send"/>
+            <EditText android:id="@+id/attachment_file_content"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:hint="Text File Contents…"/>
+        </LinearLayout>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="Send Text Attachment"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="48dp"
+                      android:layout_marginTop="4dp"
+                      android:orientation="horizontal">
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:onClick="sendAttachmentText"
+                    android:text="Send"/>
+            <EditText android:id="@+id/attachment_text"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:hint="Message…"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -13,7 +13,12 @@
         <item>test_tag_3</item>
     </string-array>
 
-    <string-array name="code_points">
+    <string-array name="events">
+        <item>init</item>
+        <item>main_activity_launch</item>
+    </string-array>
+
+    <string-array name="internal_events">
         <item>app.launch</item>
     </string-array>
 

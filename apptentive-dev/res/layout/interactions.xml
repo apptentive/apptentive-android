@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/blur_2"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+    <requestFocus/>
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+                  android:paddingBottom="16dp">
+        <include layout="@layout/header"/>
+        <FrameLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical">
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="8dp"
+                              android:background="@drawable/section_background"
+                              android:orientation="vertical">
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="32dp"
+                              android:gravity="left|center_vertical"
+                              android:textSize="@dimen/apptentive_text_medium"
+                              android:textColor="@android:color/white"
+                              android:text="Trigger code point"/>
+                    <LinearLayout android:layout_width="fill_parent"
+                                  android:layout_height="48dp"
+                                  android:layout_marginTop="4dp"
+                                  android:orientation="horizontal">
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="2"
+                                android:onClick="engage"
+                                android:text="Engage"/>
+                        <AutoCompleteTextView android:id="@+id/event_name"
+                                              android:layout_width="0dp"
+                                              android:layout_height="48dp"
+                                              android:layout_weight="6"
+                                              android:hint="Event Name…"/>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="fill_parent"
+                                  android:layout_height="48dp"
+                                  android:layout_marginTop="4dp"
+                                  android:orientation="horizontal">
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="2"
+                                android:onClick="engageInternal"
+                                android:text="Engage"/>
+                        <AutoCompleteTextView android:id="@+id/internal_event_name"
+                                              android:layout_width="0dp"
+                                              android:layout_height="48dp"
+                                              android:layout_weight="6"
+                                              android:hint="Internal Event Name…"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="8dp"
+                              android:background="@drawable/section_background"
+                              android:orientation="vertical">
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="32dp"
+                              android:gravity="left|center_vertical"
+                              android:textSize="@dimen/apptentive_text_medium"
+                              android:textColor="@android:color/white"
+                              android:text="Trigger Hardcoded Interactions"/>
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="24dp"
+                              android:gravity="left|bottom"
+                              android:textSize="@dimen/apptentive_text_small_tiny"
+                              android:textColor="@android:color/white"
+                              android:text="(replaces downloaded interactions)"/>
+                    <LinearLayout android:layout_width="fill_parent"
+                                  android:layout_height="48dp"
+                                  android:layout_marginTop="4dp"
+                                  android:orientation="horizontal">
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="2"
+                                android:onClick="interaction"
+                                android:text="Trigger"/>
+                        <Spinner android:id="@+id/interaction_spinner"
+                                 android:layout_width="0dp"
+                                 android:layout_height="fill_parent"
+                                 android:layout_weight="6"
+                                 android:entries="@array/interactions"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <Button android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:onClick="fetchInteractions"
+                        android:text="Fetch Interactions"/>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</ScrollView>
