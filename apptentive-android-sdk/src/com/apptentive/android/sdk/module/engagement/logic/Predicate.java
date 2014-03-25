@@ -1,7 +1,6 @@
 package com.apptentive.android.sdk.module.engagement.logic;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
 
 /**
