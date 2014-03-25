@@ -31,7 +31,7 @@ public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		Configuration conf = Configuration.load(getContext());
-		boolean enableMessageCenter = conf.isMessageCenterEnabled();
+		boolean enableMessageCenter = conf.isMessageCenterEnabled(getContext());
 
 		final Button close = (Button) findViewById(R.id.close);
 		final Button viewMessages = (Button) findViewById(R.id.view_messages);
