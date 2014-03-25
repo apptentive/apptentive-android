@@ -99,7 +99,7 @@ public class VersionHistoryStore {
 	 */
 	public static boolean isUpdate(Context context, Selector selector) {
 		List<VersionHistoryEntry> entries = getVersionHistory(context);
-		Set uniques = new HashSet();
+		Set<String> uniques = new HashSet<String>();
 		if (entries != null) {
 			for (VersionHistoryEntry entry : entries) {
 				switch (selector) {
