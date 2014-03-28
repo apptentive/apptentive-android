@@ -22,10 +22,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import org.json.JSONException;
 
 /**
@@ -221,6 +218,20 @@ public class InteractionsActivity extends ApptentiveActivity {
 		"  }" +
 		"}";
 
+	private static final String APP_STORE_RATING_INTERACTION = "" +
+		"{" +
+		"  \"priority\": 1," +
+		"  \"criteria\": {" +
+		"  }," +
+		"  \"id\": \"app_store_rating_interaction\"," +
+		"  \"type\": \"AppStoreRating\"," +
+		"  \"configuration\": {" +
+		"    store_id: \"12345678\"," +
+		"    method: \"magic\"," +
+		"    url: \"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=12345678&pageNumber=0&sortOrdering=1\"" +
+		"  }" +
+		"}";
+
 	public void interaction(@SuppressWarnings("unused") View view) {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
@@ -238,6 +249,8 @@ public class InteractionsActivity extends ApptentiveActivity {
 				interaction = new EnjoymentDialogInteraction(ENJOYMENT_DIALOG_INTERACTION);
 			} else if (interactionName.equals("Rating Dialog")) {
 				interaction = new EnjoymentDialogInteraction(RATING_DIALOG_INTERACTION);
+			} else if (interactionName.equals("App Store Rating")) {
+				interaction = new AppStoreRatingInteraction(APP_STORE_RATING_INTERACTION);
 			} else if (interactionName.equals("Feedback Dialog")) {
 				interaction = new FeedbackDialogInteraction(FEEDBACK_DIALOG_INTERACTION);
 			} else if (interactionName.equals("Working Rating Flow")) {

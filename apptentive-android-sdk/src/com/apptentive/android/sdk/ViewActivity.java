@@ -71,6 +71,9 @@ public class ViewActivity extends ApptentiveActivity {
 					case RatingDialog:
 						view = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
 						break;
+					case AppStoreRating:
+						view = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
+						break;
 					case FeedbackDialog:
 						view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
 						break;

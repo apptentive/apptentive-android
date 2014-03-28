@@ -113,16 +113,13 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		return new InteractionConfiguration();
 	}
 
-	public boolean isShowPoweredBy() {
-		return getConfiguration().isShowPoweredBy();
-	}
-
 	public static enum Type {
 		UpgradeMessage,
 		EnjoymentDialog,
 		RatingDialog,
 		FeedbackDialog,
 		MessageCenter,
+		AppStoreRating,
 		unknown;
 
 		public static Type parse(String type) {
@@ -154,6 +151,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 						return new FeedbackDialogInteraction(interactionString);
 					case MessageCenter:
 						return new MessageCenterInteraction(interactionString);
+					case AppStoreRating:
+						return new AppStoreRatingInteraction(interactionString);
 					case unknown:
 						break;
 				}
