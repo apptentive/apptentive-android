@@ -44,6 +44,7 @@ public class AppReleaseManager {
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);
+			appRelease.setIdentifier(packageInfo.packageName);
 			appRelease.setBuildNumber("" + packageInfo.versionCode);
 			appRelease.setTargetSdkVersion("" + packageInfo.applicationInfo.targetSdkVersion);
 			appRelease.setAppStore(Util.getInstallerPackageName(context));
