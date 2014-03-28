@@ -46,6 +46,9 @@ public class ComparisonPredicate<T extends Comparable> extends Predicate {
 	 * Boolean if the value is a Boolean.
 	 */
 	private T ensureType(T value, Object condition) {
+		if ((value == null)) {
+			return (T) condition;
+		}
 		if (!value.getClass().equals(condition.getClass())) {
 			if (value instanceof String) {
 				if (condition instanceof String) {
@@ -90,6 +93,13 @@ public class ComparisonPredicate<T extends Comparable> extends Predicate {
 		Log.v("Comparison Predicate: %s", queryName);
 		for (Condition condition : conditions) {
 			Log.v("-- Compare: %s %s %s", getLoggableValue(value), condition.operation, getLoggableValue(condition.operand));
+            // Shortcut if null.
+			if (value == null) {
+				if (condition.operand == null) {
+					return true;
+				}
+				return false;
+			}
 			switch (condition.operation) {
 				case $gt:
 					if (!(value.compareTo(condition.operand) > 0)) {
