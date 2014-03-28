@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 /**
@@ -43,8 +44,9 @@ public class AppReleaseManager {
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);
-			appRelease.setBuildNumber(""+packageInfo.versionCode);
-			appRelease.setTargetSdkVersion(""+packageInfo.applicationInfo.targetSdkVersion);
+			appRelease.setBuildNumber("" + packageInfo.versionCode);
+			appRelease.setTargetSdkVersion("" + packageInfo.applicationInfo.targetSdkVersion);
+			appRelease.setAppStore(Util.getInstallerPackageName(context));
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Can't load PackageInfo.", e);
 		}
