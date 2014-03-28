@@ -66,10 +66,10 @@ public class InteractionManager {
 		}
 	}
 
-	public static Interaction getApplicableInteraction(Context context, String codePoint) {
+	public static Interaction getApplicableInteraction(Context context, String fullCodePoint) {
 		Interactions interactions = loadInteractions(context);
 		if (interactions != null) {
-			List<Interaction> list = interactions.getInteractionList(codePoint);
+			List<Interaction> list = interactions.getInteractionList(fullCodePoint);
 			for (Interaction interaction : list) {
 				if (interaction.canRun(context)) {
 					return interaction;
