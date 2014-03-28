@@ -115,6 +115,10 @@ public class CodePointStore extends JSONObject {
 	}
 
 	public static synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build) {
+		storeRecord(context, isInteraction, fullCodePoint, version, build, Util.currentTimeSeconds());
+	}
+
+	public static synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
 		String buildString = String.valueOf(build);
 		CodePointStore store = getInstance(context);
 		if (store != null && fullCodePoint != null && version != null) {
@@ -137,8 +141,8 @@ public class CodePointStore extends JSONObject {
 					recordType.put(fullCodePoint, codePointJson);
 				}
 
-				// Set the last time this code point was seen to the current time.
-				codePointJson.put(KEY_LAST, Util.currentTimeSeconds());
+				// Set the last time this code point was seen.
+				codePointJson.put(KEY_LAST, currentTimeSeconds);
 
 				// Increment the total times this code point was seen.
 				int total = 0;
