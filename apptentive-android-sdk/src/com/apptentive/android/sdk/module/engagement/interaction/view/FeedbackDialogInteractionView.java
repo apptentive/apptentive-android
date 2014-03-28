@@ -43,6 +43,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	private CharSequence email;
 	private CharSequence message;
 
+	// Don't show the wrong view when we because of rotation.
+	private static boolean feedbackDialogVisible = false;
+	private static boolean thankYouDialogVisible = false;
+
 	public FeedbackDialogInteractionView(FeedbackDialogInteraction interaction) {
 		super(interaction);
 	}
@@ -56,66 +60,91 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, false).commit();
 
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
-
-		String title = interaction.getTitle();
-		final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
-		EditText messageView = (EditText) activity.findViewById(R.id.message);
-		Button noButton = (Button) activity.findViewById(R.id.decline);
-		final Button sendButton = (Button) activity.findViewById(R.id.submit);
-
-		// Title
-		if (title != null) {
-			TextView titleView = (TextView) activity.findViewById(R.id.title);
-			titleView.setText(title);
-		}
-
-		// Body
-		String body = interaction.getBody();
-		if (body != null) {
-			TextView bodyView = (TextView) activity.findViewById(R.id.body);
-			bodyView.setText(body);
-		}
-
-		// Email
-		String personEnteredEmail = PersonManager.loadPersonEmail(activity);
-		if (!interaction.isAskForEmail()) {
-			emailView.setVisibility(View.GONE);
-		} else if (!Util.isEmpty(personEnteredEmail)) {
-			emailView.setVisibility(View.GONE);
-			email = personEnteredEmail;
-		} else {
-			String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
-			if (!Util.isEmpty(personInitialEmail)) {
-				emailView.setText(personInitialEmail);
-				email = personInitialEmail;
+		if (!thankYouDialogVisible) {
+			if (!feedbackDialogVisible) {
+				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 			}
 
-			String emailHintText = interaction.getEmailHintText();
-			if (emailHintText != null) {
-				emailView.setHint(emailHintText);
-			} else if (interaction.isEmailRequired()) {
-				emailView.setHint(R.string.apptentive_edittext_hint_email_required);
+			String title = interaction.getTitle();
+			final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
+			EditText messageView = (EditText) activity.findViewById(R.id.message);
+			Button noButton = (Button) activity.findViewById(R.id.decline);
+			final Button sendButton = (Button) activity.findViewById(R.id.submit);
+
+			// Title
+			if (title != null) {
+				TextView titleView = (TextView) activity.findViewById(R.id.title);
+				titleView.setText(title);
 			}
 
-			// Pre-populate a list of possible emails based on those pulled from the phone.
-			ArrayAdapter<String> emailAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line, Util.getAllUserAccountEmailAddresses(activity));
-			emailView.setAdapter(emailAdapter);
-			emailView.setOnTouchListener(new View.OnTouchListener() {
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					emailView.showDropDown();
-					return false;
+			// Body
+			String body = interaction.getBody();
+			if (body != null) {
+				TextView bodyView = (TextView) activity.findViewById(R.id.body);
+				bodyView.setText(body);
+			}
+
+			// Email
+			String personEnteredEmail = PersonManager.loadPersonEmail(activity);
+			if (!interaction.isAskForEmail()) {
+				emailView.setVisibility(View.GONE);
+			} else if (!Util.isEmpty(personEnteredEmail)) {
+				emailView.setVisibility(View.GONE);
+				email = personEnteredEmail;
+			} else {
+				String personInitialEmail = PersonManager.loadInitialPersonEmail(activity);
+				if (!Util.isEmpty(personInitialEmail)) {
+					emailView.setText(personInitialEmail);
+					email = personInitialEmail;
 				}
-			});
-			emailView.addTextChangedListener(new TextWatcher() {
+
+				String emailHintText = interaction.getEmailHintText();
+				if (emailHintText != null) {
+					emailView.setHint(emailHintText);
+				} else if (interaction.isEmailRequired()) {
+					emailView.setHint(R.string.apptentive_edittext_hint_email_required);
+				}
+
+				// Pre-populate a list of possible emails based on those pulled from the phone.
+				ArrayAdapter<String> emailAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line, Util.getAllUserAccountEmailAddresses(activity));
+				emailView.setAdapter(emailAdapter);
+				emailView.setOnTouchListener(new View.OnTouchListener() {
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						emailView.showDropDown();
+						return false;
+					}
+				});
+				emailView.addTextChangedListener(new TextWatcher() {
+					@Override
+					public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+					}
+
+					@Override
+					public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+						email = charSequence;
+						validateForm(sendButton);
+					}
+
+					@Override
+					public void afterTextChanged(Editable editable) {
+					}
+				});
+			}
+
+			// Message
+			String messageHintText = interaction.getMessageHintText();
+			if (messageHintText != null) {
+				messageView.setHint(messageHintText);
+			}
+			messageView.addTextChangedListener(new TextWatcher() {
 				@Override
 				public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				}
 
 				@Override
 				public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-					email = charSequence;
+					message = charSequence;
 					validateForm(sendButton);
 				}
 
@@ -123,68 +152,52 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				public void afterTextChanged(Editable editable) {
 				}
 			});
-		}
 
-		// Message
-		String messageHintText = interaction.getMessageHintText();
-		if (messageHintText != null) {
-			messageView.setHint(messageHintText);
-		}
-		messageView.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+			// No
+			String no = interaction.getDeclineText();
+			if (no != null) {
+				noButton.setText(no);
 			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				message = charSequence;
-				validateForm(sendButton);
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-			}
-		});
-
-
-		// No
-		String no = interaction.getDeclineText();
-		if (no != null) {
-			noButton.setText(no);
-		}
-		noButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
-				activity.finish();
-			}
-		});
-
-		// Send
-		String send = interaction.getSubmitText();
-		if (send != null) {
-			sendButton.setText(send);
-		}
-		sendButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
-					EmailValidationFailedDialog dialog = new EmailValidationFailedDialog(activity);
-					dialog.show();
-					return;
+			noButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					cleanup();
+					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
+					activity.finish();
 				}
+			});
 
-				// Before we send this message, send an auto message.
-				createMessageCenterAutoMessage(activity);
-
-				sendMessage(activity);
-
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
-				activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
-				activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
+			// Send
+			String send = interaction.getSubmitText();
+			if (send != null) {
+				sendButton.setText(send);
 			}
-		});
+			sendButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
+						EmailValidationFailedDialog dialog = new EmailValidationFailedDialog(activity);
+						dialog.show();
+						return;
+					}
 
+					// Before we send this message, send an auto message.
+					createMessageCenterAutoMessage(activity);
+
+					sendMessage(activity);
+
+					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
+					thankYouDialogVisible = true;
+					feedbackDialogVisible = false;
+					activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
+					activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
+				}
+			});
+		} else {
+			activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
+			activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
+		}
 
 		// Thank You Title
 		TextView thankYouTitleView = (TextView) activity.findViewById(R.id.thank_you_title);
@@ -209,6 +222,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		thankYouCloseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				cleanup();
 				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SKIP_VIEW_MESSAGES);
 				activity.finish();
 			}
@@ -223,10 +237,12 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		thankYouViewMessagesButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				cleanup();
 				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
 				activity.finish();
 			}
 		});
+		feedbackDialogVisible = true;
 	}
 
 	public static void createMessageCenterAutoMessage(Context context) {
@@ -302,7 +318,13 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 	@Override
 	public void onBackPressed(Activity activity) {
+		cleanup();
 		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 		activity.finish();
+	}
+
+	private static void cleanup() {
+		feedbackDialogVisible = false;
+		thankYouDialogVisible = false;
 	}
 }
