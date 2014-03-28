@@ -184,29 +184,29 @@ public class InteractionTest extends InstrumentationTestCase {
 	 * Tests to make sure application_version is interpreted as a string. Never runs.
 	 */
 	private static final String TEST_CRITERIA__APPLICATION_VERSION_1 =
-			"{\n" +
-					"    \"interactions\": {\n" +
-					"        \"app.launch\": [\n" +
-					"            {\n" +
-					"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"                \"priority\": 1,\n" +
-					"                \"criteria\": {\n" +
-					"                    \"application_version\": \"2\"\n" +
-					"                },\n" +
-					"                \"type\": \"UpgradeMessage\",\n" +
-					"                \"version\": null,\n" +
-					"                \"active\": true,\n" +
-					"                \"configuration\": {\n" +
-					"                    \"active\": true,\n" +
-					"                    \"app_version\": \"2\",\n" +
-					"                    \"show_app_icon\": true,\n" +
-					"                    \"show_powered_by\": true,\n" +
-					"                    \"body\": \"\"\n" +
-					"                }\n" +
-					"            }\n" +
-					"        ]\n" +
-					"    }\n" +
-					"}";
+		"{\n" +
+			"    \"interactions\": {\n" +
+			"        \"app.launch\": [\n" +
+			"            {\n" +
+			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
+			"                \"priority\": 1,\n" +
+			"                \"criteria\": {\n" +
+			"                    \"application_version\": \"2\"\n" +
+			"                },\n" +
+			"                \"type\": \"UpgradeMessage\",\n" +
+			"                \"version\": null,\n" +
+			"                \"active\": true,\n" +
+			"                \"configuration\": {\n" +
+			"                    \"active\": true,\n" +
+			"                    \"app_version\": \"2\",\n" +
+			"                    \"show_app_icon\": true,\n" +
+			"                    \"show_powered_by\": true,\n" +
+			"                    \"body\": \"\"\n" +
+			"                }\n" +
+			"            }\n" +
+			"        ]\n" +
+			"    }\n" +
+			"}";
 
 	public void testCriteriaApplicationVersion1() {
 		Log.e("Running test: testCriteriaApplicationVersion1()\n\n");
@@ -231,29 +231,29 @@ public class InteractionTest extends InstrumentationTestCase {
 	 * Tests app application_version. Never runs.
 	 */
 	private static final String TEST_CRITERIA__APPLICATION_VERSION_2 =
-			"{\n" +
-					"    \"interactions\": {\n" +
-					"        \"app.launch\": [\n" +
-					"            {\n" +
-					"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"                \"priority\": 1,\n" +
-					"                \"criteria\": {\n" +
-					"                    \"application_version\": \"2.1\"\n" +
-					"                },\n" +
-					"                \"type\": \"UpgradeMessage\",\n" +
-					"                \"version\": null,\n" +
-					"                \"active\": true,\n" +
-					"                \"configuration\": {\n" +
-					"                    \"active\": true,\n" +
-					"                    \"app_version\": \"2\",\n" +
-					"                    \"show_app_icon\": true,\n" +
-					"                    \"show_powered_by\": true,\n" +
-					"                    \"body\": \"\"\n" +
-					"                }\n" +
-					"            }\n" +
-					"        ]\n" +
-					"    }\n" +
-					"}";
+		"{\n" +
+			"    \"interactions\": {\n" +
+			"        \"app.launch\": [\n" +
+			"            {\n" +
+			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
+			"                \"priority\": 1,\n" +
+			"                \"criteria\": {\n" +
+			"                    \"application_version\": \"2.1\"\n" +
+			"                },\n" +
+			"                \"type\": \"UpgradeMessage\",\n" +
+			"                \"version\": null,\n" +
+			"                \"active\": true,\n" +
+			"                \"configuration\": {\n" +
+			"                    \"active\": true,\n" +
+			"                    \"app_version\": \"2\",\n" +
+			"                    \"show_app_icon\": true,\n" +
+			"                    \"show_powered_by\": true,\n" +
+			"                    \"body\": \"\"\n" +
+			"                }\n" +
+			"            }\n" +
+			"        ]\n" +
+			"    }\n" +
+			"}";
 
 	public void testCriteriaApplicationVersion2() {
 		Log.e("Running test: testCriteriaApplicationVersion2()\n\n");
@@ -294,29 +294,29 @@ public class InteractionTest extends InstrumentationTestCase {
 	 * Tests application_build. Never Runs.
 	 */
 	private static final String TEST_CRITERIA__APPLICATION_BUILD_1 =
-			"{\n" +
-					"    \"interactions\": {\n" +
-					"        \"app.launch\": [\n" +
-					"            {\n" +
-					"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-					"                \"priority\": 1,\n" +
-					"                \"criteria\": {\n" +
-					"                    \"application_build\": 3\n" +
-					"                },\n" +
-					"                \"type\": \"UpgradeMessage\",\n" +
-					"                \"version\": null,\n" +
-					"                \"active\": true,\n" +
-					"                \"configuration\": {\n" +
-					"                    \"active\": true,\n" +
-					"                    \"app_version\": \"2\",\n" +
-					"                    \"show_app_icon\": true,\n" +
-					"                    \"show_powered_by\": true,\n" +
-					"                    \"body\": \"\"\n" +
-					"                }\n" +
-					"            }\n" +
-					"        ]\n" +
-					"    }\n" +
-					"}";
+		"{\n" +
+			"    \"interactions\": {\n" +
+			"        \"app.launch\": [\n" +
+			"            {\n" +
+			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
+			"                \"priority\": 1,\n" +
+			"                \"criteria\": {\n" +
+			"                    \"application_build\": 3\n" +
+			"                },\n" +
+			"                \"type\": \"UpgradeMessage\",\n" +
+			"                \"version\": null,\n" +
+			"                \"active\": true,\n" +
+			"                \"configuration\": {\n" +
+			"                    \"active\": true,\n" +
+			"                    \"app_version\": \"2\",\n" +
+			"                    \"show_app_icon\": true,\n" +
+			"                    \"show_powered_by\": true,\n" +
+			"                    \"body\": \"\"\n" +
+			"                }\n" +
+			"            }\n" +
+			"        ]\n" +
+			"    }\n" +
+			"}";
 
 	public void testCriteriaApplicationBuild1() {
 		Log.e("Running test: testCriteriaApplicationBuild1()\n\n");
@@ -1094,8 +1094,8 @@ public class InteractionTest extends InstrumentationTestCase {
 	}
 
 
-	public void testVariousInteractionCritera() {
-		Log.e("Running test: testVariousInteractionCriteria()\n\n");
+	public void testListOfVariousInteractions() {
+		Log.e("Running test: testListOfVariousInteractions()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
@@ -1177,7 +1177,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		long duration = end - start;
 		double average = (double) duration / iterations;
 		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 5d);
+		assertTrue(average < 7d);
 	}
 
 	public void testInteractionStorageAndSelectionPerformance() {
@@ -1415,6 +1415,156 @@ public class InteractionTest extends InstrumentationTestCase {
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "by.version");
 		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
 		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.version"));
+
+	}
+
+	/**
+	 * Update this when the Rating Flow group of interactions changes, or with different permutations of that flow.
+	 */
+	public void testRealRatingInteractions() {
+		Log.e("Running test: testRealRatingInteractions()");
+
+		Context targetContext = getTargetContext();
+
+		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testRealRatingInteractions.json");
+		Interaction interaction;
+
+		// Test version targeted UpgradeMessage
+
+		// Conditions not yet met.
+		Log.e("ONE");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 100000);
+		assertNull(InteractionManager.getApplicableInteraction(targetContext, "by.build"));
+
+		// Conditions partially met.
+		Log.e("TWO");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 500000);
+		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+
+		// Conditions partially met the other way.
+		Log.e("THREE");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+
+		// Conditions almost met.
+		Log.e("FOUR");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 430000);
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+
+		// Conditions met barely.
+		Log.e("FIVE");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 432000);
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
+		assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+
+
+		//// Test Rating Dialog.
+
+		// Conditions are always met.
+		Log.e("SIX");
+		resetDevice();
+		InteractionManager.storeInteractions(targetContext, json);
+		assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes"));
+
+		// Re-prompt isn't ready yet.
+		{
+			Log.e("SEVEN");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			assertNotNull(ratingDialogInteraction);
+			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
+			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#remind");
+			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		}
+
+		// Re-prompt isn't ready yet.
+		{
+			Log.e("EIGHT");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			assertNotNull(ratingDialogInteraction);
+			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
+			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 420000);
+			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		}
+
+		// Re-prompt is ready.
+		{
+			Log.e("NINE");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			assertNotNull(ratingDialogInteraction);
+			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
+			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		}
+
+		// Don't re-prompt, since we've already rated.
+		{
+			Log.e("TEN");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			assertNotNull(ratingDialogInteraction);
+			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
+			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#rate");
+			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		}
+
+		// Don't re-prompt, since we've declined to rate.
+		{
+			Log.e("ELEVEN");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			assertNotNull(ratingDialogInteraction);
+			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
+			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#decline");
+			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		}
+
+		//// Test Feedback Dialog
+
+		// Don't re-prompt, since we've declined to rate.
+		{
+			Log.e("TWELVE");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
+		}
+
+		//// Test Message Center
+
+		// Don't re-prompt, since we've declined to rate.
+		{
+			Log.e("THIRTEEN");
+			resetDevice();
+			InteractionManager.storeInteractions(targetContext, json);
+			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#FeedbackDialog#view_messages"));
+		}
+
 
 	}
 }

@@ -4,9 +4,21 @@
             {
                 "priority": 8,
                 "criteria": {
-                    "interactions/532b7a3549f63bc650000006/invokes/total": 0
+                    "$and": [
+                        {
+                            "time_since_install/total": {
+                                "$gte": 432000
+                            }
+                        },
+                        {
+                            "code_point/local#app#init/invokes/version": {
+                                "$gte": 3
+                            }
+                        }
+                    ],
+                    "interactions/53348cd049f63b5bdd000006/invokes/version": 0
                 },
-                "id": "532b7a3549f63bc650000006",
+                "id": "53348cd049f63b5bdd000006",
                 "type": "EnjoymentDialog",
                 "configuration": {
                     "title": "Do you love Travel Keeper?",
@@ -17,17 +29,17 @@
             {
                 "priority": 9,
                 "criteria": {
-                    "interactions/532b7a3549f63bc650000009/invokes/version": {
+                    "interactions/53348cd149f63b5bdd000009/invokes/version": {
                         "$gt": 0,
                         "$lte": 1
                     },
                     "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
-                        "$gte": 864000
+                        "$gte": 432000
                     }
                 },
-                "id": "532b7a3549f63bc650000009",
+                "id": "53348cd149f63b5bdd000009",
                 "type": "RatingDialog",
                 "configuration": {
                     "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
@@ -41,7 +53,7 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3549f63bc650000009",
+                "id": "53348cd149f63b5bdd000009",
                 "type": "RatingDialog",
                 "configuration": {
                     "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
@@ -55,11 +67,11 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3649f63bc65000000d",
+                "id": "53348cd149f63b5bdd00000d",
                 "type": "FeedbackDialog",
                 "configuration": {
                     "title": "Thanks for your feedback!",
-                    "body": "Please let us know how to make this app better for you!",
+                    "body": "Please let us know how to make Travel Keeper better for you!",
                     "email_hint_text": "Your Email Address",
                     "message_hint_text": "Tell us how we can help. (required)",
                     "decline_text": "No Thanks",
@@ -78,7 +90,7 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3649f63bc65000000f",
+                "id": "53348cd249f63b5bdd00000f",
                 "type": "MessageCenter"
             }
         ]
