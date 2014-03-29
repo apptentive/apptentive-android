@@ -658,32 +658,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String event) {
-		return doEngage(activity, "local", "app", event);
-	}
-
-	private static synchronized boolean doEngage(Activity activity, String vendor, String interaction, String codePointName) {
-		try {
-			String fullCodePointName =  String.format("%s#%s#%s", URLEncoder.encode(vendor), URLEncoder.encode(interaction), URLEncoder.encode(codePointName));
-			Log.d("engage(%s)", fullCodePointName);
-
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), fullCodePointName);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(fullCodePointName, (Map<String, String>) null));
-			return EngagementModule.engage(activity, fullCodePointName);
-		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-		return false;
-	}
-
-	/**
-	 * For internal use only.
-	 */
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String codePoint) {
-		return doEngage(activity, "com.apptentive", interaction, codePoint);
-	}
-
-	public static synchronized boolean engageInternal(Activity activity, String codePoint) {
-		return doEngage(activity, "com.apptentive", "app", codePoint);
+		return EngagementModule.engage(activity, "local", "app", event);
 	}
 
 
@@ -975,6 +950,6 @@ public class Apptentive {
 	 * Internal use only.
 	 */
 	public static void onAppLaunch(final Activity activity) {
-		Apptentive.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }

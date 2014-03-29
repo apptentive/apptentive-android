@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 
 /**
@@ -36,7 +37,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
 
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
 		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
@@ -61,7 +62,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
 	}
 
 	private Drawable getIconDrawableResourceId(Activity activity) {

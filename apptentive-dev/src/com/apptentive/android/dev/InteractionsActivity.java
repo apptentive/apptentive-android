@@ -101,7 +101,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.internal_event_name);
 		Log.e("Testing engageInternal(%s)", eventName.getText().toString());
 		long start = System.currentTimeMillis();
-		Apptentive.engageInternal(this, eventName.getText().toString());
+		EngagementModule.engageInternal(this, eventName.getText().toString());
 		long end = System.currentTimeMillis();
 		Log.e("Code point storage took %d millis", end - start);
 		Log.e(CodePointStore.toString(getApplicationContext()));

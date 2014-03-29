@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 
 /**
@@ -33,7 +34,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
 
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
 		String body = interaction.getTitle();
 		if (body != null) {
@@ -50,7 +51,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
 				activity.finish();
 			}
 		});
@@ -64,7 +65,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		yesButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_YES);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_YES);
 				activity.finish();
 			}
 		});
@@ -77,6 +78,6 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 	}
 }

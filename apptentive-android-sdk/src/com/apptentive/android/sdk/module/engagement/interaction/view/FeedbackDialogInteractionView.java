@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.model.TextMessage;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.view.EmailValidationFailedDialog;
@@ -62,7 +63,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 		if (!thankYouDialogVisible) {
 			if (!feedbackDialogVisible) {
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 			}
 
 			String title = interaction.getTitle();
@@ -163,7 +164,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				@Override
 				public void onClick(View view) {
 					cleanup();
-					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
+					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
 					activity.finish();
 				}
 			});
@@ -187,7 +188,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 					sendMessage(activity);
 
-					Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
+					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
 					thankYouDialogVisible = true;
 					feedbackDialogVisible = false;
 					activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
@@ -223,7 +224,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			@Override
 			public void onClick(View view) {
 				cleanup();
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_SKIP_VIEW_MESSAGES);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_SKIP_VIEW_MESSAGES);
 				activity.finish();
 			}
 		});
@@ -238,7 +239,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			@Override
 			public void onClick(View view) {
 				cleanup();
-				Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
 				activity.finish();
 			}
 		});
@@ -319,7 +320,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	@Override
 	public void onBackPressed(Activity activity) {
 		cleanup();
-		Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
 		activity.finish();
 	}
 
