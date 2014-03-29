@@ -60,14 +60,6 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Reserved for future use.
-	 */
-	public static void onCreate(Activity activity, Bundle savedInstanceState) {
-		ActivityUtil.isCurrentActivityMainActivity(activity);
-	}
-
-
-	/**
 	 * Call this method from each of your Activities' onStart() methods. Must be called before using other Apptentive APIs
 	 * methods
 	 *
