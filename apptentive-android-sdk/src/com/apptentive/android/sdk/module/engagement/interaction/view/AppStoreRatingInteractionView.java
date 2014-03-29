@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
@@ -44,7 +45,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
 
 			String appDisplayName = Configuration.load(activity).getAppDisplayName();
-			Map<String, String> ratingProviderArgs = Apptentive.getRatingProviderArgs();
+			Map<String, String> ratingProviderArgs = ApptentiveInternal.getRatingProviderArgs();
 			Map<String, String> finalRatingProviderArgs;
 			if (ratingProviderArgs != null) {
 				finalRatingProviderArgs = new HashMap<String, String>(ratingProviderArgs);

@@ -443,14 +443,7 @@ public class Apptentive {
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
-		if (ratingProviderArgs == null) {
-			ratingProviderArgs = new HashMap<String, String>();
-		}
-		ratingProviderArgs.put(key, value);
-	}
-
-	public static Map<String, String> getRatingProviderArgs() {
-		return ratingProviderArgs;
+		ApptentiveInternal.putRatingProviderArg(key, value);
 	}
 
 	// ****************************************************************************************
