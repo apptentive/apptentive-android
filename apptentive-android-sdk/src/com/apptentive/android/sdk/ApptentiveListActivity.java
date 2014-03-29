@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.ListActivity;
-import android.os.Bundle;
 
 /**
  * Extend this class instead of ListActivity to easily integrate Apptentive into your application.
@@ -21,11 +20,6 @@ import android.os.Bundle;
  * @author Sky Kelsey
  */
 public class ApptentiveListActivity extends ListActivity {
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Apptentive.onCreate(this, savedInstanceState);
-	}
 
 	@Override
 	protected void onStart() {
