@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.lifecycle;
 
 import android.app.Activity;
 import android.content.Context;
-import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SessionEvent;
 import com.apptentive.android.sdk.model.Event;
@@ -76,7 +76,7 @@ public class ActivityLifecycleManager {
 			case START:
 				if (!crash) {
 					// Don't trigger a launch in this case, to prevent possible looping crashes.
-					Apptentive.onAppLaunch(activity);
+					ApptentiveInternal.onAppLaunch(activity);
 				}
 				break;
 			case STOP:

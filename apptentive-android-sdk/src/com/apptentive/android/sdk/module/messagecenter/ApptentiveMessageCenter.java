@@ -36,11 +36,11 @@ import java.util.Map;
 public class ApptentiveMessageCenter {
 
 	protected static MessageCenterView messageCenterView;
-	private static boolean pollForMessages = false;
 	private static Trigger trigger;
 	private static Map<String, String> customData;
 
 	public static void show(Activity activity, boolean forced, Map<String, String> customData) {
+		MessageManager.createMessageCenterAutoMessage(activity, forced);
 		ApptentiveMessageCenter.trigger = (forced ? Trigger.message_center : Trigger.enjoyment_dialog);
 		ApptentiveMessageCenter.customData = customData;
 		show(activity);

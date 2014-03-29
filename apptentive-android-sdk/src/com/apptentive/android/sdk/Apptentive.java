@@ -464,7 +464,7 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		showMessageCenter(activity, true, null);
+		ApptentiveMessageCenter.show(activity, true, null);
 	}
 
 	/**
@@ -477,7 +477,7 @@ public class Apptentive {
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
 		try {
-			showMessageCenter(activity, true, customData);
+			ApptentiveMessageCenter.show(activity, true, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -933,23 +933,5 @@ public class Apptentive {
 		thread.setUncaughtExceptionHandler(handler);
 		thread.setName("Apptentive-FetchAppConfiguration");
 		thread.start();
-	}
-
-	/**
-	 * Internal use only.
-	 *
-	 * @param activity The Activity from which to launch the Message Center
-	 * @param forced   True if opened manually. False if opened from ratings flow.
-	 */
-	static void showMessageCenter(Activity activity, boolean forced, Map<String, String> customData) {
-		MessageManager.createMessageCenterAutoMessage(activity, forced);
-		ApptentiveMessageCenter.show(activity, forced, customData);
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static void onAppLaunch(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }
