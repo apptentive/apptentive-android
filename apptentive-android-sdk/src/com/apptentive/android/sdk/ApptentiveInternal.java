@@ -9,6 +9,8 @@ package com.apptentive.android.sdk;
 import android.app.Activity;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +22,22 @@ import java.util.Map;
  */
 public class ApptentiveInternal {
 
+	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
 
 	public static void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	}
+
+	public static IRatingProvider getRatingProvider() {
+		if (ratingProvider == null) {
+			ratingProvider = new GooglePlayRatingProvider();
+		}
+		return ratingProvider;
+	}
+
+	public static void setRatingProvider(IRatingProvider ratingProvider) {
+		ApptentiveInternal.ratingProvider = ratingProvider;
 	}
 
 	public static Map<String, String> getRatingProviderArgs() {

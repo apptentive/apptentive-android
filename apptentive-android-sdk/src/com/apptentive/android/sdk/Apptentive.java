@@ -52,9 +52,6 @@ import java.util.*;
  */
 public class Apptentive {
 
-	private static Map<String, String> ratingProviderArgs;
-	private static IRatingProvider ratingProvider;
-
 	private Apptentive() {
 	}
 
@@ -425,14 +422,7 @@ public class Apptentive {
 	 */
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
-		Apptentive.ratingProvider = ratingProvider;
-	}
-
-	public static IRatingProvider getRatingProvider() {
-		if (ratingProvider == null) {
-			ratingProvider = new GooglePlayRatingProvider();
-		}
-		return ratingProvider;
+		ApptentiveInternal.setRatingProvider(ratingProvider);
 	}
 
 	/**

@@ -41,7 +41,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 
 		String errorMessage = activity.getString(R.string.apptentive_rating_error);
 		try {
-			IRatingProvider ratingProvider = Apptentive.getRatingProvider();
+			IRatingProvider ratingProvider = ApptentiveInternal.getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
 
 			String appDisplayName = Configuration.load(activity).getAppDisplayName();
