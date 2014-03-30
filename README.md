@@ -295,27 +295,30 @@ public static void sendAttachmentFile(Context context, byte[] content, String mi
 public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
 ```
 
-#### Ratings
+#### Interactions
 
-Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your
-app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do you love this app?" If the answer is
-"Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center
-Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
+**New!**
+
+Apptentive's new Interaction framework is a powerful tool for communicating with your customers. It is based around a simple
+event system that lets you define a few events in your code, and later target interactions to run at those points. The
+method provided to do this is `Apptentive.engage("event_name")`. Each call to `engage()` will result in a record of the
+event pass it, and if you so choose, may display an interaction to the user. You should try to find at least five places
+within your code that are appropriate to hand control to Apptentive for displaying a UI, or that are events you want to
+track for determining when other Interactions can be displayed.
+
+For instance, you might want to call `engage()` when your main Activity gains focus. You could call `Apptentive.engage("init")`.
+Later, you could go to the server and configure the Ratings Prompt Interaction to run at the `init` event.
+
+
+##### Ratings Prompt
+
+The Ratings Prompt Interaction replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`. Instead, the
+only integration necessary is to define some events in your code, and then choose to target the Ratings Prompt Interaction
+to one of those events.
 
 ![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
 ![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
 ![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
-
-
-Apptentive can ask users to rate your app after a set of conditions are met. Those conditions can be specified in your
-Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
-have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity.
-
-###### Method
-
-```java
-public static boolean Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);
-```
 
 ###### Example
 
@@ -324,20 +327,18 @@ public static boolean Apptentive.showRatingFlowIfConditionsAreMet(Activity activ
 public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-        boolean ret = Apptentive.showRatingFlowIfConditionsAreMet(this);
+        // Engage a code point called "init".
+        boolean shown = Apptentive.engage(this, "init");
     }
 }
 ```
 
-You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](https://www.apptentive.com) account.
-Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
-days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
+You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
+[Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
 
-###### Method
-
-```java
-public static void Apptentive.logSignificantEvent(Context context);
-```
+**Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
+calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
+displayed on these events.
 
 #### Upgrade Messages
 
