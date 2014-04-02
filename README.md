@@ -62,7 +62,7 @@ Our code can be accessed in two ways.
 
 ### Using IntelliJ IDEA
 
-These instructions were tested for IntelliJ IDEA 12.1.6
+These instructions were tested for IntelliJ IDEA 13.1.1
 
 1. From the menu bar, click `File` -> `Import Module`
 2. Select the `apptentive-android-sdk` directory
