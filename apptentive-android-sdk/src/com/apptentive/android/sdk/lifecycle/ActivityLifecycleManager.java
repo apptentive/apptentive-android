@@ -12,7 +12,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.SessionEvent;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.storage.PersistentSessionQueue;
 import com.apptentive.android.sdk.storage.SharedPreferencesPersistentSessionQueue;
 
@@ -80,7 +80,7 @@ public class ActivityLifecycleManager {
 				}
 				break;
 			case STOP:
-				MetricModule.sendMetric(activity, Event.EventLabel.app__exit);
+				EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 				break;
 			default:
 				break;
