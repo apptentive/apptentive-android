@@ -3,12 +3,16 @@ This document tracks changes to the API between versions.
 
 # 1.4.0
 
-With the new Engagement Framework, many of the old rating flow methods have been removed. Instead, you will need to use the method Apptentive.engage(). Pass in the name of an event to this method. On the website, you can then configure interactions to run when this event occurs.
+The Rating Dialog has been rebuilt to use the new unified `engage()` method. See the **Interactions** section of the README for more information.
 
 | Removed Methods |
 | --------------- |
 |`public static void Apptentive.logSignificantEvent(Context context)`|
 |`public static boolean showRatingFlowIfConditionsAreMet(Activity activity)`|
+
+| Added Methods |
+| --------------- |
+|`public static boolean Apptentive.Engage(Activity activity, String eventName)`|
 
 
 # 1.2.7

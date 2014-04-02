@@ -1,3 +1,13 @@
+2014-04-03 skykelsey 1.4.0
+--------------------------
+
+Major changes:
+* Added new Engagement method. This method will triggere events, and show interactions to the user. Interactions can be configured on the server, and can be based on the count and time that events are shown.
+* Moved the existing Rating feature to be an Interaction in this new system. Removed old methods.
+* Lots of bug fixes and UI tweaks.
+* Introduced background polling for messages. We will poll for new messages every 60 seconds whie the app is up, or every 8 seconds while our Message Center is in the foreground.
+* Improved performance and robustness of SDK.
+
 2014-02-24 skykelsey 1.3.0
 --------------------------
 
