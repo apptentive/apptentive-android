@@ -295,87 +295,8 @@ public static void sendAttachmentFile(Context context, byte[] content, String mi
 public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
 ```
 
-### Interactions
 
-**Interactions** allow you to proactively start conversations with your customers. Unlike **Message Center** and
-feedback in general, you can use **Interactions** to start communicating with a customer based on how they are using the
-app. An **Interaction** is a view that is shown to the user when certain conditions are met.
-
-The core pieces of information used to determine when and where **Interactions** are displayed are called **Events**. An
-**Event** represents a place in your code where the user performed an action. Apptentive keeps track of all **Events**,
-and the record of **Events** enables you to perform very fine grained targeting of **Interactions** to users. You can
-configure **Interactions** to run when a certain combination of **Events** has been triggered.
-
-A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
-are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
-method, will let you precicely target who to talk to at the right time. You are recommended to find a few places in your
-code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
-with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
-**Interactions** based on those **Events**.
-
-##### Event
-An **Event** is a record of the user performing an action. An **Event** is always generated when you call
-`Apptentive.engage(String eventName)`. Apptentive stores a record of all events, and events can be used later to
-determine when to show interactions to the user.
-
-##### Interaction
-An action performed on the client. **Interactions** are defined on the server, and downloaded to the client.
-**Interactions** generally result in a view being shown to the user. Like **Events**, **Interactions** are launched by
-calling `Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
-
-#### Example
-Lets say you have a cloud storage app, and you would like to show an **Interaction** when the app starts, provided that
-the user has uploaded at least five files. You could choose to have two **Events**: `main_activity_focused`, and
-`user_uploaded_file`. When your main Activity regains focus, you would call `Apptentive.engage("main_activity_focused")`,
-and when the user performs a file upload, you could call `Apptentive.engage("user_uploaded_file")`. You can then go into
-the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
-conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
-
-Below are the currently supported **Interactions**.
-
-#### Ratings Prompt
-
-The **Ratings Prompt Interaction** replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`.
-Instead, the only integration necessary is to define some events in your code, and then choose to target the **Ratings
-Prompt Interaction** to one of those events.
-
-![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
-![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
-![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
-
-###### Example
-
-Trigger an **Event** when an Activity gains focus.
-
-```java
-@Override
-public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-        // Engage a code point called "init".
-        boolean shown = Apptentive.engage(this, "init");
-    }
-}
-```
-
-You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
-[Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
-
-![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
-
-**Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
-calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
-displayed on these events.
-
-### Upgrade Messages
-
-You can display a message to customers when they upgrade to a newer version of your app. Configure which version name
-or version code of your app each message is targeted to, and the message will be shown when that release is launched by
-the user. The best part is you don't need to make any code changes to take advantage of Upgrade Messages! Upgrade Messages
-are shown when we detect an app launch. To use this feature, login to [Apptentive](www.apptentive.com) and click on
-*Interactions*.
-
-#### Surveys
+### Surveys
 
 Surveys are a great tool to learn about your customers. You can create surveys that have multiple types of questions:
 multiple select, single select, and free text. You can also choose the audience your survey is shown to by choosing to
@@ -424,6 +345,88 @@ To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailab
 ```java
 public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
 ```
+
+
+### Interactions
+
+**Interactions** allow you to proactively start conversations with your customers. Unlike **Message Center** and
+feedback in general, you can use **Interactions** to start communicating with a customer based on how they are using the
+app. An **Interaction** is a view that is shown to the user when certain conditions are met.
+
+The core pieces of information used to determine when and where **Interactions** are displayed are called **Events**. An
+**Event** represents a place in your code where the user performed an action. Apptentive keeps track of all **Events**,
+and the record of **Events** enables you to perform very fine grained targeting of **Interactions** to users. You can
+configure **Interactions** to run when a certain combination of **Events** has been triggered.
+
+A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
+are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
+method, will let you precicely target who to talk to at the right time. You are recommended to find a few places in your
+code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
+with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
+**Interactions** based on those **Events**.
+
+###### Event
+An **Event** is a record of the user performing an action. An **Event** is always generated when you call
+`Apptentive.engage(String eventName)`. Apptentive stores a record of all events, and events can be used later to
+determine when to show interactions to the user.
+
+###### Interaction
+An action performed on the client. **Interactions** are defined on the server, and downloaded to the client.
+**Interactions** generally result in a view being shown to the user. Like **Events**, **Interactions** are launched by
+calling `Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
+
+##### Example
+Lets say you have a cloud storage app, and you would like to show an **Interaction** when the app starts, provided that
+the user has uploaded at least five files. You could choose to have two **Events**: `main_activity_focused`, and
+`user_uploaded_file`. When your main Activity regains focus, you would call `Apptentive.engage("main_activity_focused")`,
+and when the user performs a file upload, you could call `Apptentive.engage("user_uploaded_file")`. You can then go into
+the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
+conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
+
+Below are the currently supported **Interactions**. To configure **Interactions**, login to
+[Apptentive](www.apptentive.com) and click on **_Interactions_**.
+
+#### Ratings Prompt
+
+The **Ratings Prompt Interaction** replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`.
+Instead, the only integration necessary is to define some events in your code, and then choose to target the **Ratings
+Prompt Interaction** to one of those events.
+
+![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
+
+##### Example
+
+Trigger an **Event** when an Activity gains focus.
+
+```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        // Engage a code point called "init".
+        boolean shown = Apptentive.engage(this, "init");
+    }
+}
+```
+
+You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
+[Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
+
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+
+**Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
+calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
+displayed on these events.
+
+#### Upgrade Messages
+
+You can display an **Upgrade Message Interaction** to customers when they upgrade to a newer version of your app.
+Configure which version name or version code of your app each **Interaction** is targeted to, and the **Interaction**
+will be shown when that release is launched by the user. The best part is you don't need to make any code changes to
+take advantage of Upgrade Messages! Upgrade Messages are shown when we detect an app launch.
+
 
 ## Optional Configuration
 
