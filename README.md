@@ -31,7 +31,7 @@ The following languages are supported:
 | `zh`             |  Chinese (Traditional) |
 | `zh-rCN`         |  Chinese (Simplified)  |
 
-## Install Guide
+# Install Guide
 
 This walk-through will guide you through the installation and configuration of the Apptentive SDK in your Android apps. This video will help to get you started, and the rest of this document embody a complete reference of the Apptentive Android SDK API.
 
@@ -45,7 +45,7 @@ Note: These installation instructions are also presented to you on [Apptentive](
 
 ---
 
-### Get Apptentive 
+## Get Apptentive
 
 All of our client code is open source and available on [GitHub](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". 
 
@@ -58,9 +58,9 @@ Our code can be accessed in two ways.
 
 ---
 
-### Set up Android Workspace
+## Set up Android Workspace
 
-#### Using IntelliJ IDEA
+### Using IntelliJ IDEA
 
 These instructions were tested for IntelliJ IDEA 12.1.6
 
@@ -75,7 +75,7 @@ These instructions were tested for IntelliJ IDEA 12.1.6
 8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
 9. Click `OK` to save and close the settings
 
-#### Using Eclipse
+### Using Eclipse
 
 These instructions were tested for the Juno Eclipse release.
 
@@ -91,9 +91,9 @@ These instructions were tested for the Juno Eclipse release.
 
 ---
 
-### Implement Apptentive
+## Implement Apptentive
 
-#### Modify your AndroidManifest.xml
+### Modify your AndroidManifest.xml
 
 You will need to copy in the bold text below into your AndroidManifest.xml. Comments note the required and optional changes.
 
@@ -148,7 +148,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 
 Note: Be sure to input your Apptentive API Key where it says `YOUR_API_KEY_GOES_HERE`.
 
-#### Integrate your Activities with Apptentive
+### Integrate your Activities with Apptentive
 
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
 There are two ways of doing this: Inheritance, and Delegation. Inheritance is the easiest method, while delegation is
@@ -184,7 +184,7 @@ import com.apptentive.android.sdk.ApptentiveActivity;
     }
 ```
 
-#### Message Center
+### Message Center
 
 The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The
 customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
@@ -211,7 +211,7 @@ see them. Customers with devices running Android 4+ will also be able to send sc
 Here is what the other side of the conversation looks like.
 ![Website Conversation View](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/website_conversation_default_reply.png)
 
-##### Showing Message Center
+#### Showing Message Center
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
 
 ###### Method
@@ -231,7 +231,7 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 });
 ```
 
-##### Showing Message Center and Passing in Custom Message Data
+#### Showing Message Center and Passing in Custom Message Data
 
 Alternatively, you can supply custom key/value pairs that will be sent in the next message that the user sends while the
 Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
@@ -251,7 +251,7 @@ public static void Apptentive.showMessageCenter(Activity activity, Map<String, S
     Apptentive.showMessageCenter(YourActivity.this, customData);
 ```
 
-##### Be Notified of New Messages
+#### Be Notified of New Messages
 
 You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
 Do this in your main Activity's `onCreate()` method:
@@ -274,7 +274,7 @@ Apptentive.setUnreadMessagesListener(
 );
 ```
 
-##### Sending Attachments
+#### Sending Attachments
 
 You can send attachments to the server. We provide methods for sending text and file messages that are hidden
 from the end user, but visible to you in the conversation view on the server. There are three ways to send a FileMessage,
@@ -295,7 +295,7 @@ public static void sendAttachmentFile(Context context, byte[] content, String mi
 public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
 ```
 
-#### Interactions
+### Interactions
 
 **New!**
 
@@ -310,7 +310,7 @@ For instance, you might want to call `engage()` when your main Activity gains fo
 Later, you could go to the server and configure the Ratings Prompt Interaction to run at the `init` event.
 
 
-##### Ratings Prompt
+#### Ratings Prompt
 
 The Ratings Prompt Interaction replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`. Instead, the
 only integration necessary is to define some events in your code, and then choose to target the Ratings Prompt Interaction
@@ -340,7 +340,7 @@ You can customize the the content, as well as the display conditions of the Rati
 calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
 displayed on these events.
 
-#### Upgrade Messages
+### Upgrade Messages
 
 You can display a message to customers when they upgrade to a newer version of your app. Configure which version name
 or version code of your app each message is targeted to, and the message will be shown when that release is launched by
@@ -398,9 +398,9 @@ To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailab
 public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
 ```
 
-### Optional Configuration
+## Optional Configuration
 
-#### Support for Amazon Appstore
+### Support for Amazon Appstore
 
 If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
 there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
@@ -411,7 +411,7 @@ Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 If you omit this line, ratings will go to Google Play.
 
-#### Specifying the User's Email Address
+### Specifying the User's Email Address
 
 If you are authorized to access the user's email address, you may specify it during initialization so that in the event
 the user does not respond in-app, your message can still get to them via email. Note that if ths user updates their
@@ -423,7 +423,7 @@ email through an Apptentive UI, we will use that instead.
 public static void Apptentive.setInitialUserEmail(Context context, String email);
 ```
 
-#### Send Custom Device Data to Apptentive
+### Send Custom Device Data to Apptentive
 
 You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
 key/value string pairs.
@@ -440,7 +440,7 @@ public static void Apptentive.addCustomDeviceData(Context context, String key, S
 public static void Apptentive.removeCustomDeviceData(Context context, String key);
 ```
 
-#### Send Custom Person Data to Apptentive
+### Send Custom Person Data to Apptentive
 
 You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
 Data must be key/value string pairs.
@@ -457,19 +457,19 @@ public static void Apptentive.addCustomPersonData(Context context, String key, S
 public static void Apptentive.removeCustomPersonData(Context context, String key);
 ```
 
-### Third Party Integrations
+## Third Party Integrations
 Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
 Urban Airship is the only provider currently supported. A push notification is useful for notifying your users that they
 have received a new message while they are not using your app. Push notifications are optional, and messages will still
 be delivered when the user opens the app, even if you do not use them.
 
-#### Urban Airship Integration
+### Urban Airship Integration
 
 In order to use Urban Airship, you will need to first setup Urban Airship to work within your app. Then, you will need
 to set your App Key, App Secret, and App Master Secret in the Urban Airship section of "Integrations" on our website.
 Push notification require a Corporate Plan.
 
-##### Sending the Urban Airship APID
+#### Sending the Urban Airship APID
 
 To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
  initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
@@ -485,7 +485,7 @@ String  apid = PushManager.shared().getAPID();
 Apptentive.addUrbanAirshipPushIntegration(this, apid);
 ```
 
-##### Passing Apptentive the Push Intent
+#### Passing Apptentive the Push Intent
 
 When the user opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always pass
 that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
@@ -495,7 +495,7 @@ that `Intent` to Apptentive, so we can check to see if the push came from us, an
 public static void setPendingPushNotification(Context context, Intent intent);
 ```
 
-##### Running the Apptentive Push UI
+#### Running the Apptentive Push UI
 
 Next, in the Activity that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
 push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
@@ -519,15 +519,15 @@ public void onWindowFocusChanged(boolean hasFocus) {
 ```
 ---
 
-### Building from the command line and with CI
+## Building from the command line and with CI
 
-#### Building with ant
+### Building with ant
 
 The Apptentive SDK can be built using the `ant` based build tools bundled with the Android SDK. In order to prepare Apptentive for automated builds with ant, you will need to prepare the project for builds using the `android` tool packaged with the Android SDK. Open a shell and run `android update project -p ./ -t android-18` in the apptentive/apptentive-android-sdk directory. The target, `android-18` in the example, can be any version of android greater than or equal to 3.1 (`android-12`).
 
 Once you have initialized the build files, Apptentive will build automatically as part of your ant based build system. In the event that you update your Android SDK or Android Build Tools, you may need to re-run the `update project` command to generate new build files.
 
-### ProGuard Configuration
+## ProGuard Configuration
 
 Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
 
@@ -536,20 +536,6 @@ Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptent
 -keep class com.apptentive.android.sdk.** { *; }
 ```
 
-### Known Issues
+## Known Issues
 
-* If you are using the [OkHttp](http://square.github.io/okhttp/) library, you will need to apply the following workaround. There is a severe [known issue]() preventing normal use of SSL connections when OkHttp is in use. A [workaraound](https://github.com/square/okhttp/issues/184#issuecomment-18772733) is as follows:
-
-Call this during app initialization.
-
-```
-OkHttpClient okHttpClient = new OkHttpClient();
-SSLContext sslContext;
-try {
-  sslContext = SSLContext.getInstance("TLS");
-  sslContext.init(null, null, null);
-} catch (GeneralSecurityException e) {
-  throw new AssertionError(); // The system has no TLS. Just give up.
-}
-okHttpClient.setSslSocketFactory(sslContext.getSocketFactory());
-```
+* If you are using the [OkHttp](http://square.github.io/okhttp/) library, please make sure you are using version 1.5.2 or greater, as previous versions can cause your app to crash when another library attempts to make an SSL connection.
