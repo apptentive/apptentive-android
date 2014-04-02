@@ -186,7 +186,7 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The
 customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
 
-The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
+If the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
 submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
 
 ![Intro Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/intro_dialog_default_blank.png)
@@ -230,9 +230,10 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 
 #### Showing Message Center and Passing in Custom Message Data
 
-Alternatively, you can supply custom key/value pairs that will be sent in the next message that the customer sends while
+Additionally, you can supply custom key/value pairs that will be sent in the next message that the customer sends while
 the Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
-`Joe's Pizza`. If the customer sends a more than one message, only the first message will include this custom data.
+`Joe's Pizza`. If the customer sends a more than one message, only the first message will include this custom data. If
+you wish to add more custom data to another subsequent message, you will need to call this method with custom data again.
 
 ###### Method
 
@@ -358,7 +359,7 @@ customers. You can configure **Interactions** to run when a certain combination 
 
 A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
 are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
-method, will let you precicely target who to talk to at the right time. You are recommended to find a few places in your
+method, will let you precisely target who to talk to at the right time. You are recommended to find a few places in your
 code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
 with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
 **Interactions** based on those **Events**.
