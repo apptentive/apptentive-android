@@ -297,37 +297,41 @@ public static void sendAttachmentFile(Context context, InputStream is, String mi
 
 ### Interactions
 
-Interactions allow you to proactively start conversations with your customers. Unlike Message Center and feedback in
-general, you can use Interactions to start communicating with a customer based on how they are using the app. An
-Interaction is a view that is shown to the user when certain conditions are met.
+**Interactions** allow you to proactively start conversations with your customers. Unlike **Message Center** and
+feedback in general, you can use **Interactions** to start communicating with a customer based on how they are using the
+app. An **Interaction** is a view that is shown to the user when certain conditions are met.
 
-At core is the concept of Events. An Event represents a place in your code where the user performed an action.
-Apptentive keeps track of all Events, and the record of Events enables you to perform very fine grained targeting of
-Interactions to users. You can configure Interactions to run when a certain combination of Events has been triggered.
+The core pieces of information used to determine when and where **Interactions** are displayed are called **Events**. An
+**Event** represents a place in your code where the user performed an action. Apptentive keeps track of all **Events**,
+and the record of **Events** enables you to perform very fine grained targeting of **Interactions** to users. You can
+configure **Interactions** to run when a certain combination of **Events** has been triggered.
 
 A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
-are Events created, but Interactions are run if the necessary conditions are met. This simple, but powerful method, will
-let you precicely target who to talk to at the right time.
+are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
+method, will let you precicely target who to talk to at the right time. You are recommended to find a few places in your
+code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
+with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
+**Interactions** based on those **Events**.
 
 ###### Event
-An Event is a record of the user performing an action. An Event is always generated when you call
+An **Event** is a record of the user performing an action. An **Event** is always generated when you call
 `Apptentive.engage(String eventName)`. Apptentive stores a record of all events, and events can be used later to
 determine when to show interactions to the user.
 
 ###### Interaction
-An action performed on the client. Interactions are defined on the server, and downloaded to the client. Interactions
-generally result in a view being shown to the user. Like Events, Interactions are launched by calling
-`Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
+An action performed on the client. **Interactions** are defined on the server, and downloaded to the client.
+**Interactions** generally result in a view being shown to the user. Like **Events**, **Interactions** are launched by
+calling `Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
 
 #### Example
-Lets say you have a cloud storage app, and you would like to show an Interaction when the app starts, provided that the
-user has uploaded at least five files. You could choose to have two events: `main_activity_focused`, and
+Lets say you have a cloud storage app, and you would like to show an **Interaction** when the app starts, provided that
+the user has uploaded at least five files. You could choose to have two **Events**: `main_activity_focused`, and
 `user_uploaded_file`. When your main Activity regains focus, you would call `Apptentive.engage("main_activity_focused")`,
 and when the user performs a file upload, you could call `Apptentive.engage("user_uploaded_file")`. You can then go into
-the server, and configure the Interaction to run when the `main_activity_focused` Event is triggered, and set the
-conditions such that the `user_uploaded_file` Event had been seen at least five times.
+the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
+conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
 
-Below are the currently supported Interactions.
+Below are the currently supported **Interactions**.
 
 #### Ratings Prompt
 
