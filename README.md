@@ -361,7 +361,7 @@ public void onWindowFocusChanged(boolean hasFocus) {
 You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
 [Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
 
-![Using Custom Events](https://raw.github.com/skykelsey/apptentive-android/tree/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
 
 **Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
 calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
