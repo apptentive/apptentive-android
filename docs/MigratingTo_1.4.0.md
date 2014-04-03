@@ -4,6 +4,8 @@ If you have integrated a previous version of Apptentive's ratings, you will need
 **Interaction** and **Event** based API. The new API provides a generic interface through which all future
 **Interactions** will be displayed.
 
+## Ratings
+
 ### Displaying Ratings
 
 The previous method, `Apptentive.showRatingFlowIfConditionsAreMet(Activity activity)`, has been removed. You will need to
@@ -13,6 +15,9 @@ string that you will define that identifies the place in the code that you are c
 For instance, if you were showing ratings when the your main activity gains focus, you could call
 `Apptentive.engage(activity, "main_activity_focused")`. By default, the new **Ratings Prompt Interaction** is targeted
 to an **Event** called "init".
+
+**Note:** By default, the new Ratings Prompt will be triggered by the `init` **Event**. You can trigger this **Event**
+with `Apptentive.engage(activity, "init")`.
 
 ### Logging Significant Events
 
@@ -41,3 +46,9 @@ field.
 ##### Server Configuration
 
 ![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+
+## Upgrade Messages
+
+Prevously to 1.4.0, Upgrade Messages were displayed using a built in Apptentibe **Event** that was triggered on App
+Launch. Starting with 1.4.0, Upgrade Messages will be targeted to an **Event** that you must trigger, called `init`.
+This is because you know best what constitutes the launch of your app. Simply call `Apptentie.engage(activity, "init")`.
