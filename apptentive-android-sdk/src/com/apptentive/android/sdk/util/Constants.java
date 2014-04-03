@@ -29,8 +29,6 @@ public class Constants {
 
 	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
 
-	public static final String PREF_KEY_DEVICE_DATA_SENT = "deviceDataSent"; // Keeps track of whether we have ever sent device data.
-
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
@@ -41,10 +39,6 @@ public class Constants {
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
 	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
-	public static final String PREF_KEY_START_OF_RATING_PERIOD = "startOfRatingPeriod";
-	public static final String PREF_KEY_RATING_STATE = "ratingState";
-	public static final String PREF_KEY_RATING_EVENTS = "events";
-	public static final String PREF_KEY_RATING_USES = "uses";
 
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE = "autoMessageShownAutoMessage";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
@@ -99,6 +93,11 @@ public class Constants {
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
 	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
 	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
+	public static final String PREF_KEY_DEVICE_DATA_SENT = "deviceDataSent"; // Keeps track of whether we have ever sent device data.
+	public static final String PREF_KEY_START_OF_RATING_PERIOD = "startOfRatingPeriod";
+	public static final String PREF_KEY_RATING_STATE = "ratingState";
+	public static final String PREF_KEY_RATING_EVENTS = "events";
+	public static final String PREF_KEY_RATING_USES = "uses";
 
 	/**
 	 * A list of mobile carrier network types as Strings.
