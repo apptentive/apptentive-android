@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -13,11 +13,21 @@
         <item>test_tag_3</item>
     </string-array>
 
-    <string-array name="code_points">
+    <string-array name="events">
+        <item>init</item>
+        <item>main_activity_launch</item>
+    </string-array>
+
+    <string-array name="internal_events">
         <item>app.launch</item>
     </string-array>
 
     <string-array name="interactions">
+        <item>Working Rating Flow</item>
+        <item>Feedback Dialog</item>
+        <item>Rating Dialog</item>
+        <item>App Store Rating</item>
+        <item>Enjoyment Dialog</item>
         <item>UpgradeMessage real example</item>
         <item>UpgradeMessage exercise with branding</item>
         <item>UpgradeMessage exercise no branding</item>

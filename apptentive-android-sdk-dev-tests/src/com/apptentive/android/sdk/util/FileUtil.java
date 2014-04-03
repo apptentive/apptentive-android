@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import com.apptentive.android.sdk.Log;
 
 import java.io.*;
 
@@ -31,6 +32,7 @@ public class FileUtil {
 			}
 			return builder.toString();
 		} catch (IOException e) {
+			Log.e("Error reading asset as string.", e);
 		} finally {
 			Util.ensureClosed(reader);
 		}

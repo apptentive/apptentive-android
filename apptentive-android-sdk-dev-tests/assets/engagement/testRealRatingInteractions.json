@@ -1,0 +1,98 @@
+{
+    "interactions": {
+        "local#app#init": [
+            {
+                "priority": 8,
+                "criteria": {
+                    "$and": [
+                        {
+                            "time_since_install/total": {
+                                "$gte": 432000
+                            }
+                        },
+                        {
+                            "code_point/local#app#init/invokes/version": {
+                                "$gte": 3
+                            }
+                        }
+                    ],
+                    "interactions/53348cd049f63b5bdd000006/invokes/version": 0
+                },
+                "id": "53348cd049f63b5bdd000006",
+                "type": "EnjoymentDialog",
+                "configuration": {
+                    "title": "Do you love Travel Keeper?",
+                    "yes_text": "Yes",
+                    "no_text": "No"
+                }
+            },
+            {
+                "priority": 9,
+                "criteria": {
+                    "interactions/53348cd149f63b5bdd000009/invokes/version": {
+                        "$gt": 0,
+                        "$lte": 1
+                    },
+                    "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
+                        "$gte": 432000
+                    }
+                },
+                "id": "53348cd149f63b5bdd000009",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "decline_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#yes": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "53348cd149f63b5bdd000009",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "decline_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#no": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "53348cd149f63b5bdd00000d",
+                "type": "FeedbackDialog",
+                "configuration": {
+                    "title": "Thanks for your feedback!",
+                    "body": "Please let us know how to make Travel Keeper better for you!",
+                    "email_hint_text": "Your Email Address",
+                    "message_hint_text": "Tell us how we can help. (required)",
+                    "decline_text": "No Thanks",
+                    "submit_text": "Send",
+                    "thank_you_title": "Thanks!",
+                    "thank_you_body": "Your response has been saved in the Message Center, where you'll be able to view replies and send us other messages.",
+                    "thank_you_close_text": "Close",
+                    "thank_you_view_messages_text": "View Messages",
+                    "ask_for_email": true,
+                    "email_required": false,
+                    "enable_message_center": true
+                }
+            }
+        ],
+        "com.apptentive#FeedbackDialog#view_messages": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "53348cd249f63b5bdd00000f",
+                "type": "MessageCenter"
+            }
+        ]
+    }
+}

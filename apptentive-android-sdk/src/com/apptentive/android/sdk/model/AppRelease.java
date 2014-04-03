@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,7 +16,9 @@ public class AppRelease extends Payload {
 
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_BUILD_NUMBER = "build_number";
+	private static final String KEY_IDENTIFIER = "identifier";
 	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
+	private static final String KEY_APP_STORE = "app_store";
 
 	public AppRelease(String json) throws JSONException {
 		super(json);
@@ -66,6 +68,24 @@ public class AppRelease extends Payload {
 		}
 	}
 
+	public String getIdentifier() {
+		try {
+			if(!isNull(KEY_IDENTIFIER)) {
+				return getString(KEY_IDENTIFIER);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setIdentifier(String identifier) {
+		try {
+			put(KEY_IDENTIFIER, identifier);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
+		}
+	}
+
 	public String getTargetSdkVersion() {
 		try {
 			if(!isNull(KEY_TARGET_SDK_VERSION)) {
@@ -84,4 +104,21 @@ public class AppRelease extends Payload {
 		}
 	}
 
+	public String getAppStore() {
+		try {
+			if(!isNull(KEY_APP_STORE)) {
+				return getString(KEY_APP_STORE);
+			}
+		} catch (JSONException e) {
+		}
+		return null;
+	}
+
+	public void setAppStore(String appStore) {
+		try {
+			put(KEY_APP_STORE, appStore);
+		} catch (JSONException e) {
+			Log.w("Error adding %s to AppRelease.", KEY_APP_STORE);
+		}
+	}
 }

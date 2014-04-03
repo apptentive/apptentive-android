@@ -25,10 +25,12 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
@@ -40,6 +42,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -49,22 +52,12 @@ import java.util.*;
  */
 public class Apptentive {
 
-	private static UnreadMessagesListener unreadMessagesListener;
-
 	private Apptentive() {
 	}
 
 	// ****************************************************************************************
 	// DELEGATE METHODS
 	// ****************************************************************************************
-
-	/**
-	 * Reserved for future use.
-	 */
-	public static void onCreate(Activity activity, Bundle savedInstanceState) {
-		ActivityUtil.isCurrentActivityMainActivity(activity);
-	}
-
 
 	/**
 	 * Call this method from each of your Activities' onStart() methods. Must be called before using other Apptentive APIs
@@ -76,6 +69,8 @@ public class Apptentive {
 		try {
 			init(activity);
 			ActivityLifecycleManager.activityStarted(activity);
+			PayloadSendWorker.activityStarted(activity.getApplicationContext());
+			MessagePollingWorker.start(activity.getApplicationContext());
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -91,6 +86,8 @@ public class Apptentive {
 		try {
 			ActivityLifecycleManager.activityStopped(activity);
 			NetworkStateReceiver.clearListeners();
+			PayloadSendWorker.activityStopped();
+			MessagePollingWorker.stop();
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -251,6 +248,12 @@ public class Apptentive {
 	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
+	 * <p/>
+	 * <ul>
+	 * <li>
+	 * Urban Airship push notifications
+	 * </li>
+	 * </ul>
 	 *
 	 * @param context     The Context from which this method is called.
 	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
@@ -404,17 +407,6 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Increments the number of "significant events" the app's user has achieved. What you consider to be a significant
-	 * event is up to you to decide. The number of significant events is used be the Rating Module to determine if it
-	 * is time to run the rating flow.
-	 *
-	 * @param context The context from which this method is called.
-	 */
-	public static void logSignificantEvent(Context context) {
-		RatingModule.getInstance().logSignificantEvent(context);
-	}
-
-	/**
 	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
 	 * that the app was downloaded from.
 	 *
@@ -422,7 +414,7 @@ public class Apptentive {
 	 */
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
-		RatingModule.getInstance().setRatingProvider(ratingProvider);
+		ApptentiveInternal.setRatingProvider(ratingProvider);
 	}
 
 	/**
@@ -433,24 +425,7 @@ public class Apptentive {
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
-		RatingModule.getInstance().putRatingProviderArg(key, value);
-	}
-
-	/**
-	 * If you want to launch the ratings flow when conditions are met, call this at an appropriate place in your code.
-	 * Calling this method will display the rating flow's first dialog if the conditions you have specified at
-	 * apptentive.com for this app have been met. Otherwise it will return immediately and have no side effect.
-	 *
-	 * @param activity The activity from which this set of dialogs is launched.
-	 * @return True if the rating flow was shown, else false.
-	 */
-	public static boolean showRatingFlowIfConditionsAreMet(Activity activity) {
-		try {
-			return RatingModule.getInstance().run(activity);
-		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-		return false;
+		ApptentiveInternal.putRatingProviderArg(key, value);
 	}
 
 	// ****************************************************************************************
@@ -464,7 +439,7 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		showMessageCenter(activity, true, null);
+		ApptentiveMessageCenter.show(activity, true, null);
 	}
 
 	/**
@@ -477,7 +452,7 @@ public class Apptentive {
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
 		try {
-			showMessageCenter(activity, true, customData);
+			ApptentiveMessageCenter.show(activity, true, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -490,7 +465,7 @@ public class Apptentive {
 	 * @param listener An UnreadMessageListener that you instantiate.
 	 */
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		unreadMessagesListener = listener;
+		MessageManager.setHostUnreadMessagesListener(listener);
 	}
 
 	/**
@@ -646,31 +621,21 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method takes a unique code point string, stores a record of that code point having been visited, figures out
-	 * if there is an interaction that is able to run for this code point, and then runs it. If more than one interaction
+	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
 	 * @param activity  The Activity from which this method is called.
-	 * @param codePoint A unique String representing the line this method is called on. For instance, you may want to have
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
 	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String codePoint) {
-		return engage(activity, codePoint, true);
+	public static synchronized boolean engage(Activity activity, String event) {
+		return EngagementModule.engage(activity, "local", "app", event);
 	}
 
-	public static synchronized boolean engage(Activity activity, String codePoint, boolean runInteraction) {
-		try {
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), codePoint);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(codePoint, (Map<String, String>) null));
-			return EngagementModule.engage(activity, codePoint);
-		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-		return false;
-	}
 
 	// ****************************************************************************************
 	// INTERNAL METHODS
@@ -747,7 +712,7 @@ public class Apptentive {
 				public void stateChanged(NetworkInfo networkInfo) {
 					if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
 						Log.v("Network connected.");
-						PayloadSendWorker.start(context);
+						PayloadSendWorker.ensureRunning(context);
 					}
 					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
 						Log.v("Network disconnected.");
@@ -807,16 +772,13 @@ public class Apptentive {
 		}
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-
-		// Finally, ensure the send worker is running.
-		PayloadSendWorker.start(context);
-		Log.d("Conversation Token: %s", GlobalInfo.conversationToken);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
 		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
-		RatingModule.getInstance().onAppVersionChanged(context);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
 			Log.d("App release was updated.");
@@ -850,6 +812,13 @@ public class Apptentive {
 	private static void fetchConversationToken(Context context) {
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
+
+		// Send the Device and Sdk now, so they are available on the server from the start.
+		Device device = DeviceManager.storeDeviceAndReturnIt(context);
+		request.setDevice(device);
+		Sdk sdk = SdkManager.storeSdkAndReturnIt(context);
+		request.setSdk(sdk);
+
 		// TODO: Allow host app to send a user id, if available.
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
@@ -939,39 +908,5 @@ public class Apptentive {
 		thread.setUncaughtExceptionHandler(handler);
 		thread.setName("Apptentive-FetchAppConfiguration");
 		thread.start();
-	}
-
-	/**
-	 * Internal use only.
-	 *
-	 * @param activity The Activity from which to launch the Message Center
-	 * @param forced   True if opened manually. False if opened from ratings flow.
-	 */
-	static void showMessageCenter(Activity activity, boolean forced, Map<String, String> customData) {
-		MessageManager.createMessageCenterAutoMessage(activity, forced);
-		ApptentiveMessageCenter.show(activity, forced, customData);
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static void notifyUnreadMessagesListener(int unreadMessages) {
-		Log.v("Notifying UnreadMessagesListener");
-		if (unreadMessagesListener != null) {
-			unreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
-		}
-	}
-
-	/**
-	 * Internal use only.
-	 */
-	public static void onAppLaunch(final Activity activity) {
-		RatingModule.getInstance().logUse(activity);
-		MessageManager.asyncFetchAndStoreMessages(activity, new MessageManager.MessagesUpdatedListener() {
-			public void onMessagesUpdated() {
-				notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(activity));
-			}
-		});
-		Apptentive.engage(activity, Event.EventLabel.app__launch.getLabelName());
 	}
 }

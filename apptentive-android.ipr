@@ -31,6 +31,7 @@
     </copyright>
   </component>
   <component name="DependencyValidationManager">
+    <scope name="Javadoc Scope" pattern="src[apptentive-android-sdk]:com.apptentive.android.sdk.Apptentive||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
@@ -55,7 +56,7 @@
     <version value="1.0" />
   </component>
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Desktop/javadoc" />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/out/javadoc" />
     <option name="OPTION_SCOPE" value="public" />
     <option name="OPTION_HIERARCHY" value="true" />
     <option name="OPTION_NAVIGATOR" value="true" />

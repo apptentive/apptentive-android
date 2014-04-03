@@ -347,4 +347,13 @@ public class Util {
 		TimeZone timezone = TimeZone.getDefault();
 		return timezone.getOffset(System.currentTimeMillis()) / 1000;
 	}
+
+	public static String getInstallerPackageName(Context context) {
+		try {
+			return context.getPackageManager().getInstallerPackageName(context.getPackageName());
+		} catch (Exception e) {
+			// Just return.
+		}
+		return null;
+	}
 }

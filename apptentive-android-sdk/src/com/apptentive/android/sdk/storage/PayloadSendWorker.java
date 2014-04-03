@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -28,10 +29,10 @@ public class PayloadSendWorker {
 	private static boolean running;
 	private static Context appContext;
 
-	public static synchronized void start(Context context) {
+	public static synchronized void doStart(Context context) {
 		appContext = context.getApplicationContext();
 		if (!running) {
-			Log.i("Starting PayloadRunner.");
+			Log.i("Starting PayloadSendWorker.");
 			running = true;
 			Thread payloadRunner = new PayloadRunner();
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
@@ -58,11 +59,15 @@ public class PayloadSendWorker {
 						return;
 					}
 					PayloadStore db = getPayloadStore(appContext);
-					while (true) {
-						if (GlobalInfo.conversationToken == null || GlobalInfo.conversationToken.equals("")) {
+					while (runningActivities > 0) {
+						if (Util.isEmpty(GlobalInfo.conversationToken)) {
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
+						if (!Util.isNetworkConnectionPresent(appContext)) {
+							break;
+						}
+						Log.d("Checking for payloads to send.");
 						Payload payload;
 						payload = db.getOldestUnsentPayload();
 						if (payload == null) {
@@ -132,5 +137,20 @@ public class PayloadSendWorker {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 		}
+	}
+
+	private static long runningActivities = 0;
+
+	public static void ensureRunning(Context context) {
+		doStart(context);
+	}
+
+	public static void activityStarted(Context context) {
+		runningActivities++;
+		doStart(context);
+	}
+
+	public static void activityStopped() {
+		runningActivities--;
 	}
 }

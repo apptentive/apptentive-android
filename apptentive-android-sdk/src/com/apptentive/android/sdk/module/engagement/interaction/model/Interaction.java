@@ -113,13 +113,13 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		return new InteractionConfiguration();
 	}
 
-	public boolean isShowPoweredBy() {
-		return getConfiguration().isShowPoweredBy();
-	}
-
 	public static enum Type {
 		UpgradeMessage,
+		EnjoymentDialog,
 		RatingDialog,
+		FeedbackDialog,
+		MessageCenter,
+		AppStoreRating,
 		unknown;
 
 		public static Type parse(String type) {
@@ -143,8 +143,16 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				switch (type) {
 					case UpgradeMessage:
 						return new UpgradeMessageInteraction(interactionString);
+					case EnjoymentDialog:
+						return new EnjoymentDialogInteraction(interactionString);
 					case RatingDialog:
 						return new RatingDialogInteraction(interactionString);
+					case FeedbackDialog:
+						return new FeedbackDialogInteraction(interactionString);
+					case MessageCenter:
+						return new MessageCenterInteraction(interactionString);
+					case AppStoreRating:
+						return new AppStoreRatingInteraction(interactionString);
 					case unknown:
 						break;
 				}
@@ -159,8 +167,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 	 *
 	 * @param interaction The other Interaction to compare to this Interaction.
 	 * @return -1 if this Interaction is higher priority than the passed Interaction.<p/>
-	 *         0 if this Interaction is of equal priority to the passed Interaction.<p/>
-	 *         1 if this Interaction is of lower priority than the passed Interaction.<p/>
+	 * 0 if this Interaction is of equal priority to the passed Interaction.<p/>
+	 * 1 if this Interaction is of lower priority than the passed Interaction.<p/>
 	 */
 	@Override
 	public int compareTo(Object interaction) {

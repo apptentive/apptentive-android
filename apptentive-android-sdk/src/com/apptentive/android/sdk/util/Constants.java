@@ -13,7 +13,7 @@ import android.view.ViewGroup;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.3.1";
+	public static final String APPTENTIVE_SDK_VERSION = "1.4.0";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
@@ -46,6 +46,7 @@ public class Constants {
 	public static final String PREF_KEY_RATING_EVENTS = "events";
 	public static final String PREF_KEY_RATING_USES = "uses";
 
+	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE = "autoMessageShownAutoMessage";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
@@ -77,6 +78,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
 	public static final String CONFIG_DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
+	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 

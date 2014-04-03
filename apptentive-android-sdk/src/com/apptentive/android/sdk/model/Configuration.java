@@ -197,6 +197,19 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
 	}
 
+	public int getMessageCenterBgPoll() {
+		try {
+			JSONObject messageCenter = getMessageCenter();
+			if (messageCenter != null) {
+				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_BG_POLL)) {
+					return messageCenter.getInt(KEY_MESSAGE_CENTER_BG_POLL);
+				}
+			}
+		} catch (JSONException e) {
+		}
+		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
+	}
+
 	public boolean isMessageCenterEnabled(Context context) {
 		try {
 			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {

@@ -4,8 +4,6 @@ The Apptentive Android SDK lets you provide a powerful and simple channel to com
 you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at
 specific points within your app, and more.
 
-**Note:** For developers with apps created before June 28, 2013, please contact us to have your account upgraded to the new Message Center UI on our website.
-
 **Note:** API changes between versions are tracked [here](docs/APIChanges.md).
 
 -------------------------------------------------
@@ -31,21 +29,20 @@ The following languages are supported:
 | `zh`             |  Chinese (Traditional) |
 | `zh-rCN`         |  Chinese (Simplified)  |
 
-## Install Guide
+# Install Guide
 
 This walk-through will guide you through the installation and configuration of the Apptentive SDK in your Android apps. This video will help to get you started, and the rest of this document embody a complete reference of the Apptentive Android SDK API.
 
 [![Apptentive Android SDK Install Guide](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/apptentive_android_video_screenshot.png)](http://vimeo.com/85495302)
 
-Laid
-out below are instructions that will allow you to ask users to rate your app, give and receive feedback about app performance, and
-show surveys to your users.
+Laid out below are instructions that will allow you to ask customers to rate your app, give and receive feedback about app performance, and
+show surveys to your customers.
 
 Note: These installation instructions are also presented to you on [Apptentive](https://www.apptentive.com) when you add an app. This document is kept in sync with our web documentation.
 
 ---
 
-### Get Apptentive 
+## Get Apptentive
 
 All of our client code is open source and available on [GitHub](https://github.com/apptentive/apptentive-android). We believe in "Your App, Your Code". 
 
@@ -58,11 +55,11 @@ Our code can be accessed in two ways.
 
 ---
 
-### Set up Android Workspace
+## Set up Android Workspace
 
-#### Using IntelliJ IDEA
+### Using IntelliJ IDEA
 
-These instructions were tested for IntelliJ IDEA 12.1.6
+These instructions were tested for IntelliJ IDEA 13.1.1
 
 1. From the menu bar, click `File` -> `Import Module`
 2. Select the `apptentive-android-sdk` directory
@@ -75,7 +72,7 @@ These instructions were tested for IntelliJ IDEA 12.1.6
 8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
 9. Click `OK` to save and close the settings
 
-#### Using Eclipse
+### Using Eclipse
 
 These instructions were tested for the Juno Eclipse release.
 
@@ -91,9 +88,9 @@ These instructions were tested for the Juno Eclipse release.
 
 ---
 
-### Implement Apptentive
+## Implement Apptentive
 
-#### Modify your AndroidManifest.xml
+### Modify your AndroidManifest.xml
 
 You will need to copy in the bold text below into your AndroidManifest.xml. Comments note the required and optional changes.
 
@@ -106,7 +103,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
     <!-- Required permissions. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <!-- Optional permissions. GET_ACCOUNTS is used to pre-populate user email in form fields. -->
+    <!-- Optional permissions. GET_ACCOUNTS is used to pre-populate customer's email in form fields. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <!-- Make sure you are supporting high resolution screens so Apptentive UI elements look great! -->
@@ -148,7 +145,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 
 Note: Be sure to input your Apptentive API Key where it says `YOUR_API_KEY_GOES_HERE`.
 
-#### Integrate your Activities with Apptentive
+### Integrate your Activities with Apptentive
 
 In order to keep track of Application state, we need to hook into a few of the Activity lifecycle hooks in your Activities.
 There are two ways of doing this: Inheritance, and Delegation. Inheritance is the easiest method, while delegation is
@@ -184,12 +181,12 @@ import com.apptentive.android.sdk.ApptentiveActivity;
     }
 ```
 
-#### Message Center
+### Message Center
 
 The Apptentive Message Center lets customers send message you about problems they are having, and lets you respond. The
 customer stays in the app, and you are able to provide high quality support to make your customers feel loved.
 
-The if the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
+If the Message Center is being opened for the first time, the Intro Dialog will be shown instead. When the customer
 submits the Intro Dialog, they are taken to a Thank You Dialog, where they have a chance to open the Message Center.
 
 ![Intro Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/intro_dialog_default_blank.png)
@@ -211,7 +208,7 @@ see them. Customers with devices running Android 4+ will also be able to send sc
 Here is what the other side of the conversation looks like.
 ![Website Conversation View](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/website_conversation_default_reply.png)
 
-##### Showing Message Center
+#### Showing Message Center
 You can add a button that will show the Apptentive feedback UI when pressed. Here is an example button click handler:
 
 ###### Method
@@ -231,11 +228,12 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 });
 ```
 
-##### Showing Message Center and Passing in Custom Message Data
+#### Showing Message Center and Passing in Custom Message Data
 
-Alternatively, you can supply custom key/value pairs that will be sent in the next message that the user sends while the
-Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
-`Joe's Pizza`. If the user sends a more than one message, only the first message will include this custom data.
+Additionally, you can supply custom key/value pairs that will be sent in the next message that the customer sends while
+the Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
+`Joe's Pizza`. If the customer sends a more than one message, only the first message will include this custom data. If
+you wish to add more custom data to another subsequent message, you will need to call this method with custom data again.
 
 ###### Method
 
@@ -251,9 +249,9 @@ public static void Apptentive.showMessageCenter(Activity activity, Map<String, S
     Apptentive.showMessageCenter(YourActivity.this, customData);
 ```
 
-##### Be Notified of New Messages
+#### Be Notified of New Messages
 
-You can also receive a notification when the number of unread messages waiting to be viewed by the user changes.
+You can also receive a notification when the number of unread messages waiting to be viewed by the customer changes.
 Do this in your main Activity's `onCreate()` method:
 
 ###### Method
@@ -274,12 +272,13 @@ Apptentive.setUnreadMessagesListener(
 );
 ```
 
-##### Sending Attachments
+#### Sending Attachments
 
 You can send attachments to the server. We provide methods for sending text and file messages that are hidden
-from the end user, but visible to you in the conversation view on the server. There are three ways to send a FileMessage,
-so that you can easily send files: Using a local URI, an InputStream, or a byte array. Messages sent in this fashion are
-diplayed as hidden in the conversation view on the server, so you can differentiate them from messages sent by the customer.
+from the end customer, but visible to you in the conversation view on the server. There are three ways to send a
+FileMessage, so that you can easily send files: Using a local URI, an InputStream, or a byte array. Messages sent in
+this fashion are diplayed as hidden in the conversation view on the server, so you can differentiate them from messages
+sent by the customer.
 
 ###### Methods
 ```java
@@ -295,59 +294,8 @@ public static void sendAttachmentFile(Context context, byte[] content, String mi
 public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
 ```
 
-#### Ratings
 
-Apptentive's Rating feature revolves around a very simple set of dialogs designed to be ask happy customers to rate your
-app in an unubtrusive manner. The Enjoyment dialog asks a simple question: "Do you love this app?" If the answer is
-"Yes", then the Rating Dialog opens and asks the customer to leave a rating. If the Answer is "No", the Message Center
-Intro Dialog is opened, so that the customer can tell you what they find lacking in your app (see above).
-
-![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
-![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
-![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
-
-
-Apptentive can ask users to rate your app after a set of conditions are met. Those conditions can be specified in your
-Apptentive settings page so you don't have to submit a new version to the app store for changes to take effect. All you
-have to do is call the ratings module when you want to show the dialog. Here is an example in your main Activity.
-
-###### Method
-
-```java
-public static boolean Apptentive.showRatingFlowIfConditionsAreMet(Activity activity);
-```
-
-###### Example
-
-```java
-@Override
-public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-        boolean ret = Apptentive.showRatingFlowIfConditionsAreMet(this);
-    }
-}
-```
-
-You can change the conditions necessary for the ratings flow to be shown by logging into your [Apptentive](https://www.apptentive.com) account.
-Ratings can be shown based on a combination of days since first launch, uses, and significant events. We keep track of
-days and uses for you, but you will need to tell us each time the user performs what you deem to be a significant event.
-
-###### Method
-
-```java
-public static void Apptentive.logSignificantEvent(Context context);
-```
-
-#### Upgrade Messages
-
-You can display a message to customers when they upgrade to a newer version of your app. Configure which version name
-or version code of your app each message is targeted to, and the message will be shown when that release is launched by
-the user. The best part is you don't need to make any code changes to take advantage of Upgrade Messages! Upgrade Messages
-are shown when we detect an app launch. To use this feature, login to [Apptentive](www.apptentive.com) and click on
-*Interactions*.
-
-#### Surveys
+### Surveys
 
 Surveys are a great tool to learn about your customers. You can create surveys that have multiple types of questions:
 multiple select, single select, and free text. You can also choose the audience your survey is shown to by choosing to
@@ -362,8 +310,8 @@ Surveys are fetched from the server when the app starts, so you don't have to wo
 for 24 hours. To show a survey, simply call `Apptentive.showSurvey()`. You can optionally pass in a set of tags to match
 against. Tags are arbitrary strings that represent the place in your code that you are calling the survey API. You can
 call the survey from multiple places in your code. Then, later on, you can create a survey using one of those tags, and
-that survey will only be shown at that tagged API call. You can also pass in a listener and be notified when the user
-submits or skips a survey.
+that survey will only be shown at that tagged API call. You can also pass in a listener and be notified when the
+customer submits or skips a survey.
 
 **Note:** If you are unable to show surveys during testing, you may have installed your app before the survey was put live on our server. Just clear or reinstall your app to see surveys.
 
@@ -397,12 +345,94 @@ To first check to see if a survey can be shown, call `Apptentive.isSurveyAvailab
 public static boolean Apptentive.isSurveyAvailable(Context context, String... tags);
 ```
 
-### Optional Configuration
 
-#### Support for Amazon Appstore
+### Interactions
 
-If your app is being built for the Amazon Appstore, you will want to make sure users who want to rate you app are taken
-there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
+**Interactions** allow you to proactively start conversations with your customers. Unlike **Message Center** and
+feedback in general, you can use **Interactions** to start communicating with a customer based on how they are using the
+app. An **Interaction** is a view that is shown to the customer when certain conditions are met.
+
+The core pieces of information used to determine when and where **Interactions** are displayed are called **Events**. An
+**Event** represents a place in your code where your customer performed an action. Apptentive keeps track of all
+**Events**, and the record of **Events** enables you to perform very fine grained targeting of **Interactions** to
+customers. You can configure **Interactions** to run when a certain combination of **Events** has been triggered.
+
+A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
+are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
+method, will let you precisely target who to talk to at the right time. You are recommended to find a few places in your
+code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
+with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
+**Interactions** based on those **Events**.
+
+###### Event
+An **Event** is a record of your customer performing an action. An **Event** is always generated when you call
+`Apptentive.engage(String eventName)`. Apptentive stores a record of all events, and events can be used later to
+determine when to show interactions to your customer.
+
+###### Interaction
+An action performed on the client. **Interactions** are defined on the server, and downloaded to the client.
+**Interactions** generally result in a view being shown to your customer. Like **Events**, **Interactions** are launched
+by calling `Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
+
+##### Example
+Lets say you have a cloud storage app, and you would like to show an **Interaction** when the app starts, provided that
+the customer has uploaded at least five files. You could choose to have two **Events**: `main_activity_focused`, and
+`user_uploaded_file`. When your main Activity regains focus, you would call `Apptentive.engage("main_activity_focused")`,
+and when the customer performs a file upload, you could call `Apptentive.engage("user_uploaded_file")`. You can then go
+into the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
+conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
+
+Below are the currently supported **Interactions**. To configure **Interactions**, login to
+[Apptentive](www.apptentive.com) and click on **_Interactions_**.
+
+#### Ratings Prompt
+
+The **Ratings Prompt Interaction** replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`.
+Instead, the only integration necessary is to define some events in your code, and then choose to target the **Ratings
+Prompt Interaction** to one of those events.
+
+![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
+![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
+![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
+
+##### Example
+
+Trigger an **Event** when an Activity gains focus.
+
+```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        // Engage a code point called "init".
+        boolean shown = Apptentive.engage(this, "init");
+    }
+}
+```
+
+You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
+[Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
+
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+
+**Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
+calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
+displayed on these events.
+
+#### Upgrade Messages
+
+You can display an **Upgrade Message Interaction** to customers when they upgrade to a newer version of your app.
+Configure which version name or version code of your app each **Interaction** is targeted to, and the **Interaction**
+will be shown when that release is launched by the customer. The best part is you don't need to make any code changes to
+take advantage of Upgrade Messages! Upgrade Messages are shown when we detect an app launch.
+
+
+## Optional Configuration
+
+### Support for Amazon Appstore
+
+If your app is being built for the Amazon Appstore, you will want to make sure customers who want to rate you app are
+taken there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
 
 ```java
 Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
@@ -410,11 +440,11 @@ Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
 
 If you omit this line, ratings will go to Google Play.
 
-#### Specifying the User's Email Address
+### Specifying the Customer's Email Address
 
-If you are authorized to access the user's email address, you may specify it during initialization so that in the event
-the user does not respond in-app, your message can still get to them via email. Note that if ths user updates their
-email through an Apptentive UI, we will use that instead.
+If you are authorized to access the customer's email address, you may specify it during initialization so that in the
+event the customer does not open the app to view your reply, your message can still get to them via email. Note that if
+ths customer updates their email through an Apptentive UI, we will use that email instead.
 
 ###### Method
 
@@ -422,7 +452,7 @@ email through an Apptentive UI, we will use that instead.
 public static void Apptentive.setInitialUserEmail(Context context, String email);
 ```
 
-#### Send Custom Device Data to Apptentive
+### Send Custom Device Data to Apptentive
 
 You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
 key/value string pairs.
@@ -439,7 +469,7 @@ public static void Apptentive.addCustomDeviceData(Context context, String key, S
 public static void Apptentive.removeCustomDeviceData(Context context, String key);
 ```
 
-#### Send Custom Person Data to Apptentive
+### Send Custom Person Data to Apptentive
 
 You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
 Data must be key/value string pairs.
@@ -456,19 +486,19 @@ public static void Apptentive.addCustomPersonData(Context context, String key, S
 public static void Apptentive.removeCustomPersonData(Context context, String key);
 ```
 
-### Third Party Integrations
+## Third Party Integrations
 Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
-Urban Airship is the only provider currently supported. A push notification is useful for notifying your users that they
-have received a new message while they are not using your app. Push notifications are optional, and messages will still
-be delivered when the user opens the app, even if you do not use them.
+Urban Airship is the only provider currently supported. A push notification is useful for notifying your customers that
+they have received a new message while they are not using your app. Push notifications are optional, and messages will
+still be delivered when the customer opens the app, even if you do not use them.
 
-#### Urban Airship Integration
+### Urban Airship Integration
 
 In order to use Urban Airship, you will need to first setup Urban Airship to work within your app. Then, you will need
 to set your App Key, App Secret, and App Master Secret in the Urban Airship section of "Integrations" on our website.
 Push notification require a Corporate Plan.
 
-##### Sending the Urban Airship APID
+#### Sending the Urban Airship APID
 
 To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
  initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
@@ -484,17 +514,17 @@ String  apid = PushManager.shared().getAPID();
 Apptentive.addUrbanAirshipPushIntegration(this, apid);
 ```
 
-##### Passing Apptentive the Push Intent
+#### Passing Apptentive the Push Intent
 
-When the user opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always pass
-that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
+When the customer opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always
+pass that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
 
 ###### Method
 ```java
 public static void setPendingPushNotification(Context context, Intent intent);
 ```
 
-##### Running the Apptentive Push UI
+#### Running the Apptentive Push UI
 
 Next, in the Activity that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
 push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
@@ -518,15 +548,15 @@ public void onWindowFocusChanged(boolean hasFocus) {
 ```
 ---
 
-### Building from the command line and with CI
+## Building from the command line and with CI
 
-#### Building with ant
+### Building with ant
 
 The Apptentive SDK can be built using the `ant` based build tools bundled with the Android SDK. In order to prepare Apptentive for automated builds with ant, you will need to prepare the project for builds using the `android` tool packaged with the Android SDK. Open a shell and run `android update project -p ./ -t android-18` in the apptentive/apptentive-android-sdk directory. The target, `android-18` in the example, can be any version of android greater than or equal to 3.1 (`android-12`).
 
 Once you have initialized the build files, Apptentive will build automatically as part of your ant based build system. In the event that you update your Android SDK or Android Build Tools, you may need to re-run the `update project` command to generate new build files.
 
-### ProGuard Configuration
+## ProGuard Configuration
 
 Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
 
@@ -535,20 +565,6 @@ Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptent
 -keep class com.apptentive.android.sdk.** { *; }
 ```
 
-### Known Issues
+## Known Issues
 
-* If you are using the [OkHttp](http://square.github.io/okhttp/) library, you will need to apply the following workaround. There is a severe [known issue]() preventing normal use of SSL connections when OkHttp is in use. A [workaraound](https://github.com/square/okhttp/issues/184#issuecomment-18772733) is as follows:
-
-Call this during app initialization.
-
-```
-OkHttpClient okHttpClient = new OkHttpClient();
-SSLContext sslContext;
-try {
-  sslContext = SSLContext.getInstance("TLS");
-  sslContext.init(null, null, null);
-} catch (GeneralSecurityException e) {
-  throw new AssertionError(); // The system has no TLS. Just give up.
-}
-okHttpClient.setSslSocketFactory(sslContext.getSocketFactory());
-```
+* If you are using the [OkHttp](http://square.github.io/okhttp/) library, please make sure you are using version 1.5.2 or greater, as previous versions can cause your app to crash when another library attempts to make an SSL connection.

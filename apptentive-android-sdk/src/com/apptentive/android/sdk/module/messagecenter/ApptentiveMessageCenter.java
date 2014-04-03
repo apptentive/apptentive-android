@@ -36,11 +36,11 @@ import java.util.Map;
 public class ApptentiveMessageCenter {
 
 	protected static MessageCenterView messageCenterView;
-	private static boolean pollForMessages = false;
 	private static Trigger trigger;
 	private static Map<String, String> customData;
 
 	public static void show(Activity activity, boolean forced, Map<String, String> customData) {
+		MessageManager.createMessageCenterAutoMessage(activity, forced);
 		ApptentiveMessageCenter.trigger = (forced ? Trigger.message_center : Trigger.enjoyment_dialog);
 		ApptentiveMessageCenter.customData = customData;
 		show(activity);
@@ -109,7 +109,7 @@ public class ApptentiveMessageCenter {
 					scrollToBottom();
 				} else {
 					Log.e("Unable to send file.");
-					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT);
+					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT).show();
 				}
 			}
 		};
@@ -126,52 +126,23 @@ public class ApptentiveMessageCenter {
 		messageCenterView.setMessages(MessageManager.getMessages(context));
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-		final MessageManager.MessagesUpdatedListener listener = new MessageManager.MessagesUpdatedListener() {
+		MessageManager.setInternalOnMessagesUpdatedListener(new MessageManager.OnNewMessagesListener() {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
 						List<Message> messages = MessageManager.getMessages(context);
 						messageCenterView.setMessages(messages);
 						scrollToBottom();
-						Apptentive.notifyUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
 					}
 				});
 			}
-		};
+		});
+
+		// Change to foreground polling, which polls more often.
+		MessagePollingWorker.setForeground(true);
 
 		// Give the MessageCenterView a callback when a message is sent.
-		MessageManager.setInternalSentMessageListener(messageCenterView);
-
-		Configuration configuration = Configuration.load(context);
-		final int fgPoll = configuration.getMessageCenterFgPoll() * 1000;
-		Log.d("Starting Message Center polling every %d millis", fgPoll);
-		pollForMessages = true;
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				while (pollForMessages) {
-					// TODO: Check for data connection present before trying.
-					MessageManager.fetchAndStoreMessages(context, listener);
-					try {
-						Thread.sleep(fgPoll);
-					} catch (InterruptedException e) {
-						Log.w("Message Center polling thread interrupted.");
-						return;
-					}
-				}
-				Log.d("Stopping Message Center polling thread.");
-			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("UncaughtException in Message Center fetch thread.", throwable);
-				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-MessageCenterFetchMessages");
-		thread.start();
+		MessageManager.setSentMessageListener(messageCenterView);
 
 		scrollToBottom();
 	}
@@ -277,15 +248,13 @@ public class ApptentiveMessageCenter {
 		messageCenterView.scrollMessageListViewToBottom();
 	}
 
-	public static void onStop(@SuppressWarnings("unused") Context context) {
-		pollForMessages = false;
+	public static void onStop(Activity activity) {
+		// Remove listener here.
+		MessagePollingWorker.setForeground(false);
 	}
 
 	public static void onBackPressed(Activity activity) {
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
-		activity.finish();
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
-
 	}
 
 	enum Trigger {

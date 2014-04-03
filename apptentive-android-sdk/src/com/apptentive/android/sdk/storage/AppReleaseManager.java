@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,6 +13,9 @@ import android.content.pm.PackageManager;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.JsonDiffer;
+import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
 
 /**
  * @author Sky Kelsey
@@ -20,12 +23,17 @@ import com.apptentive.android.sdk.util.Constants;
 public class AppReleaseManager {
 
 	public static AppRelease storeAppReleaseAndReturnDiff(Context context) {
-		AppRelease original = getStoredAppRelease(context);
+		AppRelease stored = getStoredAppRelease(context);
 		AppRelease current = generateCurrentAppRelease(context);
-		AppRelease diff = diffAppRelease(original, current);
+
+		Object diff = JsonDiffer.getDiff(stored, current);
 		if(diff != null) {
-			storeAppRelease(context, current);
-			return diff;
+			try {
+				storeAppRelease(context, current);
+				return new AppRelease(diff.toString());
+			} catch (JSONException e) {
+				Log.e("Error casting to AppRelease.", e);
+			}
 		}
 		return null;
 	}
@@ -36,8 +44,10 @@ public class AppReleaseManager {
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(""+packageInfo.versionName);
-			appRelease.setBuildNumber(""+packageInfo.versionCode);
-			appRelease.setTargetSdkVersion(""+packageInfo.applicationInfo.targetSdkVersion);
+			appRelease.setIdentifier(packageInfo.packageName);
+			appRelease.setBuildNumber("" + packageInfo.versionCode);
+			appRelease.setTargetSdkVersion("" + packageInfo.applicationInfo.targetSdkVersion);
+			appRelease.setAppStore(Util.getInstallerPackageName(context));
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Can't load PackageInfo.", e);
 		}
@@ -57,66 +67,5 @@ public class AppReleaseManager {
 	private static void storeAppRelease(Context context, AppRelease appRelease) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_APP_RELEASE, appRelease.toString()).commit();
-	}
-
-	private static AppRelease diffAppRelease(AppRelease older, AppRelease newer) {
-		if(older == null) {
-			return newer;
-		}
-
-		AppRelease ret = new AppRelease();
-		int baseEntries = ret.length();
-
-		String version = chooseLatest(older.getVersion(), newer.getVersion());
-		if (version != null) {
-			ret.setVersion(version);
-		}
-
-		String buildNumber = chooseLatest(older.getBuildNumber(), newer.getBuildNumber());
-		if (buildNumber != null) {
-			ret.setBuildNumber(buildNumber);
-		}
-
-		String targetSdkVersion = chooseLatest(older.getTargetSdkVersion(), newer.getTargetSdkVersion());
-		if (targetSdkVersion != null) {
-			ret.setTargetSdkVersion(targetSdkVersion);
-		}
-
-		// If there were no differences, return null.
-		if(ret.length() <= baseEntries) {
-			return null;
-		}
-		return ret;
-	}
-
-	/**
-	 * A convenience method.
-	 *
-	 * @return newer - if it is different from old. <p/>empty string - if there was an old value, but not a newer value. This clears the old value.<p/> null - if there is no difference.
-	 */
-	private static String chooseLatest(String old, String newer) {
-		if (old == null || old.equals("")) {
-			old = null;
-		}
-		if (newer == null || newer.equals("")) {
-			newer = null;
-		}
-
-		// New value.
-		if (old != null && newer != null && !old.equals(newer)) {
-			return newer;
-		}
-
-		// Clear existing value.
-		if (old != null && newer == null) {
-			return "";
-		}
-
-		if (old == null && newer != null) {
-			return newer;
-		}
-
-		// Do nothing.
-		return null;
 	}
 }
