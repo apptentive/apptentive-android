@@ -87,6 +87,8 @@ public class Constants {
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
+	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
+	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
 
 	// View layout shortcuts
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

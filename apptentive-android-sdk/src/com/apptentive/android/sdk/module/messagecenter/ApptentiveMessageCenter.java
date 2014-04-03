@@ -49,8 +49,8 @@ public class ApptentiveMessageCenter {
 	protected static void show(Activity activity) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Configuration conf = Configuration.load(activity);
-		boolean enableMessageCenter = conf.isMessageCenterEnabled();
-		boolean emailRequired = conf.isMessageCenterEmailRequired();
+		boolean enableMessageCenter = conf.isMessageCenterEnabled(activity);
+		boolean emailRequired = conf.isMessageCenterEmailRequired(activity);
 		boolean shouldShowIntroDialog = !enableMessageCenter || prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, true);
 		// TODO: What if there is an incoming message that is unread? Shouldn't they see the Message Center right away?
 		if (shouldShowIntroDialog) {

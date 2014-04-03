@@ -8,6 +8,9 @@ package com.apptentive.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
@@ -207,17 +210,27 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
 	}
 
-	public boolean isMessageCenterEnabled() {
+	public boolean isMessageCenterEnabled(Context context) {
 		try {
 			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
 				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
 			}
 		} catch (JSONException e) {
+			// Move on.
 		}
+
+		try {
+			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			Bundle metaData = ai.metaData;
+			return metaData.getBoolean(Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED);
+		} catch (Exception e) {
+			Log.w("Unexpected error while reading default %s manifest setting.", e, Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED);
+		}
+
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
 	}
 
-	public boolean isMessageCenterEmailRequired() {
+	public boolean isMessageCenterEmailRequired(Context context) {
 		try {
 			JSONObject messageCenter = getMessageCenter();
 			if (messageCenter != null) {
@@ -226,7 +239,17 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Move on.
 		}
+
+		try {
+			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			Bundle metaData = ai.metaData;
+			return metaData.getBoolean(Constants.MANIFEST_KEY_EMAIL_REQUIRED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED);
+		} catch (Exception e) {
+			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_EMAIL_REQUIRED);
+		}
+
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
 	}
 
