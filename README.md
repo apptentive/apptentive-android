@@ -382,6 +382,10 @@ and when the customer performs a file upload, you could call `Apptentive.engage(
 into the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
 conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
 
+**Note:** You will need to trigger an **Event** called _**init**_. This **Event** is used as the default point of
+display for new **Interactions**. To do so, simply call `Apptentive.engage(activity, "init")` at an appropriate place,
+such as when your main Activity gains focus.
+
 Below are the currently supported **Interactions**. To configure **Interactions**, login to
 [Apptentive](www.apptentive.com) and click on **_Interactions_**.
 
