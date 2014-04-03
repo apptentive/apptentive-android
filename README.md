@@ -382,7 +382,7 @@ and when the customer performs a file upload, you could call `Apptentive.engage(
 into the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
 conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
 
-**Note:** You will need to trigger an **Event** called _**init**_. This **Event** is used as the default point of
+**Note:** You will need to trigger an **Event** called `init`. This **Event** is used as the default point of
 display for new **Interactions**. To do so, simply call `Apptentive.engage(activity, "init")` at an appropriate place,
 such as when your main Activity gains focus.
 
@@ -414,8 +414,9 @@ public void onWindowFocusChanged(boolean hasFocus) {
 }
 ```
 
-You can customize the the content, as well as the display conditions of the Ratings Prompt Interaction through your
-[Apptentive](https://www.apptentive.com) account. The Ratings Prompt Interaction can be targeted to any event you choose.
+You can customize the the content, as well as the display conditions of the **Ratings Prompt Interaction** through your
+[Apptentive](https://www.apptentive.com) account. The **Ratings Prompt Interaction** can be targeted to any **Event** you
+choose, but by default, it is targeted to the `init` **Event**.
 
 ![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
 
@@ -427,8 +428,8 @@ displayed on these events.
 
 You can display an **Upgrade Message Interaction** to customers when they upgrade to a newer version of your app.
 Configure which version name or version code of your app each **Interaction** is targeted to, and the **Interaction**
-will be shown when that release is launched by the customer. The best part is you don't need to make any code changes to
-take advantage of Upgrade Messages! Upgrade Messages are shown when we detect an app launch.
+will be shown when that release is launched by the customer. Right now, Upgrade Messages are always targeted to the
+`init` **Event**, so make sure you call `Apptentive.engage(activity, "init)`.
 
 
 ## Optional Configuration
