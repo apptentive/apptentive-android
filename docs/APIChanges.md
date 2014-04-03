@@ -12,7 +12,7 @@ The Rating Dialog has been rebuilt to use the new unified `engage()` method. See
 
 | Added Methods |
 | --------------- |
-|`public static boolean Apptentive.Engage(Activity activity, String eventName)`|
+|`public static boolean Apptentive.engage(Activity activity, String eventName)`|
 
 
 # 1.2.7
