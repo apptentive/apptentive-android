@@ -548,6 +548,65 @@ public void onWindowFocusChanged(boolean hasFocus) {
 ```
 ---
 
+## Gradle Integration
+
+The following documents preliminary gradle support for the Apptentive SDK. Since the Android Gradle plugin is constantly
+changing, this information may be incompatible with the version of Gradle that you are using. We will attempt to keep
+this up to date and working, but there may be a lag between new releases of the Gradle plugin, and updates to this doc.
+
+1. Import the existing Apptentive Android SDK module into your project.
+2. Add the android-Gradle facet to the apptentive-android-sdk module (in the module settings).
+3. Add a build.gradle file with this content to apptentive-android-sdk:
+```
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.+'
+    }
+}
+apply plugin: 'android-library'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "17.0.0"
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 16
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            res.srcDirs = ['res']
+        }
+    }
+}
+```
+
+4. In your main module's build.gradle file, add a reference to the Apptentive Android SDK :
+```
+dependencies {
+    compile project(":apptentive-android-sdk")
+}
+```
+
+5. In your settings.gradle file, add an include for apptentive-android-sdk:
+```
+include ':apptentive-android-sdk', ':your-module'
+```
+
+6. Adjust the gradle versions to suit your app.
+
+
 ## Building from the command line and with CI
 
 ### Building with ant
