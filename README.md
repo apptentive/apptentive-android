@@ -630,4 +630,4 @@ Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptent
 
 ## Known Issues
 
-* If you are using the [OkHttp](http://square.github.io/okhttp/) library, please make sure you are using version 1.5.2 or greater, as previous versions can cause your app to crash when another library attempts to make an SSL connection.
+* If you are using the [OkHttp](http://square.github.io/okhttp/) library, please make sure you are using OkHttp version 1.5.2 or greater, as previous versions can cause your app to crash when another library attempts to make an SSL connection.
