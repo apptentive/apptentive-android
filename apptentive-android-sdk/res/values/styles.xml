@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -12,20 +12,8 @@
     <style name="ApptentiveMainArea" parent="ApptentiveMainArea.Plain"/>
     <style name="ApptentiveMessageCenterDrawer" parent="ApptentiveMessageCenterDrawer.Plain"/>
 
-    <!--
-        <style name="ApptentiveHeader" parent="ApptentiveHeader.Denim"/>
-        <style name="ApptentiveHeaderText" parent="ApptentiveHeaderText.Denim"/>
-        <style name="ApptentiveMainArea" parent="ApptentiveMainArea.Denim"/>
-        <style name="ApptentiveMessageCenterDrawer" parent="ApptentiveMessageCenterDrawer.Denim"/>
-    -->
-
-
     <style name="ApptentiveHeader.Plain">
         <item name="android:background">#222222</item>
-    </style>
-
-    <style name="ApptentiveHeader.Denim">
-        <item name="android:background">@drawable/apptentive_message_center_header_denim</item>
     </style>
 
     <style name="ApptentiveHeaderText.Default">
@@ -45,25 +33,12 @@
         <item name="android:shadowColor">@android:color/white</item>
     </style>
 
-    <style name="ApptentiveHeaderText.Denim" parent="ApptentiveHeaderText.Default">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:shadowColor">@color/apptentive_message_center_header_text_shadow</item>
-    </style>
-
     <style name="ApptentiveMainArea.Plain">
         <item name="android:background">#E0E0E0</item>
     </style>
 
-    <style name="ApptentiveMainArea.Denim">
-        <item name="android:background">@drawable/apptentive_message_center_background_denim</item>
-    </style>
-
     <style name="ApptentiveMessageCenterDrawer.Plain">
         <item name="android:background">#222222</item>
-    </style>
-
-    <style name="ApptentiveMessageCenterDrawer.Denim">
-        <item name="android:background">@drawable/apptentive_grey_denim</item>
     </style>
 
     <style name="Apptentive.Theme.Transparent" parent="android:Theme">
