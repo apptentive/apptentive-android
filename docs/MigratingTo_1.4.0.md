@@ -45,7 +45,7 @@ field.
 
 ##### Server Configuration
 
-![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+![Using Custom Events](https://raw.githubusercontent.com/apptentive/apptentive-android/master/etc/screenshots/ratings_prompt_interaction_config.png)
 
 ## Upgrade Messages
 

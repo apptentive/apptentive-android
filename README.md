@@ -418,7 +418,7 @@ You can customize the the content, as well as the display conditions of the **Ra
 [Apptentive](https://www.apptentive.com) account. The **Ratings Prompt Interaction** can be targeted to any **Event** you
 choose, but by default, it is targeted to the `init` **Event**.
 
-![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/rating_interaction_docs/etc/screenshots/ratings_prompt_interaction_config.png)
+![Using Custom Events](https://raw.githubusercontent.com/apptentive/apptentive-android/master/etc/screenshots/ratings_prompt_interaction_config.png)
 
 **Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
 calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
