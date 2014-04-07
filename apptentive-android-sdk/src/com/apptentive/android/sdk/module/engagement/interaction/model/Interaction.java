@@ -50,6 +50,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 	 */
 	public boolean canRun(Context context) {
 		InteractionCriteria criteria = getCriteria();
+		Log.v("=== Checking interaction %s ===", getType());
 		return criteria != null && isInRunnableState(context) && criteria.isMet(context);
 	}
 
