@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
@@ -34,69 +35,79 @@ public class ViewActivity extends ApptentiveActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
+		try {
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
 
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
-		window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+			Window window = getWindow();
+			window.setFormat(PixelFormat.RGBA_8888);
+			window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+		} catch (Exception e) {
+			Log.e("Error creating ViewActivity.", e);
+			MetricModule.sendError(this, e, null, null);
+		}
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 
-		switch (activeContentType) {
-			case ABOUT:
-				AboutModule.getInstance().doShow(this);
-				break;
-			case SURVEY:
-				SurveyModule.getInstance().doShow(this);
-				break;
-			case MESSAGE_CENTER:
-				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-				ApptentiveMessageCenter.doShow(this);
-				break;
-			case INTERACTION:
-				String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
-				Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
-				InteractionView view = null;
-				switch (interaction.getType()) {
-					case UpgradeMessage:
-						view = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-						break;
-					case EnjoymentDialog:
-						view = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-						break;
-					case RatingDialog:
-						view = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-						break;
-					case AppStoreRating:
-						view = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-						break;
-					case FeedbackDialog:
-						view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
-						break;
-					case MessageCenter:
-						// For now, we use the old method.
-						getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		try {
+			switch (activeContentType) {
+				case ABOUT:
+					AboutModule.getInstance().doShow(this);
+					break;
+				case SURVEY:
+					SurveyModule.getInstance().doShow(this);
+					break;
+				case MESSAGE_CENTER:
+					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+					ApptentiveMessageCenter.doShow(this);
+					break;
+				case INTERACTION:
+					String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
+					Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
+					InteractionView view = null;
+					switch (interaction.getType()) {
+						case UpgradeMessage:
+							view = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
+							break;
+						case EnjoymentDialog:
+							view = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
+							break;
+						case RatingDialog:
+							view = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
+							break;
+						case AppStoreRating:
+							view = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
+							break;
+						case FeedbackDialog:
+							view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
+							break;
+						case MessageCenter:
+							// For now, we use the old method.
+							getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+							finish();
+							Apptentive.showMessageCenter(this);
+							return;
+						default:
+							break;
+					}
+					activityContent = view;
+					if (view == null) {
 						finish();
-						Apptentive.showMessageCenter(this);
-						return;
-					default:
-						break;
-				}
-				activityContent = view;
-				if (view == null) {
+					} else {
+						view.show(this);
+					}
+					break;
+				default:
+					Log.w("No Activity specified. Finishing...");
 					finish();
-				} else {
-					view.show(this);
-				}
-				break;
-			default:
-				Log.w("No Activity specified. Finishing...");
-				finish();
-				break;
+					break;
+			}
+		} catch (Exception e) {
+			Log.e("Error starting ViewActivity.", e);
+			MetricModule.sendError(this, e, null, null);
 		}
 	}
 
