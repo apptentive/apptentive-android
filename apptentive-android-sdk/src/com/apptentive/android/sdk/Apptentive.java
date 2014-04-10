@@ -245,6 +245,10 @@ public class Apptentive {
 	 */
 	public static final String INTEGRATION_URBAN_AIRSHIP_APID = "token";
 
+	public static final String INTEGRATION_AMAZON = "aws";
+
+	public static final String INTEGRATION_AMAZON_TOKEN = "token";
+
 	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
@@ -304,6 +308,15 @@ public class Apptentive {
 			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_APID, apid);
 			Apptentive.addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
 			Log.i("Setting Urban Airship APID: %s", apid);
+		}
+	}
+
+	public static void addAmazonAwsPushIntegration(Context context, String apid) {
+		if (apid != null) {
+			Map<String, String> config = new HashMap<String, String>();
+			config.put(Apptentive.INTEGRATION_AMAZON, apid);
+			Apptentive.addIntegration(context, Apptentive.INTEGRATION_AMAZON_TOKEN, config);
+			Log.i("Setting Amazon AWS token: %s", apid);
 		}
 	}
 
