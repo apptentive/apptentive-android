@@ -37,7 +37,7 @@ public class EngagementModule {
 
 	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String codePointName) {
 		try {
-			String fullCodePointName = String.format("%s#%s#%s", URLEncoder.encode(vendor), URLEncoder.encode(interaction), URLEncoder.encode(codePointName));
+			String fullCodePointName = generateEventName(vendor, interaction, codePointName);
 			Log.d("engage(%s)", fullCodePointName);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), fullCodePointName);
@@ -71,4 +71,16 @@ public class EngagementModule {
 			activity.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
 	}
+
+	public static String generateEventName(String vendor, String interaction, String codePointName) {
+		return String.format("%s#%s#%s", encodeEventPart(vendor), encodeEventPart(interaction), encodeEventPart(codePointName));
+	}
+
+	/**
+	 * Used only for encoding event names. DO NOT modify this method.
+	 */
+	public static String encodeEventPart(String input) {
+		return input.replace("%", "%25").replace("/", "%2F").replace("#", "%23");
+	}
+
 }
