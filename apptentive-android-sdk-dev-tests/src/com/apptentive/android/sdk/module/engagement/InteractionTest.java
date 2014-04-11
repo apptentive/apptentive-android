@@ -107,7 +107,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCriteriaTimeSinceInstall()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaTimeSinceInstall.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaTimeSinceInstall.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -277,7 +277,7 @@ public class InteractionTest extends InstrumentationTestCase {
 	public void testCriteriaApplicationVersion3() {
 		Log.e("Running test: testCriteriaApplicationVersion3()\n\n");
 		resetDevice();
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -341,7 +341,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCriteriaApplicationBuild2()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -361,7 +361,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCriteriaCodePointInvokesTotal()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTotal.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTotal.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -503,7 +503,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCriteriaCodePointInvokesVersion()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesVersion.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesVersion.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -654,7 +654,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCriteriaCodePointInvokesBuild()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesBuild.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesBuild.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -804,7 +804,7 @@ public class InteractionTest extends InstrumentationTestCase {
 	public void testCriteriaCodePointInvokesTimeAgo() {
 		Log.e("Running test: testCriteriaCodePointInvokesTimeAgo()\n\n");
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTimeAgo.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTimeAgo.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -957,7 +957,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		String appVersionName = Util.getAppVersionName(getTargetContext());
 		int appVersionCode = Util.getAppVersionCode(getTargetContext());
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaInteractionInvokesTotal.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCriteriaInteractionInvokesTotal.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
@@ -1098,7 +1098,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testListOfVariousInteractions()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
 		List<Interaction> interactionsForCodePoint = interactions.getInteractionList("complex_criteria");
@@ -1127,7 +1127,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
 		assertNotNull("Failed to parse interactions.", interactions);
@@ -1158,7 +1158,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
@@ -1185,7 +1185,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		resetDevice();
 		final int iterations = 20;
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
 
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
@@ -1232,7 +1232,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testSelectionWithInteractionIdUsedInCriteria.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testSelectionWithInteractionIdUsedInCriteria.json");
 
 		InteractionManager.storeInteractions(getTargetContext(), json);
 
@@ -1252,7 +1252,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testInteractionPriority()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testInteractionPriority.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testInteractionPriority.json");
 
 		InteractionManager.storeInteractions(getTargetContext(), json);
 
@@ -1279,7 +1279,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testMissingNullEmptyCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testMissingNullEmptyCriteria.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testMissingNullEmptyCriteria.json");
 
 		InteractionManager.storeInteractions(getTargetContext(), json);
 
@@ -1298,7 +1298,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testBadCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testBadCriteria.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testBadCriteria.json");
 
 
 		Interaction interaction = null;
@@ -1338,7 +1338,7 @@ public class InteractionTest extends InstrumentationTestCase {
 		Log.e("Running test: testCorruptedJson()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCorruptedJson.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCorruptedJson.json");
 
 		InteractionManager.storeInteractions(getTargetContext(), json);
 		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
@@ -1351,7 +1351,7 @@ public class InteractionTest extends InstrumentationTestCase {
 	public void testActualUpgradeMessage() {
 		Log.e("Running test: testActualUpgradeMessage()");
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testActualUpgradeMessage.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testActualUpgradeMessage.json");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
@@ -1426,7 +1426,7 @@ public class InteractionTest extends InstrumentationTestCase {
 
 		Context targetContext = getTargetContext();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testRealRatingInteractions.json");
+		String json = FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testRealRatingInteractions.json");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
