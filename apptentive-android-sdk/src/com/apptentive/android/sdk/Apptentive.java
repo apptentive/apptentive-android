@@ -775,35 +775,35 @@ public class Apptentive {
 			asyncFetchAppConfiguration(context);
 			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 			InteractionManager.asyncFetchAndStoreInteractions(context);
-		}
 
-		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
-		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
-		if (deviceInfo != null) {
-			Log.d("Device info was updated.");
-			Log.v(deviceInfo.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
-		} else {
-			Log.d("Device info was not updated.");
-		}
+			// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
+			// See if the device info has changed.
+			Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
+			if (deviceInfo != null) {
+				Log.d("Device info was updated.");
+				Log.v(deviceInfo.toString());
+				ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
+			} else {
+				Log.d("Device info was not updated.");
+			}
 
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
-		if (sdk != null) {
-			Log.d("Sdk was updated.");
-			Log.v(sdk.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(sdk);
-		} else {
-			Log.d("Sdk was not updated.");
-		}
+			Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
+			if (sdk != null) {
+				Log.d("Sdk was updated.");
+				Log.v(sdk.toString());
+				ApptentiveDatabase.getInstance(context).addPayload(sdk);
+			} else {
+				Log.d("Sdk was not updated.");
+			}
 
-		Person person = PersonManager.storePersonAndReturnDiff(context);
-		if (person != null) {
-			Log.d("Person was updated.");
-			Log.v(person.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(person);
-		} else {
-			Log.d("Person was not updated.");
+			Person person = PersonManager.storePersonAndReturnDiff(context);
+			if (person != null) {
+				Log.d("Person was updated.");
+				Log.v(person.toString());
+				ApptentiveDatabase.getInstance(context).addPayload(person);
+			} else {
+				Log.d("Person was not updated.");
+			}
 		}
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
@@ -850,6 +850,10 @@ public class Apptentive {
 	private static void fetchConversationToken(Context context) {
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
+		request.setSdk(SdkManager.storeSdkAndReturnDiff(context));
+		request.setDevice(DeviceManager.storeDeviceAndReturnDiff(context));
+		request.setPerson(PersonManager.storePersonAndReturnDiff(context));
+
 		// TODO: Allow host app to send a user id, if available.
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {

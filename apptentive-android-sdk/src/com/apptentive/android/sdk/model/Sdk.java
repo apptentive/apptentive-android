@@ -8,6 +8,8 @@ import org.json.JSONException;
  */
 public class Sdk extends Payload {
 
+	public static final String KEY = "sdk";
+
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_PROGRAMMING_LANGUAGE = "programming_language";
 	private static final String KEY_AUTHOR_NAME = "author_name";

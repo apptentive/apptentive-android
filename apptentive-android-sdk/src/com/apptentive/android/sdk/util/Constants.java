@@ -29,8 +29,6 @@ public class Constants {
 
 	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
 
-	public static final String PREF_KEY_DEVICE_DATA_SENT = "deviceDataSent"; // Keeps track of whether we have ever sent device data.
-
 	public static final String PREF_KEY_SDK = "sdk";
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
@@ -97,6 +95,7 @@ public class Constants {
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
 	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
 	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
+	public static final String PREF_KEY_DEVICE_DATA_SENT = "deviceDataSent"; // Keeps track of whether we have ever sent device data.
 
 	/**
 	 * A list of mobile carrier network types as Strings.
