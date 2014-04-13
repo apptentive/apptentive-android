@@ -1,7 +1,15 @@
+2014-04-13 skykelsey 1.3.2
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-318 Custom Person data was not available the first time surveys were fetched.
+
 2014-04-03 skykelsey 1.3.1
 --------------------------
 
 Major changes:
+
 * Add setting to allow Message Center to be disabled by default, even before it has connected to the server.
 
 2014-02-24 skykelsey 1.3.0
