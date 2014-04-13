@@ -79,7 +79,7 @@ public class EngagementModule {
 	/**
 	 * Used only for encoding event names. DO NOT modify this method.
 	 */
-	public static String encodeEventPart(String input) {
+	private static String encodeEventPart(String input) {
 		return input.replace("%", "%25").replace("/", "%2F").replace("#", "%23");
 	}
 

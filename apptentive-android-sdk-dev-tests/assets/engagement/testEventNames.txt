@@ -18,3 +18,11 @@ local#app#`1234567890-=~!@%23$%25^&*()_+qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASD
 %/#
 %/#
 %25%2F%23#%25%2F%23#%25%2F%23
+vendor name
+interaction name
+event name
+vendor name#interaction name#event name
+app
+local
+test#%///#%//%%/#Event_!@#$%^&*(){}Label1234567890[]`~Separators
+app#local#test%23%25%2F%2F%2F%23%25%2F%2F%25%25%2F%23Event_!@%23$%25^&*(){}Label1234567890[]`~Separators

@@ -23,7 +23,7 @@ public class EventTest extends InstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
 	public void testEventNameCreation() {
-		Log.e("Running test: testEventNames()\n\n");
+		Log.e("Running test: testEventNameCreation()\n\n");
 
 		BufferedReader reader = null;
 		try {
