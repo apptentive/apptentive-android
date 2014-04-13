@@ -22,23 +22,30 @@ public class EventTest extends InstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
-	public void testEventNameCreation() {
-		Log.e("Running test: testEventNameCreation()\n\n");
+	public void testEventLabelCreation() {
+		Log.e("Running test: testEventLabelCreation()\n\n");
 
 		BufferedReader reader = null;
 		try {
-			reader = FileUtil.openBufferedReaderFromFileAsset(getInstrumentation().getContext(), TEST_DATA_DIR + "testEventNames.txt");
+			reader = FileUtil.openBufferedReaderFromFileAsset(getInstrumentation().getContext(), TEST_DATA_DIR + "testEventLabelCreation.txt");
+
+			// Make sure the test file isn't empty.
+			reader.mark(Integer.MAX_VALUE);
+			assertNotNull(reader.readLine());
+			reader.reset();
+
 			String vendor;
 			while ((vendor = reader.readLine()) != null) {
 				String interaction = reader.readLine();
 				String eventName = reader.readLine();
 				String expected = reader.readLine();
-				String result = EngagementModule.generateEventName(vendor, interaction, eventName);
-				Log.e(".\nexpected: %s\nresult:   %s", expected, result);
+				String result = EngagementModule.generateEventLabel(vendor, interaction, eventName);
+				Log.i(".\nexpected: %s\nresult:   %s", expected, result);
 				assertTrue(result.equals(expected));
 			}
 		} catch (IOException e) {
 			Log.e("Error reading asset.", e);
+			throw new RuntimeException(e);
 		} finally {
 			Util.ensureClosed(reader);
 		}
