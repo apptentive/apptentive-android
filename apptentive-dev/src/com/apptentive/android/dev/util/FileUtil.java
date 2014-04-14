@@ -8,6 +8,7 @@ package com.apptentive.android.dev.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.BufferedReader;
@@ -28,12 +29,13 @@ public class FileUtil {
 			reader = new BufferedReader(new InputStreamReader(assetManager.open(path)));
 
 			char[] buf = new char[READ_BUF_LEN];
-			int count = 0;
+			int count;
 			while ((count = reader.read(buf, 0, READ_BUF_LEN)) != -1) {
 				builder.append(buf, 0, count);
 			}
 			return builder.toString();
 		} catch (IOException e) {
+			Log.e("Error reading from file \"%s\"", e, path);
 		} finally {
 			Util.ensureClosed(reader);
 		}
