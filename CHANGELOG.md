@@ -1,3 +1,11 @@
+2014-04-14 skykelsey 1.4.1
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-318 Surveys targeting custom person data don't return until the second time they are requested.
+* Event Labels were being encoded incorrectly.
+
 2014-04-07 skykelsey 1.4.0
 --------------------------
 

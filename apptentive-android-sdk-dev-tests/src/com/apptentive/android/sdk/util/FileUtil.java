@@ -18,12 +18,11 @@ import java.io.*;
 public class FileUtil {
 	private final static int READ_BUF_LEN = 2048;
 
-	public static String loadTextAssetAsString(Context context, String path) {
-		AssetManager assetManager = context.getResources().getAssets();
-		BufferedReader reader = null;
+	public static String loadFileAssetAsString(Context context, String path) {
+		Reader reader = null;
 		try {
 			StringBuilder builder = new StringBuilder();
-			reader = new BufferedReader(new InputStreamReader(assetManager.open(path)));
+			reader = openBufferedReaderFromFileAsset(context, path);
 
 			char[] buf = new char[READ_BUF_LEN];
 			int count = 0;
@@ -37,5 +36,10 @@ public class FileUtil {
 			Util.ensureClosed(reader);
 		}
 		return null;
+	}
+
+	public static BufferedReader openBufferedReaderFromFileAsset(Context context, String path) throws IOException {
+		AssetManager assetManager = context.getResources().getAssets();
+		return new BufferedReader(new InputStreamReader(assetManager.open(path)));
 	}
 }

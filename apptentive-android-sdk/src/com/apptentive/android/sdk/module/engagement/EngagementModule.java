@@ -19,7 +19,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.InteractionManag
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
-import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -27,30 +26,30 @@ import java.util.Map;
  */
 public class EngagementModule {
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String codePoint) {
-		return engage(activity, "com.apptentive", interaction, codePoint);
+	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
+		return engage(activity, "com.apptentive", interaction, eventName);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String codePoint) {
-		return engage(activity, "com.apptentive", "app", codePoint);
+	public static synchronized boolean engageInternal(Activity activity, String eventName) {
+		return engage(activity, "com.apptentive", "app", eventName);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String codePointName) {
+	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName) {
 		try {
-			String fullCodePointName = String.format("%s#%s#%s", URLEncoder.encode(vendor), URLEncoder.encode(interaction), URLEncoder.encode(codePointName));
-			Log.d("engage(%s)", fullCodePointName);
+			String eventLabel = generateEventLabel(vendor, interaction, eventName);
+			Log.d("engage(%s)", eventLabel);
 
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), fullCodePointName);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(fullCodePointName, (Map<String, String>) null));
-			return doEngage(activity, fullCodePointName);
+			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, (Map<String, String>) null));
+			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
 		return false;
 	}
 
-	public static boolean doEngage(Activity activity, String fullCodePoint) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), fullCodePoint);
+	public static boolean doEngage(Activity activity, String eventLabel) {
+		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), eventLabel);
 		if (interaction != null) {
 			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);
@@ -70,5 +69,16 @@ public class EngagementModule {
 			activity.startActivity(intent);
 			activity.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
+	}
+
+	public static String generateEventLabel(String vendor, String interaction, String eventName) {
+		return String.format("%s#%s#%s", encodeEventLabelPart(vendor), encodeEventLabelPart(interaction), encodeEventLabelPart(eventName));
+	}
+
+	/**
+	 * Used only for encoding event names. DO NOT modify this method.
+	 */
+	private static String encodeEventLabelPart(String input) {
+		return input.replace("%", "%25").replace("/", "%2F").replace("#", "%23");
 	}
 }
