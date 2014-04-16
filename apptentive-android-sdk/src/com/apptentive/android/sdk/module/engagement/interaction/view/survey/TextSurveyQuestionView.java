@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey.view;
+package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,9 +14,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.SurveyModule;
-import com.apptentive.android.sdk.module.survey.SinglelineQuestion;
-import com.apptentive.android.sdk.module.survey.SurveyState;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -27,8 +26,8 @@ import java.util.Set;
  */
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> {
 
-	public TextSurveyQuestionView(Context context, final SinglelineQuestion question) {
-		super(context, question);
+	public TextSurveyQuestionView(Context context, SurveyState surveyState, final SinglelineQuestion question) {
+		super(context, surveyState, question);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer());
@@ -37,10 +36,11 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		setInstructions(instructionsText);
 
 		EditText answer = (EditText) findViewById(R.id.answer_text);
-		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
+		Set<String> answers = surveyState.getAnswers(question.getId());
 		if (answers.size() > 0) {
 			answer.setText(new ArrayList<String>(answers).get(0));
 		}
+		final SurveyState state = surveyState;
 		answer.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 			}
@@ -50,7 +50,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 			public void afterTextChanged(Editable editable) {
 				String questionId = question.getId();
-				SurveyState state = SurveyModule.getInstance().getSurveyState();
 				Set<String> answers = state.getAnswers(questionId);
 				if (answers.isEmpty() || (!answers.isEmpty() && !answers.contains(editable.toString()))) {
 					state.clearAnswers(questionId);

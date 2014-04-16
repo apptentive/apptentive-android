@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
+import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import org.json.JSONException;
 
 /**
@@ -232,6 +233,84 @@ public class InteractionsActivity extends ApptentiveActivity {
 		"  }" +
 		"}";
 
+	private static final String SURVEY_INTERACTION = "" +
+		"{" +
+		"    \"id\": \"526fe2836dd8bf546a00000c\"," +
+		"    \"priority\": 3," +
+		"    \"criteria\": {}," +
+		"    \"type\": \"Survey\"," +
+		"    \"configuration\": {" +
+		"        \"questions\": [" +
+		"            {" +
+		"                \"id\": \"multi-choice-question\"," +
+		"                \"answer_choices\": [" +
+		"                    {" +
+		"                        \"id\": \"multi-choice-answer-0\"," +
+		"                        \"value\": \"Better user interface\"" +
+		"                    }," +
+		"                    {" +
+		"                        \"id\": \"multi-choice-answer-1\"," +
+		"                        \"value\": \"Cloud support\"" +
+		"                    }," +
+		"                    {" +
+		"                        \"id\": \"multi-choice-answer-2\"," +
+		"                        \"value\": \"Login with Facebook / Google / Twitter\"" +
+		"                    }" +
+		"                ]," +
+		"                \"instructions\": \"select one\"," +
+		"                \"value\": \"Which would you like to see first?\"," +
+		"                \"type\": \"multichoice\"," +
+		"                \"required\": true" +
+		"            }," +
+		"            {" +
+		"                \"id\": \"multi-select-question\"," +
+		"                \"answer_choices\": [" +
+		"                    {" +
+		"                        \"id\": \"multi-select-answer-0\"," +
+		"                        \"value\": \"Speed\"" +
+		"                    }," +
+		"                    {" +
+		"                        \"id\": \"multi-select-answer-1\"," +
+		"                        \"value\": \"Easy to use\"" +
+		"                    }," +
+		"                    {" +
+		"                        \"id\": \"multi-select-answer-2\"," +
+		"                        \"value\": \"Reliability\"" +
+		"                    }," +
+		"                    {" +
+		"                        \"id\": \"multi-select-answer-3\"," +
+		"                        \"value\": \"Works offline\"" +
+		"                    }" +
+		"                ]," +
+		"                \"instructions\": \"select up to 2\"," +
+		"                \"min_selections\": 0," +
+		"                \"max_selections\": 2," +
+		"                \"value\": \"Which two qualities for an app are the most important to you?\"," +
+		"                \"type\": \"multiselect\"," +
+		"                \"required\": false" +
+		"            }," +
+		"            {" +
+		"                \"id\": \"single-line-question\"," +
+		"                \"multiline\": false," +
+		"                \"value\": \"Is there anything you'd like to add?\"," +
+		"                \"type\": \"singleline\"," +
+		"                \"required\": false" +
+		"            }" +
+		"        ]," +
+		"        \"name\": \"What should we build?\"," +
+		"        \"show_success_message\": true," +
+		"        \"success_message\": \"Thank you for your input.\"," +
+		"        \"description\": \"Please help us figure this out!\"," +
+		"        \"app_id\": \"517884df584ef064fc00000e\"," +
+		"        \"active\": true," +
+		"        \"date\": \"2014-01-19T04:51:14Z\"," +
+		"        \"device_attrs\": {" +
+		"            \"os_name\": \"Android\"," +
+		"            \"os_version\": \"4.4.2\"" +
+		"        }" +
+		"    }" +
+		"}";
+
 	public void interaction(@SuppressWarnings("unused") View view) {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
@@ -253,6 +332,8 @@ public class InteractionsActivity extends ApptentiveActivity {
 				interaction = new AppStoreRatingInteraction(APP_STORE_RATING_INTERACTION);
 			} else if (interactionName.equals("Feedback Dialog")) {
 				interaction = new FeedbackDialogInteraction(FEEDBACK_DIALOG_INTERACTION);
+			} else if (interactionName.equals("Survey")) {
+				interaction = new SurveyInteraction(SURVEY_INTERACTION);
 			} else if (interactionName.equals("Working Rating Flow")) {
 				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractions.json");
 				// Overwrites any existing interactions.

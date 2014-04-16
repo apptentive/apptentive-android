@@ -15,7 +15,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
+import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -83,6 +85,9 @@ public class ViewActivity extends ApptentiveActivity {
 							break;
 						case FeedbackDialog:
 							view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
+							break;
+						case Survey:
+							view = new SurveyInteractionView((SurveyInteraction) interaction);
 							break;
 						case MessageCenter:
 							// For now, we use the old method.

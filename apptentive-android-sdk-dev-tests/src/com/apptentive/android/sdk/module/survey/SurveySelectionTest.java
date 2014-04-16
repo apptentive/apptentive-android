@@ -3,6 +3,8 @@ package com.apptentive.android.sdk.module.survey;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyDefinition;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyManager;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.List;

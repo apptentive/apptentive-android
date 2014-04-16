@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey.view;
+package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,9 +18,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.SurveyModule;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
-import com.apptentive.android.sdk.module.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -29,12 +29,14 @@ import com.apptentive.android.sdk.util.Util;
 abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
 
 	protected Q question;
+	protected SurveyState surveyState;
 
 	protected OnSurveyQuestionAnsweredListener listener;
 
-	protected BaseSurveyQuestionView(Context context, Q question) {
+	protected BaseSurveyQuestionView(Context context, SurveyState surveyState, Q question) {
 		super(context);
 		this.question = question;
+		this.surveyState = surveyState;
 
 		// Required to remove focus from any EditTexts.
 		setFocusable(true);
@@ -94,7 +96,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		Resources resources = getContext().getResources();
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);
-		if (question != null && !SurveyModule.getInstance().getSurveyState().isQuestionValid(question)) {
+		if (question != null && !surveyState.isQuestionValid(question)) {
 			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_invalid));
 			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_invalid));
 			instructions.setTypeface(Typeface.DEFAULT_BOLD);

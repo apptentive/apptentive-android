@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey.view;
+package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -25,10 +26,10 @@ public class CheckboxChoice extends FrameLayout {
 		super(context);
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
+		View choice = inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
 
-		TextView text = (TextView) findViewById(R.id.choice_text);
-		checkbox = (CheckBox) findViewById(R.id.checkbox);
+		TextView text = (TextView) choice.findViewById(R.id.choice_text);
+		checkbox = (CheckBox) choice.findViewById(R.id.checkbox);
 
 		text.setText(textString);
 		setClickable(true);
@@ -37,6 +38,10 @@ public class CheckboxChoice extends FrameLayout {
 
 	public void toggle() {
 		checkbox.toggle();
+	}
+
+	public void check() {
+		checkbox.setChecked(true);
 	}
 
 	public boolean isChecked() {

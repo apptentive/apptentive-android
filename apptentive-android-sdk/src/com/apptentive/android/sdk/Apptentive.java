@@ -30,11 +30,9 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
-import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.module.survey.SurveyManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
-import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -42,7 +40,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -738,7 +735,7 @@ public class Apptentive {
 			asyncFetchConversationToken(context);
 		} else {
 			asyncFetchAppConfiguration(context);
-			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+//			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 			InteractionManager.asyncFetchAndStoreInteractions(context);
 		}
 
@@ -844,7 +841,7 @@ public class Apptentive {
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
-				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
+//				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 				InteractionManager.asyncFetchAndStoreInteractions(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);

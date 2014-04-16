@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey;
+package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,8 +40,7 @@ public class SurveyDefinition extends JSONObject {
 	public enum Type {
 		multichoice,
 		singleline,
-		multiselect,
-		stackrank
+		multiselect
 	}
 
 	public String getId() {
@@ -186,10 +185,6 @@ public class SurveyDefinition extends JSONObject {
 						break;
 					case multiselect:
 						question = new MultiselectQuestion(questionJson.toString());
-						break;
-					case stackrank:
-						// TODO: Don't even handle stackrank right now, even if it shows up.
-						//question = new StackrankQuestion(questionJson);
 						break;
 					default:
 						break;

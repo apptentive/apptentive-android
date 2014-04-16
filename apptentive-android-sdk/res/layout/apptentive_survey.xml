@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -48,6 +48,7 @@
                               android:layout_height="wrap_content"
                               android:gravity="center_vertical|left"
                               android:paddingTop="16dp"
+                              android:visibility="gone"
                               android:textSize="@dimen/apptentive_text_medium"
                               android:textColor="@color/apptentive_survey_question_instruction_text"/>
                     <LinearLayout android:id="@+id/questions"

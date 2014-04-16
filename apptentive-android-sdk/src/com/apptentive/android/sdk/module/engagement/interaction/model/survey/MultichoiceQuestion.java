@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey;
+package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +22,7 @@ public class MultichoiceQuestion extends BaseQuestion {
 	protected static final String KEY_MAX_SELECTIONS = "max_selections";
 	private static final String KEY_ANSWER_CHOICES = "answer_choices";
 
-	protected MultichoiceQuestion(String json) throws JSONException {
+	public MultichoiceQuestion(String json) throws JSONException {
 		super(json);
 	}
 

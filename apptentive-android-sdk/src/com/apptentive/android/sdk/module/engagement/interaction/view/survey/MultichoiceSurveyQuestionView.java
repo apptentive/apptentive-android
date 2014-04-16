@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey.view;
+package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.SurveyModule;
-import com.apptentive.android.sdk.module.survey.AnswerDefinition;
-import com.apptentive.android.sdk.module.survey.MultichoiceQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.*;
@@ -29,18 +29,19 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	protected Map<String, CheckboxChoice> answersChoices;
 	protected Map<CheckboxChoice, String> answersChoicesReverse;
 
-	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
-		super(context, question);
+	public MultichoiceSurveyQuestionView(Context context, SurveyState surveyState, MultichoiceQuestion question) {
+		super(context, surveyState, question);
 		answersChoices = new HashMap<String, CheckboxChoice>();
 		answersChoicesReverse = new HashMap<CheckboxChoice, String>();
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
-		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
+		Set<String> answers = surveyState.getAnswers(question.getId());
 
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-		inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
-		LinearLayout choiceContainer = (LinearLayout) findViewById(R.id.choice_container);
+		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
+
+		LinearLayout choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
@@ -49,7 +50,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				choice.post(new Runnable() {
 					@Override
 					public void run() {
-						choice.toggle();
+						choice.check();
 					}
 				});
 			}
@@ -81,7 +82,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		String clickedId = answersChoicesReverse.get(choice);
 
-		Set<String> answers = SurveyModule.getInstance().getSurveyState().getAnswers(question.getId());
+		Set<String> answers = surveyState.getAnswers(question.getId());
 		boolean alreadyAnswered = answers != null && answers.contains(clickedId);
 		if (alreadyAnswered) {
 			choice.toggle();
@@ -97,7 +98,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				checkedChoices.add(id);
 			}
 		}
-		SurveyModule.getInstance().getSurveyState().setAnswers(question.getId(), checkedChoices);
+		surveyState.setAnswers(question.getId(), checkedChoices);
 		updateValidationState();
 		requestFocus();
 		fireListener();
@@ -114,7 +115,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	}
 
 	protected void clearAllChoices() {
-		SurveyModule.getInstance().getSurveyState().clearAnswers(question.getId());
+		surveyState.clearAnswers(question.getId());
 		for (String id : answersChoices.keySet()) {
 			if (answersChoices.get(id).isChecked()) {
 				answersChoices.get(id).toggle();

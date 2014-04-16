@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.survey;
+package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 
+
+import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 
 import java.util.*;
 
@@ -19,13 +21,13 @@ public class SurveyState {
 	private Map<String, Integer> questionToMaxAnswersMap;
 	private Map<String, Boolean> questionToMetricSentMap;
 
-	public SurveyState(SurveyDefinition surveyDefinition) {
+	public SurveyState(SurveyInteraction surveyInteraction) {
 		questionToAnswersMap = new HashMap<String, Set<String>>();
 		questionToMinAnswersMap = new HashMap<String, Integer>();
 		questionToMaxAnswersMap = new HashMap<String, Integer>();
 		questionToMetricSentMap = new HashMap<String, Boolean>();
 
-		for(Question question : surveyDefinition.getQuestions()) {
+		for(Question question : surveyInteraction.getQuestions()) {
 			String questionId = question.getId();
 			questionToAnswersMap.put(questionId, new HashSet<String>());
 			questionToMinAnswersMap.put(questionId, question.getMinSelections());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,9 +7,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.SurveyModule;
-import com.apptentive.android.sdk.module.survey.Question;
-import com.apptentive.android.sdk.module.survey.SurveyDefinition;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ public class SurveyResponse extends ConversationItem {
 		super(json);
 	}
 
-	public SurveyResponse(SurveyDefinition definition) {
+	public SurveyResponse(SurveyInteraction definition, SurveyState surveyState) {
 		super();
 
 		try {
@@ -43,7 +43,7 @@ public class SurveyResponse extends ConversationItem {
 			List<Question> questions = definition.getQuestions();
 			for (Question question : questions) {
 				String questionId = question.getId();
-				Set<String> answersList = SurveyModule.getInstance().getSurveyState().getAnswers(questionId);
+				Set<String> answersList = surveyState.getAnswers(questionId);
 				if (answersList.size() > 1 || question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 					JSONArray jsonArray = new JSONArray(answersList);
 					answers.put(questionId, jsonArray);

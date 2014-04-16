@@ -23,6 +23,7 @@
     </string-array>
 
     <string-array name="interactions">
+        <item>Survey</item>
         <item>Working Rating Flow</item>
         <item>Feedback Dialog</item>
         <item>Rating Dialog</item>
