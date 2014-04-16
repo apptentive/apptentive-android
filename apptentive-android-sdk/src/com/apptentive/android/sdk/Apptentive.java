@@ -30,8 +30,6 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
-import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -581,42 +579,6 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// SURVEYS
-	// ****************************************************************************************
-
-	/**
-	 * Queries to see if a survey with tags is available to be shown.
-	 *
-	 * @param tags An optional array of tags. If specified, Apptentive will check for the availability of surveys matching
-	 *             at least one tag.
-	 * @return True if a survey can be shown, else false.
-	 */
-	public static boolean isSurveyAvailable(Context context, String... tags) {
-		try {
-			return SurveyManager.isSurveyAvailable(context, tags);
-		} catch (Exception e) {
-			MetricModule.sendError(context.getApplicationContext(), e, null, null);
-		}
-		return false;
-	}
-
-	/**
-	 * Shows a survey if one is available that has no tags associated with it.
-	 *
-	 * @param listener An {@link OnSurveyFinishedListener} that is called when the survey is dismissed.
-	 * @param tags     An optional array of tags that correspond to tags applied to the surveys you create on www.apptentive.com.
-	 * @return True if a survey was shown, else false.
-	 */
-	public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags) {
-		try {
-			return SurveyManager.showSurvey(activity, listener, tags);
-		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-		return false;
-	}
-
 	/**
 	 * This method takes a unique event string, stores a record of that event having been visited, figures out
 	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
@@ -735,7 +697,6 @@ public class Apptentive {
 			asyncFetchConversationToken(context);
 		} else {
 			asyncFetchAppConfiguration(context);
-//			SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 			InteractionManager.asyncFetchAndStoreInteractions(context);
 		}
 
@@ -841,7 +802,6 @@ public class Apptentive {
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
-//				SurveyManager.asyncFetchAndStoreSurveysIfCacheExpired(context);
 				InteractionManager.asyncFetchAndStoreInteractions(context);
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);

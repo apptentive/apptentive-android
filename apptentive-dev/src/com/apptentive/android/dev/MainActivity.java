@@ -22,8 +22,6 @@ public class MainActivity extends ApptentiveActivity {
 
 	public static final String LOG_TAG = "Apptentive Dev App";
 
-	private String selectedTag;
-
 	private long lastUnreadMessageCount = 0;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -73,10 +71,6 @@ public class MainActivity extends ApptentiveActivity {
 
 	public void launchMessageCenterActivity(@SuppressWarnings("unused") View view) {
 		startActivity(new Intent(this, MessageCenterActivity.class));
-	}
-
-	public void launchSurveysActivity(@SuppressWarnings("unused") View view) {
-		startActivity(new Intent(this, SurveysActivity.class));
 	}
 
 	public void launchTestsActivity(@SuppressWarnings("unused") View view) {

@@ -51,7 +51,7 @@ public class ApptentiveClient {
 	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
-	// New API
+	// Active API
 	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
 	private static final String ENDPOINT_CONVERSATION = ENDPOINT_BASE + "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
@@ -60,13 +60,13 @@ public class ApptentiveClient {
 	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
 	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
-	private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
 
 	private static final String ENDPOINT_INTERACTIONS = ENDPOINT_BASE + "/interactions";
 
 	// Deprecated API
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
+	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
@@ -121,10 +121,6 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse putPerson(Person person) {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse getSurveys() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_SURVEYS_FETCH, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {

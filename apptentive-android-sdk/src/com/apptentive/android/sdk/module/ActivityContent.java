@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module;
 
 import android.app.Activity;
@@ -24,7 +30,6 @@ public abstract class ActivityContent {
 
 	public enum Type {
 		ABOUT,
-		SURVEY,
 		MESSAGE_CENTER,
 		INTERACTION,
 		unknown;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -18,20 +18,4 @@
             android:layout_height="wrap_content"
             android:onClick="onMessageCenterButtonPressed"
             android:text="@string/message_center_button_label"/>
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal">
-        <Button android:id="@+id/show_survey_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onShowSurveyButtonPressed"
-                android:text="@string/show_survey_button_label"/>
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/show_survey_instructions"/>
-        <Spinner android:id="@+id/survey_spinner"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:entries="@array/survey_tags"/>
-    </LinearLayout>
 </LinearLayout>

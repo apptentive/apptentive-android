@@ -59,9 +59,6 @@ public class ViewActivity extends ApptentiveActivity {
 				case ABOUT:
 					AboutModule.getInstance().doShow(this);
 					break;
-				case SURVEY:
-					SurveyModule.getInstance().doShow(this);
-					break;
 				case MESSAGE_CENTER:
 					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 					ApptentiveMessageCenter.doShow(this);
@@ -122,8 +119,6 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				break;
-			case SURVEY:
-				break;
 			case MESSAGE_CENTER:
 				ApptentiveMessageCenter.onStop(this);
 				break;
@@ -142,9 +137,6 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				AboutModule.getInstance().onBackPressed(this);
-				break;
-			case SURVEY:
-				SurveyModule.getInstance().onBackPressed(this);
 				break;
 			case MESSAGE_CENTER:
 				ApptentiveMessageCenter.onBackPressed(this);

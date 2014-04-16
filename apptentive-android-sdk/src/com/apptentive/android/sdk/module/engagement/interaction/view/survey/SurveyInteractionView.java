@@ -149,10 +149,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		title.requestFocus();
 	}
 
-	public SurveyState getSurveyState() {
-		return this.surveyState;
-	}
-
 	public boolean isSurveyValid() {
 		for (Question question : interaction.getQuestions()) {
 			if (!surveyState.isQuestionValid(question)) {
