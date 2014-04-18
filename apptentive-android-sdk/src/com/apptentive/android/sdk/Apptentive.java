@@ -30,11 +30,9 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
-import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
-import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -42,7 +40,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -245,6 +242,10 @@ public class Apptentive {
 	 */
 	public static final String INTEGRATION_URBAN_AIRSHIP_APID = "token";
 
+	public static final String INTEGRATION_AWS_SNS = "aws_sns";
+
+	public static final String INTEGRATION_AWS_SNS_TOKEN = "token";
+
 	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
@@ -289,14 +290,14 @@ public class Apptentive {
 	 * Urban Airship creates an APID after it connects to its server, the APID may be null at first. The preferred method
 	 * of retrieving the APID is to listen to the <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your
 	 * {@link android.content.BroadcastReceiver}. You can alternately find the APID by calling
-	 * <code>PushManager.shared().getAPID()</code>.
+	 * <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29">PushManager.shared().getAPID()</a>
 	 * <p/>
 	 * Note: Initializing Urban Airship may take a few seconds. You may need to close and reopen the app in order to force
 	 * the APID to be sent to our server. Push notifications will not be delivered to this app install until our server
 	 * receives the APID.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @param apid    The Airship Push ID for (APID).
+	 * @param apid    The Airship Push ID (APID).
 	 */
 	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
 		if (apid != null) {
@@ -307,26 +308,35 @@ public class Apptentive {
 		}
 	}
 
+	/**
+	 * Configures Apptentive to work with Amazon Web Services (AWS) Simple Notification Service (SNS) push notifications.
+	 * You must first set up your app to work with AWS SNS to use this integration. This method must be called when you
+	 * finish initializing AWS SNS using
+	 * <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
+	 * GoogleCloudMessaging.register(String... senderIds)</a>,
+	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
+	 * <p/>
+	 * Note: You may need to close and reopen the app in order to force the Registration ID to be sent to our server.
+	 * Push notifications will not be delivered to this app install until our server receives the Registration ID.
+	 *
+	 * @param context        The Context from which this method was called.
+	 * @param registrationId The registrationId returned from
+	 *                       <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
+	 *                       GoogleCloudMessaging.register(String... senderIds)</a>.
+	 */
+	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
+		if (registrationId != null) {
+			Map<String, String> config = new HashMap<String, String>();
+			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);
+			Apptentive.addIntegration(context, Apptentive.INTEGRATION_AWS_SNS, config);
+			Log.i("Setting Amazon AWS token: %s", registrationId);
+		}
+	}
+
 
 	// ****************************************************************************************
 	// PUSH NOTIFICATIONS
 	// ****************************************************************************************
-
-	private static final String PUSH_ACTION = "action";
-
-	private static enum PushAction {
-		pmc,       // Present Message Center.
-		unknown;   // Anything unknown will not be handled.
-
-		public static PushAction parse(String name) {
-			try {
-				return PushAction.valueOf(name);
-			} catch (IllegalArgumentException e) {
-				Log.d("Error parsing unknown PushAction: " + name);
-			}
-			return unknown;
-		}
-	}
 
 	/**
 	 * The key that is used to store extra data on an Apptentive push notification.
@@ -346,6 +356,7 @@ public class Apptentive {
 		if (intent != null) {
 			Bundle extras = intent.getExtras();
 			if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
+				Log.i("Saving pending push intent.");
 				String extra = extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, extra).commit();
@@ -368,12 +379,12 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.i("Handling Apptentive Push Intent.");
+			Log.e("Handling Apptentive Push Intent.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
-				PushAction action = PushAction.unknown;
-				if (pushJson.has(PUSH_ACTION)) {
-					action = PushAction.parse(pushJson.getString(PUSH_ACTION));
+				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
+				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
+					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
 				}
 				switch (action) {
 					case pmc:

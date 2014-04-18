@@ -25,6 +25,22 @@ public class ApptentiveInternal {
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
 
+	public static final String PUSH_ACTION = "action";
+
+	public static enum PushAction {
+		pmc,       // Present Message Center.
+		unknown;   // Anything unknown will not be handled.
+
+		public static PushAction parse(String name) {
+			try {
+				return PushAction.valueOf(name);
+			} catch (IllegalArgumentException e) {
+				Log.d("Error parsing unknown PushAction: " + name);
+			}
+			return unknown;
+		}
+	}
+
 	public static void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
 	}
