@@ -489,20 +489,25 @@ public static void Apptentive.removeCustomPersonData(Context context, String key
 
 ## Third Party Integrations
 Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
-Urban Airship is the only provider currently supported. A push notification is useful for notifying your customers that
-they have received a new message while they are not using your app. Push notifications are optional, and messages will
-still be delivered when the customer opens the app, even if you do not use them.
+**Urban Airship** and **Amazon's AWS SNS** are currently supported. A push notification is useful for notifying your
+customers that they have received a new message while they are not using your app. Push notifications are optional, and
+messages will still be delivered when the customer opens the app.
 
-### Urban Airship Integration
+Third party integrations require a Grow Plan.
 
-In order to use Urban Airship, you will need to first setup Urban Airship to work within your app. Then, you will need
-to set your App Key, App Secret, and App Master Secret in the Urban Airship section of "Integrations" on our website.
-Push notification require a Corporate Plan.
+### Push Notifications
 
-#### Sending the Urban Airship APID
+#### Urban Airship Integration
 
-To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
- initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
+In order to use **Urban Airship**, you will need to first setup **Urban Airship** to work within your app. Then, you
+will need to set your `App Key`, `App Secret`, and `App Master Secret` on the website at
+**App Settings -> Integrations -> Urban Airship**.
+
+##### Sending the Urban Airship APID
+
+To set up push notifications, you must pass in the `APID` you get from **Urban Airship**. The `APID` is available only
+after you initialize **Urban Airship**, so you will have to read it from the `BroadcastReceiver` you use to receive
+**Urban Airship** `Intents`.
 
 ###### Method
 ```java
@@ -513,6 +518,30 @@ Apptentive.addUrbanAirshipPushIntegration(Context context, String apid);
 ```java
 String  apid = PushManager.shared().getAPID();
 Apptentive.addUrbanAirshipPushIntegration(this, apid);
+```
+
+#### Amazon SNS
+
+In order to use **Amazon Web Services (AWS) Simple Notification Service (SNS)**, you will need to first set up
+**AWS SNS** to work within your app. Then, you will need to set your `Access Key ID`, `Secret Access Key`, and `ARN` on
+the website at **App Settings -> Integrations -> Amazon Web Services SNS**.
+
+##### Sending the AWS SNS Registration ID
+
+To set up push notifications, you must pass in the **Registration ID** you get from **AWS SNS**. The **Registration ID**
+is returned when you register for push notifications with
+[GoogleCloudMessaging.register(String... senderIds)](http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29).
+
+###### Method
+```java
+Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId);
+```
+
+###### Example
+```java
+GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getBaseContext());
+String  registrationId = gcm.register(getString(R.string.project_number));
+Apptentive.addAmazonSnsPushIntegration(this, registrationId);
 ```
 
 #### Passing Apptentive the Push Intent
@@ -527,9 +556,9 @@ public static void setPendingPushNotification(Context context, Intent intent);
 
 #### Running the Apptentive Push UI
 
-Next, in the Activity that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
+Next, in the `Activity` that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
 push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
-met, then we will perform an action. This is generally to show a UI, such as Message Center. If we show a UI, this
+met, then we will perform an action. This is generally to show a UI, such as **Message Center**. If we show a UI, this
 method will return true, else false. This method is a noop if the push notification was not from Apptentive.
 
 ###### Method

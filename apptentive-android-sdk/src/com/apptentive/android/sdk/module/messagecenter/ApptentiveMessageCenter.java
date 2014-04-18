@@ -25,6 +25,8 @@ import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -244,16 +246,41 @@ public class ApptentiveMessageCenter {
 		dialog.show();
 	}
 
+	public static void clearPendingMessageCenterPushNotification(Activity activity) {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
+		if (pushData != null) {
+			try {
+				JSONObject pushJson = new JSONObject(pushData);
+				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
+				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
+					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
+				}
+				switch (action) {
+					case pmc:
+						Log.i("Clearing pending Message Center push notification.");
+						prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit();
+						break;
+				}
+			} catch (JSONException e) {
+				Log.w("Error parsing JSON from push notification.", e);
+				MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
+			}
+		}
+	}
+
 	public static void scrollToBottom() {
 		messageCenterView.scrollMessageListViewToBottom();
 	}
 
 	public static void onStop(Activity activity) {
+		clearPendingMessageCenterPushNotification(activity);
 		// Remove listener here.
 		MessagePollingWorker.setForeground(false);
 	}
 
 	public static void onBackPressed(Activity activity) {
+		clearPendingMessageCenterPushNotification(activity);
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 	}
 
