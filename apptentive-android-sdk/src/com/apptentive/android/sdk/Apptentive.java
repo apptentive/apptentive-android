@@ -313,18 +313,18 @@ public class Apptentive {
 	 * You must first set up your app to work with AWS SNS to use this integration. This method must be called when you
 	 * finish initializing AWS SNS using
 	 * <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
-	 *   GoogleCloudMessaging.register(String... senderIds)</a>,
+	 * GoogleCloudMessaging.register(String... senderIds)</a>,
 	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
 	 * <p/>
 	 * Note: You may need to close and reopen the app in order to force the Registration ID to be sent to our server.
 	 * Push notifications will not be delivered to this app install until our server receives the Registration ID.
-	 * @param context The Context from which this method was called.
+	 *
+	 * @param context        The Context from which this method was called.
 	 * @param registrationId The registrationId returned from
-	 *                        <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
-	 *                          GoogleCloudMessaging.register(String... senderIds)</a>.
-
+	 *                       <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
+	 *                       GoogleCloudMessaging.register(String... senderIds)</a>.
 	 */
-	public static void addAwsSnsPushIntegration(Context context, String registrationId) {
+	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
 		if (registrationId != null) {
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);

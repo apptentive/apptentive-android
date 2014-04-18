@@ -7,7 +7,7 @@ Added support for AWS SNS push notifications
 
 | Added Methods |
 | --------------- |
-|`public static void addAwsSnsPushIntegration(Context context, String registrationId)`|
+|`public static void addAmazonSnsPushIntegration(Context context, String registrationId)`|
 
 
 # 1.4.0
