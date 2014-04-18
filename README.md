@@ -534,7 +534,7 @@ is returned when you register for push notifications with
 
 ###### Method
 ```java
-Apptentive.addAwsSnsPushIntegration(Context context, String registrationId);
+Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId);
 ```
 
 ###### Example
