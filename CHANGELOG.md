@@ -3,7 +3,7 @@
 
 Major changes:
 
-* Added support for Amason Web Services (AWS) Simple Notification Service (SNS) push notifications. If you use AWS SNS, you can now notify your customers when you reply their conversation.
+* Added support for Amason Web Services (AWS) Simple Notification Service (SNS) push notifications. If you use AWS SNS, you can now notify your customers when you reply to their conversation.
 
 Bugs Fixed:
 
