@@ -493,8 +493,6 @@ Apptentive can be configured to send push notifications to your app, using the p
 customers that they have received a new message while they are not using your app. Push notifications are optional, and
 messages will still be delivered when the customer opens the app.
 
-Third party integrations require a Grow Plan.
-
 ### Push Notifications
 
 #### Urban Airship Integration
