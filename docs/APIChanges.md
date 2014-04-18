@@ -1,6 +1,15 @@
 This document tracks changes to the API between versions.
 
 
+# 1.4.2
+
+Added support for AWS SNS push notifications
+
+| Added Methods |
+| --------------- |
+|`public static void addAwsSnsPushIntegration(Context context, String registrationId)`|
+
+
 # 1.4.0
 
 The Rating Dialog has been rebuilt to use the new unified `engage()` method. See the **Interactions** section of the README for more information.

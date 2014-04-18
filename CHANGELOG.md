@@ -1,3 +1,14 @@
+2014-04-17 skykelsey 1.4.2
+--------------------------
+
+Major changes:
+
+* Added support for Amason Web Services (AWS) Simple Notification Service (SNS) push notifications. If you use AWS SNS, you can now notify your customers when you reply their conversation.
+
+Bugs Fixed:
+
+* Improved robustness of message polling.
+
 2014-04-14 skykelsey 1.4.1
 --------------------------
 
@@ -10,6 +21,7 @@ Bugs Fixed:
 --------------------------
 
 Major changes:
+
 * Added new Engagement method. This method will triggere events, and show interactions to the user. Interactions can be configured on the server, and can be based on the count and time that events are shown.
 * Moved the existing Rating feature to be an Interaction in this new system. Removed old methods.
 * Lots of bug fixes and UI tweaks.
