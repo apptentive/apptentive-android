@@ -19,5 +19,6 @@
               android:textColor="@color/apptentive_survey_answer_text"
               android:textSize="@dimen/apptentive_text_small"
               android:hint="@string/apptentive_survey_singleline_hint"
-              android:background="@drawable/android_textfield_activated_holo_light"/>
+              android:background="@drawable/android_textfield_activated_holo_light"
+              android:saveEnabled="false"/>
 </LinearLayout>
