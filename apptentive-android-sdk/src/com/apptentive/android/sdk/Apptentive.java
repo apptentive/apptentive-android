@@ -245,7 +245,7 @@ public class Apptentive {
 	 */
 	public static final String INTEGRATION_URBAN_AIRSHIP_APID = "token";
 
-	public static final String INTEGRATION_AMAZON = "aws";
+	public static final String INTEGRATION_AMAZON = "aws_sns";
 
 	public static final String INTEGRATION_AMAZON_TOKEN = "token";
 
@@ -311,12 +311,12 @@ public class Apptentive {
 		}
 	}
 
-	public static void addAmazonAwsPushIntegration(Context context, String apid) {
-		if (apid != null) {
+	public static void addAmazonAwsPushIntegration(Context context, String registrationId) {
+		if (registrationId != null) {
 			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_AMAZON, apid);
-			Apptentive.addIntegration(context, Apptentive.INTEGRATION_AMAZON_TOKEN, config);
-			Log.i("Setting Amazon AWS token: %s", apid);
+			config.put(Apptentive.INTEGRATION_AMAZON_TOKEN, registrationId);
+			Apptentive.addIntegration(context, Apptentive.INTEGRATION_AMAZON, config);
+			Log.i("Setting Amazon AWS token: %s", registrationId);
 		}
 	}
 
