@@ -45,6 +45,26 @@ public class PersonManager {
 		return null;
 	}
 
+	/**
+	 * Provided so we can be sure that the person we send during conversation creation is 100% accurate. Since we do not
+	 * queue this person up in the payload queue, it could otherwise be lost.
+	 */
+	public static Person storePersonAndReturnIt(Context context) {
+		Person current = generateCurrentPerson();
+
+		CustomData customData = loadCustomPersonData(context);
+		current.setCustomData(customData);
+
+		String email = loadPersonEmail(context);
+		if (email == null) {
+			email = loadInitialPersonEmail(context);
+		}
+		current.setEmail(email);
+
+		storePerson(context, current);
+		return current;
+	}
+
 	public static CustomData loadCustomPersonData(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String personDataString = prefs.getString(Constants.PREF_KEY_PERSON_DATA, null);

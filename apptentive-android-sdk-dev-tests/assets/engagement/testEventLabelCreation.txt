@@ -1,0 +1,28 @@
+com.apptentive
+RatingDialog
+launch
+com.apptentive#RatingDialog#launch
+local
+app
+init
+local#app#init
+local
+app
+percent%slash/pound#
+local#app#percent%25slash%2Fpound%23
+local
+app
+`1234567890-=~!@#$%^&*()_+qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?
+local#app#`1234567890-=~!@%23$%25^&*()_+qwertyuiop[]\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,.%2FZXCVBNM<>?
+%/#
+%/#
+%/#
+%25%2F%23#%25%2F%23#%25%2F%23
+vendor name
+interaction name
+event name
+vendor name#interaction name#event name
+app
+local
+test#%///#%//%%/#Event_!@#$%^&*(){}Label1234567890[]`~Separators
+app#local#test%23%25%2F%2F%2F%23%25%2F%2F%25%25%2F%23Event_!@%23$%25^&*(){}Label1234567890[]`~Separators

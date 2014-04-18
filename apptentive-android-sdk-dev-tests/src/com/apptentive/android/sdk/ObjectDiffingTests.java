@@ -28,9 +28,9 @@ public class ObjectDiffingTests extends InstrumentationTestCase {
 	public void testDeviceDiffing1() {
 		Log.e("testDeviceDiffing1()");
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
+			JSONObject original = new JSONObject(FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
+			JSONObject updated = new JSONObject(FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
+			JSONObject expected = new JSONObject(FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 
@@ -49,8 +49,8 @@ public class ObjectDiffingTests extends InstrumentationTestCase {
 	public void testDeviceDiffing2() {
 		Log.e("testDeviceDiffing2()");
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
+			JSONObject original = new JSONObject(FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
+			JSONObject updated = new JSONObject(FileUtil.loadFileAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 
