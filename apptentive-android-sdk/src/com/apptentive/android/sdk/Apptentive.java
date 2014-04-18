@@ -30,11 +30,9 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
-import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.SurveyManager;
 import com.apptentive.android.sdk.storage.*;
-import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -42,7 +40,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -325,22 +322,6 @@ public class Apptentive {
 	// PUSH NOTIFICATIONS
 	// ****************************************************************************************
 
-	private static final String PUSH_ACTION = "action";
-
-	private static enum PushAction {
-		pmc,       // Present Message Center.
-		unknown;   // Anything unknown will not be handled.
-
-		public static PushAction parse(String name) {
-			try {
-				return PushAction.valueOf(name);
-			} catch (IllegalArgumentException e) {
-				Log.d("Error parsing unknown PushAction: " + name);
-			}
-			return unknown;
-		}
-	}
-
 	/**
 	 * The key that is used to store extra data on an Apptentive push notification.
 	 */
@@ -359,6 +340,7 @@ public class Apptentive {
 		if (intent != null) {
 			Bundle extras = intent.getExtras();
 			if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
+				Log.i("Saving pending push intent.");
 				String extra = extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, extra).commit();
@@ -381,12 +363,12 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.i("Handling Apptentive Push Intent.");
+			Log.e("Handling Apptentive Push Intent.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
-				PushAction action = PushAction.unknown;
-				if (pushJson.has(PUSH_ACTION)) {
-					action = PushAction.parse(pushJson.getString(PUSH_ACTION));
+				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
+				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
+					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
 				}
 				switch (action) {
 					case pmc:
