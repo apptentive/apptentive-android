@@ -16,6 +16,8 @@ import java.util.*;
  */
 public class SurveyState {
 
+	private boolean surveyLaunchSent;
+
 	private Map<String, Set<String>> questionToAnswersMap;
 	private Map<String, Integer> questionToMinAnswersMap;
 	private Map<String, Integer> questionToMaxAnswersMap;
@@ -34,6 +36,14 @@ public class SurveyState {
 			questionToMaxAnswersMap.put(questionId, question.getMaxSelections());
 			questionToMetricSentMap.put(questionId, false);
 		}
+	}
+
+	public void setSurveyLaunchSent() {
+		surveyLaunchSent = true;
+	}
+
+	public boolean isSurveyLaunchSent() {
+		return surveyLaunchSent;
 	}
 
 	public void addAnswer(String questionId, String answer) {

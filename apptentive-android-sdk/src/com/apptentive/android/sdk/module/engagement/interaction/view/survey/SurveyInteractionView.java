@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.Button;
@@ -15,12 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.SurveyResponse;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
@@ -32,6 +30,11 @@ import java.util.Map;
  * @author Sky Kelsey
  */
 public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
+
+	private static final String EVENT_LAUNCH = "launch";
+	private static final String EVENT_CANCEL = "cancel";
+	private static final String EVENT_SUBMIT = "submit";
+	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
 	private static SurveyState surveyState;
 	private static Map<String, String> data;
@@ -57,6 +60,11 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		if (interaction == null) {
 			activity.finish();
 			return;
+		}
+
+		if (!surveyState.isSurveyLaunchSent()) {
+			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_LAUNCH, data);
+			surveyState.setSurveyLaunchSent();
 		}
 
 		activity.setContentView(R.layout.apptentive_survey);
@@ -93,7 +101,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 					activity.finish();
 				}
 
-				MetricModule.sendMetric(activity, Event.EventLabel.survey__submit, null, data);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_SUBMIT, data);
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
 				Log.d("Survey Submitted.");
 
@@ -141,7 +149,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				questions.addView(multiselectQuestionView);
 			}
 		}
-		MetricModule.sendMetric(activity, Event.EventLabel.survey__launch, null, data);
 
 		send.setEnabled(isSurveyValid());
 
@@ -158,13 +165,13 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		return true;
 	}
 
-	void sendMetricForQuestion(Context context, Question question) {
+	void sendMetricForQuestion(Activity activity, Question question) {
 		String questionId = question.getId();
 		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
 			Map<String, String> answerData = new HashMap<String, String>();
 			answerData.put("id", question.getId());
 			answerData.put("survey_id", interaction.getId());
-			MetricModule.sendMetric(context, Event.EventLabel.survey__question_response, null, answerData);
+			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_QUESTION_RESPONSE, answerData);
 			surveyState.markMetricSent(questionId);
 		}
 	}
@@ -183,7 +190,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 	@Override
 	public void onBackPressed(Activity activity) {
-		MetricModule.sendMetric(activity, Event.EventLabel.survey__cancel, null, data);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data);
 /*
 		TODO: How do we support this?
 		if (SurveyModule.this.onSurveyFinishedListener != null) {

@@ -26,21 +26,29 @@ import java.util.Map;
  */
 public class EngagementModule {
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
-		return engage(activity, "com.apptentive", interaction, eventName);
+	public static synchronized boolean engageInternal(Activity activity, String eventName) {
+		return engage(activity, "com.apptentive", "app", eventName, null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", eventName);
+	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
+		return engage(activity, "com.apptentive", interaction, eventName, null);
+	}
+
+	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, Map<String, String> data) {
+		return engage(activity, "com.apptentive", interaction, eventName, data);
 	}
 
 	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName) {
+		return engage(activity, vendor, interaction, eventName, null);
+	}
+
+	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, Map<String, String> data) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, (Map<String, String>) null));
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, data));
 			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
