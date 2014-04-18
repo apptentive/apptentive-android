@@ -493,13 +493,17 @@ Urban Airship is the only provider currently supported. A push notification is u
 they have received a new message while they are not using your app. Push notifications are optional, and messages will
 still be delivered when the customer opens the app, even if you do not use them.
 
-### Urban Airship Integration
+### Push Notifications
 
-In order to use Urban Airship, you will need to first setup Urban Airship to work within your app. Then, you will need
-to set your App Key, App Secret, and App Master Secret in the Urban Airship section of "Integrations" on our website.
 Push notification require a Corporate Plan.
 
-#### Sending the Urban Airship APID
+#### Urban Airship Integration
+
+In order to use **Urban Airship**, you will need to first setup **Urban Airship** to work within your app. Then, you
+will need to set your `App Key`, `App Secret`, and `App Master Secret` on the website at
+**App Settings -> Integrations -> Urban Airship**.
+
+##### Sending the Urban Airship APID
 
 To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
  initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
@@ -507,6 +511,28 @@ To set up push notifications, you must pass in the APID you get from Urban Airsh
 ###### Method
 ```java
 Apptentive.addUrbanAirshipPushIntegration(Context context, String apid);
+```
+
+###### Example
+```java
+String  apid = PushManager.shared().getAPID();
+Apptentive.addUrbanAirshipPushIntegration(this, apid);
+```
+
+#### Amazon SNS
+
+In order to use **Amazon Web Services (AWS) Simple Notification Service (SNS)**, you will need to first setup AWS SNS to work within your
+app. Then, you will need to set your `Access Key ID`, `Secret Access Key`, and `ARN` on the website at
+**App Settings -> Integrations -> Amazon Web Services SNS **.
+
+##### Sending the Urban Airship APID
+
+To set up push notifications, you must pass in the APID you get from Urban Airship. This ID is available only after you
+ initialize Urban Airship, so you will have to read it from the BroadcastReceiver you use to receive Urban Airship Intents.
+
+###### Method
+```java
+Apptentive.addAwsSnsPushIntegration(Context context, String registrationId);
 ```
 
 ###### Example

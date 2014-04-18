@@ -290,14 +290,14 @@ public class Apptentive {
 	 * Urban Airship creates an APID after it connects to its server, the APID may be null at first. The preferred method
 	 * of retrieving the APID is to listen to the <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your
 	 * {@link android.content.BroadcastReceiver}. You can alternately find the APID by calling
-	 * <code>PushManager.shared().getAPID()</code>.
+	 * <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29">PushManager.shared().getAPID()</a>
 	 * <p/>
 	 * Note: Initializing Urban Airship may take a few seconds. You may need to close and reopen the app in order to force
 	 * the APID to be sent to our server. Push notifications will not be delivered to this app install until our server
 	 * receives the APID.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @param apid    The Airship Push ID for (APID).
+	 * @param apid    The Airship Push ID (APID).
 	 */
 	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
 		if (apid != null) {
@@ -309,9 +309,9 @@ public class Apptentive {
 	}
 
 	/**
-	 * Configures Apptentive to work with Amazon Simple Notification Service (SNS) push notifications. You must first set
-	 * up your app to work with AWS SNS to use this integration. This method must be called when you finish initializing
-	 * AWS SNS using
+	 * Configures Apptentive to work with Amazon Web Services (AWS) Simple Notification Service (SNS) push notifications.
+	 * You must first set up your app to work with AWS SNS to use this integration. This method must be called when you
+	 * finish initializing AWS SNS using
 	 * <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
 	 *   GoogleCloudMessaging.register(String... senderIds)</a>,
 	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
@@ -324,7 +324,7 @@ public class Apptentive {
 	 *                          GoogleCloudMessaging.register(String... senderIds)</a>.
 
 	 */
-	public static void addAmazonAwsSnsPushIntegration(Context context, String registrationId) {
+	public static void addAwsSnsPushIntegration(Context context, String registrationId) {
 		if (registrationId != null) {
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);
