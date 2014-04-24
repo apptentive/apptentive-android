@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.logic;
 
 import android.content.Context;
@@ -15,25 +21,27 @@ import java.util.List;
  */
 public class CombinationPredicate extends Predicate {
 
+	protected String operationKey;
 	protected Operation operation;
 	protected List<Predicate> children;
 
-	protected CombinationPredicate(Context context, Operation operation, Object object) throws JSONException {
-		this.operation = operation;
+	protected CombinationPredicate(String operationKey, Object object) throws JSONException {
+		this.operationKey = operationKey;
+		operation = Operation.parse(operationKey);
 		this.children = new ArrayList<Predicate>();
 		if (object instanceof JSONArray) {
 			JSONArray jsonArray = (JSONArray) object;
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject child = (JSONObject) jsonArray.get(i);
-				children.add(Predicate.parse(context, null, child));
+				children.add(Predicate.parse(null, child));
 			}
 		} else if (object instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) object;
 			@SuppressWarnings("unchecked")
 			Iterator<String> it = (Iterator<String>) jsonObject.keys();
 			while (it.hasNext()) {
-				String key =  it.next();
-				children.add(Predicate.parse(context, key, jsonObject.get(key)));
+				String key = it.next();
+				children.add(Predicate.parse(key, jsonObject.get(key)));
 			}
 		} else {
 			Log.w("Unrecognized Combination Predicate: %s", object.toString());
@@ -44,17 +52,16 @@ public class CombinationPredicate extends Predicate {
 	public boolean apply(Context context) {
 		try {
 			Log.v("Start: Combination Predicate: %s", operation.name());
-			if (this.operation == Operation.$and) { // $and
+			if (operation == Operation.$and) {
 				for (Predicate predicate : children) {
 					boolean ret = predicate.apply(context);
 					Log.v("=> %b", ret);
 					if (!ret) {
 						return false;
 					}
-
 				}
 				return true;
-			} else { // $or
+			} else if (operation == Operation.$or) {
 				for (Predicate predicate : children) {
 					boolean ret = predicate.apply(context);
 					Log.v("=> %b", ret);
@@ -62,6 +69,18 @@ public class CombinationPredicate extends Predicate {
 						return true;
 					}
 				}
+				return false;
+			} else if (operation == Operation.$not) {
+				if (children.size() != 1) {
+					throw new IllegalArgumentException("$not condition must have exactly one child, has ." + children.size());
+				}
+				Predicate predicate = children.get(0);
+				boolean ret = !predicate.apply(context);
+				Log.v("=> %b", ret);
+				return ret;
+			} else {
+				// Unsupported
+				Log.v("Unsupported operation: \"%s\" => false", operationKey);
 				return false;
 			}
 		} finally {

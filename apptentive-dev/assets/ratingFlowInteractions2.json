@@ -1,0 +1,135 @@
+{
+    "interactions": {
+        "local#app#init": [
+            {
+                "priority": 8,
+                "criteria": {
+                    "interactions/532b7a3549f63bc650000006/invokes/total": 0
+                },
+                "id": "532b7a3549f63bc650000006",
+                "type": "EnjoymentDialog",
+                "configuration": {
+                    "title": "Do you love Travel Keeper?",
+                    "yes_text": "Yes",
+                    "no_text": "No"
+                }
+            },
+            {
+                "priority": 9,
+                "criteria": {
+                    "interactions/532b7a3549f63bc650000009/invokes/version": {
+                        "$gt": 0,
+                        "$lte": 1
+                    },
+                    "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
+                        "$gte": 10
+                    }
+                },
+                "id": "532b7a3549f63bc650000009",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "decline_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#yes": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "532b7a3549f63bc650000009",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "rate_text": "Rate",
+                    "remind_text": "Remind Me Later",
+                    "decline_text": "No Thanks"
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#no": [
+            {
+                "id": "526fe2836dd8bf546a00000c",
+                "type": "Survey",
+                "priority": 3,
+                "criteria": {
+                },
+                "configuration": {
+                    "questions": [
+                        {
+                            "id": "52db59c27724c591ab00003e",
+                            "answer_choices": [
+                                {
+                                    "id": "52db59c27724c591ab00003f",
+                                    "value": "Better user interface"
+                                },
+                                {
+                                    "id": "52db59c27724c591ab000040",
+                                    "value": "Cloud support"
+                                },
+                                {
+                                    "id": "52db59c27724c591ab000041",
+                                    "value": "Login with Facebook / Google / Twitter"
+                                }
+                            ],
+                            "instructions": "select one",
+                            "value": "Which would you like to see first?",
+                            "type": "multichoice",
+                            "required": true
+                        },
+                        {
+                            "id": "52db59c27724c591ab000042",
+                            "answer_choices": [
+                                {
+                                    "id": "52db59c27724c591ab000043",
+                                    "value": "Speed"
+                                },
+                                {
+                                    "id": "52db59c27724c591ab000044",
+                                    "value": "Easy to use"
+                                },
+                                {
+                                    "id": "52db59c27724c591ab000045",
+                                    "value": "Reliability"
+                                },
+                                {
+                                    "id": "52db59c27724c591ab000046",
+                                    "value": "Works offline"
+                                }
+                            ],
+                            "instructions": "select up to 2",
+                            "min_selections": 0,
+                            "max_selections": 2,
+                            "value": "Which two qualities for an app are the most important to you?",
+                            "type": "multiselect",
+                            "required": false
+                        },
+                        {
+                            "id": "52db59c27724c591ab000047",
+                            "multiline": false,
+                            "value": "Is there anything you'd like to add?",
+                            "type": "singleline",
+                            "required": false
+                        }
+                    ],
+                    "name": "What should we build?",
+                    "show_success_message": true,
+                    "success_message": "Thank you for your input.",
+                    "description": "Please help us figure this out!"
+                }
+            }
+        ],
+        "com.apptentive#FeedbackDialog#view_messages": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "532b7a3649f63bc65000000f",
+                "type": "MessageCenter"
+            }
+        ]
+    }
+}

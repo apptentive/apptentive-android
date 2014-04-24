@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.logic;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Log;
 import org.json.JSONException;
 
 /**
@@ -9,36 +14,38 @@ import org.json.JSONException;
  */
 public abstract class Predicate {
 
-	protected Predicate parent;
-
 	public abstract boolean apply(Context context);
 
-	public static Predicate parse(Context context, String key, Object value) throws JSONException {
+	public static Predicate parse(String key, Object value) throws JSONException {
 		if (key == null) {
-			// This is the root, so it must be an AND.
-			return new CombinationPredicate(context, Operation.$and, value);
-		} else {
-			Operation op = Operation.parse(key);
-			switch (op) {
-				case $or:
-					return new CombinationPredicate(context, Operation.$or, value);
-				case $and:
-					return new CombinationPredicate(context, Operation.$and, value);
-				default: // All other keys meant this is a ComparisonPredicate.
-					return ComparisonPredicateFactory.generatePredicate(context, key, value);
-			}
+			// The Root object, and objects inside arrays should be treated as $and.
+			key = Operation.$and.name();
+		}
+		Operation op = Operation.parse(key);
+		switch (op) {
+			case $or:
+				return new CombinationPredicate(key, value);
+			case $and:
+				return new CombinationPredicate(key, value);
+			case $not:
+				return new CombinationPredicate(key, value);
+			default: // All other keys meant this is a ComparisonPredicate.
+				return new ComparisonPredicate(key, value);
 		}
 	}
 
 	public enum Operation {
 		$and,
 		$or,
+		$not,
+		$exists,
 		$lt,
 		$lte,
 		$ne,
 		$eq,
 		$gte,
 		$gt,
+		$contains,
 		unknown;
 
 		public static Operation parse(String name) {

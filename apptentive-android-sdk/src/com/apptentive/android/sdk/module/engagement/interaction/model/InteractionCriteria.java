@@ -24,7 +24,7 @@ public class InteractionCriteria extends JSONObject {
 
 	public boolean isMet(Context context) {
 		try {
-			Predicate criteria = Predicate.parse(context, null, this);
+			Predicate criteria = Predicate.parse(null, this);
 			return criteria.apply(context);
 		} catch (JSONException e) {
 			Log.w("Error parsing and running InteractionCriteria predicate logic.", e);
