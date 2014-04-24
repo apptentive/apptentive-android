@@ -9,6 +9,9 @@ package com.apptentive.android.sdk.module.engagement.logic;
 import android.content.Context;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.model.CustomData;
+import com.apptentive.android.sdk.model.Person;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -133,8 +136,23 @@ public class ComparisonPredicate extends Predicate {
 					default:
 						break;
 				}
-			case person:
-				// TODO
+			case person: {
+				String key = tokens[1];
+				boolean queryCustomData = false;
+				if (key.equals("custom_data")) {
+					queryCustomData = true;
+					key = tokens[2];
+				}
+				Person person = PersonManager.getStoredPerson(context);
+				if (queryCustomData) {
+					CustomData customData = person.getCustomData();
+					if (customData != null) {
+						return (Comparable) customData.opt(key);
+					}
+				} else {
+					return (Comparable) person.opt(key);
+				}
+			}
 			case device:
 				// TODO
 			case app_release:

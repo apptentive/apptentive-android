@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -57,7 +56,6 @@ public class OperatorTests extends InstrumentationTestCase {
 		assertFalse(canRun);
 
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		Apptentive.setInitialUserEmail(getTargetContext(), "sky.kelsey@gmail.com");
 		canRun = interaction.canRun(getTargetContext());
 		assertTrue(canRun);
 	}
