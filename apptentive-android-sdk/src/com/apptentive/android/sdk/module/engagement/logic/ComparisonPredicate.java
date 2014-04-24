@@ -23,9 +23,6 @@ import java.util.List;
  */
 public class ComparisonPredicate extends Predicate {
 
-	private static final String KEY_TIME_SINCE_INSTALL = "time_since_install";
-	private static final String KEY_IS_UPDATE = "is_update";
-
 	protected String query;
 	protected List<Condition> conditions;
 
@@ -55,7 +52,7 @@ public class ComparisonPredicate extends Predicate {
 	 * @return The second parameter, converted to a Double if it is a Number, and the first parameter is a Double. Else
 	 * return the second parameter straight away.
 	 */
-	private Object normalize (Object one, Object two) {
+	private Object normalize(Object one, Object two) {
 		if (one instanceof Double && two instanceof Number) {
 			return ((Number) two).doubleValue();
 		}
@@ -63,75 +60,88 @@ public class ComparisonPredicate extends Predicate {
 	}
 
 	public Comparable getValue(Context context, String query) {
-		QueryType queryType = QueryType.parse(query);
+
+		String[] tokens = query.split("/");
+		QueryType queryType = QueryType.parse(tokens[0]);
 
 		switch (queryType) {
 			case application_version:
 				return Util.getAppVersionName(context);
 			case application_build:
 				return (double) Util.getAppVersionCode(context);
-			default:
-				if (query.startsWith(KEY_TIME_SINCE_INSTALL)) {
-					ValueSubFilterType subFilterType = ValueSubFilterType.parse(query.replace(KEY_TIME_SINCE_INSTALL + "/", ""));
-					Double seconds = null;
-					switch (subFilterType) {
-						case total:
-							seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.total);
-							break;
-						case version:
-							seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.version);
-							break;
-						case build:
-							seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.build);
-							break;
-						default:
-							Log.w("Unsupported sub filter type \"%s\" for query \"%s\"", subFilterType.name(), query);
-					}
-					return seconds;
-				} else if (query.startsWith(KEY_IS_UPDATE)) {
-					ValueSubFilterType subFilterType = ValueSubFilterType.parse(query.replace(KEY_IS_UPDATE + "/", ""));
-					Boolean isUpdate = false;
-					switch (subFilterType) {
-						case version:
-							isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.version);
-							break;
-						case build:
-							isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.build);
-							break;
-						default:
-							Log.w("Unsupported sub filter type \"%s\" for query \"%s\"", subFilterType.name(), query);
-					}
-					return isUpdate;
-				} else {
-					// Must be a code point / interaction
-					String[] parts = query.split("/");
-					boolean interaction = parts[0].equals(CodePointStore.KEY_INTERACTIONS);
-					String name = parts[1];
-					ValueFilterType valueFilterType = ValueFilterType.parse(parts[2]);
-					ValueSubFilterType valueSubFilterType = ValueSubFilterType.parse(parts[3]);
-
-					switch (valueFilterType) {
-						case invokes:
-							switch (valueSubFilterType) {
-								case total: // Get total for all versions of the app.
-									return (double) CodePointStore.getTotalInvokes(context, interaction, name);
-								case version:
-									String appVersion = Util.getAppVersionName(context);
-									return (double) CodePointStore.getVersionInvokes(context, interaction, name, appVersion);
-								case build:
-									String appBuild = String.valueOf(Util.getAppVersionCode(context));
-									return (double) CodePointStore.getBuildInvokes(context, interaction, name, appBuild);
-								case time_ago:
-									double timeAgo = Util.currentTimeSeconds() - CodePointStore.getLastInvoke(context, interaction, name);
-									return timeAgo;
-								default:
-									break;
-							}
-							break;
-						default:
-							break;
-					}
+			case current_time:
+				return Util.currentTimeSeconds();
+			case is_update: {
+				ValueSubFilterType subFilterType = ValueSubFilterType.parse(tokens[1]);
+				Boolean isUpdate = false;
+				switch (subFilterType) {
+					case version:
+						isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.version);
+						break;
+					case build:
+						isUpdate = VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.build);
+						break;
+					default:
+						Log.w("Unsupported sub filter type \"%s\" for query \"%s\"", subFilterType.name(), query);
 				}
+				return isUpdate;
+			}
+			case time_since_install: {
+				ValueSubFilterType subFilterType = ValueSubFilterType.parse(tokens[1]);
+				Double seconds = null;
+				switch (subFilterType) {
+					case total:
+						seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.total);
+						break;
+					case version:
+						seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.version);
+						break;
+					case build:
+						seconds = VersionHistoryStore.getTimeSinceVersionFirstSeen(context, VersionHistoryStore.Selector.build);
+						break;
+					default:
+						Log.w("Unsupported sub filter type \"%s\" for query \"%s\"", subFilterType.name(), query);
+				}
+				return seconds;
+			}
+			case interactions:
+				// Handled same as interactions below.
+			case code_point:
+				boolean isInteraction = queryType.equals(QueryType.interactions);
+				String name = tokens[1];
+				ValueFilterType valueFilterType = ValueFilterType.parse(tokens[2]);
+				ValueSubFilterType valueSubFilterType = ValueSubFilterType.parse(tokens[3]);
+
+				switch (valueFilterType) {
+					case invokes:
+						switch (valueSubFilterType) {
+							case total: // Get total for all versions of the app.
+								return (double) CodePointStore.getTotalInvokes(context, isInteraction, name);
+							case version:
+								String appVersion = Util.getAppVersionName(context);
+								return (double) CodePointStore.getVersionInvokes(context, isInteraction, name, appVersion);
+							case build:
+								String appBuild = String.valueOf(Util.getAppVersionCode(context));
+								return (double) CodePointStore.getBuildInvokes(context, isInteraction, name, appBuild);
+							case time_ago:
+								double timeAgo = Util.currentTimeSeconds() - CodePointStore.getLastInvoke(context, isInteraction, name);
+								return timeAgo;
+							default:
+								break;
+						}
+						break;
+					default:
+						break;
+				}
+			case person:
+				// TODO
+			case device:
+				// TODO
+			case app_release:
+				// TODO
+			case sdk:
+				// TODO
+			default:
 				break;
 		}
 		return null;
@@ -254,7 +264,6 @@ public class ComparisonPredicate extends Predicate {
 		return true;
 	}
 
-
 	private String getLoggableValue(Object input) {
 		if (input != null) {
 			if (input instanceof String) {
@@ -270,6 +279,15 @@ public class ComparisonPredicate extends Predicate {
 	private enum QueryType {
 		application_version,
 		application_build,
+		current_time,
+		is_update,
+		time_since_install,
+		code_point,
+		interactions,
+		person,
+		device,
+		app_release,
+		sdk,
 		other;
 
 		public static QueryType parse(String name) {
