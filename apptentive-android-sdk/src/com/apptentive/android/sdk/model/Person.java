@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -25,7 +25,7 @@ public class Person extends Payload {
 	private static final String KEY_ZIP = "zip";
 	private static final String KEY_COUNTRY = "country";
 	private static final String KEY_BIRTHDAY = "birthday";
-	private static final String KEY_CUSTOM_DATA = "custom_data";
+	public static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public Person() {
 		super();

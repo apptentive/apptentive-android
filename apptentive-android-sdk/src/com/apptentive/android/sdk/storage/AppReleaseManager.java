@@ -54,7 +54,7 @@ public class AppReleaseManager {
 		return appRelease;
 	}
 
-	private static AppRelease getStoredAppRelease(Context context) {
+	public static AppRelease getStoredAppRelease(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String appReleaseString = prefs.getString(Constants.PREF_KEY_APP_RELEASE, null);
 		try {

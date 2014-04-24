@@ -63,7 +63,7 @@ public class SdkManager {
 		return sdk;
 	}
 
-	private static Sdk getStoredSdk(Context context) {
+	public static Sdk getStoredSdk(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String sdkString = prefs.getString(Constants.PREF_KEY_SDK, null);
 		try {

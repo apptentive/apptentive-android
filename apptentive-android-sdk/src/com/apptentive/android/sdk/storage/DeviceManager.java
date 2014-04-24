@@ -37,7 +37,7 @@ public class DeviceManager {
 	 */
 	public static Device storeDeviceAndReturnDiff(Context context) {
 
-		Device stored = loadOldDevice(context);
+		Device stored = getStoredDevice(context);
 
 		Device current = generateNewDevice(context);
 		CustomData customData = loadCustomDeviceData(context);
@@ -147,7 +147,7 @@ public class DeviceManager {
 		return device;
 	}
 
-	private static Device loadOldDevice(Context context) {
+	public static Device getStoredDevice(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE, null);
 		try {

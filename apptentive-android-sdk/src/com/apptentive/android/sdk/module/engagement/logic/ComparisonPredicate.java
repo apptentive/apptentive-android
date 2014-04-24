@@ -8,11 +8,8 @@ package com.apptentive.android.sdk.module.engagement.logic;
 
 import android.content.Context;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.storage.PersonManager;
-import com.apptentive.android.sdk.storage.VersionHistoryStore;
+import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -153,12 +150,32 @@ public class ComparisonPredicate extends Predicate {
 					return (Comparable) person.opt(key);
 				}
 			}
-			case device:
-				// TODO
-			case app_release:
-				// TODO
+			case device: {
+				String key = tokens[1];
+				boolean queryCustomData = false;
+				if (key.equals(Device.KEY_CUSTOM_DATA)) {
+					queryCustomData = true;
+					key = tokens[2];
+				}
+				Device device = DeviceManager.getStoredDevice(context);
+				if (queryCustomData) {
+					CustomData customData = device.getCustomData();
+					if (customData != null) {
+						return (Comparable) customData.opt(key);
+					}
+				} else {
+					return (Comparable) device.opt(key);
+				}
+			}
+			case app_release: {
+				String key = tokens[1];
+				AppRelease appRelease = AppReleaseManager.getStoredAppRelease(context);
+				return (Comparable) appRelease.opt(key);
+			}
 			case sdk:
-				// TODO
+				String key = tokens[1];
+				Sdk sdk = SdkManager.getStoredSdk(context);
+				return (Comparable) sdk.opt(key);
 			default:
 				break;
 		}

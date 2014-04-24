@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -35,7 +35,7 @@ public class Device extends Payload {
 	private static final String KEY_BUILD_ID = "build_id";
 	private static final String KEY_BOOTLOADER_VERSION = "bootloader_version";
 	private static final String KEY_RADIO_VERSION = "radio_version";
-	private static final String KEY_CUSTOM_DATA = "custom_data";
+	public  static final String KEY_CUSTOM_DATA = "custom_data";
 	private static final String KEY_LOCALE_COUNTRY_CODE = "locale_country_code";
 	private static final String KEY_LOCALE_LANGUAGE_CODE = "locale_language_code";
 	private static final String KEY_LOCALE_RAW = "locale_raw";
