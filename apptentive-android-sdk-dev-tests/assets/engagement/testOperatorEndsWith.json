@@ -8,31 +8,37 @@
                         {
                             "code_point/switch.code.point/invokes/total": 0,
                             "application_version": {
-                                "$contains": "1.0"
+                                "$ends_with": ".1"
                             }
                         },
                         {
                             "code_point/switch.code.point/invokes/total": 1,
                             "application_version": {
-                                "$contains": "2.0"
+                                "$ends_with": ".0"
                             }
                         },
                         {
                             "code_point/switch.code.point/invokes/total": 2,
-                            "application_version": {
-                                "$contains": "2."
+                            "person/email": {
+                                "$ends_with": "example"
                             }
                         },
                         {
                             "code_point/switch.code.point/invokes/total": 3,
-                            "application_version": {
-                                "$contains": ".0"
+                            "person/email": {
+                                "$ends_with": "examplE.com"
                             }
                         },
                         {
                             "code_point/switch.code.point/invokes/total": 4,
-                            "application_version": {
-                                "$contains": "2.0.0"
+                            "device/os_name": {
+                                "$ends_with": "roid "
+                            }
+                        },
+                        {
+                            "code_point/switch.code.point/invokes/total": 5,
+                            "device/os_name": {
+                                "$ends_with": "Roid"
                             }
                         }
                     ]

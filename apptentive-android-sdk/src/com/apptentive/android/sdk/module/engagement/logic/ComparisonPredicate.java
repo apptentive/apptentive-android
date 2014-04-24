@@ -288,7 +288,27 @@ public class ComparisonPredicate extends Predicate {
 					}
 					boolean ret = false;
 					if (value instanceof String && condition.operand instanceof String) {
-						ret = ((String) value).contains((String) condition.operand);
+						ret = ((String) value).toLowerCase().contains(((String) condition.operand).toLowerCase());
+					}
+					return ret;
+				}
+				case $starts_with: {
+					if (value == null) {
+						return false;
+					}
+					boolean ret = false;
+					if (value instanceof String && condition.operand instanceof String) {
+						ret = ((String) value).toLowerCase().startsWith(((String) condition.operand).toLowerCase());
+					}
+					return ret;
+				}
+				case $ends_with: {
+					if (value == null) {
+						return false;
+					}
+					boolean ret = false;
+					if (value instanceof String && condition.operand instanceof String) {
+						ret = ((String) value).toLowerCase().endsWith(((String) condition.operand).toLowerCase());
 					}
 					return ret;
 				}

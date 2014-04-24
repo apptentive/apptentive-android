@@ -46,6 +46,8 @@ public abstract class Predicate {
 		$gte,
 		$gt,
 		$contains,
+		$starts_with,
+		$ends_with,
 		unknown;
 
 		public static Operation parse(String name) {
