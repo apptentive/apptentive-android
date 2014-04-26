@@ -894,6 +894,7 @@ public class Apptentive {
 			if (cacheSeconds == null) {
 				cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 			}
+			Log.e("Caching configuration for %d seconds.", cacheSeconds);
 			Configuration config = new Configuration(response.getContent());
 			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
 			config.save(context);
