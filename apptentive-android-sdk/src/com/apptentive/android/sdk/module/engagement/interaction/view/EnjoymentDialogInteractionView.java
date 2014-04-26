@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
@@ -36,11 +35,9 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 
-		String body = interaction.getTitle();
-		if (body != null) {
-			TextView bodyView = (TextView) activity.findViewById(R.id.title);
-			bodyView.setText(body);
-		}
+		TextView bodyView = (TextView) activity.findViewById(R.id.title);
+		String body = interaction.getTitle(activity);
+		bodyView.setText(body);
 
 		// No
 		String noText = interaction.getNoText();

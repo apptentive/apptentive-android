@@ -10,9 +10,7 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
 
@@ -45,18 +43,12 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		}
 
 		TextView bodyView = (TextView) activity.findViewById(R.id.body);
-		String body = interaction.getBody();
-		if (body == null) {
-			body = String.format(activity.getResources().getString(R.string.apptentive_rating_message_fs), Configuration.load(activity).getAppDisplayName());
-		}
+		String body = interaction.getBody(activity);
 		bodyView.setText(body);
 
 		// Rate
 		Button rateButton = (Button) activity.findViewById(R.id.rate);
-		String rate = interaction.getRateText();
-		if (rate == null) {
-			rate = String.format(activity.getResources().getString(R.string.apptentive_rate_this_app), Configuration.load(activity).getAppDisplayName());
-		}
+		String rate = interaction.getRateText(activity);
 		rateButton.setText(rate);
 		rateButton.setOnClickListener(new View.OnClickListener() {
 			@Override

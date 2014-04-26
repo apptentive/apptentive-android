@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.content.Context;
+import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import org.json.JSONException;
 
 /**
@@ -34,144 +37,105 @@ public class FeedbackDialogInteraction extends Interaction {
 	}
 
 	public boolean isAskForEmail() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_ASK_FOR_EMAIL)) {
-				return configuration.getBoolean(KEY_ASK_FOR_EMAIL);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_ASK_FOR_EMAIL)) {
+			return configuration.optBoolean(KEY_ASK_FOR_EMAIL, true);
 		}
 		return true;
 	}
 
 	public boolean isEmailRequired() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_EMAIL_REQUIRED)) {
-				return configuration.getBoolean(KEY_EMAIL_REQUIRED);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_EMAIL_REQUIRED)) {
+			return configuration.optBoolean(KEY_EMAIL_REQUIRED, false);
 		}
 		return false;
 	}
 
 	public boolean isMessageCenterEnabled() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_MESSAGE_CENTER_ENABLED)) {
-				return configuration.getBoolean(KEY_MESSAGE_CENTER_ENABLED);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_MESSAGE_CENTER_ENABLED)) {
+			return configuration.optBoolean(KEY_MESSAGE_CENTER_ENABLED, true);
 		}
 		return true;
 	}
 
 	public String getTitle() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_TITLE)) {
-				return configuration.getString(KEY_TITLE);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_TITLE)) {
+			return configuration.optString(KEY_TITLE, null);
 		}
 		return null;
 	}
 
-	public String getBody() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_BODY)) {
-				return configuration.getString(KEY_BODY);
-			}
-		} catch (JSONException e) {
+	public String getBody(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_BODY)) {
+			return configuration.optString(KEY_BODY, null);
 		}
-		return null;
+		return context.getResources().getString(R.string.apptentive_intro_dialog_body, Configuration.load(context).getAppDisplayName());
 	}
 
 	public String getEmailHintText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_EMAIL_HINT_TEXT)) {
-				return configuration.getString(KEY_EMAIL_HINT_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_EMAIL_HINT_TEXT)) {
+			return configuration.optString(KEY_EMAIL_HINT_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getMessageHintText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_MESSAGE_HINT_TEXT)) {
-				return configuration.getString(KEY_MESSAGE_HINT_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_MESSAGE_HINT_TEXT)) {
+			return configuration.optString(KEY_MESSAGE_HINT_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getDeclineText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_DECLINE_TEXT)) {
-				return configuration.getString(KEY_DECLINE_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_DECLINE_TEXT)) {
+			return configuration.optString(KEY_DECLINE_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getSubmitText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_SUBMIT_TEXT)) {
-				return configuration.getString(KEY_SUBMIT_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_SUBMIT_TEXT)) {
+			return configuration.optString(KEY_SUBMIT_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getThankYouTitle() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_THANK_YOU_TITLE)) {
-				return configuration.getString(KEY_THANK_YOU_TITLE);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_THANK_YOU_TITLE)) {
+			return configuration.optString(KEY_THANK_YOU_TITLE, null);
 		}
 		return null;
 	}
 
 	public String getThankYouBody() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_THANK_YOU_BODY)) {
-				return configuration.getString(KEY_THANK_YOU_BODY);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_THANK_YOU_BODY)) {
+			return configuration.optString(KEY_THANK_YOU_BODY, null);
 		}
 		return null;
 	}
 
 	public String getThankYouCloseText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_THANK_YOU_CLOSE_TEXT)) {
-				return configuration.getString(KEY_THANK_YOU_CLOSE_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_THANK_YOU_CLOSE_TEXT)) {
+			return configuration.optString(KEY_THANK_YOU_CLOSE_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getThankYouViewMessagesText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_THANK_YOU_VIEW_MESSAGES_TEXT)) {
-				return configuration.getString(KEY_THANK_YOU_VIEW_MESSAGES_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_THANK_YOU_VIEW_MESSAGES_TEXT)) {
+			return configuration.optString(KEY_THANK_YOU_VIEW_MESSAGES_TEXT, null);
 		}
 		return null;
 	}

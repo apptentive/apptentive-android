@@ -14,7 +14,6 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.AutomatedMessage;
@@ -79,11 +78,9 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			}
 
 			// Body
-			String body = interaction.getBody();
-			if (body != null) {
-				TextView bodyView = (TextView) activity.findViewById(R.id.body);
-				bodyView.setText(body);
-			}
+			String body = interaction.getBody(activity);
+			TextView bodyView = (TextView) activity.findViewById(R.id.body);
+			bodyView.setText(body);
 
 			// Email
 			String personEnteredEmail = PersonManager.loadPersonEmail(activity);

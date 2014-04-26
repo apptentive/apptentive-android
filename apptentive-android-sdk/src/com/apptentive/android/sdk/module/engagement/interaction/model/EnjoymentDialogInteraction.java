@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.content.Context;
+import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import org.json.JSONException;
 
 /**
@@ -21,35 +24,26 @@ public class EnjoymentDialogInteraction extends Interaction {
 		super(json);
 	}
 
-	public String getTitle() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_TITLE)) {
-				return configuration.getString(KEY_TITLE);
-			}
-		} catch (JSONException e) {
+	public String getTitle(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_TITLE)) {
+			return configuration.optString(KEY_TITLE, null);
 		}
-		return null;
+		return context.getResources().getString(R.string.apptentive_intro_dialog_body, Configuration.load(context).getAppDisplayName());
 	}
 
 	public String getYesText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_YES_TEXT)) {
-				return configuration.getString(KEY_YES_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_YES_TEXT)) {
+			return configuration.optString(KEY_YES_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getNoText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_NO_TEXT)) {
-				return configuration.getString(KEY_NO_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_NO_TEXT)) {
+			return configuration.optString(KEY_NO_TEXT, null);
 		}
 		return null;
 	}
