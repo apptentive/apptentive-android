@@ -31,7 +31,8 @@
         <activity android:name="com.apptentive.android.dev.TestsActivity"
                   android:theme="@style/ApptentiveDevTheme"/>
 
-        <meta-data android:name="apptentive_api_key" android:value=""/>
+        <meta-data android:name="apptentive_api_key"
+                   android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/Apptentive.Theme.Transparent"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
