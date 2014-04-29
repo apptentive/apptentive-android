@@ -334,8 +334,13 @@ public class InteractionsActivity extends ApptentiveActivity {
 				interaction = new FeedbackDialogInteraction(FEEDBACK_DIALOG_INTERACTION);
 			} else if (interactionName.equals("Survey")) {
 				interaction = new SurveyInteraction(SURVEY_INTERACTION);
-			} else if (interactionName.equals("Working Rating Flow")) {
-				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractions.json");
+			} else if (interactionName.equals("Working Rating Flow Default Text")) {
+				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractionsDefaultText.json");
+				// Overwrites any existing interactions.
+				InteractionManager.storeInteractions(this, json);
+				Apptentive.engage(this, "init");
+			} else if (interactionName.equals("Working Rating Flow Modified Text")) {
+				String json = FileUtil.loadTextAssetAsString(this, "ratingFlowInteractionsModifiedText.json");
 				// Overwrites any existing interactions.
 				InteractionManager.storeInteractions(this, json);
 				Apptentive.engage(this, "init");

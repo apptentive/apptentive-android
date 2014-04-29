@@ -2,35 +2,35 @@
     "interactions": {
         "local#app#init": [
             {
-                "priority": 8,
+                "priority": 1,
                 "criteria": {
-                    "interactions/532b7a3549f63bc650000006/invokes/total": 0
                 },
-                "id": "532b7a3549f63bc650000006",
+                "id": "535c28297724c5d4f800006f",
                 "type": "EnjoymentDialog",
                 "configuration": {
-                    "title": "Do you love Travel Keeper?",
+                    "title": "Do you love Delete Me 3?",
                     "yes_text": "Yes",
                     "no_text": "No"
                 }
             },
             {
-                "priority": 9,
+                "priority": 2,
                 "criteria": {
-                    "interactions/532b7a3549f63bc650000009/invokes/version": {
+                    "interactions/535c28297724c5d4f8000072/invokes/version": {
                         "$gt": 0,
                         "$lte": 1
                     },
                     "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
                     "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
-                        "$gte": 10
+                        "$gte": 432000
                     }
                 },
-                "id": "532b7a3549f63bc650000009",
+                "id": "535c28297724c5d4f8000072",
                 "type": "RatingDialog",
                 "configuration": {
-                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "body": "We're so happy to hear that you love Delete Me 3! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "title": "Thank You",
                     "rate_text": "Rate",
                     "remind_text": "Remind Me Later",
                     "decline_text": "No Thanks"
@@ -41,10 +41,11 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3549f63bc650000009",
+                "id": "535c28297724c5d4f8000072",
                 "type": "RatingDialog",
                 "configuration": {
-                    "body": "We're so happy to hear that you love Travel Keeper! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "body": "We're so happy to hear that you love Delete Me 3! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+                    "title": "Thank You",
                     "rate_text": "Rate",
                     "remind_text": "Remind Me Later",
                     "decline_text": "No Thanks"
@@ -55,11 +56,11 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3649f63bc65000000d",
+                "id": "535c28297724c5d4f8000076",
                 "type": "FeedbackDialog",
                 "configuration": {
-                    "title": "We're Sorry!",
-                    "body": "Please let us know how to make this app better for you!",
+                    "title": "Thanks for your feedback!",
+                    "body": "Please let us know how to make Delete Me 3 better for you!",
                     "email_hint_text": "Your Email Address",
                     "message_hint_text": "Tell us how we can help. (required)",
                     "decline_text": "No Thanks",
@@ -78,8 +79,17 @@
             {
                 "priority": 1,
                 "criteria": {},
-                "id": "532b7a3649f63bc65000000f",
+                "id": "535c28297724c5d4f8000078",
                 "type": "MessageCenter"
+            }
+        ],
+        "com.apptentive#RatingDialog#rate": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "535c28297724c5d4f800007a",
+                "type": "AppStoreRating",
+                "configuration": {}
             }
         ]
     }

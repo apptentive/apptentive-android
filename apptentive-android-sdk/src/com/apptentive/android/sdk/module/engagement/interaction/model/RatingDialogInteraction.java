@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.content.Context;
+import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import org.json.JSONException;
 
 /**
@@ -24,59 +27,42 @@ public class RatingDialogInteraction extends Interaction {
 	}
 
 	public String getTitle() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_TITLE)) {
-				return configuration.getString(KEY_TITLE);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_TITLE)) {
+			return configuration.optString(KEY_TITLE, null);
 		}
 		return null;
 	}
 
-	public String getBody() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_BODY)) {
-				return configuration.getString(KEY_BODY);
-			}
-		} catch (JSONException e) {
+	public String getBody(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_BODY)) {
+			return configuration.optString(KEY_BODY, null);
 		}
-		return null;
+		return String.format(context.getResources().getString(R.string.apptentive_rating_message_fs), Configuration.load(context).getAppDisplayName());
 	}
 
-	public String getRateText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_RATE_TEXT)) {
-				return configuration.getString(KEY_RATE_TEXT);
-			}
-		} catch (JSONException e) {
+	public String getRateText(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_RATE_TEXT)) {
+			return configuration.optString(KEY_RATE_TEXT, null);
 		}
-		return null;
+		return String.format(context.getResources().getString(R.string.apptentive_rate_this_app), Configuration.load(context).getAppDisplayName());
 	}
 
 	public String getRemindText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_REMIND_TEXT)) {
-				return configuration.getString(KEY_REMIND_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_REMIND_TEXT)) {
+			return configuration.optString(KEY_REMIND_TEXT, null);
 		}
 		return null;
 	}
 
 	public String getDeclineText() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_DECLINE_TEXT)) {
-				return configuration.getString(KEY_DECLINE_TEXT);
-			}
-		} catch (JSONException e) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_DECLINE_TEXT)) {
+			return configuration.optString(KEY_DECLINE_TEXT, null);
 		}
 		return null;
 	}
-
-
 }

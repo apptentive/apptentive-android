@@ -1,0 +1,75 @@
+{
+    "interactions": {
+        "local#app#init": [
+            {
+                "priority": 1,
+                "criteria": {
+                },
+                "id": "535c28297724c5d4f800006f",
+                "type": "EnjoymentDialog",
+                "configuration": {
+                    "title": null
+                }
+            },
+            {
+                "priority": 2,
+                "criteria": {
+                    "interactions/535c28297724c5d4f8000072/invokes/version": {
+                        "$gt": 0,
+                        "$lte": 1
+                    },
+                    "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
+                    "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
+                        "$gte": 432000
+                    }
+                },
+                "id": "535c28297724c5d4f8000072",
+                "type": "RatingDialog",
+                "configuration": {
+                    "body": null
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#yes": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "535c28297724c5d4f8000072",
+                "type": "RatingDialog",
+                "configuration": {
+                }
+            }
+        ],
+        "com.apptentive#EnjoymentDialog#no": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "535c28297724c5d4f8000076",
+                "type": "FeedbackDialog",
+                "configuration": {
+                    "ask_for_email": true,
+                    "email_required": false,
+                    "enable_message_center": true
+                }
+            }
+        ],
+        "com.apptentive#FeedbackDialog#view_messages": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "535c28297724c5d4f8000078",
+                "type": "MessageCenter"
+            }
+        ],
+        "com.apptentive#RatingDialog#rate": [
+            {
+                "priority": 1,
+                "criteria": {},
+                "id": "535c28297724c5d4f800007a",
+                "type": "AppStoreRating",
+                "configuration": {}
+            }
+        ]
+    }
+}
