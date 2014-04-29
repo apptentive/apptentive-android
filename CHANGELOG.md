@@ -1,3 +1,10 @@
+2014-04-28 skykelsey 1.4.3
+--------------------------
+
+Bugs Fixed:
+
+* ANDROID-323 Localized strings not properly populated with app name.
+
 2014-04-18 skykelsey 1.4.2
 --------------------------
 
