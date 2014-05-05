@@ -174,6 +174,8 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			sendButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
+					Util.hideSoftKeyboard(activity, view);
+
 					if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
 						EmailValidationFailedDialog dialog = new EmailValidationFailedDialog(activity);
 						dialog.show();
