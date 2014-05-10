@@ -31,7 +31,7 @@
     </copyright>
   </component>
   <component name="DependencyValidationManager">
-    <scope name="Javadoc Scope" pattern="src[apptentive-android-sdk]:com.apptentive.android.sdk.Apptentive||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener" />
+    <scope name="Javadoc Scope" pattern="src[apptentive-android-sdk]:com.apptentive.android.sdk.Apptentive||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.ApptentiveActivity" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
