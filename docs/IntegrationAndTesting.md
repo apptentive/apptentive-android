@@ -12,7 +12,7 @@ To download the SDK, either clone the SDK
 
 `git clone https://github.com/apptentive/apptentive-android.git`
 
-or download the [latest release](https://github.com/apptentive/apptentive-android/releases)
+Or download the [latest release](https://github.com/apptentive/apptentive-android/releases)
 
 # Setting up the Project
 
@@ -106,20 +106,21 @@ In order to keep track of Application state, we need to hook into the lifecycle 
 There are two ways of doing this: Inheritance and Delegation. Inheritance is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities.
 
-Add one of the following code snippets to ALL of the Activities you define in your manifest (mix and match is OK too).
+Integrate ALL of the Activities in your app with [ApptentiveActivity](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/ApptentiveActivity.html).
+You can mix and match, but make sure they all integrate in one of the following ways.
 
-###### Inheritance
+1. **Inheritance**
 
-```java
-import com.apptentive.android.sdk.ApptentiveActivity;
+    ```java
+    import com.apptentive.android.sdk.ApptentiveActivity;
 
-public class ExampleActivity extends ApptentiveActivity {
-```
+    public class ExampleActivity extends ApptentiveActivity {
+    ```
 
-###### Delegation
+2. **Delegation**
 
-```java
-import com.apptentive.android.sdk.ApptentiveActivity;
+    ```java
+    import com.apptentive.android.sdk.ApptentiveActivity;
 
     ...
 
@@ -138,7 +139,7 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 
 # Message Center
 
-The [Message Center](https://github.com/skykelsey/apptentive-android/new_docs/docs/Features.md#Message%20Center) is a self contained Activity that you can launch with the `Apptentive.showMessageCenter()` method.
+The [Message Center](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#message-center) is a self contained Activity that you can launch with the `Apptentive.showMessageCenter()` method.
 
 You should find a place in your app where you can create a link or button that opens your Message Center.
 
