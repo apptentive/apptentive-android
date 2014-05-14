@@ -2,12 +2,6 @@
 <iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=watch"
   allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
 
-<iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=fork"
-  allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
-
-<iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=follow"
-  allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
-
 # System Requirements
 
 ### SDK Versions
