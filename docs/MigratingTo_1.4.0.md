@@ -28,12 +28,12 @@ a file, you can replace that call with `Apptentive.engage(activity, "customer_up
 
 ### Setting things up on the server
 
-Any previous Ratings configuration settings on the server have been to use the new system. Old SDKs will continue to
-work for previous client versions. In order to use the new system, you will need go to *Interactions -> Ratings Prompt*,
-and then select *Who &amp; When*. You will notice that these settings are almost identical to the previous settings.
-However, you will need to select the name of the **Event** which should display the Ratings Prompt under *When will this
-be shown?*. If you are targeting significant events, you will also need to enable event this in the *The ratings prompt
-will be displayed if:* section.
+Any previous Ratings configuration settings on the server have been migrated to use the new system. Old SDKs will
+continue to work for previous client versions. In order to use the new system, you will need go to
+*Interactions -> Ratings Prompt*, and then select *Who &amp; When*. You will notice that these settings are almost
+identical to the previous settings. However, you will need to select the name of the **Event** which should display the
+Ratings Prompt under *When will this be shown?*. If you are targeting significant events, you will also need to enable
+this in the *The ratings prompt will be displayed if:* section.
 
 If you are trying to configure the Ratings Prompt with **Events**, and you have never sent an **Event** to the server,
 you can manually add them so that they can be used in the Ratings Prompt Configuration. Simply go to *Interactions ->
@@ -49,6 +49,6 @@ field.
 
 ## Upgrade Messages
 
-Prevously to 1.4.0, Upgrade Messages were displayed using a built in Apptentibe **Event** that was triggered on App
+Prevously to 1.4.0, Upgrade Messages were displayed using a built in Apptentive **Event** that was triggered on App
 Launch. Starting with 1.4.0, Upgrade Messages will be targeted to an **Event** that you must trigger, called `init`.
 This is because you know best what constitutes the launch of your app. Simply call `Apptentie.engage(activity, "init")`.
