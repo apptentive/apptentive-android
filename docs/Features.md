@@ -1,13 +1,3 @@
-
-<iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=watch"
-  allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
-
-<iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=fork"
-  allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
-
-<iframe src="http://ghbtns.com/github-btn.html?user=apptentive&repo=apptentive-android&type=follow"
-  allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
-
 # System Requirements
 
 ### SDK Versions
@@ -37,13 +27,15 @@ allows us to use newer XML syntax for forward compatibility.
 | `zh`             |  Chinese (Traditional) |
 | `zh-rCN`         |  Chinese (Simplified)  |
 
+---
+
 # Events and Interactions
 
 Our SDK lets you keep track of customer behavior, and initiate conversations with each customer based on their behavior.
 **Interactions** are the UI elements that you use to interact with each customer, and **Events** are the records of past
 customer behavior.
 
-## Events
+### Events
 
 **Events** are records of actions taken in your app. What constitutes an **Event** is up to you. For example, you may
 choose to keep track of each time a user has logs into your app, the app crashes, or they pass a level. **Events** are
@@ -56,7 +48,7 @@ under *Interactions -> Events*, so you can verify that **Events** are making it 
 predefine an **Event** name so that you can use it in an **Interaction** before you make any changes on the client, you
 can do so by entering it manually here as well.
 
-## Interactions
+### Interactions
 
 **Interactions** are views that you can use to easily and proactively start conversations with your customers. You
 configure their content, the conditions necessary to show them, and which **Event** should trigger them,
@@ -71,7 +63,7 @@ while an **Interaction** is a view that is displayed when `engage()` is called.
 **Interactions** can be configured on the [Apptentive website](https://be.apptentive.com) by clicking the *Interactions*
 link in the top bar.
 
-### Ratings Prompt
+## Ratings Prompt
 
 The **Ratings Prompt Interaction** is a powerful tool to help you get better ratings and more reviews from happy
 customers, and talk to customers that aren't happy with your app. The **Ratings Prompt** is actually a series of views.
@@ -89,7 +81,7 @@ with, and configure when to thos the prompt, and who to show it to.
 
 ![Using Custom Events](https://raw.githubusercontent.com/apptentive/apptentive-android/master/etc/screenshots/ratings_prompt_interaction_config.png)
 
-### Surveys
+## Surveys
 
 **Surveys** are **Interactions** that help you understand the wants and needs of your customers. **Surveys** are
 composed of one of more questions, and since they are **Interactions**, can be targeted to any **Event** you have
@@ -110,6 +102,8 @@ Messages** on the [Apptentive website](https://be.apptentive.com), navigate to *
 
 **Note**: **Upgrade Messages** are always targeted to the special **_init_** **Event**. you should trigger **_init_** at
 the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
+
+---
 
 # Message Center
 
@@ -180,6 +174,8 @@ can better support your customers.
 #### Sending Hidden Text Messages
 
 * [Apptentive.sendAttachmentText(Context context, String text)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentText%28android.content.Context,%20java.lang.String%29)
+
+---
 
 # Misc
 
