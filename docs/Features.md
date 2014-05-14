@@ -43,7 +43,7 @@ stored on the client, and can be used to determine when and where to show **Inte
 least five **Events**. The more **Events** you define in your app, the more powerful useful the Apptentive SDK will be.
 
 **Events** are invoked using the [Apptentive.engage()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29) method.
-When your app invokes an **Event**, it will be sent to our server. It wiill show up on the [Apptentive website](https://be.apptentive.com)
+When your app invokes an **Event**, it will be sent to our server. It wiill show up on [apptentive.com](https://be.apptentive.com)
 under *Interactions -> Events*, so you can verify that **Events** are making it to our server. If you would like to
 predefine an **Event** name so that you can use it in an **Interaction** before you make any changes on the client, you
 can do so by entering it manually here as well.
@@ -60,7 +60,7 @@ to configure an **Interaction** to display at **Event** of your choosing after y
 between an **Event** and an **Interaction** is that an **Event** is a record of the `engage()` method being called,
 while an **Interaction** is a view that is displayed when `engage()` is called.
 
-**Interactions** can be configured on the [Apptentive website](https://be.apptentive.com) by clicking the *Interactions*
+**Interactions** can be configured on [apptentive.com](https://be.apptentive.com) by clicking the *Interactions*
 link in the top bar.
 
 ## Ratings Prompt
@@ -75,7 +75,7 @@ then they are shown the *Rating Dialog*, which offers them the oportunity to go 
 ![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
 ![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
 
-To set up the **Ratings Prompt**, visit the [Apptentive website](https://be.apptentive.com) and go ti *Interactions ->
+To set up the **Ratings Prompt**, visit [apptentive.com](https://be.apptentive.com) and go to *Interactions ->
 Ratings Prompt*. There, you can customize the **Ratings Prompt** content, specify which **Event** to target the prompt
 with, and configure when to thos the prompt, and who to show it to.
 
@@ -86,7 +86,7 @@ with, and configure when to thos the prompt, and who to show it to.
 **Surveys** are **Interactions** that help you understand the wants and needs of your customers. **Surveys** are
 composed of one of more questions, and since they are **Interactions**, can be targeted to any **Event** you have
 configured in your app. There are three supported question types: Single Select, Multiple Select, and Free Form. To set
-up a survey on the [Apptentive website](https://be.apptentive.com), navigate to *Interactions -> Surveys*.
+up a survey on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Surveys*.
 
 ![Survey Incomplete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_incomplete.png)
 ![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
@@ -98,7 +98,7 @@ Many customers choose to have their apps automatically update. While this is con
 won't see announcements or release notes that you display on your app store page. **Upgrade Messages** solve this
 problem. You can configure an **Upgrade Message** for each release of your app. When the user upgrades from a previous
 version of your app to one of the targeted versions, whey will see the **Upgrade Message**. To view and create **Upgrade
-Messages** on the [Apptentive website](https://be.apptentive.com), navigate to *Interactions -> Upgrade Messages*.
+Messages** on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Upgrade Messages*.
 
 **Note**: **Upgrade Messages** are always targeted to the special **_init_** **Event**. you should trigger **_init_** at
 the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
