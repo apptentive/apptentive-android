@@ -1,3 +1,9 @@
+<iframe src="github-btn.html?user=apptentive&repo=apptentive-android&type=watch&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="156px" height="30px"></iframe>
+
+<iframe src="github-btn.html?user=apptentive&repo=apptentive-android&type=follow&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="156px" height="30px"></iframe>
+
+<iframe src="github-btn.html?user=apptentive&repo=apptentive-android&type=fork&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="156px" height="30px"></iframe>
+
 # System Requirements
 
 ### SDK Versions
