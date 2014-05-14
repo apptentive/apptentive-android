@@ -12,7 +12,7 @@ To download the SDK, either clone the SDK
 
 `git clone https://github.com/apptentive/apptentive-android.git`
 
-Or download the [latest release](https://github.com/apptentive/apptentive-android/releases)
+Or download the [latest release](https://github.com/apptentive/apptentive-android/releases).
 
 # Setting up the Project
 
@@ -106,7 +106,7 @@ In order to keep track of Application state, we need to hook into the lifecycle 
 There are two ways of doing this: Inheritance and Delegation. Inheritance is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities.
 
-Integrate ALL of the Activities in your app with [ApptentiveActivity](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/ApptentiveActivity.html).
+Integrate ALL of the Activities in your app with [ApptentiveActivity](http://www.apptentive.com/docs/android/api/index.html?com/apptentive/android/sdk/ApptentiveActivity.html).
 You can mix and match, but make sure they all integrate in one of the following ways.
 
 1. **Inheritance**
