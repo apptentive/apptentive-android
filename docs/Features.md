@@ -13,11 +13,12 @@
 ### SDK Versions
 
 **Minimum SDK version:** 7 (Android 2.1)
+
 **Build SDK version:** 12 (3.1)
 
-The Apptentive SDK works on devices with **Android 2.1 (API Level 7)** and newer. You must also build your app against
-Android SDK 3.1 (API 12) or newer. This will not cause your app to stop working on pre 3.1 devices, but allows us to use
-newer XML syntax for forward compatibility.
+The Apptentive SDK works on devices with **Android SDK 2.1 (API Level 7)** and newer. You must also build your app
+against **Android SDK 3.1 (API 12)** or newer. This will not cause your app to stop working on pre-3.1 devices, but
+allows us to use newer XML syntax for forward compatibility.
 
 ###Supported Languages
 
@@ -164,7 +165,7 @@ You can also check to see how many messages are waiting to be read in the custom
 
 [Aptentive.getUnreadMessageCount(Context context)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getUnreadMessageCount%28android.content.Context%29)
 
-### Sending Attachments
+### Sending Hidden Messages and Attachments
 
 You can also send hidden messages from the client that will show up in your customer convesation. They won't be visible
 to the customer, but you can send file and text messages that help fill in details about the state of the app, so you
@@ -176,7 +177,7 @@ can better support your customers.
 * [Apptentive.sendAttachmentFile(Context context, InputStream is, String mimeType)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentFile%28android.content.Context,%20java.io.InputStream,%20java.lang.String%29)
 * [Apptentive.sendAttachmentFile(Context context, String Uri)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentFile%28android.content.Context,%20java.lang.String%29)
 
-#### Sending Text Attachments
+#### Sending Hidden Text Messages
 
 * [Apptentive.sendAttachmentText(Context context, String text)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentText%28android.content.Context,%20java.lang.String%29)
 
