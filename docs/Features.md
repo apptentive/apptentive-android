@@ -67,6 +67,11 @@ to configure an **Interaction** to display at **Event** of your choosing after y
 between an **Event** and an **Interaction** is that an **Event** is a record of the `engage()` method being called,
 while an **Interaction** is a view or group of views that is displayed when `engage()` is called.
 
+##### Supported Interactions
+* [Ratings Prompt](#ratings-prompt)
+* [Surveys](#surveys)
+* [Upgrade messages](#upgrade-messages)
+
 **Interactions** can be configured on [apptentive.com](https://be.apptentive.com) by clicking the *Interactions*
 link in the top bar.
 
