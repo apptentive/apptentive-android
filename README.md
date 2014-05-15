@@ -7,19 +7,19 @@ and how they use your app, and to talk to them at the right time and in the righ
 
 ### Learn about the SDK's [Features](docs/Features.md)
 
-### Browse the [Client API](http://www.apptentive.com/docs/android/api)
-
 ### Read about implementation [Best Practices](docs/BestPractices.md)
 
-### API Changes are tracked [here](docs/APIChanges.md)
+### Browse the [Client API](http://www.apptentive.com/docs/android/api)
 
-### Version history is tracked [here](CHANGELOG.md)
+#### API Changes are tracked [here](docs/APIChanges.md)
 
-### Contributing
+#### Version history is tracked [here](CHANGELOG.md)
+
+#### Contributing
 
 We appriciate contributions to make this SDK better. If you have an improvement or bug fix, please [read this](CONTRIBUTING.md).
 
-### Notes
+#### Notes
 
-* Make sure you have latest version
-* Make sure to follow the repo to get updates
+* Make sure you have latest version or our SDK. We're always adding new features!
+* Make sure to follow the repo to get updates about features and bug fixes.
