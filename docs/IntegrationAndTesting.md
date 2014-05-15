@@ -270,6 +270,9 @@ to tell your customers what's new. To do so, go to *Interactions -> Upgrade Mess
 out details about this release, and then target the message to display when a customer upgrades your app to a specific
 [version name or code](http://developer.android.com/tools/publishing/versioning.html).
 
+**Note**: **Upgrade Messages** are always targeted to the special `init` **Event**. You should trigger `init` at
+the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
+
 # Push Notifications
 
 **Apptentive** can send [push notifications](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#push-notifications)
