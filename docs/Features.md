@@ -69,7 +69,7 @@ The **Ratings Prompt Interaction** is a powerful tool to help you get better rat
 customers, and talk to customers that aren't happy with your app. The **Ratings Prompt** is actually a series of views.
 The inital view is called the *Enjoyment Dialog*, and ask the customer whether they love your app. If the answer is yes,
 then they are shown the *Rating Dialog*, which offers them the oportunity to go to the app store to rate the app. If
- they don't love your app, will be taken to the [Message Center](#Message Center) where they can give you feedback.
+ they don't love your app, will be taken to the [Message Center](#message-center) where they can give you feedback.
 
 ![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
 ![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
@@ -100,7 +100,7 @@ problem. You can configure an **Upgrade Message** for each release of your app. 
 version of your app to one of the targeted versions, whey will see the **Upgrade Message**. To view and create **Upgrade
 Messages** on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Upgrade Messages*.
 
-**Note**: **Upgrade Messages** are always targeted to the special **_init_** **Event**. you should trigger **_init_** at
+**Note**: **Upgrade Messages** are always targeted to the special `init` **Event**. you should trigger `init` at
 the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
 
 ---
@@ -151,7 +151,7 @@ understand what yoru customer was doing when they decided to send feedback.
 
 You can also receive a notification when the number of unread messages waiting to be viewed by the customer changes.
 
-[Apptentive.showMessageCenter(UnreadMessageListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setUnreadMessagesListener%28com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener%29)
+[Apptentive.setUnreadMessageListener(UnreadMessageListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setUnreadMessagesListener%28com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener%29)
 
 ### Checking Unread Message Count
 
@@ -189,8 +189,8 @@ interface.
 
 ### Supported App Store Rating Providers
 
-* [Google Play](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/IRatingProvider.html)
-* [Amazon Appstore](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/IRatingProvider.html)
+* [Google Play](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.html)
+* [Amazon Appstore](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.html)
 
 ### Settings Rating Provider Arguments
 
@@ -223,7 +223,7 @@ When your app registers with **Urban Airship**, it will need to send the *Airshi
 send push notifications to the correct device. The `APID` is available only after you initialize **Urban Airship**, so
 you will have to read it from the `BroadcastReceiver` you use to receive **Urban Airship** `Intents`.
 
-[Apptentive.addUrbanAirshipPushIntegration(Activity activity, String apid](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addUrbanAirshipPushIntegration%28android.content.Context,%20java.lang.String%29)
+[Apptentive.addUrbanAirshipPushIntegration(Activity activity, String apid)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addUrbanAirshipPushIntegration%28android.content.Context,%20java.lang.String%29)
 
 ###### Example
 
@@ -245,7 +245,7 @@ is returned when you register for push notifications with
 [GoogleCloudMessaging.register(String... senderIds)](http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29).
 You can then pass the Registration ID to us using this method:
 
-[Apptentive.addAmazonSnsPushIntegration(Activity activity, String registrationId](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addAmazonSnsPushIntegration%28android.content.Context,%20java.lang.String%29)
+[Apptentive.addAmazonSnsPushIntegration(Activity activity, String registrationId)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addAmazonSnsPushIntegration%28android.content.Context,%20java.lang.String%29)
 
 ###### Example
 
@@ -290,10 +290,10 @@ in the logic that **[Interactions](Interactions)** use to determine when and if 
 
 * [Apptentive.addCustomDeviceData(Context context, String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData%28android.content.Context,%20java.lang.String,%20java.lang.String%29)
 * [Apptentive.removeCustomDeviceData(Context context, String key)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#removeCustomDeviceData%28android.content.Context,%20java.lang.String%29)
-* [Apptentive.setCustomDeviceData(Context context, Map<String, String> customDeviceData](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomDeviceData%28android.content.Context,%20java.util.Map%29)
+* [Apptentive.setCustomDeviceData(Context context, Map<String, String> customDeviceData)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomDeviceData%28android.content.Context,%20java.util.Map%29)
 * [Apptentive.addCustomPersonData(Context context, String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData%28android.content.Context,%20java.lang.String,%20java.lang.String%29)
 * [Apptentive.removeCustomPersonData(Context context, String key)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#removeCustomPersonData%28android.content.Context,%20java.lang.String%29)
-* [Apptentive.setCustomPersonData(Context context, Map<String, String> customDeviceData](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomPersonData%28android.content.Context,%20java.util.Map%29)
+* [Apptentive.setCustomPersonData(Context context, Map<String, String> customDeviceData)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomPersonData%28android.content.Context,%20java.util.Map%29)
 
 ## Specifying a Customer's Email Address
 
