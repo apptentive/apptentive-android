@@ -15,7 +15,7 @@ Or download the [latest release](https://github.com/apptentive/apptentive-androi
 
 ### Keep Up To Date
 
-We strive to fix bugs and add new features as quickly as possible. Please watch our Github repo so stay up to date.
+We strive to fix bugs and add new features as quickly as possible. **Please watch our Github repo so stay up to date.**
 
 # Setting up the Project
 
@@ -106,11 +106,11 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 # Integrate your Activities with Apptentive
 
 In order to keep track of Application state, we need to hook into the lifecycle of each Activity defined in your app.
-There are two ways of doing this: Inheritance and Delegation. Inheritance is the easiest method, while delegation is
+There are two ways of doing this: *Inheritance* and *Delegation*. Inheritance is the easiest method, while delegation is
 provided if you can't or don't want to inherit from our Activities.
 
 Integrate ALL of the Activities in your app with [ApptentiveActivity](http://www.apptentive.com/docs/android/api/index.html?com/apptentive/android/sdk/ApptentiveActivity.html).
-You can mix and match, but make sure they all integrate in one of the following ways.
+You can mix and match, but make sure they all integrate in one of the following two ways.
 
 1. **Inheritance**
 
@@ -142,7 +142,8 @@ You can mix and match, but make sure they all integrate in one of the following 
 
 # Message Center
 
-The [Message Center](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#message-center) is a self contained Activity that you can launch with the `Apptentive.showMessageCenter()` method.
+The [Message Center](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#message-center) is a
+self contained Activity that you can launch with [Apptentive.showMessageCenter(Activity activity)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter%28android.app.Activity%29).
 
 You should find a place in your app where you can create a link or button that opens your **Message Center**.
 
@@ -176,7 +177,7 @@ you wish to add more custom data to another subsequent message, you will need to
 
 ### New Message Notification (Optional)
 
-If you would like to be notified when a new message is sent to the client, register a listener using `Apptentive.setUnreadMessagesListener(UnreadMessageListener listener)`.
+If you would like to be notified when a new message is sent to the client, register a listener using [Apptentive.setUnreadMessageListener(UnreadMessageListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setUnreadMessagesListener%28com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener%29).
 When the number of unread messages changes, either because your customer read a message, or a new message came in, [onUnreadMessageCountChanged(int unreadMessages)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/messagecenter/UnreadMessagesListener.html#onUnreadMessageCountChanged%28int%29)
 will be called. Because this listener could be called at any time, you should store the value returned from this method,
 and then perform any user interaction you desire at the appropriate time.
@@ -222,7 +223,7 @@ As you can see, there is some overlap in whether you want to just record an **Ev
 To add an **Event** and possibly show an **Interaction**, simply call [Apptentive.engage(Activity activity, String eventName)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29)
 with an `eventName` of your choosing.
 
-###### Examples
+###### Example
 
 Add an **Event** when your app's main Activity comes up.
 
@@ -273,6 +274,10 @@ out details about this release, and then target the message to display when a cu
 **Note**: **Upgrade Messages** are always targeted to the special `init` **Event**. You should trigger `init` at
 the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
 
+**Note**: **Upgrade Messages** are only shown if the app is upgrading from a previous version. If you are installing a
+version of your app that has an **Upgrade Message** targeted to it, but it is not upgradeing from a previous version,
+the **Upgrade Message** will not be shown.
+
 # Push Notifications
 
 **Apptentive** can send [push notifications](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#push-notifications)
@@ -305,28 +310,28 @@ retreive the APID by listening for the Intent with action [PushManager.ACTION_RE
 grabbing the extra data [PushManager.EXTRA_APID](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#EXTRA_APID),
 and passing it to [Apptentive.addUrbanAirshipPushIntegration(Context context, String apid](http://www.apptentive.com/docs/android/api/index.html?com/apptentive/android/sdk/ApptentiveActivity.html).
 
-###### Example
+    ###### Example
 
-```java
-String apid = intent.getStringExtra(PushManager.EXTRA_APID);
-Apptentive.addUrbanAirshipPushIntegration(context, apid);
-```
+    ```java
+    String apid = intent.getStringExtra(PushManager.EXTRA_APID);
+    Apptentive.addUrbanAirshipPushIntegration(context, apid);
+    ```
 
-This method is preferable, because you will get the APID at the earliest possible time after the app is registered with
-UA, and will only need to give it to the Apptentive SDK once.
+    This method is preferable, because you will get the APID at the earliest possible time after the app is registered with
+    UA, and will only need to give it to the Apptentive SDK once.
 
 2. If you are not using a broadcast receiver, you can call [PushManager.getAPID()](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29).
 This method may return null if Urban Airship hasn't finished registering, so don't give it to us until it returns an
 actual apid.
 
-###### Example
+    ###### Example
 
-```java
-String apid = PushManager.getAPID();
-if (apid != null) {
-  Apptentive.addUrbanAirshipPushIntegration(context, apid);
-}
-```
+    ```java
+    String apid = PushManager.getAPID();
+    if (apid != null) {
+    Apptentive.addUrbanAirshipPushIntegration(context, apid);
+    }
+    ```
 
 #### Setting the Amazon Web Services SNS Registration ID
 
@@ -343,7 +348,8 @@ Apptentive.addAmazonSnsPushIntegration(this, registrationId);
 
 #### Displaying the Push Notification
 
-Opening an Apptentive push notification involves three easy steps: Pass the push notification to [Apptentive.setPendingPushNotification(Context context, Intent intent)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification%28android.content.Context,%20android.content.Intent%29),
+Opening an Apptentive push notification involves three easy steps: When the push notification is tapped by your customer,
+pass it to [Apptentive.setPendingPushNotification(Context context, Intent intent)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification%28android.content.Context,%20android.content.Intent%29),
 launch your main Activity, and display the push notification with [Apptentive.handleOpenedPushNotification(Activity activity)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#handleOpenedPushNotification%28android.app.Activity%29).
 This two pass approach is necessary to avoid double displaying the push notification. Both of these methods do nothing
 if the push notification didn't come from Apptentive.
@@ -359,7 +365,7 @@ Apptentive.setPendingPushNotification(context, intent);
 
 
 
-In your main Activity, open the push notification.
+In your main Activity, handle the push notification.
 
 ```java
 @Override
@@ -378,7 +384,6 @@ public void onWindowFocusChanged(boolean hasFocus) {
 # Set Customer Email address
 
 If you already know the customer's email address, you can pass it to us during initialization. Simple call [Apptentive.setInitialUserEmail(Context context, String email)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setInitialUserEmail%28android.content.Context,%20java.lang.String%29).
-Make sure to call it in your main Activity's `onCreate()`.
 
 # Custom Data
 
@@ -427,91 +432,8 @@ interface, and pass your implementation to `setRatingProvider()`.
 * [Google Play](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.html)
 * [Amazon Appstore](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.html)
 
-###### Example
-
-Setting the rating provider
+###### Using the Amazon Appstore Rating Provider
 
 ```java
 Apptentive.setRatingProvider(new AmaonAppstoreRatingProvider);
 ```
-
----
-
-## Gradle Integration
-
-The following documents preliminary gradle support for the Apptentive SDK. Since the Android Gradle plugin is constantly
-changing, this information may be incompatible with the version of Gradle that you are using. We will attempt to keep
-this up to date and working, but there may be a lag between new releases of the Gradle plugin, and updates to this doc.
-
-1. Import the existing Apptentive Android SDK module into your project.
-2. Add the android-Gradle facet to the apptentive-android-sdk module (in the module settings).
-3. Add a build.gradle file with this content to apptentive-android-sdk:
-    ```
-    buildscript {
-        repositories {
-            mavenCentral()
-        }
-        dependencies {
-            classpath 'com.android.tools.build:gradle:0.5.+'
-        }
-    }
-    apply plugin: 'android-library'
-
-    repositories {
-        mavenCentral()
-    }
-
-    android {
-        compileSdkVersion 17
-        buildToolsVersion "17.0.0"
-
-        defaultConfig {
-            minSdkVersion 7
-            targetSdkVersion 16
-        }
-
-        sourceSets {
-            main {
-                manifest.srcFile 'AndroidManifest.xml'
-                java.srcDirs = ['src']
-                resources.srcDirs = ['src']
-                res.srcDirs = ['res']
-            }
-        }
-    }
-    ```
-4. In your main module's build.gradle file, add a reference to the Apptentive Android SDK :
-    ```
-    dependencies {
-        compile project(":apptentive-android-sdk")
-    }
-    ```
-
-5. In your settings.gradle file, add an include for apptentive-android-sdk:
-    ```
-    include ':apptentive-android-sdk', ':your-module'
-    ```
-
-6. Adjust the gradle versions to suit your app.
-
-
-## Building from the command line and with CI
-
-### Building with ant
-
-The Apptentive SDK can be built using the `ant` based build tools bundled with the Android SDK. In order to prepare Apptentive for automated builds with ant, you will need to prepare the project for builds using the `android` tool packaged with the Android SDK. Open a shell and run `android update project -p ./ -t android-18` in the apptentive/apptentive-android-sdk directory. The target, `android-18` in the example, can be any version of android greater than or equal to 3.1 (`android-12`).
-
-Once you have initialized the build files, Apptentive will build automatically as part of your ant based build system. In the event that you update your Android SDK or Android Build Tools, you may need to re-run the `update project` command to generate new build files.
-
-## ProGuard Configuration
-
-Since Apptentive is an open source SDK, it is not necessary to obfuscate Apptentive code. If you are using ProGuard, Apptentive classes and methods will be obfuscated unless you add the following to your project's `proguard-project.txt`:
-
-```java
--keepattributes SourceFile,LineNumberTable
--keep class com.apptentive.android.sdk.** { *; }
-```
-
-## Known Issues
-
-* If you are using the [OkHttp](http://square.github.io/okhttp/) library, please make sure you are using OkHttp version 1.5.2 or greater, as previous versions can cause your app to crash when another library attempts to make an SSL connection.
