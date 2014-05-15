@@ -244,14 +244,31 @@ public void onWindowFocusChanged(boolean hasFocus) {
 
 Once you have configured your app to use several **Events**, you can configure **Interactions** on [apptentive.com](https://be.apptentive.com)
 
+#### Ratings Prompt
 
-// TODO
+To set up the [Ratings Prompt](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#ratings-prompt)
+**Interaction**, first make sure you have created some [Events](#adding-events) in your app. Then, go to
+*Interactions -> Ratings Prompt*. There, you will be able to customize the text and behavior of the dialogs that make up
+the **Ratings Prompt**, and configure the logic that will determine when it will be shown. You will also need to pick
+where the **Ratings Prompt** will be shownn, by choosing an **Event** from the dropdown.
 
-# Interaction specific methods
+#### Surveys
 
-// TODO
+[Surveys](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#surveys) can also be configured
+from the server. First, make sure you have created some [Events](#adding-events), then go to *Interactions -> Surveys*.
+Create a new survey. You can give it a title and description, then add questions, and finally set targeting and limiting
+constraints so it's shown to the right people. After your survey is live, you will start to see results in the *Surveys*
+page.
 
-Survey Finished Listener
+**Note:** If you were using surveys prior to version 1.5.0 of the Apptentive Android SDK, see this Migration Guide for
+instructions.
+
+#### Upgrade Messages
+
+When you release a new version of your app, you should create an [Upgrade Message](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#upgrade-messages)
+to tell your customers what's new. To do so, go to *Interactions -> Upgrade Messages*. You can use the editor to write
+out details about this release, and then target the message to display when a customer upgrades your app to a specific
+[version name or code](http://developer.android.com/tools/publishing/versioning.html).
 
 # Push Notifications
 
@@ -315,11 +332,13 @@ Registration ID. See the [GCM documentation](http://developer.android.com/google
 to retreive your Registration ID. When you have the Registration ID, pass it to [Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addAmazonSnsPushIntegration%28android.content.Context,%20java.lang.String%29).
 
 ###### Example
+
 ```java
 String registrationId;
 Apptentive.addAmazonSnsPushIntegration(this, registrationId);
 ```
-### Displaying the Push Notification
+
+#### Displaying the Push Notification
 
 Opening an Apptentive push notification involves three easy steps: Pass the push notification to [Apptentive.setPendingPushNotification(Context context, Intent intent)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification%28android.content.Context,%20android.content.Intent%29),
 launch your main Activity, and display the push notification with [Apptentive.handleOpenedPushNotification(Activity activity)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#handleOpenedPushNotification%28android.app.Activity%29).
@@ -332,9 +351,10 @@ Push notification opened.
 
 ```java
 Apptentive.setPendingPushNotification(context, intent);
-
-// Launch your main Activity
+// Then launch your main Activity.
 ```
+
+
 
 In your main Activity, open the push notification.
 
@@ -367,7 +387,7 @@ will run. For best results, call this during `onCreate()`.
 
 ###### Example
 
-Send the user ID of this person.
+Send the user ID of your customer.
 
 ```java
 Apptentive.addCustomPersonData(this, "1234567890");
@@ -375,268 +395,43 @@ Apptentive.addCustomPersonData(this, "1234567890");
 
 # Attachments
 
+You can send [hidden messages and attachments](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#sending-hidden-messages-and-attachments) to Apptentoive that will show up in your customer conversation view on [apptentive.com](https://be.apptentive.com),
+but are not shown to your customer.
+
+###### Example
+
+```java
+// Send a file.
+InputStream is = new FileInputStream("filePath");
+Apptentive.sendAttachmentFile(this, is);
+
+// Send a text message.
+Apptentive.sendAttachmentText(this, "Message to display in the conversation view.");
+```
+
 # Setting Rating Provider
 
-# Sending Attachment Messages
+If you host your app in an app store other than Google Play, you will need to make sure customers who want to rate your
+app will be able to do so. To choose which app store the **Ratings Prompt Interaction** will take you to, we've built
+several **Rating Providers**. A **Rating Provider** is an implementation of the [IRatingProvider](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/IRatingProvider.html)
+interface, and its job is to provide a simple interface to open the app store. To use another supported [rating provider](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#setting-rating-provider),
+you can make a call to [Apptentive.setRatingProvider(IRatingProvider ratingProvider)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setRatingProvider%28com.apptentive.android.sdk.module.rating.IRatingProvider%29).
+If you would like to use an app store that we don't yet support, you can implement the [IRatingProvider](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/IRatingProvider.html)
+interface, and pass your implementation to `setRatingProvider()`.
 
-### Interactions
+#### Supported Rating Providers
 
-**Interactions** allow you to proactively start conversations with your customers. Unlike **Message Center** and
-feedback in general, you can use **Interactions** to start communicating with a customer based on how they are using the
-app. An **Interaction** is a view that is shown to the customer when certain conditions are met.
-
-The core pieces of information used to determine when and where **Interactions** are displayed are called **Events**. An
-**Event** represents a place in your code where your customer performed an action. Apptentive keeps track of all
-**Events**, and the record of **Events** enables you to perform very fine grained targeting of **Interactions** to
-customers. You can configure **Interactions** to run when a certain combination of **Events** has been triggered.
-
-A single API method makes all of this happen: `Apptentive.engage(String eventName)`. When you call `engage()`, not only
-are **Events** created, but **Interactions** are run if the necessary conditions are met. This simple, but powerful
-method, will let you precisely target who to talk to at the right time. You are recommended to find a few places in your
-code that you would like to track, and a few places where it would be appropriate to show an **Interaction**. Come up
-with an **Event** name that describes each place, and make a call to `engage()`. Later on, you can configure
-**Interactions** based on those **Events**.
-
-###### Event
-An **Event** is a record of your customer performing an action. An **Event** is always generated when you call
-`Apptentive.engage(String eventName)`. Apptentive stores a record of all events, and events can be used later to
-determine when to show interactions to your customer.
-
-###### Interaction
-An action performed on the client. **Interactions** are defined on the server, and downloaded to the client.
-**Interactions** generally result in a view being shown to your customer. Like **Events**, **Interactions** are launched
-by calling `Apptentive.engage(String eventName)`, but only when the necessary conditions are met.
-
-##### Example
-Lets say you have a cloud storage app, and you would like to show an **Interaction** when the app starts, provided that
-the customer has uploaded at least five files. You could choose to have two **Events**: `main_activity_focused`, and
-`user_uploaded_file`. When your main Activity regains focus, you would call `Apptentive.engage("main_activity_focused")`,
-and when the customer performs a file upload, you could call `Apptentive.engage("user_uploaded_file")`. You can then go
-into the server, and configure the **Interaction** to run when the `main_activity_focused` Event is triggered, and set the
-conditions such that the `user_uploaded_file` **Event** had been seen at least five times.
-
-**Note:** You will need to trigger an **Event** called `init`. This **Event** is used as the default point of
-display for new **Interactions**. To do so, simply call `Apptentive.engage(activity, "init")` at an appropriate place,
-such as when your main Activity gains focus.
-
-Below are the currently supported **Interactions**. To configure **Interactions**, login to
-[Apptentive](www.apptentive.com) and click on **_Interactions_**.
-
-#### Ratings Prompt
-
-The **Ratings Prompt Interaction** replaces our previous call to `Apptentive.showRatingFlowIfConditionsAreMet()`.
-Instead, the only integration necessary is to define some events in your code, and then choose to target the **Ratings
-Prompt Interaction** to one of those events.
-
-![Enjoyment Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/enjoyment_dialog.png)
-![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
-![Rating Dialog](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/rating_dialog.png)
-
-##### Example
-
-Trigger an **Event** when an Activity gains focus.
-
-```java
-@Override
-public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-        // Engage a code point called "init".
-        boolean shown = Apptentive.engage(this, "init");
-    }
-}
-```
-
-You can customize the the content, as well as the display conditions of the **Ratings Prompt Interaction** through your
-[Apptentive](https://www.apptentive.com) account. The **Ratings Prompt Interaction** can be targeted to any **Event** you
-choose, but by default, it is targeted to the `init` **Event**.
-
-![Using Custom Events](https://raw.githubusercontent.com/apptentive/apptentive-android/master/etc/screenshots/ratings_prompt_interaction_config.png)
-
-**Note:** If you used the previous Rating Prompt in your app, you can replace calls to `logSignificantEvent()` with other
-calls to `engage()` with various event names. You can then base the logic that determines when an interaction will be
-displayed on these events.
-
-#### Surveys
-
-Surveys are a great tool to learn about your customers. You can create surveys that have multiple types of questions:
-multiple select, single select, and free text. You can also choose the audience your survey is shown to by choosing to
-send it only to devices which match certain criteria. Finally, you can chose to limit how often and how many times a
-survey can be shown to each person, or to the entire customer base.
-
-![Survey Incomplete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_incomplete.png)
-![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
-![Survey Complete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_complete.png)
-
-Surveys a type of **Interaction**, so they are launched using the `Apptentive.engage()` method.
-
-**Note:** If you were using surveys prior to version 1.5.0 of the Apptentive Android SDK, see this Migration Guide for
-instructions.
-
-##### Example
-
-Trigger an **Event** when the user does something.
-
-```java
-boolean showedInteraction = Apptentive.engage(this, "user_did_something");
-```
-
-Surveys can be created and managed on the website at **Interactions -> Surveys**.
-
-#### Upgrade Messages
-
-You can display an **Upgrade Message Interaction** to customers when they upgrade to a newer version of your app.
-Configure which version name or version code of your app each **Interaction** is targeted to, and the **Interaction**
-will be shown when that release is launched by the customer. Right now, Upgrade Messages are always targeted to the
-`init` **Event**, so make sure you call `Apptentive.engage(activity, "init)`.
-
-
-## Optional Configuration
-
-### Support for Amazon Appstore
-
-If your app is being built for the Amazon Appstore, you will want to make sure customers who want to rate you app are
-taken there instead of to Google Play. To do this, simply add the following line in `onCreate()`.
-
-```java
-Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
-```
-
-If you omit this line, ratings will go to Google Play.
-
-### Specifying the Customer's Email Address
-
-If you are authorized to access the customer's email address, you may specify it during initialization so that in the
-event the customer does not open the app to view your reply, your message can still get to them via email. Note that if
-ths customer updates their email through an Apptentive UI, we will use that email instead.
-
-###### Method
-
-```java
-public static void Apptentive.setInitialUserEmail(Context context, String email);
-```
-
-### Send Custom Device Data to Apptentive
-
-You may send us custom data associated with the device, that will be surfaced for you on our website. Data must be
-key/value string pairs.
-
-###### Method
-
-```java
-public static void Apptentive.addCustomDeviceData(Context context, String key, String value);
-```
-
-###### Method
-
-```java
-public static void Apptentive.removeCustomDeviceData(Context context, String key);
-```
-
-### Send Custom Person Data to Apptentive
-
-You may send us custom data associated with the person using the app, that will be surfaced for you on our website.
-Data must be key/value string pairs.
-
-###### Method
-
-```java
-public static void Apptentive.addCustomPersonData(Context context, String key, String value);
-```
-
-###### Method
-
-```java
-public static void Apptentive.removeCustomPersonData(Context context, String key);
-```
-
-## Third Party Integrations
-Apptentive can be configured to send push notifications to your app, using the push notification provider of your choice.
-**Urban Airship** and **Amazon's AWS SNS** are currently supported. A push notification is useful for notifying your
-customers that they have received a new message while they are not using your app. Push notifications are optional, and
-messages will still be delivered when the customer opens the app.
-
-### Push Notifications
-
-#### Urban Airship Integration
-
-In order to use **Urban Airship**, you will need to first setup **Urban Airship** to work within your app. Then, you
-will need to set your `App Key`, `App Secret`, and `App Master Secret` on the website at
-**App Settings -> Integrations -> Urban Airship**.
-
-##### Sending the Urban Airship APID
-
-To set up push notifications, you must pass in the `APID` you get from **Urban Airship**. The `APID` is available only
-after you initialize **Urban Airship**, so you will have to read it from the `BroadcastReceiver` you use to receive
-**Urban Airship** `Intents`.
-
-###### Method
-```java
-Apptentive.addUrbanAirshipPushIntegration(Context context, String apid);
-```
+* [Google Play](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.html)
+* [Amazon Appstore](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.html)
 
 ###### Example
+
+Setting the rating provider
+
 ```java
-String  apid = PushManager.shared().getAPID();
-Apptentive.addUrbanAirshipPushIntegration(this, apid);
+Apptentive.setRatingProvider(new AmaonAppstoreRatingProvider);
 ```
 
-#### Amazon SNS
-
-In order to use **Amazon Web Services (AWS) Simple Notification Service (SNS)**, you will need to first set up
-**AWS SNS** to work within your app. Then, you will need to set your `Access Key ID`, `Secret Access Key`, and `ARN` on
-the website at **App Settings -> Integrations -> Amazon Web Services SNS**.
-
-##### Sending the AWS SNS Registration ID
-
-To set up push notifications, you must pass in the **Registration ID** you get from **AWS SNS**. The **Registration ID**
-is returned when you register for push notifications with
-[GoogleCloudMessaging.register(String... senderIds)](http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29).
-
-###### Method
-```java
-Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId);
-```
-
-###### Example
-```java
-GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getBaseContext());
-String  registrationId = gcm.register(getString(R.string.project_number));
-Apptentive.addAmazonSnsPushIntegration(this, registrationId);
-```
-
-#### Passing Apptentive the Push Intent
-
-When the customer opens a push notification, you will receive an `Intent` in your `BroadcastReceiver`. You must always
-pass that `Intent` to Apptentive, so we can check to see if the push came from us, and save our data to use when we launch.
-
-###### Method
-```java
-public static void setPendingPushNotification(Context context, Intent intent);
-```
-
-#### Running the Apptentive Push UI
-
-Next, in the `Activity` that you launched, you will need to allow Apptentive to run based on the push `Intent`. If the
-push notification came from us, this version of the SDK is compatible with the notification, and other conditions are
-met, then we will perform an action. This is generally to show a UI, such as **Message Center**. If we show a UI, this
-method will return true, else false. This method is a noop if the push notification was not from Apptentive.
-
-###### Method
-```java
-public boolean Apptentive.handleOpenedPushNotification(Activity activity);
-```
-
-###### Example
-```java
-@Override
-public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-        boolean ranApptentive = Apptentive.handleOpenedPushNotification(this);
-    }
-}
-```
 ---
 
 ## Gradle Integration

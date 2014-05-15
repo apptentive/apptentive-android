@@ -87,18 +87,22 @@ To set up the **Ratings Prompt**, visit [apptentive.com](https://be.apptentive.c
 Ratings Prompt*. There, you can customize the **Ratings Prompt** content, specify which **Event** to target the prompt
 with, and configure when to thos the prompt, and who to show it to.
 
-![Using Custom Events](https://raw.githubusercontent.com/apptentive/apptentive-android/master/etc/screenshots/ratings_prompt_interaction_config.png)
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/new_docs/etc/screenshots/ratings_prompt_interaction_config.png)
 
 ## Surveys
 
 **Surveys** are **Interactions** that help you understand the wants and needs of your customers. **Surveys** are
 composed of one of more questions, and since they are **Interactions**, can be targeted to any **Event** you have
-configured in your app. There are three supported question types: Single Select, Multiple Select, and Free Form. To set
-up a survey on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Surveys*.
+configured in your app.
 
 ![Survey Incomplete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_incomplete.png)
 ![spacer](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/10px.png)
 ![Survey Complete](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/survey_complete.png)
+
+There are three supported question types: Single Select, Multiple Select, and Free Form. To set
+up a survey on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Surveys*.
+
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/new_docs/etc/screenshots/survey_interaction_config.png)
 
 ## Upgrade Messages
 
@@ -107,6 +111,8 @@ won't see announcements or release notes that you display on your app store page
 problem. You can configure an **Upgrade Message** for each release of your app. When the user upgrades from a previous
 version of your app to one of the targeted versions, whey will see the **Upgrade Message**. To view and create **Upgrade
 Messages** on [apptentive.com](https://be.apptentive.com), navigate to *Interactions -> Upgrade Messages*.
+
+![Using Custom Events](https://raw.githubusercontent.com/skykelsey/apptentive-android/new_docs/etc/screenshots/upgrade_message_interaction_config.png)
 
 **Note**: **Upgrade Messages** are always targeted to the special `init` **Event**. you should trigger `init` at
 the first opportunity when your app starts up by calling `Apptentive.engage(this, "init")`.
@@ -138,6 +144,7 @@ see them. Customers with devices running Android 4+ will also be able to send sc
 ![Message Center Reply Received](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/message_center_default_reply_received.png)
 
 Here is what the other side of the conversation looks like.
+
 ![Website Conversation View](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/website_conversation_default_reply.png)
 
 The Apptentive Android SDK checks for new messages every 60 seconds while your app is running. When **Message Center**
@@ -358,7 +365,7 @@ this up to date and working, but there may be a lag between new releases of the 
         }
     }
     ```
-4. In your main module's build.gradle file, add a reference to the Apptentive Android SDK :
+4. In your main module's build.gradle file, add a reference to the Apptentive Android SDK:
     ```
     dependencies {
         compile project(":apptentive-android-sdk")
