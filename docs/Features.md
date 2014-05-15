@@ -1,3 +1,9 @@
+# Apptentive Android SDK Features
+
+The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it,
+you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at
+specific points within your app, and more.
+
 # System Requirements
 
 ### SDK Versions
@@ -62,6 +68,8 @@ while an **Interaction** is a view that is displayed when `engage()` is called.
 
 **Interactions** can be configured on [apptentive.com](https://be.apptentive.com) by clicking the *Interactions*
 link in the top bar.
+
+**Note:** Interactions are fetched automatically by our SDK and cached locally for 24 hours.
 
 ## Ratings Prompt
 
@@ -131,6 +139,10 @@ see them. Customers with devices running Android 4+ will also be able to send sc
 
 Here is what the other side of the conversation looks like.
 ![Website Conversation View](https://raw.github.com/apptentive/apptentive-android/master/etc/screenshots/website_conversation_default_reply.png)
+
+The Apptentive Android SDK checks for new messages every 60 seconds while your app is running. When **Message Center**
+is open, it checks every 8 seconds, in order to provide lower latency. Messages sent from the client are sent
+immediately.
 
 ### Displaying Message Center
 

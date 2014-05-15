@@ -1,12 +1,11 @@
 # Integration & Testing
 
-The Apptentive Android SDK lets you provide a powerful and simple channel to communicate with your customers. With it,
-you can manage your app's ratings, let your customers give you feedback, respond to customer feedback, show surveys at
-specific points within your app, and more.
+This document will show you how to integrate the Apptentive Android SDK into your app, configure it, and test to make
+sure it's working properly. Each section lists the minimum necessary configuration, as well as optional steps.
 
 # Download
 
-The Apptentive Android SDK is open source. The project is located [here](https://github.com/apptentive/apptentive-android).
+The Apptentive Android SDK is open source. The project is lociated [here](https://github.com/apptentive/apptentive-android).
 
 To download the SDK, either clone the SDK
 
@@ -14,9 +13,13 @@ To download the SDK, either clone the SDK
 
 Or download the [latest release](https://github.com/apptentive/apptentive-android/releases).
 
+### Keep Up To Date
+
+We strive to fix bugs and add new features as quickly as possible. Please watch our Github repo so stay up to date.
+
 # Setting up the Project
 
-## Using IntelliJ IDEA
+### Using IntelliJ IDEA
 
 These instructions were tested with IntelliJ IDEA 13.1.2
 
@@ -31,7 +34,7 @@ These instructions were tested with IntelliJ IDEA 13.1.2
 8. Choose `Module Dependency...`, select `apptentive-android-sdk` module, and click `OK`
 9. Click `OK` to save and close the settings
 
-## Using Eclipse
+### Using Eclipse
 
 These instructions were tested for the Juno Eclipse release.
 
@@ -98,7 +101,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
 </manifest>
 ```
 
-Note: Be sure to input your Apptentive API Key where it says `YOUR_API_KEY_GOES_HERE`.
+**Note:** Be sure to input your Apptentive API Key where it says `YOUR_API_KEY_GOES_HERE`.
 
 # Integrate your Activities with Apptentive
 
@@ -141,11 +144,11 @@ You can mix and match, but make sure they all integrate in one of the following 
 
 The [Message Center](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#message-center) is a self contained Activity that you can launch with the `Apptentive.showMessageCenter()` method.
 
-You should find a place in your app where you can create a link or button that opens your Message Center.
+You should find a place in your app where you can create a link or button that opens your **Message Center**.
 
 ###### Example
 
-Here is how you can show Message Center by hooking it up to a button in your app.
+Here is how you can show **Message Center** by hooking it up to a button in your app.
 
 ```java
 Button messageCenterButton = (Button)findViewById(R.id.your_message_center_button);
@@ -156,8 +159,10 @@ messageCenterButton.setOnClickListener(new View.OnClickListener(){
 });
 ```
 
+### Send Custom Data With a Message (Optional)
+
 Additionally, you can supply custom key/value pairs that will be sent in the next message that the customer sends while
-the Message Center is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
+**Message Center** is open. For instance, if you have a dining app, you could pass in a key of `restaurant` and value of
 `Joe's Pizza`. If the customer sends a more than one message, only the first message will include this custom data. If
 you wish to add more custom data to another subsequent message, you will need to call this method with custom data again.
 
@@ -169,9 +174,12 @@ you wish to add more custom data to another subsequent message, you will need to
     Apptentive.showMessageCenter(YourActivity.this, customData);
 ```
 
-### New Message Notification
+### New Message Notification (Optional)
 
 If you would like to be notified when a new message is sent to the client, register a listener using `Apptentive.setUnreadMessagesListener(UnreadMessageListener listener)`.
+When the number of unread messages changes, either because your customer read a message, or a new message came in, [onUnreadMessageCountChanged(int unreadMessages)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/module/messagecenter/UnreadMessagesListener.html#onUnreadMessageCountChanged%28int%29)
+will be called. Because this listener could be called at any time, you should store the value returned from this method,
+and then perform any user interaction you desire at the appropriate time.
 
 ###### Example
 
@@ -185,55 +193,191 @@ Apptentive.setUnreadMessagesListener(
 );
 ```
 
-# Interactions
+# Adding Events
 
-Interactions are user interfaces that are displayed to the user. Interactions include Ratings Prompts, Surveys, and
-Upgrade Messages. Interactions are all invoked by triggering an Event. Which Interaction gets shown, and when, is
-determined by settings on the server.
+You should add a handful of [Events](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#events)
+to your app when you integrate. Since **Events** are both records of an action within your app being performed, and an
+opportunity to show an [Interaction](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#interactions),
+you should choose places within your app that would be appropriate to interact with your customer, as well as places
+where a significant event has occured. The more **Events** you add during integration, the more you will learn about
+your customers, and the more fine tuned your communications with them can be. Here is a list of potential places to add
+**Events**.
 
-## Adding Events
+Places where you might want to show an **Interaction**:
+* Main Activity gains focus
+* Settings Activity gains focus
+* Customer performs an action that indicates they are confused
+* There is a natural pause in the app's UI where starting a conversation would not offend the customer
 
-Events are records of action having taken place, as well as an opportunity to show an Interaction. You should add Events
-at places within your app where users perform important or notable actions, as well as places where it is appropriate to
-show an Interaction to a user.
+Places where you might want to record a significant event:
+* Customer makes a purchase
+* Customer declines to make a purchase
+* Customer beats a level
+* Customer performs an action that indicates they know how to use your app
+* Customer performs an action that indicates they are confused
+* Your app crashes
 
-To add an Event, make a call to `boolean Apptentive.engage(Activity activity, String eventName)`. This method will
-record the Event, and display an Interaction if there is an Interaction targeted to the Event that is able to be shown.
+As you can see, there is some overlap in whether you want to just record an **Event**, or also show an **Interaction**.
+
+To add an **Event** and possibly show an **Interaction**, simply call [Apptentive.engage(Activity activity, String eventName)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29)
+with an `eventName` of your choosing.
+
+###### Examples
+
+Add an **Event** when your app's main Activity comes up.
 
 ```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        // Engage a code point called "init".
+        boolean shown = Apptentive.engage(this, "main_activity_focused");
+    }
+}
+```
+
+**Note:** Each **Event** should have a unique name.
+
+
+# Configure Interactions
+
+Once you have configured your app to use several **Events**, you can configure **Interactions** on [apptentive.com](https://be.apptentive.com)
+
+
+// TODO
 
 # Interaction specific methods
 
+// TODO
+
+Survey Finished Listener
 
 # Push Notifications
 
-# Email address
+**Apptentive** can send [push notifications](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#push-notifications)
+to your app when you reply to your customers. Your replies are more likely to be seen by your customer when you do this.
+To set up push notifications, you will need to enter your push credentials on [apptentive.com](https://be.apptentive.com),
+send us the id that your push provider uses to identify the device, and call into our SDK when you receive and open a
+push notification.
+
+### Supported Push Providers
+
+* Urban Airship
+* Amazom Web Services SNS
+
+### Configuring Your Push Credentials
+
+To enter your push credentials, go to [apptentive.com](https://be.apptentive.com), select *Settings -> Integrations*,
+choose either *Urban Airship* or *Amazon Web Services SNS*, and follow the instructions on that page.
+
+### Setting the Device Token
+
+In order for **Apptentive** to send push notifications to the correct device, you will need to pass us the device
+identifier for the push provider you are using.
+
+#### Setting the Urban Airship APID
+
+The Urban Airship device ID is called *APID* (Airship Push ID). You can retreive it in one of two ways:
+
+1. If you set up Urban Airship using a BroadcastReceiver to listen to Intents that Urban Airship sends you, you can
+retreive the APID by listening for the Intent with action [PushManager.ACTION_REGISTRATION_FINISHED](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#ACTION_REGISTRATION_FINISHED),
+grabbing the extra data [PushManager.EXTRA_APID](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#EXTRA_APID),
+and passing it to [Apptentive.addUrbanAirshipPushIntegration(Context context, String apid](http://www.apptentive.com/docs/android/api/index.html?com/apptentive/android/sdk/ApptentiveActivity.html).
+
+###### Example
+
+```java
+String apid = intent.getStringExtra(PushManager.EXTRA_APID);
+Apptentive.addUrbanAirshipPushIntegration(context, apid);
+```
+
+This method is preferable, because you will get the APID at the earliest possible time after the app is registered with
+UA, and will only need to give it to the Apptentive SDK once.
+
+2. If you are not using a broadcast receiver, you can call [PushManager.getAPID()](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29).
+This method may return null if Urban Airship hasn't finished registering, so don't give it to us until it returns an
+actual apid.
+
+###### Example
+
+```java
+String apid = PushManager.getAPID();
+if (apid != null) {
+  Apptentive.addUrbanAirshipPushIntegration(context, apid);
+}
+```
+
+#### Setting the Amazon Web Services SNS Registration ID
+
+Amazzon Web Services SNS uses GCM directly on the client, so you will need to use the GCM API to retreive the
+Registration ID. See the [GCM documentation](http://developer.android.com/google/gcm/client.html) if you are unsure how
+to retreive your Registration ID. When you have the Registration ID, pass it to [Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addAmazonSnsPushIntegration%28android.content.Context,%20java.lang.String%29).
+
+###### Example
+```java
+String registrationId;
+Apptentive.addAmazonSnsPushIntegration(this, registrationId);
+```
+### Displaying the Push Notification
+
+Opening an Apptentive push notification involves three easy steps: Pass the push notification to [Apptentive.setPendingPushNotification(Context context, Intent intent)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification%28android.content.Context,%20android.content.Intent%29),
+launch your main Activity, and display the push notification with [Apptentive.handleOpenedPushNotification(Activity activity)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#handleOpenedPushNotification%28android.app.Activity%29).
+This two pass approach is necessary to avoid double displaying the push notification. Both of these methods do nothing
+if the push notification didn't come from Apptentive.
+
+###### Example
+
+Push notification opened.
+
+```java
+Apptentive.setPendingPushNotification(context, intent);
+
+// Launch your main Activity
+```
+
+In your main Activity, open the push notification.
+
+```java
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+  super.onWindowFocusChanged(hasFocus);
+  if (hasFocus) {
+    boolean ranApptentive = Apptentive.handleOpenedPushNotification(this);
+    if (ranApptentive) {
+      // Don't try to take any action here. Wait until the customer closes our UI.
+      return;
+    }
+  }
+}
+```
+
+# Set Customer Email address
+
+If you already know the customer's email address, you can pass it to us during initialization. Simple call [Apptentive.setInitialUserEmail(Context context, String email)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setInitialUserEmail%28android.content.Context,%20java.lang.String%29).
+Make sure to call it in your main Activity's `onCreate()`.
 
 # Custom Data
+
+You can send [Custom Data](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#custom-data)
+associated with either the device, or the person using the app. This is useful for sending
+user IDs and other information that helps you support your users better. **Custom Data** can also be used for
+configuring when [Interactions](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#interactions)
+will run. For best results, call this during `onCreate()`.
+
+###### Example
+
+Send the user ID of this person.
+
+```java
+Apptentive.addCustomPersonData(this, "1234567890");
+```
 
 # Attachments
 
 # Setting Rating Provider
 
 # Sending Attachment Messages
-
-You can send attachments such as files and logs to the server to help provide better support. To send attachments to the
-server, use `sendAttachment()`.
-
-We provide several methods for sending file and text attachments.
-
-```java
-public static void sendAttachmentText(Context context, String text);`
-```
-```java
-public static void sendAttachmentFile(Context context, String uri);
-```
-```java
-public static void sendAttachmentFile(Context context, byte[] content, String mimeType);
-```
-```java
-public static void sendAttachmentFile(Context context, InputStream is, String mimeType);
-```
 
 ### Interactions
 
