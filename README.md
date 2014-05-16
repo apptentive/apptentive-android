@@ -19,6 +19,10 @@ and how they use your app, and to talk to them at the right time and in the righ
 
 We appriciate contributions to make this SDK better. If you have an improvement or bug fix, please [read this](CONTRIBUTING.md).
 
+#### Reporting Bugs
+
+If you find a bug, please fill in the contriibutor agreement, then open a [github issue](https://github.com/apptentive/apptentive-android/issues?direction=desc&sort=created&state=open).
+If it is an urgent bug, please contact support@apptentive.com.
 #### Notes
 
 * Make sure you have latest version or our SDK. We're always adding new features!
