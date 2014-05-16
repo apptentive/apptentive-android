@@ -5,7 +5,7 @@ sure it's working properly. Each section lists the minimum necessary configurati
 
 # Download
 
-The Apptentive Android SDK is open source. The project is lociated [here](https://github.com/apptentive/apptentive-android).
+The Apptentive Android SDK is open source. The project is located [here](https://github.com/apptentive/apptentive-android).
 
 To download the SDK, either clone the SDK
 
@@ -15,7 +15,7 @@ Or download the [latest release](https://github.com/apptentive/apptentive-androi
 
 ### Keep Up To Date
 
-We strive to fix bugs and add new features as quickly as possible. **Please watch our Github repo so stay up to date.**
+We strive to fix bugs and add new features as quickly as possible. **Please watch our Github repo to stay up to date.**
 
 # Setting up the Project
 
@@ -50,7 +50,7 @@ These instructions were tested for the Juno Eclipse release.
 
 # Modifying your Manifest
 
-You will need to copy in the bold text below into your AndroidManifest.xml. Comments note the required and optional changes.
+You will need to make the following changes to your AndroidManifest.xml. Comments note the required and optional changes.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -70,7 +70,7 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
                       android:smallScreens="true"
                       android:anyDensity="true"/>
 
-    <!-- minSDKVersion must be at least 7 -->
+    <!-- Your minSDKVersion is required to be at least 7. -->
     <uses-sdk android:minSdkVersion="7"
               android:targetSdkVersion="19"/>
 
@@ -85,13 +85,11 @@ You will need to copy in the bold text below into your AndroidManifest.xml. Comm
             </intent-filter>
         </activity>
 
+        <!-- The following is required -->
         <!-- Include your App's Apptentive API key from your app's "settings" page on www.apptentive.com -->
         <meta-data android:name="apptentive_api_key" android:value="YOUR_API_KEY_GOES_HERE"/>
-
-        <!-- Add a reference to Apptentive's ViewActivity and NetworkStateReceiver -->
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/Apptentive.Theme.Transparent"/>
-
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
@@ -208,7 +206,7 @@ Places where you might want to show an **Interaction**:
 * Main Activity gains focus
 * Settings Activity gains focus
 * Customer performs an action that indicates they are confused
-* There is a natural pause in the app's UI where starting a conversation would not offend the customer
+* There is a natural pause in the app's UI where starting a conversation would not interrupt the customer
 
 Places where you might want to record a significant event:
 * Customer makes a purchase
@@ -251,7 +249,7 @@ To set up the [Ratings Prompt](https://github.com/skykelsey/apptentive-android/b
 **Interaction**, first make sure you have created some [Events](#adding-events) in your app. Then, go to
 *Interactions -> Ratings Prompt*. There, you will be able to customize the text and behavior of the dialogs that make up
 the **Ratings Prompt**, and configure the logic that will determine when it will be shown. You will also need to pick
-where the **Ratings Prompt** will be shownn, by choosing an **Event** from the dropdown.
+where the **Ratings Prompt** will be shown, by choosing an **Event** from the dropdown.
 
 #### Surveys
 
@@ -261,7 +259,7 @@ Create a new survey. You can give it a title and description, then add questions
 constraints so it's shown to the right people. After your survey is live, you will start to see results in the *Surveys*
 page.
 
-**Note:** If you were using surveys prior to version 1.5.0 of the Apptentive Android SDK, see this Migration Guide for
+**Note:** If you were using surveys prior to version 1.5.0 of the Apptentive Android SDK, see this [Migration Guide](MigratingTo_1.5.0.md) for
 instructions.
 
 #### Upgrade Messages
@@ -322,7 +320,7 @@ and passing it to [Apptentive.addUrbanAirshipPushIntegration(Context context, St
 
 2. If you are not using a broadcast receiver, you can call [PushManager.getAPID()](http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29).
 This method may return null if Urban Airship hasn't finished registering, so don't give it to us until it returns an
-actual apid.
+actual APID.
 
     ###### Example
 
@@ -335,7 +333,7 @@ actual apid.
 
 #### Setting the Amazon Web Services SNS Registration ID
 
-Amazzon Web Services SNS uses GCM directly on the client, so you will need to use the GCM API to retreive the
+Amazon Web Services SNS uses GCM directly on the client, so you will need to use the GCM API to retreive the
 Registration ID. See the [GCM documentation](http://developer.android.com/google/gcm/client.html) if you are unsure how
 to retreive your Registration ID. When you have the Registration ID, pass it to [Apptentive.addAmazonSnsPushIntegration(Context context, String registrationId)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addAmazonSnsPushIntegration%28android.content.Context,%20java.lang.String%29).
 
@@ -403,7 +401,7 @@ Apptentive.addCustomPersonData(this, "1234567890");
 
 # Attachments
 
-You can send [hidden messages and attachments](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#sending-hidden-messages-and-attachments) to Apptentoive that will show up in your customer conversation view on [apptentive.com](https://be.apptentive.com),
+You can send [hidden messages and attachments](https://github.com/skykelsey/apptentive-android/blob/new_docs/docs/Features.md#sending-hidden-messages-and-attachments) to Apptentive that will show up in your customer conversation view on [apptentive.com](https://be.apptentive.com),
 but are not shown to your customer.
 
 ###### Example
@@ -435,5 +433,5 @@ interface, and pass your implementation to `setRatingProvider()`.
 ###### Using the Amazon Appstore Rating Provider
 
 ```java
-Apptentive.setRatingProvider(new AmaonAppstoreRatingProvider);
+Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider);
 ```
