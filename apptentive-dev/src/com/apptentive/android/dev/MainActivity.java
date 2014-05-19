@@ -34,8 +34,8 @@ public class MainActivity extends ApptentiveActivity {
 		//Apptentive.setUserEmail("user_email@example.com");
 
 		// OPTIONAL: To send extra about the device to the server.
-		Apptentive.addCustomDeviceData(this, "user-id", "1234567890");
-		Apptentive.addCustomDeviceData(this, "user-name", "John Doe");
+		//Apptentive.addCustomDeviceData(this, "custom_device_key", "custom_device_value");
+		//Apptentive.addCustomPersonData(this, "custom_person_key", "custom_person_value");
 
 		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
 		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());

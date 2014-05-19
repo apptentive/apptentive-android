@@ -184,8 +184,9 @@ public class ComparisonPredicate extends Predicate {
 
 	@Override
 	public boolean apply(Context context) {
+		Log.v("Comparison Predicate: %s", query);
 		Comparable value = getValue(context, query);
-		Log.v("Comparison Predicate: %s = %s", query, value);
+		Log.v("   => %s",  value);
 		for (Condition condition : conditions) {
 			condition.operand = normalize(value, condition.operand);
 			Log.v("-- Compare: %s %s %s", getLoggableValue(value), condition.operation, getLoggableValue(condition.operand));
