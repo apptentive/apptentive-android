@@ -277,6 +277,7 @@ public class Apptentive {
 			}
 			Log.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
+			syncDevice(context);
 		} catch (JSONException e) {
 			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
@@ -299,10 +300,10 @@ public class Apptentive {
 	 */
 	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
 		if (apid != null) {
+			Log.i("Setting Urban Airship APID: %s", apid);
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_APID, apid);
-			Apptentive.addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
-			Log.i("Setting Urban Airship APID: %s", apid);
+			addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
 		}
 	}
 
@@ -324,10 +325,10 @@ public class Apptentive {
 	 */
 	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
 		if (registrationId != null) {
+			Log.i("Setting Amazon AWS token: %s", registrationId);
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);
-			Apptentive.addIntegration(context, Apptentive.INTEGRATION_AWS_SNS, config);
-			Log.i("Setting Amazon AWS token: %s", registrationId);
+			addIntegration(context, Apptentive.INTEGRATION_AWS_SNS, config);
 		}
 	}
 
@@ -714,34 +715,10 @@ public class Apptentive {
 			InteractionManager.asyncFetchAndStoreInteractions(context);
 		}
 
-		// TODO: Do this on a dedicated thread if it takes too long. Some HTC devices might take like 30 seconds I think.
-		// See if the device info has changed.
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
-		if (deviceInfo != null) {
-			Log.d("Device info was updated.");
-			Log.v(deviceInfo.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
-		} else {
-			Log.d("Device info was not updated.");
-		}
-
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
-		if (sdk != null) {
-			Log.d("Sdk was updated.");
-			Log.v(sdk.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(sdk);
-		} else {
-			Log.d("Sdk was not updated.");
-		}
-
-		Person person = PersonManager.storePersonAndReturnDiff(context);
-		if (person != null) {
-			Log.d("Person was updated.");
-			Log.v(person.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(person);
-		} else {
-			Log.d("Person was not updated.");
-		}
+		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
+		syncDevice(context);
+		syncSdk(context);
+		syncPerson(context);
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -879,5 +856,53 @@ public class Apptentive {
 		thread.setUncaughtExceptionHandler(handler);
 		thread.setName("Apptentive-FetchAppConfiguration");
 		thread.start();
+	}
+
+	/**
+	 * Sends current Device to the server if it differs from the last time it was sent.
+	 *
+	 * @param context
+	 */
+	private static void syncDevice(Context context) {
+		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
+		if (deviceInfo != null) {
+			Log.d("Device info was updated.");
+			Log.v(deviceInfo.toString());
+			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
+		} else {
+			Log.d("Device info was not updated.");
+		}
+	}
+
+	/**
+	 * Sends current Sdk to the server if it differs from the last time it was sent.
+	 *
+	 * @param context
+	 */
+	private static void syncSdk(Context context) {
+		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
+		if (sdk != null) {
+			Log.d("Sdk was updated.");
+			Log.v(sdk.toString());
+			ApptentiveDatabase.getInstance(context).addPayload(sdk);
+		} else {
+			Log.d("Sdk was not updated.");
+		}
+	}
+
+	/**
+	 * Sends current Person to the server if it differs from the last time it was sent.
+	 *
+	 * @param context
+	 */
+	private static void syncPerson(Context context) {
+		Person person = PersonManager.storePersonAndReturnDiff(context);
+		if (person != null) {
+			Log.d("Person was updated.");
+			Log.v(person.toString());
+			ApptentiveDatabase.getInstance(context).addPayload(person);
+		} else {
+			Log.d("Person was not updated.");
+		}
 	}
 }
