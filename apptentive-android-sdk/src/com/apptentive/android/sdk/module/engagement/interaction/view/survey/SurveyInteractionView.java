@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.SurveyResponse;
@@ -19,6 +20,7 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
@@ -104,13 +106,8 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_SUBMIT, data);
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
 				Log.d("Survey Submitted.");
+				callListener(true);
 
-/*
-				TODO: How do we support this?
-				if (SurveyModule.onSurveyFinishedListener != null) {
-					SurveyModule.onSurveyFinishedListener.onSurveyFinished(true);
-				}
-*/
 				cleanup();
 			}
 		});
@@ -191,12 +188,15 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	@Override
 	public void onBackPressed(Activity activity) {
 		EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data);
-/*
-		TODO: How do we support this?
-		if (SurveyModule.this.onSurveyFinishedListener != null) {
-			SurveyModule.this.onSurveyFinishedListener.onSurveyFinished(false);
-		}
-*/
+		callListener(false);
+
 		cleanup();
+	}
+
+	private void callListener(boolean completed) {
+		OnSurveyFinishedListener listener = ApptentiveInternal.getOnSurveyFinishedListener();
+		if (listener != null) {
+			listener.onSurveyFinished(completed);
+		}
 	}
 }

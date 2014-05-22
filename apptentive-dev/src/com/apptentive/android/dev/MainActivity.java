@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 
 /**
  * @author Sky Kelsey
@@ -28,8 +29,6 @@ public class MainActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// *** BEGIN APPTENTIVE INITIALIZATION
-
 		// OPTIONAL: To specify a different user email than what the device was setup with.
 		//Apptentive.setUserEmail("user_email@example.com");
 
@@ -42,8 +41,6 @@ public class MainActivity extends ApptentiveActivity {
 
 		// Impersonate an app for ratings.
 		//Apptentive.putRatingProviderArg("package", "your.package.name");
-
-		// *** END APPTENTIVE INITIALIZATION
 
 		// If you would like to be notified when there are unread messages available, set a listener like this.
 		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
@@ -61,6 +58,14 @@ public class MainActivity extends ApptentiveActivity {
 					}
 				});
 				lastUnreadMessageCount = unreadMessages;
+			}
+		});
+
+		// Ad a listener to notify you when a survey is completed.
+		Apptentive.setOnSurveyFinishedListener(new OnSurveyFinishedListener() {
+			@Override
+			public void onSurveyFinished(boolean completed) {
+				Toast.makeText(MainActivity.this, completed ? "Survey was completed." : "Survey was skipped.", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}

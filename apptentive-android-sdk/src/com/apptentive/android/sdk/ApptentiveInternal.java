@@ -11,6 +11,7 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class ApptentiveInternal {
 
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
+	private static OnSurveyFinishedListener onSurveyFinishedListener;
 
 	public static final String PUSH_ACTION = "action";
 
@@ -67,4 +69,11 @@ public class ApptentiveInternal {
 		ratingProviderArgs.put(key, value);
 	}
 
+	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
+		ApptentiveInternal.onSurveyFinishedListener = onSurveyFinishedListener;
+	}
+
+	public static OnSurveyFinishedListener getOnSurveyFinishedListener() {
+		return onSurveyFinishedListener;
+	}
 }

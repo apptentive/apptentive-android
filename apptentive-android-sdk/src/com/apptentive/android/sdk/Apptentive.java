@@ -30,6 +30,7 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
+import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -610,6 +611,13 @@ public class Apptentive {
 		return EngagementModule.engage(activity, "local", "app", event);
 	}
 
+	/**
+	 * Pass in a listener. The listener will be called whenever a survey is finished.
+	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
+	 */
+	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
+		ApptentiveInternal.setOnSurveyFinishedListener(listener);
+	}
 
 	// ****************************************************************************************
 	// INTERNAL METHODS
