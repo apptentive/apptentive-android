@@ -141,8 +141,8 @@ public class ApptentiveClient {
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+    HttpClient httpClient = null;
 		try {
-			HttpClient httpClient;
 			HttpRequestBase request;
 			httpClient = new DefaultHttpClient();
 			switch (method) {
@@ -205,7 +205,11 @@ public class ApptentiveClient {
 			Log.w("Timeout communicating with server.");
 		} catch (IOException e) {
 			Log.w("Error communicating with server.", e);
-		}
+		} finally {
+      if (httpClient != null) {
+        httpClient.getConnectionManager().shutdown();
+      }
+    }
 		return ret;
 	}
 
