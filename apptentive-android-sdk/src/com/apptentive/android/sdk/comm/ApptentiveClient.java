@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -38,7 +38,8 @@ import java.util.*;
 
 /**
  * TODO: When we drop API level 7 (2.1) support, we can start using AndroidHttpClient.
- *       http://developer.android.com/reference/android/net/http/AndroidHttpClient.html
+ * http://developer.android.com/reference/android/net/http/AndroidHttpClient.html
+ *
  * @author Sky Kelsey
  */
 public class ApptentiveClient {
@@ -78,7 +79,7 @@ public class ApptentiveClient {
 	}
 
 	/**
-	 * Gets all messages since the message specified by guid was specified.
+	 * Gets all messages since the message specified by guid was sent.
 	 *
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
@@ -137,8 +138,8 @@ public class ApptentiveClient {
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+		HttpClient httpClient = null;
 		try {
-			HttpClient httpClient;
 			HttpRequestBase request;
 			httpClient = new DefaultHttpClient();
 			switch (method) {
@@ -186,7 +187,7 @@ public class ApptentiveClient {
 				}
 			}
 			HeaderIterator headerIterator = response.headerIterator();
-			if(headerIterator != null) {
+			if (headerIterator != null) {
 				Map<String, String> headers = new HashMap<String, String>();
 				while (headerIterator.hasNext()) {
 					Header header = (Header) headerIterator.next();
@@ -201,6 +202,10 @@ public class ApptentiveClient {
 			Log.w("Timeout communicating with server.");
 		} catch (IOException e) {
 			Log.w("Error communicating with server.", e);
+		} finally {
+			if (httpClient != null) {
+				httpClient.getConnectionManager().shutdown();
+			}
 		}
 		return ret;
 	}
@@ -210,7 +215,7 @@ public class ApptentiveClient {
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 
-		if(storedFile == null) {
+		if (storedFile == null) {
 			Log.e("StoredFile is null. Unable to send.");
 			return ret;
 		}
@@ -299,7 +304,7 @@ public class ApptentiveClient {
 				nbaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
 				int eRead;
-				while ( nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
+				while (nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
 					nbaos.write(eBuf, 0, eRead);
 				}
 				ret.setContent(nbaos.toString());
@@ -318,10 +323,10 @@ public class ApptentiveClient {
 				ebaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
 				int eRead;
-				while ( eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
+				while (eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
 					ebaos.write(eBuf, 0, eRead);
 				}
-				if(ebaos.size() > 0) {
+				if (ebaos.size() > 0) {
 					ret.setContent(ebaos.toString());
 				}
 			} catch (IOException e) {

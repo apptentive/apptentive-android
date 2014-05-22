@@ -194,6 +194,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 					activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
 				}
 			});
+			validateForm(sendButton);
 		} else {
 			activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
 			activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
