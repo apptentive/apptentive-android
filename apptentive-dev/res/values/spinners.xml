@@ -15,7 +15,7 @@
 
     <string-array name="events">
         <item>init</item>
-        <item>main_activity_launch</item>
+        <item>test_survey_interaction</item>
     </string-array>
 
     <string-array name="internal_events">
