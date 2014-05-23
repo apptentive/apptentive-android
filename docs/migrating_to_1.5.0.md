@@ -5,7 +5,7 @@ version of our SDK, and utilizing our Survey product, you will need to perform t
 already using surveys, you can ignore this document.
 
 **Note:** If you were using a version of our SDK prior to 1.4.0, and you were using **Ratings**, you will also need to
-read [Migrating to 1.4.0](https://github.com/apptentive/apptentive-android/blob/master/docs/MigratingTo_1.4.0.md).
+read [Migrating to 1.4.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.4.0.md).
 
 ## Interactions
 
