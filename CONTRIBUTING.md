@@ -1,5 +1,5 @@
-Contributing
-------------
+# Contributing
+
 We love contributions!
 
 Any contributions to the master apptentive-ios project must sign the [Individual Contributor License Agreement (CLA)](https://docs.google.com/a/apptentive.com/spreadsheet/viewform?formkey=dDhMaXJKQnRoX0dRMzZNYnp5bk1Sbmc6MQ#gid=0). It's a doc that makes our lawyers happy and ensures we can provide a solid open source project.

@@ -1,5 +1,21 @@
 This document tracks changes to the API between versions.
 
+# 1.5.0
+
+Refactored [Surveys](http://www.apptentive.com/docs/android/features/#surveys) to use the new Event framework. You should use [Apptentive.engage(Activity activity, String eventName)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29) instead of `Apptentive.showSurvey()`.
+
+[New Survey integration instructions.](http://www.apptentive.com/docs/android/integration/#surveys)
+
+[Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_t_1.5.0.md)
+
+| Removed Methods |
+| --------------- |
+| `public static boolean showSurvey(Activity activity, OnSurveyFinishedListener listener, String... tags)` |
+
+| Added Methods |
+| ------------- |
+| [public static boolean Apptentive.engage(Activity activity, String eventName)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29) |
+| [public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setOnSurveyFinishedListener%28com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener%29) |
 
 # 1.4.2
 

@@ -22,7 +22,6 @@ If it is an urgent bug, please contact support@apptentive.com.
 
 We appriciate contributions to make this SDK better. If you have an improvement or bug fix, please [read this](CONTRIBUTING.md).
 
-
 #### Notes
 
 * Make sure you have latest version or our SDK. We're always adding new features!
