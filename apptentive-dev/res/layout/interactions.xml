@@ -111,6 +111,44 @@
                         android:layout_marginTop="4dp"
                         android:onClick="fetchInteractions"
                         android:text="Fetch Interactions"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="8dp"
+                              android:background="@drawable/section_background"
+                              android:orientation="vertical">
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="32dp"
+                              android:gravity="left|center_vertical"
+                              android:textSize="@dimen/apptentive_text_medium"
+                              android:textColor="@android:color/white"
+                              android:text="Force Show Ratings Prompt"/>
+                    <TextView android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:gravity="left|center_vertical"
+                              android:textSize="@dimen/apptentive_text_small"
+                              android:textColor="@android:color/white"
+                              android:text="This will force the Ratings Prompt to display if there is one returned from the server."/>
+                    <LinearLayout android:layout_width="fill_parent"
+                                  android:layout_height="48dp"
+                                  android:layout_marginTop="4dp"
+                                  android:orientation="horizontal">
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="1"
+                                android:onClick="checkForInteraction"
+                                android:text="Can Show?"/>
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="1"
+                                android:onClick="forceRatingsPrompt"
+                                android:text="Show"/>
+                    </LinearLayout>
+                    <EditText android:id="@+id/force_ratings_prompt_event_name"
+                              android:layout_width="fill_parent"
+                              android:layout_height="48dp"
+                              android:cursorVisible="true"
+                              android:hint="Event Name…"/>
+                </LinearLayout>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

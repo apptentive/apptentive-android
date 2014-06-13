@@ -7,24 +7,33 @@
 package com.apptentive.android.dev;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
+import android.widget.*;
 import com.apptentive.android.dev.util.FileUtil;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
+import com.apptentive.android.sdk.module.metric.MetricModule;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Sky Kelsey
@@ -360,5 +369,66 @@ public class InteractionsActivity extends ApptentiveActivity {
 		InteractionManager.asyncFetchAndStoreInteractions(view.getContext());
 	}
 
+	public void forceRatingsPrompt(View view) {
+		String eventName = ((EditText) findViewById(R.id.force_ratings_prompt_event_name)).getText().toString();
+		boolean shown = forceShowRatingsPromptInteraction(this, eventName);
+		Log.e("Force showed Ratings Prompt? %b", shown);
+	}
 
+	public void checkForInteraction(View view) {
+		String eventName = ((EditText) findViewById(R.id.force_ratings_prompt_event_name)).getText().toString();
+		boolean available = isInteractionAvailable(this, eventName);
+		Toast.makeText(this, "Ratins Prompt Available? " + available, Toast.LENGTH_SHORT).show();
+		Log.e("Ratings Prompt Available? %b", available);
+	}
+
+	public static boolean forceShowRatingsPromptInteraction(Activity activity, String eventName) {
+		if (eventName == null) {
+			Log.w("Event name is null. Can't force show Ratings Prompt.");
+			return false;
+		}
+		try {
+			String eventLabel = EngagementModule.generateEventLabel("local", "app", eventName);
+			Log.d("Force Showing Ratings Prompt at: ", eventLabel);
+
+			Interaction interaction = getRatingsPromptInteraction(activity, eventLabel);
+
+			if (interaction != null) {
+				CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
+				EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, (JSONObject)null));
+
+				CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
+				EngagementModule.launchInteraction(activity, interaction);
+				return true;
+			}
+		} catch (Exception e) {
+			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+			Log.e("Error:", e);
+		}
+		return false;
+	}
+
+	public static boolean isInteractionAvailable(Context context, String eventName) {
+		if (eventName == null) {
+			Log.w("Event name is null. Can't check for Ratings Prompt.");
+			return false;
+		}
+
+		String eventLabel = EngagementModule.generateEventLabel("local", "app", eventName);
+		Interaction interaction = getRatingsPromptInteraction(context, eventLabel);
+		return interaction != null;
+	}
+
+	public static Interaction getRatingsPromptInteraction(Context context, String eventLabel) {
+		Interactions interactions = InteractionManager.loadInteractions(context);
+		List<Interaction> interactionList = interactions.getInteractionList(eventLabel);
+
+		for (Interaction interaction : interactionList) {
+			switch (interaction.getType()) {
+				case EnjoymentDialog:
+					return interaction;
+			}
+		}
+		return null;
+	}
 }
