@@ -57,7 +57,7 @@ public class ActivityLifecycleManager {
 	 * will occur if the number of seconds between one Activity defined in the Application calling onStop(), and another
 	 * calling onStart() exceeds this value.
 	 * <p/>
-	 * Ten seconds was choosen because it is unlikely that it would take an Activity more than that amount of time to
+	 * Ten seconds was chosen because it is unlikely that it would take an Activity more than that amount of time to
 	 * be created and started, but it is also unlikely that we would incorrectly decide an Application session was still
 	 * in affect after ten seconds had passed.
 	 */

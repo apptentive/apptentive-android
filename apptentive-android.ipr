@@ -205,7 +205,18 @@
     <option name="PREFERRED_PROJECT_CODE_STYLE" value="Apptentive" />
   </component>
   <component name="ProjectDictionaryState">
-    <dictionary name="sky" />
+    <dictionary name="sky">
+      <words>
+        <w>apid</w>
+        <w>appstore</w>
+        <w>bootloader</w>
+        <w>debuggable</w>
+        <w>multipart</w>
+        <w>screenshots</w>
+        <w>useragent</w>
+        <w>webview</w>
+      </words>
+    </dictionary>
   </component>
   <component name="ProjectModuleManager">
     <modules>

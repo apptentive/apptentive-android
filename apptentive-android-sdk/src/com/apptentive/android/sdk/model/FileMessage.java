@@ -45,7 +45,7 @@ public class FileMessage extends Message {
 	}
 
 	/**
-	 * FileMessages are sent using a multipart form encoded request, so they are handled differently here.
+	 * FileMessages are sent using a multi-part form encoded request, so they are handled differently here.
 	 *
 	 * @return A String containing just the meta data about the FileMessage.
 	 */

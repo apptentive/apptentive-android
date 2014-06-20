@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -112,7 +111,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 					maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 					maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 					imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null);
-					Log.v("Loaded bitmap and resized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
+					Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 					imageView.post(new Runnable() {
 						public void run() {
 							imageView.setImageBitmap(imageBitmap);
@@ -123,9 +122,9 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 				} catch (Exception e) {
 					Log.e("Error opening stored image.", e);
 				} catch (OutOfMemoryError e) {
-					// It's generally not a good idea to catch an OOME. But in this case, the OOME had to result from allocating a bitmap,
-					// So the system should be in a good state.
-					// TODO: Log an event to the server so we know an OOME occurred.
+					// It's generally not a good idea to catch an OutOfMemoryException. But in this case, the OutOfMemoryException
+					// had to result from allocating a bitmap, so the system should be in a good state.
+					// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
 					Log.e("Ran out of memory opening image.", e);
 				} finally {
 					Util.ensureClosed(fis);

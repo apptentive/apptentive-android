@@ -51,7 +51,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		this.context = context;
 		MessageCenterView.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
-		setup(); // TODO: Move this into a configurationchange handler?
+		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
 	protected void setup() {
