@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 
 /**
@@ -19,6 +20,7 @@ import android.app.Activity;
  * @see ApptentiveListActivity
  * @author Sky Kelsey
  */
+@SuppressLint("Registered")
 public class ApptentiveActivity extends Activity {
 
 	@Override
