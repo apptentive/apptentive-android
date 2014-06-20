@@ -29,7 +29,7 @@ public class EnjoymentDialogInteraction extends Interaction {
 		if (configuration != null && !configuration.isNull(KEY_TITLE)) {
 			return configuration.optString(KEY_TITLE, null);
 		}
-		return context.getResources().getString(R.string.apptentive_intro_dialog_body, Configuration.load(context).getAppDisplayName());
+		return context.getResources().getString(R.string.apptentive_do_you_love_this_app, Configuration.load(context).getAppDisplayName());
 	}
 
 	public String getYesText() {
