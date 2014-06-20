@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -36,6 +36,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
+	private static final String KEY_HIDE_BRANDING = "hide_apptentive_branding";
 
 	// This one is not sent in JSON, but as a header form the server.
 	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
@@ -251,6 +252,29 @@ public class Configuration extends JSONObject {
 		}
 
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
+	}
+
+	public boolean isHideBranding(Context context) {
+		try {
+			JSONObject messageCenter = getMessageCenter();
+			if (messageCenter != null) {
+				if (!messageCenter.isNull(KEY_HIDE_BRANDING)) {
+					return messageCenter.getBoolean(KEY_HIDE_BRANDING);
+				}
+			}
+		} catch (JSONException e) {
+			// Move on.
+		}
+
+		try {
+			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			Bundle metaData = ai.metaData;
+			return metaData.getBoolean(Constants.MANIFEST_KEY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
+		} catch (Exception e) {
+			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_HIDE_BRANDING);
+		}
+
+		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
 	}
 
 	public long getConfigurationCacheExpirationMillis() {

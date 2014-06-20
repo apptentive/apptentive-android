@@ -58,6 +58,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		LayoutInflater inflater = context.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
+		// Hide branding if needed.
+		final View branding = findViewById(R.id.apptentive_branding_view);
+		if (branding != null) {
+			if (Configuration.load(context).isHideBranding(context)) {
+				branding.setVisibility(View.GONE);
+			} else {
+				branding.setOnClickListener(new OnClickListener() {
+					public void onClick(View view) {
+						AboutModule.getInstance().show(context);
+					}
+				});
+			}
+		}
+
 		TextView titleTextView = (TextView) findViewById(R.id.apptentive_message_center_header_title);
 		String titleText = Configuration.load(context).getMessageCenterTitle();
 		if (titleText != null) {
@@ -99,13 +113,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				onSendMessageListener.onSendTextMessage(text);
 				message = null;
 				Util.hideSoftKeyboard(context, view);
-			}
-		});
-
-		View aboutApptentive = findViewById(R.id.apptentive_message_center_powered_by_apptentive);
-		aboutApptentive.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				AboutModule.getInstance().show(context);
 			}
 		});
 

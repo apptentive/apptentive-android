@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -15,8 +15,7 @@
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="4dp"
                  android:background="@color/apptentive_survey_separator"/>
-    <LinearLayout android:id="@+id/apptentive_branding_view"
-                  android:layout_width="fill_parent"
+    <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="48dp"
                   android:gravity="center"
                   android:orientation="horizontal">

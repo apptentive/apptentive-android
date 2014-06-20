@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
@@ -70,6 +71,14 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		}
 
 		activity.setContentView(R.layout.apptentive_survey);
+
+		// Hide branding if needed.
+		final View branding = activity.findViewById(R.id.apptentive_branding_view);
+		if (branding != null) {
+			if (Configuration.load(activity).isHideBranding(activity)) {
+				branding.setVisibility(View.GONE);
+			}
+		}
 
 		TextView title = (TextView) activity.findViewById(R.id.title);
 		title.setFocusable(true);

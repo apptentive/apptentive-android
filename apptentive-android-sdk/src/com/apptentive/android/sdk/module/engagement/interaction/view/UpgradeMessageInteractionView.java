@@ -14,9 +14,9 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
 
@@ -51,8 +51,11 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 		webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
 
 		// If branding is not desired, turn the view off.
-		if (!interaction.isShowPoweredBy()) {
-			activity.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
+		final View branding = activity.findViewById(R.id.apptentive_branding_view);
+		if (branding != null) {
+			if (!interaction.isShowPoweredBy() || Configuration.load(activity).isHideBranding(activity)) {
+				branding.setVisibility(View.GONE);
+			}
 		}
 	}
 

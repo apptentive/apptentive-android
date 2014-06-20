@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -66,7 +66,7 @@
                        android:clickable="true"
                        android:src="@drawable/android_ic_action_send"/>
         </LinearLayout>
-        <FrameLayout android:id="@+id/apptentive_message_center_powered_by_apptentive"
+        <FrameLayout android:id="@+id/apptentive_branding_view"
                      android:layout_width="fill_parent"
                      android:layout_height="24dp"
                      android:background="@android:color/black">

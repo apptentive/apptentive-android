@@ -75,6 +75,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
+	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
 
 	// Manifest keys
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
@@ -83,6 +84,7 @@ public class Constants {
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
 	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
+	public static final String MANIFEST_KEY_HIDE_BRANDING = "apptentive_hide_branding";
 
 	// View layout shortcuts
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
