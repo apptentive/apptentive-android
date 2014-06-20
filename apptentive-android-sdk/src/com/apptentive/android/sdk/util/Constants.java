@@ -48,10 +48,6 @@ public class Constants {
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
-	public static final String PREF_KEY_SURVEYS = "surveys";
-	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
-	public static final String PREF_KEY_SURVEYS_HISTORY = "surveyHistory";
-
 	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
 
 	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
@@ -63,7 +59,6 @@ public class Constants {
 
 	// Config Defaults
 	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
-	public static final int CONFIG_DEFAULT_SURVEY_CACHE_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_DAYS_BEFORE_PROMPT = 30;
@@ -92,6 +87,9 @@ public class Constants {
 
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
+	public static final String PREF_KEY_SURVEYS = "surveys";
+	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
+	public static final String PREF_KEY_SURVEYS_HISTORY = "surveyHistory";
 	public static final String PREF_KEY_USER_ENTERED_EMAIL = "userEnteredEmail";
 	public static final String PREF_KEY_APP_VERSION_CODE = "app_version_code";
 	public static final String PREF_KEY_APP_VERSION_NAME = "app_version_name";
@@ -107,22 +105,22 @@ public class Constants {
 	 * @see android.telephony.TelephonyManager
 	 */
 	private static final String[] networkTypeLookup = {
-			"UNKNOWN", //  0
-			"GPRS",    //  1
-			"EDGE",    //  2
-			"UMTS",    //  3
-			"CDMA",    //  4
-			"EVDO_0",  //  5
-			"EVDO_A",  //  6
-			"1xRTT",   //  7
-			"HSDPA",   //  8
-			"HSUPA",   //  9
-			"HSPA",    // 10
-			"IDEN",    // 11
-			"EVDO_B",  // 12
-			"LTE",     // 13
-			"EHRPD",   // 14
-			"HSPAP"    // 15
+		"UNKNOWN", //  0
+		"GPRS",    //  1
+		"EDGE",    //  2
+		"UMTS",    //  3
+		"CDMA",    //  4
+		"EVDO_0",  //  5
+		"EVDO_A",  //  6
+		"1xRTT",   //  7
+		"HSDPA",   //  8
+		"HSUPA",   //  9
+		"HSPA",    // 10
+		"IDEN",    // 11
+		"EVDO_B",  // 12
+		"LTE",     // 13
+		"EHRPD",   // 14
+		"HSPAP"    // 15
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {
