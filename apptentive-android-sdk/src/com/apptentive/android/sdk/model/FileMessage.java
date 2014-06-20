@@ -58,6 +58,7 @@ public class FileMessage extends Message {
 		try {
 			return getString(KEY_FILE_NAME);
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -74,6 +75,7 @@ public class FileMessage extends Message {
 		try {
 			return getString(KEY_MIME_TYPE);
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}

@@ -60,6 +60,7 @@ public class AppReleaseManager {
 		try {
 			return new AppRelease(appReleaseString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		return null;
 	}

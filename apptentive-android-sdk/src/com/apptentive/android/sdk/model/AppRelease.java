@@ -38,6 +38,7 @@ public class AppRelease extends Payload {
 				return getString(KEY_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -56,6 +57,7 @@ public class AppRelease extends Payload {
 				return getString(KEY_BUILD_NUMBER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -74,6 +76,7 @@ public class AppRelease extends Payload {
 				return getString(KEY_IDENTIFIER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -92,6 +95,7 @@ public class AppRelease extends Payload {
 				return getString(KEY_TARGET_SDK_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -110,6 +114,7 @@ public class AppRelease extends Payload {
 				return getString(KEY_APP_STORE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}

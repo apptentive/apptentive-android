@@ -77,10 +77,12 @@ public class DeviceManager {
 		try {
 			return new CustomData(deviceDataString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		try {
 			return new CustomData();
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null; // This should never happen.
 	}
@@ -97,10 +99,12 @@ public class DeviceManager {
 		try {
 			return new CustomData(integrationConfigString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		try {
 			return new CustomData();
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null; // This should never happen.
 	}
@@ -153,6 +157,7 @@ public class DeviceManager {
 		try {
 			return new Device(deviceString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		return null;
 	}

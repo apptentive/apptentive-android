@@ -350,6 +350,7 @@ public class ComparisonPredicate extends Predicate {
 			try {
 				return QueryType.valueOf(name);
 			} catch (IllegalArgumentException e) {
+				// Ignore
 			}
 			return other;
 		}
@@ -363,6 +364,7 @@ public class ComparisonPredicate extends Predicate {
 			try {
 				return ValueFilterType.valueOf(name);
 			} catch (IllegalArgumentException e) {
+				// Ignore
 			}
 			return other;
 		}
@@ -379,6 +381,7 @@ public class ComparisonPredicate extends Predicate {
 			try {
 				return ValueSubFilterType.valueOf(name);
 			} catch (IllegalArgumentException e) {
+				// Ignore
 			}
 			return other;
 		}

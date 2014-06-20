@@ -215,6 +215,7 @@ public class CodePointStore extends JSONObject {
 				return record.getLong(KEY_TOTAL);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return 0l;
 	}
@@ -226,6 +227,7 @@ public class CodePointStore extends JSONObject {
 				return record.getDouble(KEY_LAST);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return 0d;
 	}
@@ -240,6 +242,7 @@ public class CodePointStore extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return 0l;
 	}
@@ -254,6 +257,7 @@ public class CodePointStore extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return 0l;
 	}

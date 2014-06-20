@@ -69,6 +69,7 @@ public class SdkManager {
 		try {
 			return new Sdk(sdkString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		return null;
 	}

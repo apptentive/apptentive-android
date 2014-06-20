@@ -29,6 +29,7 @@ public class UpgradeMessageInteraction extends Interaction {
 				return configuration.getBoolean(KEY_ACTIVE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}
@@ -40,6 +41,7 @@ public class UpgradeMessageInteraction extends Interaction {
 				return configuration.getString(KEY_APP_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -51,6 +53,7 @@ public class UpgradeMessageInteraction extends Interaction {
 				return configuration.getBoolean(KEY_SHOW_APP_ICON);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}
@@ -62,6 +65,7 @@ public class UpgradeMessageInteraction extends Interaction {
 				return configuration.getBoolean(KEY_SHOW_POWERED_BY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}
@@ -73,9 +77,8 @@ public class UpgradeMessageInteraction extends Interaction {
 				return configuration.getString(KEY_BODY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
-
-
 }

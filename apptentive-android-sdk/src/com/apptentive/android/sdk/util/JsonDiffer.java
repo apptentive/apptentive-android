@@ -70,7 +70,6 @@ public class JsonDiffer {
 				ret.put(key, updated.get(key));
 			} catch (JSONException e) {
 				// This can't happen.
-				continue;
 			}
 		}
 

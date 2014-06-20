@@ -42,6 +42,7 @@ public class Sdk extends Payload {
 				return getString(KEY_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -60,6 +61,7 @@ public class Sdk extends Payload {
 				return getString(KEY_PROGRAMMING_LANGUAGE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -78,6 +80,7 @@ public class Sdk extends Payload {
 				return getString(KEY_AUTHOR_NAME);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -96,6 +99,7 @@ public class Sdk extends Payload {
 				return getString(KEY_AUTHOR_EMAIL);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -114,6 +118,7 @@ public class Sdk extends Payload {
 				return getString(KEY_PLATFORM);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -132,6 +137,7 @@ public class Sdk extends Payload {
 				return getString(KEY_DISTRIBUTION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -150,6 +156,7 @@ public class Sdk extends Payload {
 				return getString(KEY_DISTRIBUTION_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -161,6 +168,4 @@ public class Sdk extends Payload {
 			Log.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
 		}
 	}
-
-
 }

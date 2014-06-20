@@ -66,6 +66,7 @@ public abstract class Message extends ConversationItem {
 				return getString(KEY_ID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -74,6 +75,7 @@ public abstract class Message extends ConversationItem {
 		try {
 			return getDouble(KEY_CREATED_AT);
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -90,6 +92,7 @@ public abstract class Message extends ConversationItem {
 		try {
 			return Type.parse(getString(KEY_TYPE));
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return Type.unknown;
 	}
@@ -106,6 +109,7 @@ public abstract class Message extends ConversationItem {
 		try {
 			return getBoolean(KEY_HIDDEN);
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}
@@ -164,6 +168,7 @@ public abstract class Message extends ConversationItem {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -193,6 +198,7 @@ public abstract class Message extends ConversationItem {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -213,8 +219,7 @@ public abstract class Message extends ConversationItem {
 
 	public boolean isOutgoingMessage() {
 		String senderId = getSenderId();
-		boolean outgoing = senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
-		return outgoing;
+		return senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
 	}
 
 	public enum Type {

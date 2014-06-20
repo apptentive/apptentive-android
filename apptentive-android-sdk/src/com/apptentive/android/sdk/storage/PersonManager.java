@@ -71,10 +71,12 @@ public class PersonManager {
 		try {
 			return new CustomData(personDataString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		try {
 			return new CustomData();
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -115,6 +117,7 @@ public class PersonManager {
 		try {
 			return new Person(PersonString);
 		} catch (Exception e) {
+			// Ignore
 		}
 		return null;
 	}

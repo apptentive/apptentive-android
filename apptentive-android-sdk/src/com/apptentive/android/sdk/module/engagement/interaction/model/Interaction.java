@@ -60,6 +60,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return getString(KEY_ID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -70,6 +71,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return Type.parse(getString(KEY_TYPE));
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return Type.unknown;
 	}
@@ -80,6 +82,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return getInt(KEY_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -90,6 +93,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return getInt(KEY_PRIORITY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -100,6 +104,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return new InteractionCriteria(getJSONObject(KEY_CRITERIA).toString());
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -110,6 +115,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 				return new InteractionConfiguration(getJSONObject(KEY_CONFIGURATION).toString());
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return new InteractionConfiguration();
 	}
@@ -161,6 +167,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 						break;
 				}
 			} catch (JSONException e) {
+				// Ignore
 			}
 			return null;
 		}

@@ -40,6 +40,7 @@ public class SurveyInteraction extends Interaction {
 				return configuration.getString(KEY_NAME);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -51,6 +52,7 @@ public class SurveyInteraction extends Interaction {
 				return configuration.getString(KEY_DESCRIPTION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -62,6 +64,7 @@ public class SurveyInteraction extends Interaction {
 				return configuration.getBoolean(KEY_SHOW_SUCCESS_MESSAGE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}
@@ -73,6 +76,7 @@ public class SurveyInteraction extends Interaction {
 				return configuration.getString(KEY_SUCCESS_MESSAGE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -107,6 +111,7 @@ public class SurveyInteraction extends Interaction {
 				return questions;
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}

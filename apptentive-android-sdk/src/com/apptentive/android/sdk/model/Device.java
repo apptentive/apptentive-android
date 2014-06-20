@@ -61,6 +61,7 @@ public class Device extends Payload {
 				return getString(KEY_UUID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -79,6 +80,7 @@ public class Device extends Payload {
 				return getString(KEY_OS_NAME);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -97,6 +99,7 @@ public class Device extends Payload {
 				return getString(KEY_OS_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -115,6 +118,7 @@ public class Device extends Payload {
 				return getString(KEY_OS_BUILD);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -133,6 +137,7 @@ public class Device extends Payload {
 				return getString(KEY_OS_API_LEVEL);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -151,6 +156,7 @@ public class Device extends Payload {
 				return getString(KEY_MANUFACTURER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -169,6 +175,7 @@ public class Device extends Payload {
 				return getString(KEY_MODEL);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -187,6 +194,7 @@ public class Device extends Payload {
 				return getString(KEY_BOARD);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -205,6 +213,7 @@ public class Device extends Payload {
 				return getString(KEY_PRODUCT);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -223,6 +232,7 @@ public class Device extends Payload {
 				return getString(KEY_BRAND);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -241,6 +251,7 @@ public class Device extends Payload {
 				return getString(KEY_CPU);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -259,6 +270,7 @@ public class Device extends Payload {
 				return getString(KEY_DEVICE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -277,6 +289,7 @@ public class Device extends Payload {
 				return getString(KEY_CARRIER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -295,6 +308,7 @@ public class Device extends Payload {
 				return getString(KEY_CURRENT_CARRIER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -313,6 +327,7 @@ public class Device extends Payload {
 				return getString(KEY_NETWORK_TYPE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -331,6 +346,7 @@ public class Device extends Payload {
 				return getString(KEY_BUILD_TYPE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -349,6 +365,7 @@ public class Device extends Payload {
 				return getString(KEY_BUILD_ID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -367,6 +384,7 @@ public class Device extends Payload {
 				return getString(KEY_BOOTLOADER_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -385,6 +403,7 @@ public class Device extends Payload {
 				return getString(KEY_RADIO_VERSION);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -403,6 +422,7 @@ public class Device extends Payload {
 			try {
 				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
 			} catch (JSONException e) {
+				// Ignore
 			}
 		}
 		return null;
@@ -422,6 +442,7 @@ public class Device extends Payload {
 			try {
 				return new CustomData(getJSONObject(KEY_INTEGRATION_CONFIG));
 			} catch (JSONException e) {
+				// Ignore
 			}
 		}
 		return null;
@@ -441,6 +462,7 @@ public class Device extends Payload {
 				return getString(KEY_LOCALE_COUNTRY_CODE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -459,6 +481,7 @@ public class Device extends Payload {
 				return getString(KEY_LOCALE_LANGUAGE_CODE);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -477,6 +500,7 @@ public class Device extends Payload {
 				return getString(KEY_LOCALE_RAW);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -495,6 +519,7 @@ public class Device extends Payload {
 				return getString(KEY_UTC_OFFSET);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}

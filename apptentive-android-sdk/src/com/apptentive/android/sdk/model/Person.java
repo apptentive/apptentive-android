@@ -45,6 +45,7 @@ public class Person extends Payload {
 				return getString(KEY_ID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -63,6 +64,7 @@ public class Person extends Payload {
 				return getString(KEY_EMAIL);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -81,6 +83,7 @@ public class Person extends Payload {
 				return getString(KEY_FACEBOOK_ID);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -99,6 +102,7 @@ public class Person extends Payload {
 				return getString(KEY_PHONE_NUMBER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -117,6 +121,7 @@ public class Person extends Payload {
 				return getString(KEY_STREET);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -135,6 +140,7 @@ public class Person extends Payload {
 				return getString(KEY_CITY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -153,6 +159,7 @@ public class Person extends Payload {
 				return getString(KEY_ZIP);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -171,6 +178,7 @@ public class Person extends Payload {
 				return getString(KEY_COUNTRY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -189,6 +197,7 @@ public class Person extends Payload {
 				return getString(KEY_BIRTHDAY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -207,6 +216,7 @@ public class Person extends Payload {
 			try {
 				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
 			} catch (JSONException e) {
+				// Ignore
 			}
 		}
 		return null;

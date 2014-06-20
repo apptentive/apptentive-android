@@ -38,6 +38,7 @@ public class AutomatedMessage extends TextMessage {
 		try {
 			return getString(KEY_TITLE);
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}

@@ -24,6 +24,7 @@ public class InteractionConfiguration extends JSONObject {
 				return getBoolean(KEY_SHOW_POWERED_BY);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return false;
 	}

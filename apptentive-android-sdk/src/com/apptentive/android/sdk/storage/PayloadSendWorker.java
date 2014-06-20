@@ -136,6 +136,7 @@ public class PayloadSendWorker {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
+			// Happens during normal operation.
 		}
 	}
 

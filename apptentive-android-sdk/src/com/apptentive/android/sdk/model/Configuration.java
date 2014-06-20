@@ -71,6 +71,7 @@ public class Configuration extends JSONObject {
 				return getBoolean(KEY_METRICS_ENABLED);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return true;
 	}
@@ -81,6 +82,7 @@ public class Configuration extends JSONObject {
 				return getString(KEY_APP_DISPLAY_NAME);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return GlobalInfo.appDisplayName;
 	}
@@ -91,6 +93,7 @@ public class Configuration extends JSONObject {
 				return getJSONObject(KEY_MESSAGE_CENTER);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -104,6 +107,7 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return null;
 	}
@@ -117,6 +121,7 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
 	}
@@ -130,6 +135,7 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
 	}
@@ -206,6 +212,7 @@ public class Configuration extends JSONObject {
 				return getLong(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 			}
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS;
 	}

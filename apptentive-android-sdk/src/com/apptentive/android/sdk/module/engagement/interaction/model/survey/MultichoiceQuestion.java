@@ -48,8 +48,8 @@ public class MultichoiceQuestion extends BaseQuestion {
 					answerChoices.add(new AnswerDefinition(answer.toString()));
 				}
 			}
-			return answerChoices;
 		} catch (JSONException e) {
+			// Ignore
 		}
 		return answerChoices;
 	}
