@@ -7,6 +7,7 @@
 
 <resources>
     <dimen name="apptentive_text_large">22sp</dimen>
+    <dimen name="apptentive_text_medium_large">20sp</dimen>
     <dimen name="apptentive_text_medium">18sp</dimen>
     <dimen name="apptentive_text_medium_small">16sp</dimen>
     <dimen name="apptentive_text_small">14sp</dimen>

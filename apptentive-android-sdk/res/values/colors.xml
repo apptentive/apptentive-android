@@ -6,10 +6,13 @@
   -->
 
 <resources>
+    <color name="apptentive_message_center_main_area_background">#E0E0E0</color>
+    <color name="apptentive_message_center_header_background">#222222</color>
+    <color name="apptentive_message_center_header_text">#FFFFFF</color>
+    <color name="apptentive_message_center_header_text_shadow">#AAFFFFFF</color>
     <color name="apptentive_text_message_text">#000000</color>
     <color name="apptentive_message_sender_text">#222222</color>
     <color name="apptentive_message_center_timestamp">#999999</color>
-    <color name="apptentive_message_center_header_text_shadow">#AA000000</color>
 
     <color name="apptentive_message_auto_separator">#BBBBBB</color>
     <color name="apptentive_message_auto_text">#000000</color>

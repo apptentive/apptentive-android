@@ -6,33 +6,6 @@
   -->
 
 <resources>
-
-    <style name="ApptentiveHeader">
-        <item name="android:background">#222222</item>
-    </style>
-
-    <style name="ApptentiveHeaderText">
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:shadowDx">0</item>
-        <item name="android:shadowDy">-1</item>
-        <item name="android:shadowRadius">1</item>
-        <item name="android:drawableLeft">@drawable/android_ic_menu_start_conversation</item>
-        <item name="android:drawablePadding">5dp</item>
-        <item name="android:textColor">@android:color/primary_text_dark</item>
-        <item name="android:shadowColor">@android:color/white</item>
-    </style>
-
-    <style name="ApptentiveMainArea">
-        <item name="android:background">#E0E0E0</item>
-    </style>
-
-    <style name="ApptentiveMessageCenterDrawer">
-        <item name="android:background">#222222</item>
-    </style>
-
     <style name="Apptentive.Theme.Transparent" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/apptentive_activity_frame</item>
@@ -41,5 +14,4 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
-
 </resources>
