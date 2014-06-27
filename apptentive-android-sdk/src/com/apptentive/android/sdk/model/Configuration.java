@@ -29,7 +29,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
-	private static final String KEY_HIDE_BRANDING = "hide_apptentive_branding";
+	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
 	// This one is not sent in JSON, but as a header form the server.
 	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
@@ -185,11 +185,8 @@ public class Configuration extends JSONObject {
 
 	public boolean isHideBranding(Context context) {
 		try {
-			JSONObject messageCenter = getMessageCenter();
-			if (messageCenter != null) {
-				if (!messageCenter.isNull(KEY_HIDE_BRANDING)) {
-					return messageCenter.getBoolean(KEY_HIDE_BRANDING);
-				}
+			if (!isNull(KEY_HIDE_BRANDING)) {
+				return getBoolean(KEY_HIDE_BRANDING);
 			}
 		} catch (JSONException e) {
 			// Move on.
