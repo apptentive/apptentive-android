@@ -652,7 +652,7 @@ public class Apptentive {
 
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
-			if ((apiKey == null || apiKey.equals(""))) {
+			if ((Util.isEmpty(apiKey))) {
 				if (GlobalInfo.isAppDebuggable) {
 					AlertDialog alertDialog = new AlertDialog.Builder(context)
 						.setTitle("Error")
@@ -661,9 +661,8 @@ public class Apptentive {
 						.create();
 					alertDialog.setCanceledOnTouchOutside(false);
 					alertDialog.show();
-				} else {
-					Log.e(errorString);
 				}
+				Log.e(errorString);
 			}
 			GlobalInfo.apiKey = apiKey;
 
