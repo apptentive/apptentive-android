@@ -13,6 +13,10 @@
     <dimen name="apptentive_text_small">14sp</dimen>
     <dimen name="apptentive_text_small_tiny">12sp</dimen>
 
+    <dimen name="apptentive_dialog_title_text">@dimen/apptentive_text_large</dimen>
+    <dimen name="apptentive_dialog_body_text">@dimen/apptentive_text_medium</dimen>
+    <dimen name="apptentive_dialog_button_text">@dimen/apptentive_text_medium</dimen>
+
     <dimen name="apptentive_activity_side_padding">0dp</dimen>
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">0dp</dimen>

@@ -14,4 +14,51 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
+    <style name="ApptentiveInteractionPositiveButton">
+        <item name="android:background">@drawable/apptentive_dialog_positive_button</item>
+        <item name="android:textColor">@drawable/apptentive_dialog_positive_button_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="ApptentiveInteractionNegativeButton">
+        <item name="android:background">@drawable/apptentive_dialog_negative_button</item>
+        <item name="android:textColor">@drawable/apptentive_dialog_negative_button_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="ApptentiveInteractionDialogTitle">
+        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center_vertical|left</item>
+    </style>
+
+    <style name="ApptentiveInteractionDialogTitleNoBody">
+        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ApptentiveInteractionDialogBody">
+        <item name="android:textColor">@color/apptentive_dialog_body_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:autoLink">all</item>
+    </style>
+
+    <style name="ApptentiveInteractionAutoCompleteTextView" parent="ApptentiveInteractionEditText">
+        <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="ApptentiveInteractionEditText">
+        <item name="android:background">@drawable/android_textfield_activated_holo_light</item>
+        <item name="android:textColor">@color/apptentive_dialog_form_text</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:gravity">bottom</item>item>
+    </style>
 </resources>
