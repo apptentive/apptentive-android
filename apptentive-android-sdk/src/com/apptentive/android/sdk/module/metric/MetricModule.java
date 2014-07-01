@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,12 +7,12 @@
 package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -44,10 +44,11 @@ public class MetricModule {
 
 	/**
 	 * Used for internal error reporting when we intercept a Throwable that may have otherwise caused a crash.
-	 * @param context The context from which this method was called.
-	 * @param throwable An optional throwable that was caught, and which we want to log.
+	 *
+	 * @param context     The context from which this method was called.
+	 * @param throwable   An optional throwable that was caught, and which we want to log.
 	 * @param description An optional description of what happened.
-	 * @param extraData Any extra data that may have contributed to the Throwable being thrown.
+	 * @param extraData   Any extra data that may have contributed to the Throwable being thrown.
 	 */
 	public static void sendError(Context context, Throwable throwable, String description, String extraData) {
 		Event.EventLabel type = Event.EventLabel.error;
@@ -72,8 +73,10 @@ public class MetricModule {
 				Event event = new Event(type.getLabelName(), data);
 				EventManager.sendEvent(context, event, false); // Don't restart the send worker because of an error.
 			}
-		} catch (JSONException e) {
-			Log.e("Error creating Error Metric.", e);
+		} catch (Exception e) {
+			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to
+			// prevent the app from crashing.
+			Log.w("Error creating Error Metric. Nothing we can do but log this.", e);
 		}
 	}
 }
