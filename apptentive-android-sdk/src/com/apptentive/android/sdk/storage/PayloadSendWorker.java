@@ -153,5 +153,9 @@ public class PayloadSendWorker {
 
 	public static void activityStopped() {
 		runningActivities--;
+		if (runningActivities < 0) {
+			Log.w("PayloadSendWorker: Incorrect number of running Activities encountered. Resetting to 0.");
+			runningActivities = 0;
+		}
 	}
 }

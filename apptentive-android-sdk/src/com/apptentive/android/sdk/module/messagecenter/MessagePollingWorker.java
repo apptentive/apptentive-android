@@ -90,6 +90,10 @@ public class MessagePollingWorker {
 
 	public static void stop() {
 		runningActivities--;
+		if (runningActivities < 0) {
+			Log.w("MessagePollingWorker: Incorrect number of running Activities encountered. Resetting to 0.");
+			runningActivities = 0;
+		}
 		// If there are no running activities, wake the thread so it can stop immediately and gracefully.
 		if (runningActivities == 0) {
 			wakeUp();
