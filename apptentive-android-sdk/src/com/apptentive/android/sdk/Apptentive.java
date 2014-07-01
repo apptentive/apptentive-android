@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -639,11 +640,10 @@ public class Apptentive {
 			try {
 				ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
-				apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-
-				boolean debugFlagSet = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-				boolean apptentiveDebugSet = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-				GlobalInfo.isAppDebuggable = debugFlagSet || apptentiveDebugSet;
+				if (metaData != null ) {
+					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+				}
+				GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			} catch (Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
 			}
@@ -654,7 +654,13 @@ public class Apptentive {
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
 			if ((apiKey == null || apiKey.equals(""))) {
 				if (GlobalInfo.isAppDebuggable) {
-					throw new RuntimeException(errorString);
+					AlertDialog alertDialog = new AlertDialog.Builder(context)
+						.setTitle("Error")
+						.setMessage(errorString)
+						.setPositiveButton("OK", null)
+						.create();
+					alertDialog.setCanceledOnTouchOutside(false);
+					alertDialog.show();
 				} else {
 					Log.e(errorString);
 				}

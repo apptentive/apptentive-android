@@ -73,7 +73,6 @@ public class Constants {
 	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
 
 	// Manifest keys
-	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
@@ -86,6 +85,7 @@ public class Constants {
 	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
+	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_SURVEYS = "surveys";
 	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
