@@ -15,6 +15,9 @@
 
     <string-array name="events">
         <item>init</item>
+        <item>event_1</item>
+        <item>event_2</item>
+        <item>event_3</item>
         <item>test_survey_interaction</item>
     </string-array>
 
