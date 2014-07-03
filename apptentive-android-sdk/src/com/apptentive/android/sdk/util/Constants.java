@@ -61,11 +61,6 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
-	public static final int CONFIG_DEFAULT_DAYS_BEFORE_PROMPT = 30;
-	public static final int CONFIG_DEFAULT_USES_BEFORE_PROMPT = 5;
-	public static final int CONFIG_DEFAULT_SIGNIFICANT_EVENTS_BEFORE_PROMPT = 10;
-	public static final int CONFIG_DEFAULT_DAYS_BEFORE_REPROMPTING = 5;
-	public static final String CONFIG_DEFAULT_RATING_PROMPT_LOGIC = "{\"and\": [\"uses\",\"days\",\"events\"]}";
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
@@ -78,7 +73,7 @@ public class Constants {
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
 	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
-	public static final String MANIFEST_KEY_HIDE_BRANDING = "apptentive_hide_branding";
+	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
 
 	// View layout shortcuts
 	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
