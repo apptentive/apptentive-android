@@ -38,6 +38,7 @@ public class PayloadSendWorker {
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 				@Override
 				public void uncaughtException(Thread thread, Throwable throwable) {
+					Log.e("Error in PayloadSendWorker.", throwable);
 					MetricModule.sendError(appContext, throwable, null, null);
 				}
 			};
@@ -55,6 +56,7 @@ public class PayloadSendWorker {
 		public void run() {
 			try {
 				synchronized (this) {
+					Log.v("Started %s", toString());
 					if(appContext == null) {
 						return;
 					}
@@ -67,7 +69,7 @@ public class PayloadSendWorker {
 						if (!Util.isNetworkConnectionPresent(appContext)) {
 							break;
 						}
-						Log.d("Checking for payloads to send.");
+						Log.v("Checking for payloads to send.");
 						Payload payload;
 						payload = db.getOldestUnsentPayload();
 						if (payload == null) {
@@ -127,6 +129,7 @@ public class PayloadSendWorker {
 					}
 				}
 			} finally {
+				Log.v("Stopping PayloadSendWorker.");
 				running = false;
 			}
 		}
