@@ -195,9 +195,9 @@ public class Configuration extends JSONObject {
 		try {
 			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 			Bundle metaData = ai.metaData;
-			return metaData.getBoolean(Constants.MANIFEST_KEY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
+			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
-			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_HIDE_BRANDING);
+			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
