@@ -65,13 +65,13 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
 			}
 
-			String title = interaction.getTitle();
 			final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
 			EditText messageView = (EditText) activity.findViewById(R.id.message);
 			Button noButton = (Button) activity.findViewById(R.id.decline);
 			final Button sendButton = (Button) activity.findViewById(R.id.submit);
 
 			// Title
+			String title = interaction.getTitle();
 			if (title != null) {
 				TextView titleView = (TextView) activity.findViewById(R.id.title);
 				titleView.setText(title);
@@ -79,8 +79,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 			// Body
 			String body = interaction.getBody(activity);
-			TextView bodyView = (TextView) activity.findViewById(R.id.body);
-			bodyView.setText(body);
+			if (body != null) {
+				TextView bodyView = (TextView) activity.findViewById(R.id.body);
+				bodyView.setText(body);
+			}
 
 			// Email
 			String personEnteredEmail = PersonManager.loadPersonEmail(activity);

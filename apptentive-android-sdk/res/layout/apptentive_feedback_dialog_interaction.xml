@@ -36,12 +36,12 @@
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"
                                   style="@style/ApptentiveInteractionDialogTitle"
-                                  android:text=""/>
+                                  android:text="@string/apptentive_intro_dialog_title_no_love"/>
                         <TextView android:id="@+id/body"
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"
                                   style="@style/ApptentiveInteractionDialogBody"
-                                  android:text=""/>
+                                  android:text="@string/apptentive_intro_dialog_body"/>
                     </LinearLayout>
                     <AutoCompleteTextView android:id="@+id/email"
                                           android:layout_width="fill_parent"
