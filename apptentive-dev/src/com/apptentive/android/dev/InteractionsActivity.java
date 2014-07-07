@@ -182,9 +182,6 @@ public class InteractionsActivity extends ApptentiveActivity {
 		"  \"id\": \"enjoyment_dialog_interaction_1234567890\"," +
 		"  \"type\": \"EnjoymentDialog\"," +
 		"  \"configuration\": {" +
-		"    \"title\": \"Do you love Urbanspoon?\"," +
-		"    \"yes_text\": \"Yes\"," +
-		"    \"no_text\": \"No\"" +
 		"  }" +
 		"}";
 
