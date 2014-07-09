@@ -2,13 +2,10 @@
 .DS_Store
 
 # Android
+local.properties
 gen/
 out/
 bin/
 
 # IntelliJ
 *.iws
-
-# Ant
-build.xml
-local.properties
