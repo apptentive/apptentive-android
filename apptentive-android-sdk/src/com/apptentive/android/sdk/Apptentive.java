@@ -64,7 +64,7 @@ public class Apptentive {
 	 */
 	public static void onStart(Activity activity) {
 		try {
-			init(activity.getApplicationContext());
+			init(activity);
 			ActivityLifecycleManager.activityStarted(activity);
 			PayloadSendWorker.activityStarted(activity.getApplicationContext());
 			MessagePollingWorker.start(activity.getApplicationContext());
@@ -624,21 +624,23 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
-	private static void init(final Context context) {
+	private static void init(Activity activity) {
 
 		//
 		// First, initialize data relies on synchronous reads from local resources.
 		//
 
+		final Context appContext = activity.getApplicationContext();
+
 		if (!GlobalInfo.initialized) {
-			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			NetworkStateReceiver.clearListeners();
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
 			String apiKey = null;
 			try {
-				ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
 				if (metaData != null ) {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
@@ -654,7 +656,7 @@ public class Apptentive {
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
 			if ((Util.isEmpty(apiKey))) {
 				if (GlobalInfo.isAppDebuggable) {
-					AlertDialog alertDialog = new AlertDialog.Builder(context)
+					AlertDialog alertDialog = new AlertDialog.Builder(activity)
 						.setTitle("Error")
 						.setMessage(errorString)
 						.setPositiveButton("OK", null)
@@ -669,22 +671,22 @@ public class Apptentive {
 			Log.i("API Key: %s", GlobalInfo.apiKey);
 
 			// Grab app info we need to access later on.
-			GlobalInfo.appPackage = context.getPackageName();
-			GlobalInfo.androidId = Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+			GlobalInfo.appPackage = appContext.getPackageName();
+			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
 			// Check the host app version, and notify modules if it's changed.
 			try {
-				PackageManager packageManager = context.getPackageManager();
-				PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+				PackageManager packageManager = appContext.getPackageManager();
+				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 
 				Integer currentVersionCode = packageInfo.versionCode;
 				String currentVersionName = packageInfo.versionName;
-				VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(context);
+				VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
 				if (lastVersionEntrySeen == null) {
-					onVersionChanged(context, null, currentVersionCode, null, currentVersionName);
+					onVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
 				} else {
 					if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-						onVersionChanged(context, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
+						onVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
 					}
 				}
 
@@ -699,7 +701,7 @@ public class Apptentive {
 				public void stateChanged(NetworkInfo networkInfo) {
 					if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
 						Log.v("Network connected.");
-						PayloadSendWorker.ensureRunning(context);
+						PayloadSendWorker.ensureRunning(appContext);
 					}
 					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
 						Log.v("Network disconnected.");
@@ -722,19 +724,19 @@ public class Apptentive {
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
 		if (GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
-			asyncFetchConversationToken(context);
+			asyncFetchConversationToken(appContext.getApplicationContext());
 		} else {
-			asyncFetchAppConfiguration(context);
-			InteractionManager.asyncFetchAndStoreInteractions(context);
+			asyncFetchAppConfiguration(appContext.getApplicationContext());
+			InteractionManager.asyncFetchAndStoreInteractions(appContext.getApplicationContext());
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
-		syncDevice(context);
-		syncSdk(context);
-		syncPerson(context);
+		syncDevice(appContext);
+		syncSdk(appContext);
+		syncPerson(appContext);
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
