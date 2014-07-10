@@ -42,13 +42,13 @@ public class CustomData extends JSONObject {
 			Map<String, String> rightMap = new HashMap<String, String>();
 
 			try {
-				Iterator leftIterator = left.keys();
+				Iterator<?> leftIterator = left.keys();
 				while (leftIterator.hasNext()) {
 					String key = (String) leftIterator.next();
 					leftMap.put(key, left.getString(key));
 				}
 
-				Iterator rightIterator = right.keys();
+				Iterator<?> rightIterator = right.keys();
 				while (rightIterator.hasNext()) {
 					String key = (String) rightIterator.next();
 					rightMap.put(key, right.getString(key));
