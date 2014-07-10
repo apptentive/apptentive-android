@@ -43,10 +43,10 @@ public class AppReleaseManager {
 
 		try {
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-			appRelease.setVersion(""+packageInfo.versionName);
+			appRelease.setVersion(packageInfo.versionName);
 			appRelease.setIdentifier(packageInfo.packageName);
-			appRelease.setBuildNumber("" + packageInfo.versionCode);
-			appRelease.setTargetSdkVersion("" + packageInfo.applicationInfo.targetSdkVersion);
+			appRelease.setBuildNumber(String.valueOf(packageInfo.versionCode));
+			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
 			appRelease.setAppStore(Util.getInstallerPackageName(context));
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Can't load PackageInfo.", e);

@@ -122,7 +122,7 @@ public class DeviceManager {
 		device.setOsName("Android");
 		device.setOsVersion(Build.VERSION.RELEASE);
 		device.setOsBuild(Build.VERSION.INCREMENTAL);
-		device.setOsApiLevel("" + Build.VERSION.SDK_INT);
+		device.setOsApiLevel(String.valueOf(Build.VERSION.SDK_INT));
 		device.setManufacturer(Build.MANUFACTURER);
 		device.setModel(Build.MODEL);
 		device.setBoard(Build.BOARD);
@@ -147,7 +147,7 @@ public class DeviceManager {
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
 		device.setLocaleRaw(Locale.getDefault().toString());
-		device.setUtcOffset("" + (TimeZone.getDefault().getRawOffset() / 1000));
+		device.setUtcOffset(String.valueOf((TimeZone.getDefault().getRawOffset() / 1000)));
 		return device;
 	}
 
