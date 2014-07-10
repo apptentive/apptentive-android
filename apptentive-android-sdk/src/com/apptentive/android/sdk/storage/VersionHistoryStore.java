@@ -113,7 +113,7 @@ public class VersionHistoryStore {
 						uniques.add(entry.versionName);
 						break;
 					case build:
-						uniques.add(entry.versionCode);
+						uniques.add(String.valueOf(entry.versionCode));
 						break;
 					default:
 						break;
