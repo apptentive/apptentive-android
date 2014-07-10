@@ -64,7 +64,7 @@ public class Apptentive {
 	 */
 	public static void onStart(Activity activity) {
 		try {
-			init(activity);
+			init(activity.getApplicationContext());
 			ActivityLifecycleManager.activityStarted(activity);
 			PayloadSendWorker.activityStarted(activity.getApplicationContext());
 			MessagePollingWorker.start(activity.getApplicationContext());
