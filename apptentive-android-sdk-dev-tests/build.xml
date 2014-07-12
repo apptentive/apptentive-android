@@ -89,4 +89,27 @@
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
+    <target name="test-and-fail-on-error" >
+
+        <property name="log.file" value="test.log" />
+        <!-- because we don't have control over the 'test' target (to check for passes an fails) this prints to standard out
+             we capture standard out into a file and query this to see if we have any test failures, using this to pass/fail our task -->
+        <record name="${log.file}" action="start" />
+        <antcall target="test" />
+        <record name="${log.file}" action="stop" />
+
+        <!-- do other stuff -->
+
+        <loadfile property="tests.output" srcFile="${log.file}" />
+
+        <echo>Checking for failed tests.</echo>
+        <fail message="Tests Failed." >
+            <condition>
+                <contains string="${tests.output}" substring="FAILURES" />
+            </condition>
+        </fail>
+
+        <echo>Tests Passed.</echo>
+    </target>
+
 </project>

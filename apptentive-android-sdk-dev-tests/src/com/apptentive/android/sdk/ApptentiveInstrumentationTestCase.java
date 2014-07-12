@@ -42,6 +42,6 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	}
 
 	protected static boolean isRunningOnEmulator() {
-		return Build.FINGERPRINT.startsWith("generic");
+		return Build.FINGERPRINT.contains("generic");
 	}
 }
