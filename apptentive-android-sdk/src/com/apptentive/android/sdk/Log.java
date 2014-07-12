@@ -19,8 +19,15 @@ public class Log {
 	public static final int WARN    = 5;
 	public static final int ERROR   = 6;
 	public static final int ASSERT  = 7;
+	public static final int DEFAULT = INFO;
 
 	private static final String TAG = "Apptentive";
+
+	private static int logLevel = DEFAULT;
+
+	public static void overrideLogLevel(int logLevel) {
+		Log.logLevel = logLevel;
+	}
 
 	private static void doLog(int level, Throwable throwable, String message, Object... args){
 		if(canLog(level) && message != null){
@@ -43,7 +50,7 @@ public class Log {
 	}
 
 	public static boolean canLog(int level) {
-		return GlobalInfo.isAppDebuggable || level > DEBUG; // Don't log below "level" unless we are debugging.
+		return level >= logLevel;
 	}
 
 	public static void v(String message, Object... args){

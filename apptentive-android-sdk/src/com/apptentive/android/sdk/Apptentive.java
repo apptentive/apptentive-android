@@ -646,6 +646,9 @@ public class Apptentive {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
 				}
 				GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+				if (GlobalInfo.isAppDebuggable) {
+					//ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+				}
 			} catch (Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
 			}
