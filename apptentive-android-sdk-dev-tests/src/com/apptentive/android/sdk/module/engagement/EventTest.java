@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement;
 
-import android.test.InstrumentationTestCase;
+import com.apptentive.android.sdk.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * @author Sky Kelsey
  */
-public class EventTest extends InstrumentationTestCase {
+public class EventTest extends ApptentiveInstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 

@@ -6,8 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement;
 
-import android.content.Context;
-import android.test.InstrumentationTestCase;
+import com.apptentive.android.sdk.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -23,24 +22,9 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class OperatorTests extends InstrumentationTestCase {
-
-	private Context context;
+public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
-
-	private Context getTargetContext() {
-		if (context == null) {
-			context = getInstrumentation().getTargetContext();
-		}
-		return context;
-	}
-
-	private void resetDevice() {
-		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		CodePointStore.clear(getTargetContext());
-	}
-
 
 	public void testOperatorExists() {
 		Log.e("Running test: testOperatorExists()\n\n");

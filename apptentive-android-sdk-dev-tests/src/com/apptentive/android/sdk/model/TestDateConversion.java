@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2012, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.util;
+package com.apptentive.android.sdk.model;
 
 import android.test.AndroidTestCase;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;

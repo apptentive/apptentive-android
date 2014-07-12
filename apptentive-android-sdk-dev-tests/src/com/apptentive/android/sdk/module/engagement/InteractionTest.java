@@ -7,8 +7,8 @@
 package com.apptentive.android.sdk.module.engagement;
 
 import android.content.Context;
-import android.test.InstrumentationTestCase;
 import android.text.format.DateUtils;
+import com.apptentive.android.sdk.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -27,30 +27,9 @@ import java.util.List;
  *
  * @author Sky Kelsey
  */
-public class InteractionTest extends InstrumentationTestCase {
-
-	private Context context;
+public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
-
-	private Context getTargetContext() {
-		if (context == null) {
-			context = getInstrumentation().getTargetContext();
-		}
-		return context;
-	}
-
-	private void resetDevice() {
-		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		CodePointStore.clear(getTargetContext());
-	}
-
-	private static void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-		}
-	}
 
 	public void testInteractionSavingAndLoading() {
 		Log.e("Running test: testCriteriaDaysSinceInstall()\n\n");

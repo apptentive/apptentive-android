@@ -4,9 +4,10 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk;
+package com.apptentive.android.sdk.model;
 
 import android.test.InstrumentationTestCase;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.FileUtil;
 import com.apptentive.android.sdk.util.JsonDiffer;
 import org.json.JSONException;
@@ -20,7 +21,6 @@ import java.io.File;
 public class ObjectDiffingTests extends InstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "util" + File.separator;
-
 
 	/**
 	 * Tests to make sure that objects that differ are calculated correctly.

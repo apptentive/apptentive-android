@@ -6,9 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement;
 
-import android.content.Context;
-import android.test.InstrumentationTestCase;
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -26,24 +25,9 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class DataObjectQueryTest extends InstrumentationTestCase {
-
-	private Context targetContext;
+public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
-
-	private Context getTargetContext() {
-		if (targetContext == null) {
-			targetContext = getInstrumentation().getTargetContext();
-		}
-		return targetContext;
-	}
-
-	private void resetDevice() {
-		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		CodePointStore.clear(getTargetContext());
-	}
-
 
 	public void testQueriesAgainstPerson() {
 		Log.e("Running test: testQueriesAgainstPerson()\n\n");
