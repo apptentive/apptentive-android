@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.content.Context;
+import android.os.Build;
 import android.test.InstrumentationTestCase;
 import com.apptentive.android.sdk.model.CodePointStore;
 
@@ -38,5 +39,9 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 		}
+	}
+
+	protected static boolean isRunningOnEmulator() {
+		return Build.FINGERPRINT.startsWith("generic");
 	}
 }

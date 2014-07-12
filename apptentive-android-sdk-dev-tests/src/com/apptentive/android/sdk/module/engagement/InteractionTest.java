@@ -1103,6 +1103,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	public void testCriteriaProcessingPerformance() {
 		Log.e("Running test: testCriteriaProcessingPerformance()");
+		if (isRunningOnEmulator()) {
+			Log.e("Running on emulator. Skipping test.");
+			return;
+		}
 		resetDevice();
 		final int iterations = 100;
 
@@ -1134,6 +1138,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	public void testInteractionSelectionPerformance() {
 		Log.e("Running test: testInteractionSelectionPerformance()");
+		if (isRunningOnEmulator()) {
+			Log.e("Running on emulator. Skipping test.");
+			return;
+		}
 		resetDevice();
 		final int iterations = 100;
 
@@ -1161,6 +1169,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	public void testInteractionStorageAndSelectionPerformance() {
 		Log.e("Running test: testInteractionStorageAndSelectionPerformance()");
+		if (isRunningOnEmulator()) {
+			Log.e("Running on emulator. Skipping test.");
+			return;
+		}
 		resetDevice();
 		final int iterations = 20;
 
