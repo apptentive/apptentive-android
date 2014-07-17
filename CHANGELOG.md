@@ -1,3 +1,23 @@
+# 2014-07-16 skykelsey 1.5.1
+
+#### Major changes
+
+* Simplified Apptentive's native UI styling. Common things like buttons in our UI now use the same styles, so changes can easily be made to all similar elements at once.
+* Added translations for French Canadian (fr-rCA).
+* Added Apache Ant build scripts for the SDK, dev app, and tests.
+* Added support to hide Apptentive branding for enterprise accounts.
+
+#### Bugs fixed:
+
+* Fixed a rare crash that can occur when a user's database is stored on an SD card and that card is removed.
+* Fixed a potential memory leak.
+* Fixed default text in the Enjoyment Dialog portion of the Ratings Prompt.
+* Removed some benign lint warnings.
+* Removed unused resources.
+* Fixed a bug that could result in a delay when sending data to the server.
+* During development only, if you forget to specify an API key, we will display a dialog to let you know. Previously we only logged it.
+
+
 # 2014-05-27 skykelsey 1.5.0
 
 #### Major changes
