@@ -26,11 +26,15 @@ public class PersonManager {
 		Person current = generateCurrentPerson();
 		CustomData customData = loadCustomPersonData(context);
 		current.setCustomData(customData);
+
 		String email = loadPersonEmail(context);
 		if (email == null) {
 			email = loadInitialPersonEmail(context);
 		}
 		current.setEmail(email);
+
+		String name = loadInitialPersonUserName(context);
+		current.setName(name);
 
 		Object diff = JsonDiffer.getDiff(stored, current);
 		if(diff != null) {
@@ -60,6 +64,9 @@ public class PersonManager {
 			email = loadInitialPersonEmail(context);
 		}
 		current.setEmail(email);
+
+		String name = loadInitialPersonUserName(context);
+		current.setName(name);
 
 		storePerson(context, current);
 		return current;
@@ -99,6 +106,16 @@ public class PersonManager {
 	public static void storeInitialPersonEmail(Context context, String email) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_INITIAL_EMAIL, email).commit();
+	}
+
+	public static String loadInitialPersonUserName(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		return prefs.getString(Constants.PREF_KEY_PERSON_INITIAL_USER_NAME, null);
+	}
+
+	public static void storeInitialPersonUserName(Context context, String name) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putString(Constants.PREF_KEY_PERSON_INITIAL_USER_NAME, name).commit();
 	}
 
 	public static String loadPersonEmail(Context context) {

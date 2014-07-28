@@ -110,6 +110,18 @@ public class Apptentive {
 	}
 
 	/**
+	 * Sets the initial user name. This name will be sent to the Apptentive server and displayed in conversations you have
+	 * with this person. This name will be the definitive username for this user, unless one is provided directly by the
+	 * user through an Apptentive UI. Calls to this method are idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param name   The user's name.
+	 */
+	public static void setInitialUserName(Context context, String name) {
+		PersonManager.storeInitialPersonUserName(context, name);
+	}
+
+	/**
 	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
 	 * custom device data that you have set for this app. Calls to this method are idempotent.</p>
 	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>

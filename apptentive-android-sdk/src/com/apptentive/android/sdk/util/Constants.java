@@ -35,6 +35,7 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_DATA = "personData";
 	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
+	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 

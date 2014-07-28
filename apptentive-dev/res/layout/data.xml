@@ -129,5 +129,27 @@
                       android:inputType="textEmailAddress"
                       android:hint="Email…"/>
         </LinearLayout>
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="32dp"
+                  android:gravity="left|bottom"
+                  android:textSize="@dimen/apptentive_text_medium"
+                  android:textColor="@android:color/white"
+                  android:text="Initial Person Name"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="48dp"
+                      android:layout_marginTop="4dp"
+                      android:orientation="horizontal">
+            <Button android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:onClick="setInitialPersonUserName"
+                    android:text="Set"/>
+            <EditText android:id="@+id/set_initial_person_user_name"
+                      android:layout_width="0dp"
+                      android:layout_height="fill_parent"
+                      android:layout_weight="6"
+                      android:inputType="textPersonName"
+                      android:hint="User Name…"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

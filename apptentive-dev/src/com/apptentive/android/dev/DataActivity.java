@@ -63,4 +63,11 @@ public class DataActivity extends ApptentiveActivity {
 		emailText.setText(null);
 		PersonManager.storeInitialPersonEmail(this, email);
 	}
+
+	public void setInitialPersonUserName(@SuppressWarnings("unused") View view) {
+		EditText userNameText = (EditText) findViewById(R.id.set_initial_person_user_name);
+		String userName = (userNameText).getText().toString().trim();
+		userNameText.setText(null);
+		PersonManager.storeInitialPersonUserName(this, userName);
+	}
 }

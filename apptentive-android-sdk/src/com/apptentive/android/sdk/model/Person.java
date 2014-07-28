@@ -18,6 +18,7 @@ public class Person extends Payload {
 
 	private static final String KEY_ID = "id";
 	private static final String KEY_EMAIL = "email";
+	private static final String KEY_NAME = "name";
 	private static final String KEY_FACEBOOK_ID = "facebook_id";
 	private static final String KEY_PHONE_NUMBER = "phone_number";
 	private static final String KEY_STREET = "street";
@@ -74,6 +75,25 @@ public class Person extends Payload {
 			put(KEY_EMAIL, email);
 		} catch (JSONException e) {
 			Log.e("Unable to set field " + KEY_EMAIL + " of " + KEY);
+		}
+	}
+
+	public String getName() {
+		try {
+			if (!isNull(KEY_NAME)) {
+				return getString(KEY_NAME);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return null;
+	}
+
+	public void setName(String name) {
+		try {
+			put(KEY_NAME, name);
+		} catch (JSONException e) {
+			Log.e("Unable to set field " + KEY_NAME + " of " + KEY);
 		}
 	}
 
