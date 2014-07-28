@@ -18,6 +18,9 @@ import java.util.*;
  */
 public class JsonDiffer {
 
+	private JsonDiffer() {
+	}
+
 	public static JSONObject getDiff(JSONObject original, JSONObject updated) {
 		JSONObject ret = new JSONObject();
 
@@ -108,8 +111,29 @@ public class JsonDiffer {
 			}
 			return true;
 		} else if (left instanceof JSONArray && right instanceof JSONArray) {
-			// TODO: Figure out how to do this efficiently. Maybe since ordering is important, this is actually rather simple.
-			return false;
+			JSONArray leftArray = (JSONArray) left;
+			JSONArray rightArray = (JSONArray) right;
+			if (leftArray.length() != rightArray.length()) {
+				return false;
+			}
+			try {
+				for (int i = 0; i < leftArray.length(); i++) {
+					if (!areObjectsEqual(leftArray.get(i), rightArray.get(i))) {
+						return false;
+					}
+				}
+			} catch (JSONException e) {
+				Log.e("", e);
+				return false;
+			}
+			return true;
+		} else if (left instanceof Number && right instanceof Number) {
+			// Treat all numbers as doubles. Numbers are equal if within 1/10,000 of each other. This
+			// is to account for floating point errors when comparing a float and double of equal value.
+			double leftDouble = ((Number) left).doubleValue();
+			double rightDouble = ((Number) right).doubleValue();
+			double error = Math.abs(0.000001 * rightDouble);
+			return Math.abs(leftDouble - rightDouble) < error;
 		} else {
 			return left.equals(right);
 		}
