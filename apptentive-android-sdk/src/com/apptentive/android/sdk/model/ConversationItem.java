@@ -37,7 +37,7 @@ public abstract class ConversationItem extends Payload {
 		super(json);
 	}
 
-	protected void setNonce(String nonce) {
+	public void setNonce(String nonce) {
 		try {
 			put(KEY_NONCE, nonce);
 		} catch (JSONException e) {
@@ -65,7 +65,7 @@ public abstract class ConversationItem extends Payload {
 		return null;
 	}
 
-	private void setClientCreatedAt(Double clientCreatedAt) {
+	public void setClientCreatedAt(Double clientCreatedAt) {
 		try {
 			put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
 		} catch (JSONException e) {

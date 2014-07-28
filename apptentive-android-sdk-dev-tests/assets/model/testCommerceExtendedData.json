@@ -1,0 +1,19 @@
+{
+    "version": 1,
+    "id": "commerce_id",
+    "affiliation": 1111111111,
+    "revenue": 100,
+    "shipping": 5,
+    "tax": 4.38,
+    "currency": "USD",
+    "items": [
+        {
+            "id": 22222222,
+            "name": "Item Name",
+            "category": "Category",
+            "price": 20,
+            "quantity": 5,
+            "currency": "USD"
+        }
+    ]
+}

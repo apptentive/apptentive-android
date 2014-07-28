@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
+import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -27,28 +28,28 @@ import java.util.Map;
 public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", eventName, null);
+		return engage(activity, "com.apptentive", "app", eventName, null, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
-		return engage(activity, "com.apptentive", interaction, eventName, null);
+		return engage(activity, "com.apptentive", interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, Map<String, String> data) {
-		return engage(activity, "com.apptentive", interaction, eventName, data);
+		return engage(activity, "com.apptentive", interaction, eventName, data, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName) {
-		return engage(activity, vendor, interaction, eventName, null);
+		return engage(activity, vendor, interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, Map<String, String> data) {
+	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, data));
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, data, customData, extendedData));
 			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);

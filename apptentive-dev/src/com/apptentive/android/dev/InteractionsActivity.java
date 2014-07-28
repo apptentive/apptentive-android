@@ -18,62 +18,58 @@ import com.apptentive.android.dev.util.FileUtil;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
-import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.EventManager;
+import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
  */
 public class InteractionsActivity extends ApptentiveActivity {
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.interactions);
 
-		// Internal Events.
-		final AutoCompleteTextView intenalEventName = (AutoCompleteTextView) findViewById(R.id.internal_event_name);
-		String[] internalEvents = getResources().getStringArray(R.array.internal_events);
-		ArrayAdapter<String> internalEventAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, internalEvents);
-		intenalEventName.setAdapter(internalEventAdapter);
-		intenalEventName.setOnTouchListener(new View.OnTouchListener() {
+		CheckBox engageInternalEvent = (CheckBox) findViewById(R.id.internal_event_checkbox);
+		engageInternalEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				intenalEventName.showDropDown();
-				return false;
+			public void onCheckedChanged(CompoundButton compoundButton, boolean engageInternalEvent) {
+				if (engageInternalEvent) {
+					setupForInternalEvent();
+				} else {
+					setupForExternalEvent();
+				}
 			}
 		});
-		intenalEventName.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-			}
+		setupForExternalEvent();
+	}
 
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-			}
+	private void setupForInternalEvent() {
+		CheckBox includeCustomData = (CheckBox) findViewById(R.id.include_custom_data_checkbox);
+		CheckBox includeTime = (CheckBox) findViewById(R.id.include_time_checkbox);
+		CheckBox includeLocation = (CheckBox) findViewById(R.id.include_location_checkbox);
+		CheckBox includeCommerce = (CheckBox) findViewById(R.id.include_commerce_checkbox);
+		includeCustomData.setEnabled(false);
+		includeTime.setEnabled(false);
+		includeLocation.setEnabled(false);
+		includeCommerce.setEnabled(false);
 
-			@Override
-			public void afterTextChanged(Editable editable) {
-			}
-		});
-
-		// External Events.
 		final AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
-		String[] events = getResources().getStringArray(R.array.events);
-		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, events);
+		eventName.setText(null);
+		String[] events = getResources().getStringArray(R.array.internal_events);
+		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_dropdown_item_1line, events);
 		eventName.setAdapter(eventAdapter);
 		eventName.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -95,26 +91,104 @@ public class InteractionsActivity extends ApptentiveActivity {
 			public void afterTextChanged(Editable editable) {
 			}
 		});
+		eventName.setText(null);
+	}
+
+	private void setupForExternalEvent() {
+		CheckBox includeCustomData = (CheckBox) findViewById(R.id.include_custom_data_checkbox);
+		CheckBox includeTime = (CheckBox) findViewById(R.id.include_time_checkbox);
+		CheckBox includeLocation = (CheckBox) findViewById(R.id.include_location_checkbox);
+		CheckBox includeCommerce = (CheckBox) findViewById(R.id.include_commerce_checkbox);
+		includeCustomData.setEnabled(true);
+		includeTime.setEnabled(true);
+		includeLocation.setEnabled(true);
+		includeCommerce.setEnabled(true);
+
+		final AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
+		String[] events = getResources().getStringArray(R.array.events);
+		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_dropdown_item_1line, events);
+		eventName.setAdapter(eventAdapter);
+		eventName.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				eventName.showDropDown();
+				return false;
+			}
+		});
+		eventName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+			}
+		});
+		eventName.setText(null);
 	}
 
 	public void engage(@SuppressWarnings("unused") View view) {
 		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
-		Log.e("Testing engage(%s)", eventName.getText().toString());
-		long start = System.currentTimeMillis();
-		Apptentive.engage(this, eventName.getText().toString());
-		long end = System.currentTimeMillis();
-		Log.e("Code point storage took %d millis", end - start);
-		Log.e(CodePointStore.toString(getApplicationContext()));
-	}
+		CheckBox engageInternalEvent = (CheckBox) findViewById(R.id.internal_event_checkbox);
+		CheckBox includeCustomData = (CheckBox) findViewById(R.id.include_custom_data_checkbox);
+		CheckBox includeTime = (CheckBox) findViewById(R.id.include_time_checkbox);
+		CheckBox includeLocation = (CheckBox) findViewById(R.id.include_location_checkbox);
+		CheckBox includeCommerce = (CheckBox) findViewById(R.id.include_commerce_checkbox);
 
-	public void engageInternal(@SuppressWarnings("unused") View view) {
-		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.internal_event_name);
-		Log.e("Testing engageInternal(%s)", eventName.getText().toString());
-		long start = System.currentTimeMillis();
-		EngagementModule.engageInternal(this, eventName.getText().toString());
-		long end = System.currentTimeMillis();
-		Log.e("Code point storage took %d millis", end - start);
-		Log.e(CodePointStore.toString(getApplicationContext()));
+		Map<String, Object> customData = null;
+		if (includeCustomData.isEnabled() && includeCustomData.isChecked()) {
+			customData = new HashMap<String, Object>();
+			customData.put("string", "bar");
+			customData.put("number", 12345);
+		}
+
+		List<ExtendedData> extendedData = null;
+		if (includeTime.isEnabled() && includeTime.isChecked()) {
+			if (extendedData == null) {
+				extendedData = new ArrayList<ExtendedData>();
+			}
+			extendedData.add(new TimeExtendedData());
+		}
+
+		if (includeLocation.isEnabled() && includeLocation.isChecked()) {
+			if (extendedData == null) {
+				extendedData = new ArrayList<ExtendedData>();
+			}
+			extendedData.add(new LocationExtendedData(-122.349273, 47.620509));
+		}
+
+		if (includeCommerce.isEnabled() && includeCommerce.isChecked()) {
+			if (extendedData == null) {
+				extendedData = new ArrayList<ExtendedData>();
+			}
+			CommerceExtendedData commerce = new CommerceExtendedData("id", "affiliation", 100, 5, 10, "USD");
+			commerce.addItem("id", "name", "category", 20, 5, "USD");
+			extendedData.add(commerce);
+		}
+
+		if (!engageInternalEvent.isChecked()) {
+			Log.e("Testing engage(%s)", eventName.getText().toString());
+			long start = System.currentTimeMillis();
+			if (extendedData != null) {
+				Apptentive.engage(this, eventName.getText().toString(), customData, extendedData.toArray(new ExtendedData[extendedData.size()]));
+			} else {
+				Apptentive.engage(this, eventName.getText().toString(), customData);
+			}
+			long end = System.currentTimeMillis();
+			Log.e("Engage call took %d millis", end - start);
+			Log.e(CodePointStore.toString(getApplicationContext()));
+		} else {
+			Log.e("Testing engageInternal(%s)", eventName.getText().toString());
+			long start = System.currentTimeMillis();
+			EngagementModule.engageInternal(this, eventName.getText().toString());
+			long end = System.currentTimeMillis();
+			Log.e("Code point storage took %d millis", end - start);
+			Log.e(CodePointStore.toString(getApplicationContext()));
+		}
 	}
 
 	private static final String UPGRADE_MESSAGE_BRANDING_INTERACTION = "" +
@@ -392,7 +466,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 
 			if (interaction != null) {
 				CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-				EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, (JSONObject)null));
+				EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, (JSONObject) null));
 
 				CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 				EngagementModule.launchInteraction(activity, interaction);

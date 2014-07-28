@@ -35,7 +35,27 @@
                               android:gravity="left|center_vertical"
                               android:textSize="@dimen/apptentive_text_medium"
                               android:textColor="@android:color/white"
-                              android:text="Trigger code point"/>
+                              android:text="Engage Event"/>
+                    <CheckBox android:id="@+id/internal_event_checkbox"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Internal Event"/>
+                    <CheckBox android:id="@+id/include_custom_data_checkbox"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Include Custom Data"/>
+                    <CheckBox android:id="@+id/include_time_checkbox"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Include Time"/>
+                    <CheckBox android:id="@+id/include_location_checkbox"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Include Location"/>
+                    <CheckBox android:id="@+id/include_commerce_checkbox"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="Include Commerce"/>
                     <LinearLayout android:layout_width="fill_parent"
                                   android:layout_height="48dp"
                                   android:layout_marginTop="4dp"
@@ -53,24 +73,6 @@
                                               android:inputType="textVisiblePassword"
                                               android:completionThreshold="1"
                                               android:hint="Event Name…"/>
-                    </LinearLayout>
-                    <LinearLayout android:layout_width="fill_parent"
-                                  android:layout_height="48dp"
-                                  android:layout_marginTop="4dp"
-                                  android:orientation="horizontal">
-                        <Button android:layout_width="0dp"
-                                android:layout_height="fill_parent"
-                                android:layout_weight="2"
-                                android:onClick="engageInternal"
-                                android:text="Engage"/>
-                        <AutoCompleteTextView android:id="@+id/internal_event_name"
-                                              android:layout_width="0dp"
-                                              android:layout_height="48dp"
-                                              android:layout_weight="6"
-                                              android:cursorVisible="true"
-                                              android:inputType="textVisiblePassword"
-                                              android:completionThreshold="1"
-                                              android:hint="Internal Event Name…"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout android:layout_width="fill_parent"

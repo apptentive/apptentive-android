@@ -612,6 +612,14 @@ public class Apptentive {
 		return EngagementModule.engage(activity, "local", "app", event);
 	}
 
+	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData) {
+		return EngagementModule.engage(activity, "local", "app", event, null, customData, (ExtendedData[]) null);
+	}
+
+	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData) {
+		return EngagementModule.engage(activity, "local", "app", event, null, customData, extendedData);
+	}
+
 	/**
 	 * Pass in a listener. The listener will be called whenever a survey is finished.
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
@@ -647,7 +655,7 @@ public class Apptentive {
 				}
 				GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 				if (GlobalInfo.isAppDebuggable) {
-					//ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+					ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
 				}
 			} catch (Exception e) {
 				Log.e("Unexpected error while reading application info.", e);

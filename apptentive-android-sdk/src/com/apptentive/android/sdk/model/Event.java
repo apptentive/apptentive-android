@@ -21,9 +21,22 @@ public class Event extends ConversationItem {
 	private static final String KEY_LABEL = "label";
 	private static final String KEY_DATA = "data";
 	private static final String KEY_TRIGGER = "trigger";
+	private static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public Event(String json) throws JSONException {
 		super(json);
+	}
+
+	public Event(String label, JSONObject data) {
+		super();
+		try {
+			put(KEY_LABEL, label);
+			if (data != null) {
+				put(KEY_DATA, data);
+			}
+		} catch (JSONException e) {
+			Log.e("Unable to construct Event.", e);
+		}
 	}
 
 	public Event(String label, Map<String, String> data) {
@@ -42,16 +55,48 @@ public class Event extends ConversationItem {
 		}
 	}
 
-	public Event(String label, JSONObject data) {
+	public Event(String label, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
 		super();
 		try {
 			put(KEY_LABEL, label);
-			if (data != null) {
-				put(KEY_DATA, data);
+			if (data != null && !data.isEmpty()) {
+				JSONObject dataObject = new JSONObject();
+				for (String key : data.keySet()) {
+					dataObject.put(key, data.get(key));
+				}
+				put(KEY_DATA, dataObject);
+			}
+
+			if (customData != null && !customData.isEmpty()) {
+				JSONObject customDataJson = generateCustomDataJson(customData);
+				put(KEY_CUSTOM_DATA, customDataJson);
+			}
+
+			if (extendedData != null && extendedData.length != 0) {
+				for (ExtendedData currentExtendedData : extendedData) {
+					if (currentExtendedData != null) {
+						put(currentExtendedData.getTypeName(), currentExtendedData);
+					}
+				}
 			}
 		} catch (JSONException e) {
 			Log.e("Unable to construct Event.", e);
 		}
+	}
+
+	private JSONObject generateCustomDataJson(Map<String, Object> customData) {
+		JSONObject ret = new JSONObject();
+		for (String key : customData.keySet()) {
+			Object value = customData.get(key);
+			if (value != null) {
+				try {
+					ret.put(key, value);
+				} catch (Exception e) {
+					Log.w("Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
+				}
+			}
+		}
+		return ret;
 	}
 
 	public Event(String label, String trigger) {
