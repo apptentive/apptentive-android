@@ -612,10 +612,42 @@ public class Apptentive {
 		return EngagementModule.engage(activity, "local", "app", event);
 	}
 
+	/**
+	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
+	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
+	 * invocation of this method.
+	 *
+	 * @param activity  The Activity from which this method is called.
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
+	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
+	 *                   is sent to the server for tracking information in the context of the engaged Event.
+	 * @return true if the an interaction was shown, else false.
+	 */
 	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData) {
 		return EngagementModule.engage(activity, "local", "app", event, null, customData, (ExtendedData[]) null);
 	}
 
+	/**
+	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
+	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
+	 * invocation of this method.
+	 *
+	 * @param activity  The Activity from which this method is called.
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
+	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
+	 *                   is sent to the server for tracking information in the context of the engaged Event.
+	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send structured data that has
+	 *                     specific meaning to the server. By using an {@link ExtendedData} object instead of arbitrary
+	 *                     customData, special meaning can be derived. Supported objects include {@link TimeExtendedData},
+	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include each type only once.
+	 * @return true if the an interaction was shown, else false.
+	 */
 	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData) {
 		return EngagementModule.engage(activity, "local", "app", event, null, customData, extendedData);
 	}
