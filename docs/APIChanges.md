@@ -6,7 +6,7 @@ Refactored [Surveys](http://www.apptentive.com/docs/android/features/#surveys) t
 
 [New Survey integration instructions.](http://www.apptentive.com/docs/android/integration/#surveys)
 
-[Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_t_1.5.0.md)
+[Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.5.0.md)
 
 | Removed Methods |
 | --------------- |
