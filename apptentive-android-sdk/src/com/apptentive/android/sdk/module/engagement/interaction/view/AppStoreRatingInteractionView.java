@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
@@ -78,7 +77,8 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 	}
 
 	@Override
-	public void onBackPressed(Activity activity) {
+	public boolean onBackPressed(Activity activity) {
+		return true;
 	}
 
 	private void displayError(Activity activity, String message) {

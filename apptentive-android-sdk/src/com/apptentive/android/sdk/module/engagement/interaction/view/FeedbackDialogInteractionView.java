@@ -320,10 +320,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	}
 
 	@Override
-	public void onBackPressed(Activity activity) {
-		cleanup();
+	public boolean onBackPressed(Activity activity) {
 		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
-		activity.finish();
+		cleanup();
+		return true;
 	}
 
 	private static void cleanup() {

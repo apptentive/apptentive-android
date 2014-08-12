@@ -28,6 +28,7 @@ public class SurveyInteraction extends Interaction {
 	private static final String KEY_SHOW_SUCCESS_MESSAGE = "show_success_message";
 	private static final String KEY_SUCCESS_MESSAGE = "success_message";
 	private static final String KEY_QUESTIONS = "questions";
+	private static final String KEY_REQUIRED = "required";
 
 	public SurveyInteraction(String json) throws JSONException {
 		super(json);
@@ -115,4 +116,18 @@ public class SurveyInteraction extends Interaction {
 		}
 		return null;
 	}
+
+	public boolean isRequired() {
+		try {
+			InteractionConfiguration configuration = getConfiguration();
+			if (configuration != null && configuration.has(KEY_REQUIRED)) {
+				return configuration.getBoolean(KEY_REQUIRED);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return false;
+	}
+
+
 }

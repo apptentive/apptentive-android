@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -19,9 +19,6 @@ import com.apptentive.android.sdk.util.Constants;
  */
 public class AboutModule {
 
-	// *************************************************************************************************
-	// ********************************************* Static ********************************************
-	// *************************************************************************************************
 	private static AboutModule instance = null;
 
 	public static AboutModule getInstance() {
@@ -31,16 +28,8 @@ public class AboutModule {
 		return instance;
 	}
 
-	// *************************************************************************************************
-	// ********************************************* Private *******************************************
-	// *************************************************************************************************
-
 	private AboutModule() {
 	}
-
-	// *************************************************************************************************
-	// ******************************************* Not Private *****************************************
-	// *************************************************************************************************
 
 	public void show(Activity activity) {
 		Intent intent = new Intent();
@@ -77,7 +66,8 @@ public class AboutModule {
 		version.setText(String.format(versionString, Constants.APPTENTIVE_SDK_VERSION));
 	}
 
-	void onBackPressed(Activity activity) {
+	boolean onBackPressed(Activity activity) {
+		return true;
 	}
 
 }

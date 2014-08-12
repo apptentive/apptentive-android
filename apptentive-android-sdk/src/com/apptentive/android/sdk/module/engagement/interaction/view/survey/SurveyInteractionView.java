@@ -42,8 +42,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	private static SurveyState surveyState;
 	private static Map<String, String> data;
 
-	//private OnSurveyFinishedListener onSurveyFinishedListener;
-
 	public SurveyInteractionView(SurveyInteraction interaction) {
 		super(interaction);
 		if (surveyState == null) {
@@ -184,7 +182,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 	private void cleanup() {
 		surveyState = null;
-		//this.onSurveyFinishedListener = null;
 		data = null;
 	}
 
@@ -195,11 +192,16 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	}
 
 	@Override
-	public void onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data);
-		callListener(false);
-
-		cleanup();
+	public boolean onBackPressed(Activity activity) {
+		// If this survey is required, do not let it be dismissed when the user clicks the back button.
+		if (!interaction.isRequired()) {
+			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data);
+			callListener(false);
+			cleanup();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void callListener(boolean completed) {

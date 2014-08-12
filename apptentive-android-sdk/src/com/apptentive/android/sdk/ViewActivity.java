@@ -134,24 +134,28 @@ public class ViewActivity extends ApptentiveActivity {
 
 	@Override
 	public void onBackPressed() {
+		boolean finish = true;
 		switch (activeContentType) {
 			case ABOUT:
-				AboutModule.getInstance().onBackPressed(this);
+				finish = AboutModule.getInstance().onBackPressed(this);
 				break;
 			case MESSAGE_CENTER:
-				ApptentiveMessageCenter.onBackPressed(this);
+				finish = ApptentiveMessageCenter.onBackPressed(this);
 				break;
 			case INTERACTION:
 				if (activityContent != null) {
-					activityContent.onBackPressed(this);
+					finish = activityContent.onBackPressed(this);
 				}
 				break;
 			default:
 				break;
 		}
-		finish();
-		overridePendingTransition(0, R.anim.slide_down_out);
-		super.onBackPressed();
+
+		if (finish) {
+			finish();
+			overridePendingTransition(0, R.anim.slide_down_out);
+			super.onBackPressed();
+		}
 	}
 
 	@Override

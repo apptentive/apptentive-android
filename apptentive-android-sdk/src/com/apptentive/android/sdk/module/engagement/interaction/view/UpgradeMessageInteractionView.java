@@ -64,8 +64,9 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 	}
 
 	@Override
-	public void onBackPressed(Activity activity) {
+	public boolean onBackPressed(Activity activity) {
 		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		return true;
 	}
 
 	private Drawable getIconDrawableResourceId(Activity activity) {

@@ -279,9 +279,10 @@ public class ApptentiveMessageCenter {
 		MessagePollingWorker.setForeground(false);
 	}
 
-	public static void onBackPressed(Activity activity) {
+	public static boolean onBackPressed(Activity activity) {
 		clearPendingMessageCenterPushNotification(activity);
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
+		return true;
 	}
 
 	enum Trigger {

@@ -20,7 +20,14 @@ public abstract class ActivityContent {
 
 	public abstract void onStop();
 
-	public abstract void onBackPressed(Activity activity);
+	/**
+	 * Called from the container Activity when the Android back button is pressed. When done processing the back button,
+	 * return true if you would like the container Activity to process the back button press as usual. Return false if you
+	 * do not. Returning false will result in the back button press being ignored by the container Activity, and the
+	 * current view will remain in place.
+	 * @return True if this back button press should propagate back to the parent object, else false.
+	 */
+	public abstract boolean onBackPressed(Activity activity);
 
 	public abstract void show(Activity activity);
 

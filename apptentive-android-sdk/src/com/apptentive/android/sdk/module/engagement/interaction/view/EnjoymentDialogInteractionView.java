@@ -74,7 +74,8 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 	}
 
 	@Override
-	public void onBackPressed(Activity activity) {
+	public boolean onBackPressed(Activity activity) {
 		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		return true;
 	}
 }
