@@ -259,6 +259,12 @@ public class Apptentive {
 	public static final String INTEGRATION_AWS_SNS_TOKEN = "token";
 
 	/**
+	 * The key to use to store a Map of Parse configuration settings.
+	 */
+	public static final String INTEGRATION_PARSE = "parse";
+	public static final String INTEGRATION_PARSE_DEVICE_TOKEN = "token";
+
+	/**
 	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
 	 * of the SDK is published is listed below.
 	 * <p/>
@@ -305,9 +311,7 @@ public class Apptentive {
 	 * {@link android.content.BroadcastReceiver}. You can alternately find the APID by calling
 	 * <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29">PushManager.shared().getAPID()</a>
 	 * <p/>
-	 * Note: Initializing Urban Airship may take a few seconds. You may need to close and reopen the app in order to force
-	 * the APID to be sent to our server. Push notifications will not be delivered to this app install until our server
-	 * receives the APID.
+	 * Push notifications will not be delivered to this app install until our server receives the APID.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param apid    The Airship Push ID (APID).
@@ -329,7 +333,6 @@ public class Apptentive {
 	 * GoogleCloudMessaging.register(String... senderIds)</a>,
 	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
 	 * <p/>
-	 * Note: You may need to close and reopen the app in order to force the Registration ID to be sent to our server.
 	 * Push notifications will not be delivered to this app install until our server receives the Registration ID.
 	 *
 	 * @param context        The Context from which this method was called.
@@ -346,6 +349,27 @@ public class Apptentive {
 		}
 	}
 
+	/**
+	 * Configures Apptentive to work with Parse push notifications. You must first set up your app to work with Parse to
+	 * use this integration. You must call this method, and pass in the Parse deviceToken when you finish initializing
+	 * Parse push notifications in your app. Please see our <a href="http://www.apptentive.com/docs/android/integration/">
+	 * integration guide</a> for instructions.
+	 * <p/>
+	 * Push notifications will not be delivered to this app install until our server receives the deviceToken.
+	 *
+	 * @param context     The Context from which this method was called.
+	 * @param deviceToken The deviceToken returned from
+	 *
+	 */
+	public static void addParsePushIntegration(Context context, String deviceToken) {
+		if (deviceToken != null) {
+			Log.i("Setting Parse Device Token: %s", deviceToken);
+			Map<String, String> config = new HashMap<String, String>();
+			config.put(Apptentive.INTEGRATION_PARSE_DEVICE_TOKEN, deviceToken);
+			addIntegration(context, Apptentive.INTEGRATION_PARSE, config);
+		}
+	}
+
 
 	// ****************************************************************************************
 	// PUSH NOTIFICATIONS
@@ -357,32 +381,55 @@ public class Apptentive {
 	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
 
 	/**
-	 * Saves Apptentive specific data form a push notification Intent. In your BroadcastReceiver, if the push notification
-	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
-	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
+	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
+	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. If you are using
+	 * Parse, you must create and register your own receiver, as explained in our
+	 * <a href="http://www.apptentive.com/docs/android/integration/">integration guide</a>. You must call this method
+	 * <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
 	 * notification did not come from Apptentive, this method has no effect.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
 	 */
-	public static void setPendingPushNotification(Context context, Intent intent) {
+	public static boolean setPendingPushNotification(Context context, Intent intent) {
+		String apptentive = null;
 		if (intent != null) {
-			Bundle extras = intent.getExtras();
-			if (extras != null && extras.containsKey(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
-				Log.i("Saving pending push intent.");
-				String extra = extras.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+			// Check and handle Parse pushes.
+			if (intent.getAction() != null && intent.getAction().equals("com.apptentive.PUSH")) {
+				Log.d("Received Apptentive push notification from Parse.");
+				String data = intent.getStringExtra("com.parse.Data");
+				JSONObject jsonObject = null;
+				try {
+					jsonObject = new JSONObject(data);
+				} catch (JSONException e) {
+					Log.e("Error parsing Parse push notification.", e);
+				}
+				if (jsonObject != null) {
+					apptentive = jsonObject.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, null);
+				}
+			} else {
+				Log.d("Received Apptentive push notification.");
+				  // Other push providers. The apptentive object is stored as a String Extra on the intent.
+				apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+			}
+			if (apptentive != null) {
+				Log.d("Saving Apptentive push notification data.");
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, extra).commit();
+				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentive).commit();
+				return true;
+			} else {
+				Log.d("Not an apptentive push notification.");
 			}
 		}
+		return false;
 	}
 
 	/**
 	 * Launches Apptentive features based on a push notification Intent. Before you call this, you must call
 	 * {@link Apptentive#setPendingPushNotification(Context, Intent)} in your Broadcast receiver when a push notification
-	 * is opened by the user. Call this method must be called from the Activity that you launched from the
-	 * BroadcastReceiver. This method will only handle Apptentive originated push notifications, so call is anytime you
-	 * receive a push.
+	 * is opened by the user. This method must be called from the Activity that you launched from the
+	 * BroadcastReceiver, or if using Parse, from teh default Activity you have set to handle opened push notifications.
+	 * This method will only handle Apptentive originated push notifications, so call is anytime you receive a push.
 	 *
 	 * @param activity The Activity from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
@@ -422,7 +469,17 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
-		return intent != null && intent.getExtras() != null && intent.getExtras().getString(APPTENTIVE_PUSH_EXTRA_KEY) != null;
+		if (intent != null) {
+			if (intent.getAction() != null && intent.getAction().equals("com.apptentive.PUSH")) {
+				// This came from Parse.
+				return true;
+			}
+			if (intent.hasExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
+				// This came from another push provider.
+				return true;
+			}
+		}
+		return false;
 	}
 
 
