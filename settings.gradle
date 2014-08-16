@@ -1,0 +1,16 @@
+// Apptentive SDK
+include ':apptentive'
+
+// Tests
+/*
+include 'test-app'
+project(':test-app').projectDir = new File('apptentive/test-app')
+include 'tests'
+project(':tests').projectDir = new File('facebook/tests')
+*/
+
+// Samples
+include 'apptentive-dev'
+project(':apptentive-dev').projectDir = new File('samples/apptentive-dev')
+include 'apptentive-example'
+project(':apptentive-example').projectDir = new File('samples/apptentive-example')
