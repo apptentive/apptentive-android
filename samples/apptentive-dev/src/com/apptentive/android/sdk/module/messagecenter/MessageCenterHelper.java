@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.tests.module.messagecenter;
+package com.apptentive.android.sdk.module.messagecenter;
 
 import android.app.Activity;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
