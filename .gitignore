@@ -13,3 +13,7 @@ build/
 
 # IntelliJ
 *.iws
+
+# Eclipse
+.settings
+.metadata
