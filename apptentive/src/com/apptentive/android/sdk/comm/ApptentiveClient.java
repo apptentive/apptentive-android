@@ -10,8 +10,6 @@ import android.content.Context;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.apache.http.Header;

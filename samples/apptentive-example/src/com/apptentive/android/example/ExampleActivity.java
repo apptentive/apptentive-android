@@ -6,24 +6,20 @@
 
 package com.apptentive.android.example;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveActivity;
 
 /**
- * This is an example Application, demonstrating the most straight-forward Apptentive integration path: inheriting
- * from {@link ApptentiveActivity}.
+ * This is an example integration of Apptentive.
  *
  * @author Sky Kelsey
  */
-public class ExampleActivity extends ApptentiveActivity {
+public class ExampleActivity extends Activity {
 
 	private static String LOG_TAG = "Apptentive Example";
 
-	/**
-	 * Called when the activity is first created.
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,11 +29,16 @@ public class ExampleActivity extends ApptentiveActivity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
+		// Only engage if this window is gaining focus.
 		if (hasFocus) {
-			Apptentive.engage(this, "init");
+			// If you plan on showing your own views, first make sure Apptentive hasn't already shown one.
+			boolean apptentiveShowedInteraction = Apptentive.engage(this, "init");
 		}
 	}
 
+	/**
+	 * Provide a simple feedback button in your app.
+	 */
 	public void onMessageCenterButtonPressed(@SuppressWarnings("unused") View view) {
 		Apptentive.showMessageCenter(this);
 	}

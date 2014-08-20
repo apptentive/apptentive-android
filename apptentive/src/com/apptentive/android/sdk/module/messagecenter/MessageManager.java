@@ -122,7 +122,7 @@ public class MessageManager {
 		getMessageStore(context).updateMessage(message);
 	}
 
-	protected static List<Message> parseMessagesString(String messageString) throws JSONException {
+	public static List<Message> parseMessagesString(String messageString) throws JSONException {
 		List<Message> ret = new ArrayList<Message>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {

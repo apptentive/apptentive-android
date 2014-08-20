@@ -2,12 +2,8 @@
 include ':apptentive'
 
 // Tests
-/*
 include 'test-app'
-project(':test-app').projectDir = new File('apptentive/test-app')
-include 'tests'
-project(':tests').projectDir = new File('facebook/tests')
-*/
+project(':test-app').projectDir = new File('tests/test-app')
 
 // Samples
 include 'apptentive-dev'

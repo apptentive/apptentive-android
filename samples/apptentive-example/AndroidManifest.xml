@@ -7,8 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-sdk android:minSdkVersion="7"
-              android:targetSdkVersion="18"/>
-    <supports-screens android:largeScreens="true"
+              android:targetSdkVersion="19"/>
+    <supports-screens android:xlargeScreens="true"
+                      android:largeScreens="true"
                       android:normalScreens="true"
                       android:smallScreens="true"
                       android:anyDensity="true"/>
@@ -22,13 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <meta-data android:name="apptentive_api_key" android:value=""/>
+        <meta-data android:name="apptentive_api_key"
+                   android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/Apptentive.Theme.Transparent"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
             </intent-filter>
         </receiver>
     </application>

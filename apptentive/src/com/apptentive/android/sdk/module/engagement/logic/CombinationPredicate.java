@@ -33,7 +33,7 @@ public class CombinationPredicate extends Predicate {
 			JSONArray jsonArray = (JSONArray) object;
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject child = (JSONObject) jsonArray.get(i);
-				children.add(Predicate.parse(null, child));
+				children.add(parse(null, child));
 			}
 		} else if (object instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) object;
@@ -41,7 +41,7 @@ public class CombinationPredicate extends Predicate {
 			Iterator<String> it = (Iterator<String>) jsonObject.keys();
 			while (it.hasNext()) {
 				String key = it.next();
-				children.add(Predicate.parse(key, jsonObject.get(key)));
+				children.add(parse(key, jsonObject.get(key)));
 			}
 		} else {
 			Log.w("Unrecognized Combination Predicate: %s", object.toString());

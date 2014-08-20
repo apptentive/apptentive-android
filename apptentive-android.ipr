@@ -2,7 +2,7 @@
 <project version="4">
   <component name="AntConfiguration">
     <buildFile url="file://$PROJECT_DIR$/samples/apptentive-dev/build.xml" />
-    <buildFile url="file://$PROJECT_DIR$/samples/apptentive-android-sdk-dev-tests/build.xml" />
+    <buildFile url="file://$PROJECT_DIR$/tests/integration-tests/build.xml" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -57,6 +57,7 @@
             <option value="$PROJECT_DIR$/apptentive" />
             <option value="$PROJECT_DIR$/samples/apptentive-dev" />
             <option value="$PROJECT_DIR$/samples/apptentive-example" />
+            <option value="$PROJECT_DIR$/tests/test-app" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -246,10 +247,11 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/apptentive/apptentive.iml" filepath="$PROJECT_DIR$/apptentive/apptentive.iml" />
       <module fileurl="file://$PROJECT_DIR$/apptentive-android.iml" filepath="$PROJECT_DIR$/apptentive-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/samples/apptentive-android-sdk-dev-tests/apptentive-android-sdk-dev-tests.iml" filepath="$PROJECT_DIR$/samples/apptentive-android-sdk-dev-tests/apptentive-android-sdk-dev-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" filepath="$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" filepath="$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/samples/apptentive-example-alternate/apptentive-example-alternate.iml" filepath="$PROJECT_DIR$/samples/apptentive-example-alternate/apptentive-example-alternate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/integration-tests-app/test-app.iml" filepath="$PROJECT_DIR$/tests/integration-tests-app/test-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/integration-tests/tests.iml" filepath="$PROJECT_DIR$/tests/integration-tests/tests.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">

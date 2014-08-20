@@ -15,7 +15,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
-import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;

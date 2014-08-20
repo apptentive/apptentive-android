@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;

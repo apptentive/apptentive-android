@@ -276,7 +276,7 @@ public class Util {
 	public static Object getPackageMetaData(Context context, String key) {
 		try {
 			return context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData.get(key);
-		} catch (PackageManager.NameNotFoundException e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}

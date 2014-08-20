@@ -6,36 +6,16 @@
 
 package com.apptentive.android.dev;
 
-import android.app.Activity;
 import android.content.*;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
-import com.apptentive.android.dev.util.FileUtil;
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.model.*;
-import com.apptentive.android.sdk.storage.PersonManager;
-import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Sky Kelsey
