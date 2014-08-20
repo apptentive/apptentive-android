@@ -250,8 +250,6 @@
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" filepath="$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" filepath="$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" />
       <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tests/integration-tests-app/test-app.iml" filepath="$PROJECT_DIR$/tests/integration-tests-app/test-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tests/integration-tests/tests.iml" filepath="$PROJECT_DIR$/tests/integration-tests/tests.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
