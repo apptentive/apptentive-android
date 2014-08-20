@@ -20,7 +20,6 @@ import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
-import com.apptentive.android.sdk.tests.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
