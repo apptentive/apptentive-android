@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="apptentive-dev" default="help">
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<project name="apptentive-example" default="help">
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
