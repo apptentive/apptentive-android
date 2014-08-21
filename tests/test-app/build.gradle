@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        testPackageName "com.apptentive.android.sdk.tests"
+        testApplicationId "com.apptentive.android.sdk.tests"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
         testHandleProfiling true
         testFunctionalTest true
