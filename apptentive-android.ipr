@@ -34,7 +34,8 @@
     </copyright>
   </component>
   <component name="DependencyValidationManager">
-    <scope name="Javadoc Scope" pattern="src[apptentive-android-sdk]:com.apptentive.android.sdk.Apptentive||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener||src[apptentive-android-sdk]:com.apptentive.android.sdk.ApptentiveActivity||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider||src[apptentive-android-sdk]:com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider" />
+    <scope name="SDK Lint" pattern="src[apptentive]:*..*" />
+    <scope name="Javadoc" pattern="src[apptentive]:com.apptentive.android.sdk.Apptentive||src[apptentive]:com.apptentive.android.sdk.ApptentiveActivity||src[apptentive]:com.apptentive.android.sdk.ApptentiveListActivity||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
@@ -251,7 +252,7 @@
       <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 3.1 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
