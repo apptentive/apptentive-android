@@ -43,7 +43,9 @@ public abstract class ActivityContent {
 
 		public static Type parse(String type) {
 			try {
-				return Type.valueOf(type);
+				if (type != null) {
+					return Type.valueOf(type);
+				}
 			} catch (IllegalArgumentException e) {
 				Log.v("Error parsing unknown ActivityContent.Type: " + type);
 			}

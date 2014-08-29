@@ -91,4 +91,22 @@ public class ActivityUtil {
 
 		return currentActivityName != null && currentActivityName.equals(mainActivityName);
 	}
+
+	public static Class<? extends Activity> getActivityClassFromName(String className) {
+		Class cls = null;
+		if (!Util.isEmpty(className)) {
+			try {
+				cls = Class.forName(className);
+			} catch (ClassNotFoundException var3) {
+				//
+			}
+		}
+		if(cls != null && !Activity.class.isAssignableFrom(cls)) {
+			cls = null;
+		}
+		if(cls == null) {
+			Log.e("Class %s does not exist.", className);
+		}
+		return cls;
+	}
 }

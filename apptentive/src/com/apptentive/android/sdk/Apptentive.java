@@ -318,7 +318,7 @@ public class Apptentive {
 	 */
 	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
 		if (apid != null) {
-			Log.i("Setting Urban Airship APID: %s", apid);
+			Log.d("Setting Urban Airship APID: %s", apid);
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_APID, apid);
 			addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
@@ -342,7 +342,7 @@ public class Apptentive {
 	 */
 	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
 		if (registrationId != null) {
-			Log.i("Setting Amazon AWS token: %s", registrationId);
+			Log.d("Setting Amazon AWS token: %s", registrationId);
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);
 			addIntegration(context, Apptentive.INTEGRATION_AWS_SNS, config);
@@ -363,7 +363,7 @@ public class Apptentive {
 	 */
 	public static void addParsePushIntegration(Context context, String deviceToken) {
 		if (deviceToken != null) {
-			Log.i("Setting Parse Device Token: %s", deviceToken);
+			Log.d("Setting Parse Device Token: %s", deviceToken);
 			Map<String, String> config = new HashMap<String, String>();
 			config.put(Apptentive.INTEGRATION_PARSE_DEVICE_TOKEN, deviceToken);
 			addIntegration(context, Apptentive.INTEGRATION_PARSE, config);
@@ -382,11 +382,12 @@ public class Apptentive {
 
 	/**
 	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
-	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. If you are using
-	 * Parse, you must create and register your own receiver, as explained in our
-	 * <a href="http://www.apptentive.com/docs/android/integration/">integration guide</a>. You must call this method
-	 * <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
+	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
+	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
 	 * notification did not come from Apptentive, this method has no effect.
+	 * <p/>
+	 * <strong>Note: </strong>If you are using Parse, do not use this method. Instead, see the Apptentive
+	 * <a href="http://www.apptentive.com/docs/android/integration/"> integration guide</a> for Parse.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
@@ -394,24 +395,8 @@ public class Apptentive {
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
 		String apptentive = null;
 		if (intent != null) {
-			// Check and handle Parse pushes.
-			if (intent.getAction() != null && intent.getAction().equals("com.apptentive.PUSH")) {
-				Log.d("Received Apptentive push notification from Parse.");
-				String data = intent.getStringExtra("com.parse.Data");
-				JSONObject jsonObject = null;
-				try {
-					jsonObject = new JSONObject(data);
-				} catch (JSONException e) {
-					Log.e("Error parsing Parse push notification.", e);
-				}
-				if (jsonObject != null) {
-					apptentive = jsonObject.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, null);
-				}
-			} else {
-				Log.d("Received Apptentive push notification.");
-				  // Other push providers. The apptentive object is stored as a String Extra on the intent.
-				apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-			}
+			Log.i("Received Apptentive push notification.");
+			apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
 			if (apptentive != null) {
 				Log.d("Saving Apptentive push notification data.");
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -428,8 +413,11 @@ public class Apptentive {
 	 * Launches Apptentive features based on a push notification Intent. Before you call this, you must call
 	 * {@link Apptentive#setPendingPushNotification(Context, Intent)} in your Broadcast receiver when a push notification
 	 * is opened by the user. This method must be called from the Activity that you launched from the
-	 * BroadcastReceiver, or if using Parse, from teh default Activity you have set to handle opened push notifications.
-	 * This method will only handle Apptentive originated push notifications, so call is anytime you receive a push.
+	 * BroadcastReceiver. This method will only handle Apptentive originated push notifications, so call is any time you
+	 * receive a push.
+	 * <p/>
+	 * <strong>Note: </strong>If you are using Parse, do not use this method. Instead, see the Apptentive
+	 * <a href="http://www.apptentive.com/docs/android/integration/"> integration guide</a> for Parse.
 	 *
 	 * @param activity The Activity from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
@@ -439,7 +427,7 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.e("Handling Apptentive Push Intent.");
+			Log.i("Handling Apptentive Push Intent.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
 				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
@@ -459,6 +447,16 @@ public class Apptentive {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Use this method to set the Activity that you would like to return to when Apptentive is done responding to a Parse
+	 * push notification. It should only be used for Parse push notifications.
+	 *
+	 * @param activity The Activity you would like Apptentive to launch when we are done responding to a Parse push.
+	 */
+	public static void setParsePushCallback(Class<? extends Activity> activity) {
+		ApptentiveInternal.setPushCallbackActivity(activity);
 	}
 
 	/**

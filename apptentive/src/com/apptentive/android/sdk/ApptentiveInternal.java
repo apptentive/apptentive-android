@@ -105,4 +105,14 @@ public class ApptentiveInternal {
 	public static void setMinimumLogLevel(int logLevel) {
 		Log.overrideLogLevel(logLevel);
 	}
+
+	private static String pushCallbackActivityName;
+	public static void setPushCallbackActivity(Class<? extends Activity> activity) {
+		pushCallbackActivityName = activity.getName();
+		Log.d("Setting push callback activity name to %s", pushCallbackActivityName);
+	}
+
+	public static String getPushCallbackActivityName() {
+		return pushCallbackActivityName;
+	}
 }

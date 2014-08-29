@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
@@ -20,7 +21,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
+import org.json.JSONObject;
 
 /**
  * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
@@ -32,21 +35,73 @@ public class ViewActivity extends ApptentiveActivity {
 	private ActivityContent activityContent;
 	private ActivityContent.Type activeContentType;
 
+
+	/**
+	 * The class name to return to if this Activity was launched from a push notification.
+	 */
+	private String pushCallbackActivityName;
+
+	/**
+	 * A flag that is set when this Activity was launched from a push notification. If true, we should launch
+	 * pushCallbackActivityName when we finish this Activity.
+	 */
+	private boolean returnToPushCallbackActivity;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		try {
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
 
-			Window window = getWindow();
-			window.setFormat(PixelFormat.RGBA_8888);
-			window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
+			String activityContent = getIntent().getStringExtra(ActivityContent.KEY);
+			String parseStringExtra = getIntent().getStringExtra("com.parse.Data");
+
+			if (activityContent != null) {
+				Log.v("Started ViewActivity normally for %s.", activityContent);
+				activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
+			} else
+				// If no content was sent to this Activity, then it may have been started from a Parse push notification.
+			if (parseStringExtra != null) {
+				Log.i("Started ViewActivity from Parse push.");
+
+				// Save off the callback Activity if one was passed in.
+				pushCallbackActivityName = ApptentiveInternal.getPushCallbackActivityName();
+
+				// If the callback is null and we got here, then the developer forgot to set it.
+				if (pushCallbackActivityName != null) {
+					returnToPushCallbackActivity = true;
+					JSONObject parseJson = new JSONObject(parseStringExtra);
+					String apptentiveStringData = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+					JSONObject apptentiveJson = new JSONObject(apptentiveStringData);
+					ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.parse(apptentiveJson.getString(ApptentiveInternal.PUSH_ACTION));
+					switch (action) {
+						case pmc:
+							activeContentType = ActivityContent.Type.MESSAGE_CENTER;
+							break;
+						default:
+							break;
+					}
+				} else {
+					Log.a("Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()");
+					if (GlobalInfo.isAppDebuggable) {
+						Toast.makeText(this, "Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()", Toast.LENGTH_LONG).show();
+					}
+					finish();
+				}
+			} else {
+				Log.e("Started ViewActivity in a bad way.");
+			}
 		} catch (Exception e) {
 			Log.e("Error creating ViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
 		}
+		if (activeContentType == null) {
+			finish();
+		}
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
 	}
 
 	@Override
@@ -152,7 +207,6 @@ public class ViewActivity extends ApptentiveActivity {
 
 		if (finish) {
 			finish();
-			overridePendingTransition(0, R.anim.slide_down_out);
 			super.onBackPressed();
 		}
 	}
@@ -173,5 +227,35 @@ public class ViewActivity extends ApptentiveActivity {
 
 	public void showAboutActivity(View view) {
 		AboutModule.getInstance().show(this);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean("returnToPushCallbackActivity", returnToPushCallbackActivity);
+		outState.putString("pushCallbackActivityName", pushCallbackActivityName);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		returnToPushCallbackActivity = savedInstanceState.getBoolean("returnToPushCallbackActivity", false);
+		pushCallbackActivityName = savedInstanceState.getString("pushCallbackActivityName");
+	}
+
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(0, R.anim.slide_down_out);
+		// If we started from a Parse push, then we need to return to the callback Activity when this Activity finishes.
+		if (pushCallbackActivityName != null) {
+			Log.d("Returning to callback Activity: %s", pushCallbackActivityName);
+			Class<? extends Activity> cls = ActivityUtil.getActivityClassFromName(pushCallbackActivityName);
+			if (cls != null) {
+				Intent intent = new Intent(this, cls);
+				startActivity(intent);
+				overridePendingTransition(R.anim.slide_up_in, 0);
+			}
+		}
 	}
 }
