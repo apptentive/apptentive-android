@@ -32,7 +32,9 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 	public void testExtendedDataEvents() {
 		Log.e("testExtendedDataEvents()");
 		try {
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testExtendedDataEvents.json"));
+			Event expected = new Event(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testExtendedDataEvents.json"));
+			// Change the expected output to use the same timezone as the test machine.
+			expected.setClientCreatedAtUtcOffset(Util.getUtcOffset());
 
 			Map<String, String> data = new HashMap<String, String>();
 			data.put("data_key", "data_value");
@@ -53,9 +55,9 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 
 			LocationExtendedData location = new LocationExtendedData(-122.34569190000002d, 47.6288591d);
 
+
 			Event actual = new Event("event_label", data, customData, commerce, time, location);
 			actual.setClientCreatedAt(1.406316991967E9);
-			actual.setClientCreatedAtUtcOffset(Util.getUtcOffset());
 			actual.setNonce("4579c403-e8c5-4e6b-8826-f3d61e6ebb98");
 
 			boolean equal = JsonDiffer.areObjectsEqual(expected, actual);
