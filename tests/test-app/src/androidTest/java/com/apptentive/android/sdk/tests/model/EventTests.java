@@ -52,12 +52,18 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 
 			LocationExtendedData location = new LocationExtendedData(-122.34569190000002d, 47.6288591d);
 
-			Event event = new Event("event_label", data, customData, commerce, time, location);
-			event.setClientCreatedAt(1.406316991967E9);
-			event.setNonce("4579c403-e8c5-4e6b-8826-f3d61e6ebb98");
+			Event actual = new Event("event_label", data, customData, commerce, time, location);
+			actual.setClientCreatedAt(1.406316991967E9);
+			actual.setNonce("4579c403-e8c5-4e6b-8826-f3d61e6ebb98");
 
-			boolean equal = JsonDiffer.areObjectsEqual(expected, event);
+			boolean equal = JsonDiffer.areObjectsEqual(expected, actual);
 			Log.e("Events are equal: %b", equal);
+			if (!equal) {
+				Log.e("JSON equality test failed:");
+				Log.e("%s", expected);
+				Log.e("Actual:");
+				Log.e("%s", actual);
+			}
 			assertTrue(equal);
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
