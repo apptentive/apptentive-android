@@ -73,7 +73,10 @@ public abstract class ConversationItem extends Payload {
 		}
 	}
 
-	private void setClientCreatedAtUtcOffset(int clientCreatedAtUtcOffset) {
+	/**
+	 * This is made public primarily so that unit tests can be made to run successfully no matter what the time zone.
+	 */
+	public void setClientCreatedAtUtcOffset(int clientCreatedAtUtcOffset) {
 		try {
 			put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
 		} catch (JSONException e) {

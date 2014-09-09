@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.JsonDiffer;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,16 +55,11 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 
 			Event actual = new Event("event_label", data, customData, commerce, time, location);
 			actual.setClientCreatedAt(1.406316991967E9);
+			actual.setClientCreatedAtUtcOffset(Util.getUtcOffset());
 			actual.setNonce("4579c403-e8c5-4e6b-8826-f3d61e6ebb98");
 
 			boolean equal = JsonDiffer.areObjectsEqual(expected, actual);
 			Log.e("Events are equal: %b", equal);
-			if (!equal) {
-				Log.e("JSON equality test failed:");
-				Log.e("%s", expected);
-				Log.e("Actual:");
-				Log.e("%s", actual);
-			}
 			assertTrue(equal);
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
