@@ -133,7 +133,8 @@ public class JsonDiffer {
 			double leftDouble = ((Number) left).doubleValue();
 			double rightDouble = ((Number) right).doubleValue();
 			double error = Math.abs(0.000001 * rightDouble);
-			return Math.abs(leftDouble - rightDouble) < error;
+			// Use <= because if both sides are zero, the error will also be zero.
+			return Math.abs(leftDouble - rightDouble) <= error;
 		} else {
 			return left.equals(right);
 		}
