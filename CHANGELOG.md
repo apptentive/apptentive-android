@@ -24,7 +24,7 @@
 
 We've refactored [Surveys](http://www.apptentive.com/docs/android/features/#surveys) to use our [Event Framework](http://www.apptentive.com/docs/android/features/#events-and-interactions)! You will now have the ability to show surveys at any Event in your code. This release also lets you show a Survey instead of asking for feedback if your customer says they don't love your app from the [Ratings Prompt](http://www.apptentive.com/docs/android/features/#ratings-prompt) Interaction.
 
-See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_t_1.5.0.md)
+See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.5.0.md)
 
 #### Bugs fixed:
 
