@@ -1,5 +1,23 @@
 This document tracks changes to the API between versions.
 
+# 1.6.0
+
+* Added ability to send custom data and EventData with Events.
+* Added support for Parse push notifications.
+* Added ability to set initial user name.
+* The repo has been refactored to use a more Gradle friendly format.
+
+[Migrating to 1.6.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.6.0.md)
+
+| Added Methods |
+| ------------- |
+| [public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData)]() |
+| [public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData)]() |
+| [public static void addParsePushIntegration(Context context, String deviceToken)]() |
+| [public static void setParsePushCallback(Class<? extends Activity> activity)]() |
+| [public static void setInitialUserName(Context context, String name)]() |
+
+
 # 1.5.0
 
 Refactored [Surveys](http://www.apptentive.com/docs/android/features/#surveys) to use the new Event framework. You should use [Apptentive.engage(Activity activity, String eventName)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#engage%28android.app.Activity,%20java.lang.String%29) instead of `Apptentive.showSurvey()`.

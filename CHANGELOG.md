@@ -1,3 +1,22 @@
+# 2014-09-12 skykelsey 1.6.0
+
+#### Major changes
+
+* Refactored repo to be more Gradle friendly. See these instructions if you are upgrading from a previous release.
+* Added Gradle support.
+* Added legacy IntelliJ project files for those who do not yet use Gradle.
+* Simplified the sample apps.
+* Added ability to send CustomData and EventData with Events.
+* Added Parse push notification support.
+* Added ability to set initial user name through API.
+
+#### Bugs fixed:
+
+* Fixed Eclipse project files.
+* Fixed JsonDiffer to handle zero value float diffing.
+
+If you were using a previous version, see [Migrating to 1.6.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.6.0.md)
+
 # 2014-07-16 skykelsey 1.5.1
 
 #### Major changes
