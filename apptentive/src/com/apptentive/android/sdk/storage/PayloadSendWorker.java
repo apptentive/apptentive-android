@@ -23,6 +23,7 @@ public class PayloadSendWorker {
 
 	private static final int NO_TOKEN_SLEEP = 5000;
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
+	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
 
 	private static boolean running;
 	private static Context appContext;
@@ -61,11 +62,14 @@ public class PayloadSendWorker {
 					PayloadStore db = getPayloadStore(appContext);
 					while (runningActivities > 0) {
 						if (Util.isEmpty(GlobalInfo.conversationToken)) {
+							Log.i("No conversation token yet.");
 							pause(NO_TOKEN_SLEEP);
 							continue;
 						}
 						if (!Util.isNetworkConnectionPresent(appContext)) {
-							break;
+							Log.v("Can't send payloads. No network connection.");
+							pause(NO_CONNECTION_SLEEP_TIME);
+							continue;
 						}
 						Log.v("Checking for payloads to send.");
 						Payload payload;
@@ -120,8 +124,7 @@ public class PayloadSendWorker {
 								db.deletePayload(payload);
 							} else if (response.isRejectedTemporarily()) {
 								Log.d("Unable to send JSON. Leaving in queue.");
-								// Break the loop. Restart when network is reachable.
-								break;
+								continue;
 							}
 						}
 					}
