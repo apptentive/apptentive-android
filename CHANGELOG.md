@@ -1,3 +1,11 @@
+# 2014-09-17 skykelsey 1.5.2
+
+#### Major changes
+
+* Don't check for messages while Message Center is disabled.
+* If no network connection is present, network worker threads will go back to sleep instead of exit.
+
+
 # 2014-07-16 skykelsey 1.5.1
 
 #### Major changes
