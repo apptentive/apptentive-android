@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 android {
-    compileSdkVersion 19
+    compileSdkVersion 13
     buildToolsVersion '19.1.0'
 
     defaultConfig {
