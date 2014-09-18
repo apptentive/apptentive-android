@@ -10,6 +10,7 @@ import android.content.Context;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -57,13 +58,13 @@ public class MessagePollingWorker {
 						return;
 					}
 					while (runningActivities > 0) {
+						long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
 						Configuration conf = Configuration.load(appContext);
-						if (conf.isMessageCenterEnabled(appContext)) {
-							long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
-							Log.i("Checking server for new messages every %d seconds", pollingInterval / 1000);
+						if (Util.isNetworkConnectionPresent(appContext) && conf.isMessageCenterEnabled(appContext)) {
+							Log.d("Checking server for new messages every %d seconds", pollingInterval / 1000);
 							MessageManager.fetchAndStoreMessages(appContext);
-							MessagePollingWorker.goToSleep(pollingInterval);
 						}
+						MessagePollingWorker.goToSleep(pollingInterval);
 					}
 				}
 			} finally {
