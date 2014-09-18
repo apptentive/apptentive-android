@@ -57,10 +57,13 @@ public class MessagePollingWorker {
 						return;
 					}
 					while (runningActivities > 0) {
-						long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
-						Log.i("Checking server for new messages every %d seconds", pollingInterval / 1000);
-						MessageManager.fetchAndStoreMessages(appContext);
-						MessagePollingWorker.goToSleep(pollingInterval);
+						Configuration conf = Configuration.load(appContext);
+						if (conf.isMessageCenterEnabled(appContext)) {
+							long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
+							Log.i("Checking server for new messages every %d seconds", pollingInterval / 1000);
+							MessageManager.fetchAndStoreMessages(appContext);
+							MessagePollingWorker.goToSleep(pollingInterval);
+						}
 					}
 				}
 			} finally {
@@ -79,8 +82,10 @@ public class MessagePollingWorker {
 
 	private static long runningActivities = 0;
 
-	public static void wakeUp() {
-		messagePollingThread.interrupt();
+	private static void wakeUp() {
+		if (messagePollingThread != null) {
+			messagePollingThread.interrupt();
+		}
 	}
 
 	public static void start(Context context) {
