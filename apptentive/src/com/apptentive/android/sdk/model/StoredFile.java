@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.model;
+
+import android.webkit.MimeTypeMap;
 
 /**
  * @author Sky Kelsey
@@ -54,5 +56,9 @@ public class StoredFile {
 
 	public void setApptentiveUri(String apptentiveUri) {
 		this.apptentiveUri = apptentiveUri;
+	}
+
+	public String getFileName() {
+		return String.format("file.%s", MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType));
 	}
 }
