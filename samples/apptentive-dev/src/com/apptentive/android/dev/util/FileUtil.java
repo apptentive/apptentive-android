@@ -11,9 +11,7 @@ import android.content.res.AssetManager;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * @author Sky Kelsey
@@ -41,4 +39,22 @@ public class FileUtil {
 		}
 		return null;
 	}
+
+	public static InputStream openFileAsset(Context context, String path) {
+		AssetManager assetManager = context.getResources().getAssets();
+		BufferedReader reader = null;
+		try {
+			return new BufferedInputStream(assetManager.open(path));
+		} catch (IOException e) {
+			Log.e("Error open stream from file \"%s\"", e, path);
+		} finally {
+			Util.ensureClosed(reader);
+		}
+		return null;
+	}
+
+	public static String createFileAssetUriString(String path) {
+		return "file:///android_asset/" + path;
+	}
+
 }

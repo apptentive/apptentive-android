@@ -37,4 +37,10 @@
         <item>UpgradeMessage exercise with branding</item>
         <item>UpgradeMessage exercise no branding</item>
     </string-array>
+
+    <string-array name="attachment_files">
+        <item>test.pptx</item>
+        <item>test.docx</item>
+        <item>test.pdf</item>
+    </string-array>
 </resources>
