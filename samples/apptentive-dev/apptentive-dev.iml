@@ -15,7 +15,6 @@
         <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
-        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
       </configuration>
     </facet>
   </component>
@@ -43,7 +42,7 @@
       <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/assets" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
