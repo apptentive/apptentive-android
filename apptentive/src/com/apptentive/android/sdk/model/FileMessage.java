@@ -140,7 +140,7 @@ public class FileMessage extends Message {
 		storedFile.setId(getStoredFileId());
 		storedFile.setOriginalUri(uri.toString());
 		storedFile.setLocalFilePath(localFile.getPath());
-		storedFile.setMimeType(mimeType);
+		storedFile.setMimeType("image/jpeg");
 		FileStore db = ApptentiveDatabase.getInstance(context);
 		return db.putStoredFile(storedFile);
 	}
@@ -152,6 +152,15 @@ public class FileMessage extends Message {
 		String mimeType = resolver.getType(uri);
 		MimeTypeMap mime = MimeTypeMap.getSingleton();
 		String extension = mime.getExtensionFromMimeType(mimeType);
+
+		// If we can't get the mime type from the uri, try getting it from the extension.
+		if (extension == null) {
+			extension = MimeTypeMap.getFileExtensionFromUrl(uriString);
+		}
+		if (mimeType == null && extension != null) {
+			mimeType = mime.getMimeTypeFromExtension(extension);
+		}
+
 		setFileName(uri.getLastPathSegment() + "." + extension);
 		setMimeType(mimeType);
 
@@ -196,7 +205,7 @@ public class FileMessage extends Message {
 		try {
 			os = new CountingOutputStream(new BufferedOutputStream(context.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
 			byte[] buf = new byte[2048];
-			int count = 0;
+			int count;
 			while ((count = is.read(buf, 0, 2048)) != -1) {
 				os.write(buf, 0, count);
 			}
@@ -216,8 +225,7 @@ public class FileMessage extends Message {
 
 	public StoredFile getStoredFile(Context context) {
 		FileStore fileStore = ApptentiveDatabase.getInstance(context);
-		StoredFile storedFile = fileStore.getStoredFile(getStoredFileId());
-		return storedFile;
+		return fileStore.getStoredFile(getStoredFileId());
 	}
 
 	public void deleteStoredFile(Context context) {

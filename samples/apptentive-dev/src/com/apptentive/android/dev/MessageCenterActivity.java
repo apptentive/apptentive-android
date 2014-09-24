@@ -14,8 +14,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import com.apptentive.android.dev.util.FileUtil;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
 import com.apptentive.android.sdk.Log;
@@ -64,7 +67,19 @@ public class MessageCenterActivity extends ApptentiveActivity {
 	}
 
 	public void sendAttachmentFile(View view) {
-		EditText text = (EditText) findViewById(R.id.attachment_file_content);
+		Spinner fileSpinner = (Spinner) findViewById(R.id.attachment_file_spinner);
+		String fileName = (String) fileSpinner.getSelectedItem();
+		String uri = FileUtil.createFileAssetUriString(fileName);
+
+		String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+		String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+		InputStream fis = FileUtil.openFileAsset(this, fileName);
+
+		Apptentive.sendAttachmentFile(this, fis, mimeType);
+	}
+
+	public void sendAttachmentTextFile(View view) {
+		EditText text = (EditText) findViewById(R.id.attachment_text_file_content);
 		byte[] bytes = text.getText().toString().getBytes();
 		Apptentive.sendAttachmentFile(this, bytes, "text/plain");
 		text.setText("");

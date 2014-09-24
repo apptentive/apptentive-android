@@ -262,7 +262,7 @@ public class ApptentiveClient {
 
 			// Write file attributes.
 			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.png\"").append(lineEnd);
+			requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
 			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 			requestText.append(lineEnd);
 
