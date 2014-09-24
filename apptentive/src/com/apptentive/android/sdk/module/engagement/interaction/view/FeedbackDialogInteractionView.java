@@ -233,18 +233,22 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 		// Thank You View Messages Button
 		Button thankYouViewMessagesButton = (Button) activity.findViewById(R.id.thank_you_view_messages);
-		String thankYouViewMessages = interaction.getThankYouViewMessagesText();
-		if (thankYouViewMessages != null) {
-			thankYouViewMessagesButton.setText(thankYouViewMessages);
-		}
-		thankYouViewMessagesButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				cleanup();
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
-				activity.finish();
+		if (interaction.isMessageCenterEnabled()) {
+			String thankYouViewMessages = interaction.getThankYouViewMessagesText();
+			if (thankYouViewMessages != null) {
+				thankYouViewMessagesButton.setText(thankYouViewMessages);
 			}
-		});
+			thankYouViewMessagesButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					cleanup();
+					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
+					activity.finish();
+				}
+			});
+		} else {
+			thankYouViewMessagesButton.setVisibility(View.GONE);
+		}
 		feedbackDialogVisible = true;
 	}
 
