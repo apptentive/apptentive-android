@@ -18,7 +18,7 @@ public class FeedbackDialogInteraction extends Interaction {
 
 	private static final String KEY_ASK_FOR_EMAIL = "ask_for_email";
 	private static final String KEY_EMAIL_REQUIRED = "email_required";
-	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
+	private static final String KEY_ENABLE_MESSAGE_CENTER = "enable_message_center";
 
 	private static final String KEY_TITLE = "title";
 	private static final String KEY_BODY = "body";
@@ -54,8 +54,8 @@ public class FeedbackDialogInteraction extends Interaction {
 
 	public boolean isMessageCenterEnabled() {
 		InteractionConfiguration configuration = getConfiguration();
-		if (configuration != null && !configuration.isNull(KEY_MESSAGE_CENTER_ENABLED)) {
-			return configuration.optBoolean(KEY_MESSAGE_CENTER_ENABLED, true);
+		if (configuration != null && !configuration.isNull(KEY_ENABLE_MESSAGE_CENTER)) {
+			return configuration.optBoolean(KEY_ENABLE_MESSAGE_CENTER, true);
 		}
 		return true;
 	}
