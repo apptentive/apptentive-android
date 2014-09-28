@@ -1,3 +1,17 @@
+# 2014-09-28 skykelsey 1.6.1
+
+#### Bugs fixed
+
+* Fix enable Message Center setting.
+* Use proper extension when uploading Attachment files.
+
+# 2014-09-17 skykelsey 1.5.2
+
+#### Major changes
+
+* Don't check for messages while Message Center is disabled.
+* If no network connection is present, network worker threads will go back to sleep instead of exit.
+
 # 2014-09-12 skykelsey 1.6.0
 
 #### Major changes
@@ -10,7 +24,7 @@
 * Added Parse push notification support.
 * Added ability to set initial user name through API.
 
-#### Bugs fixed:
+#### Bugs fixed
 
 * Fixed Eclipse project files.
 * Fixed JsonDiffer to handle zero value float diffing.
@@ -26,7 +40,7 @@ If you were using a previous version, see [Migrating to 1.6.0](https://github.co
 * Added Apache Ant build scripts for the SDK, dev app, and tests.
 * Added support to hide Apptentive branding for enterprise accounts.
 
-#### Bugs fixed:
+#### Bugs fixed
 
 * Fixed a rare crash that can occur when a user's database is stored on an SD card and that card is removed.
 * Fixed a potential memory leak.
@@ -45,7 +59,7 @@ We've refactored [Surveys](http://www.apptentive.com/docs/android/features/#surv
 
 See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.5.0.md)
 
-#### Bugs fixed:
+#### Bugs fixed
 
 * Fixed a potential crash in the Feedback Dialog if submitted with blank feedback.
 
