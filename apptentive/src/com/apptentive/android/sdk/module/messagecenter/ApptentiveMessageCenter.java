@@ -141,7 +141,7 @@ public class ApptentiveMessageCenter {
 		});
 
 		// Change to foreground polling, which polls more often.
-		MessagePollingWorker.setForeground(true);
+		MessagePollingWorker.setMessageCenterInForeground(true);
 
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setSentMessageListener(messageCenterView);
@@ -276,7 +276,7 @@ public class ApptentiveMessageCenter {
 	public static void onStop(Activity activity) {
 		clearPendingMessageCenterPushNotification(activity);
 		// Remove listener here.
-		MessagePollingWorker.setForeground(false);
+		MessagePollingWorker.setMessageCenterInForeground(false);
 	}
 
 	public static boolean onBackPressed(Activity activity) {

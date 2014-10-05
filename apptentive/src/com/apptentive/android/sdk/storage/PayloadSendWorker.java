@@ -25,15 +25,17 @@ public class PayloadSendWorker {
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
 	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
 
-	private static boolean running;
+	private static boolean appInForeground;
+	private static boolean threadRunning;
 	private static Context appContext;
+	private static PayloadSendThread payloadSendThread;
 
 	public static synchronized void doStart(Context context) {
 		appContext = context.getApplicationContext();
-		if (!running) {
+		if (!threadRunning) {
 			Log.i("Starting PayloadSendWorker.");
-			running = true;
-			Thread payloadRunner = new PayloadRunner();
+			threadRunning = true;
+			payloadSendThread = new PayloadSendThread();
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 				@Override
 				public void uncaughtException(Thread thread, Throwable throwable) {
@@ -41,9 +43,9 @@ public class PayloadSendWorker {
 					MetricModule.sendError(appContext, throwable, null, null);
 				}
 			};
-			payloadRunner.setUncaughtExceptionHandler(handler);
-			payloadRunner.setName("Apptentive-PayloadSendWorker");
-			payloadRunner.start();
+			payloadSendThread.setUncaughtExceptionHandler(handler);
+			payloadSendThread.setName("Apptentive-PayloadSendWorker");
+			payloadSendThread.start();
 		}
 	}
 
@@ -51,24 +53,24 @@ public class PayloadSendWorker {
 		return ApptentiveDatabase.getInstance(context);
 	}
 
-	private static class PayloadRunner extends Thread {
+	private static class PayloadSendThread extends Thread {
 		public void run() {
 			try {
 				synchronized (this) {
 					Log.v("Started %s", toString());
-					if(appContext == null) {
+					if (appContext == null) {
 						return;
 					}
 					PayloadStore db = getPayloadStore(appContext);
-					while (runningActivities > 0) {
+					while (appInForeground) {
 						if (Util.isEmpty(GlobalInfo.conversationToken)) {
 							Log.i("No conversation token yet.");
-							pause(NO_TOKEN_SLEEP);
+							goToSleep(NO_TOKEN_SLEEP);
 							continue;
 						}
 						if (!Util.isNetworkConnectionPresent(appContext)) {
-							Log.v("Can't send payloads. No network connection.");
-							pause(NO_CONNECTION_SLEEP_TIME);
+							Log.d("Can't send payloads. No network connection.");
+							goToSleep(NO_CONNECTION_SLEEP_TIME);
 							continue;
 						}
 						Log.v("Checking for payloads to send.");
@@ -76,7 +78,7 @@ public class PayloadSendWorker {
 						payload = db.getOldestUnsentPayload();
 						if (payload == null) {
 							// There is no payload in the db.
-							pause(EMPTY_QUEUE_SLEEP_TIME);
+							goToSleep(EMPTY_QUEUE_SLEEP_TIME);
 							continue;
 						}
 						Log.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
@@ -130,13 +132,13 @@ public class PayloadSendWorker {
 					}
 				}
 			} finally {
-				Log.v("Stopping PayloadSendWorker.");
-				running = false;
+				Log.v("Stopping PayloadSendThread.");
+				threadRunning = false;
 			}
 		}
 	}
 
-	private static void pause(int millis) {
+	private static void goToSleep(int millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
@@ -144,22 +146,20 @@ public class PayloadSendWorker {
 		}
 	}
 
-	private static long runningActivities = 0;
-
-	public static void ensureRunning(Context context) {
-		doStart(context);
-	}
-
-	public static void activityStarted(Context context) {
-		runningActivities++;
-		doStart(context);
-	}
-
-	public static void activityStopped() {
-		runningActivities--;
-		if (runningActivities < 0) {
-			Log.w("PayloadSendWorker: Incorrect number of running Activities encountered. Resetting to 0.");
-			runningActivities = 0;
+	private static void wakeUp() {
+		if (payloadSendThread != null) {
+			Log.v("Waking PayloadSendThread.");
+			payloadSendThread.interrupt();
 		}
+	}
+
+	public static void appWentToForeground(Context context) {
+		appInForeground = true;
+		doStart(context);
+	}
+
+	public static void appWentToBackground() {
+		appInForeground = false;
+		wakeUp();
 	}
 }

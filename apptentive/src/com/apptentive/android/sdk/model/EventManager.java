@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.model;
 import android.content.Context;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.EventStore;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
 
 /**
  * @author Sky Kelsey
@@ -21,13 +20,6 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Context context, Event event) {
-		sendEvent(context, event, true);
-	}
-
-	public static void sendEvent(Context context, Event event, boolean startPayloadSendWorker) {
 		getEventStore(context).addPayload(event);
-		if (startPayloadSendWorker) {
-			PayloadSendWorker.ensureRunning(context);
-		}
 	}
 }

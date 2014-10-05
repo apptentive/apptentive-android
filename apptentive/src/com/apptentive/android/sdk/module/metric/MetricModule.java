@@ -70,7 +70,7 @@ public class MetricModule {
 			if (config.isMetricsEnabled()) {
 				Log.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
 				Event event = new Event(type.getLabelName(), data);
-				EventManager.sendEvent(context, event, false); // Don't restart the send worker because of an error.
+				EventManager.sendEvent(context, event);
 			}
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to

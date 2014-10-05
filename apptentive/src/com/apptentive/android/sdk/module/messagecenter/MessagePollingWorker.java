@@ -19,15 +19,15 @@ public class MessagePollingWorker {
 
 	private static Context appContext;
 	private static MessagePollingThread messagePollingThread;
-	private static boolean running;
-	private static boolean foreground = false;
+	private static boolean appInForeground;
+	private static boolean threadRunning;
+	private static boolean messageCenterInForeground;
 	private static long backgroundPollingInterval = -1;
 	private static long foregroundPollingInterval = -1;
 
 	public static synchronized void doStart(Context context) {
 		appContext = context.getApplicationContext();
-
-		if (!running) {
+		if (!threadRunning) {
 			Log.i("Starting MessagePollingWorker.");
 
 			if (backgroundPollingInterval == -1 || foregroundPollingInterval == -1) {
@@ -36,7 +36,7 @@ public class MessagePollingWorker {
 				foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
 			}
 
-			running = true;
+			threadRunning = true;
 			messagePollingThread = new MessagePollingThread();
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 				@Override
@@ -54,21 +54,23 @@ public class MessagePollingWorker {
 		public void run() {
 			try {
 				synchronized (this) {
+					Log.v("Started %s", toString());
 					if (appContext == null) {
 						return;
 					}
-					while (runningActivities > 0) {
-						long pollingInterval = foreground ? foregroundPollingInterval : backgroundPollingInterval;
+					while (appInForeground) {
+						long pollingInterval = messageCenterInForeground ? foregroundPollingInterval : backgroundPollingInterval;
 						Configuration conf = Configuration.load(appContext);
 						if (Util.isNetworkConnectionPresent(appContext) && conf.isMessageCenterEnabled(appContext)) {
-							Log.d("Checking server for new messages every %d seconds", pollingInterval / 1000);
+							Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
 							MessageManager.fetchAndStoreMessages(appContext);
 						}
 						MessagePollingWorker.goToSleep(pollingInterval);
 					}
 				}
 			} finally {
-				running = false;
+				Log.v("Stopping MessagePollingThread.");
+				threadRunning = false;
 			}
 		}
 	}
@@ -81,29 +83,21 @@ public class MessagePollingWorker {
 		}
 	}
 
-	private static long runningActivities = 0;
-
 	private static void wakeUp() {
 		if (messagePollingThread != null) {
+			Log.v("Waking MessagePollingThread.");
 			messagePollingThread.interrupt();
 		}
 	}
 
-	public static void start(Context context) {
-		runningActivities++;
+	public static void appWentToForeground(Context context) {
+		appInForeground = true;
 		doStart(context);
 	}
 
-	public static void stop() {
-		runningActivities--;
-		if (runningActivities < 0) {
-			Log.w("MessagePollingWorker: Incorrect number of running Activities encountered. Resetting to 0.");
-			runningActivities = 0;
-		}
-		// If there are no running activities, wake the thread so it can stop immediately and gracefully.
-		if (runningActivities == 0) {
-			wakeUp();
-		}
+	public static void appWentToBackground() {
+		appInForeground = false;
+		wakeUp();
 	}
 
 	/**
@@ -111,11 +105,11 @@ public class MessagePollingWorker {
 	 * from the foreground, let the polling interval timeout naturally, at which point the polling interval will become
 	 * the background polling interval.
 	 *
-	 * @param foreground true if the worker should be in foreground polling mode, else false.
+	 * @param messageCenterInForeground true if the worker should be in foreground polling mode, else false.
 	 */
-	public static void setForeground(boolean foreground) {
-		boolean enteringForeground = foreground && !MessagePollingWorker.foreground;
-		MessagePollingWorker.foreground = foreground;
+	public static void setMessageCenterInForeground(boolean messageCenterInForeground) {
+		boolean enteringForeground = messageCenterInForeground && !MessagePollingWorker.messageCenterInForeground;
+		MessagePollingWorker.messageCenterInForeground = messageCenterInForeground;
 		if (enteringForeground) {
 			wakeUp();
 		}

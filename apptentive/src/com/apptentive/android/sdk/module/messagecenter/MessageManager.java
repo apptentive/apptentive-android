@@ -18,7 +18,6 @@ import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
@@ -89,7 +88,6 @@ public class MessageManager {
 	public static void sendMessage(Context context, Message message) {
 		getMessageStore(context).addOrUpdateMessages(message);
 		ApptentiveDatabase.getInstance(context).addPayload(message);
-		PayloadSendWorker.ensureRunning(context);
 	}
 
 	/**

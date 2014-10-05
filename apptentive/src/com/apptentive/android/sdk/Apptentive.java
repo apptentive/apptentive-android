@@ -14,13 +14,10 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.comm.NetworkStateListener;
-import com.apptentive.android.sdk.comm.NetworkStateReceiver;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -57,6 +54,12 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
+	 * A reference count of the number of Activities that are started. If the count drops to zero, then no Activities are currently running.
+	 * Any threads or receivers that are spawned by Apptentive should exit or stop listening when runningActivities == 0.
+	 */
+	private static int runningActivities;
+
+	/**
 	 * Call this method from each of your Activities' onStart() methods. Must be called before using other Apptentive APIs
 	 * methods
 	 *
@@ -66,8 +69,11 @@ public class Apptentive {
 		try {
 			init(activity);
 			ActivityLifecycleManager.activityStarted(activity);
-			PayloadSendWorker.activityStarted(activity.getApplicationContext());
-			MessagePollingWorker.start(activity.getApplicationContext());
+			if (runningActivities == 0) {
+				PayloadSendWorker.appWentToForeground(activity.getApplicationContext());
+				MessagePollingWorker.appWentToForeground(activity.getApplicationContext());
+			}
+			runningActivities++;
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -82,9 +88,16 @@ public class Apptentive {
 	public static void onStop(Activity activity) {
 		try {
 			ActivityLifecycleManager.activityStopped(activity);
-			NetworkStateReceiver.clearListeners();
-			PayloadSendWorker.activityStopped();
-			MessagePollingWorker.stop();
+			runningActivities--;
+			if (runningActivities < 0) {
+				Log.e("Incorrect number of running Activities encountered. Resetting to 0. Did you make sure to call Apptentive.onStart() and Apptentive.onStop() in all your Activities?");
+				runningActivities = 0;
+			}
+			// If there are no running activities, wake the thread so it can stop immediately and gracefully.
+			if (runningActivities == 0) {
+				PayloadSendWorker.appWentToBackground();
+				MessagePollingWorker.appWentToBackground();
+			}
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -741,7 +754,6 @@ public class Apptentive {
 
 		if (!GlobalInfo.initialized) {
 			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			NetworkStateReceiver.clearListeners();
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
@@ -805,20 +817,6 @@ public class Apptentive {
 				// Nothing we can do then.
 				GlobalInfo.appDisplayName = "this app";
 			}
-
-			// Listen for network state changes.
-			NetworkStateListener networkStateListener = new NetworkStateListener() {
-				public void stateChanged(NetworkInfo networkInfo) {
-					if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
-						Log.v("Network connected.");
-						PayloadSendWorker.ensureRunning(appContext);
-					}
-					if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
-						Log.v("Network disconnected.");
-					}
-				}
-			};
-			NetworkStateReceiver.addListener(networkStateListener);
 
 			// Grab the conversation token from shared preferences.
 			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {

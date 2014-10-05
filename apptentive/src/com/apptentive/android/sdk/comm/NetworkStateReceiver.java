@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -9,9 +9,6 @@ package com.apptentive.android.sdk.comm;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,14 +29,6 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Bundle extras = intent.getExtras();
-		if (extras != null) {
-			NetworkInfo ni = (NetworkInfo) extras.get(ConnectivityManager.EXTRA_NETWORK_INFO);
-			if (ni != null) {
-				for (NetworkStateListener listener : listeners) {
-					listener.stateChanged(ni);
-				}
-			}
-		}
+		// Deprecated.
 	}
 }
