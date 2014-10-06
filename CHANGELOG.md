@@ -1,3 +1,11 @@
+# 2014-??-?? skykelsey next
+
+#### Improvements
+
+* Added translations for Arabic, Greek, Brazilian Portuguese, Korean, and Turkish.
+* Refactored message polling and payload sending for simplicity.
+* Deprecated NetworkStateReceiver.
+
 # 2014-09-28 skykelsey 1.6.1
 
 #### Bugs fixed
