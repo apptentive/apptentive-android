@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+<resources>
+    <string name="apptentive_ok">확인</string>
+    <string name="apptentive_yes">예</string>
+    <string name="apptentive_no">아니오</string>
+    <string name="apptentive_skip">건너뛰기</string>
+    <string name="apptentive_you">귀하</string>
+    <string name="apptentive_developer">개발자</string>
+    <string name="apptentive_oops">문제 발생!</string>
+    <string name="apptentive_send">보내기</string>
+    <string name="apptentive_give_feedback">의견을 제공하세요</string>
+    <string name="apptentive_thanks">감사합니다!</string>
+    <string name="apptentive_no_thanks">아니오, 괜찮습니다</string>
+    <string name="apptentive_thank_you">감사합니다</string>
+    <string name="apptentive_were_sorry">죄송합니다!</string>
+    <string name="apptentive_required">필수</string>
+    <string name="apptentive_optional">선택 사항</string>
+    <string name="apptentive_sending">보내는 중...</string>
+    <string name="apptentive_version">Apptentive 버전 %s</string>
+    <string name="apptentive_edittext_hint_email">귀하의 이메일 주소</string>
+    <string name="apptentive_edittext_hint_email_required">이메일 주소 (필수)</string>
+    <string name="apptentive_powered_by_apptentive">Apptentive 기술 제공</string>
+    <string name="apptentive_about_title">Apptentive 정보</string>
+    <string name="apptentive_about_description">Apptentive는 이 앱의 개발자가 귀하의 의견을 빠르게 접수하고 더 효과적으로 경청할 수 있도록 돕는 의견 및 커뮤니케이션 서비스입니다.</string>
+    <string name="apptentive_about_description_link">apptentive.com에서 자세히 보기</string>
+    <string name="apptentive_about_privacy">귀하의 의견은 Apptentive가 보관하고 Apptentive의 개인정보 취급방침 및 이 앱 개발자의 개인정보 취급방침의 적용을 받습니다.</string>
+    <string name="apptentive_about_privacy_link">Apptentive 개인정보 취급방침 보기</string>
+    <string name="apptentive_do_you_love_this_app">%s 앱이 마음에 드세요?</string>
+    <string name="apptentive_rating_message_fs">%s 앱이 마음에 드신다니 기쁩니다! 이 앱을 평가해주시면 큰 도움이 됩니다. 시간을 내어주셔서 정말로 감사합니다.</string>
+    <string name="apptentive_rate_this_app">%s 평가</string>
+    <string name="apptentive_rating_remind">다음에</string>
+    <string name="apptentive_rating_error">스토어에서 이 앱을 찾을 수 없습니다. 찾고 평가하려면 스토어를 방문해주십시오.</string>
+    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
+    <string name="apptentive_intro_dialog_title_default">의견을 주셔서 감사합니다!</string>
+    <string name="apptentive_intro_dialog_body">%s 앱을 개선시킬 수 있는 방법을 알려주십시오!</string>
+    <string name="apptentive_intro_dialog_edittext_hint">어떻게 도와드리면 좋을지 알려주세요. (필수)</string>
+    <string name="apptentive_thank_you_dialog_body">귀하의 답변은 메시지 센터에 저장되었으며 그곳에서 응답을 보고 다른 메시지를 보낼 수 있습니다.</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled">의견을 주셔서 감사합니다!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">이메일을 연락드리겠습니다.</string>
+    <string name="apptentive_thank_you_dialog_close">닫기</string>
+    <string name="apptentive_thank_you_dialog_view_messages">메시지 표시</string>
+    <string name="apptentive_dialog_email_validation_failed_title">잘못된 이메일 주소</string>
+    <string name="apptentive_dialog_email_validation_failed_body">올바른 이메일 주소를 입력해주십시오.</string>
+    <string name="apptentive_survey_header">설문조사</string>
+    <string name="apptentive_survey_singleline_hint">답변을 입력하세요...</string>
+    <string name="apptentive_survey_send_response">답변 보내기</string>
+    <string name="apptentive_message_center_title">메시지 센터</string>
+    <string name="apptentive_message_center_compose_hint">메시지를 입력하세요...</string>
+    <string name="apptentive_message_center_attachment_title">이미지를 보냅니까?</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
+    <string name="apptentive_message_auto_body_manual">여기는 저희 메시지 센터입니다. 질문, 제안, 문제가 있거나 저희에게 연락하고 싶으실 경우 메시지를 보내주십시오. 저희는 고객들과 소통하는 것을 좋아합니다!</string>
+    <string name="apptentive_message_auto_body_no_love">어떻게 하면 이 앱이 마음에 드시겠습니까? 건설적인 의견을 주시면 감사하겠습니다.</string>
+    <string name="apptentive_rating_provider_no_google_play">Google Play를 찾지 못했습니다. 이 앱을 평가하기 전에 Google Play를 설치해주십시오.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore를 찾지 못했습니다. 이 앱을 평가하기 전에 Amazon Appstore를 설치해주십시오.</string>
+    <string name="apptentive_rating_provider_no_mikandi">MiKandi Market을 찾지 못했습니다. 이 앱을 평가하기 전에 MiKandi Market을 설치해주십시오.</string>
+</resources>

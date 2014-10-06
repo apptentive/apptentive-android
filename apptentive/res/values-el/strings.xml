@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+<resources>
+    <string name="apptentive_ok">ΟΚ</string>
+    <string name="apptentive_yes">Ναι</string>
+    <string name="apptentive_no">Όχι</string>
+    <string name="apptentive_skip">Παράβλεψη</string>
+    <string name="apptentive_you">Εσείς</string>
+    <string name="apptentive_developer">Προγραμματιστής</string>
+    <string name="apptentive_oops">Ωχ!</string>
+    <string name="apptentive_send">Αποστολή</string>
+    <string name="apptentive_give_feedback">Παροχή σχολίων</string>
+    <string name="apptentive_thanks">Ευχαριστούμε!</string>
+    <string name="apptentive_no_thanks">Όχι, ευχαριστώ</string>
+    <string name="apptentive_thank_you">Ευχαριστούμε</string>
+    <string name="apptentive_were_sorry">Ζητούμε συγγνώμη!</string>
+    <string name="apptentive_required">Υποχρεωτικό</string>
+    <string name="apptentive_optional">Προαιρετικό</string>
+    <string name="apptentive_sending">Αποστολή&#8230;</string>
+    <string name="apptentive_version">Έκδοση Apptentive %s</string>
+    <string name="apptentive_edittext_hint_email">Διεύθυνση e-mail</string>
+    <string name="apptentive_edittext_hint_email_required">Διεύθυνση e-mail (υποχρεωτικό)</string>
+    <string name="apptentive_powered_by_apptentive">Με την υποστήριξη της Apptentive</string>
+    <string name="apptentive_about_title">Σχετικά με την Apptentive</string>
+    <string name="apptentive_about_description">Η Apptentive είναι μια υπηρεσία παροχής σχολίων και επικοινωνίας με την οποία τα άτομα που έχουν φτιάξει αυτή την εφαρμογή μπορούν να λαμβάνουν γρήγορα τα σχόλιά σας και να ενημερώνονται καλύτερα για τη γνώμη σας.</string>
+    <string name="apptentive_about_description_link">Διαβάστε περισσότερα στη διεύθυνση apptentive.com</string>
+    <string name="apptentive_about_privacy">Τα σχόλιά σας φιλοξενούνται από την Apptentive και υπόκεινται στην πολιτική ιδιωτικού απορρήτου της Apptentive και την πολιτική ιδιωτικού απορρήτου του προγραμματιστή αυτής της εφαρμογής.</string>
+    <string name="apptentive_about_privacy_link">Επισκεφτείτε την πολιτική ιδιωτικού απορρήτου της Apptentive</string>
+    <string name="apptentive_do_you_love_this_app">Απολαμβάνετε την εφαρμογή %s;</string>
+    <string name="apptentive_rating_message_fs">Είμαστε πολύ χαρούμενοι που διαβάζουμε ότι σας αρέσει η εφαρμογή %s! Θα μας βοηθούσατε πραγματικά εάν βαθμολογούσατε την εφαρμογή μας. Σας ευχαριστούμε θερμά για τον χρόνο σας.</string>
+    <string name="apptentive_rate_this_app">Βαθμολογήστε την εφαρμογή %s</string>
+    <string name="apptentive_rating_remind">Θύμισέ το μου αργότερα</string>
+    <string name="apptentive_rating_error">Αδυνατούμε να βρούμε αυτή την εφαρμογή στο κατάστημα. Επισκεφτείτε το κατάστημα για να την βρείτε και να την βαθμολογήσετε.</string>
+    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
+    <string name="apptentive_intro_dialog_title_default">Ευχαριστούμε για τα σχόλιά σας!</string>
+    <string name="apptentive_intro_dialog_body">Πείτε μας πώς μπορούμε να βελτιώσουμε την εφαρμογή %s για σας!</string>
+    <string name="apptentive_intro_dialog_edittext_hint">Πείτε μας πώς μπορούμε να βοηθήσουμε. (υποχρεωτικό)</string>
+    <string name="apptentive_thank_you_dialog_body">Η απάντησή σας αποθηκεύτηκε στο Κέντρο Μηνυμάτων, όπου θα μπορείτε να δείτε τυχόν απαντήσεις και να μας στείλετε άλλα μηνύματα.</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled">Σας ευχαριστούμε για τα σχόλιά σας!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Θα επικοινωνήσουμε μέσω e-mail.</string>
+    <string name="apptentive_thank_you_dialog_close">Κλείσιμο</string>
+    <string name="apptentive_thank_you_dialog_view_messages">Προβολή μηνυμάτων</string>
+    <string name="apptentive_dialog_email_validation_failed_title">Μη έγκυρη διεύθυνση e-mail</string>
+    <string name="apptentive_dialog_email_validation_failed_body">Συμπληρώστε μια έγκυρη διεύθυνση e-mail.</string>
+    <string name="apptentive_survey_header">Έρευνα</string>
+    <string name="apptentive_survey_singleline_hint">Συμπληρώστε μια απάντηση&#8230;</string>
+    <string name="apptentive_survey_send_response">Αποστολή απάντησης</string>
+    <string name="apptentive_message_center_title">Κέντρο μηνυμάτων</string>
+    <string name="apptentive_message_center_compose_hint">Πληκτρολογήστε ένα μήνυμα&#8230;</string>
+    <string name="apptentive_message_center_attachment_title">Αποστολή εικόνας;</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
+    <string name="apptentive_message_auto_body_manual">Αυτό είναι το Κέντρο Μηνυμάτων. Σε περίπτωση που έχετε τυχόν ερωτήσεις, υποδείξεις, αμφιβολίες ή απλά θέλετε να επικοινωνήσετε μαζί μας, στείλτε μας ένα μήνυμα. Θέλουμε πάντοτε να μιλάμε με τους πελάτες μας!</string>
+    <string name="apptentive_message_auto_body_no_love">Τι μπορούμε να κάνουμε για να διασφαλίσουμε ότι απολαμβάνετε πραγματικά την εφαρμογή μας; Τα εποικοδομητικά σας σχόλια θα μας φανούν πολύ χρήσιμα.</string>
+    <string name="apptentive_rating_provider_no_google_play">Δεν βρέθηκε το Google Play. Εγκαταστήστε το Google Play για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">Το Amazon Appstore δεν βρέθηκε. Εγκαταστήστε το Amazon Appstore για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
+    <string name="apptentive_rating_provider_no_mikandi">Το MiKandi Market δεν βρέθηκε. Εγκαταστήστε το MiKandi Market για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
+</resources>

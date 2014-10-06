@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+<resources>
+    <string name="apptentive_ok">Tamam</string>
+    <string name="apptentive_yes">Evet</string>
+    <string name="apptentive_no">Hayır</string>
+    <string name="apptentive_skip">Atla</string>
+    <string name="apptentive_you">Siz</string>
+    <string name="apptentive_developer">Geliştirici</string>
+    <string name="apptentive_oops">Aman!</string>
+    <string name="apptentive_send">Gönder</string>
+    <string name="apptentive_give_feedback">Geribildirimde Bulun</string>
+    <string name="apptentive_thanks">Teşekkürler!</string>
+    <string name="apptentive_no_thanks">Hayır, teşekkürler</string>
+    <string name="apptentive_thank_you">Teşekkür Ederiz</string>
+    <string name="apptentive_were_sorry">Üzgünüz!</string>
+    <string name="apptentive_required">Gerekli</string>
+    <string name="apptentive_optional">İsteğe bağlı</string>
+    <string name="apptentive_sending">Gönderiliyor&#8230;</string>
+    <string name="apptentive_version">Apptentive sürüm %s</string>
+    <string name="apptentive_edittext_hint_email">E-posta adresiniz</string>
+    <string name="apptentive_edittext_hint_email_required">E-posta Adresi (gerekli)</string>
+    <string name="apptentive_powered_by_apptentive">Apptentive tarafından desteklenir</string>
+    <string name="apptentive_about_title">Apptentive hakkında</string>
+    <string name="apptentive_about_description">Apptentive, bu uygulamayı yapan insanların geribildiriminizi çabucak almalarına ve sizi daha iyi dinlemelerine izin veren bir geribildirim ve iletişim hizmetidir.</string>
+    <string name="apptentive_about_description_link">apptentive.com\'da daha fazlasını öğrenin</string>
+    <string name="apptentive_about_privacy">Geribildiriminiz Apptentive tarafından barındırılıyor ve Apptentive gizlilik politikası ile bu uygulama geliştiricisinin gizlilik politikasına tâbidir.</string>
+    <string name="apptentive_about_privacy_link">Apptentive\'nın Gizlilik Politikasını ziyaret edin</string>
+    <string name="apptentive_do_you_love_this_app">%s uygulamasını seviyor musunuz?</string>
+    <string name="apptentive_rating_message_fs">%s uygulamasını sevdiğinizi duymaktan dolayı çok mutluyuz! Bizi derecelendirirseniz, çok yardımcı olacak. Bizimle zaman geçirdiğiniz için çok teşekkürler.</string>
+    <string name="apptentive_rate_this_app">%s Uygulamasını Derecelendir</string>
+    <string name="apptentive_rating_remind">Daha Sonra Anımsat</string>
+    <string name="apptentive_rating_error">Mağazada bu uygulamayı bulamıyoruz. Lütfen mağazayı ziyaret edin ve derecelendirin.</string>
+    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
+    <string name="apptentive_intro_dialog_title_default">Geribildiriminiz için teşekkürler!</string>
+    <string name="apptentive_intro_dialog_body">Lütfen %s uygulamasını sizin için nasıl daha iyi yapabileceğimizi bize bildirin!</string>
+    <string name="apptentive_intro_dialog_edittext_hint">Nasıl yardımcı olacağımızı söyleyin. (gerekli)</string>
+    <string name="apptentive_thank_you_dialog_body">Yanıtınız yanıtları görüntüleyebileceğiniz ve bize diğer mesajları gönderebileceğiniz Mesaj Merkezine kaydedildi.</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled">Geribildiriminiz için teşekkür ederiz!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Eposta yoluyla iletişimde kalacağız.</string>
+    <string name="apptentive_thank_you_dialog_close">Kapat</string>
+    <string name="apptentive_thank_you_dialog_view_messages">Mesajları Görüntüle</string>
+    <string name="apptentive_dialog_email_validation_failed_title">Geçersiz E-posta Adresi</string>
+    <string name="apptentive_dialog_email_validation_failed_body">Lütfen geçerli bir eposta adresi girin.</string>
+    <string name="apptentive_survey_header">Anket</string>
+    <string name="apptentive_survey_singleline_hint">Bir yanıt girin&#8230;</string>
+    <string name="apptentive_survey_send_response">Yanıtı Gönder</string>
+    <string name="apptentive_message_center_title">Mesaj Merkezi</string>
+    <string name="apptentive_message_center_compose_hint">Bir mesaj yaz&#8230;</string>
+    <string name="apptentive_message_center_attachment_title">Resmi Gönder?</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
+    <string name="apptentive_message_auto_body_manual">Burası bizim Mesaj Merkezimiz. Sorunuz, öneriniz, endişeniz varsa veya sadece iletişim kurmak isterseniz, lütfen bize bir mesaj gönderin. Müşterilerimizle konuşmaya bayılıyoruz!</string>
+    <string name="apptentive_message_auto_body_no_love">Uygulamamızı sevmenizi sağlamak için ne yapabiliriz? Yapıcı geribildiriminiz için minnettarız.</string>
+    <string name="apptentive_rating_provider_no_google_play">Google Play bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Google Play\'i kurun.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Amazon Appstore\'u kurun.</string>
+    <string name="apptentive_rating_provider_no_mikandi">MİKandi Market bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce MİKandi Market\'i kurun.</string>
+</resources>

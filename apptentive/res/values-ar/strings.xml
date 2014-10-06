@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+<resources>
+    <string name="apptentive_ok">موافق</string>
+    <string name="apptentive_yes">نعم</string>
+    <string name="apptentive_no">لا</string>
+    <string name="apptentive_skip">تخطي</string>
+    <string name="apptentive_you">أنت</string>
+    <string name="apptentive_developer">المطور</string>
+    <string name="apptentive_oops">عفوا!</string>
+    <string name="apptentive_send">إرسال</string>
+    <string name="apptentive_give_feedback">تقديم الآراء</string>
+    <string name="apptentive_thanks">شكرا!</string>
+    <string name="apptentive_no_thanks">لا، شكراً</string>
+    <string name="apptentive_thank_you">شكراً لك</string>
+    <string name="apptentive_were_sorry">نأسف!</string>
+    <string name="apptentive_required">مطلوب</string>
+    <string name="apptentive_optional">اختياري</string>
+    <string name="apptentive_sending">جاري الإرسال...</string>
+    <string name="apptentive_version">الإصدار %s من أبتينتيف</string>
+    <string name="apptentive_edittext_hint_email">عنوان بريدك الإلكتروني</string>
+    <string name="apptentive_edittext_hint_email_required">عنوان البريد الإلكتروني (مطلوب)</string>
+    <string name="apptentive_powered_by_apptentive">بواسطة أبتينتيف</string>
+    <string name="apptentive_about_title">نبذة عن أبتينتيف</string>
+    <string name="apptentive_about_description">أبتينتيف هي خدمة لإرسال الآراء والتواصل تسمح لمطوري هذا التطبيق بالحصول بسرعة على ملاحظاتك والاستماع إليك بشكل أفضل.</string>
+    <string name="apptentive_about_description_link">اعرف المزيد عبر apptentive.com</string>
+    <string name="apptentive_about_privacy">تتم استضافة آرائك من قبل أبتينتيف، وهي تخضع  لسياسة أبتينتيف للخصوصية وسياسة الخصوصية التي حددها مطور هذا التطبيق.</string>
+    <string name="apptentive_about_privacy_link">اطلع على لسياسة الخصوصية لأبتينتيف</string>
+    <string name="apptentive_do_you_love_this_app">هل تحب %s؟</string>
+    <string name="apptentive_rating_message_fs">يسعدنا أن %s قد أعجبك! سيكون من المفيد حقاً إذا قمت بتقييمنا. شكراً جزيلاً لقضاء بعض الوقت معنا.</string>
+    <string name="apptentive_rate_this_app">تقييم %s</string>
+    <string name="apptentive_rating_remind">ذكرني لاحقاً</string>
+    <string name="apptentive_rating_error">تعذر العثور على هذا التطبيق في المتجر. الرجاء زيارة المتجر للبحث عنه وتصنيفه.</string>
+    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
+    <string name="apptentive_intro_dialog_title_default">شكرا على آرائك!</string>
+    <string name="apptentive_intro_dialog_body">نرجو منك أن تخبرنا كيف يمكننا أن نجعل %s أفضل بالنسبة لك!</string>
+    <string name="apptentive_intro_dialog_edittext_hint">أخبرنا كيف يمكننا تقديم المساعدة. (مطلوب)</string>
+    <string name="apptentive_thank_you_dialog_body">تم حفظ ردك في مركز الرسائل، حيث ستتمكن من الاطلاع على الردود وإرسال رسائل أخرى إلينا.</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled">شكرا على آرائك!</string>
+    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">سنكون على اتصال عبر البريد الإلكتروني.</string>
+    <string name="apptentive_thank_you_dialog_close">إغلاق</string>
+    <string name="apptentive_thank_you_dialog_view_messages">عرض الرسائل</string>
+    <string name="apptentive_dialog_email_validation_failed_title">عنوان البريد الإلكتروني غير صالح</string>
+    <string name="apptentive_dialog_email_validation_failed_body">الرجاء إدخال عنوان بريد إلكتروني صالح.</string>
+    <string name="apptentive_survey_header">استقصاء</string>
+    <string name="apptentive_survey_singleline_hint">قم بإدخال إجابة...</string>
+    <string name="apptentive_survey_send_response">إرسال الرد</string>
+    <string name="apptentive_message_center_title">مركز الرسائل</string>
+    <string name="apptentive_message_center_compose_hint">اكتب رسالة...</string>
+    <string name="apptentive_message_center_attachment_title">إرسال الصورة؟</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
+    <string name="apptentive_message_auto_body_manual">هذا هو مركز الرسائل. إذا كانت لديك أسئلة أو اقتراحات أو مخاوف، أو  فقط كنت ترغب في التواصل معنا، الرجاء إرسال رسالة إلينا. يسعدنا التحدث مع عملائنا!</string>
+    <string name="apptentive_message_auto_body_no_love">ماذا يمكننا أن نفعل لضمان أن يعجبك تطبيقنا؟ ونحن نقدر آراءك البناءة.</string>
+    <string name="apptentive_rating_provider_no_google_play">لم يتم العثور على غوغل بلاي. الرجاء تثبيت غوغل بلاي قبل تقييم هذا التطبيق.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">لم يتم العثور على أمازون ابستور. الرجاء تثبيت أمازون ابستور قبل تقييم هذا التطبيق.</string>
+    <string name="apptentive_rating_provider_no_mikandi">لم يتم العثور على ميكاندي ماركت. الرجاء تثبيت ميكاندي ماركت قبل تقييم هذا التطبيق.</string>
+</resources>
