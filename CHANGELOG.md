@@ -1,9 +1,10 @@
-# 2014-??-?? skykelsey next
+# 2014-??-?? skykelsey 1.6.2
 
 #### Improvements
 
 * Added translations for Arabic, Greek, Brazilian Portuguese, Korean, and Turkish.
 * Update to Gradle 2.1 and Android Plugin 0.13.+
+* Add gradle configuration for uploading AAR and Javadoc to central maven repo.
 * Refactored message polling and payload sending for simplicity.
 * Deprecated NetworkStateReceiver.
 
