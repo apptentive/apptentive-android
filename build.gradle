@@ -3,15 +3,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
-}
-
-task run(type: Exec) {
-    executable 'adb'
-    args = ['shell', 'am', 'start', '-n', 'com.apptentive.android.dev/.MainActivity']
 }

@@ -27,3 +27,8 @@ android {
         }
     }
 }
+
+task run(type: Exec) {
+    executable 'adb'
+    args = ['shell', 'am', 'start', '-n', 'com.apptentive.android.dev/.MainActivity']
+}
