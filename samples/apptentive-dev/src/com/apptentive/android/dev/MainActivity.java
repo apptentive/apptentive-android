@@ -90,14 +90,14 @@ public class MainActivity extends ApptentiveActivity {
 		Apptentive.showMessageCenter(this);
 	}
 
-	// Call the ratings flow. This is one way to do it: Show the ratings flow if conditions are met when the window
-	// gains focus.
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
+/*
 		if (hasFocus) {
 			boolean ret = Apptentive.engage(this, "init");
 			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
 		}
+*/
 	}
 }
