@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -79,6 +80,17 @@ public class EngagementModule {
 			activity.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
 	}
+
+	public static boolean willShowInteraction(Context context, String vendor, String interaction, String eventName) {
+		String eventLabel = generateEventLabel(vendor, interaction, eventName);
+		return willShowInteraction(context, eventLabel);
+	}
+
+	private static boolean willShowInteraction(Context context, String eventLabel) {
+		Interaction interaction = InteractionManager.getApplicableInteraction(context, eventLabel);
+		return interaction != null;
+	}
+
 
 	public static String generateEventLabel(String vendor, String interaction, String eventName) {
 		return String.format("%s#%s#%s", encodeEventLabelPart(vendor), encodeEventLabelPart(interaction), encodeEventLabelPart(eventName));

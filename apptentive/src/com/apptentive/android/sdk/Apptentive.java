@@ -733,6 +733,26 @@ public class Apptentive {
 	}
 
 	/**
+	 * This method can be used to determine if a call to one of the <strong><code>engage()</code></strong> methods such as
+	 * {@link com.apptentive.android.sdk.Apptentive#engage(android.app.Activity, String)} using the same event name will
+	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
+	 * displayed before you create a UI Button, etc.
+	 *
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
+	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
+	 */
+	public static synchronized boolean willShowInteraction(Context context, String event) {
+		try {
+			return EngagementModule.willShowInteraction(context, "local", "app", event);
+		} catch (Exception e) {
+			MetricModule.sendError(context, e, null, null);
+		}
+		return false;
+	}
+
+	/**
 	 * Pass in a listener. The listener will be called whenever a survey is finished.
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
 	 */
