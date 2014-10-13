@@ -18,10 +18,18 @@ import com.apptentive.android.sdk.model.CodePointStore;
  */
 public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 
+	protected Context testContext;
 	protected Context targetContext;
 
 	static {
 		ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+	}
+
+	protected Context getTestContext() {
+		if (testContext == null) {
+			testContext = getInstrumentation().getContext();
+		}
+		return testContext;
 	}
 
 	protected Context getTargetContext() {

@@ -19,9 +19,6 @@
         <item>event_2</item>
         <item>event_3</item>
         <item>test_survey_interaction</item>
-    </string-array>
-
-    <string-array name="internal_events">
         <item>app.launch</item>
     </string-array>
 

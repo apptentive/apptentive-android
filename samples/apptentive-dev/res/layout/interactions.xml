@@ -36,10 +36,6 @@
                               android:textSize="@dimen/apptentive_text_medium"
                               android:textColor="@android:color/white"
                               android:text="Engage Event"/>
-                    <CheckBox android:id="@+id/internal_event_checkbox"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="Internal Event"/>
                     <CheckBox android:id="@+id/include_custom_data_checkbox"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
@@ -56,25 +52,35 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:text="Include Commerce"/>
+                    <AutoCompleteTextView android:id="@+id/event_name"
+                                          android:layout_width="fill_parent"
+                                          android:layout_height="48dp"
+                                          android:cursorVisible="true"
+                                          android:inputType="textVisiblePassword"
+                                          android:completionThreshold="1"
+                                          android:hint="Event Name…"/>
                     <LinearLayout android:layout_width="fill_parent"
                                   android:layout_height="48dp"
                                   android:layout_marginTop="4dp"
                                   android:orientation="horizontal">
                         <Button android:layout_width="0dp"
                                 android:layout_height="fill_parent"
-                                android:layout_weight="2"
+                                android:layout_weight="1"
                                 android:onClick="engage"
-                                android:text="Engage"/>
-                        <AutoCompleteTextView android:id="@+id/event_name"
-                                              android:layout_width="0dp"
-                                              android:layout_height="48dp"
-                                              android:layout_weight="6"
-                                              android:cursorVisible="true"
-                                              android:inputType="textVisiblePassword"
-                                              android:completionThreshold="1"
-                                              android:hint="Event Name…"/>
+                                android:text="engage()"/>
+                        <Button android:layout_width="0dp"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="1"
+                                android:onClick="engageInternal"
+                                android:text="engageInternal()"/>
                     </LinearLayout>
+                    <Button android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:gravity="center_horizontal"
+                            android:text="willShowInteraction()"
+                            android:onClick="willShowInteraction"/>
                 </LinearLayout>
+
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:layout_marginTop="8dp"
