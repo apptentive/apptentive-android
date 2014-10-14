@@ -15,7 +15,7 @@ use your app, to talk to them at the right time, and in the right way.
 
 #### Reporting Bugs
 
-We encourage you to help us find and fix bugs. If you find a bug, please fill in the contriibutor agreement, then open a [github issue](https://github.com/apptentive/apptentive-android/issues?direction=desc&sort=created&state=open).
+We encourage you to help us find and fix bugs. If you find a bug, please fill in the contributor agreement, then open a [github issue](https://github.com/apptentive/apptentive-android/issues?direction=desc&sort=created&state=open).
 If it is an urgent bug, please contact support@apptentive.com.
 
 #### Contributing
