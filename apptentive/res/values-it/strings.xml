@@ -38,7 +38,7 @@
   <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
   <string name="apptentive_intro_dialog_title_default">Grazie per i tuoi commenti!</string>
   <string name="apptentive_intro_dialog_body">Facci sapere come possiamo migliorare %s.</string>
-  <string name="apptentive_intro_dialog_edittext_hint">Facci sapere come possiamo aiutarti. (facoltativo)</string>
+  <string name="apptentive_intro_dialog_edittext_hint">Facci sapere come possiamo aiutarti. (obbligatorio)</string>
   <string name="apptentive_thank_you_dialog_body">La tua risposta è stata salvata nel Centro messaggi, in cui potrai visualizzare le risposte e inviarci altri messaggi.</string>
   <string name="apptentive_thank_you_dialog_body_message_center_disabled">Grazie per i tuoi commenti!</string>
   <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Ti contatteremo via email.</string>
