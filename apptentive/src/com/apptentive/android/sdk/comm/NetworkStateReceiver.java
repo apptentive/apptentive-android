@@ -7,8 +7,10 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -23,11 +25,23 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
 	private static Set<NetworkStateListener> listeners = new HashSet<NetworkStateListener>();
 
-	public static void clearListeners() {
-		listeners.clear();
+	public static void clearListeners(Context context) {
+        ComponentName receiver = new ComponentName(context, NetworkStateReceiver.class);
+        PackageManager pm = context.getPackageManager();
+        if (pm != null) {
+            pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        }
+
+        listeners.clear();
 	}
-	public static void addListener(NetworkStateListener listener) {
-		listeners.add(listener);
+	public static void addListener(NetworkStateListener listener, Context context) {
+        ComponentName receiver = new ComponentName(context, NetworkStateReceiver.class);
+        PackageManager pm = context.getPackageManager();
+        if (pm != null) {
+            pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        }
+
+        listeners.add(listener);
 	}
 
 	@Override

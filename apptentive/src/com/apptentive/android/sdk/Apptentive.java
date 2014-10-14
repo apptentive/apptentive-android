@@ -82,7 +82,7 @@ public class Apptentive {
 	public static void onStop(Activity activity) {
 		try {
 			ActivityLifecycleManager.activityStopped(activity);
-			NetworkStateReceiver.clearListeners();
+			NetworkStateReceiver.clearListeners(activity.getApplication());
 			PayloadSendWorker.activityStopped();
 			MessagePollingWorker.stop();
 		} catch (Exception e) {
@@ -741,7 +741,7 @@ public class Apptentive {
 
 		if (!GlobalInfo.initialized) {
 			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			NetworkStateReceiver.clearListeners();
+			NetworkStateReceiver.clearListeners(appContext);
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
@@ -818,7 +818,7 @@ public class Apptentive {
 					}
 				}
 			};
-			NetworkStateReceiver.addListener(networkStateListener);
+			NetworkStateReceiver.addListener(networkStateListener, appContext);
 
 			// Grab the conversation token from shared preferences.
 			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
