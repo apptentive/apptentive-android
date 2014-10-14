@@ -1,7 +1,7 @@
 # Apptentive Android SDK
 
-The Apptentive Android SDK is the best way to engage your mobile customer. Use it to talk to learn about your customers
-and how they use your app, and to talk to them at the right time and in the right way.
+The Apptentive Android SDK is the best way to engage your mobile customers. Use it to learn about how your customers
+use your app, to talk to them at the right time, and in the right way.
 
 #### To get started, read our [Integration Guide](http://www.apptentive.com/docs/android/integration/)
 
