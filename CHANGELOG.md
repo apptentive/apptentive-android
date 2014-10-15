@@ -1,12 +1,13 @@
-# 2014-??-?? skykelsey 1.6.2
+# 2014-10-15 skykelsey 1.6.2
 
 #### Improvements
 
 * Added translations for Arabic, Greek, Brazilian Portuguese, Korean, and Turkish.
 * Update to Gradle 2.1 and Android Plugin 0.13.+
-* Add gradle configuration for uploading AAR and Javadoc to central maven repo.
+* Add gradle configuration for uploading AAR and Javadoc to central maven repo. You can now integrate Apptentive using Maven!
 * Refactored message polling and payload sending for simplicity.
 * Deprecated NetworkStateReceiver.
+* Added method for checking to see if an Interaction will show for a given Event.
 
 # 2014-09-28 skykelsey 1.6.1
 

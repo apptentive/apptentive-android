@@ -1,5 +1,15 @@
 This document tracks changes to the API between versions.
 
+# 1.6.2
+
+* Added API method [Apptentive.willShowInteraction()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#willShowInteraction-android.content.Context-java.lang.String-).
+    If a call to this method returns true, then a call to engage() with the same Event name will result in an Interaction being displayed.
+
+| Added Methods |
+| ------------- |
+| [public static synchronized boolean willShowInteraction(Activity activity, String event)]() |
+
+
 # 1.6.0
 
 * Added ability to send custom data and EventData with Events.
