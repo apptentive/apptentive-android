@@ -143,11 +143,6 @@
                         <Button android:layout_width="0dp"
                                 android:layout_height="fill_parent"
                                 android:layout_weight="1"
-                                android:onClick="checkForInteraction"
-                                android:text="Can Show?"/>
-                        <Button android:layout_width="0dp"
-                                android:layout_height="fill_parent"
-                                android:layout_weight="1"
                                 android:onClick="forceRatingsPrompt"
                                 android:text="Show"/>
                     </LinearLayout>
