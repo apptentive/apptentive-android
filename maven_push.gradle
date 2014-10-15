@@ -97,6 +97,10 @@ afterEvaluate { project ->
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     }
 
+    androidJavadocs << {
+        println "Javadocs written to: " + destinationDir
+    }
+
     task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
         classifier = 'javadoc'
         from androidJavadocs.destinationDir
