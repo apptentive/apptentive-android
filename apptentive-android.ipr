@@ -35,7 +35,7 @@
   </component>
   <component name="DependencyValidationManager">
     <scope name="SDK Lint" pattern="src[apptentive]:*..*" />
-    <scope name="Javadoc" pattern="src[apptentive]:com.apptentive.android.sdk.Apptentive||src[apptentive]:com.apptentive.android.sdk.ApptentiveActivity||src[apptentive]:com.apptentive.android.sdk.ApptentiveListActivity||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener" />
+    <scope name="Javadoc" pattern="src[apptentive]:com.apptentive.android.sdk.Apptentive||src[apptentive]:com.apptentive.android.sdk.ApptentiveActivity||src[apptentive]:com.apptentive.android.sdk.ApptentiveListActivity||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.AmazonAppstoreRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.rating.IRatingProvider||src[apptentive]:com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener||src[apptentive]:com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener||src[apptentive]:com.apptentive.android.sdk.model.CommerceExtendedData||src[apptentive]:com.apptentive.android.sdk.model.LocationExtendedData||src[apptentive]:com.apptentive.android.sdk.model.TimeExtendedData||src[apptentive]:com.apptentive.android.sdk.model.ExtendedData" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
@@ -96,7 +96,7 @@
     <option name="HEAP_SIZE" value="100" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
-    <option name="OPTION_INCLUDE_LIBS" value="false" />
+    <option name="OPTION_INCLUDE_LIBS" value="true" />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -260,4 +260,3 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
 </project>
-
