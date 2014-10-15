@@ -383,18 +383,12 @@ public class InteractionsActivity extends ApptentiveActivity {
 		Log.e("Force showed Ratings Prompt? %b", shown);
 	}
 
-	public void checkForInteraction(View view) {
-		String eventName = ((EditText) findViewById(R.id.force_ratings_prompt_event_name)).getText().toString();
-		boolean available = isInteractionAvailable(this, eventName);
-		Toast.makeText(this, "Ratins Prompt Available? " + available, Toast.LENGTH_SHORT).show();
-		Log.e("Ratings Prompt Available? %b", available);
-	}
-
 	public static boolean forceShowRatingsPromptInteraction(Activity activity, String eventName) {
 		if (eventName == null) {
 			Log.w("Event name is null. Can't force show Ratings Prompt.");
 			return false;
 		}
+
 		try {
 			String eventLabel = EngagementModule.generateEventLabel("local", "app", eventName);
 			Log.d("Force Showing Ratings Prompt at: ", eventLabel);
@@ -408,23 +402,14 @@ public class InteractionsActivity extends ApptentiveActivity {
 				CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 				EngagementModule.launchInteraction(activity, interaction);
 				return true;
+			} else {
+				Toast.makeText(activity, "No Ratings Prompt available for that Interaction.", Toast.LENGTH_SHORT).show();
 			}
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 			Log.e("Error:", e);
 		}
 		return false;
-	}
-
-	public static boolean isInteractionAvailable(Context context, String eventName) {
-		if (eventName == null) {
-			Log.w("Event name is null. Can't check for Ratings Prompt.");
-			return false;
-		}
-
-		String eventLabel = EngagementModule.generateEventLabel("local", "app", eventName);
-		Interaction interaction = getRatingsPromptInteraction(context, eventLabel);
-		return interaction != null;
 	}
 
 	public static Interaction getRatingsPromptInteraction(Context context, String eventLabel) {
