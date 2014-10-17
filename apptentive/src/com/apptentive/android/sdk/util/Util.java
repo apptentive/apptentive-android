@@ -357,4 +357,25 @@ public class Util {
 		}
 		return null;
 	}
+
+	public static String readStringFromInputStream(InputStream is, String charEncoding) {
+		Reader reader = null;
+		StringBuilder out = new StringBuilder();
+		final char[] buf = new char[8196];
+		try {
+			reader = new InputStreamReader(is, charEncoding);
+			while (true) {
+				int read = reader.read(buf, 0, 8196);
+				if (read < 0) {
+					break;
+				}
+				out.append(buf, 0, read);
+			}
+		} catch (Exception e) {
+			//
+		} finally {
+			Util.ensureClosed(reader);
+		}
+		return out.toString();
+	}
 }

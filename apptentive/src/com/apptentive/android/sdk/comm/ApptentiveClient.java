@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * TODO: When we drop API level 7 (2.1) support, we can start using AndroidHttpClient.
@@ -166,6 +167,7 @@ public class ApptentiveClient {
 			HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
 			httpParams.setParameter("http.useragent", getUserAgentString());
 			request.setHeader("Authorization", "OAuth " + oauthToken);
+			request.setHeader("Accept-Encoding", "gzip");
 			request.setHeader("Accept", "application/json");
 			request.setHeader("X-API-Version", API_VERSION);
 
@@ -175,15 +177,6 @@ public class ApptentiveClient {
 			ret.setReason(response.getStatusLine().getReasonPhrase());
 			Log.d("Response Status Line: " + response.getStatusLine().toString());
 
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				ret.setContent(EntityUtils.toString(entity, "UTF-8"));
-				if (code >= 200 && code < 300) {
-					Log.d("Response: " + ret.getContent());
-				} else {
-					Log.w("Response: " + ret.getContent());
-				}
-			}
 			HeaderIterator headerIterator = response.headerIterator();
 			if (headerIterator != null) {
 				Map<String, String> headers = new HashMap<String, String>();
@@ -193,6 +186,23 @@ public class ApptentiveClient {
 					//Log.v("Header: %s = %s", header.getName(), header.getValue());
 				}
 				ret.setHeaders(headers);
+			}
+
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				InputStream is = entity.getContent();
+				if (is != null) {
+					String contentEncoding = ret.getHeaders().get("Content-Encoding");
+					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("gzip")) {
+						is = new GZIPInputStream(is);
+					}
+					ret.setContent(Util.readStringFromInputStream(is, "UTF-8"));
+					if (code >= 200 && code < 300) {
+						Log.d("Response: " + ret.getContent());
+					} else {
+						Log.w("Response: " + ret.getContent());
+					}
+				}
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
