@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.rating.view;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -30,9 +29,7 @@ public abstract class ApptentiveBaseDialog extends Dialog {
 		params.width = ViewGroup.LayoutParams.FILL_PARENT;
 		params.height = ViewGroup.LayoutParams.FILL_PARENT;
 		params.gravity = Gravity.CENTER;
-		params.dimAmount = 0.5f;
 		getWindow().setAttributes(params);
-		getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+		getWindow().setBackgroundDrawable(new ColorDrawable(0x7F000000));
 	}
 }
