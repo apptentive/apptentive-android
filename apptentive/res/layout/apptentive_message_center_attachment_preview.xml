@@ -1,49 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:paddingLeft="@dimen/apptentive_dialog_side_padding"
-            android:paddingRight="@dimen/apptentive_dialog_side_padding">
-    <LinearLayout android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:padding="16dp"
-                  android:background="@drawable/apptentive_dialog_background_with_border">
-        <TextView android:id="@+id/title"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginBottom="16dp"
-                  style="@style/ApptentiveInteractionDialogTitleNoBody"
-                  android:text="@string/apptentive_message_center_attachment_title"/>
-        <ImageView android:id="@+id/image"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_gravity="center_horizontal"
-                   android:paddingBottom="16dp"/>
-        <LinearLayout android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal">
-            <Button android:id="@+id/no"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginRight="4dp"
-                    style="@style/ApptentiveInteractionNegativeButton"
-                    android:text="@string/apptentive_no"/>
-            <Button android:id="@+id/yes"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="4dp"
-                    style="@style/ApptentiveInteractionPositiveButton"
-                    android:text="@string/apptentive_yes"/>
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:gravity="center_vertical">
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_dialog_side_padding"
+                android:paddingRight="@dimen/apptentive_dialog_side_padding"
+                android:fadingEdge="none">
+        <FrameLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:paddingTop="@dimen/apptentive_dialog_vertical_padding"
+                     android:paddingBottom="@dimen/apptentive_dialog_vertical_padding">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:padding="16dp"
+                          android:background="@drawable/apptentive_dialog_background_with_border">
+                <TextView android:id="@+id/title"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginBottom="16dp"
+                          style="@style/ApptentiveInteractionDialogTitleNoBody"
+                          android:text="@string/apptentive_message_center_attachment_title"/>
+                <ImageView android:id="@+id/image"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_gravity="center_horizontal"
+                           android:paddingBottom="16dp"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="horizontal">
+                    <Button android:id="@+id/no"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginRight="4dp"
+                            style="@style/ApptentiveInteractionNegativeButton"
+                            android:text="@string/apptentive_no"/>
+                    <Button android:id="@+id/yes"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="4dp"
+                            style="@style/ApptentiveInteractionPositiveButton"
+                            android:text="@string/apptentive_yes"/>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </ScrollView>
+</LinearLayout>
