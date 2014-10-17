@@ -1,3 +1,10 @@
+# 2014-10-17 skykelsey 1.6.3
+
+#### Improvements
+
+* Dim background when dialogs are shown.
+* Request gzip compression from server to save bandwidth.
+
 # 2014-10-15 skykelsey 1.6.2
 
 #### Improvements
