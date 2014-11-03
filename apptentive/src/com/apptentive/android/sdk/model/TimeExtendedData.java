@@ -31,6 +31,10 @@ public class TimeExtendedData extends ExtendedData {
 		setTimestamp(System.currentTimeMillis());
 	}
 
+	public TimeExtendedData(String json) throws JSONException {
+		super(json);
+	}
+
 	public TimeExtendedData(Date date) {
 		super();
 		setTimestamp(date);

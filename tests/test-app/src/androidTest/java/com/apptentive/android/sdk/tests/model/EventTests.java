@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.JsonDiffer;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
@@ -43,7 +42,8 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 			customData.put("string_key", "string_value");
 			customData.put("number_key", 12345.6789f);
 
-			CommerceExtendedData commerce = new CommerceExtendedData("commerce_id")
+			CommerceExtendedData commerce = new CommerceExtendedData()
+				.setId("commerce_id")
 				.setAffiliation(1111111111)
 				.setRevenue(100d)
 				.setShipping(5l)

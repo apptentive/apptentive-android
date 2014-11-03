@@ -39,13 +39,15 @@ public class CommerceExtendedData extends ExtendedData {
 		setVersion(VERSION);
 	}
 
-	public CommerceExtendedData(Object id) {
+	public CommerceExtendedData()  {
 		super();
-		setId(id);
+	}
+
+	public CommerceExtendedData(String json) throws JSONException {
+		super(json);
 	}
 
 	public CommerceExtendedData(Object id, Object affiliation, Number revenue, Number shipping, Number tax, String currency) {
-		this(id);
 		setId(id);
 		setAffiliation(affiliation);
 		setRevenue(revenue);

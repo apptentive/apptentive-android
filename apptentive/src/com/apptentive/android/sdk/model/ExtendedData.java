@@ -23,6 +23,11 @@ public abstract class ExtendedData extends JSONObject {
 		init();
 	}
 
+	protected ExtendedData(String json) throws JSONException {
+		super(json);
+		init();
+	}
+
 	public String getTypeName() {
 		return type.name();
 	}
@@ -42,7 +47,7 @@ public abstract class ExtendedData extends JSONObject {
 
 	protected abstract void init();
 
-	protected enum Type {
+	public enum Type {
 		time,
 		location,
 		commerce,

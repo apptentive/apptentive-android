@@ -25,6 +25,10 @@ public class LocationExtendedData extends ExtendedData {
 		setVersion(VERSION);
 	}
 
+	public LocationExtendedData(String json) throws JSONException {
+		super(json);
+	}
+
 	public LocationExtendedData(double longitude, double latitude) {
 		super();
 		setCoordinates(longitude, latitude);

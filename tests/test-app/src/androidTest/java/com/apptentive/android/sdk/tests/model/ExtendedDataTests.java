@@ -28,9 +28,10 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	public void testCommerceExtendedData() {
 		Log.e("testCommerceExtendedData()");
 		try {
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCommerceExtendedData.json"));
+			JSONObject expected = new CommerceExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCommerceExtendedData.json"));
 
-			CommerceExtendedData actual = new CommerceExtendedData("commerce_id")
+			CommerceExtendedData actual = new CommerceExtendedData()
+				.setId("commerce_id")
 				.setAffiliation(1111111111)
 				.setRevenue(100d)
 				.setShipping(5l)
@@ -47,7 +48,7 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	public void testLocationExtendedData() {
 		Log.e("testLocationExtendedData()");
 		try {
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testLocationExtendedData.json"));
+			JSONObject expected = new LocationExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testLocationExtendedData.json"));
 
 			LocationExtendedData actual = new LocationExtendedData(-122.34569190000002d, 47.6288591d);
 
@@ -60,7 +61,7 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	public void testTimeExtendedData() {
 		Log.e("testTimeExtendedData()");
 		try {
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testTimeExtendedData.json"));
+			JSONObject expected = new TimeExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testTimeExtendedData.json"));
 
 			TimeExtendedData millis = new TimeExtendedData(1406251926165l);
 			assertEquals(expected.toString(), millis.toString());
