@@ -42,14 +42,21 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 			customData.put("string_key", "string_value");
 			customData.put("number_key", 12345.6789f);
 
-			CommerceExtendedData commerce = new CommerceExtendedData()
-				.setId("commerce_id")
-				.setAffiliation(1111111111)
-				.setRevenue(100d)
-				.setShipping(5l)
-				.setTax(4.38f)
-				.setCurrency("USD")
-				.addItem(22222222, "Item Name", "Category", 20, 5.0d, "USD");
+			CommerceExtendedData commerce = null;
+			try {
+				commerce = new CommerceExtendedData()
+					.setId("commerce_id")
+					.setAffiliation(1111111111)
+					.setRevenue(100d)
+					.setShipping(5l)
+					.setTax(4.38f)
+					.setCurrency("USD");
+				CommerceExtendedData.Item item = new CommerceExtendedData.Item(22222222, "Item Name", "Category", 20, 5.0d, "USD");
+				commerce.addItem(item);
+			} catch (JSONException e) {
+				Log.e("Error: ", e);
+			}
+			assertNotNull(commerce);
 
 			TimeExtendedData time = new TimeExtendedData(1.406316991957E9);
 

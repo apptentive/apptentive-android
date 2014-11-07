@@ -36,8 +36,9 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 				.setRevenue(100d)
 				.setShipping(5l)
 				.setTax(4.38f)
-				.setCurrency("USD")
-				.addItem(22222222, "Item Name", "Category", 20, 5.0d, "USD");
+				.setCurrency("USD");
+			CommerceExtendedData.Item item = new CommerceExtendedData.Item(22222222, "Item Name", "Category", 20, 5.0d, "USD");
+			actual.addItem(item);
 
 			assertEquals(expected.toString(), actual.toString());
 		} catch (JSONException e) {

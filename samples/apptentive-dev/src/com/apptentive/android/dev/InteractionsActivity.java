@@ -88,9 +88,15 @@ public class InteractionsActivity extends ApptentiveActivity {
 			if (extendedData == null) {
 				extendedData = new ArrayList<ExtendedData>();
 			}
-			CommerceExtendedData commerce = new CommerceExtendedData("id", "affiliation", 100, 5, 10, "USD");
-			commerce.addItem("id", "name", "category", 20, 5, "USD");
-			extendedData.add(commerce);
+			CommerceExtendedData commerce = null;
+			try {
+				commerce = new CommerceExtendedData("id", "affiliation", 100, 5, 10, "USD");
+				CommerceExtendedData.Item item = new CommerceExtendedData.Item(12345, "name", "category", 20, 5, "USD");
+				commerce.addItem(item);
+				extendedData.add(commerce);
+			} catch (JSONException e) {
+				Log.e("Error creating commerce data.", e);
+			}
 		}
 
 		if (!internal) {
