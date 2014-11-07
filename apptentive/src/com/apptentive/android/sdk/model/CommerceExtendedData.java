@@ -32,7 +32,7 @@ public class CommerceExtendedData extends ExtendedData {
 		setVersion(VERSION);
 	}
 
-	public CommerceExtendedData()  {
+	public CommerceExtendedData() {
 		super();
 	}
 
@@ -49,7 +49,7 @@ public class CommerceExtendedData extends ExtendedData {
 		setCurrency(currency);
 	}
 
-	public CommerceExtendedData setId(Object id) throws JSONException{
+	public CommerceExtendedData setId(Object id) throws JSONException {
 		put(KEY_ID, id);
 		return this;
 	}
@@ -59,7 +59,7 @@ public class CommerceExtendedData extends ExtendedData {
 		return this;
 	}
 
-	public CommerceExtendedData setRevenue(Number revenue) throws JSONException{
+	public CommerceExtendedData setRevenue(Number revenue) throws JSONException {
 		put(KEY_REVENUE, revenue);
 		return this;
 	}
@@ -127,24 +127,53 @@ public class CommerceExtendedData extends ExtendedData {
 		public Item(Object id, Object name, String category, Number price, Number quantity, String currency) throws JSONException {
 			super();
 			if (id != null) {
-				put(KEY_ID, id);
+				setId(id);
 			}
 			if (name != null) {
-				put(KEY_NAME, name);
+				setName(name);
 			}
 			if (category != null) {
-				put(KEY_CATEGORY, category);
+				setCategory(category);
 			}
 			if (price != null) {
-				put(KEY_PRICE, price);
+				setPrice(price);
 			}
 			if (quantity != null) {
-				put(KEY_QUANTITY, quantity);
+				setQuantity(quantity);
 			}
 			if (currency != null) {
-				put(KEY_CURRENCY, currency);
+				setCurrency(currency);
 			}
 		}
 
+		public Item setId(Object id) throws JSONException {
+			put(KEY_ID, id);
+			return this;
+		}
+
+		public Item setName(Object name) throws JSONException {
+			put(KEY_NAME, name);
+			return this;
+		}
+
+		public Item setCategory(String category) throws JSONException {
+			put(KEY_CATEGORY, category);
+			return this;
+		}
+
+		public Item setPrice(Number price) throws JSONException {
+			put(KEY_PRICE, price);
+			return this;
+		}
+
+		public Item setQuantity(Number quantity) throws JSONException {
+			put(KEY_QUANTITY, quantity);
+			return this;
+		}
+
+		public Item setCurrency(String currency) throws JSONException {
+			put(KEY_CURRENCY, currency);
+			return this;
+		}
 	}
 }
