@@ -106,6 +106,10 @@ public class CommerceExtendedData extends ExtendedData {
 		private static final String KEY_QUANTITY = "quantity";
 		private static final String KEY_CURRENCY = "currency";
 
+		public Item() {
+			super();
+		}
+
 		public Item(String json) throws JSONException {
 			super(json);
 		}
