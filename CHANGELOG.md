@@ -1,3 +1,9 @@
+# 2014-11-17 skykelsey 1.6.5
+
+#### Improvements
+
+* Minor improvements to prepare for updated Trigger.io module.
+
 # 2014-10-20 skykelsey 1.6.4
 
 #### Improvements
