@@ -778,15 +778,22 @@ public class Apptentive {
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
 			String apiKey = null;
+			String logLevelOverride = null;
 			try {
 				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
 				if (metaData != null ) {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 				}
-				GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-				if (GlobalInfo.isAppDebuggable) {
-					ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+				if (logLevelOverride != null) {
+					Log.i("Overriding log level: %s", logLevelOverride);
+					ApptentiveInternal.setMinimumLogLevel(Log.Level.parse(logLevelOverride));
+				} else {
+					GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+					if (GlobalInfo.isAppDebuggable) {
+						ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+					}
 				}
 			} catch (Exception e) {
 				Log.e("Unexpected error while reading application info.", e);
@@ -974,7 +981,7 @@ public class Apptentive {
 			if (cacheSeconds == null) {
 				cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 			}
-			Log.e("Caching configuration for %d seconds.", cacheSeconds);
+			Log.d("Caching configuration for %d seconds.", cacheSeconds);
 			Configuration config = new Configuration(response.getContent());
 			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
 			config.save(context);

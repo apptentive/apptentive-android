@@ -1563,7 +1563,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testWillShowInteraction()\n\n");
 		resetDevice();
 
-		ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testWillShowInteraction.json");
 		InteractionManager.storeInteractions(getTargetContext(), json);
 

@@ -78,32 +78,11 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Pass in a log level to override the default, which is {@link Log#INFO}
+	 * Pass in a log level to override the default, which is {@link Log.Level#INFO}
 	 *
-	 * @param logLevel One of the following:
-	 *                 <ul>
-	 *                 <li>
-	 *                 {@link Log#VERBOSE}
-	 *                 </li>
-	 *                 <li>
-	 *                 {@link Log#DEBUG}
-	 *                 </li>
-	 *                 <li>
-	 *                 {@link Log#INFO}
-	 *                 </li>
-	 *                 <li>
-	 *                 {@link Log#WARN}
-	 *                 </li>
-	 *                 <li>
-	 *                 {@link Log#ERROR}
-	 *                 </li>
-	 *                 <li>
-	 *                 {@link Log#ASSERT}
-	 *                 </li>
-	 *                 </ul>
 	 */
-	public static void setMinimumLogLevel(int logLevel) {
-		Log.overrideLogLevel(logLevel);
+	public static void setMinimumLogLevel(Log.Level level) {
+		Log.overrideLogLevel(level);
 	}
 
 	private static String pushCallbackActivityName;
