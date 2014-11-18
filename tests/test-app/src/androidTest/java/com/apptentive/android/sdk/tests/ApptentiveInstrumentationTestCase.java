@@ -22,7 +22,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected Context targetContext;
 
 	static {
-		ApptentiveInternal.setMinimumLogLevel(Log.VERBOSE);
+		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {
