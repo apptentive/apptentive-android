@@ -778,6 +778,7 @@ public class Apptentive {
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
 			String apiKey = null;
+			boolean apptentiveDebug = false;
 			String logLevelOverride = null;
 			try {
 				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
@@ -785,8 +786,12 @@ public class Apptentive {
 				if (metaData != null ) {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
+					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 				}
-				if (logLevelOverride != null) {
+				if (apptentiveDebug) {
+					Log.i("Apptentive debug logging set to VERBOSE.");
+					ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+				} else if (logLevelOverride != null) {
 					Log.i("Overriding log level: %s", logLevelOverride);
 					ApptentiveInternal.setMinimumLogLevel(Log.Level.parse(logLevelOverride));
 				} else {
