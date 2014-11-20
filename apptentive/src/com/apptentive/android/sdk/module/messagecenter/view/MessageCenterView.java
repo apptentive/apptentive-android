@@ -117,8 +117,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		});
 
 		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
-		// Android devices can't take screenshots until version 4+
-		boolean canTakeScreenshot = Build.VERSION.RELEASE.matches("^4.*");
+		// Android devices can't take screenshots until Android OS version 4+
+		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
 		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
