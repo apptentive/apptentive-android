@@ -1,3 +1,14 @@
+# 2014-11-25 skykelsey 1.6.6
+
+#### Improvements
+
+* Update to latest versions of Gradle (2.2), Android Gradle Plugin (0.14.4), Android build tools (21.1.1), and Target SDK Version (21).
+* You can now set Apptentive's minimum log level by setting a flag in the manifest.
+
+#### Bugs fixed
+
+* Fixed a bug that prevented feedback from being submitted when email is required, but already supplied.
+
 # 2014-11-17 skykelsey 1.6.5
 
 #### Improvements
