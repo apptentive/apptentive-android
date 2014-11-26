@@ -310,10 +310,10 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 	private void validateForm(Button sendButton) {
 		boolean passedEmail = true;
-		if (interaction.isEmailRequired()) {
-			passedEmail = !(email == null || email.length() == 0);
+		if (interaction.isEmailRequired() && !Util.isEmpty(PersonManager.loadInitialPersonEmail(sendButton.getContext()))) {
+			passedEmail = !Util.isEmpty(email);
 		}
-		boolean passedMessage = !(message == null || message.length() == 0);
+		boolean passedMessage = !Util.isEmpty(message);
 
 		sendButton.setEnabled(passedEmail && passedMessage);
 	}

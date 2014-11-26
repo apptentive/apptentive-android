@@ -30,7 +30,7 @@ public class MainActivity extends ApptentiveActivity {
 		setContentView(R.layout.main);
 
 		// OPTIONAL: To specify a different user email than what the device was setup with.
-		//Apptentive.setUserEmail("user_email@example.com");
+		//Apptentive.setInitialUserEmail(this, "user_email@example.com");
 
 		// OPTIONAL: To send extra about the device to the server.
 		//Apptentive.addCustomDeviceData(this, "custom_device_key", "custom_device_value");

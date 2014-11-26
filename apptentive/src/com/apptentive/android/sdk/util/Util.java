@@ -235,8 +235,8 @@ public class Util {
 		Log.e("Screen size: PX=%dx%d DP=%dx%d", point.x, point.y, Util.pixelsToDips(context, point.x), Util.pixelsToDips(context, point.y));
 	}
 
-	public static boolean isEmpty(String theString) {
-		return theString == null || theString.length() == 0;
+	public static boolean isEmpty(CharSequence charSequence) {
+		return charSequence == null || charSequence.length() == 0;
 	}
 
 	public static Integer parseCacheControlHeader(String cacheControlHeader) {
