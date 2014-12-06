@@ -25,14 +25,14 @@ public class Interactions extends JSONObject {
 		super(json);
 	}
 
-	public List<Interaction> getInteractionList(String codePoint) {
+	public List<Interaction> getInteractionList(String eventLabel) {
 		List<Interaction> list = new ArrayList<Interaction>();
 		try {
 			JSONObject interactions = getJSONObject(KEY_INTERACTIONS);
-			if (!interactions.isNull(codePoint)) {
-				JSONArray interactionsForCodePoint = interactions.getJSONArray(codePoint);
-				for (int i = 0; i < interactionsForCodePoint.length(); i++) {
-					String interactionString = interactionsForCodePoint.getJSONObject(i).toString();
+			if (!interactions.isNull(eventLabel)) {
+				JSONArray interactionsForEventLabel = interactions.getJSONArray(eventLabel);
+				for (int i = 0; i < interactionsForEventLabel.length(); i++) {
+					String interactionString = interactionsForEventLabel.getJSONObject(i).toString();
 					Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
 					if (interaction != null) {
 						list.add(interaction);
