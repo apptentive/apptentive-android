@@ -1,0 +1,31 @@
+{
+  "interactions": {
+    "local#app#event_name": [
+      {
+        "id": "52fc18a27724c50177000001",
+        "type": "Announcement",
+        "priority": 6,
+        "criteria": {
+        },
+        "configuration": {
+          "template": "ModalDialog",
+          "title": "Order Shipped",
+          "body": "Your order has shipped and you will receive a notice shortly!",
+          "style": "colorful",
+          "text_color": "#111111",
+          "accent_color": "#ffeeff",
+          "buttons": [
+            {
+              "title": "Launch Twitter",
+              "action": "interaction"
+            },
+            {
+              "title": "Dismiss",
+              "action": "dismiss"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

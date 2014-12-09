@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+~ Please refer to the LICENSE file for the terms and conditions
+~ under which redistribution and use of this file is permitted.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:gravity="center_vertical">
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding"
+                android:paddingRight="@dimen/apptentive_activity_side_padding"
+                android:fadingEdge="none">
+        <FrameLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+                     android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:padding="16dp"
+                          android:background="@drawable/apptentive_dialog_background">
+                <TextView android:id="@+id/title"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginBottom="8dp"
+                          style="@style/ApptentiveInteractionDialogTitle"
+                          android:text="@string/apptentive_thank_you"/>
+                <TextView android:id="@+id/body"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginBottom="16dp"
+                          style="@style/ApptentiveInteractionDialogBody"/>
+                <LinearLayout android:id="@+id/buttons"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="vertical"/>
+            </LinearLayout>
+        </FrameLayout>
+    </ScrollView>
+</LinearLayout>

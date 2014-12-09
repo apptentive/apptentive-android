@@ -367,6 +367,9 @@ public class InteractionsActivity extends ApptentiveActivity {
 				// Overwrites any existing interactions.
 				InteractionManager.storeInteractions(this, json);
 				Apptentive.engage(this, "init");
+			} else if (interactionName.equals("Announcement")) {
+				String json = FileUtil.loadTextAssetAsString(this, "announcementInteraction.json");
+				interaction = new AnnouncementInteraction(json);
 			}
 			if (interaction != null) {
 				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
