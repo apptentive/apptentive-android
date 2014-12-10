@@ -1,12 +1,12 @@
 {
   "type": "TextModal",
-  "name": "Website Name",
-  "id": "textmodal_interaction_1234567890",
+  "name": "Bottom TextModal Interaction",
+  "id": "textmodal_interaction_bottom",
   "priority": 1,
   "criteria": {},
   "configuration": {
-    "layout": "ModalDialog",
-    "title": "TextModal Title",
+    "layout": "bottom",
+    "title": "Bottom TextModal Title",
     "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     "actions": [
       {

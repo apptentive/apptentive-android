@@ -23,7 +23,8 @@
     </string-array>
 
     <string-array name="interactions">
-        <item>TextModal</item>
+        <item>TextModal Centered</item>
+        <item>TextModal Bottom</item>
         <item>Survey</item>
         <item>Working Rating Flow Default Text</item>
         <item>Working Rating Flow Modified Text</item>

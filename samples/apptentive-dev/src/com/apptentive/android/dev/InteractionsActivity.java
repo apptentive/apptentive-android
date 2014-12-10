@@ -367,8 +367,11 @@ public class InteractionsActivity extends ApptentiveActivity {
 				// Overwrites any existing interactions.
 				InteractionManager.storeInteractions(this, json);
 				Apptentive.engage(this, "init");
-			} else if (interactionName.equals("TextModal")) {
-				String json = FileUtil.loadTextAssetAsString(this, "textModalInteraction.json");
+			} else if (interactionName.equals("TextModal Centered")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCentered.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal Bottom")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionBottom.json");
 				interaction = new TextModalInteraction(json);
 			}
 			if (interaction != null) {
