@@ -9,13 +9,13 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.common;
 import android.content.Context;
 import android.view.ViewGroup;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionInteractionButton;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 
 /**
  * @author Sky Kelsey
  */
-public class LaunchInteractionInteractionButtonViewController extends InteractionButtonViewController<LaunchInteractionInteractionButton> {
-	public LaunchInteractionInteractionButtonViewController(Context context, ViewGroup parent, LaunchInteractionInteractionButton interactionButton) {
+public class LaunchInteractionInteractionButtonViewController extends InteractionButtonViewController<LaunchInteractionAction> {
+	public LaunchInteractionInteractionButtonViewController(Context context, ViewGroup parent, LaunchInteractionAction interactionButton) {
 		super(context, parent, R.layout.apptentive_interaction_button_launch_interaction, interactionButton);
 	}
 

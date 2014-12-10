@@ -13,9 +13,9 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.DismissInteractionButton;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionButton;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionInteractionButton;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.DismissAction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.DismissInteractionButtonViewController;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.InteractionButtonViewController;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.LaunchInteractionInteractionButtonViewController;
@@ -51,12 +51,12 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 
 		ViewGroup buttonContainer = (ViewGroup) activity.findViewById(R.id.buttons);
 
-		List<InteractionButton> buttons = interaction.getInteractionButtons().getAsList();
-		for (InteractionButton button : buttons) {
+		List<Action> buttons = interaction.getInteractionButtons().getAsList();
+		for (Action button : buttons) {
 			InteractionButtonViewController buttonView = null;
-			switch (button.getAction()) {
+			switch (button.getType()) {
 				case Dismiss:
-					buttonView = new DismissInteractionButtonViewController(activity, buttonContainer, (DismissInteractionButton) button);
+					buttonView = new DismissInteractionButtonViewController(activity, buttonContainer, (DismissAction) button);
 					buttonView.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View view) {
@@ -67,7 +67,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 					});
 					break;
 				case Interaction:
-					buttonView = new LaunchInteractionInteractionButtonViewController(activity, buttonContainer, (LaunchInteractionInteractionButton) button);
+					buttonView = new LaunchInteractionInteractionButtonViewController(activity, buttonContainer, (LaunchInteractionAction) button);
 					buttonView.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View view) {

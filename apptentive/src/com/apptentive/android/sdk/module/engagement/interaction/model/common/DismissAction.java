@@ -11,8 +11,8 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class DismissInteractionButton extends InteractionButton {
-	public DismissInteractionButton(String json) throws JSONException {
+public class DismissAction extends Action {
+	public DismissAction(String json) throws JSONException {
 		super(json);
 	}
 }

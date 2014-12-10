@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionButtons;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionActions;
 import org.json.JSONException;
 
 /**
@@ -18,7 +18,7 @@ public class TextModalInteraction extends Interaction {
 	private static String KEY_TEMPLATE = "template";
 	private static String KEY_TITLE = "title";
 	private static String KEY_BODY = "body";
-	private static String KEY_BUTTONS = "buttons";
+	private static String KEY_ACTIONS = "actions";
 
 	public TextModalInteraction(String json) throws JSONException {
 		super(json);
@@ -76,11 +76,11 @@ public class TextModalInteraction extends Interaction {
 		return null;
 	}
 
-	public InteractionButtons getInteractionButtons() {
+	public InteractionActions getInteractionButtons() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_BUTTONS)) {
-				return new InteractionButtons(configuration.getString(KEY_BUTTONS));
+			if (configuration != null && configuration.has(KEY_ACTIONS)) {
+				return new InteractionActions(configuration.getString(KEY_ACTIONS));
 			}
 		} catch (JSONException e) {
 			// Ignore

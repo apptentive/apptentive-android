@@ -13,50 +13,50 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public abstract class InteractionButton<T extends InteractionButton> extends JSONObject {
+public abstract class Action<T extends Action> extends JSONObject {
 	private static final String KEY_ACTION = "action";
 	private static final String KEY_LABEL = "label";
 
-	public InteractionButton(String json) throws JSONException {
+	public Action(String json) throws JSONException {
 		super(json);
 	}
 
-	public Action getAction() {
-		return Action.parse(optString(KEY_ACTION, "unknown"));
+	public Type getType() {
+		return Type.parse(optString(KEY_ACTION, Type.unknown.name()));
 	}
 
 	public String getLabel() {
 		return optString(KEY_LABEL, null);
 	}
 
-	public static enum Action {
+	public static enum Type {
 		Dismiss,
 		Interaction,
 		unknown;
 
-		public static Action parse(String actionName) {
+		public static Type parse(String name) {
 			try {
-				return Action.valueOf(actionName);
+				return Type.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown InteractionButton.Action: " + actionName);
+				Log.v("Error parsing unknown Action.Type: " + name);
 			}
 			return unknown;
 		}
 	}
 
 	public static class Factory {
-		public static InteractionButton parseInteractionButton(String interactionButtonString) {
+		public static com.apptentive.android.sdk.module.engagement.interaction.model.common.Action parseInteractionAction(String actionString) {
 			try {
-				InteractionButton.Action action = Action.unknown;
-				JSONObject interactionButton = new JSONObject(interactionButtonString);
-				if (interactionButton.has(KEY_ACTION)) {
-					action = Action.parse(interactionButton.getString(KEY_ACTION));
+				Type action = Type.unknown;
+				JSONObject actionObject = new JSONObject(actionString);
+				if (actionObject.has(KEY_ACTION)) {
+					action = Type.parse(actionObject.getString(KEY_ACTION));
 				}
 				switch (action) {
 					case Dismiss:
-						return new DismissInteractionButton(interactionButtonString);
+						return new DismissAction(actionString);
 					case Interaction:
-						return new LaunchInteractionInteractionButton(interactionButtonString);
+						return new LaunchInteractionAction(actionString);
 					case unknown:
 						break;
 				}
@@ -66,5 +66,4 @@ public abstract class InteractionButton<T extends InteractionButton> extends JSO
 			return null;
 		}
 	}
-
 }

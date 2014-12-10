@@ -16,16 +16,16 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class InteractionButtons extends JSONArray {
-	public InteractionButtons(String json) throws JSONException {
+public class InteractionActions extends JSONArray {
+	public InteractionActions(String json) throws JSONException {
 		super(json);
 	}
 
-	public List<InteractionButton> getAsList() {
-		List<InteractionButton> ret = new ArrayList<InteractionButton>();
+	public List<Action> getAsList() {
+		List<Action> ret = new ArrayList<Action>();
 		try {
 			for (int i = 0; i < length(); i++) {
-				InteractionButton button = InteractionButton.Factory.parseInteractionButton(getJSONObject(i).toString());
+				Action button = Action.Factory.parseInteractionAction(getJSONObject(i).toString());
 				if (button != null) {
 					ret.add(button);
 				}
