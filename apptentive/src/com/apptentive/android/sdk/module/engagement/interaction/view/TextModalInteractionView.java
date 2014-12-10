@@ -34,7 +34,17 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 	@Override
 	public void show(final Activity activity) {
 		super.show(activity);
-		activity.setContentView(R.layout.apptentive_textmodal_interaction);
+		switch(interaction.getLayout()) {
+			case center:
+				activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
+				break;
+			case bottom:
+				activity.setContentView(R.layout.apptentive_textmodal_interaction_bottom);
+				break;
+			default:
+				activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
+				break;
+		}
 
 //		EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
 

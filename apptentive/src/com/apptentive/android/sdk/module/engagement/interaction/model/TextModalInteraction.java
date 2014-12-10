@@ -15,7 +15,7 @@ import org.json.JSONException;
  */
 public class TextModalInteraction extends Interaction {
 
-	private static String KEY_TEMPLATE = "template";
+	private static String KEY_LAYOUT = "layout";
 	private static String KEY_TITLE = "title";
 	private static String KEY_BODY = "body";
 	private static String KEY_ACTIONS = "actions";
@@ -29,27 +29,26 @@ public class TextModalInteraction extends Interaction {
 		super(json);
 	}
 
-	public static enum Template {
-		ModalDialog,
-		Toast,
-		Fullscreen,
+	public static enum Layout {
+		center,
+		bottom,
 		unknown;
 
-		public static Template parse(String templateName) {
+		public static Layout parse(String name) {
 			try {
-				return Template.valueOf(templateName);
+				return Layout.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown TextModalInteraction.Template: " + templateName);
+				Log.v("Error parsing unknown TextModalInteraction.Layout: " + name);
 			}
 			return unknown;
 		}
 	}
 
-	public Template getTemplate() {
+	public Layout getLayout() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_TEMPLATE)) {
-				return Template.parse(configuration.getString(KEY_TEMPLATE));
+			if (configuration != null && configuration.has(KEY_LAYOUT)) {
+				return Layout.parse(configuration.getString(KEY_LAYOUT));
 			}
 		} catch (JSONException e) {
 			// Ignore
