@@ -146,8 +146,8 @@ public class ViewActivity extends ApptentiveActivity {
 							finish();
 							Apptentive.showMessageCenter(this);
 							return;
-						case Announcement:
-							view = new AnnouncementInteractionView((AnnouncementInteraction) interaction);
+						case TextModal:
+							view = new TextModalInteractionView((TextModalInteraction) interaction);
 							break;
 						default:
 							break;

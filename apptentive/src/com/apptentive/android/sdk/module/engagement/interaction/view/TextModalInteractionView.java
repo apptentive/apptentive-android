@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.interaction.model.AnnouncementInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.DismissInteractionButton;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionButton;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionInteractionButton;
@@ -25,21 +25,21 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class AnnouncementInteractionView extends InteractionView<AnnouncementInteraction> {
+public class TextModalInteractionView extends InteractionView<TextModalInteraction> {
 
 	private static final String EVENT_NAME_LAUNCH = "launch";
 	private static final String EVENT_NAME_CANCEL = "cancel";
 	private static final String EVENT_NAME_DISMISS = "dismiss";
 	private static final String EVENT_NAME_INTERACTION_CANCEL = "interaction";
 
-	public AnnouncementInteractionView(AnnouncementInteraction interaction) {
+	public TextModalInteractionView(TextModalInteraction interaction) {
 		super(interaction);
 	}
 
 	@Override
 	public void show(final Activity activity) {
 		super.show(activity);
-		activity.setContentView(R.layout.apptentive_announcement_interaction);
+		activity.setContentView(R.layout.apptentive_textmodal_interaction);
 
 //		EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_NAME_LAUNCH);
 

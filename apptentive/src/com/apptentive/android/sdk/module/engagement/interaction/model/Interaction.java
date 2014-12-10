@@ -128,7 +128,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		MessageCenter,
 		AppStoreRating,
 		Survey,
-		Announcement,
+		TextModal,
 		unknown;
 
 		public static Type parse(String type) {
@@ -164,8 +164,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 						return new AppStoreRatingInteraction(interactionString);
 					case Survey:
 						return new SurveyInteraction(interactionString);
-					case Announcement:
-						return new AnnouncementInteraction(interactionString);
+					case TextModal:
+						return new TextModalInteraction(interactionString);
 					case unknown:
 						break;
 				}

@@ -10,19 +10,17 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionButtons;
 import org.json.JSONException;
 
-import java.util.List;
-
 /**
  * @author Sky Kelsey
  */
-public class AnnouncementInteraction extends Interaction {
+public class TextModalInteraction extends Interaction {
 
 	private static String KEY_TEMPLATE = "template";
 	private static String KEY_TITLE = "title";
 	private static String KEY_BODY = "body";
 	private static String KEY_BUTTONS = "buttons";
 
-	public AnnouncementInteraction(String json) throws JSONException {
+	public TextModalInteraction(String json) throws JSONException {
 		super(json);
 	}
 
@@ -36,7 +34,7 @@ public class AnnouncementInteraction extends Interaction {
 			try {
 				return Template.valueOf(templateName);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown AnnouncementInteraction.Template: " + templateName);
+				Log.v("Error parsing unknown TextModalInteraction.Template: " + templateName);
 			}
 			return unknown;
 		}
