@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+~ Please refer to the LICENSE file for the terms and conditions
+~ under which redistribution and use of this file is permitted.
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/apptentive_header_height"
+                style="@style/ApptentiveFullscreenHeader">
+    <ImageView android:id="@+id/back_button"
+               android:layout_width="@dimen/apptentive_header_button_height"
+               android:layout_height="@dimen/apptentive_header_button_height"
+               android:layout_alignParentLeft="true"
+               style="@style/ApptentiveHeaderButton"
+               android:src="@drawable/apptentive_ic_arrow_back_black_24dp"
+               android:contentDescription="Back"/>
+    <TextView android:id="@+id/title"
+              android:layout_width="wrap_content"
+              android:layout_height="fill_parent"
+              android:layout_toRightOf="@id/back_button"
+              android:layout_marginLeft="@dimen/apptentive_header_title_margin_left"
+              android:layout_marginRight="@dimen/apptentive_header_title_margin_right"
+              style="@style/ApptentiveHeaderTitle"
+              android:visibility="gone"/>
+    <TextView android:id="@+id/action"
+              android:layout_width="wrap_content"
+              android:layout_height="@dimen/apptentive_header_button_height"
+              android:layout_alignParentRight="true"
+              style="@style/ApptentiveHeaderButton"
+              android:visibility="gone"/>
+</RelativeLayout>

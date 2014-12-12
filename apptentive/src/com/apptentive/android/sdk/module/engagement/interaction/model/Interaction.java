@@ -129,6 +129,7 @@ public abstract class Interaction extends JSONObject implements Comparable {
 		AppStoreRating,
 		Survey,
 		TextModal,
+		FullscreenHtml,
 		unknown;
 
 		public static Type parse(String type) {
@@ -166,6 +167,8 @@ public abstract class Interaction extends JSONObject implements Comparable {
 						return new SurveyInteraction(interactionString);
 					case TextModal:
 						return new TextModalInteraction(interactionString);
+					case FullscreenHtml:
+						return new FullscreenHtmlInteraction(interactionString);
 					case unknown:
 						break;
 				}
