@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 13
+    compileSdkVersion 15
 
     buildToolsVersion '21.1.1'
 
