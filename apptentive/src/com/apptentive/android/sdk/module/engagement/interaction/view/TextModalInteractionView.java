@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class TextModalInteractionView extends InteractionView<TextModalInteraction> {
 
-	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 25;
+	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 21;
 
 	public TextModalInteractionView(TextModalInteraction interaction) {
 		super(interaction);
@@ -89,8 +89,11 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 			} else if (buttons.size() == 1) {
 				vertical = true;
 			} else {
-				int totalLength = buttons.get(0).getLabel().length() + buttons.get(1).getLabel().length();
-				vertical = totalLength > MAX_TEXT_LENGTH_FOR_TWO_BUTTONS;
+				int totalChars = 0;
+				for (Action button : buttons) {
+					totalChars += button.getLabel().length();
+				}
+				vertical = totalChars > MAX_TEXT_LENGTH_FOR_TWO_BUTTONS;
 			}
 			if (vertical) {
 				Log.e("Setting orientation to VERTICAL");

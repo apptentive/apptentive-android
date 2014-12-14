@@ -382,6 +382,9 @@ public class InteractionsActivity extends ApptentiveActivity {
 			} else if (interactionName.equals("TextModal 2 Long Buttons")) {
 				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredTwoLongButtons.json");
 				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal 2 Really Long Buttons")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredTwoReallyLongButtons.json");
+				interaction = new TextModalInteraction(json);
 			} else if (interactionName.equals("TextModal Colors 1")) {
 				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredCustomColorsOne.json");
 				interaction = new TextModalInteraction(json);

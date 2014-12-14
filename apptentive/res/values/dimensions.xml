@@ -50,7 +50,8 @@
     <dimen name="apptentive_dialog_button_corner_radius">1dp</dimen>
     <dimen name="apptentive_dialog_button_click_area_height">48dp</dimen>
     <dimen name="apptentive_dialog_button_bar_padding_right">12dp</dimen>
-    <dimen name="apptentive_dialog_button_visible_area_height">36dp</dimen>
+    <dimen name="apptentive_dialog_button_visible_area_min_width">64dp</dimen>
+    <dimen name="apptentive_dialog_button_visible_area_min_height">36dp</dimen>
     <dimen name="apptentive_dialog_button_margin_left">4dp</dimen>
     <dimen name="apptentive_dialog_button_margin_right">4dp</dimen>
     <dimen name="apptentive_dialog_button_padding_left">8dp</dimen>

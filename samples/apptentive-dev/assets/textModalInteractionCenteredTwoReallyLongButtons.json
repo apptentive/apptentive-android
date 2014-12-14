@@ -1,0 +1,22 @@
+{
+  "type": "TextModal",
+  "name": "Two Long Button Labels",
+  "id": "textmodal_interaction_centered",
+  "priority": 1,
+  "criteria": {},
+  "configuration": {
+    "layout": "center",
+    "title": "Long Buttons",
+    "body": "These buttons are long, so the system should stack them vertically if it can't fit them horizontally..",
+    "actions": [
+      {
+        "label": "A VERY VERY VERY VERY VERY LONG BUTTON",
+        "action": "Dismiss"
+      },
+      {
+        "label": "ANOTHER VERY VERY VERY LONG BUTTON",
+        "action": "Dismiss"
+      }
+    ]
+  }
+}

@@ -109,12 +109,14 @@
         <item name="android:textSize">@dimen/apptentive_dialog_title_text_2</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/apptentive_dialog_text</item>
+        <item name="android:gravity">left</item>
     </style>
 
     <style name="ApptentiveDialogBody">
         <item name="android:textSize">@dimen/apptentive_dialog_body</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/apptentive_dialog_text</item>
+        <item name="android:gravity">left</item>
     </style>
 
     <style name="ApptentiveDialogBottomArea">
@@ -128,7 +130,8 @@
     <style name="ApptentiveDialogButtonVisibleArea">
         <item name="android:paddingLeft">@dimen/apptentive_dialog_button_padding_left</item>
         <item name="android:paddingRight">@dimen/apptentive_dialog_button_padding_right</item>
-        <item name="android:minWidth">64dp</item>
+        <item name="android:minWidth">@dimen/apptentive_dialog_button_visible_area_min_width</item>
+        <item name="android:minHeight">@dimen/apptentive_dialog_button_visible_area_min_height</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/apptentive_dialog_button</item>
         <item name="android:textStyle">bold</item>

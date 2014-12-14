@@ -33,10 +33,6 @@
     <LinearLayout android:id="@+id/bottom_area"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
-                  android:paddingTop="@dimen/apptentive_dialog_buttons_padding_top"
-                  android:paddingBottom="@dimen/apptentive_dialog_buttons_padding_bottom"
-                  android:paddingRight="12dp"
-                  android:background="@drawable/apptentive_dialog_bottom_area_background"
-                  android:gravity="center_vertical|right"
+                  style="@style/ApptentiveDialogBottomArea"
                   android:orientation="horizontal"/>
 </LinearLayout>
