@@ -397,6 +397,12 @@ public class InteractionsActivity extends ApptentiveActivity {
 			} else if (interactionName.equals("TextModal Bottom")) {
 				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionBottom.json");
 				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal Centered Long Content")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredLongContent.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal Bottom Long Content")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionBottomLongContent.json");
+				interaction = new TextModalInteraction(json);
 			} else if (interactionName.equals("Fullscreen HTML")) {
 				String json = FileUtil.loadTextAssetAsString(this, "fullscreenHtmlInteraction.json");
 				interaction = new FullscreenHtmlInteraction(json);
