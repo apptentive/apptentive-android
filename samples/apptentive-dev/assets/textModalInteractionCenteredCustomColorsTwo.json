@@ -1,0 +1,26 @@
+{
+  "type": "TextModal",
+  "name": "Two Long Button Labels",
+  "id": "textmodal_interaction_centered",
+  "priority": 1,
+  "criteria": {},
+  "configuration": {
+    "layout": "center",
+    "title": "Which is better?",
+    "body": "Android is better than iOS.",
+    "primary_color": "#FFFFFF",
+    "secondary_color": "#FF009933",
+    "text_color": "#FF009933",
+    "button_text_color": "#FFFFFFFF",
+    "actions": [
+      {
+        "label": "AGREE",
+        "action": "Dismiss"
+      },
+      {
+        "label": "DISAGREE",
+        "action": "Dismiss"
+      }
+    ]
+  }
+}

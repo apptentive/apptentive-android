@@ -23,9 +23,15 @@
     </string-array>
 
     <string-array name="interactions">
-        <item>Fullscreen HTML</item>
-        <item>TextModal Centered</item>
+        <item>TextModal 1 Button</item>
+        <item>TextModal 2 Buttons</item>
+        <item>TextModal 3 Buttons</item>
+        <item>TextModal 4 Buttons</item>
+        <item>TextModal 2 Long Buttons</item>
+        <item>TextModal Colors 1</item>
+        <item>TextModal Colors 2</item>
         <item>TextModal Bottom</item>
+        <item>Fullscreen HTML</item>
         <item>Survey</item>
         <item>Working Rating Flow Default Text</item>
         <item>Working Rating Flow Modified Text</item>

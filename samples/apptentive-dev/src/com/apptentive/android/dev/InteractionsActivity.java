@@ -367,8 +367,26 @@ public class InteractionsActivity extends ApptentiveActivity {
 				// Overwrites any existing interactions.
 				InteractionManager.storeInteractions(this, json);
 				Apptentive.engage(this, "init");
-			} else if (interactionName.equals("TextModal Centered")) {
-				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCentered.json");
+			} else if (interactionName.equals("TextModal 1 Button")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredOneButton.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal 2 Buttons")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredTwoButtons.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal 3 Buttons")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredThreeButtons.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal 4 Buttons")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredFourButtons.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal 2 Long Buttons")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredTwoLongButtons.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal Colors 1")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredCustomColorsOne.json");
+				interaction = new TextModalInteraction(json);
+			} else if (interactionName.equals("TextModal Colors 2")) {
+				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionCenteredCustomColorsTwo.json");
 				interaction = new TextModalInteraction(json);
 			} else if (interactionName.equals("TextModal Bottom")) {
 				String json = FileUtil.loadTextAssetAsString(this, "textModalInteractionBottom.json");

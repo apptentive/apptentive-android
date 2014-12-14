@@ -51,10 +51,10 @@ public class FullscreenHtmlInteractionView extends InteractionView<FullscreenHtm
 
 		Action action = interaction.getAction();
 		if (action != null) {
-			TextView actionView = (TextView) activity.findViewById(R.id.action);
-			actionView.setText(action.getLabel());
-			actionView.setVisibility(View.VISIBLE);
-			actionView.setOnClickListener(new View.OnClickListener() {
+			View actionButton = activity.findViewById(R.id.button);
+			((TextView) actionButton.findViewById(R.id.label)).setText(action.getLabel());
+			actionButton.setVisibility(View.VISIBLE);
+			actionButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
 					Log.e("Action.");

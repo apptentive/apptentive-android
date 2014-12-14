@@ -67,4 +67,15 @@
     <color name="apptentive_about_text">#000000</color>
     <color name="apptentive_about_link">#004444</color>
     <color name="apptentive_about_version">#AAAAAA</color>
+
+
+    <color name="apptentive_dialog_primary">#FFFFFFFF</color>
+    <color name="apptentive_dialog_secondary">#FFFFFFFF</color>
+    <color name="apptentive_dialog_text">#FF000000</color>
+    <color name="apptentive_dialog_button_text">#FF22AAFF</color>
+
+    <color name="apptentive_dialog_button_default">#00000000</color>
+    <color name="apptentive_dialog_button_hovered">#44999999</color>
+    <color name="apptentive_dialog_button_focused">#44999999</color>
+    <color name="apptentive_dialog_button_pressed">#66999999</color>
 </resources>
