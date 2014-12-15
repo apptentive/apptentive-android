@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import android.graphics.Color;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionActions;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 /**
@@ -90,7 +91,7 @@ public class TextModalInteraction extends Interaction {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_TEXT_COLOR)) {
 				try {
-					return Color.parseColor(configuration.getString(KEY_TEXT_COLOR));
+					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_TEXT_COLOR));
 				} catch (IllegalArgumentException e) {
 					// Return null
 				}
@@ -106,7 +107,7 @@ public class TextModalInteraction extends Interaction {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_BUTTON_TEXT_COLOR)) {
 				try {
-					return Color.parseColor(configuration.getString(KEY_BUTTON_TEXT_COLOR));
+					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_BUTTON_TEXT_COLOR));
 				} catch (IllegalArgumentException e) {
 					// Return null
 				}
@@ -122,7 +123,7 @@ public class TextModalInteraction extends Interaction {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_PRIMARY_COLOR)) {
 				try {
-					return Color.parseColor(configuration.getString(KEY_PRIMARY_COLOR));
+					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_PRIMARY_COLOR));
 				} catch (IllegalArgumentException e) {
 					// Return null
 				}
@@ -138,7 +139,7 @@ public class TextModalInteraction extends Interaction {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_SECONDARY_COLOR)) {
 				try {
-					return Color.parseColor(configuration.getString(KEY_SECONDARY_COLOR));
+					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_SECONDARY_COLOR));
 				} catch (IllegalArgumentException e) {
 					// Return null
 				}

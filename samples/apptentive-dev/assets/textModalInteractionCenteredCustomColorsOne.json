@@ -8,10 +8,10 @@
     "layout": "center",
     "title": "Which is better?",
     "body": "Android is better than iOS.",
-    "primary_color": "#FF009933",
+    "primary_color": "#009933FF",
     "secondary_color": "#FFFFFFFF",
     "text_color": "#FFFFFFFF",
-    "button_text_color": "#FF009933",
+    "button_text_color": "#009933",
     "actions": [
       {
         "label": "AGREE",

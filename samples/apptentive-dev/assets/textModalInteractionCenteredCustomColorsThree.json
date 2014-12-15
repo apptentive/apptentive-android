@@ -9,8 +9,8 @@
     "title": "How does this look?",
     "body": "What about when we use long button labels while we are also applying custom colors?",
     "primary_color": "#FFFFFF",
-    "secondary_color": "#FF009933",
-    "text_color": "#FF009933",
+    "secondary_color": "#009933",
+    "text_color": "#009933FF",
     "button_text_color": "#FFFFFFFF",
     "actions": [
       {
