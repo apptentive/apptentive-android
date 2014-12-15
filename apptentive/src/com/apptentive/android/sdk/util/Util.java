@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
@@ -187,7 +188,6 @@ public class Util {
 		}
 	}
 
-	// TODO: Use reflection to load this so we can drop 2.1 API requirement?
 	private static Account getAccount(AccountManager accountManager) {
 		Account account = null;
 		try {
@@ -391,5 +391,23 @@ public class Util {
 			Log.w("Error getting major OS version", e);
 		}
 		return -1;
+	}
+
+	/**
+	 * The web standard for colors is RGBA, but Android uses ARGB. This method provides a way to convert RGBA to ARGB.
+	 */
+	public static Integer parseWebColorAsAndroidColor(String input) {
+		// Swap if input is #RRGGBBAA, but not if it is #RRGGBB
+		Boolean swapAlpha = (input.length() == 9);
+		try {
+			Integer ret = Color.parseColor(input);
+			if (swapAlpha) {
+				ret = (ret >>> 8) | ((ret & 0x000000FF) << 24);
+			}
+			return ret;
+		} catch (IllegalArgumentException e) {
+			//
+		}
+		return null;
 	}
 }
