@@ -1,0 +1,11 @@
+{
+  "priority": 1,
+  "criteria": {
+    "interactions/enjoyment_dialog_interaction_1234567890/invokes/total": 0
+  },
+  "id": "enjoyment_dialog_interaction_1234567890",
+  "type": "EnjoymentDialog",
+  "configuration": {
+  }
+}
+

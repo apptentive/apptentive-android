@@ -23,6 +23,13 @@
     </string-array>
 
     <string-array name="interactions">
+        <item>Upgrade Message With Branding</item>
+        <item>Upgrade Message No Branding</item>
+        <item>Enjoyment Dialog</item>
+        <item>Rating Dialog</item>
+        <item>App Store Rating</item>
+        <item>Feedback Dialog</item>
+        <item>Survey</item>
         <item>TextModal 1 Button</item>
         <item>TextModal 2 Buttons</item>
         <item>TextModal 3 Buttons</item>
@@ -36,16 +43,6 @@
         <item>TextModal Centered Long Content</item>
         <item>TextModal Bottom Long Content</item>
         <item>Fullscreen HTML</item>
-        <item>Survey</item>
-        <item>Working Rating Flow Default Text</item>
-        <item>Working Rating Flow Modified Text</item>
-        <item>Feedback Dialog</item>
-        <item>Rating Dialog</item>
-        <item>App Store Rating</item>
-        <item>Enjoyment Dialog</item>
-        <item>UpgradeMessage real example</item>
-        <item>UpgradeMessage exercise with branding</item>
-        <item>UpgradeMessage exercise no branding</item>
     </string-array>
 
     <string-array name="attachment_files">

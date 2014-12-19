@@ -1,0 +1,177 @@
+{
+  "interactions":[
+    {
+      "id":"545bdac249f63bbd8b000235",
+      "type":"EnjoymentDialog",
+      "version":1,
+      "configuration":{
+        "title":"Do you love Apptentive?",
+        "yes_text":"Yes",
+        "no_text":"No"
+      }
+    },
+    {
+      "id":"545bdac349f63bbd8b000239",
+      "type":"RatingDialog",
+      "version":1,
+      "configuration":{
+        "title":"Thank You",
+        "body":"We're so happy to hear that you love Apptentive! It'd be really helpful if you rated us. Thanks so much for spending some time with us.",
+        "rate_text":"Rate Apptentive",
+        "remind_text":"Remind Me Later",
+        "decline_text":"No thanks"
+      }
+    },
+    {
+      "id":"545bdac549f63bbd8b00023d",
+      "type":"FeedbackDialog",
+      "configuration":{
+        "enable_message_center":true,
+        "thank_you_body":"Your response has been saved in the Message Center, where you'll be able to view replies and send us other messages.",
+        "title":"Thanks for your feedback!",
+        "body":"Please let us know how to make Apptentive better for you!",
+        "email_hint_text":"Your Email Address",
+        "message_hint_text":"Tell us how we can help. (required)",
+        "decline_text":"No thanks",
+        "submit_text":"Send",
+        "thank_you_title":"Thanks!",
+        "thank_you_close_text":"Close",
+        "thank_you_view_messages_text":"View Messages",
+        "ask_for_email":true,
+        "email_required":false
+      }
+    },
+    {
+      "id":"545bdac549f63bbd8b00023f",
+      "type":"MessageCenter"
+    },
+    {
+      "id":"545bdac749f63bbd8b000241",
+      "type":"AppStoreRating",
+      "configuration":{
+        "method":"app_store",
+        "store_id":"SoundEmulator.English"
+      }
+    },
+    {
+      "id":"548cc5dd49f63bb5c2000001",
+      "type":"TextModal",
+      "configuration":{
+        "layout":"center",
+        "text_color":"#000000",
+        "primary_color":"#ffffff",
+        "secondary_color":"#ffffff",
+        "button_text_color":"#333333",
+        "actions":[
+          {
+            "label":"Send feedback",
+            "action":"interaction",
+            "invokes":[
+              {
+                "interaction_id":"545bdac549f63bbd8b00023f",
+                "criteria":{
+
+                }
+              }
+            ]
+          },
+          {
+            "label":"Take survey",
+            "action":"interaction",
+            "invokes":[
+              {
+                "interaction_id":"521bb07c4712c72e4e000005",
+                "criteria":{
+                  "time_since_install/total":{
+                    "$gte":604800
+                  }
+                }
+              },
+              {
+                "interaction_id":"548cc5667724c51ebe000002",
+                "criteria":{
+
+                }
+              }
+            ]
+          },
+          {
+            "label":"Dismiss",
+            "action":"dismiss"
+          }
+        ]
+      }
+    }
+  ],
+  "targets":{
+    "local#app#init":[
+      {
+        "interaction_id":"545bdac349f63bbd8b000239",
+        "criteria":{
+          "interactions/545bdac349f63bbd8b000239/invokes/version":{
+            "$gt":0,
+            "$lte":1
+          },
+          "code_point/rating_dialog.rate/invokes/total":0,
+          "code_point/rating_dialog.decline/invokes/total":0,
+          "code_point/rating_dialog.remind/invokes/time_ago":{
+            "$gte":432000
+          }
+        }
+      },
+      {
+        "interaction_id":"545bdac249f63bbd8b000235",
+        "criteria":{
+          "interactions/545bdac249f63bbd8b000235/invokes/version":0,
+          "$or":[
+            {
+              "time_since_install/total":{
+                "$gte":259200
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "com.apptentive#EnjoymentDialog#yes":[
+      {
+        "interaction_id":"545bdac349f63bbd8b000239",
+        "criteria":{
+
+        }
+      }
+    ],
+    "com.apptentive#EnjoymentDialog#no":[
+      {
+        "interaction_id":"545bdac549f63bbd8b00023d",
+        "criteria":{
+
+        }
+      }
+    ],
+    "com.apptentive#FeedbackDialog#view_messages":[
+      {
+        "interaction_id":"545bdac549f63bbd8b00023f",
+        "criteria":{
+
+        }
+      }
+    ],
+    "com.apptentive#RatingDialog#rate":[
+      {
+        "interaction_id":"545bdac749f63bbd8b000241",
+        "criteria":{
+
+        }
+      }
+    ],
+    "local#app#message":[
+      {
+        "interaction_id":"548cc5dd49f63bb5c2000001",
+        "criteria":{
+          "interactions/548cc5dd49f63bb5c2000001/invokes/total":0
+        }
+      }
+    ]
+  }
+}
