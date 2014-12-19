@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -81,8 +80,8 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		}
 
 		LayoutInflater inflater = activity.getLayoutInflater();
-		List<Action> buttons = interaction.getInteractionButtons().getAsList();
-		boolean vertical = false;
+		List<Action> buttons = interaction.getActions().getAsList();
+		boolean vertical;
 		if (buttons != null && !buttons.isEmpty()) {
 			if (buttons.size() > 4) {
 				vertical = true;
@@ -113,7 +112,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 					buttonTextView.setTextColor(buttonTextColor);
 				}
 				switch (button.getType()) {
-					case Dismiss:
+					case dismiss:
 						buttonView.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
@@ -123,7 +122,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 							}
 						});
 						break;
-					case Interaction:
+					case interaction:
 						buttonView.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {

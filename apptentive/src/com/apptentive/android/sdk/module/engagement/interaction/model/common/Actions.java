@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class InteractionActions extends JSONArray {
-	public InteractionActions(String json) throws JSONException {
+public class Actions extends JSONArray {
+	public Actions(String json) throws JSONException {
 		super(json);
 	}
 
@@ -25,7 +25,7 @@ public class InteractionActions extends JSONArray {
 		List<Action> ret = new ArrayList<Action>();
 		try {
 			for (int i = 0; i < length(); i++) {
-				Action button = Action.Factory.parseInteractionAction(getJSONObject(i).toString());
+				Action button = Action.Factory.parseAction(getJSONObject(i).toString());
 				if (button != null) {
 					ret.add(button);
 				}

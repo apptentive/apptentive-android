@@ -6,9 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.graphics.Color;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.InteractionActions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -17,14 +16,14 @@ import org.json.JSONException;
  */
 public class TextModalInteraction extends Interaction {
 
-	private static String KEY_LAYOUT = "layout";
-	private static String KEY_TITLE = "title";
-	private static String KEY_BODY = "body";
-	private static String KEY_TEXT_COLOR = "text_color";
-	private static String KEY_BUTTON_TEXT_COLOR = "button_text_color";
-	private static String KEY_PRIMARY_COLOR = "primary_color";
-	private static String KEY_SECONDARY_COLOR = "secondary_color";
-	private static String KEY_ACTIONS = "actions";
+	private static final String KEY_LAYOUT = "layout";
+	private static final String KEY_TITLE = "title";
+	private static final String KEY_BODY = "body";
+	private static final String KEY_TEXT_COLOR = "text_color";
+	private static final String KEY_BUTTON_TEXT_COLOR = "button_text_color";
+	private static final String KEY_PRIMARY_COLOR = "primary_color";
+	private static final String KEY_SECONDARY_COLOR = "secondary_color";
+	private static final String KEY_ACTIONS = "actions";
 
 	public static final String EVENT_NAME_LAUNCH = "launch";
 	public static final String EVENT_NAME_CANCEL = "cancel";
@@ -150,11 +149,11 @@ public class TextModalInteraction extends Interaction {
 		return null;
 	}
 
-	public InteractionActions getInteractionButtons() {
+	public Actions getActions() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_ACTIONS)) {
-				return new InteractionActions(configuration.getString(KEY_ACTIONS));
+				return new Actions(configuration.getString(KEY_ACTIONS));
 			}
 		} catch (JSONException e) {
 			// Ignore

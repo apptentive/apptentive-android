@@ -54,7 +54,7 @@ public class FullscreenHtmlInteraction extends Interaction {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && !configuration.isNull(KEY_ACTION)) {
-				return Action.Factory.parseInteractionAction(configuration.getString(KEY_ACTION));
+				return Action.Factory.parseAction(configuration.getString(KEY_ACTION));
 			}
 		} catch (JSONException e) {
 			// Ignore

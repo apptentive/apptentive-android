@@ -30,8 +30,8 @@ public abstract class Action<T extends Action> extends JSONObject {
 	}
 
 	public static enum Type {
-		Dismiss,
-		Interaction,
+		dismiss,
+		interaction,
 		unknown;
 
 		public static Type parse(String name) {
@@ -45,7 +45,7 @@ public abstract class Action<T extends Action> extends JSONObject {
 	}
 
 	public static class Factory {
-		public static com.apptentive.android.sdk.module.engagement.interaction.model.common.Action parseInteractionAction(String actionString) {
+		public static com.apptentive.android.sdk.module.engagement.interaction.model.common.Action parseAction(String actionString) {
 			try {
 				Type action = Type.unknown;
 				JSONObject actionObject = new JSONObject(actionString);
@@ -53,9 +53,9 @@ public abstract class Action<T extends Action> extends JSONObject {
 					action = Type.parse(actionObject.getString(KEY_ACTION));
 				}
 				switch (action) {
-					case Dismiss:
+					case dismiss:
 						return new DismissAction(actionString);
-					case Interaction:
+					case interaction:
 						return new LaunchInteractionAction(actionString);
 					case unknown:
 						break;
