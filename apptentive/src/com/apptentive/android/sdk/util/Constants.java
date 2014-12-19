@@ -55,7 +55,8 @@ public class Constants {
 
 	// Engagement
 	public static final String PREF_KEY_INTERACTIONS = "interactions";
-	public static final String PREF_KEY_INTERACTIONS_CACHE_EXPIRATION = "interactionsCacheExpiration";
+	public static final String PREF_KEY_TARGETS = "targets";
+	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
 	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 
 	// Config Defaults

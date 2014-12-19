@@ -45,7 +45,7 @@ public class ApptentiveClient {
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
-	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
+	private static final String ENDPOINT_BASE = "https://api.apptentive-beta.com";
 	private static final String ENDPOINT_CONVERSATION = ENDPOINT_BASE + "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";

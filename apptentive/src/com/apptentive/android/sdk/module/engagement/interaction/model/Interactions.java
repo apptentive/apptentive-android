@@ -7,43 +7,62 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.Log;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Sky Kelsey
  */
 public class Interactions extends JSONObject {
-	private static final String KEY_INTERACTIONS = "interactions";
+	public static final String KEY_NAME = "interactions";
+
+	public Interactions() throws JSONException {
+		super();
+	}
 
 	public Interactions(String json) throws JSONException {
 		super(json);
 	}
 
-	public List<Interaction> getInteractionList(String eventLabel) {
-		List<Interaction> list = new ArrayList<Interaction>();
+	public void putInteraction(String id, Interaction interaction) throws JSONException {
+		put(id, interaction);
+	}
+
+	public Interaction getInteraction(String id) {
 		try {
-			JSONObject interactions = getJSONObject(KEY_INTERACTIONS);
-			if (!interactions.isNull(eventLabel)) {
-				JSONArray interactionsForEventLabel = interactions.getJSONArray(eventLabel);
-				for (int i = 0; i < interactionsForEventLabel.length(); i++) {
-					String interactionString = interactionsForEventLabel.getJSONObject(i).toString();
-					Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
-					if (interaction != null) {
-						list.add(interaction);
-					}
-				}
+			if (!isNull(id)) {
+				return Interaction.Factory.parseInteraction(getJSONObject(id).toString());
 			}
 		} catch (JSONException e) {
 			Log.w("Exception parsing interactions array.", e);
 		}
-		// Sort list by Priority
-		Collections.sort(list);
-		return list;
+		return null;
+	}
+
+	public List<Interaction> getInteractionList() {
+		List<Interaction> ret = new ArrayList<Interaction>();
+		Iterator<String> keys = (Iterator<String>) keys();
+		while (keys.hasNext()) {
+			String key = keys.next();
+			JSONObject interactionObject = optJSONObject(key);
+			if (interactionObject != null) {
+				Interaction interaction = Interaction.Factory.parseInteraction(interactionObject.toString());
+				if (interaction != null) {
+					ret.add(interaction);
+				}
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Returns true if the data that was loaded into this object is from an old style interactions payload.
+	 */
+	private boolean isLegacyInteractions() {
+		return !isNull(KEY_NAME);
 	}
 }

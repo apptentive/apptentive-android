@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionsPayload;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -24,6 +26,38 @@ import java.util.List;
  * @author Sky Kelsey
  */
 public class InteractionManager {
+
+	private static Interactions interactions;
+	private static Targets targets;
+
+	public static Interactions getInteractions(Context context) {
+		if (interactions == null) {
+			loadInteractions(context);
+		}
+		return interactions;
+	}
+
+	public static Targets getTargets(Context context) {
+		if (targets == null) {
+			loadTargets(context);
+		}
+		return targets;
+	}
+
+	public static Interaction getApplicableInteraction(Context context, String eventLabel) {
+
+		Targets targets = getTargets(context);
+
+		// TODO: Check with Interaction to see if it can run. Otherwise, put that check in the criteria?
+		if (targets != null) {
+			String interactionId = targets.getApplicableInteraction(context, eventLabel);
+			if (interactionId != null) {
+				Interactions interactions = getInteractions(context);
+				return interactions.getInteraction(interactionId);
+			}
+		}
+		return null;
+	}
 
 	public static void asyncFetchAndStoreInteractions(final Context context) {
 
@@ -49,11 +83,11 @@ public class InteractionManager {
 		}
 	}
 
-	public static void fetchAndStoreInteractions(Context context) {
+	private static void fetchAndStoreInteractions(Context context) {
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
 		if (response != null && response.isSuccessful()) {
-			String interactionsString = response.getContent();
+			String interactionsPayloadString = response.getContent();
 
 			// Store new integration cache expiration.
 			String cacheControl = response.getHeaders().get("Cache-Control");
@@ -62,30 +96,47 @@ public class InteractionManager {
 				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
 			}
 			updateCacheExpiration(context, cacheSeconds);
-			storeInteractions(context, interactionsString);
+			storeInteractionsPayloadString(context, interactionsPayloadString);
 		}
 	}
 
-	public static Interaction getApplicableInteraction(Context context, String eventLabel) {
-		Interactions interactions = loadInteractions(context);
-		if (interactions != null) {
-			List<Interaction> list = interactions.getInteractionList(eventLabel);
-			for (Interaction interaction : list) {
-				if (interaction.canRun(context)) {
-					return interaction;
-				}
+	/**
+	 * Made public for testing. There is no other reason to use this method directly.
+	 */
+	public static void storeInteractionsPayloadString(Context context, String interactionsPayloadString) {
+		try {
+			InteractionsPayload payload = new InteractionsPayload(interactionsPayloadString);
+			Interactions interactions = payload.getInteractions();
+			Targets targets = payload.getTargets();
+			if (interactions != null && targets != null) {
+				InteractionManager.interactions = interactions;
+				InteractionManager.targets = targets;
+				saveInteractions(context);
+				saveTargets(context);
+			} else {
+				Log.e("Unable to save payloads.");
 			}
+		} catch (JSONException e) {
+			Log.w("Invalid InteractionsPayload received.");
 		}
-		return null;
 	}
 
-	private static String loadInteractionsString(Context context) {
+	public static void clear(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		return prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
+		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).commit();
+		prefs.edit().remove(Constants.PREF_KEY_TARGETS).commit();
+		interactions = null;
+		targets = null;
 	}
 
-	public static Interactions loadInteractions(Context context) {
-		String interactionsString = loadInteractionsString(context);
+	private static void saveInteractions(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).commit();
+	}
+
+	private static Interactions loadInteractions(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String interactionsString = prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 		if (interactionsString != null) {
 			try {
 				return new Interactions(interactionsString);
@@ -96,23 +147,33 @@ public class InteractionManager {
 		return null;
 	}
 
-	/**
-	 * Made public for testing. There is no other reason to use this method directly.
-	 */
-	public static void storeInteractions(Context context, String interactionsString) {
+	private static void saveTargets(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactionsString).commit();
+		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).commit();
+	}
+
+	private static Targets loadTargets(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String targetsString = prefs.getString(Constants.PREF_KEY_TARGETS, null);
+		if (targetsString != null) {
+			try {
+				return new Targets(targetsString);
+			} catch (JSONException e) {
+				Log.w("Exception creating Targets object.", e);
+			}
+		}
+		return null;
 	}
 
 	private static boolean hasCacheExpired(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		long expiration = prefs.getLong(Constants.PREF_KEY_INTERACTIONS_CACHE_EXPIRATION, 0);
+		long expiration = prefs.getLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, 0);
 		return expiration < System.currentTimeMillis();
 	}
 
 	private static void updateCacheExpiration(Context context, long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_CACHE_EXPIRATION, expiration).commit();
+		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();
 	}
 }
