@@ -1,8 +1,16 @@
 {
-  "interactions": {
+  "interactions": [
+    {
+      "id": "53348cd049f63b5bdd000006",
+      "type": "EnjoymentDialog",
+      "configuration": {
+      }
+    }
+  ],
+  "targets": {
     "local#app#init": [
       {
-        "priority": 8,
+        "interaction_id": "53348cd049f63b5bdd000006",
         "criteria": {
           "$or": [
             {
@@ -18,10 +26,6 @@
               }
             }
           ]
-        },
-        "id": "53348cd049f63b5bdd000006",
-        "type": "EnjoymentDialog",
-        "configuration": {
         }
       }
     ]

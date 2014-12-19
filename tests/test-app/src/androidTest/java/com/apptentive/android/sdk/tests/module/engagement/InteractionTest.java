@@ -19,10 +19,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Note: Right now, these tests need versionName and versionCode in the manifest to be "2.0" and 4", respectively.
@@ -33,8 +31,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
-	public void testInteractionSavingAndLoading() {
-		Log.e("Running test: testCriteriaDaysSinceInstall()\n\n");
+	public void testInteractionInvocationStorage() {
+		Log.e("Running test: testInteractionInvocationStorage()\n\n");
 		resetDevice();
 		final String testInteraction = "test.interaction";
 		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.0", 1);
@@ -86,252 +84,105 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	public void testCriteriaTimeSinceInstall() {
 		Log.e("Running test: testCriteriaTimeSinceInstall()\n\n");
-		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaTimeSinceInstall.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaTimeSinceInstall.json");
 
-		assertNotNull("Failed to parse Interactions.", interactionsList);
-
-		boolean canRun;
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 4);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 2.8);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 1);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
-
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 4);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "1.1", Util.currentTimeSeconds() - 4);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 5, "2.0", Util.currentTimeSeconds() - 2.8);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "1.1", Util.currentTimeSeconds() - 2.8);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 5, "2.0", Util.currentTimeSeconds() - 1);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
-
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 4);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "2.0", Util.currentTimeSeconds() - 4);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 2.8);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "2.0", Util.currentTimeSeconds() - 2.8);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 1);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		Log.e("Finished test.");
 	}
 
-	/**
-	 * Tests to make sure application_version is interpreted as a string. Never runs.
-	 */
-	private static final String TEST_CRITERIA__APPLICATION_VERSION_1 =
-		"{\n" +
-			"    \"interactions\": {\n" +
-			"        \"app.launch\": [\n" +
-			"            {\n" +
-			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-			"                \"priority\": 1,\n" +
-			"                \"criteria\": {\n" +
-			"                    \"application_version\": \"2\"\n" +
-			"                },\n" +
-			"                \"type\": \"UpgradeMessage\",\n" +
-			"                \"version\": null,\n" +
-			"                \"active\": true,\n" +
-			"                \"configuration\": {\n" +
-			"                    \"active\": true,\n" +
-			"                    \"app_version\": \"2\",\n" +
-			"                    \"show_app_icon\": true,\n" +
-			"                    \"show_powered_by\": true,\n" +
-			"                    \"body\": \"\"\n" +
-			"                }\n" +
-			"            }\n" +
-			"        ]\n" +
-			"    }\n" +
-			"}";
-
-	public void testCriteriaApplicationVersion1() {
-		Log.e("Running test: testCriteriaApplicationVersion1()\n\n");
-		resetDevice();
-		Interactions interactionsList = null;
-		try {
-			interactionsList = new Interactions(TEST_CRITERIA__APPLICATION_VERSION_1);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-			assertNotNull("Failed to parse Interactions.", interactionsList);
-
-			Interaction interaction = interactionsForCodePoint.get(0);
-
-			boolean canRun = interaction.canRun(getTargetContext());
-			assertFalse(canRun);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
-		Log.e("Finished test.");
-	}
-
-	/**
-	 * Tests app application_version. Never runs.
-	 */
-	private static final String TEST_CRITERIA__APPLICATION_VERSION_2 =
-		"{\n" +
-			"    \"interactions\": {\n" +
-			"        \"app.launch\": [\n" +
-			"            {\n" +
-			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-			"                \"priority\": 1,\n" +
-			"                \"criteria\": {\n" +
-			"                    \"application_version\": \"2.1\"\n" +
-			"                },\n" +
-			"                \"type\": \"UpgradeMessage\",\n" +
-			"                \"version\": null,\n" +
-			"                \"active\": true,\n" +
-			"                \"configuration\": {\n" +
-			"                    \"active\": true,\n" +
-			"                    \"app_version\": \"2\",\n" +
-			"                    \"show_app_icon\": true,\n" +
-			"                    \"show_powered_by\": true,\n" +
-			"                    \"body\": \"\"\n" +
-			"                }\n" +
-			"            }\n" +
-			"        ]\n" +
-			"    }\n" +
-			"}";
-
-	public void testCriteriaApplicationVersion2() {
-		Log.e("Running test: testCriteriaApplicationVersion2()\n\n");
-		resetDevice();
-		Interactions interactionsList = null;
-		try {
-			interactionsList = new Interactions(TEST_CRITERIA__APPLICATION_VERSION_2);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-			assertNotNull("Failed to parse Interactions.", interactionsList);
-
-			Interaction interaction = interactionsForCodePoint.get(0);
-
-			boolean canRun = interaction.canRun(getTargetContext());
-			assertFalse(canRun);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
-		Log.e("Finished test.");
-	}
-
-	public void testCriteriaApplicationVersion3() {
-		Log.e("Running test: testCriteriaApplicationVersion3()\n\n");
-		resetDevice();
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
-
-		Interaction interaction = interactionsForCodePoint.get(0);
-
-		boolean canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
-		Log.e("Finished test.");
-	}
-
-	/**
-	 * Tests application_build. Never Runs.
-	 */
-	private static final String TEST_CRITERIA__APPLICATION_BUILD_1 =
-		"{\n" +
-			"    \"interactions\": {\n" +
-			"        \"app.launch\": [\n" +
-			"            {\n" +
-			"                \"id\": \"528d14854712c7bfd7000002\",\n" +
-			"                \"priority\": 1,\n" +
-			"                \"criteria\": {\n" +
-			"                    \"application_build\": 3\n" +
-			"                },\n" +
-			"                \"type\": \"UpgradeMessage\",\n" +
-			"                \"version\": null,\n" +
-			"                \"active\": true,\n" +
-			"                \"configuration\": {\n" +
-			"                    \"active\": true,\n" +
-			"                    \"app_version\": \"2\",\n" +
-			"                    \"show_app_icon\": true,\n" +
-			"                    \"show_powered_by\": true,\n" +
-			"                    \"body\": \"\"\n" +
-			"                }\n" +
-			"            }\n" +
-			"        ]\n" +
-			"    }\n" +
-			"}";
-
-	public void testCriteriaApplicationBuild1() {
-		Log.e("Running test: testCriteriaApplicationBuild1()\n\n");
-		resetDevice();
-		Interactions interactionsList = null;
-		try {
-			interactionsList = new Interactions(TEST_CRITERIA__APPLICATION_BUILD_1);
-			List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-			assertNotNull("Failed to parse Interactions.", interactionsList);
-
-			Interaction interaction = interactionsForCodePoint.get(0);
-
-			boolean canRun = interaction.canRun(getTargetContext());
-			assertFalse(canRun);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
-		Log.e("Finished test.");
-	}
-
-	public void testCriteriaApplicationBuild2() {
-		Log.e("Running test: testCriteriaApplicationBuild2()\n\n");
+	public void testCriteriaApplicationVersionAndBuild() {
+		Log.e("Running test: testCriteriaApplicationVersionAndBuild()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaApplicationBuild2.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaApplicationVersionAndBuild.json");
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
-		boolean canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
+
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
+
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
+
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
+
 		Log.e("Finished test.");
 	}
 
@@ -342,120 +193,123 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testCriteriaCodePointInvokesTotal()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTotal.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaCodePointInvokesTotal.json");
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		// 0 - $gt
-		boolean canRun = interaction.canRun(getTargetContext());
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gt");
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 1 - $gte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 2 - $ne
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $ne");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 3 - $eq
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $eq");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 4 - :
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test :");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 5 - $lte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 6 - $lt
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lt");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
@@ -463,17 +317,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		Log.e("Finished test.");
 	}
 
@@ -482,126 +336,129 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	 */
 	public void testCriteriaCodePointInvokesVersion() {
 		Log.e("Running test: testCriteriaCodePointInvokesVersion()\n\n");
-		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesVersion.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaCodePointInvokesVersion.json");
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		// 0 - $gt
-		boolean canRun = interaction.canRun(getTargetContext());
+		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
 		Log.e("Test $gt");
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-		assertFalse(canRun);
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 1 - $gte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 2 - $ne
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $ne");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 3 - $eq
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $eq");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 4 - :
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test :");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 5 - $lte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 6 - $lt
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lt");
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
@@ -613,17 +470,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		Log.e("Finished test.");
 	}
@@ -633,126 +490,129 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	 */
 	public void testCriteriaCodePointInvokesBuild() {
 		Log.e("Running test: testCriteriaCodePointInvokesBuild()\n\n");
-		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesBuild.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaCodePointInvokesBuild.json");
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		// 0 - $gt
-		boolean canRun = interaction.canRun(getTargetContext());
+		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gt");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-		assertFalse(canRun);
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 1 - $gte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 2 - $ne
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $ne");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 3 - $eq
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $eq");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 4 - :
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test :");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 5 - $lte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 6 - $lt
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lt");
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 		CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
@@ -764,17 +624,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		Log.e("Finished test.");
 	}
@@ -785,127 +645,130 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	public void testCriteriaCodePointInvokesTimeAgo() {
 		Log.e("Running test: testCriteriaCodePointInvokesTimeAgo()\n\n");
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaCodePointInvokesTimeAgo.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaCodePointInvokesTimeAgo.json");
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		// 0 - $gt
 		resetDevice();
-		boolean canRun = interaction.canRun(getTargetContext());
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gt");
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 1 - $gte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 2 - $ne
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $ne");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 3 - $eq // There's no easy way to test this unless we contrive the times.
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $eq");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 4 - : // Ditto
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test :");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 5 - $lte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 6 - $lt
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lt");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
@@ -913,18 +776,18 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		sleep(300);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		Log.e("Finished test.");
 	}
@@ -938,120 +801,123 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		String appVersionName = Util.getAppVersionName(getTargetContext());
 		int appVersionCode = Util.getAppVersionCode(getTargetContext());
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCriteriaInteractionInvokesTotal.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactionsList = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactionsList.getInteractionList("app.launch");
-		assertNotNull("Failed to parse Interactions.", interactionsList);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaInteractionInvokesTotal.json");
 
-		Interaction interaction = interactionsForCodePoint.get(0);
+		Interaction interaction;
 
 		// 0 - $gt
-		boolean canRun = interaction.canRun(getTargetContext());
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gt");
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 1 - $gte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $gte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 2 - $ne
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $ne");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 
 		// 3 - $eq
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $eq");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 4 - :
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test :");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 5 - $lte
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lte");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		// 6 - $lt
 		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		Log.e("Test $lt");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
@@ -1059,17 +925,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNotNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 		CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
-		canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		assertNull(interaction);
 
 		Log.e("Finished test.");
 	}
@@ -1077,28 +943,27 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 	public void testListOfVariousInteractions() {
 		Log.e("Running test: testListOfVariousInteractions()\n\n");
-		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
-		List<Interaction> interactionsForCodePoint = interactions.getInteractionList("complex_criteria");
-		assertNotNull("Failed to parse interactions.", interactions);
-		Interaction interaction = interactionsForCodePoint.get(0);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+
+		resetDevice();
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		Interaction interaction;
+
 
 		// Conditions are not met yet.
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 0, "1.0", Util.currentTimeSeconds() - (DateUtils.DAY_IN_MILLIS / 1000 * 10)); // 10 days ago
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 1, "1.1", Util.currentTimeSeconds() - (DateUtils.DAY_IN_MILLIS / 1000 * 8));  //  8 days ago
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 2, "1.2", Util.currentTimeSeconds() - (DateUtils.DAY_IN_MILLIS / 1000 * 6));  //  6 days ago
 		//CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		boolean canRun = interaction.canRun(getTargetContext());
-		assertFalse(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+		assertNull(interaction);
 
 		// Allow it to run.
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - (DateUtils.DAY_IN_MILLIS / 1000 * 2));  //  2 days ago
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		canRun = interaction.canRun(getTargetContext());
-		assertTrue(canRun);
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+		assertNotNull(interaction);
 
 		Log.e("Finished test.");
 	}
@@ -1112,12 +977,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
-		assertNotNull("Failed to parse interactions.", interactions);
-		List<Interaction> interactionsForCodePoint = interactions.getInteractionList("complex_criteria");
-		Interaction interaction = interactionsForCodePoint.get(0);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
@@ -1127,8 +988,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			boolean canRun = interaction.getCriteria().isMet(getTargetContext());
-			assertTrue(canRun);
+			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+			assertNotNull(interaction);
 		}
 		long end = System.currentTimeMillis();
 
@@ -1147,8 +1008,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
@@ -1178,7 +1039,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 		final int iterations = 20;
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testListOfVariousInteractions.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
 
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
@@ -1190,7 +1051,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		for (int i = 0; i < iterations; i++) {
 			resetDevice();
 			VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
-			InteractionManager.storeInteractions(getTargetContext(), json);
+			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
 			assertNotNull(interaction);
 		}
@@ -1225,9 +1086,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testSelectionWithInteractionIdUsedInCriteria.json");
-
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testSelectionWithInteractionIdUsedInCriteria.json");
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
 		assertNull(interaction);
@@ -1245,9 +1105,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testInteractionPriority()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testInteractionPriority.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testInteractionPriority.json");
 
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
 		assertNotNull(interaction);
@@ -1272,9 +1132,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testMissingNullEmptyCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testMissingNullEmptyCriteria.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testMissingNullEmptyCriteria.json");
 
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
 		assertNull(interaction);
@@ -1284,44 +1144,35 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.3");
 		assertNotNull(interaction);
-		assertTrue(interaction.canRun(getTargetContext()));
 	}
 
 	public void testBadCriteria() {
 		Log.e("Running test: testBadCriteria()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testBadCriteria.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testBadCriteria.json");
 
-
-		Interaction interaction = null;
+		Interaction interaction;
 		try {
-			Interactions interactions = new Interactions(json);
+			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
-			interaction = interactions.getInteractionList("code.point.1").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+			assertNull(interaction);
 
-			interaction = interactions.getInteractionList("code.point.2").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
+			assertNull(interaction);
 
-			interaction = interactions.getInteractionList("code.point.3").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.3");
+			assertNull(interaction);
 
-			interaction = interactions.getInteractionList("code.point.4").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.4");
+			assertNull(interaction);
 
-			interaction = interactions.getInteractionList("code.point.5").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.5");
+			assertNull(interaction);
 
-			interaction = interactions.getInteractionList("code.point.6").get(0);
-			assertNotNull(interaction);
-			assertFalse(interaction.canRun(getTargetContext()));
-
+			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.6");
+			assertNull(interaction);
 		} catch (Exception e) {
 			assertNull("An exception was thrown from bad criteria.", e);
 		}
@@ -1331,20 +1182,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testCorruptedJson()");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCorruptedJson.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCorruptedJson.json");
 
-		InteractionManager.storeInteractions(getTargetContext(), json);
-		Interactions interactions = InteractionManager.loadInteractions(getTargetContext());
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		Interactions interactions = InteractionManager.getInteractions(getTargetContext());
 		assertNull(interactions);
 	}
 
-	/**
-	 * Update this when the UpgradeMessage payload and client changes.
-	 */
 	public void testActualUpgradeMessage() {
 		Log.e("Running test: testActualUpgradeMessage()");
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testActualUpgradeMessage.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
@@ -1352,7 +1200,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Saw this build too long ago.
 		Log.e("ONE");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 604800);
 		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.build"));
@@ -1360,14 +1208,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Haven't upgraded
 		Log.e("TWO");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 500000);
 		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.build"));
 
 		// Just right
 		Log.e("THREE");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 500000);
 		assertNotNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.build"));
@@ -1383,7 +1231,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Saw this version too long ago.
 		Log.e("ONE");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 604800);
 		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.version"));
@@ -1391,14 +1239,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Haven't upgraded
 		Log.e("TWO");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 500000);
 		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.version"));
 
 		// Just right
 		Log.e("THREE");
 		resetDevice();
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
 		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 500000);
 		assertNotNull(InteractionManager.getApplicableInteraction(getTargetContext(), "by.version"));
@@ -1419,38 +1267,38 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		Context targetContext = getTargetContext();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testRealRatingInteractions.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testRealRatingInteractions.json");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
 
 		// Conditions not yet met.
-		Log.e("ONE");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("ONE");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 100000);
 		assertNull(InteractionManager.getApplicableInteraction(targetContext, "by.build"));
 
 		// Conditions partially met.
-		Log.e("TWO");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("TWO");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 500000);
 		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
 
 		// Conditions partially met the other way.
-		Log.e("THREE");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("THREE");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
 		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
 
 		// Conditions almost met.
-		Log.e("FOUR");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("FOUR");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 430000);
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
@@ -1458,9 +1306,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
 
 		// Conditions met barely.
-		Log.e("FIVE");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("FIVE");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 432000);
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
 		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
@@ -1471,16 +1319,16 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		//// Test Rating Dialog.
 
 		// Conditions are always met.
-		Log.e("SIX");
 		resetDevice();
-		InteractionManager.storeInteractions(targetContext, json);
+		Log.e("SIX");
+		InteractionManager.storeInteractionsPayloadString(targetContext, json);
 		assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes"));
 
 		// Re-prompt isn't ready yet.
 		{
-			Log.e("SEVEN");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("SEVEN");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
 			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
@@ -1490,9 +1338,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Re-prompt isn't ready yet.
 		{
-			Log.e("EIGHT");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("EIGHT");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
 			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
@@ -1502,9 +1350,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Re-prompt is ready.
 		{
-			Log.e("NINE");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("NINE");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
 			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
@@ -1514,9 +1362,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Don't re-prompt, since we've already rated.
 		{
-			Log.e("TEN");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("TEN");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
 			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
@@ -1527,9 +1375,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Don't re-prompt, since we've declined to rate.
 		{
-			Log.e("ELEVEN");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("ELEVEN");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
 			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
@@ -1542,9 +1390,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Don't re-prompt, since we've declined to rate.
 		{
-			Log.e("TWELVE");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("TWELVE");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
 		}
 
@@ -1552,9 +1400,9 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Don't re-prompt, since we've declined to rate.
 		{
-			Log.e("THIRTEEN");
 			resetDevice();
-			InteractionManager.storeInteractions(targetContext, json);
+			Log.e("THIRTEEN");
+			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#FeedbackDialog#view_messages"));
 		}
 	}
@@ -1564,8 +1412,8 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 
 		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testWillShowInteraction.json");
-		InteractionManager.storeInteractions(getTargetContext(), json);
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testWillShowInteraction.json");
+		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
 		boolean willShow = Apptentive.willShowInteraction(getTargetContext(), "init");
 		assertFalse(willShow);

@@ -12,6 +12,7 @@ import android.test.InstrumentationTestCase;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 
 /**
  * @author Sky Kelsey
@@ -42,6 +43,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected void resetDevice() {
 		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
 		CodePointStore.clear(getTargetContext());
+		InteractionManager.clear(getTargetContext());
 	}
 
 	protected static void sleep(long millis) {
