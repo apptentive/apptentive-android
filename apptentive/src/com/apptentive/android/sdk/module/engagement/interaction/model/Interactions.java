@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * A map of "interaction_id" => {Interaction}
  * @author Sky Kelsey
  */
 public class Interactions extends JSONObject {
@@ -26,10 +27,6 @@ public class Interactions extends JSONObject {
 
 	public Interactions(String json) throws JSONException {
 		super(json);
-	}
-
-	public void putInteraction(String id, Interaction interaction) throws JSONException {
-		put(id, interaction);
 	}
 
 	public Interaction getInteraction(String id) {

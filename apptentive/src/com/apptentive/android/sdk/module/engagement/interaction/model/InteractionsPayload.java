@@ -20,6 +20,11 @@ public class InteractionsPayload extends JSONObject {
 		super(json);
 	}
 
+	/**
+	 * In addition to returning the Interactions contained in this payload, this method reformats the Interactions from a
+	 * list into a map. The map is then used for further Interaction lookup.
+	 * @return
+	 */
 	public Interactions getInteractions() {
 		try {
 			if (!isNull(Interactions.KEY_NAME)) {
