@@ -11,11 +11,11 @@
     "actions": [
       {
         "label": "One",
-        "action": "Dismiss"
+        "action": "dismiss"
       },
       {
         "label": "Two",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

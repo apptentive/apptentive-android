@@ -15,11 +15,11 @@
     "actions": [
       {
         "label": "AGREE",
-        "action": "Dismiss"
+        "action": "dismiss"
       },
       {
         "label": "DISAGREE",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

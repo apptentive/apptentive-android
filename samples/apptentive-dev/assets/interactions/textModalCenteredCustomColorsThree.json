@@ -15,11 +15,11 @@
     "actions": [
       {
         "label": "LONG ANSWER BUTTON LABEL",
-        "action": "Dismiss"
+        "action": "dismiss"
       },
       {
         "label": "ANOTHER LONG ANSWER BUTTON LABEL",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

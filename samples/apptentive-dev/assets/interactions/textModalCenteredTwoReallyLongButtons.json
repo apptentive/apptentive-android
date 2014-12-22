@@ -11,11 +11,11 @@
     "actions": [
       {
         "label": "A VERY VERY VERY VERY VERY LONG BUTTON",
-        "action": "Dismiss"
+        "action": "dismiss"
       },
       {
         "label": "ANOTHER VERY VERY VERY LONG BUTTON",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

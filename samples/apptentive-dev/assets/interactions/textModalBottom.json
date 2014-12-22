@@ -11,7 +11,7 @@
     "actions": [
       {
         "label": "Interaction 1",
-        "action": "Interaction",
+        "action": "interaction",
         "interaction_invocations": [
           {
             "interaction_id": "interaction_123",
@@ -21,7 +21,7 @@
       },
       {
         "label": "Interaction 2",
-        "action": "Interaction",
+        "action": "interaction",
         "interaction_invocations": [
           {
             "interaction_id": "interaction_456",
@@ -31,7 +31,7 @@
       },
       {
         "label": "Dismiss",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

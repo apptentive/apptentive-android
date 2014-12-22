@@ -11,7 +11,7 @@
     "actions": [
       {
         "label": "One",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }

@@ -11,11 +11,11 @@
     "actions": [
       {
         "label": "OK",
-        "action": "Dismiss"
+        "action": "dismiss"
       },
       {
         "label": "NO THANKS",
-        "action": "Dismiss"
+        "action": "dismiss"
       }
     ]
   }
