@@ -28,7 +28,7 @@ public class TextModalInteraction extends Interaction {
 	public static final String EVENT_NAME_LAUNCH = "launch";
 	public static final String EVENT_NAME_CANCEL = "cancel";
 	public static final String EVENT_NAME_DISMISS = "dismiss";
-	public static final String EVENT_NAME_INTERACTION_CANCEL = "interaction";
+	public static final String EVENT_NAME_INTERACTION = "interaction";
 
 	public TextModalInteraction(String json) throws JSONException {
 		super(json);

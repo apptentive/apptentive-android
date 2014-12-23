@@ -51,7 +51,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 				break;
 		}
 
-//	EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
+	EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
 		Integer primaryColor = interaction.getPrimaryColor();
 		if (primaryColor != null) {
 			View topArea = activity.findViewById(R.id.top_area);
@@ -105,36 +105,38 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 			} else {
 				bottomArea.setOrientation(LinearLayout.HORIZONTAL);
 			}
-			for (final Action button : actions) {
-				View buttonView;
-				buttonView = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
-				TextView buttonTextView = ((TextView) buttonView.findViewById(R.id.label));
-				buttonTextView.setText(button.getLabel());
+			for (int i = 0; i < actions.size(); i++) {
+				final Action buttonAction = actions.get(i);
+				final int position = i;
+				View button;
+				button = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
+				TextView buttonTextView = ((TextView) button.findViewById(R.id.label));
+				buttonTextView.setText(buttonAction.getLabel());
 				Integer buttonTextColor = interaction.getButtonTextColor();
 				if (buttonTextColor != null) {
 					buttonTextView.setTextColor(buttonTextColor);
 				}
-				switch (button.getType()) {
+				switch (buttonAction.getType()) {
 					case dismiss:
-						buttonView.setOnClickListener(new View.OnClickListener() {
+						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								Log.e("Dismiss Button Clicked.");
-//							EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_DISMISS);
+								String data = String.format("{\"title\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
+								EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_DISMISS, data);
 								activity.finish();
 							}
 						});
 						break;
 					case interaction:
-						buttonView.setOnClickListener(new View.OnClickListener() {
+						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								Log.e("Interaction Button Clicked.");
-//							EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_INTERACTION);
-								LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) button;
+								LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
 								List<Invocation> invocations = launchInteractionButton.getInvocations();
 								String interactionIdToLaunch = null;
-								for(Invocation invocation : invocations) {
+								for (Invocation invocation : invocations) {
 									if (invocation.isCriteriaMet(activity)) {
 										interactionIdToLaunch = invocation.getInteractionId();
 										break;
@@ -144,7 +146,11 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 									Interactions interactions = InteractionManager.getInteractions(activity);
 									if (interactions != null) {
 										Interaction interaction = interactions.getInteraction(interactionIdToLaunch);
-										EngagementModule.launchInteraction(activity, interaction);
+										if (interaction != null) {
+											String data = String.format("{\"title\":\"%s\",\"position\":%d,\"target\":\"%s\"}", buttonAction.getLabel(), position, interaction.getId());
+											EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_INTERACTION, data);
+											EngagementModule.launchInteraction(activity, interaction);
+										}
 									}
 								} else {
 									Log.w("No Interactions were launched.");
@@ -154,7 +160,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						});
 						break;
 				}
-				bottomArea.addView(buttonView);
+				bottomArea.addView(button);
 			}
 		} else {
 			bottomArea.setVisibility(View.GONE);
@@ -168,7 +174,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-//	EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_CANCEL);
+		EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_CANCEL);
 		return true;
 	}
 }

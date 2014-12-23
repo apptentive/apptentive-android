@@ -55,16 +55,12 @@ public class Event extends ConversationItem {
 		}
 	}
 
-	public Event(String label, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public Event(String label, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		super();
 		try {
 			put(KEY_LABEL, label);
-			if (data != null && !data.isEmpty()) {
-				JSONObject dataObject = new JSONObject();
-				for (String key : data.keySet()) {
-					dataObject.put(key, data.get(key));
-				}
-				put(KEY_DATA, dataObject);
+			if (data != null) {
+				put(KEY_DATA, new JSONObject(data));
 			}
 
 			if (customData != null && !customData.isEmpty()) {

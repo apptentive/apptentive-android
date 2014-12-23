@@ -25,9 +25,9 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -40,7 +40,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
 	private static SurveyState surveyState;
-	private static Map<String, String> data;
+	private static JSONObject data;
 
 	public SurveyInteractionView(SurveyInteraction interaction) {
 		super(interaction);
@@ -48,10 +48,13 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			surveyState = new SurveyState(interaction);
 		}
 		if (data == null) {
-			data = new HashMap<String, String>();
-			data.put("id", interaction.getId());
+			data = new JSONObject();
+			try {
+				data.put("id", interaction.getId());
+			} catch (JSONException e) {
+				// Never happens.
+			}
 		}
-
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		}
 
 		if (!surveyState.isSurveyLaunchSent()) {
-			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_LAUNCH, data);
+			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_LAUNCH, data.toString());
 			surveyState.setSurveyLaunchSent();
 		}
 
@@ -110,7 +113,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 					activity.finish();
 				}
 
-				EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_SUBMIT, data);
+				EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_SUBMIT, data.toString());
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
 				Log.d("Survey Submitted.");
 				callListener(true);
@@ -172,9 +175,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	void sendMetricForQuestion(Activity activity, Question question) {
 		String questionId = question.getId();
 		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
-			Map<String, String> answerData = new HashMap<String, String>();
-			answerData.put("id", question.getId());
-			answerData.put("survey_id", interaction.getId());
+			String answerData = String.format("{\"id\":\"%s\",\"survey_id\":\"%s\"}", question.getId(), interaction.getId());
 			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_QUESTION_RESPONSE, answerData);
 			surveyState.markMetricSent(questionId);
 		}
@@ -195,7 +196,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	public boolean onBackPressed(Activity activity) {
 		// If this survey is required, do not let it be dismissed when the user clicks the back button.
 		if (!interaction.isRequired()) {
-			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data);
+			EngagementModule.engageInternal(activity, interaction.getType().name(), EVENT_CANCEL, data.toString());
 			callListener(false);
 			cleanup();
 			return true;

@@ -29,14 +29,14 @@ import java.util.Map;
 public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", eventName, null, null, (ExtendedData[]) null);
+		return engage(activity, "com.apptentive", "app", eventName,  null, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
 		return engage(activity, "com.apptentive", interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, Map<String, String> data) {
+	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, String data) {
 		return engage(activity, "com.apptentive", interaction, eventName, data, null, (ExtendedData[]) null);
 	}
 
@@ -44,7 +44,7 @@ public class EngagementModule {
 		return engage(activity, vendor, interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
@@ -71,7 +71,7 @@ public class EngagementModule {
 
 	public static void launchInteraction(Activity activity, Interaction interaction) {
 		if (interaction != null) {
-			Log.e("Launching interaction: %s", interaction.getType().toString());
+			Log.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
