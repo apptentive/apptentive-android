@@ -18,32 +18,24 @@ import org.json.JSONObject;
 public class Targets extends JSONObject {
 
 	public static final String KEY_NAME = "targets";
-	public static final String KEY_INTERACTION_ID = "interaction_id";
-	public static final String KEY_CRITERIA = "criteria";
 
 	public Targets(String json) throws JSONException {
 		super(json);
 	}
 
 	public String getApplicableInteraction(Context context, String eventLabel) {
-		JSONArray targetsForEventLabel = optJSONArray(eventLabel);
-		if (targetsForEventLabel != null) {
-			for (int i = 0; i < targetsForEventLabel.length(); i++) {
-				JSONObject target = targetsForEventLabel.optJSONObject(i);
-				if (target != null) {
-					JSONObject criteriaObject = target.optJSONObject(KEY_CRITERIA);
-					// If criteria is null or missing, it is assumed false.
-					if (criteriaObject == null) {
-						return null;
-					}
-					String criteriaString = criteriaObject.toString();
+		JSONArray invocations = optJSONArray(eventLabel);
+		if (invocations != null) {
+			for (int i = 0; i < invocations.length(); i++) {
+				JSONObject invocationObject = invocations.optJSONObject(i);
+				if (invocationObject != null) {
 					try {
-						InteractionCriteria criteria = new InteractionCriteria(criteriaString);
-						if (criteria.isMet(context)) {
-							return target.optString(KEY_INTERACTION_ID);
+						Invocation invocation = new Invocation(invocationObject.toString());
+						if (invocation.isCriteriaMet(context)) {
+							return invocation.getInteractionId();
 						}
 					} catch (JSONException e) {
-						Log.e("Invalid InteractionCriteria.", e);
+						//
 					}
 				}
 			}

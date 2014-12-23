@@ -20,9 +20,6 @@
       {
         "interaction_id": "528d14854712c7bfd7000002",
         "criteria": {
-          "application_version": "2"
-        },
-        "criteria": {
           "$or": [
             {
               "code_point/switch/invokes/total": 0,

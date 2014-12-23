@@ -14,8 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 
 import java.util.List;
 
@@ -80,30 +86,27 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		}
 
 		LayoutInflater inflater = activity.getLayoutInflater();
-		List<Action> buttons = interaction.getActions().getAsList();
+		List<Action> actions = interaction.getActions().getAsList();
 		boolean vertical;
-		if (buttons != null && !buttons.isEmpty()) {
-			if (buttons.size() > 4) {
+		if (actions != null && !actions.isEmpty()) {
+			if (actions.size() > 4) {
 				vertical = true;
-			} else if (buttons.size() == 1) {
+			} else if (actions.size() == 1) {
 				vertical = true;
 			} else {
 				int totalChars = 0;
-				for (Action button : buttons) {
+				for (Action button : actions) {
 					totalChars += button.getLabel().length();
 				}
 				vertical = totalChars > MAX_TEXT_LENGTH_FOR_TWO_BUTTONS;
 			}
 			if (vertical) {
-				Log.e("Setting orientation to VERTICAL");
 				bottomArea.setOrientation(LinearLayout.VERTICAL);
 			} else {
-				Log.e("Setting orientation to HORIZONTAL");
 				bottomArea.setOrientation(LinearLayout.HORIZONTAL);
 			}
-			for (Action button : buttons) {
-				View buttonView = null;
-				Log.e("Adding: %s", button.getLabel());
+			for (final Action button : actions) {
+				View buttonView;
 				buttonView = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
 				TextView buttonTextView = ((TextView) buttonView.findViewById(R.id.label));
 				buttonTextView.setText(button.getLabel());
@@ -128,6 +131,25 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 							public void onClick(View view) {
 								Log.e("Interaction Button Clicked.");
 //							EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_INTERACTION);
+								LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) button;
+								List<Invocation> invocations = launchInteractionButton.getInvocations();
+								String interactionIdToLaunch = null;
+								for(Invocation invocation : invocations) {
+									if (invocation.isCriteriaMet(activity)) {
+										interactionIdToLaunch = invocation.getInteractionId();
+										break;
+									}
+								}
+								if (interactionIdToLaunch != null) {
+									Interactions interactions = InteractionManager.getInteractions(activity);
+									if (interactions != null) {
+										Interaction interaction = interactions.getInteraction(interactionIdToLaunch);
+										EngagementModule.launchInteraction(activity, interaction);
+									}
+								} else {
+									Log.w("No Interactions were launched.");
+								}
+								activity.finish();
 							}
 						});
 						break;
