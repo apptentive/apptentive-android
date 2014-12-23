@@ -20,6 +20,7 @@
         <item>event_3</item>
         <item>test_survey_interaction</item>
         <item>app.launch</item>
+        <item>test_event</item>
     </string-array>
 
     <string-array name="interactions">
@@ -43,6 +44,10 @@
         <item>TextModal Centered Long Content</item>
         <item>TextModal Bottom Long Content</item>
         <item>Fullscreen HTML</item>
+    </string-array>
+
+    <string-array name="payloads">
+        <item>textModalWorkingInteractions</item>
     </string-array>
 
     <string-array name="attachment_files">

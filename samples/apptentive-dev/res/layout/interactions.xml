@@ -79,6 +79,40 @@
                             android:gravity="center_horizontal"
                             android:text="willShowInteraction()"
                             android:onClick="willShowInteraction"/>
+                    <LinearLayout android:layout_width="fill_parent"
+                                  android:layout_height="wrap_content"
+                                  android:layout_marginTop="8dp"
+                                  android:background="@drawable/section_background"
+                                  android:orientation="vertical">
+                        <TextView android:layout_width="fill_parent"
+                                  android:layout_height="32dp"
+                                  android:gravity="left|center_vertical"
+                                  android:textSize="@dimen/apptentive_text_medium"
+                                  android:textColor="@android:color/white"
+                                  android:text="Replace Interaction Payload"/>
+                        <TextView android:layout_width="fill_parent"
+                                  android:layout_height="wrap_content"
+                                  android:gravity="left|bottom"
+                                  android:textSize="@dimen/apptentive_text_small_tiny"
+                                  android:textColor="@android:color/white"
+                                  android:text="Use without API key set, to prevent these from immediately being replaced from the server."/>
+                        <LinearLayout android:layout_width="fill_parent"
+                                      android:layout_height="48dp"
+                                      android:layout_marginTop="4dp"
+                                      android:orientation="horizontal">
+                            <Button android:layout_width="0dp"
+                                    android:layout_height="fill_parent"
+                                    android:layout_weight="2"
+                                    android:onClick="replacePayload"
+                                    android:text="Replace"/>
+                            <Spinner android:id="@+id/payload_spinner"
+                                     android:layout_width="0dp"
+                                     android:layout_height="fill_parent"
+                                     android:layout_weight="6"
+                                     android:entries="@array/payloads"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="fill_parent"
@@ -91,13 +125,13 @@
                               android:gravity="left|center_vertical"
                               android:textSize="@dimen/apptentive_text_medium"
                               android:textColor="@android:color/white"
-                              android:text="Trigger Hardcoded Interactions"/>
+                              android:text="Test Interaction Display"/>
                     <TextView android:layout_width="fill_parent"
-                              android:layout_height="24dp"
+                              android:layout_height="wrap_content"
                               android:gravity="left|bottom"
                               android:textSize="@dimen/apptentive_text_small_tiny"
                               android:textColor="@android:color/white"
-                              android:text="(replaces downloaded interactions)"/>
+                              android:text="Interactions always display. Can't trigger other Interactions."/>
                     <LinearLayout android:layout_width="fill_parent"
                                   android:layout_height="48dp"
                                   android:layout_marginTop="4dp"

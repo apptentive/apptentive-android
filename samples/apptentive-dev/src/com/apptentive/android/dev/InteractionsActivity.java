@@ -136,7 +136,6 @@ public class InteractionsActivity extends ApptentiveActivity {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
 		Log.e("Testing engage(%s)", interactionName);
-		long start = System.currentTimeMillis();
 		Interaction interaction = null;
 		if (interactionName.equals("Upgrade Message With Branding")) {
 			interaction = loadInteractionFromAsset("interactions/upgradeMessageWithBranding.json");
@@ -182,9 +181,15 @@ public class InteractionsActivity extends ApptentiveActivity {
 		if (interaction != null) {
 			EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
 		}
-		long end = System.currentTimeMillis();
-		Log.e("Interaction storage took %d millis", end - start);
 		Log.e(CodePointStore.toString(getApplicationContext()));
+	}
+
+	public void replacePayload(@SuppressWarnings("unused") View view) {
+		Spinner payloadsSpinner = (Spinner) findViewById(R.id.payload_spinner);
+		String payloadsFileName = "payloads/" + payloadsSpinner.getSelectedItem() + ".json";
+		Log.e("Replacing payloads with \"%s\"", payloadsFileName);
+		String payloadString = FileUtil.loadTextAssetAsString(this, payloadsFileName);
+		InteractionManager.storeInteractionsPayloadString(this, payloadString);
 	}
 
 	private Interaction loadInteractionFromAsset(String fileName) {

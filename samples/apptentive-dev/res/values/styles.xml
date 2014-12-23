@@ -2,6 +2,8 @@
 <resources>
     <style name="ApptentiveDevTheme" parent="android:Theme.Holo.NoActionBar">
         <item name="android:buttonStyle">@style/ButtonStyle</item>
+        <item name="android:spinnerItemStyle">@style/SpinnerItemStyle</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemStyle</item>
     </style>
 
     <style name="ButtonStyle" parent="@android:style/Widget.Button">
@@ -13,5 +15,13 @@
         <item name="android:paddingRight">8dp</item>
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <style name="SpinnerItemStyle">
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
+    </style>
+
+    <style name="SpinnerDropDownItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
     </style>
 </resources>

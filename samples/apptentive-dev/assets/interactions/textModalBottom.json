@@ -10,27 +10,11 @@
     "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "actions": [
       {
-        "label": "Interaction 1",
-        "action": "interaction",
-        "interaction_invocations": [
-          {
-            "interaction_id": "interaction_123",
-            "criteria": {}
-          }
-        ]
+        "label": "OK",
+        "action": "dismiss"
       },
       {
-        "label": "Interaction 2",
-        "action": "interaction",
-        "interaction_invocations": [
-          {
-            "interaction_id": "interaction_456",
-            "criteria": {}
-          }
-        ]
-      },
-      {
-        "label": "Dismiss",
+        "label": "NO THANKS",
         "action": "dismiss"
       }
     ]
