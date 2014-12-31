@@ -34,7 +34,11 @@ public class InteractionsPayload extends JSONObject {
 					JSONArray interactionsJSONArray = (JSONArray) obj;
 					for (int i = 0; i < interactionsJSONArray.length(); i++) {
 						Interaction interaction = Interaction.Factory.parseInteraction(interactionsJSONArray.getString(i));
-						interactions.put(interaction.getId(), interaction);
+						if (interaction != null) {
+							interactions.put(interaction.getId(), interaction);
+						} else {
+							// This is an unknown Interaction type. Probably for a future SDK version.
+						}
 					}
 					return interactions;
 				}
