@@ -47,6 +47,7 @@
     </string-array>
 
     <string-array name="payloads">
+        <item>textmodal_url_dismiss</item>
         <item>textModalWorkingInteractions</item>
     </string-array>
 

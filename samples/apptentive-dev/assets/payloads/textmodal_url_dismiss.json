@@ -1,0 +1,50 @@
+{
+  "interactions": [
+    {
+      "id": "548cc5dd49f63bb5c2000001",
+      "type": "TextModal",
+      "configuration": {
+        "layout": "center",
+        "title": "Centered TextModal Title",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "text_color": "#000000",
+        "primary_color": "#ffffff",
+        "secondary_color": "#ffffff",
+        "button_text_color": "#333333",
+        "actions": [
+          {
+            "label": "URL",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000043",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Dismiss",
+            "action": "dismiss"
+          }
+        ]
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000043",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "http://www.apptentive.com"
+      }
+    }
+  ],
+  "targets": {
+    "local#app#event_1": [
+      {
+        "interaction_id": "548cc5dd49f63bb5c2000001",
+        "criteria": {
+          "interactions/548cc5dd49f63bb5c2000001/invokes/total": 0
+        }
+      }
+    ]
+  }
+}
