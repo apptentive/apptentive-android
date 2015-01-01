@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -93,6 +93,7 @@ public abstract class Interaction extends JSONObject {
 		Survey,
 		TextModal,
 		FullscreenHtml,
+		NavigateToLink,
 		unknown;
 
 		public static Type parse(String type) {
@@ -132,6 +133,8 @@ public abstract class Interaction extends JSONObject {
 						return new TextModalInteraction(interactionString);
 					case FullscreenHtml:
 						return new FullscreenHtmlInteraction(interactionString);
+					case NavigateToLink:
+						return new NavigateToLinkInteraction(interactionString);
 					case unknown:
 						break;
 				}

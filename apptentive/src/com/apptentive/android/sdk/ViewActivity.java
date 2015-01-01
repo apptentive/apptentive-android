@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -62,36 +62,36 @@ public class ViewActivity extends ApptentiveActivity {
 				activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
 			} else
 				// If no content was sent to this Activity, then it may have been started from a Parse push notification.
-			if (parseStringExtra != null) {
-				Log.i("Started ViewActivity from Parse push.");
+				if (parseStringExtra != null) {
+					Log.i("Started ViewActivity from Parse push.");
 
-				// Save off the callback Activity if one was passed in.
-				pushCallbackActivityName = ApptentiveInternal.getPushCallbackActivityName();
+					// Save off the callback Activity if one was passed in.
+					pushCallbackActivityName = ApptentiveInternal.getPushCallbackActivityName();
 
-				// If the callback is null and we got here, then the developer forgot to set it.
-				if (pushCallbackActivityName != null) {
-					returnToPushCallbackActivity = true;
-					JSONObject parseJson = new JSONObject(parseStringExtra);
-					String apptentiveStringData = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-					JSONObject apptentiveJson = new JSONObject(apptentiveStringData);
-					ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.parse(apptentiveJson.getString(ApptentiveInternal.PUSH_ACTION));
-					switch (action) {
-						case pmc:
-							activeContentType = ActivityContent.Type.MESSAGE_CENTER;
-							break;
-						default:
-							break;
+					// If the callback is null and we got here, then the developer forgot to set it.
+					if (pushCallbackActivityName != null) {
+						returnToPushCallbackActivity = true;
+						JSONObject parseJson = new JSONObject(parseStringExtra);
+						String apptentiveStringData = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+						JSONObject apptentiveJson = new JSONObject(apptentiveStringData);
+						ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.parse(apptentiveJson.getString(ApptentiveInternal.PUSH_ACTION));
+						switch (action) {
+							case pmc:
+								activeContentType = ActivityContent.Type.MESSAGE_CENTER;
+								break;
+							default:
+								break;
+						}
+					} else {
+						Log.a("Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()");
+						if (GlobalInfo.isAppDebuggable) {
+							Toast.makeText(this, "Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()", Toast.LENGTH_LONG).show();
+						}
+						finish();
 					}
 				} else {
-					Log.a("Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()");
-					if (GlobalInfo.isAppDebuggable) {
-						Toast.makeText(this, "Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()", Toast.LENGTH_LONG).show();
-					}
-					finish();
+					Log.e("Started ViewActivity in a bad way.");
 				}
-			} else {
-				Log.e("Started ViewActivity in a bad way.");
-			}
 		} catch (Exception e) {
 			Log.e("Error creating ViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
@@ -151,6 +151,9 @@ public class ViewActivity extends ApptentiveActivity {
 							break;
 						case FullscreenHtml:
 							view = new FullscreenHtmlInteractionView((FullscreenHtmlInteraction) interaction);
+							break;
+						case NavigateToLink:
+							view = new NavigateToUrlInteractionView((NavigateToLinkInteraction) interaction);
 							break;
 						default:
 							break;
