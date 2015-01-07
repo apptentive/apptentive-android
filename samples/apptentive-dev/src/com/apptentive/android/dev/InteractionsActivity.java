@@ -20,7 +20,6 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -91,8 +90,71 @@ public class InteractionsActivity extends ApptentiveActivity {
 			interactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			spinner.setAdapter(interactionAdapter);
 		}
+
+		// Set up Payload Polling toggle.
+		ToggleButton pollForPayloadsToggle = (ToggleButton) findViewById(R.id.poll_for_payloads);
+		boolean enabled = InteractionManager.isPollForInteractions(this);
+		pollForPayloadsToggle.setChecked(enabled);
+		findViewById(R.id.fetch_interactions).setEnabled(enabled);
 	}
 
+	public void engage(@SuppressWarnings("unused") View view) {
+		doEngage(false);
+	}
+
+	public void engageInternal(@SuppressWarnings("unused") View view) {
+		doEngage(true);
+	}
+
+	public void willShowInteraction(@SuppressWarnings("unused") View view) {
+		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
+		boolean willShowInteraction = Apptentive.willShowInteraction(this, eventName.getText().toString());
+		Toast.makeText(this, willShowInteraction ? "Interaction will show." : "Interaction will NOT show.", Toast.LENGTH_SHORT).show();
+	}
+
+	public void interaction(@SuppressWarnings("unused") View view) {
+		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
+		String interactionName = (String) interactionsSpinner.getSelectedItem();
+		if (!Util.isEmpty(interactionName)) {
+			// Add back in the .json extension.
+			Interaction interaction = loadInteractionFromAsset("interactions/" + interactionName + ".json");
+			if (interaction != null) {
+				Log.e("Launching interaction manually: %s", interactionName);
+				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
+				Log.e(CodePointStore.toString(getApplicationContext()));
+				return;
+			}
+		}
+		Log.e("No interaction name selected from list.");
+	}
+
+	public void replacePayloads(@SuppressWarnings("unused") View view) {
+		Spinner spinner = (Spinner) findViewById(R.id.payload_spinner);
+		// Add back in the .json extension.
+		String payloadsFileName = "payloads/" + spinner.getSelectedItem() + ".json";
+		Log.e("Replacing payloads with \"%s\"", payloadsFileName);
+		String payloadString = FileUtil.loadTextAssetAsString(this, payloadsFileName);
+		InteractionManager.storeInteractionsPayloadString(this, payloadString);
+	}
+
+	public void fetchInteractions(@SuppressWarnings("unused") View view) {
+		InteractionManager.asyncFetchAndStoreInteractions(view.getContext());
+	}
+
+	public void forceRatingsPrompt(@SuppressWarnings("unused") View view) {
+		boolean shown = forceShowRatingsPromptInteraction(this);
+	}
+
+	public void onPollForPayloadsChanged(@SuppressWarnings("unused") View view) {
+		ToggleButton button = (ToggleButton) view;
+		boolean enabled = button.isChecked();
+		InteractionManager.setPollForInteractions(this, enabled);
+		findViewById(R.id.fetch_interactions).setEnabled(enabled);
+	}
+
+	public void launchRootInteraction(@SuppressWarnings("unused") View view) {
+		Apptentive.engage(this, "launch");
+	}
 
 	public void doEngage(boolean internal) {
 		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
@@ -157,60 +219,11 @@ public class InteractionsActivity extends ApptentiveActivity {
 		}
 	}
 
-	public void engage(@SuppressWarnings("unused") View view) {
-		doEngage(false);
-	}
-
-	public void engageInternal(@SuppressWarnings("unused") View view) {
-		doEngage(true);
-	}
-
-	public void willShowInteraction(@SuppressWarnings("unused") View view) {
-		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
-		boolean willShowInteraction = Apptentive.willShowInteraction(this, eventName.getText().toString());
-		Toast.makeText(this, willShowInteraction ? "Interaction will show." : "Interaction will NOT show.", Toast.LENGTH_SHORT).show();
-	}
-
-	public void interaction(@SuppressWarnings("unused") View view) {
-		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
-		String interactionName = (String) interactionsSpinner.getSelectedItem();
-		if (!Util.isEmpty(interactionName)) {
-			// Add back in the .json extension.
-			Interaction interaction = loadInteractionFromAsset("interactions/" + interactionName + ".json");
-			if (interaction != null) {
-				Log.e("Launching interaction manually: %s", interactionName);
-				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
-				Log.e(CodePointStore.toString(getApplicationContext()));
-				return;
-			}
-		}
-		Log.e("No interaction name selected from list.");
-	}
-
-	public void replacePayload(@SuppressWarnings("unused") View view) {
-		Spinner spinner= (Spinner) findViewById(R.id.payload_spinner);
-		// Add back in the .json extension.
-		String payloadsFileName = "payloads/" + spinner.getSelectedItem() + ".json";
-		Log.e("Replacing payloads with \"%s\"", payloadsFileName);
-		String payloadString = FileUtil.loadTextAssetAsString(this, payloadsFileName);
-		InteractionManager.storeInteractionsPayloadString(this, payloadString);
-	}
-
 	private Interaction loadInteractionFromAsset(String fileName) {
 		return Interaction.Factory.parseInteraction(FileUtil.loadTextAssetAsString(this, fileName));
 	}
 
-	public void fetchInteractions(View view) {
-		InteractionManager.asyncFetchAndStoreInteractions(view.getContext());
-	}
-
-	public void forceRatingsPrompt(View view) {
-		String eventName = ((EditText) findViewById(R.id.force_ratings_prompt_event_name)).getText().toString();
-		boolean shown = forceShowRatingsPromptInteraction(this, eventName);
-		Log.e("Force showed Ratings Prompt? %b", shown);
-	}
-
-	public static boolean forceShowRatingsPromptInteraction(Activity activity, String eventName) {
+	public static boolean forceShowRatingsPromptInteraction(Activity activity) {
 		try {
 			Log.d("Force Showing Ratings Prompt.");
 
@@ -224,7 +237,6 @@ public class InteractionsActivity extends ApptentiveActivity {
 				Toast.makeText(activity, "No Ratings Prompt available for that Interaction.", Toast.LENGTH_SHORT).show();
 			}
 		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 			Log.e("Error:", e);
 		}
 		return false;
