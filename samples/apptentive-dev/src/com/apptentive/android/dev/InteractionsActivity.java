@@ -51,24 +51,46 @@ public class InteractionsActivity extends ApptentiveActivity {
 		eventName.setText(null);
 
 		// Populate a dropdown of manually invokable Interactions.
-		List<String> files = FileUtil.getFileNamesInAssetsDirectory(this, "interactions");
-		// Massage the files list before setting the dropdown contents.
-		ListIterator<String> fileIterator = files.listIterator();
-		while (fileIterator.hasNext()) {
-			String fileName = fileIterator.next();
-			// Remove non-JSON files
-			if (!fileName.endsWith(".json")) {
-				fileIterator.remove();
-				continue;
+		{
+			List<String> files = FileUtil.getFileNamesInAssetsDirectory(this, "interactions");
+			// Massage the files list before setting the dropdown contents.
+			ListIterator<String> fileIterator = files.listIterator();
+			while (fileIterator.hasNext()) {
+				String fileName = fileIterator.next();
+				// Remove non-JSON files
+				if (!fileName.endsWith(".json")) {
+					fileIterator.remove();
+					continue;
+				}
+				// Trim off the JSON suffix.
+				fileIterator.set(fileName.split("\\.")[0]);
 			}
-			// Trim off the JSON suffix.
-			fileIterator.set(fileName.split("\\.")[0]);
+			Spinner spinner = (Spinner) findViewById(R.id.interaction_spinner);
+			ArrayAdapter interactionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, files);
+			interactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(interactionAdapter);
 		}
-		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
-		ArrayAdapter interactionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, files);
-		interactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		interactionsSpinner.setAdapter(interactionAdapter);
 
+		// Populate another dropdown for payloads.
+		{
+			List<String> files = FileUtil.getFileNamesInAssetsDirectory(this, "payloads");
+			// Massage the files list before setting the dropdown contents.
+			ListIterator<String> fileIterator = files.listIterator();
+			while (fileIterator.hasNext()) {
+				String fileName = fileIterator.next();
+				// Remove non-JSON files
+				if (!fileName.endsWith(".json")) {
+					fileIterator.remove();
+					continue;
+				}
+				// Trim off the JSON suffix.
+				fileIterator.set(fileName.split("\\.")[0]);
+			}
+			Spinner spinner = (Spinner) findViewById(R.id.payload_spinner);
+			ArrayAdapter interactionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, files);
+			interactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(interactionAdapter);
+		}
 	}
 
 
@@ -166,8 +188,9 @@ public class InteractionsActivity extends ApptentiveActivity {
 	}
 
 	public void replacePayload(@SuppressWarnings("unused") View view) {
-		Spinner payloadsSpinner = (Spinner) findViewById(R.id.payload_spinner);
-		String payloadsFileName = "payloads/" + payloadsSpinner.getSelectedItem() + ".json";
+		Spinner spinner= (Spinner) findViewById(R.id.payload_spinner);
+		// Add back in the .json extension.
+		String payloadsFileName = "payloads/" + spinner.getSelectedItem() + ".json";
 		Log.e("Replacing payloads with \"%s\"", payloadsFileName);
 		String payloadString = FileUtil.loadTextAssetAsString(this, payloadsFileName);
 		InteractionManager.storeInteractionsPayloadString(this, payloadString);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -108,8 +108,7 @@
                             <Spinner android:id="@+id/payload_spinner"
                                      android:layout_width="0dp"
                                      android:layout_height="fill_parent"
-                                     android:layout_weight="6"
-                                     android:entries="@array/payloads"/>
+                                     android:layout_weight="6"/>
                         </LinearLayout>
                     </LinearLayout>
 

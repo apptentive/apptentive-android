@@ -38,7 +38,7 @@
     }
   ],
   "targets": {
-    "local#app#event_1": [
+    "local#app#launch": [
       {
         "interaction_id": "548cc5dd49f63bb5c2000001",
         "criteria": {

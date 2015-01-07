@@ -100,7 +100,7 @@
     }
   ],
   "targets": {
-    "local#app#event_1": [
+    "local#app#launch": [
       {
         "interaction_id": "textmodal_interaction",
         "criteria": {}
