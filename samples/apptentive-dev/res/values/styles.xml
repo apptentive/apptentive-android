@@ -4,6 +4,7 @@
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="android:spinnerItemStyle">@style/SpinnerItemStyle</item>
         <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemStyle</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListViewStyle</item>
     </style>
 
     <style name="ButtonStyle" parent="@android:style/Widget.Button">
@@ -22,6 +23,10 @@
     </style>
 
     <style name="SpinnerDropDownItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
+    </style>
+
+    <style name="DropDownListViewStyle" parent="@android:style/Widget.Holo.DropDownItem">
         <item name="android:textSize">@dimen/apptentive_text_small</item>
     </style>
 </resources>

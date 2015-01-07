@@ -23,29 +23,6 @@
         <item>test_event</item>
     </string-array>
 
-    <string-array name="interactions">
-        <item>Upgrade Message With Branding</item>
-        <item>Upgrade Message No Branding</item>
-        <item>Enjoyment Dialog</item>
-        <item>Rating Dialog</item>
-        <item>App Store Rating</item>
-        <item>Feedback Dialog</item>
-        <item>Survey</item>
-        <item>TextModal 1 Button</item>
-        <item>TextModal 2 Buttons</item>
-        <item>TextModal 3 Buttons</item>
-        <item>TextModal 4 Buttons</item>
-        <item>TextModal 2 Long Buttons</item>
-        <item>TextModal 2 Really Long Buttons</item>
-        <item>TextModal Colors 1</item>
-        <item>TextModal Colors 2</item>
-        <item>TextModal Colors 3</item>
-        <item>TextModal Bottom</item>
-        <item>TextModal Centered Long Content</item>
-        <item>TextModal Bottom Long Content</item>
-        <item>Fullscreen HTML</item>
-    </string-array>
-
     <string-array name="payloads">
         <item>textmodal_url_dismiss</item>
         <item>textModalWorkingInteractions</item>

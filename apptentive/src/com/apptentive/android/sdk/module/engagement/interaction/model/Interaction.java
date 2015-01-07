@@ -108,6 +108,9 @@ public abstract class Interaction extends JSONObject {
 
 	public static class Factory {
 		public static Interaction parseInteraction(String interactionString) {
+			if (interactionString == null) {
+				return null;
+			}
 			try {
 				Interaction.Type type = Type.unknown;
 				JSONObject interaction = new JSONObject(interactionString);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -21,12 +21,10 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Sky Kelsey
@@ -38,9 +36,10 @@ public class InteractionsActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.interactions);
 
+		// Populate an auto=complete text view of event names that can be engaged.
 		final AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
 		String[] events = getResources().getStringArray(R.array.events);
-		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_dropdown_item_1line, events);
+		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_spinner_dropdown_item, events);
 		eventName.setAdapter(eventAdapter);
 		eventName.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -50,6 +49,26 @@ public class InteractionsActivity extends ApptentiveActivity {
 			}
 		});
 		eventName.setText(null);
+
+		// Populate a dropdown of manually invokable Interactions.
+		List<String> files = FileUtil.getFileNamesInAssetsDirectory(this, "interactions");
+		// Massage the files list before setting the dropdown contents.
+		ListIterator<String> fileIterator = files.listIterator();
+		while (fileIterator.hasNext()) {
+			String fileName = fileIterator.next();
+			// Remove non-JSON files
+			if (!fileName.endsWith(".json")) {
+				fileIterator.remove();
+				continue;
+			}
+			// Trim off the JSON suffix.
+			fileIterator.set(fileName.split("\\.")[0]);
+		}
+		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
+		ArrayAdapter interactionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, files);
+		interactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		interactionsSpinner.setAdapter(interactionAdapter);
+
 	}
 
 
@@ -69,9 +88,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 
 		List<ExtendedData> extendedData = null;
 		if (includeTime.isEnabled() && includeTime.isChecked()) {
-			if (extendedData == null) {
-				extendedData = new ArrayList<ExtendedData>();
-			}
+			extendedData = new ArrayList<ExtendedData>();
 			extendedData.add(new TimeExtendedData());
 		}
 
@@ -135,53 +152,17 @@ public class InteractionsActivity extends ApptentiveActivity {
 	public void interaction(@SuppressWarnings("unused") View view) {
 		Spinner interactionsSpinner = (Spinner) findViewById(R.id.interaction_spinner);
 		String interactionName = (String) interactionsSpinner.getSelectedItem();
-		Log.e("Testing engage(%s)", interactionName);
-		Interaction interaction = null;
-		if (interactionName.equals("Upgrade Message With Branding")) {
-			interaction = loadInteractionFromAsset("interactions/upgradeMessageWithBranding.json");
-		} else if (interactionName.equals("Upgrade Message No Branding")) {
-			interaction = loadInteractionFromAsset("interactions/upgradeMessageNoBranding.json");
-		} else if (interactionName.equals("Enjoyment Dialog")) {
-			interaction = loadInteractionFromAsset("interactions/enjoymentDialog.json");
-		} else if (interactionName.equals("Rating Dialog")) {
-			interaction = loadInteractionFromAsset("interactions/ratingDialog.json");
-		} else if (interactionName.equals("App Store Rating")) {
-			interaction = loadInteractionFromAsset("interactions/appStoreRating.json");
-		} else if (interactionName.equals("Feedback Dialog")) {
-			interaction = loadInteractionFromAsset("interactions/feedbackDialog.json");
-		} else if (interactionName.equals("Survey")) {
-			interaction = loadInteractionFromAsset("interactions/survey.json");
-		} else if (interactionName.equals("TextModal 1 Button")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredOneButton.json");
-		} else if (interactionName.equals("TextModal 2 Buttons")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredTwoButtons.json");
-		} else if (interactionName.equals("TextModal 3 Buttons")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredThreeButtons.json");
-		} else if (interactionName.equals("TextModal 4 Buttons")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredFourButtons.json");
-		} else if (interactionName.equals("TextModal 2 Long Buttons")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredTwoLongButtons.json");
-		} else if (interactionName.equals("TextModal 2 Really Long Buttons")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredTwoReallyLongButtons.json");
-		} else if (interactionName.equals("TextModal Colors 1")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredCustomColorsOne.json");
-		} else if (interactionName.equals("TextModal Colors 2")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredCustomColorsTwo.json");
-		} else if (interactionName.equals("TextModal Colors 3")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredCustomColorsThree.json");
-		} else if (interactionName.equals("TextModal Bottom")) {
-			interaction = loadInteractionFromAsset("interactions/textModalBottom.json");
-		} else if (interactionName.equals("TextModal Centered Long Content")) {
-			interaction = loadInteractionFromAsset("interactions/textModalCenteredLongContent.json");
-		} else if (interactionName.equals("TextModal Bottom Long Content")) {
-			interaction = loadInteractionFromAsset("interactions/textModalBottomLongContent.json");
-		} else if (interactionName.equals("Fullscreen HTML")) {
-			interaction = loadInteractionFromAsset("interactions/fullscreenHtml.json");
+		if (!Util.isEmpty(interactionName)) {
+			// Add back in the .json extension.
+			Interaction interaction = loadInteractionFromAsset("interactions/" + interactionName + ".json");
+			if (interaction != null) {
+				Log.e("Launching interaction manually: %s", interactionName);
+				EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
+				Log.e(CodePointStore.toString(getApplicationContext()));
+				return;
+			}
 		}
-		if (interaction != null) {
-			EngagementModule.launchInteraction((Activity) view.getContext(), interaction);
-		}
-		Log.e(CodePointStore.toString(getApplicationContext()));
+		Log.e("No interaction name selected from list.");
 	}
 
 	public void replacePayload(@SuppressWarnings("unused") View view) {
