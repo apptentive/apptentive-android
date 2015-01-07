@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,8 +20,6 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
-import java.util.List;
-
 /**
  * @author Sky Kelsey
  */
@@ -29,6 +27,7 @@ public class InteractionManager {
 
 	private static Interactions interactions;
 	private static Targets targets;
+	private static Boolean pollForInteractions;
 
 	public static Interactions getInteractions(Context context) {
 		if (interactions == null) {
@@ -60,6 +59,11 @@ public class InteractionManager {
 	}
 
 	public static void asyncFetchAndStoreInteractions(final Context context) {
+
+		if (!isPollForInteractions(context)) {
+			Log.v("Interaction polling is disabled.");
+			return;
+		}
 
 		if (hasCacheExpired(context)) {
 			Log.d("Interaction cache has expired. Fetching new interactions.");
@@ -175,5 +179,19 @@ public class InteractionManager {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();
+	}
+
+	public static boolean isPollForInteractions(Context context) {
+		if (pollForInteractions == null) {
+			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			pollForInteractions = prefs.getBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, true);
+		}
+		return pollForInteractions;
+	}
+
+	public static void setPollForInteractions(Context context, boolean pollForInteractions) {
+		InteractionManager.pollForInteractions = pollForInteractions;
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).commit();
 	}
 }
