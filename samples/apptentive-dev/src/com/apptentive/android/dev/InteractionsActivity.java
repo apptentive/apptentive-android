@@ -13,13 +13,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import com.apptentive.android.dev.util.FileUtil;
-import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveActivity;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -141,10 +140,6 @@ public class InteractionsActivity extends ApptentiveActivity {
 		InteractionManager.asyncFetchAndStoreInteractions(view.getContext());
 	}
 
-	public void forceRatingsPrompt(@SuppressWarnings("unused") View view) {
-		boolean shown = forceShowRatingsPromptInteraction(this);
-	}
-
 	public void onPollForPayloadsChanged(@SuppressWarnings("unused") View view) {
 		ToggleButton button = (ToggleButton) view;
 		boolean enabled = button.isChecked();
@@ -154,6 +149,15 @@ public class InteractionsActivity extends ApptentiveActivity {
 
 	public void launchRootInteraction(@SuppressWarnings("unused") View view) {
 		Apptentive.engage(this, "launch");
+	}
+
+	public void resetSdkState(@SuppressWarnings("unused") View view) {
+		getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
+		CodePointStore.clear(this);
+		InteractionManager.clear(this);
+		GlobalInfo.reset();
+		ApptentiveDatabase.reset(this);
+		Apptentive.onStart(this);
 	}
 
 	public void doEngage(boolean internal) {
@@ -221,37 +225,5 @@ public class InteractionsActivity extends ApptentiveActivity {
 
 	private Interaction loadInteractionFromAsset(String fileName) {
 		return Interaction.Factory.parseInteraction(FileUtil.loadTextAssetAsString(this, fileName));
-	}
-
-	public static boolean forceShowRatingsPromptInteraction(Activity activity) {
-		try {
-			Log.d("Force Showing Ratings Prompt.");
-
-			Interaction interaction = getRatingsPromptInteraction(activity);
-
-			if (interaction != null) {
-				CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
-				EngagementModule.launchInteraction(activity, interaction);
-				return true;
-			} else {
-				Toast.makeText(activity, "No Ratings Prompt available for that Interaction.", Toast.LENGTH_SHORT).show();
-			}
-		} catch (Exception e) {
-			Log.e("Error:", e);
-		}
-		return false;
-	}
-
-	public static Interaction getRatingsPromptInteraction(Context context) {
-		Interactions interactions = InteractionManager.getInteractions(context);
-		List<Interaction> interactionList = interactions.getInteractionList();
-
-		for (Interaction interaction : interactionList) {
-			switch (interaction.getType()) {
-				case EnjoymentDialog:
-					return interaction;
-			}
-		}
-		return null;
 	}
 }
