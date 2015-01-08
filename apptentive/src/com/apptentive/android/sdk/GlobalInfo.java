@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -22,4 +22,10 @@ public class GlobalInfo {
 	public static String appDisplayName;
 	public static String appPackage;
 	public static String apiKey = null;
+
+	public static void reset() {
+		conversationToken = null;
+		personId = null;
+		initialized = false;
+	}
 }

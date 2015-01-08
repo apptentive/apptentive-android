@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -934,6 +934,7 @@ public class Apptentive {
 				String conversationToken = root.getString("token");
 				Log.d("ConversationToken: " + conversationToken);
 				String conversationId = root.getString("id");
+				Log.d("New Conversation id: %s", conversationId);
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				if (conversationToken != null && !conversationToken.equals("")) {
 					GlobalInfo.conversationToken = conversationToken;

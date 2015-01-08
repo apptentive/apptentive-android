@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -444,6 +444,17 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			Log.d("Deleted %d stored files.", deleted);
 		} finally {
 			ensureClosed(db);
+		}
+	}
+
+	/**
+	 * This method should ONLY be used during development and testing. It will delete the database, including all saved
+	 * payloads, messages, and files.
+	 */
+	public static void reset(Context context) {
+		synchronized (instance) {
+			context.deleteDatabase(DATABASE_NAME);
+			instance = null;
 		}
 	}
 }
