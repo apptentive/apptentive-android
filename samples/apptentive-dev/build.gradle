@@ -1,7 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.0.0'
+    }
+}
+
 apply plugin: 'com.android.application'
 
-dependencies {
-    compile project(':apptentive')
+repositories {
+    mavenCentral()
+    maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 android {
@@ -12,6 +22,30 @@ android {
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 21
+    }
+
+    productFlavors {
+        dev {
+            applicationId "com.apptentive.android.dev"
+            // Using environment variables means that we can't run this directly from Android Studio.
+            def apptentiveApiKey = System.env.APPTENTIVE_API_KEY_DEV;
+            apptentiveApiKey = (apptentiveApiKey == null ? "" : apptentiveApiKey);
+            manifestPlaceholders = [APPTENTIVE_API_KEY: apptentiveApiKey];
+        }
+        qa {
+            applicationId "com.apptentive.android.qa"
+            // Using environment variables means that we can't run this directly from Android Studio.
+            def apptentiveApiKey = System.env.APPTENTIVE_API_KEY_QA;
+            apptentiveApiKey = (apptentiveApiKey == null ? "" : apptentiveApiKey);
+            manifestPlaceholders = [APPTENTIVE_API_KEY: apptentiveApiKey];
+        }
+        rc {
+            applicationId "com.apptentive.android.rc"
+            // Using environment variables means that we can't run this directly from Android Studio.
+            def apptentiveApiKey = System.env.APPTENTIVE_API_KEY_RC;
+            apptentiveApiKey = (apptentiveApiKey == null ? "" : apptentiveApiKey);
+            manifestPlaceholders = [APPTENTIVE_API_KEY: apptentiveApiKey];
+        }
     }
 
     lintOptions {
@@ -26,6 +60,13 @@ android {
             assets.srcDirs = ['assets']
         }
     }
+}
+
+dependencies {
+    compile 'net.hockeyapp.android:HockeySDK:3.5.0'
+    devCompile project(':apptentive')
+    qaCompile 'com.apptentive:apptentive-android:1.6.6-SNAPSHOT@aar'
+    rcCompile 'com.apptentive:apptentive-android:1.6.6@aar'
 }
 
 task run(type: Exec) {
