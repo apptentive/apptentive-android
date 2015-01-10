@@ -1,4 +1,10 @@
-# Development Process
+# Apptentive Dev App
+This app is for internal development and testing purposes.
+
+# Setup
+Modify gradle.properties in this directory. Fill in the Apptentive API Key for each build flavor you plan to use.
+
+# Build Process
 
 ## Dev build
 1. ./gradlew clean

@@ -45,22 +45,24 @@ public class ApptentiveClient {
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
-	private static final String ENDPOINT_BASE = "https://api.apptentive.com";
-	private static final String ENDPOINT_CONVERSATION = ENDPOINT_BASE + "/conversation";
+	private static final String ENDPOINT_BASE_STAGING = "https://api.apptentive-beta.com";
+	private static final String ENDPOINT_BASE_PRODUCTION = "https://api.apptentive.com";
+	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
-	private static final String ENDPOINT_MESSAGES = ENDPOINT_BASE + "/messages";
-	private static final String ENDPOINT_EVENTS = ENDPOINT_BASE + "/events";
-	private static final String ENDPOINT_DEVICES = ENDPOINT_BASE + "/devices";
-	private static final String ENDPOINT_PEOPLE = ENDPOINT_BASE + "/people";
+	private static final String ENDPOINT_MESSAGES = "/messages";
+	private static final String ENDPOINT_EVENTS = "/events";
+	private static final String ENDPOINT_DEVICES = "/devices";
+	private static final String ENDPOINT_PEOPLE = "/people";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
-	private static final String ENDPOINT_SURVEYS_POST = ENDPOINT_BASE + "/surveys/%s/respond";
+	private static final String ENDPOINT_SURVEYS_POST = "/surveys/%s/respond";
 
-	private static final String ENDPOINT_INTERACTIONS = ENDPOINT_BASE + "/interactions";
+	private static final String ENDPOINT_INTERACTIONS = "/interactions";
 
 	// Deprecated API
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
+	public static boolean useStagingServer = false;
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
 		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, 1, conversationTokenRequest.toString());
@@ -126,6 +128,7 @@ public class ApptentiveClient {
 	}
 
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, int apiVersion, String body) {
+		uri = getEndpointBase() + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
@@ -212,6 +215,7 @@ public class ApptentiveClient {
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, int apiVersion, String postBody, StoredFile storedFile) {
+		uri = getEndpointBase() + uri;
 		Log.d("Performing multipart request to %s", uri);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -362,5 +366,9 @@ public class ApptentiveClient {
 
 	private static String getUserAgentString() {
 		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
+	}
+
+	private static String getEndpointBase() {
+		return useStagingServer ? ENDPOINT_BASE_STAGING : ENDPOINT_BASE_PRODUCTION;
 	}
 }

@@ -787,6 +787,7 @@ public class Apptentive {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
+					ApptentiveClient.useStagingServer = metaData.getBoolean(Constants.MANIFEST_KEY_USE_STAGING_SERVER);
 				}
 				if (apptentiveDebug) {
 					Log.i("Apptentive debug logging set to VERBOSE.");

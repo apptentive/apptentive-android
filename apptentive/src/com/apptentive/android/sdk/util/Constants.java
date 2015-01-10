@@ -74,6 +74,7 @@ public class Constants {
 	// Manifest keys
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";

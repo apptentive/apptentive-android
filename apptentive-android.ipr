@@ -260,10 +260,10 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="apptentive-android-1.6.6-SNAPSHOT">
+    <library name="apptentive-android-1.7.0-SNAPSHOT">
       <CLASSES>
-        <root url="file://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.6.6-SNAPSHOT/res" />
-        <root url="jar://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.6.6-SNAPSHOT/classes.jar!/" />
+        <root url="jar://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.7.0-SNAPSHOT/classes.jar!/" />
+        <root url="file://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.7.0-SNAPSHOT/res" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
