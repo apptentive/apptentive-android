@@ -2,7 +2,11 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
+    return hasProperty("MAVEN_RELEASE_BUILD") && MAVEN_RELEASE_BUILD == "true";
+}
+
+def getVersionName() {
+    return isReleaseBuild() ? VERSION_NAME : VERSION_NAME + "-SNAPSHOT";
 }
 
 def getReleaseRepositoryUrl() {
@@ -31,7 +35,7 @@ afterEvaluate { project ->
 
                 pom.groupId = GROUP
                 pom.artifactId = POM_ARTIFACT_ID
-                pom.version = VERSION_NAME
+                pom.version = getVersionName();
 
                 repository(url: getReleaseRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
