@@ -35,8 +35,7 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 			// Change the expected output to use the same timezone as the test machine.
 			expected.setClientCreatedAtUtcOffset(Util.getUtcOffset());
 
-			Map<String, String> data = new HashMap<String, String>();
-			data.put("data_key", "data_value");
+			String data = "{\"data_key\":\"data_value\"}";
 
 			Map<String, Object> customData = new HashMap<String, Object>();
 			customData.put("string_key", "string_value");

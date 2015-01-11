@@ -16,7 +16,7 @@
             {
               "code_point/switch.code.point/invokes/total": 0,
               "sdk/version": {
-                "$contains": "1.6."
+                "$contains": "1.7."
               }
             },
             {
