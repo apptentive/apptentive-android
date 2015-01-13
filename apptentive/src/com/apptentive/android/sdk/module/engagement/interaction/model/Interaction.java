@@ -92,7 +92,6 @@ public abstract class Interaction extends JSONObject {
 		AppStoreRating,
 		Survey,
 		TextModal,
-		FullscreenHtml,
 		NavigateToLink,
 		unknown;
 
@@ -134,8 +133,6 @@ public abstract class Interaction extends JSONObject {
 						return new SurveyInteraction(interactionString);
 					case TextModal:
 						return new TextModalInteraction(interactionString);
-					case FullscreenHtml:
-						return new FullscreenHtmlInteraction(interactionString);
 					case NavigateToLink:
 						return new NavigateToLinkInteraction(interactionString);
 					case unknown:

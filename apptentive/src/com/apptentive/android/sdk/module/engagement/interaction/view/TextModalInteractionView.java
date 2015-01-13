@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
-import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -51,40 +50,13 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 				break;
 		}
 
-	EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
-		Integer primaryColor = interaction.getPrimaryColor();
-		if (primaryColor != null) {
-			View topArea = activity.findViewById(R.id.top_area);
-			GradientDrawable backgroundDrawable = (GradientDrawable) topArea.getBackground();
-			backgroundDrawable.setColor(primaryColor);
-		} else {
-			// Changing the background color affects this background if it is reused later. Reset it to defaults.
-			View topArea = activity.findViewById(R.id.top_area);
-			GradientDrawable backgroundDrawable = (GradientDrawable) topArea.getBackground();
-			backgroundDrawable.setColor(activity.getResources().getColor(R.color.apptentive_dialog_primary));
-		}
-
+		EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
 		TextView title = (TextView) activity.findViewById(R.id.title);
 		title.setText(interaction.getTitle());
 		TextView body = (TextView) activity.findViewById(R.id.body);
 		body.setText(interaction.getBody());
-		Integer textColor = interaction.getTextColor();
-		if (textColor != null) {
-			title.setTextColor(textColor);
-			body.setTextColor(textColor);
-		}
 
 		LinearLayout bottomArea = (LinearLayout) activity.findViewById(R.id.bottom_area);
-		Integer secondaryColor = interaction.getSecondaryColor();
-		if (primaryColor != null) {
-			GradientDrawable backgroundDrawable = (GradientDrawable) bottomArea.getBackground();
-			backgroundDrawable.setColor(secondaryColor);
-		} else {
-			// Changing the background color affects this background if it is reused later. Reset it to defaults.
-			GradientDrawable backgroundDrawable = (GradientDrawable) bottomArea.getBackground();
-			backgroundDrawable.setColor(activity.getResources().getColor(R.color.apptentive_dialog_secondary));
-		}
-
 		LayoutInflater inflater = activity.getLayoutInflater();
 		List<Action> actions = interaction.getActions().getAsList();
 		boolean vertical;
@@ -112,10 +84,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 				button = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
 				TextView buttonTextView = ((TextView) button.findViewById(R.id.label));
 				buttonTextView.setText(buttonAction.getLabel());
-				Integer buttonTextColor = interaction.getButtonTextColor();
-				if (buttonTextColor != null) {
-					buttonTextView.setTextColor(buttonTextColor);
-				}
 				switch (buttonAction.getType()) {
 					case dismiss:
 						button.setOnClickListener(new View.OnClickListener() {
