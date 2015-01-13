@@ -13,33 +13,18 @@
     <dimen name="apptentive_text_small">14sp</dimen>
     <dimen name="apptentive_text_small_tiny">12sp</dimen>
 
-    <dimen name="apptentive_dialog_title_text">@dimen/apptentive_text_large</dimen>
-    <dimen name="apptentive_dialog_body_text">@dimen/apptentive_text_medium</dimen>
-    <dimen name="apptentive_dialog_button_text">@dimen/apptentive_text_medium</dimen>
-
     <dimen name="apptentive_activity_side_padding">0dp</dimen>
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">0dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
 
-    <dimen name="apptentive_header_height">56dp</dimen>
-    <dimen name="apptentive_header_padding_top">4dp</dimen>
-    <dimen name="apptentive_header_padding_bottom">4dp</dimen>
-    <dimen name="apptentive_header_padding_left">4dp</dimen>
-    <dimen name="apptentive_header_padding_right">4dp</dimen>
-    <dimen name="apptentive_header_title_text">18sp</dimen>
-    <dimen name="apptentive_header_title_margin_left">20dp</dimen>
-    <dimen name="apptentive_header_title_margin_right">8sp</dimen>
-    <dimen name="apptentive_header_button_height">48dp</dimen>
-    <dimen name="apptentive_header_button_text">14sp</dimen>
     <dimen name="apptentive_text_button_padding_left">12dp</dimen>
     <dimen name="apptentive_text_button_padding_right">12dp</dimen>
 
-
-    <dimen name="apptentive_dialog_background_corner_radius">1dp</dimen>
-    <dimen name="apptentive_dialog_title_text_2">18sp</dimen>
+    <dimen name="apptentive_dialog_background_corner_radius">1.5dp</dimen>
+    <dimen name="apptentive_dialog_title_text">21dp</dimen>
     <dimen name="apptentive_dialog_title_padding_bottom">16dp</dimen>
-    <dimen name="apptentive_dialog_body">16sp</dimen>
+    <dimen name="apptentive_dialog_body_text">16sp</dimen>
     <dimen name="apptentive_dialog_content_padding_top">24dp</dimen>
     <dimen name="apptentive_dialog_content_padding_left">24dp</dimen>
     <dimen name="apptentive_dialog_content_padding_right">24dp</dimen>
@@ -47,7 +32,7 @@
 
     <dimen name="apptentive_dialog_buttons_padding_bottom">8dp</dimen>
     <dimen name="apptentive_dialog_buttons_padding_top">8dp</dimen>
-    <dimen name="apptentive_dialog_button_corner_radius">1dp</dimen>
+    <dimen name="apptentive_dialog_button_corner_radius">1.5dp</dimen>
     <dimen name="apptentive_dialog_button_click_area_height">48dp</dimen>
     <dimen name="apptentive_dialog_button_bar_padding_right">12dp</dimen>
     <dimen name="apptentive_dialog_button_visible_area_min_width">64dp</dimen>
@@ -57,5 +42,6 @@
     <dimen name="apptentive_dialog_button_padding_left">8dp</dimen>
     <dimen name="apptentive_dialog_button_padding_right">8dp</dimen>
     <dimen name="apptentive_dialog_button_spacing">8dp</dimen>
+    <dimen name="apptentive_dialog_button_text">15sp</dimen>
 
 </resources>

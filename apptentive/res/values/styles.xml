@@ -62,38 +62,9 @@
         <item name="android:gravity">bottom</item>item>
     </style>
 
-
     <style name="ApptentiveButtonClickArea">
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
-    </style>
-
-    <style name="ApptentiveFullscreenHeader">
-        <item name="android:background">@android:color/white</item>
-        <item name="android:paddingTop">@dimen/apptentive_header_padding_top</item>
-        <item name="android:paddingBottom">@dimen/apptentive_header_padding_bottom</item>
-        <item name="android:paddingRight">@dimen/apptentive_header_padding_right</item>
-        <item name="android:paddingLeft">@dimen/apptentive_header_padding_left</item>
-    </style>
-
-    <style name="ApptentiveFullscreenHeaderButtonVisibleArea">
-        <item name="android:paddingLeft">@dimen/apptentive_text_button_padding_left</item>
-        <item name="android:paddingRight">@dimen/apptentive_text_button_padding_right</item>
-        <item name="android:minWidth">64dp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/apptentive_header_button</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textSize">@dimen/apptentive_header_button_text</item>
-        <item name="android:textColor">@android:color/black</item>
-        <item name="android:scaleType">center</item>
-        <item name="android:duplicateParentState">true</item>
-    </style>
-
-    <style name="ApptentiveFullscreenHeaderTitle">
-        <item name="android:gravity">center</item>
-        <item name="android:textSize">@dimen/apptentive_header_title_text</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="ApptentiveDialogTopArea">
@@ -106,16 +77,17 @@
 
     <style name="ApptentiveDialogTitle">
         <item name="android:paddingBottom">@dimen/apptentive_dialog_title_padding_bottom</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_title_text_2</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/apptentive_dialog_text</item>
+        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
         <item name="android:gravity">left</item>
     </style>
 
     <style name="ApptentiveDialogBody">
-        <item name="android:textSize">@dimen/apptentive_dialog_body</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/apptentive_dialog_text</item>
+        <item name="android:textColor">@color/apptentive_dialog_body_text</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
         <item name="android:gravity">left</item>
     </style>
 
@@ -135,7 +107,7 @@
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/apptentive_dialog_button</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
         <item name="android:textColor">@color/apptentive_dialog_button_text</item>
         <item name="android:duplicateParentState">true</item>
     </style>
