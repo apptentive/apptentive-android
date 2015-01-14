@@ -27,6 +27,12 @@ public class ExampleActivity extends Activity {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		Apptentive.onStart(this);
+	}
+
+	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		// Only engage if this window is gaining focus.
@@ -34,6 +40,12 @@ public class ExampleActivity extends Activity {
 			// If you plan on showing your own views, first make sure Apptentive hasn't already shown one.
 			boolean apptentiveShowedInteraction = Apptentive.engage(this, "init");
 		}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		Apptentive.onStop(this);
 	}
 
 	/**
