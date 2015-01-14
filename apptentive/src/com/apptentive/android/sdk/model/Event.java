@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -19,6 +19,7 @@ import java.util.Map;
 public class Event extends ConversationItem {
 
 	private static final String KEY_LABEL = "label";
+	private static final String KEY_INTERACTION_ID = "interaction_id";
 	private static final String KEY_DATA = "data";
 	private static final String KEY_TRIGGER = "trigger";
 	private static final String KEY_CUSTOM_DATA = "custom_data";
@@ -55,10 +56,13 @@ public class Event extends ConversationItem {
 		}
 	}
 
-	public Event(String label, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public Event(String label, String interactionId, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		super();
 		try {
 			put(KEY_LABEL, label);
+			if (interactionId != null) {
+				put(KEY_INTERACTION_ID, interactionId);
+			}
 			if (data != null) {
 				put(KEY_DATA, new JSONObject(data));
 			}

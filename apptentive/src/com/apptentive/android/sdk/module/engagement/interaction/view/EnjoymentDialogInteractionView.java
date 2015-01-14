@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -33,7 +33,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
 
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		TextView bodyView = (TextView) activity.findViewById(R.id.title);
 		String body = interaction.getTitle(activity);
@@ -48,7 +48,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		noButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_NO);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_NO);
 				activity.finish();
 			}
 		});
@@ -62,7 +62,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 		yesButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_YES);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_YES);
 				activity.finish();
 			}
 		});
@@ -75,7 +75,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_CANCEL);
 		return true;
 	}
 }

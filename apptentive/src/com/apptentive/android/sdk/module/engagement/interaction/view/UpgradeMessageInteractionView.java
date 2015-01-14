@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -37,7 +37,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
 
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
@@ -65,7 +65,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DISMISS);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_DISMISS);
 		return true;
 	}
 

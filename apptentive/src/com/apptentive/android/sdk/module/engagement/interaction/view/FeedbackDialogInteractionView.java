@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -62,7 +62,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 		if (!thankYouDialogVisible) {
 			if (!feedbackDialogVisible) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 			}
 
 			final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
@@ -163,7 +163,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				@Override
 				public void onClick(View view) {
 					cleanup();
-					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
+					EngagementModule.engageInternal(activity, interaction, CODE_POINT_DECLINE);
 					activity.finish();
 				}
 			});
@@ -189,7 +189,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 					sendMessage(activity);
 
-					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_SUBMIT);
+					EngagementModule.engageInternal(activity, interaction, CODE_POINT_SUBMIT);
 					thankYouDialogVisible = true;
 					feedbackDialogVisible = false;
 					activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
@@ -226,7 +226,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			@Override
 			public void onClick(View view) {
 				cleanup();
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_SKIP_VIEW_MESSAGES);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_SKIP_VIEW_MESSAGES);
 				activity.finish();
 			}
 		});
@@ -242,7 +242,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 				@Override
 				public void onClick(View view) {
 					cleanup();
-					EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_VIEW_MESSAGES);
+					EngagementModule.engageInternal(activity, interaction, CODE_POINT_VIEW_MESSAGES);
 					activity.finish();
 				}
 			});
@@ -325,7 +325,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_CANCEL);
 		cleanup();
 		return true;
 	}
