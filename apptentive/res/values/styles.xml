@@ -76,7 +76,6 @@
     </style>
 
     <style name="ApptentiveDialogTitle">
-        <item name="android:paddingBottom">@dimen/apptentive_dialog_title_padding_bottom</item>
         <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/apptentive_dialog_title_text</item>
