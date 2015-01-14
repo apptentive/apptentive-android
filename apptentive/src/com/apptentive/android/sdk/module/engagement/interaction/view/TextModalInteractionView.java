@@ -50,7 +50,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 				break;
 		}
 
-		EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_LAUNCH);
 		TextView title = (TextView) activity.findViewById(R.id.title);
 		title.setText(interaction.getTitle());
 		TextView body = (TextView) activity.findViewById(R.id.body);
@@ -91,7 +91,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 							public void onClick(View view) {
 								Log.e("Dismiss Button Clicked.");
 								String data = String.format("{\"title\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
-								EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_DISMISS, data);
+								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data);
 								activity.finish();
 							}
 						});
@@ -116,7 +116,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 										Interaction interaction = interactions.getInteraction(interactionIdToLaunch);
 										if (interaction != null) {
 											String data = String.format("{\"title\":\"%s\",\"position\":%d,\"target\":\"%s\"}", buttonAction.getLabel(), position, interaction.getId());
-											EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_INTERACTION, data);
+											EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data);
 											EngagementModule.launchInteraction(activity, interaction);
 										}
 									}
@@ -142,7 +142,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), TextModalInteraction.EVENT_NAME_CANCEL);
+		EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_CANCEL);
 		return true;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -34,7 +34,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		super.show(activity);
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
 
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_LAUNCH);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		String title = interaction.getTitle();
 		if (title != null) {
@@ -53,7 +53,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		rateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_RATE);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_RATE);
 				activity.finish();
 			}
 		});
@@ -67,7 +67,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		remindButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_REMIND);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_REMIND);
 				activity.finish();
 			}
 		});
@@ -81,7 +81,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		declineButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_DECLINE);
+				EngagementModule.engageInternal(activity, interaction, CODE_POINT_DECLINE);
 				activity.finish();
 			}
 		});
@@ -93,7 +93,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		EngagementModule.engageInternal(activity, interaction.getType().name(), CODE_POINT_CANCEL);
+		EngagementModule.engageInternal(activity, interaction, CODE_POINT_CANCEL);
 		return true;
 	}
 }

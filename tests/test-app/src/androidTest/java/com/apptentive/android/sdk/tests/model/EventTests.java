@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -62,7 +62,7 @@ public class EventTests extends ApptentiveInstrumentationTestCase {
 			LocationExtendedData location = new LocationExtendedData(-122.34569190000002d, 47.6288591d);
 
 
-			Event actual = new Event("event_label", data, customData, commerce, time, location);
+			Event actual = new Event("event_label", null, data, customData, commerce, time, location);
 			actual.setClientCreatedAt(1.406316991967E9);
 			actual.setNonce("4579c403-e8c5-4e6b-8826-f3d61e6ebb98");
 

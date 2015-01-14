@@ -689,7 +689,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String event) {
-		return EngagementModule.engage(activity, "local", "app", event);
+		return EngagementModule.engage(activity, "local", "app", null, event, null, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -707,7 +707,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(activity, "local", "app", event, null, customData, (ExtendedData[]) null);
+		return EngagementModule.engage(activity, "local", "app", null, event, null, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -729,7 +729,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(activity, "local", "app", event, null, customData, extendedData);
+		return EngagementModule.engage(activity, "local", "app", null, event, null, customData, extendedData);
 	}
 
 	/**
