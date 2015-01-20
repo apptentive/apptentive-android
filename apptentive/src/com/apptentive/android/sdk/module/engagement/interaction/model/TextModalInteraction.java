@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
-import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 /**
@@ -19,10 +18,6 @@ public class TextModalInteraction extends Interaction {
 	private static final String KEY_LAYOUT = "layout";
 	private static final String KEY_TITLE = "title";
 	private static final String KEY_BODY = "body";
-	private static final String KEY_TEXT_COLOR = "text_color";
-	private static final String KEY_BUTTON_TEXT_COLOR = "button_text_color";
-	private static final String KEY_PRIMARY_COLOR = "primary_color";
-	private static final String KEY_SECONDARY_COLOR = "secondary_color";
 	private static final String KEY_ACTIONS = "actions";
 
 	public static final String EVENT_NAME_LAUNCH = "launch";
@@ -85,70 +80,6 @@ public class TextModalInteraction extends Interaction {
 		return null;
 	}
 
-	public Integer getTextColor() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_TEXT_COLOR)) {
-				try {
-					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_TEXT_COLOR));
-				} catch (IllegalArgumentException e) {
-					// Return null
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
-	public Integer getButtonTextColor() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_BUTTON_TEXT_COLOR)) {
-				try {
-					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_BUTTON_TEXT_COLOR));
-				} catch (IllegalArgumentException e) {
-					// Return null
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
-	public Integer getPrimaryColor() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_PRIMARY_COLOR)) {
-				try {
-					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_PRIMARY_COLOR));
-				} catch (IllegalArgumentException e) {
-					// Return null
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
-	public Integer getSecondaryColor() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_SECONDARY_COLOR)) {
-				try {
-					return Util.parseWebColorAsAndroidColor(configuration.getString(KEY_SECONDARY_COLOR));
-				} catch (IllegalArgumentException e) {
-					// Return null
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
 	public Actions getActions() {
 		try {
 			InteractionConfiguration configuration = getConfiguration();
@@ -160,6 +91,4 @@ public class TextModalInteraction extends Interaction {
 		}
 		return null;
 	}
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -29,28 +29,24 @@ import java.util.Map;
 public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", eventName,  null, null, (ExtendedData[]) null);
+		return engage(activity, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
-		return engage(activity, "com.apptentive", interaction, eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName) {
+		return engage(activity, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, String data) {
-		return engage(activity, "com.apptentive", interaction, eventName, data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName, String data) {
+		return engage(activity, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName) {
-		return engage(activity, vendor, interaction, eventName, null, null, (ExtendedData[]) null);
-	}
-
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, data, customData, extendedData));
+			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);

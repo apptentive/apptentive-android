@@ -149,9 +149,6 @@ public class ViewActivity extends ApptentiveActivity {
 						case TextModal:
 							view = new TextModalInteractionView((TextModalInteraction) interaction);
 							break;
-						case FullscreenHtml:
-							view = new FullscreenHtmlInteractionView((FullscreenHtmlInteraction) interaction);
-							break;
 						case NavigateToLink:
 							view = new NavigateToUrlInteractionView((NavigateToLinkInteraction) interaction);
 							break;

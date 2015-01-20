@@ -18,8 +18,6 @@
     <color name="apptentive_message_auto_text">#000000</color>
 
     <color name="apptentive_dialog_background">#FFFFFF</color>
-    <color name="apptentive_dialog_title_text">#000000</color>
-    <color name="apptentive_dialog_body_text">#444444</color>
     <color name="apptentive_dialog_form_text">#000000</color>
 
     <color name="apptentive_dialog_button_negative">#DDDDDD</color>
@@ -69,10 +67,11 @@
     <color name="apptentive_about_version">#AAAAAA</color>
 
 
-    <color name="apptentive_dialog_primary">#FFFFFFFF</color>
-    <color name="apptentive_dialog_secondary">#FFFFFFFF</color>
-    <color name="apptentive_dialog_text">#FF000000</color>
-    <color name="apptentive_dialog_button_text">#FF22AAFF</color>
+    <color name="apptentive_dialog_primary">#FAFAFA</color>
+    <color name="apptentive_dialog_secondary">#FAFAFA</color>
+    <color name="apptentive_dialog_title_text">#000000</color>
+    <color name="apptentive_dialog_body_text">#757575</color>
+    <color name="apptentive_dialog_button_text">#5D96F5</color>
 
     <color name="apptentive_dialog_button_default">#00000000</color>
     <color name="apptentive_dialog_button_hovered">#44999999</color>
