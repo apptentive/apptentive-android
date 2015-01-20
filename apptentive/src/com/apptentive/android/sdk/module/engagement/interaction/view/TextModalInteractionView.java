@@ -29,7 +29,11 @@ import java.util.List;
  */
 public class TextModalInteractionView extends InteractionView<TextModalInteraction> {
 
-	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 21;
+	@SuppressWarnings("unused")
+	private final static int MAX_TEXT_LENGTH_FOR_ONE_BUTTONS = 19;
+	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 17;
+	private final static int MAX_TEXT_LENGTH_FOR_THREE_BUTTONS = 15;
+	private final static int MAX_TEXT_LENGTH_FOR_FOUR_BUTTONS = 11;
 
 	public TextModalInteractionView(TextModalInteraction interaction) {
 		super(interaction);
@@ -60,22 +64,27 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		List<Action> actions = interaction.getActions().getAsList();
 		boolean vertical;
 		if (actions != null && !actions.isEmpty()) {
-			if (actions.size() > 4) {
-				vertical = true;
-			} else if (actions.size() == 1) {
-				vertical = true;
-			} else {
-				int totalChars = 0;
-				for (Action button : actions) {
-					totalChars += button.getLabel().length();
-				}
+			int totalChars = 0;
+			for (Action button : actions) {
+				totalChars += button.getLabel().length();
+			}
+			if (actions.size() == 1) {
+				vertical = false;
+			} else if (actions.size() == 2) {
 				vertical = totalChars > MAX_TEXT_LENGTH_FOR_TWO_BUTTONS;
+			} else if (actions.size() == 3) {
+				vertical = totalChars > MAX_TEXT_LENGTH_FOR_THREE_BUTTONS;
+			} else if (actions.size() == 4) {
+				vertical = totalChars > MAX_TEXT_LENGTH_FOR_FOUR_BUTTONS;
+			} else {
+				vertical = true;
 			}
 			if (vertical) {
 				bottomArea.setOrientation(LinearLayout.VERTICAL);
 			} else {
 				bottomArea.setOrientation(LinearLayout.HORIZONTAL);
 			}
+
 			for (int i = 0; i < actions.size(); i++) {
 				final Action buttonAction = actions.get(i);
 				final int position = i;
@@ -123,7 +132,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						});
 						break;
 				}
-				bottomArea.addView(button);
 			}
 		} else {
 			bottomArea.setVisibility(View.GONE);
