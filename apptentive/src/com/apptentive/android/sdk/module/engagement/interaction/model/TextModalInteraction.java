@@ -15,7 +15,6 @@ import org.json.JSONException;
  */
 public class TextModalInteraction extends Interaction {
 
-	private static final String KEY_LAYOUT = "layout";
 	private static final String KEY_TITLE = "title";
 	private static final String KEY_BODY = "body";
 	private static final String KEY_ACTIONS = "actions";
@@ -42,18 +41,6 @@ public class TextModalInteraction extends Interaction {
 			}
 			return unknown;
 		}
-	}
-
-	public Layout getLayout() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_LAYOUT)) {
-				return Layout.parse(configuration.getString(KEY_LAYOUT));
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
 	}
 
 	public String getTitle() {

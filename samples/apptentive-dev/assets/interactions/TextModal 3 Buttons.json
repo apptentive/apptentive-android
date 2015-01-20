@@ -1,20 +1,23 @@
 {
   "type": "TextModal",
-  "name": "Bottom TextModal Interaction",
-  "id": "textmodal_interaction_bottom",
+  "name": "Centered TextModal Interaction",
+  "id": "textmodal_interaction_centered",
   "priority": 1,
   "criteria": {},
   "configuration": {
-    "layout": "bottom",
-    "title": "Bottom TextModal Title",
+    "title": "Centered TextModal Title",
     "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "actions": [
       {
-        "label": "OK",
+        "label": "One",
         "action": "dismiss"
       },
       {
-        "label": "NO THANKS",
+        "label": "Two",
+        "action": "dismiss"
+      },
+      {
+        "label": "Three",
         "action": "dismiss"
       }
     ]
