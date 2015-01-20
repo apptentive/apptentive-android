@@ -7,6 +7,6 @@
 
 <resources>
     <declare-styleable name="ApptentiveDialogButton">
-        <attr name="label" format="string"/>
+        <attr name="text" format="string"/>
     </declare-styleable>
 </resources>

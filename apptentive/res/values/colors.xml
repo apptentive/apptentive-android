@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -71,7 +71,9 @@
     <color name="apptentive_dialog_secondary">#FAFAFA</color>
     <color name="apptentive_dialog_title_text">#000000</color>
     <color name="apptentive_dialog_body_text">#757575</color>
-    <color name="apptentive_dialog_button_text">#5D96F5</color>
+    <color name="apptentive_dialog_button_text_enabled">#5D96F5</color>
+    <color name="apptentive_dialog_button_text_disabled">#757575</color>
+    <color name="apptentive_dialog_hint_text">#757575</color>
 
     <color name="apptentive_dialog_button_default">#00000000</color>
     <color name="apptentive_dialog_button_hovered">#44999999</color>

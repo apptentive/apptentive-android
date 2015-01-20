@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +20,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 import java.util.List;
 
@@ -57,7 +57,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		body.setText(interaction.getBody());
 
 		LinearLayout bottomArea = (LinearLayout) activity.findViewById(R.id.bottom_area);
-		LayoutInflater inflater = activity.getLayoutInflater();
 		List<Action> actions = interaction.getActions().getAsList();
 		boolean vertical;
 		if (actions != null && !actions.isEmpty()) {
@@ -80,16 +79,13 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 			for (int i = 0; i < actions.size(); i++) {
 				final Action buttonAction = actions.get(i);
 				final int position = i;
-				View button;
-				button = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
-				TextView buttonTextView = ((TextView) button.findViewById(R.id.label));
-				buttonTextView.setText(buttonAction.getLabel());
+				ApptentiveDialogButton button = new ApptentiveDialogButton(activity);
+				button.setText(buttonAction.getLabel());
 				switch (buttonAction.getType()) {
 					case dismiss:
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Log.e("Dismiss Button Clicked.");
 								String data = String.format("{\"title\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
 								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data);
 								activity.finish();
@@ -100,7 +96,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Log.e("Interaction Button Clicked.");
 								LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
 								List<Invocation> invocations = launchInteractionButton.getInvocations();
 								String interactionIdToLaunch = null;

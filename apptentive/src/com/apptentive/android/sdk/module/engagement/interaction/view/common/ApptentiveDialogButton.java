@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
@@ -34,19 +35,21 @@ public class ApptentiveDialogButton extends FrameLayout {
 
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveDialogButton, defStyle, 0);
 		try {
-			String label = a.getString(R.styleable.ApptentiveDialogButton_label);
-			setLabel(label);
+			String label = a.getString(R.styleable.ApptentiveDialogButton_text);
+			setText(label);
 		} finally {
 			a.recycle();
 		}
 	}
 
 	private void init(Context context) {
+		ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		setLayoutParams(layoutParams);
 		inflate(context, R.layout.apptentive_dialog_button, this);
 		setClickable(true);
 	}
 
-	public void setLabel(String label) {
+	public void setText(String label) {
 		if (label != null) {
 			((TextView) findViewById(R.id.label)).setText(label);
 		}
@@ -64,5 +67,12 @@ public class ApptentiveDialogButton extends FrameLayout {
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 		// This is a hack to get FrameLayout's OnClickListener to be fired correctly.
 		return onClickListener != null;
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		findViewById(R.id.background).setEnabled(enabled);
+		findViewById(R.id.label).setEnabled(enabled);
 	}
 }

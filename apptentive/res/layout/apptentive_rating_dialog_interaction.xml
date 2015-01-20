@@ -1,57 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
 ~ Please refer to the LICENSE file for the terms and conditions
 ~ under which redistribution and use of this file is permitted.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:apptentive="http://schemas.android.com/apk/res-auto"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:gravity="center_vertical">
+              android:gravity="center">
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/apptentive_activity_side_padding"
                 android:paddingRight="@dimen/apptentive_activity_side_padding"
                 android:fadingEdge="none">
-        <FrameLayout android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:paddingTop="@dimen/apptentive_activity_vertical_padding"
-                     android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
-            <LinearLayout android:layout_width="fill_parent"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+                      android:paddingBottom="@dimen/apptentive_activity_vertical_padding"
+                      android:gravity="center"
+                      android:orientation="vertical">
+            <LinearLayout android:id="@+id/top_area"
+                          android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:orientation="vertical"
-                          android:padding="16dp"
-                          android:background="@drawable/apptentive_dialog_background">
+                          style="@style/ApptentiveInteractionDialogTopArea"
+                          android:orientation="vertical">
                 <TextView android:id="@+id/title"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:layout_marginBottom="8dp"
-                          style="@style/ApptentiveInteractionDialogTitle"
+                          style="@style/ApptentiveDialogTitle"
                           android:text="@string/apptentive_thank_you"/>
                 <TextView android:id="@+id/body"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:layout_marginBottom="16dp"
-                          style="@style/ApptentiveInteractionDialogBody"/>
-                <Button android:id="@+id/rate"
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="8dp"
-                        style="@style/ApptentiveInteractionPositiveButton"/>
-                <Button android:id="@+id/remind"
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginBottom="8dp"
-                        style="@style/ApptentiveInteractionNegativeButton"
-                        android:text="@string/apptentive_rating_remind"/>
-                <Button android:id="@+id/decline"
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        style="@style/ApptentiveInteractionNegativeButton"
-                        android:text="@string/apptentive_no_thanks"/>
+                          style="@style/ApptentiveDialogBody"/>
             </LinearLayout>
-        </FrameLayout>
+            <LinearLayout android:id="@+id/bottom_area"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          style="@style/ApptentiveDialogBottomArea"
+                          android:orientation="vertical">
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
+                        android:id="@+id/rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
+                        android:id="@+id/remind"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        apptentive:text="@string/apptentive_rating_remind"/>
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
+                        android:id="@+id/decline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        apptentive:text="@string/apptentive_no_thanks"/>
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>

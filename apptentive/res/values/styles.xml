@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -29,20 +29,6 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="ApptentiveInteractionDialogTitle">
-        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center_vertical|left</item>
-    </style>
-
-    <style name="ApptentiveInteractionDialogTitleNoBody">
-        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:gravity">center</item>
-    </style>
-
     <style name="ApptentiveInteractionDialogBody">
         <item name="android:textColor">@color/apptentive_dialog_body_text</item>
         <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
@@ -51,15 +37,13 @@
         <item name="android:autoLink">all</item>
     </style>
 
-    <style name="ApptentiveInteractionAutoCompleteTextView" parent="ApptentiveInteractionEditText">
-        <item name="android:cursorVisible">true</item>
-    </style>
-
     <style name="ApptentiveInteractionEditText">
         <item name="android:background">@drawable/android_textfield_activated_holo_light</item>
         <item name="android:textColor">@color/apptentive_dialog_form_text</item>
+        <item name="android:textColorHint">@color/apptentive_dialog_hint_text</item>
+        <item name="android:textSize">@dimen/apptentive_dialog_edittext</item>
         <item name="android:textCursorDrawable">@null</item>
-        <item name="android:gravity">bottom</item>item>
+        <item name="android:gravity">bottom|left</item>item>
     </style>
 
     <style name="ApptentiveButtonClickArea">
@@ -67,7 +51,7 @@
         <item name="android:focusable">true</item>
     </style>
 
-    <style name="ApptentiveDialogTopArea">
+    <style name="ApptentiveInteractionDialogTopArea">
         <item name="android:paddingTop">@dimen/apptentive_dialog_content_padding_top</item>
         <item name="android:paddingBottom">@dimen/apptentive_dialog_content_padding_bottom</item>
         <item name="android:paddingLeft">@dimen/apptentive_dialog_content_padding_left</item>
@@ -83,6 +67,7 @@
     </style>
 
     <style name="ApptentiveDialogBody">
+        <item name="android:paddingTop">@dimen/apptentive_dialog_content_spacing</item>
         <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/apptentive_dialog_body_text</item>
@@ -98,16 +83,27 @@
         <item name="android:gravity">center_vertical|right</item>
     </style>
 
-    <style name="ApptentiveDialogButtonVisibleArea">
+    <style name="ApptentiveDialogButtonText">
         <item name="android:paddingLeft">@dimen/apptentive_dialog_button_padding_left</item>
         <item name="android:paddingRight">@dimen/apptentive_dialog_button_padding_right</item>
         <item name="android:minWidth">@dimen/apptentive_dialog_button_visible_area_min_width</item>
         <item name="android:minHeight">@dimen/apptentive_dialog_button_visible_area_min_height</item>
-        <item name="android:gravity">center</item>
         <item name="android:background">@drawable/apptentive_dialog_button</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/apptentive_dialog_button_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
-        <item name="android:textColor">@color/apptentive_dialog_button_text</item>
-        <item name="android:duplicateParentState">true</item>
+    </style>
+
+    <style name="ApptentiveInteractionDialogAutoCompleteTextView" parent="ApptentiveInteractionEditText">
+        <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="ApptentiveInteractionDialogAutoCompleteTextViewEmail"
+           parent="ApptentiveInteractionDialogAutoCompleteTextView">
+        <item name="android:inputType">textEmailAddress</item>
+        <item name="android:completionThreshold">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:imeOptions">actionNext</item>
     </style>
 </resources>

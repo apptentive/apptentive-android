@@ -8,11 +8,11 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 /**
  * @author Sky Kelsey
@@ -41,7 +41,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 		// No
 		String noText = interaction.getNoText();
-		Button noButton = (Button) activity.findViewById(R.id.no);
+		ApptentiveDialogButton noButton = (ApptentiveDialogButton) activity.findViewById(R.id.no);
 		if (noText != null) {
 			noButton.setText(noText);
 		}
@@ -55,7 +55,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 
 		// Yes
 		String yesText = interaction.getYesText();
-		Button yesButton = (Button) activity.findViewById(R.id.yes);
+		ApptentiveDialogButton yesButton = (ApptentiveDialogButton) activity.findViewById(R.id.yes);
 		if (yesText != null) {
 			yesButton.setText(yesText);
 		}
