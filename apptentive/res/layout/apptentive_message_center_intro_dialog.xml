@@ -66,7 +66,7 @@
                                   style="@style/ApptentiveDialogBottomArea"
                                   android:orientation="horizontal">
                         <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
-                                android:id="@+id/no_thanks"
+                                android:id="@+id/decline"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 apptentive:text="@string/apptentive_no_thanks"/>

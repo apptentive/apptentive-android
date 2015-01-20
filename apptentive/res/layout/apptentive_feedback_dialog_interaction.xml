@@ -25,6 +25,7 @@
                       android:orientation="vertical">
             <FrameLayout android:layout_width="fill_parent"
                          android:layout_height="wrap_content">
+                <!-- Feedback Dialog -->
                 <LinearLayout android:id="@+id/feedback_dialog"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
@@ -76,13 +77,13 @@
                                 apptentive:text="@string/apptentive_send"/>
                     </LinearLayout>
                 </LinearLayout>
-                <!---->
+                <!-- -->
+                <!-- Thank You Dialog -->
                 <LinearLayout android:id="@+id/thank_you_dialog"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:orientation="vertical"
                               android:visibility="gone">
-                    <!---->
                     <LinearLayout android:id="@+id/thank_you_top_area"
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"
@@ -116,6 +117,7 @@
                                 apptentive:text="@string/apptentive_send"/>
                     </LinearLayout>
                 </LinearLayout>
+                <!-- -->
             </FrameLayout>
         </LinearLayout>
     </ScrollView>
