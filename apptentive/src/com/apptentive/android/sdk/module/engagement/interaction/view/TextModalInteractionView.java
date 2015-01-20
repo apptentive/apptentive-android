@@ -132,6 +132,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						});
 						break;
 				}
+				bottomArea.addView(button);
 			}
 		} else {
 			bottomArea.setVisibility(View.GONE);
