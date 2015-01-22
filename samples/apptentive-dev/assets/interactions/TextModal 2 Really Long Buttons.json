@@ -5,16 +5,15 @@
   "priority": 1,
   "criteria": {},
   "configuration": {
-    "layout": "center",
     "title": "Long Buttons",
     "body": "These buttons are long, so the system should stack them vertically if it can't fit them horizontally..",
     "actions": [
       {
-        "label": "A VERY LONG BUTTON ONE",
+        "label": "A VERY VERY VERY VERY VERY LONG BUTTON",
         "action": "dismiss"
       },
       {
-        "label": "A VERY LONG BUTTON TWO",
+        "label": "ANOTHER VERY VERY VERY LONG BUTTON",
         "action": "dismiss"
       }
     ]

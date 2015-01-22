@@ -72,7 +72,7 @@ public class ImageUtil {
 			final int width = decodeBoundsOptions.outWidth;
 			final int height = decodeBoundsOptions.outHeight;
 			Log.v("Original bitmap dimensions: %d x %d", width, height);
-			int sampleRatio = Math.max(width / minShrunkWidth, height / minShrunkHeight);
+			int sampleRatio = Math.min(width / minShrunkWidth, height / minShrunkHeight);
 			if (sampleRatio >= 2) {
 				options.inSampleSize = sampleRatio;
 			}

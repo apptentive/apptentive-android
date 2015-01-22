@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 /**
  * @author Sky Kelsey
@@ -47,7 +48,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		bodyView.setText(body);
 
 		// Rate
-		Button rateButton = (Button) activity.findViewById(R.id.rate);
+		ApptentiveDialogButton rateButton = (ApptentiveDialogButton) activity.findViewById(R.id.rate);
 		String rate = interaction.getRateText(activity);
 		rateButton.setText(rate);
 		rateButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +60,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		});
 
 		// Remind
-		Button remindButton = (Button) activity.findViewById(R.id.remind);
+		ApptentiveDialogButton remindButton = (ApptentiveDialogButton) activity.findViewById(R.id.remind);
 		String remind = interaction.getRemindText();
 		if (remind != null) {
 			remindButton.setText(remind);
@@ -73,7 +74,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 		});
 
 		// Decline
-		Button declineButton = (Button) activity.findViewById(R.id.decline);
+		ApptentiveDialogButton declineButton = (ApptentiveDialogButton) activity.findViewById(R.id.decline);
 		String decline = interaction.getDeclineText();
 		if (decline != null) {
 			declineButton.setText(decline);

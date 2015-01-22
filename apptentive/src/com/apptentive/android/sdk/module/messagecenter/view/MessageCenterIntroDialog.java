@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
 import com.apptentive.android.sdk.util.Util;
 
@@ -37,8 +38,8 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 
 		final AutoCompleteTextView emailText = (AutoCompleteTextView) findViewById(R.id.email);
 		final EditText messageText = (EditText) findViewById(R.id.message);
-		final Button noThanksButton = (Button) findViewById(R.id.no_thanks);
-		final Button sendButton = (Button) findViewById(R.id.send);
+		final ApptentiveDialogButton declineButton = (ApptentiveDialogButton) findViewById(R.id.decline);
+		final ApptentiveDialogButton submitButton = (ApptentiveDialogButton) findViewById(R.id.submit);
 
 		// Pre-populate a list of possible emails based on those pulled from the phone.
 		ArrayAdapter<String> emailAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, Util.getAllUserAccountEmailAddresses(getContext()));
@@ -58,7 +59,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				email = charSequence;
-				validateForm(sendButton);
+				validateForm(submitButton);
 			}
 
 			@Override
@@ -74,7 +75,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				message = charSequence;
-				validateForm(sendButton);
+				validateForm(submitButton);
 			}
 
 			@Override
@@ -82,16 +83,16 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 			}
 		});
 
-		noThanksButton.setEnabled(true);
-		noThanksButton.setOnClickListener(new View.OnClickListener() {
+		declineButton.setEnabled(true);
+		declineButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				cancel();
 			}
 		});
 
-		sendButton.setEnabled(false);
-		sendButton.setOnClickListener(new View.OnClickListener() {
+		submitButton.setEnabled(false);
+		submitButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (email != null && email.length() != 0 && !Util.isEmailValid(email.toString())) {
@@ -104,7 +105,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 				}
 			}
 		});
-		validateForm(sendButton);
+		validateForm(submitButton);
 	}
 
 	@Override
@@ -157,7 +158,7 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 		}
 	}
 
-	private void validateForm(Button sendButton) {
+	private void validateForm(ApptentiveDialogButton sendButton) {
 		boolean passedEmail = true;
 		if (emailRequired) {
 			passedEmail = !(email == null || email.length() == 0);

@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.view.EmailValidationFailedDialog;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -43,7 +44,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	private CharSequence email;
 	private CharSequence message;
 
-	// Don't show the wrong view when we because of rotation.
+	// Don't show the wrong view when we rotate.
 	private static boolean feedbackDialogVisible = false;
 	private static boolean thankYouDialogVisible = false;
 
@@ -67,8 +68,8 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 			final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
 			EditText messageView = (EditText) activity.findViewById(R.id.message);
-			Button noButton = (Button) activity.findViewById(R.id.decline);
-			final Button sendButton = (Button) activity.findViewById(R.id.submit);
+			ApptentiveDialogButton noButton = (ApptentiveDialogButton) activity.findViewById(R.id.decline);
+			final ApptentiveDialogButton sendButton = (ApptentiveDialogButton) activity.findViewById(R.id.submit);
 
 			// Title
 			String title = interaction.getTitle();
@@ -217,7 +218,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		}
 
 		// Thank You Close Button
-		Button thankYouCloseButton = (Button) activity.findViewById(R.id.thank_you_close);
+		ApptentiveDialogButton thankYouCloseButton = (ApptentiveDialogButton) activity.findViewById(R.id.thank_you_close);
 		String thankYouCloseText = interaction.getThankYouCloseText();
 		if (thankYouCloseText != null) {
 			thankYouCloseButton.setText(thankYouCloseText);
@@ -232,7 +233,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		});
 
 		// Thank You View Messages Button
-		Button thankYouViewMessagesButton = (Button) activity.findViewById(R.id.thank_you_view_messages);
+		ApptentiveDialogButton thankYouViewMessagesButton = (ApptentiveDialogButton) activity.findViewById(R.id.thank_you_view_messages);
 		if (interaction.isMessageCenterEnabled()) {
 			String thankYouViewMessages = interaction.getThankYouViewMessagesText();
 			if (thankYouViewMessages != null) {
@@ -308,7 +309,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		MessageManager.sendMessage(activity, textMessage);
 	}
 
-	private void validateForm(Button sendButton) {
+	private void validateForm(ApptentiveDialogButton sendButton) {
 		boolean passedEmail = true;
 		if (interaction.isEmailRequired() && !Util.isEmpty(PersonManager.loadInitialPersonEmail(sendButton.getContext()))) {
 			passedEmail = !Util.isEmpty(email);

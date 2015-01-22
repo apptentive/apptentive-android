@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="wrap_content"
-             android:layout_height="@dimen/apptentive_dialog_button_click_area_height"
-             style="@style/ApptentiveButtonClickArea">
-    <TextView android:id="@+id/label"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="@dimen/apptentive_dialog_button_margin_left"
-              android:layout_marginRight="@dimen/apptentive_dialog_button_margin_right"
-              android:layout_gravity="center"
-              style="@style/ApptentiveDialogButtonVisibleArea"/>
-</FrameLayout>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:id="@+id/background"
+                 android:layout_width="wrap_content"
+                 android:layout_height="@dimen/apptentive_dialog_button_click_area_height"
+                 android:duplicateParentState="true"
+                 style="@style/ApptentiveButtonClickArea">
+        <TextView android:id="@+id/label"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="@dimen/apptentive_dialog_button_margin_left"
+                  android:layout_marginRight="@dimen/apptentive_dialog_button_margin_right"
+                  android:layout_gravity="center"
+                  android:duplicateParentState="true"
+                  style="@style/ApptentiveDialogButtonText"/>
+    </FrameLayout>
+</merge>

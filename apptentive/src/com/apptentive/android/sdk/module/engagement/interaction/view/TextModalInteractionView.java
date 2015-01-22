@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +20,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 import java.util.List;
 
@@ -29,7 +29,11 @@ import java.util.List;
  */
 public class TextModalInteractionView extends InteractionView<TextModalInteraction> {
 
-	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 21;
+	@SuppressWarnings("unused")
+	private final static int MAX_TEXT_LENGTH_FOR_ONE_BUTTONS = 19;
+	private final static int MAX_TEXT_LENGTH_FOR_TWO_BUTTONS = 17;
+	private final static int MAX_TEXT_LENGTH_FOR_THREE_BUTTONS = 15;
+	private final static int MAX_TEXT_LENGTH_FOR_FOUR_BUTTONS = 11;
 
 	public TextModalInteractionView(TextModalInteraction interaction) {
 		super(interaction);
@@ -38,17 +42,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 	@Override
 	public void show(final Activity activity) {
 		super.show(activity);
-		switch (interaction.getLayout()) {
-			case center:
-				activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
-				break;
-			case bottom:
-				activity.setContentView(R.layout.apptentive_textmodal_interaction_bottom);
-				break;
-			default:
-				activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
-				break;
-		}
+		activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
 
 		EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_LAUNCH);
 		TextView title = (TextView) activity.findViewById(R.id.title);
@@ -57,39 +51,40 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		body.setText(interaction.getBody());
 
 		LinearLayout bottomArea = (LinearLayout) activity.findViewById(R.id.bottom_area);
-		LayoutInflater inflater = activity.getLayoutInflater();
 		List<Action> actions = interaction.getActions().getAsList();
 		boolean vertical;
 		if (actions != null && !actions.isEmpty()) {
-			if (actions.size() > 4) {
-				vertical = true;
-			} else if (actions.size() == 1) {
-				vertical = true;
-			} else {
-				int totalChars = 0;
-				for (Action button : actions) {
-					totalChars += button.getLabel().length();
-				}
+			int totalChars = 0;
+			for (Action button : actions) {
+				totalChars += button.getLabel().length();
+			}
+			if (actions.size() == 1) {
+				vertical = false;
+			} else if (actions.size() == 2) {
 				vertical = totalChars > MAX_TEXT_LENGTH_FOR_TWO_BUTTONS;
+			} else if (actions.size() == 3) {
+				vertical = totalChars > MAX_TEXT_LENGTH_FOR_THREE_BUTTONS;
+			} else if (actions.size() == 4) {
+				vertical = totalChars > MAX_TEXT_LENGTH_FOR_FOUR_BUTTONS;
+			} else {
+				vertical = true;
 			}
 			if (vertical) {
 				bottomArea.setOrientation(LinearLayout.VERTICAL);
 			} else {
 				bottomArea.setOrientation(LinearLayout.HORIZONTAL);
 			}
+
 			for (int i = 0; i < actions.size(); i++) {
 				final Action buttonAction = actions.get(i);
 				final int position = i;
-				View button;
-				button = inflater.inflate(R.layout.apptentive_dialog_button, bottomArea, false);
-				TextView buttonTextView = ((TextView) button.findViewById(R.id.label));
-				buttonTextView.setText(buttonAction.getLabel());
+				ApptentiveDialogButton button = new ApptentiveDialogButton(activity);
+				button.setText(buttonAction.getLabel());
 				switch (buttonAction.getType()) {
 					case dismiss:
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Log.e("Dismiss Button Clicked.");
 								String data = String.format("{\"title\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
 								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data);
 								activity.finish();
@@ -100,7 +95,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Log.e("Interaction Button Clicked.");
 								LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
 								List<Invocation> invocations = launchInteractionButton.getInvocations();
 								String interactionIdToLaunch = null;

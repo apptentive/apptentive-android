@@ -5,12 +5,11 @@
   "priority": 1,
   "criteria": {},
   "configuration": {
-    "layout": "center",
     "title": "Centered TextModal Title",
     "body": "Mauris morbi bibendum erat vestibulum nulla augue sociis in quis cras a hac suspendisse orci litora tellus feugiat feugiat non suspendisse natoque pharetra commodo augue.Natoque ullamcorper vestibulum nascetur dui dui erat ornare vestibulum suscipit porta curabitur fringilla vestibulum accumsan morbi cum adipiscing metus parturient.",
     "actions": [
       {
-        "label": "One",
+        "label": "OnNE",
         "action": "dismiss"
       }
     ]

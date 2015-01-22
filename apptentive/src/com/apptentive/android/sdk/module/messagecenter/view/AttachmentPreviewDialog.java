@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -12,9 +12,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -37,7 +37,7 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Button no = (Button) findViewById(R.id.no);
+		ApptentiveDialogButton no = (ApptentiveDialogButton) findViewById(R.id.no);
 		no.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -45,7 +45,7 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 			}
 		});
 
-		Button yes = (Button) findViewById(R.id.yes);
+		ApptentiveDialogButton yes = (ApptentiveDialogButton) findViewById(R.id.yes);
 		yes.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
