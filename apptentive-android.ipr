@@ -260,14 +260,6 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="apptentive-android-1.7.0-SNAPSHOT">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.7.0-SNAPSHOT/classes.jar!/" />
-        <root url="file://$PROJECT_DIR$/samples/apptentive-dev/build/intermediates/exploded-aar/com.apptentive/apptentive-android/1.7.0-SNAPSHOT/res" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="HockeySDK-3.5.0">
       <CLASSES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.hockeyapp.android/HockeySDK/3.5.0/1624c0039a56f9cc45915def1632c225326c3c03/HockeySDK-3.5.0.jar!/" />
