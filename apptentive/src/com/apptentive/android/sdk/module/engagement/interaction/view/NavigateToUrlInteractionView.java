@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
@@ -32,8 +31,9 @@ public class NavigateToUrlInteractionView extends InteractionView<NavigateToLink
 			String url = interaction.getUrl();
 			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 
-			// Do this if the customer wants to launch the new URL outside the app as a separate app.
-//			intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NEW_TASK);
+			if (interaction.isNewTask()) {
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			}
 
 			activity.startActivity(intent);
 		} finally {

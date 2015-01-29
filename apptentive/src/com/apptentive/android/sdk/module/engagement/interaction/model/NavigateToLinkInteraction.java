@@ -14,6 +14,7 @@ import org.json.JSONException;
 public class NavigateToLinkInteraction extends Interaction {
 
 	private static final String KEY_URL = "url";
+	private static final String KEY_NEW_TASK = "new_task";
 
 	public NavigateToLinkInteraction(String json) throws JSONException {
 		super(json);
@@ -25,5 +26,13 @@ public class NavigateToLinkInteraction extends Interaction {
 			return configuration.optString(KEY_URL, null);
 		}
 		return null;
+	}
+
+	public boolean isNewTask() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration != null && !configuration.isNull(KEY_NEW_TASK)) {
+			return configuration.optBoolean(KEY_NEW_TASK, true);
+		}
+		return true;
 	}
 }
