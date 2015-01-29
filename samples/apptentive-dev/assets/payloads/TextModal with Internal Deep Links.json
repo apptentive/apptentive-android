@@ -1,0 +1,112 @@
+{
+  "interactions": [
+    {
+      "id": "548cc5dd49f63bb5c2000001",
+      "type": "TextModal",
+      "configuration": {
+        "title": "Internal Deep Links",
+        "body": "This example allow testing how internal deep links are opened.",
+        "actions": [
+          {
+            "label": "Main",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000042",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Interactions",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000043",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Message Center",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000044",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Data",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000045",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Tests",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000046",
+                "criteria": {}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000042",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "apptentive://dev/main",
+        "new_task": false
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000043",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "apptentive://dev/interactions",
+        "new_task": false
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000044",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "apptentive://dev/message_center",
+        "new_task": true
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000045",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "apptentive://dev/data",
+        "new_task": true
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000046",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "apptentive://dev/tests",
+        "new_task": true
+      }
+    }
+  ],
+  "targets": {
+    "local#app#launch": [
+      {
+        "interaction_id": "548cc5dd49f63bb5c2000001",
+        "criteria": {}
+      }
+    ]
+  }
+}
