@@ -45,10 +45,19 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
 
 		EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_LAUNCH);
+
 		TextView title = (TextView) activity.findViewById(R.id.title);
-		title.setText(interaction.getTitle());
+		if (interaction.getTitle() == null) {
+			title.setVisibility(View.GONE);
+		} else {
+			title.setText(interaction.getTitle());
+		}
 		TextView body = (TextView) activity.findViewById(R.id.body);
-		body.setText(interaction.getBody());
+		if (interaction.getBody() == null) {
+			body.setVisibility(View.GONE);
+		} else {
+			body.setText(interaction.getBody());
+		}
 
 		LinearLayout bottomArea = (LinearLayout) activity.findViewById(R.id.bottom_area);
 		List<Action> actions = interaction.getActions().getAsList();
