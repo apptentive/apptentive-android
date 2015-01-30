@@ -196,7 +196,7 @@ public class ApptentiveClient {
 					}
 					ret.setContent(Util.readStringFromInputStream(is, "UTF-8"));
 					if (code >= 200 && code < 300) {
-						Log.d("Response: " + ret.getContent());
+						Log.v("Response: " + ret.getContent());
 					} else {
 						Log.w("Response: " + ret.getContent());
 					}
