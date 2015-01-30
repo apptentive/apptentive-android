@@ -46,6 +46,26 @@
                 "criteria": {}
               }
             ]
+          },
+          {
+            "label": "Twitter - Same Task",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000047",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Twitter - New Task ",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000048",
+                "criteria": {}
+              }
+            ]
           }
         ]
       }
@@ -54,7 +74,7 @@
       "id": "54a3437b7724c57cf6000043",
       "type": "NavigateToLink",
       "configuration": {
-        "url": "http://pages.ebay.com/link/?nav=item.view&id=221648890812",
+        "url": "http://pages.ebay.com/link/?nav=item.view&id=121370565034",
         "target": "self"
       }
     },
@@ -62,7 +82,7 @@
       "id": "54a3437b7724c57cf6000044",
       "type": "NavigateToLink",
       "configuration": {
-        "url": "http://pages.ebay.com/link/?nav=item.view&id=221648890812",
+        "url": "http://pages.ebay.com/link/?nav=item.view&id=121370565034",
         "target": "new"
       }
     },
@@ -79,6 +99,22 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "amzn://apps/android?asin=B00CBMH14I",
+        "target": "new"
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000047",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "https://twitter.com/RedRussak/status/561250376414818304",
+        "target": "self"
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000048",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "https://twitter.com/RedRussak/status/561250376414818304",
         "target": "new"
       }
     }
