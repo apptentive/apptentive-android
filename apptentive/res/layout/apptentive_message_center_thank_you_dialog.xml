@@ -51,12 +51,12 @@
                             android:id="@+id/close"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            apptentive:text="@string/apptentive_no_thanks"/>
+                            apptentive:text="@string/apptentive_thank_you_dialog_close"/>
                     <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
                             android:id="@+id/view_messages"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            apptentive:text="@string/apptentive_send"/>
+                            apptentive:text="@string/apptentive_thank_you_dialog_view_messages"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
