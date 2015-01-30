@@ -150,7 +150,7 @@ public class ViewActivity extends ApptentiveActivity {
 							view = new TextModalInteractionView((TextModalInteraction) interaction);
 							break;
 						case NavigateToLink:
-							view = new NavigateToUrlInteractionView((NavigateToLinkInteraction) interaction);
+							view = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
 							break;
 						default:
 							break;

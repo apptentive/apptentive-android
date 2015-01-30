@@ -16,9 +16,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateTo
  *
  * @author Sky Kelsey
  */
-public class NavigateToUrlInteractionView extends InteractionView<NavigateToLinkInteraction> {
+public class NavigateToLinkInteractionView extends InteractionView<NavigateToLinkInteraction> {
 
-	public NavigateToUrlInteractionView(NavigateToLinkInteraction interaction) {
+	public NavigateToLinkInteractionView(NavigateToLinkInteraction interaction) {
 		super(interaction);
 	}
 
