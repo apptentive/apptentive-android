@@ -1,0 +1,50 @@
+{
+  "id": "548cc5dd49f63bb5c2000001",
+  "type": "TextModal",
+  "configuration": {
+    "title": "External Deep Links",
+    "body": "This example allow testing how external deep links are opened.",
+    "actions": [
+      {
+        "label": "eBay - Same Task",
+        "action": "interaction",
+        "invokes": [
+          {
+            "interaction_id": "54a3437b7724c57cf6000043",
+            "criteria": {}
+          }
+        ]
+      },
+      {
+        "label": "eBay - New Task ",
+        "action": "interaction",
+        "invokes": [
+          {
+            "interaction_id": "54a3437b7724c57cf6000044",
+            "criteria": {}
+          }
+        ]
+      },
+      {
+        "label": "Amazon Appstore - Same Task",
+        "action": "interaction",
+        "invokes": [
+          {
+            "interaction_id": "54a3437b7724c57cf6000045",
+            "criteria": {}
+          }
+        ]
+      },
+      {
+        "label": "Amazon Appstore - New Task ",
+        "action": "interaction",
+        "invokes": [
+          {
+            "interaction_id": "54a3437b7724c57cf6000046",
+            "criteria": {}
+          }
+        ]
+      }
+    ]
+  }
+}
