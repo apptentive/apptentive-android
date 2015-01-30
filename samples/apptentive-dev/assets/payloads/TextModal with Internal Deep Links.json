@@ -65,7 +65,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "apptentive://dev/main",
-        "new_task": false
+        "target": "self"
       }
     },
     {
@@ -73,7 +73,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "apptentive://dev/interactions",
-        "new_task": false
+        "target": "self"
       }
     },
     {
@@ -81,7 +81,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "apptentive://dev/message_center",
-        "new_task": true
+        "target": "self"
       }
     },
     {
@@ -89,7 +89,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "apptentive://dev/data",
-        "new_task": true
+        "target": "self"
       }
     },
     {

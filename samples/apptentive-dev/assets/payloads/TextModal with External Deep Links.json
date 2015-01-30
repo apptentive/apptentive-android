@@ -55,7 +55,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "http://pages.ebay.com/link/?nav=item.view&id=221648890812",
-        "new_task": false
+        "target": "self"
       }
     },
     {
@@ -63,7 +63,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "http://pages.ebay.com/link/?nav=item.view&id=221648890812",
-        "new_task": true
+        "target": "new"
       }
     },
     {
@@ -71,7 +71,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "amzn://apps/android?asin=B00CBMH14I",
-        "new_task": false
+        "target": "self"
       }
     },
     {
@@ -79,7 +79,7 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "amzn://apps/android?asin=B00CBMH14I",
-        "new_task": true
+        "target": "new"
       }
     }
   ],
