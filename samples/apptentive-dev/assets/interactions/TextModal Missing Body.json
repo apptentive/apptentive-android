@@ -1,0 +1,15 @@
+{
+  "type": "TextModal",
+  "name": "Centered TextModal Interaction",
+  "id": "textmodal_interaction_centered",
+  "priority": 1,
+  "configuration": {
+    "title": "Centered TextModal Title",
+    "actions": [
+      {
+        "label": "OnNE",
+        "action": "dismiss"
+      }
+    ]
+  }
+}
