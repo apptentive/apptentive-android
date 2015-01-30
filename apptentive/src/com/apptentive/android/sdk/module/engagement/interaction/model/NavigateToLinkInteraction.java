@@ -14,7 +14,7 @@ import org.json.JSONException;
 public class NavigateToLinkInteraction extends Interaction {
 
 	private static final String KEY_URL = "url";
-	private static final String KEY_NEW_TASK = "new_task";
+	private static final String KEY_TARGET = "target";
 
 	public NavigateToLinkInteraction(String json) throws JSONException {
 		super(json);
@@ -28,11 +28,32 @@ public class NavigateToLinkInteraction extends Interaction {
 		return null;
 	}
 
-	public boolean isNewTask() {
+	public Target getTarget() {
 		InteractionConfiguration configuration = getConfiguration();
-		if (configuration != null && !configuration.isNull(KEY_NEW_TASK)) {
-			return configuration.optBoolean(KEY_NEW_TASK, true);
+		if (configuration != null && !configuration.isNull(KEY_TARGET)) {
+			return Target.parse(configuration.optString(KEY_TARGET, ""));
 		}
-		return true;
+		return Target.New;
+	}
+
+	public static enum Target {
+		New, // Default value
+		Self;
+
+		public static Target parse(String value) {
+			if (value != null) {
+				try {
+					for (Target target : Target.values()) {
+						// "new" is a reserved keyword, so perform a case-insensitive match.
+						if (target.name().equalsIgnoreCase(value)) {
+							return target;
+						}
+					}
+				} catch (Exception e) {
+					// Happens for values introduced after this version of the SDK.
+				}
+			}
+			return New;
+		}
 	}
 }

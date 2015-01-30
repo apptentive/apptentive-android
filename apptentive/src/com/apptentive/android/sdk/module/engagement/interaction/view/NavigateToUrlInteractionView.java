@@ -20,7 +20,6 @@ public class NavigateToUrlInteractionView extends InteractionView<NavigateToLink
 
 	public NavigateToUrlInteractionView(NavigateToLinkInteraction interaction) {
 		super(interaction);
-
 	}
 
 	@Override
@@ -31,8 +30,15 @@ public class NavigateToUrlInteractionView extends InteractionView<NavigateToLink
 			String url = interaction.getUrl();
 			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 
-			if (interaction.isNewTask()) {
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			switch (interaction.getTarget()) {
+				case New:
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					break;
+				case Self:
+					// Nothing
+					break;
+				default:
+					break;
 			}
 
 			activity.startActivity(intent);
