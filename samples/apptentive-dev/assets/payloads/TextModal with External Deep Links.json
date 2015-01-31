@@ -68,7 +68,7 @@
             ]
           },
           {
-            "label": "Invalid - New Task ",
+            "label": "Invalid URL - New Task ",
             "action": "interaction",
             "invokes": [
               {
@@ -78,7 +78,7 @@
             ]
           },
           {
-            "label": "Invalid - Same Task",
+            "label": "Invalid URL - Same Task",
             "action": "interaction",
             "invokes": [
               {
