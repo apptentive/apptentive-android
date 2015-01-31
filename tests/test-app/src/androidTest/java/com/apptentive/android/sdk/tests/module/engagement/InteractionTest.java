@@ -996,7 +996,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		long duration = end - start;
 		double average = (double) duration / iterations;
 		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 4d);
+		assertTrue(average < 7d);
 	}
 
 	public void testInteractionSelectionPerformance() {

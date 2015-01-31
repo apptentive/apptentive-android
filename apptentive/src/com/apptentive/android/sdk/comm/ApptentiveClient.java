@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -39,6 +39,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
+	private static final int API_VERSION = 2;
+
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
 	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
@@ -65,11 +67,11 @@ public class ApptentiveClient {
 	public static boolean useStagingServer = false;
 
 	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, 1, conversationTokenRequest.toString());
+		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
 	}
 
 	public static ApptentiveHttpResponse getAppConfiguration() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, 1, null);
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -79,19 +81,19 @@ public class ApptentiveClient {
 	 */
 	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
 		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, 1, null);
+		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse postMessage(Context context, Message message) {
 		switch (message.getType()) {
 			case TextMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, 1, message.marshallForSending());
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case AutomatedMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, 1, message.marshallForSending());
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
 			case FileMessage:
 				FileMessage fileMessage = (FileMessage) message;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, 1, message.marshallForSending(), storedFile);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
 			case unknown:
 				break;
 		}
@@ -99,35 +101,35 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse postEvent(Event event) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, 1, event.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putDevice(Device device) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, 1, device.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, 1, sdk.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, 1, appRelease.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putPerson(Person person) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, 1, person.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, 1, survey.marshallForSending());
+		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse getInteractions() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, 2, null);
+		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
-	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, int apiVersion, String body) {
+	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
@@ -165,7 +167,7 @@ public class ApptentiveClient {
 			request.setHeader("Authorization", "OAuth " + oauthToken);
 			request.setHeader("Accept-Encoding", "gzip");
 			request.setHeader("Accept", "application/json");
-			request.setHeader("X-API-Version", String.valueOf(apiVersion));
+			request.setHeader("X-API-Version", String.valueOf(API_VERSION));
 
 			HttpResponse response = httpClient.execute(request);
 			int code = response.getStatusLine().getStatusCode();
@@ -194,7 +196,7 @@ public class ApptentiveClient {
 					}
 					ret.setContent(Util.readStringFromInputStream(is, "UTF-8"));
 					if (code >= 200 && code < 300) {
-						Log.d("Response: " + ret.getContent());
+						Log.v("Response: " + ret.getContent());
 					} else {
 						Log.w("Response: " + ret.getContent());
 					}
@@ -214,7 +216,7 @@ public class ApptentiveClient {
 		return ret;
 	}
 
-	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, int apiVersion, String postBody, StoredFile storedFile) {
+	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
 		uri = getEndpointBase() + uri;
 		Log.d("Performing multipart request to %s", uri);
 
@@ -254,7 +256,7 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("X-API-Version", String.valueOf(apiVersion));
+			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
 			connection.setRequestProperty("User-Agent", getUserAgentString());
 
 			StringBuilder requestText = new StringBuilder();

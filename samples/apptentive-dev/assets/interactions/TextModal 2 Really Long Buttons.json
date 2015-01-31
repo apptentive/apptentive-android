@@ -3,7 +3,6 @@
   "name": "Two Long Button Labels",
   "id": "textmodal_interaction_centered",
   "priority": 1,
-  "criteria": {},
   "configuration": {
     "title": "Long Buttons",
     "body": "These buttons are long, so the system should stack them vertically if it can't fit them horizontally..",

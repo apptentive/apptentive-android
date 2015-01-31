@@ -16,21 +16,64 @@
     <application android:label="${APPTENTIVE_APP_NAME}" android:icon="@drawable/icon">
         <activity android:name=".MainActivity"
                   android:label="${APPTENTIVE_APP_NAME}"
-                  android:launchMode="singleTop"
                   android:theme="@style/ApptentiveDevTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="apptentive"
+                      android:host="dev"
+                      android:pathPrefix="/main"/>
+            </intent-filter>
         </activity>
-        <activity android:name="com.apptentive.android.dev.InteractionsActivity"
-                  android:theme="@style/ApptentiveDevTheme"/>
-        <activity android:name="com.apptentive.android.dev.MessageCenterActivity"
-                  android:theme="@style/ApptentiveDevTheme"/>
-        <activity android:name="com.apptentive.android.dev.DataActivity"
-                  android:theme="@style/ApptentiveDevTheme"/>
-        <activity android:name="com.apptentive.android.dev.TestsActivity"
-                  android:theme="@style/ApptentiveDevTheme"/>
+        <activity android:name=".InteractionsActivity"
+                  android:theme="@style/ApptentiveDevTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="apptentive"
+                      android:host="dev"
+                      android:pathPrefix="/interactions"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".MessageCenterActivity"
+                  android:theme="@style/ApptentiveDevTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="apptentive"
+                      android:host="dev"
+                      android:pathPrefix="/message_center"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".DataActivity"
+                  android:theme="@style/ApptentiveDevTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="apptentive"
+                      android:host="dev"
+                      android:pathPrefix="/data"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".TestsActivity"
+                  android:theme="@style/ApptentiveDevTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="apptentive"
+                      android:host="dev"
+                      android:pathPrefix="/tests"/>
+            </intent-filter>
+        </activity>
 
         <meta-data android:name="apptentive_api_key" android:value="${APPTENTIVE_API_KEY}"/>
         <meta-data android:name="apptentive_use_staging_server" android:value="${APPTENTIVE_USE_STAGING_SERVER}"/>
