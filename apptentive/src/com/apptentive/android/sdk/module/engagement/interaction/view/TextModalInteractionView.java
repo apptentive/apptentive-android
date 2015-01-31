@@ -94,7 +94,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								String data = String.format("{\"title\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
+								String data = String.format("{\"label\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
 								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data);
 								activity.finish();
 							}
@@ -116,11 +116,14 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 								if (interactionIdToLaunch != null) {
 									Interactions interactions = InteractionManager.getInteractions(activity);
 									if (interactions != null) {
-										Interaction interaction = interactions.getInteraction(interactionIdToLaunch);
+										Interaction invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 										if (interaction != null) {
-											String data = String.format("{\"title\":\"%s\",\"position\":%d,\"target\":\"%s\"}", buttonAction.getLabel(), position, interaction.getId());
+											String data = String.format("{\"label\":\"%s\",\"position\":%d,\"invoked_interaction_id\":\"%s\"}", buttonAction.getLabel(), position, invokedInteraction.getId());
 											EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data);
-											EngagementModule.launchInteraction(activity, interaction);
+											EngagementModule.launchInteraction(activity, invokedInteraction);
+										} else {
+											String data = String.format("{\"label\":\"%s\",\"position\":%d,\"invoked_interaction_id\":null}", buttonAction.getLabel(), position);
+											EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data);
 										}
 									}
 								} else {
