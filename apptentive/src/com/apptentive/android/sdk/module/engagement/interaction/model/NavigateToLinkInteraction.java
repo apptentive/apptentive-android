@@ -15,8 +15,10 @@ import java.util.Locale;
  */
 public class NavigateToLinkInteraction extends Interaction {
 
-	private static final String KEY_URL = "url";
-	private static final String KEY_TARGET = "target";
+	public static final String KEY_URL = "url";
+	public static final String KEY_TARGET = "target";
+
+	public static final String EVENT_KEY_SUCCESS = "success";
 
 	public static final String EVENT_NAME_NAVIGATE = "navigate";
 

@@ -13,6 +13,8 @@ import android.net.Uri;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This interaction doesn't display its own UI. It just launches a URL.
@@ -50,8 +52,15 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 		} catch (ActivityNotFoundException e) {
 			Log.w("NavigateToLink Error: ", e);
 		} finally {
-			String data = String.format("{\"url\":\"%s\",\"target\":\"%s\",\"success\":%b}", interaction.getUrl(), interaction.getTarget().lowercaseName(), success);
-			EngagementModule.engageInternal(activity, interaction, NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data);
+			JSONObject data = new JSONObject();
+			try {
+				data.put(NavigateToLinkInteraction.KEY_URL, interaction.getUrl());
+				data.put(NavigateToLinkInteraction.KEY_TARGET, interaction.getTarget().lowercaseName());
+				data.put(NavigateToLinkInteraction.EVENT_KEY_SUCCESS, success);
+			} catch (JSONException e) {
+				Log.e("Error creating Event data object.", e);
+			}
+			EngagementModule.engageInternal(activity, interaction, NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data.toString());
 			// Always finish this Activity.
 			activity.finish();
 		}

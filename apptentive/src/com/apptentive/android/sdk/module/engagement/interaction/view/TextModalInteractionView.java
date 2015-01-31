@@ -132,9 +132,9 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 
 								JSONObject data = new JSONObject();
 								try {
-									data.put("label", buttonAction.getLabel());
-									data.put("position", position);
-									data.put("invoked_interaction_id", invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
+									data.put(TextModalInteraction.EVENT_KEY_LABEL, buttonAction.getLabel());
+									data.put(TextModalInteraction.EVENT_KEY_POSITION, position);
+									data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
 								} catch (JSONException e) {
 									Log.e("Error creating Event data object.", e);
 								}
