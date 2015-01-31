@@ -21,6 +21,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -94,8 +96,14 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								String data = String.format("{\"label\":\"%s\",\"position\":%d}", buttonAction.getLabel(), position);
-								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data);
+								JSONObject data = new JSONObject();
+								try {
+									data.put("label", buttonAction.getLabel());
+									data.put("position", position);
+								} catch (JSONException e) {
+									Log.e("Error creating Event data object.", e);
+								}
+								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
 								activity.finish();
 							}
 						});
@@ -113,22 +121,29 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 										break;
 									}
 								}
+
+								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
 									Interactions interactions = InteractionManager.getInteractions(activity);
 									if (interactions != null) {
-										Interaction invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
-										if (interaction != null) {
-											String data = String.format("{\"label\":\"%s\",\"position\":%d,\"invoked_interaction_id\":\"%s\"}", buttonAction.getLabel(), position, invokedInteraction.getId());
-											EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data);
-											EngagementModule.launchInteraction(activity, invokedInteraction);
-										} else {
-											String data = String.format("{\"label\":\"%s\",\"position\":%d,\"invoked_interaction_id\":null}", buttonAction.getLabel(), position);
-											EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data);
-										}
+										invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 									}
-								} else {
-									Log.w("No Interactions were launched.");
 								}
+
+								JSONObject data = new JSONObject();
+								try {
+									data.put("label", buttonAction.getLabel());
+									data.put("position", position);
+									data.put("invoked_interaction_id", invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
+								} catch (JSONException e) {
+									Log.e("Error creating Event data object.", e);
+								}
+
+								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
+								if (invokedInteraction != null) {
+									EngagementModule.launchInteraction(activity, invokedInteraction);
+								}
+
 								activity.finish();
 							}
 						});
