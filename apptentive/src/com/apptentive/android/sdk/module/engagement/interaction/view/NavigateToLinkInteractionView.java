@@ -7,8 +7,11 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 
 /**
@@ -26,6 +29,7 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 	public void show(Activity activity) {
 		super.show(activity);
 
+		boolean success = false;
 		try {
 			String url = interaction.getUrl();
 			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -42,7 +46,12 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 			}
 
 			activity.startActivity(intent);
+			success = true;
+		} catch (ActivityNotFoundException e) {
+			Log.w("NavigateToLink Error: ", e);
 		} finally {
+			String data = String.format("{\"url\":\"%s\",\"target\":\"%s\",\"success\":%b}", interaction.getUrl(), interaction.getTarget().lowercaseName(), success);
+			EngagementModule.engageInternal(activity, interaction, NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data);
 			// Always finish this Activity.
 			activity.finish();
 		}

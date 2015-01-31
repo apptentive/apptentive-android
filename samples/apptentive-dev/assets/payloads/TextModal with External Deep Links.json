@@ -66,6 +66,26 @@
                 "criteria": {}
               }
             ]
+          },
+          {
+            "label": "Invalid - New Task ",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000049",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "label": "Invalid - Same Task",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "54a3437b7724c57cf6000050",
+                "criteria": {}
+              }
+            ]
           }
         ]
       }
@@ -115,6 +135,22 @@
       "type": "NavigateToLink",
       "configuration": {
         "url": "https://twitter.com/RedRussak/status/561250376414818304",
+        "target": "new"
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000049",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "qwerty://uiop",
+        "target": "self"
+      }
+    },
+    {
+      "id": "54a3437b7724c57cf6000050",
+      "type": "NavigateToLink",
+      "configuration": {
+        "url": "qwerty://uiop",
         "target": "new"
       }
     }
