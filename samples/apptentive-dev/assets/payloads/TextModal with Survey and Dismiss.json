@@ -10,6 +10,7 @@
         "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         "actions": [
           {
+            "id": "action_id_1",
             "label": "Show Survey",
             "action": "interaction",
             "invokes": [
@@ -28,6 +29,7 @@
             ]
           },
           {
+            "id": "action_id_2",
             "label": "Dismiss",
             "action": "dismiss"
           }

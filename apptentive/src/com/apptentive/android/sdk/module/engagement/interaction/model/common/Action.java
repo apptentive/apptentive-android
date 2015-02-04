@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -15,7 +15,8 @@ import org.json.JSONObject;
  */
 public abstract class Action<T extends Action> extends JSONObject {
 	private static final String KEY_ACTION = "action";
-	private static final String KEY_LABEL = "label";
+	public  static final String KEY_ID = "id";
+	public  static final String KEY_LABEL = "label";
 
 	public Action(String json) throws JSONException {
 		super(json);
@@ -23,6 +24,10 @@ public abstract class Action<T extends Action> extends JSONObject {
 
 	public Type getType() {
 		return Type.parse(optString(KEY_ACTION, Type.unknown.name()));
+	}
+
+	public String getId() {
+		return optString(KEY_ID, null);
 	}
 
 	public String getLabel() {
