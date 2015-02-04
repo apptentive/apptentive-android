@@ -8,6 +8,7 @@
         "body": "This example allow testing how the SDK handles invoking an Interaction that doesn't exist.",
         "actions": [
           {
+            "id": "action_id_1",
             "label": "Invalid Interaction",
             "action": "interaction",
             "invokes": [

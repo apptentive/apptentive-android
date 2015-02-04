@@ -98,8 +98,9 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 							public void onClick(View view) {
 								JSONObject data = new JSONObject();
 								try {
-									data.put("label", buttonAction.getLabel());
-									data.put("position", position);
+									data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
+									data.put(Action.KEY_LABEL, buttonAction.getLabel());
+									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 								} catch (JSONException e) {
 									Log.e("Error creating Event data object.", e);
 								}
@@ -132,8 +133,9 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 
 								JSONObject data = new JSONObject();
 								try {
-									data.put(TextModalInteraction.EVENT_KEY_LABEL, buttonAction.getLabel());
-									data.put(TextModalInteraction.EVENT_KEY_POSITION, position);
+									data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
+									data.put(Action.KEY_LABEL, buttonAction.getLabel());
+									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 									data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
 								} catch (JSONException e) {
 									Log.e("Error creating Event data object.", e);

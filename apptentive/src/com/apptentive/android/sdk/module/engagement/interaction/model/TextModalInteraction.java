@@ -24,8 +24,8 @@ public class TextModalInteraction extends Interaction {
 	public static final String EVENT_NAME_DISMISS = "dismiss";
 	public static final String EVENT_NAME_INTERACTION = "interaction";
 
-	public static final String EVENT_KEY_LABEL = "label";
-	public static final String EVENT_KEY_POSITION = "position";
+	public static final String EVENT_KEY_ACTION_ID = "action_id";
+	public static final String EVENT_KEY_ACTION_POSITION = "position";
 	public static final String EVENT_KEY_INVOKED_INTERACTION_ID = "invoked_interaction_id";
 
 

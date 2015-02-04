@@ -8,6 +8,7 @@
         "body": "This example allow testing how external deep links are opened.",
         "actions": [
           {
+            "id": "action_id_1",
             "label": "eBay - Same Task",
             "action": "interaction",
             "invokes": [
@@ -18,6 +19,7 @@
             ]
           },
           {
+            "id": "action_id_2",
             "label": "eBay - New Task ",
             "action": "interaction",
             "invokes": [
@@ -28,6 +30,7 @@
             ]
           },
           {
+            "id": "action_id_3",
             "label": "Amazon Appstore - Same Task",
             "action": "interaction",
             "invokes": [
@@ -38,6 +41,7 @@
             ]
           },
           {
+            "id": "action_id_4",
             "label": "Amazon Appstore - New Task ",
             "action": "interaction",
             "invokes": [
@@ -48,6 +52,7 @@
             ]
           },
           {
+            "id": "action_id_5",
             "label": "Twitter - Same Task",
             "action": "interaction",
             "invokes": [
@@ -58,6 +63,7 @@
             ]
           },
           {
+            "id": "action_id_6",
             "label": "Twitter - New Task ",
             "action": "interaction",
             "invokes": [
@@ -68,6 +74,7 @@
             ]
           },
           {
+            "id": "action_id_7",
             "label": "Invalid URL - New Task ",
             "action": "interaction",
             "invokes": [
@@ -78,6 +85,7 @@
             ]
           },
           {
+            "id": "action_id_8",
             "label": "Invalid URL - Same Task",
             "action": "interaction",
             "invokes": [

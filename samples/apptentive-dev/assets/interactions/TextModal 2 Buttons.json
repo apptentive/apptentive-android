@@ -8,10 +8,12 @@
     "body": "Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.",
     "actions": [
       {
+        "id": "action_id_1",
         "label": "DISAGREE",
         "action": "dismiss"
       },
       {
+        "id": "action_id_2",
         "label": "AGREE",
         "action": "dismiss"
       }
