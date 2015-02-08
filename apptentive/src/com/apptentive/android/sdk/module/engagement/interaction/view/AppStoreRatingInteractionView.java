@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
@@ -33,11 +34,8 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 	}
 
 	@Override
-	public void show(Activity activity) {
-		super.show(activity);
-
+	public void doOnCreate(Activity activity, Bundle savedInstanceState) {
 		// TODO: See if we can determine which app store the app was downloaded and go directly there.
-
 		String errorMessage = activity.getString(R.string.apptentive_rating_error);
 		try {
 			IRatingProvider ratingProvider = ApptentiveInternal.getRatingProvider();
@@ -59,8 +57,6 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 				finalRatingProviderArgs.put("name", appDisplayName);
 			}
 
-			// Engage, then start the rating.
-			//Apptentive.engageInternal(activity, interaction.getType().name(), CODE_POINT_RATE);
 			ratingProvider.startRating(activity, finalRatingProviderArgs);
 		} catch (ActivityNotFoundException e) {
 			displayError(activity, errorMessage);
@@ -70,10 +66,6 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 		} finally {
 			activity.finish();
 		}
-	}
-
-	@Override
-	public void onStop() {
 	}
 
 	@Override

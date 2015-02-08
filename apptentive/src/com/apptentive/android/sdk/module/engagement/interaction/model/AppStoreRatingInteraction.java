@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.app.Activity;
 import org.json.JSONException;
 
 /**
@@ -17,5 +18,10 @@ public class AppStoreRatingInteraction extends Interaction {
 
 	public AppStoreRatingInteraction(String json) throws JSONException {
 		super(json);
+	}
+
+	@Override
+	public void sendLaunchEvent(Activity activity) {
+		// This Interaction type does not send a launch Event.
 	}
 }

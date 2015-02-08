@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,11 +43,9 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 	}
 
 	@Override
-	public void show(final Activity activity) {
-		super.show(activity);
+	public void doOnCreate(final Activity activity, Bundle onSavedInstanceState) {
 		activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
 
-		EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_LAUNCH);
 
 		TextView title = (TextView) activity.findViewById(R.id.title);
 		if (interaction.getTitle() == null) {
@@ -156,11 +155,6 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		} else {
 			bottomArea.setVisibility(View.GONE);
 		}
-	}
-
-	@Override
-	public void onStop() {
-
 	}
 
 	@Override

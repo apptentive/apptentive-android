@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.app.Activity;
 import org.json.JSONException;
 
 import java.util.Locale;
@@ -42,7 +43,7 @@ public class NavigateToLinkInteraction extends Interaction {
 		return Target.New;
 	}
 
-	public static enum Target {
+	public enum Target {
 		New, // Default value
 		Self;
 
@@ -65,5 +66,10 @@ public class NavigateToLinkInteraction extends Interaction {
 			}
 			return New;
 		}
+	}
+
+	@Override
+	public void sendLaunchEvent(Activity activity) {
+		// This Interaction type does not send a launch Event.
 	}
 }

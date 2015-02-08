@@ -54,12 +54,71 @@ public class ViewActivity extends ApptentiveActivity {
 		try {
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			String activityContent = getIntent().getStringExtra(ActivityContent.KEY);
+			String activityContentTypeString = getIntent().getStringExtra(ActivityContent.KEY);
 			String parseStringExtra = getIntent().getStringExtra("com.parse.Data");
 
-			if (activityContent != null) {
+			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
-				activeContentType = ActivityContent.Type.parse(getIntent().getStringExtra(ActivityContent.KEY));
+				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
+
+				try {
+					switch (activeContentType) {
+						case ABOUT:
+							break;
+						case MESSAGE_CENTER:
+							break;
+						case INTERACTION:
+							String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
+							Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
+							switch (interaction.getType()) {
+								case UpgradeMessage:
+									activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
+									break;
+								case EnjoymentDialog:
+									activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
+									break;
+								case RatingDialog:
+									activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
+									break;
+								case AppStoreRating:
+									activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
+									break;
+								case FeedbackDialog:
+									activityContent = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
+									break;
+								case Survey:
+									activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
+									break;
+								case MessageCenter:
+									// For now, we use the old method.
+									getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+									finish();
+									Apptentive.showMessageCenter(this);
+									return;
+								case TextModal:
+									activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
+									break;
+								case NavigateToLink:
+									activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
+									break;
+								default:
+									break;
+							}
+							if (activityContent == null) {
+								finish();
+							} else {
+								activityContent.onCreate(this, savedInstanceState);
+							}
+							break;
+						default:
+							Log.w("No Activity specified. Finishing...");
+							finish();
+							break;
+					}
+				} catch (Exception e) {
+					Log.e("Error starting ViewActivity.", e);
+					MetricModule.sendError(this, e, null, null);
+				}
 			} else
 				// If no content was sent to this Activity, then it may have been started from a Parse push notification.
 				if (parseStringExtra != null) {
@@ -107,69 +166,21 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-
-		try {
-			switch (activeContentType) {
-				case ABOUT:
-					AboutModule.getInstance().doShow(this);
-					break;
-				case MESSAGE_CENTER:
-					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-					ApptentiveMessageCenter.doShow(this);
-					break;
-				case INTERACTION:
-					String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
-					Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
-					InteractionView view = null;
-					switch (interaction.getType()) {
-						case UpgradeMessage:
-							view = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-							break;
-						case EnjoymentDialog:
-							view = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-							break;
-						case RatingDialog:
-							view = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-							break;
-						case AppStoreRating:
-							view = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-							break;
-						case FeedbackDialog:
-							view = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
-							break;
-						case Survey:
-							view = new SurveyInteractionView((SurveyInteraction) interaction);
-							break;
-						case MessageCenter:
-							// For now, we use the old method.
-							getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-							finish();
-							Apptentive.showMessageCenter(this);
-							return;
-						case TextModal:
-							view = new TextModalInteractionView((TextModalInteraction) interaction);
-							break;
-						case NavigateToLink:
-							view = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
-							break;
-						default:
-							break;
-					}
-					activityContent = view;
-					if (view == null) {
-						finish();
-					} else {
-						view.show(this);
-					}
-					break;
-				default:
-					Log.w("No Activity specified. Finishing...");
-					finish();
-					break;
-			}
-		} catch (Exception e) {
-			Log.e("Error starting ViewActivity.", e);
-			MetricModule.sendError(this, e, null, null);
+		switch (activeContentType) {
+			case ABOUT:
+				AboutModule.getInstance().doShow(this);
+				break;
+			case MESSAGE_CENTER:
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+				ApptentiveMessageCenter.doShow(this);
+				break;
+			case INTERACTION:
+				// Interactions are already set up from onCreate().
+				break;
+			default:
+				Log.w("No Activity specified. Finishing...");
+				finish();
+				break;
 		}
 	}
 
@@ -183,9 +194,7 @@ public class ViewActivity extends ApptentiveActivity {
 				ApptentiveMessageCenter.onStop(this);
 				break;
 			case INTERACTION:
-				if (activityContent != null) {
-					activityContent.onStop();
-				}
+				// Interactions don't need to hear about onStop().
 				break;
 			default:
 				break;
@@ -240,6 +249,9 @@ public class ViewActivity extends ApptentiveActivity {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean("returnToPushCallbackActivity", returnToPushCallbackActivity);
 		outState.putString("pushCallbackActivityName", pushCallbackActivityName);
+		if(activityContent != null) {
+			activityContent.onSaveInstanceState(outState);
+		}
 	}
 
 	@Override
@@ -247,6 +259,9 @@ public class ViewActivity extends ApptentiveActivity {
 		super.onRestoreInstanceState(savedInstanceState);
 		returnToPushCallbackActivity = savedInstanceState.getBoolean("returnToPushCallbackActivity", false);
 		pushCallbackActivityName = savedInstanceState.getString("pushCallbackActivityName");
+		if(activityContent != null) {
+			activityContent.onRestoreInstanceState(savedInstanceState);
+		}
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -34,10 +35,12 @@ import org.json.JSONObject;
  */
 public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
-	private static final String EVENT_LAUNCH = "launch";
 	private static final String EVENT_CANCEL = "cancel";
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
+
+	private static final String KEY_SURVEY_SUBMITTED = "survey_submitted";
+	private boolean surveySubmitted = false;
 
 	private static SurveyState surveyState;
 	private static JSONObject data;
@@ -58,17 +61,15 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	}
 
 	@Override
-	public void show(final Activity activity) {
-		super.show(activity);
+	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
 
-		if (interaction == null) {
-			activity.finish();
-			return;
+		if (savedInstanceState != null) {
+			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
 		}
 
-		if (!surveyState.isSurveyLaunchSent()) {
-			EngagementModule.engageInternal(activity, interaction, EVENT_LAUNCH, data.toString());
-			surveyState.setSurveyLaunchSent();
+		if (interaction == null || surveySubmitted) {
+			activity.finish();
+			return;
 		}
 
 		activity.setContentView(R.layout.apptentive_survey);
@@ -98,7 +99,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			@Override
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
-
+				surveySubmitted = true;
 				if (interaction.isShowSuccessMessage() && interaction.getSuccessMessage() != null) {
 					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
 					dialog.setMessage(interaction.getSuccessMessage());
@@ -188,11 +189,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 
 	@Override
-	public void onStop() {
-
-	}
-
-	@Override
 	public boolean onBackPressed(Activity activity) {
 		// If this survey is required, do not let it be dismissed when the user clicks the back button.
 		if (!interaction.isRequired()) {
@@ -210,5 +206,17 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		if (listener != null) {
 			listener.onSurveyFinished(completed);
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(KEY_SURVEY_SUBMITTED, surveySubmitted);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
 	}
 }

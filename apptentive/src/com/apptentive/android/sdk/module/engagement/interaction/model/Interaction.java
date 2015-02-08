@@ -6,8 +6,10 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.app.Activity;
 import android.content.Context;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,8 +25,14 @@ public abstract class Interaction extends JSONObject {
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_CONFIGURATION = "configuration";
 
+	public static final String EVENT_NAME_LAUNCH = "launch";
+
 	public Interaction(String json) throws JSONException {
 		super(json);
+	}
+
+	public void sendLaunchEvent(Activity activity) {
+		EngagementModule.engageInternal(activity, this, Interaction.EVENT_NAME_LAUNCH);
 	}
 
 	/**
