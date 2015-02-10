@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -15,8 +15,6 @@ import java.util.*;
  * @author Sky Kelsey
  */
 public class SurveyState {
-
-	private boolean surveyLaunchSent;
 
 	private Map<String, Set<String>> questionToAnswersMap;
 	private Map<String, Integer> questionToMinAnswersMap;
@@ -36,14 +34,6 @@ public class SurveyState {
 			questionToMaxAnswersMap.put(questionId, question.getMaxSelections());
 			questionToMetricSentMap.put(questionId, false);
 		}
-	}
-
-	public void setSurveyLaunchSent() {
-		surveyLaunchSent = true;
-	}
-
-	public boolean isSurveyLaunchSent() {
-		return surveyLaunchSent;
 	}
 
 	public void addAnswer(String questionId, String answer) {

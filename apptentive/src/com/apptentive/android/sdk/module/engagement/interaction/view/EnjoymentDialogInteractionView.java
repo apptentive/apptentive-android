@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
@@ -19,7 +20,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.common.Appt
  */
 public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_YES = "yes";
 	private static final String CODE_POINT_NO = "no";
@@ -29,11 +29,8 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 	}
 
 	@Override
-	public void show(final Activity activity) {
-		super.show(activity);
+	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
-
-		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		TextView bodyView = (TextView) activity.findViewById(R.id.title);
 		String body = interaction.getTitle(activity);
@@ -66,11 +63,6 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 				activity.finish();
 			}
 		});
-	}
-
-	@Override
-	public void onStop() {
-
 	}
 
 	@Override

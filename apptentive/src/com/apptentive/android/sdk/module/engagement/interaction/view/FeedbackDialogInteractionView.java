@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -34,7 +35,6 @@ import com.apptentive.android.sdk.util.Util;
  */
 public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_DECLINE = "decline";
 	private static final String CODE_POINT_SUBMIT = "submit";
@@ -45,27 +45,25 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	private CharSequence message;
 
 	// Don't show the wrong view when we rotate.
-	private static boolean feedbackDialogVisible = false;
-	private static boolean thankYouDialogVisible = false;
+	private static final String THANK_YOU_DIALOG_VISIBLE = "thank_you_dialog_visible";
+	private boolean thankYouDialogVisible = false;
 
 	public FeedbackDialogInteractionView(FeedbackDialogInteraction interaction) {
 		super(interaction);
 	}
 
 	@Override
-	public void show(final Activity activity) {
-		super.show(activity);
+	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_feedback_dialog_interaction);
 
 		// Legacy support: We can remove this when we switch over to 100% interaction based Message Center.
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG, false).commit();
 
+		if (savedInstanceState != null) {
+			thankYouDialogVisible = savedInstanceState.getBoolean(THANK_YOU_DIALOG_VISIBLE, false);
+		}
 		if (!thankYouDialogVisible) {
-			if (!feedbackDialogVisible) {
-				EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
-			}
-
 			final AutoCompleteTextView emailView = (AutoCompleteTextView) activity.findViewById(R.id.email);
 			EditText messageView = (EditText) activity.findViewById(R.id.message);
 			ApptentiveDialogButton noButton = (ApptentiveDialogButton) activity.findViewById(R.id.decline);
@@ -163,7 +161,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			noButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					cleanup();
 					EngagementModule.engageInternal(activity, interaction, CODE_POINT_DECLINE);
 					activity.finish();
 				}
@@ -192,7 +189,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 
 					EngagementModule.engageInternal(activity, interaction, CODE_POINT_SUBMIT);
 					thankYouDialogVisible = true;
-					feedbackDialogVisible = false;
 					activity.findViewById(R.id.feedback_dialog).setVisibility(View.GONE);
 					activity.findViewById(R.id.thank_you_dialog).setVisibility(View.VISIBLE);
 				}
@@ -226,7 +222,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		thankYouCloseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				cleanup();
 				EngagementModule.engageInternal(activity, interaction, CODE_POINT_SKIP_VIEW_MESSAGES);
 				activity.finish();
 			}
@@ -242,7 +237,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			thankYouViewMessagesButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					cleanup();
 					EngagementModule.engageInternal(activity, interaction, CODE_POINT_VIEW_MESSAGES);
 					activity.finish();
 				}
@@ -250,7 +244,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		} else {
 			thankYouViewMessagesButton.setVisibility(View.GONE);
 		}
-		feedbackDialogVisible = true;
 	}
 
 	public static void createMessageCenterAutoMessage(Context context) {
@@ -301,11 +294,6 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 		final TextMessage textMessage = new TextMessage();
 		textMessage.setBody(message.toString());
 		textMessage.setRead(true);
-/*
-		// TODO: Figure out how to add custom data here.
-		textMessage.setCustomData(customData);
-		customData = null;
-*/
 		MessageManager.sendMessage(activity, textMessage);
 	}
 
@@ -320,19 +308,20 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 	}
 
 	@Override
-	public void onStop() {
-
-	}
-
-	@Override
 	public boolean onBackPressed(Activity activity) {
 		EngagementModule.engageInternal(activity, interaction, CODE_POINT_CANCEL);
-		cleanup();
 		return true;
 	}
 
-	private static void cleanup() {
-		feedbackDialogVisible = false;
-		thankYouDialogVisible = false;
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(THANK_YOU_DIALOG_VISIBLE, thankYouDialogVisible);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		thankYouDialogVisible = savedInstanceState.getBoolean(THANK_YOU_DIALOG_VISIBLE, false);
 	}
 }

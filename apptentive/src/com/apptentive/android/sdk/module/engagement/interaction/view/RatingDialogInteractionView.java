@@ -7,8 +7,8 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -20,7 +20,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.common.Appt
  */
 public class RatingDialogInteractionView extends InteractionView<RatingDialogInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_RATE = "rate";
 	private static final String CODE_POINT_REMIND = "remind";
@@ -31,11 +30,8 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 	}
 
 	@Override
-	public void show(final Activity activity) {
-		super.show(activity);
+	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
-
-		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		String title = interaction.getTitle();
 		if (title != null) {
@@ -86,10 +82,6 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 				activity.finish();
 			}
 		});
-	}
-
-	@Override
-	public void onStop() {
 	}
 
 	@Override

@@ -19,7 +19,6 @@ public class TextModalInteraction extends Interaction {
 	private static final String KEY_BODY = "body";
 	private static final String KEY_ACTIONS = "actions";
 
-	public static final String EVENT_NAME_LAUNCH = "launch";
 	public static final String EVENT_NAME_CANCEL = "cancel";
 	public static final String EVENT_NAME_DISMISS = "dismiss";
 	public static final String EVENT_NAME_INTERACTION = "interaction";
@@ -31,21 +30,6 @@ public class TextModalInteraction extends Interaction {
 
 	public TextModalInteraction(String json) throws JSONException {
 		super(json);
-	}
-
-	public static enum Layout {
-		center,
-		bottom,
-		unknown;
-
-		public static Layout parse(String name) {
-			try {
-				return Layout.valueOf(name);
-			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown TextModalInteraction.Layout: " + name);
-			}
-			return unknown;
-		}
 	}
 
 	public String getTitle() {

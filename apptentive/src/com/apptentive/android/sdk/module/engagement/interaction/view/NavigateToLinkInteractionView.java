@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
@@ -28,9 +29,7 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 	}
 
 	@Override
-	public void show(Activity activity) {
-		super.show(activity);
-
+	public void doOnCreate(Activity activity, Bundle savedInteraction) {
 		boolean success = false;
 		try {
 			String url = interaction.getUrl();
@@ -64,10 +63,6 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 			// Always finish this Activity.
 			activity.finish();
 		}
-	}
-
-	@Override
-	public void onStop() {
 	}
 
 	@Override

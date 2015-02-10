@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
@@ -25,7 +26,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMes
  */
 public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessageInteraction> {
 
-	private static final String CODE_POINT_LAUNCH = "launch";
 	private static final String CODE_POINT_DISMISS = "dismiss";
 
 	public UpgradeMessageInteractionView(UpgradeMessageInteraction interaction) {
@@ -33,11 +33,8 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 	}
 
 	@Override
-	public void show(Activity activity) {
-		super.show(activity);
+	public void doOnCreate(Activity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
-
-		EngagementModule.engageInternal(activity, interaction, CODE_POINT_LAUNCH);
 
 		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId(activity);
@@ -57,10 +54,6 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 				branding.setVisibility(View.GONE);
 			}
 		}
-	}
-
-	@Override
-	public void onStop() {
 	}
 
 	@Override
