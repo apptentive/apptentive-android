@@ -63,7 +63,7 @@ dependencies {
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
     qaCompile 'com.apptentive:apptentive-android:1.7.0-SNAPSHOT@aar'
-    rcCompile 'com.apptentive:apptentive-android:1.7.0-SNAPSHOT@aar'
+    rcCompile 'com.apptentive:apptentive-android:1.7.0@aar'
 }
 
 task run(type: Exec) {
