@@ -1,3 +1,19 @@
+# 2015-02-10 skykelsey 1.7.0
+
+This release includes support for Notes, which allows you to send messages to your customers and gives them the option
+ to take surveys, navigate directly to content within your app, and more. Notes is currently in beta with select 
+ customers. If you are interested in trying out Notes, please contact us.
+ 
+#### Improvements
+
+* Added the ability to display Notes Interactions.
+* Added support for invoking nested Interactions, such as launching a Survey from a Note, and opening a Deep Link from a Note.
+* Updated to use the latest versions of Android build tools and Android Gradle plugin.
+
+#### Bugs fixed
+
+* Fixed a bug that allowed internal analytics to send multiple launch events per displayed Interaction.
+
 # 2014-11-25 skykelsey 1.6.6
 
 #### Improvements
