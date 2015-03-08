@@ -393,6 +393,8 @@ public class Apptentive {
 	 */
 	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
 
+	private static final String PARSE_PUSH_DATA_KEY = "com.parse.Data";
+
 	/**
 	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
 	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
@@ -408,8 +410,20 @@ public class Apptentive {
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
 		String apptentive = null;
 		if (intent != null) {
-			Log.i("Received Apptentive push notification.");
-			apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+			Log.v("Received a push notification.");
+			String parseStringExtra = intent.getStringExtra(Apptentive.PARSE_PUSH_DATA_KEY);
+			if (parseStringExtra != null) {
+				Log.d("Got a Parse Push.");
+				try {
+					JSONObject parseJson = new JSONObject(parseStringExtra);
+					apptentive = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, null);
+				} catch (JSONException e) {
+					Log.e("Corrupt Parse String Extra: %s", parseStringExtra);
+				}
+			} else {
+				Log.d("Got a non-Parse push.");
+				apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
+			}
 			if (apptentive != null) {
 				Log.d("Saving Apptentive push notification data.");
 				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -463,16 +477,6 @@ public class Apptentive {
 	}
 
 	/**
-	 * Use this method to set the Activity that you would like to return to when Apptentive is done responding to a Parse
-	 * push notification. It should only be used for Parse push notifications.
-	 *
-	 * @param activity The Activity you would like Apptentive to launch when we are done responding to a Parse push.
-	 */
-	public static void setParsePushCallback(Class<? extends Activity> activity) {
-		ApptentiveInternal.setPushCallbackActivity(activity);
-	}
-
-	/**
 	 * Determines whether a push was sent by Apptentive. Apptentive push notifications will result in an Intent
 	 * containing a string extra key of {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY}.
 	 *
@@ -480,14 +484,24 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
+		String apptentive = null;
 		if (intent != null) {
-			if (intent.getAction() != null && intent.getAction().equals("com.apptentive.PUSH")) {
-				// This came from Parse.
-				return true;
+			String parseStringExtra = intent.getStringExtra(Apptentive.PARSE_PUSH_DATA_KEY);
+			if (parseStringExtra != null) {
+				try {
+					JSONObject parseJson = new JSONObject(parseStringExtra);
+					apptentive = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, null);
+				} catch (JSONException e) {
+					Log.e("Corrupt Parse String Extra: %s", parseStringExtra);
+				}
+			} else {
+				apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
 			}
-			if (intent.hasExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
-				// This came from another push provider.
+			if (apptentive != null) {
+				Log.d("This push was from Apptentive.");
 				return true;
+			} else {
+				Log.d("This push was not from Apptentive.");
 			}
 		}
 		return false;
