@@ -51,6 +51,7 @@
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="/usr/local/gradle/gradle-1.12" />
+        <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -230,7 +231,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/apptentive/apptentive.iml" filepath="$PROJECT_DIR$/apptentive/apptentive.iml" />
-      <module fileurl="file://$PROJECT_DIR$/apptentive-android.iml" filepath="$PROJECT_DIR$/apptentive-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apptentive-android-private.iml" filepath="$PROJECT_DIR$/apptentive-android-private.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" filepath="$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" filepath="$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" />
       <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
@@ -241,7 +242,6 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="HockeySDK-3.5.0">

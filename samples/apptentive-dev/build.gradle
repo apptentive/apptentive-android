@@ -1,16 +1,16 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.1'
+        classpath 'com.android.tools.build:gradle:1.1.1'
     }
 }
 
 apply plugin: 'com.android.application'
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
@@ -22,6 +22,11 @@ android {
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 21
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
     }
 
     productFlavors {
