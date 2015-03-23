@@ -265,7 +265,7 @@ public class Apptentive {
 	/**
 	 * The key to use to specify the Urban Airship Channel ID within the Urban Airship configuration settings Map.
 	 */
-	public static final String INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID = "channel_id";
+	public static final String INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID = "token";
 
 	public static final String INTEGRATION_AWS_SNS = "aws_sns";
 
