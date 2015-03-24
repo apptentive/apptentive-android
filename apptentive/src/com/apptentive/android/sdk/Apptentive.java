@@ -263,27 +263,41 @@ public class Apptentive {
 	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
 
 	/**
-	 * The key to use to specify the Urban Airship Channel ID within the Urban Airship configuration settings Map.
+	 * The key to use to specify the Urban Airship Channel ID within Apptentive's push integration Map.
 	 */
 	public static final String INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID = "token";
 
+	/**
+	 * The key to use to store a Map of Amazon SNS configuration settings.
+	 */
 	public static final String INTEGRATION_AWS_SNS = "aws_sns";
 
+	/**
+	 * The key to use to specify the Amazon SNS Registration ID within Apptentive's push integration Map.
+	 */
 	public static final String INTEGRATION_AWS_SNS_TOKEN = "token";
 
 	/**
 	 * The key to use to store a Map of Parse configuration settings.
 	 */
 	public static final String INTEGRATION_PARSE = "parse";
+
+	/**
+	 * The key to use to specify the Parse channel ID within Apptentive's push integration Map.
+	 */
 	public static final String INTEGRATION_PARSE_DEVICE_TOKEN = "token";
 
 	/**
-	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
-	 * of the SDK is published is listed below.
-	 * <p/>
+	 * Allows you to pass in third party integration details. Supported push providers:
 	 * <ul>
 	 * <li>
-	 * Urban Airship push notifications
+	 * Urban Airship
+	 * </li>
+	 * <li>
+	 * Amazon SNS via GCM
+	 * </li>
+	 * <li>
+	 * Parse
 	 * </li>
 	 * </ul>
 	 *
@@ -389,12 +403,25 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * The key that is used to store extra data on an Apptentive push notification.
+	 * Determines whether this Intent is a push notification sent from Apptentive.
+	 *
+	 * @param intent The opened push notification Intent you received in your BroadcastReceiver.
+	 * @return True if the Intent contains Apptentive push information.
 	 */
-	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
+	public static boolean isApptentivePushNotification(Intent intent) {
+		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
+	}
 
-	private static final String PARSE_PUSH_EXTRA_KEY = "com.parse.Data";
-	private static final String URBAN_AIRSHIP_PUSH_EXTRA_KEY = "com.urbanairship.push.EXTRA_PUSH_BUNDLE";
+	/**
+	 * Determines whether this Bundle came from an Apptentive push notification. This method is used with Urban Airship
+	 * integrations.
+	 *
+	 * @param bundle The Extra data from an opened push notification.
+	 * @return True if the Intent contains Apptentive push information.
+	 */
+	public static boolean isApptentivePushNotification(Bundle bundle) {
+		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+	}
 
 	/**
 	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
@@ -408,36 +435,9 @@ public class Apptentive {
 	 * @param intent  The Intent that you received when the user opened a push notification.
 	 */
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
-		String apptentive = null;
-		if (intent != null) {
-			Log.v("Got an Intent.");
-			// Parse
-			if (intent.hasExtra(Apptentive.PARSE_PUSH_EXTRA_KEY)) {
-				String parseStringExtra = intent.getStringExtra(Apptentive.PARSE_PUSH_EXTRA_KEY);
-				Log.d("Got a Parse Push.");
-				try {
-					JSONObject parseJson = new JSONObject(parseStringExtra);
-					apptentive = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY, null);
-				} catch (JSONException e) {
-					Log.e("Corrupt Parse String Extra: %s", parseStringExtra);
-				}
-			} else
-			// Urban Airship
-			if (intent.hasExtra(URBAN_AIRSHIP_PUSH_EXTRA_KEY)) {
-				Log.e("Got an Urban Airship push.");
-				Bundle uaBundle = intent.getBundleExtra(URBAN_AIRSHIP_PUSH_EXTRA_KEY);
-				apptentive = uaBundle.getString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-			} else
-			// Straight GCM / SNS
-			{
-				Log.d("Got a non-Parse push.");
-				apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-			}
-			if (apptentive != null) {
-				return setPendingPushNotification(context, apptentive);
-			} else {
-				Log.d("Not an apptentive push notification.");
-			}
+		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
+		if (apptentive != null) {
+			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
 		}
 		return false;
 	}
@@ -449,25 +449,13 @@ public class Apptentive {
 	 * with Urban Airship integrations. Calling this method for a push that did not come from Apptentive has no effect.
 	 *
 	 * @param context The context from which this method was called.
-	 * @param pushBundle The Bundle contained in the push notification.
+	 * @param bundle  The Bundle contained in the push notification.
 	 * @return true if pushBundle came from Apptentive.
 	 */
-	public static boolean setPendingPushNotification(Context context, Bundle pushBundle) {
-		if (pushBundle != null) {
-			if (pushBundle.containsKey(APPTENTIVE_PUSH_EXTRA_KEY)) {
-				Log.d("This push Bundle came from Apptentive.");
-				return setPendingPushNotification(context, pushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY));
-			}
-		}
-		return false;
-	}
-
-	static boolean setPendingPushNotification(Context context, String apptentivePushData) {
-		if (apptentivePushData != null) {
-			Log.d("Saving Apptentive push notification data.");
-			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).commit();
-			return true;
+	public static boolean setPendingPushNotification(Context context, Bundle bundle) {
+		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+		if (apptentive != null) {
+			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
 		}
 		return false;
 	}
@@ -511,6 +499,7 @@ public class Apptentive {
 		}
 		return false;
 	}
+
 
 	// ****************************************************************************************
 	// RATINGS
