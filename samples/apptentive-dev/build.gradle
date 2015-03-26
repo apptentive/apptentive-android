@@ -29,6 +29,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_6
     }
 
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+
     productFlavors {
         dev {
             applicationId "com.apptentive.android.dev"
