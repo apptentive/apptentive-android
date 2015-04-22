@@ -33,9 +33,9 @@ public class MessageCenterThankYouDialog extends ApptentiveBaseDialog {
 		Configuration conf = Configuration.load(getContext());
 		boolean enableMessageCenter = conf.isMessageCenterEnabled(getContext());
 
+		final TextView body = (TextView) findViewById(R.id.thank_you_body);
 		final ApptentiveDialogButton close = (ApptentiveDialogButton) findViewById(R.id.close);
 		final ApptentiveDialogButton viewMessages = (ApptentiveDialogButton) findViewById(R.id.view_messages);
-		final TextView body = (TextView) findViewById(R.id.body);
 
 		if (!enableMessageCenter) {
 			if(validEmailProvided) {
