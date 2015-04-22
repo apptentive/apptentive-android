@@ -64,22 +64,6 @@
     </option>
   </component>
   <component name="IdProvider" IDEtalkID="559664322781B77446E3F5CE3A937CE9" />
-  <component name="InspectionProjectProfileManager">
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-        <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
-          <option name="processCode" value="false" />
-          <option name="processLiterals" value="true" />
-          <option name="processComments" value="true" />
-        </inspection_tool>
-      </profile>
-    </profiles>
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
-    <version value="1.0" />
-  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/out/javadoc" />
     <option name="OPTION_SCOPE" value="public" />
@@ -252,7 +236,7 @@
       <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
