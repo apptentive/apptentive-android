@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -13,7 +13,7 @@ import android.view.ViewGroup;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.6.6";
+	public static final String APPTENTIVE_SDK_VERSION = "1.6.7";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
