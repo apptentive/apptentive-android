@@ -1,3 +1,9 @@
+# 2015-4-23 skykelsey 1.6.7
+
+#### Bugs fixed
+
+* Fixed a bug where HTTP response inputstreams weren't being closed.
+
 # 2015-02-10 skykelsey 1.7.0
 
 This release includes support for Notes, which allows you to send messages to your customers and gives them the option
