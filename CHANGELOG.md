@@ -1,3 +1,9 @@
+# 2015-4-23 skykelsey 1.6.7
+
+#### Bugs fixed
+
+* Fixed a bug where HTTP response inputstreams weren't being closed.
+
 # 2014-11-25 skykelsey 1.6.6
 
 #### Improvements
