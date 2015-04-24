@@ -1,3 +1,8 @@
+# 2015-04-24 skykelsey 1.7.1
+
+* Fixed a bug where HTTP response inputstreams weren't being closed.
+* Fixed a bug that prevented the Feedback Thank You dialog from displaying under some circumstances.
+ 
 # 2015-4-23 skykelsey 1.6.7
 
 #### Bugs fixed
