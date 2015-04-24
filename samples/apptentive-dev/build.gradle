@@ -12,6 +12,9 @@ apply plugin: 'com.android.application'
 repositories {
     mavenCentral()
     maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 android {
@@ -63,7 +66,8 @@ dependencies {
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
     qaCompile 'com.apptentive:apptentive-android:1.7.1-SNAPSHOT@aar'
-    rcCompile 'com.apptentive:apptentive-android:1.7.0@aar'
+    //rcCompile(name:'apptentive-android-1.7.1', ext:'aar')
+    rcCompile 'com.apptentive:apptentive-android:1.7.1@aar'
 }
 
 task run(type: Exec) {
