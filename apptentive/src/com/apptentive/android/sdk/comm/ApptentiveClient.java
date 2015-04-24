@@ -136,6 +136,7 @@ public class ApptentiveClient {
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		HttpClient httpClient = null;
+		InputStream is = null;
 		try {
 			HttpRequestBase request;
 			httpClient = new DefaultHttpClient();
@@ -188,7 +189,7 @@ public class ApptentiveClient {
 
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
-				InputStream is = entity.getContent();
+				is = entity.getContent();
 				if (is != null) {
 					String contentEncoding = ret.getHeaders().get("Content-Encoding");
 					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("gzip")) {
@@ -212,6 +213,7 @@ public class ApptentiveClient {
 			if (httpClient != null) {
 				httpClient.getConnectionManager().shutdown();
 			}
+			Util.ensureClosed(is);
 		}
 		return ret;
 	}
