@@ -263,27 +263,41 @@ public class Apptentive {
 	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
 
 	/**
-	 * The key to use to specify the Urban Airship APID withing the Urban Airship configuration settings Map.
+	 * The key to use to specify the Urban Airship Channel ID within Apptentive's push integration Map.
 	 */
-	public static final String INTEGRATION_URBAN_AIRSHIP_APID = "token";
+	public static final String INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID = "token";
 
+	/**
+	 * The key to use to store a Map of Amazon SNS configuration settings.
+	 */
 	public static final String INTEGRATION_AWS_SNS = "aws_sns";
 
+	/**
+	 * The key to use to specify the Amazon SNS Registration ID within Apptentive's push integration Map.
+	 */
 	public static final String INTEGRATION_AWS_SNS_TOKEN = "token";
 
 	/**
 	 * The key to use to store a Map of Parse configuration settings.
 	 */
 	public static final String INTEGRATION_PARSE = "parse";
+
+	/**
+	 * The key to use to specify the Parse channel ID within Apptentive's push integration Map.
+	 */
 	public static final String INTEGRATION_PARSE_DEVICE_TOKEN = "token";
 
 	/**
-	 * Allows you to pass in third party integration details. Each integration that is supported at the time this version
-	 * of the SDK is published is listed below.
-	 * <p/>
+	 * Allows you to pass in third party integration details. Supported push providers:
 	 * <ul>
 	 * <li>
-	 * Urban Airship push notifications
+	 * Urban Airship
+	 * </li>
+	 * <li>
+	 * Amazon SNS via GCM
+	 * </li>
+	 * <li>
+	 * Parse
 	 * </li>
 	 * </ul>
 	 *
@@ -319,21 +333,21 @@ public class Apptentive {
 	/**
 	 * Configures Apptentive to work with Urban Airship push notifications. You must first set up your app to work with
 	 * Urban Airship to use this integration. This method must be called when you finish initializing Urban Airship. Since
-	 * Urban Airship creates an APID after it connects to its server, the APID may be null at first. The preferred method
-	 * of retrieving the APID is to listen to the <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your
-	 * {@link android.content.BroadcastReceiver}. You can alternately find the APID by calling
-	 * <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getAPID%28%29">PushManager.shared().getAPID()</a>
+	 * Urban Airship creates a Channel ID after it connects to its server, the Channel ID may be null at first. The
+	 * preferred method of retrieving the Channel ID is to listen to the
+	 * <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your {@link android.content.BroadcastReceiver}. You
+	 * can alternately find the Channel ID by calling <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getChannelId%28%29">PushManager.shared().getChannelId()</a>
 	 * <p/>
 	 * Push notifications will not be delivered to this app install until our server receives the APID.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @param apid    The Airship Push ID (APID).
+	 * @param channelId    The Android Channel ID.
 	 */
-	public static void addUrbanAirshipPushIntegration(Context context, String apid) {
-		if (apid != null) {
-			Log.d("Setting Urban Airship APID: %s", apid);
+	public static void addUrbanAirshipPushIntegration(Context context, String channelId) {
+		if (channelId != null) {
+			Log.d("Setting Urban Airship Channel ID: %s", channelId);
 			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_APID, apid);
+			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID, channelId);
 			addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
 		}
 	}
@@ -389,9 +403,25 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * The key that is used to store extra data on an Apptentive push notification.
+	 * Determines whether this Intent is a push notification sent from Apptentive.
+	 *
+	 * @param intent The opened push notification Intent you received in your BroadcastReceiver.
+	 * @return True if the Intent contains Apptentive push information.
 	 */
-	public static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
+	public static boolean isApptentivePushNotification(Intent intent) {
+		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
+	}
+
+	/**
+	 * Determines whether this Bundle came from an Apptentive push notification. This method is used with Urban Airship
+	 * integrations.
+	 *
+	 * @param bundle The Extra data from an opened push notification.
+	 * @return True if the Intent contains Apptentive push information.
+	 */
+	public static boolean isApptentivePushNotification(Bundle bundle) {
+		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+	}
 
 	/**
 	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
@@ -399,25 +429,33 @@ public class Apptentive {
 	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
 	 * notification did not come from Apptentive, this method has no effect.
 	 * <p/>
-	 * <strong>Note: </strong>If you are using Parse, do not use this method. Instead, see the Apptentive
-	 * <a href="http://www.apptentive.com/docs/android/integration/"> integration guide</a> for Parse.
+	 * Use this method when using Parse and Amazon SNS as push providers.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
 	 */
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
-		String apptentive = null;
-		if (intent != null) {
-			Log.i("Received Apptentive push notification.");
-			apptentive = intent.getStringExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-			if (apptentive != null) {
-				Log.d("Saving Apptentive push notification data.");
-				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-				prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentive).commit();
-				return true;
-			} else {
-				Log.d("Not an apptentive push notification.");
-			}
+		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
+		if (apptentive != null) {
+			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
+		}
+		return false;
+	}
+
+	/**
+	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use this method when a
+	 * push notification is opened, and you only have access to a Bundle of extras that were included in the push
+	 * notification. have access to a push Intent Bundle containing an "apptentive" key. This will generally be used only
+	 * with Urban Airship integrations. Calling this method for a push that did not come from Apptentive has no effect.
+	 *
+	 * @param context The context from which this method was called.
+	 * @param bundle  The Bundle contained in the push notification.
+	 * @return true if pushBundle came from Apptentive.
+	 */
+	public static boolean setPendingPushNotification(Context context, Bundle bundle) {
+		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+		if (apptentive != null) {
+			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
 		}
 		return false;
 	}
@@ -440,7 +478,7 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.i("Handling Apptentive Push Intent.");
+			Log.i("Handling opened Apptentive push notification.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
 				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
@@ -452,42 +490,11 @@ public class Apptentive {
 						Apptentive.showMessageCenter(activity);
 						return true;
 					default:
-						Log.v("Unknown Push Notification Action \"%s\"", action.name());
+						Log.v("Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
 			} catch (JSONException e) {
 				Log.w("Error parsing JSON from push notification.", e);
 				MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Use this method to set the Activity that you would like to return to when Apptentive is done responding to a Parse
-	 * push notification. It should only be used for Parse push notifications.
-	 *
-	 * @param activity The Activity you would like Apptentive to launch when we are done responding to a Parse push.
-	 */
-	public static void setParsePushCallback(Class<? extends Activity> activity) {
-		ApptentiveInternal.setPushCallbackActivity(activity);
-	}
-
-	/**
-	 * Determines whether a push was sent by Apptentive. Apptentive push notifications will result in an Intent
-	 * containing a string extra key of {@link Apptentive#APPTENTIVE_PUSH_EXTRA_KEY}.
-	 *
-	 * @param intent The push notification Intent you received in your BroadcastReceiver.
-	 * @return True if the Intent contains Apptentive push information.
-	 */
-	public static boolean isApptentivePushNotification(Intent intent) {
-		if (intent != null) {
-			if (intent.getAction() != null && intent.getAction().equals("com.apptentive.PUSH")) {
-				// This came from Parse.
-				return true;
-			}
-			if (intent.hasExtra(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY)) {
-				// This came from another push provider.
-				return true;
 			}
 		}
 		return false;

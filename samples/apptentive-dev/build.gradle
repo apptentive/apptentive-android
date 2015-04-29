@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.3'
@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'com.android.application'
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven { url 'http://oss.sonatype.org/content/repositories/snapshots/' }
     flatDir {
         dirs 'libs'
@@ -25,6 +25,17 @@ android {
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 21
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+        }
     }
 
     productFlavors {
@@ -65,7 +76,7 @@ android {
 dependencies {
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
-    qaCompile 'com.apptentive:apptentive-android:1.7.1-SNAPSHOT@aar'
+    qaCompile 'com.apptentive:apptentive-android:1.7.2-SNAPSHOT@aar'
     //rcCompile(name:'apptentive-android-1.7.1', ext:'aar')
     rcCompile 'com.apptentive:apptentive-android:1.7.1@aar'
 }
