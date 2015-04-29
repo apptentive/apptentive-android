@@ -12,6 +12,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
@@ -37,6 +38,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 	public void doOnCreate(Activity activity, Bundle savedInstanceState) {
 		// TODO: See if we can determine which app store the app was downloaded and go directly there.
 		String errorMessage = activity.getString(R.string.apptentive_rating_error);
+		boolean showingDialog = false;
 		try {
 			IRatingProvider ratingProvider = ApptentiveInternal.getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
@@ -59,12 +61,17 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 
 			ratingProvider.startRating(activity, finalRatingProviderArgs);
 		} catch (ActivityNotFoundException e) {
+			showingDialog = true;
 			displayError(activity, errorMessage);
 		} catch (InsufficientRatingArgumentsException e) {
 			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
+			showingDialog = true;
+			Log.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} finally {
-			activity.finish();
+			if (!showingDialog) {
+				activity.finish();
+			}
 		}
 	}
 
@@ -73,13 +80,20 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 		return true;
 	}
 
-	private void displayError(Activity activity, String message) {
+	private void displayError(final Activity activity, String message) {
+		Log.e(message);
 		final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
 		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
 		alertDialog.setMessage(message);
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				alertDialog.dismiss();
+			}
+		});
+		alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				activity.finish();
 			}
 		});
 		alertDialog.show();
