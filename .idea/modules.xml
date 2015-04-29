@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/apptentive/apptentive.iml" filepath="$PROJECT_DIR$/apptentive/apptentive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apptentive-android.iml" filepath="$PROJECT_DIR$/apptentive-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" filepath="$PROJECT_DIR$/samples/apptentive-dev/apptentive-dev.iml" />
+      <module fileurl="file://$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" filepath="$PROJECT_DIR$/samples/apptentive-example/apptentive-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/test-app/test-app.iml" filepath="$PROJECT_DIR$/tests/test-app/test-app.iml" />
+    </modules>
+  </component>
+</project>
