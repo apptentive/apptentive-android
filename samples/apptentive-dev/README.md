@@ -6,17 +6,20 @@ Modify gradle.properties in this directory. Fill in the Apptentive API Key for e
 
 # Build Process
 
+## Clean
+1. ./gradlew clean
+
 ## Dev build
 1. ./gradlew installDevDebug
 
 ## Create SNAPSHOT build
-1. ./gradlew clean uploadArchives
+1. ./gradlew uploadArchives
 
 ## QA SNAPSHOT Build
-1. ./gradlew --refresh-dependencies clean installQaDebug
+1. ./gradlew installQaDebug
 
 ## Create RELEASE build
-1. ./gradlew -DMAVEN_RELEASE_BUILD clean uploadArchives
+1. ./gradlew -PMAVEN_RELEASE_BUILD uploadArchives
 
 ## QA RELEASE Build
-1. ./gradlew clean installRcRelease
+1. ./gradlew installRcDebug
