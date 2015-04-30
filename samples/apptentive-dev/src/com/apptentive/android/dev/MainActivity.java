@@ -52,12 +52,12 @@ public class MainActivity extends ApptentiveActivity {
 						if (messageCenterButton != null) {
 							messageCenterButton.setText("Message Center, unread = " + unreadMessages);
 						}
-						if (lastUnreadMessageCount < unreadMessages) {
+						if (lastUnreadMessageCount != unreadMessages) {
 							Toast.makeText(MainActivity.this, "You have " + unreadMessages + " unread messages.", Toast.LENGTH_SHORT).show();
 						}
+						lastUnreadMessageCount = unreadMessages;
 					}
 				});
-				lastUnreadMessageCount = unreadMessages;
 			}
 		});
 
