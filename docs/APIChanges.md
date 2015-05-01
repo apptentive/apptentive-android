@@ -1,5 +1,22 @@
 This document tracks changes to the API between versions.
 
+# 1.7.2
+
+* Removed a method to set the callback Activity that Apptentive will return to after handling a push notification. This
+ method is no longer needed because the Parse SDK has changed, and therefore the Apptentive integration changed. Please
+ see this [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
+
+| Removed Methods |
+| --------------- |
+| [public static void setParsePushCallback(Class<? extends Activity> activity)]() |
+
+* Added new methods to work with Urban Airship's new integration style. Again, please see the [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
+
+| Added Methods |
+| ------------- |
+| [public static boolean setPendingPushNotification(Context context, Bundle bundle)]() |
+| [public static boolean isApptentivePushNotification(Bundle bundle)]() |
+
 # 1.6.2
 
 * Added API method [Apptentive.willShowInteraction()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#willShowInteraction-android.content.Context-java.lang.String-).
