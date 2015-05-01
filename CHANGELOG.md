@@ -1,8 +1,15 @@
+# 2015-05-01 skykelsey 1.7.2
+
+#### Improvements
+
+* Updated our Push Notification API to work with Parse 1.8.3 and Urban Airship 6.0.1. If you were using either of these
+ push notification providers in a prior version, please see our [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
+
 # 2015-04-24 skykelsey 1.7.1
 
 * Fixed a bug where HTTP response inputstreams weren't being closed.
 * Fixed a bug that prevented the Feedback Thank You dialog from displaying under some circumstances.
- 
+
 # 2015-4-23 skykelsey 1.6.7
 
 #### Bugs fixed
@@ -14,7 +21,7 @@
 This release includes support for Notes, which allows you to send messages to your customers and gives them the option
  to take surveys, navigate directly to content within your app, and more. Notes is currently in beta with select 
  customers. If you are interested in trying out Notes, please contact us.
- 
+
 #### Improvements
 
 * Added the ability to display Notes Interactions.
