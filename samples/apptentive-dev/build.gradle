@@ -77,8 +77,8 @@ dependencies {
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
     qaCompile 'com.apptentive:apptentive-android:1.7.2-SNAPSHOT@aar'
-    //rcCompile(name:'apptentive-android-1.7.1', ext:'aar')
-    rcCompile 'com.apptentive:apptentive-android:1.7.1@aar'
+    //rcCompile(name:'apptentive-android-1.7.2', ext:'aar')
+    rcCompile 'com.apptentive:apptentive-android:1.7.2@aar'
 }
 
 task run(type: Exec) {
