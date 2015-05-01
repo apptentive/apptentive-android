@@ -13,6 +13,9 @@ build/
 
 # IntelliJ
 *.iws
+.idea/tasks.xml
+.idea/vcs.xml
+.idea/workspace.xml
 
 # Eclipse
 .settings

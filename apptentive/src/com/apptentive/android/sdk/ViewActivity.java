@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
@@ -21,9 +20,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.util.ActivityUtil;
 import com.apptentive.android.sdk.util.Constants;
-import org.json.JSONObject;
 
 /**
  * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
@@ -36,17 +33,6 @@ public class ViewActivity extends ApptentiveActivity {
 	private ActivityContent.Type activeContentType;
 
 
-	/**
-	 * The class name to return to if this Activity was launched from a push notification.
-	 */
-	private String pushCallbackActivityName;
-
-	/**
-	 * A flag that is set when this Activity was launched from a push notification. If true, we should launch
-	 * pushCallbackActivityName when we finish this Activity.
-	 */
-	private boolean returnToPushCallbackActivity;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,7 +41,6 @@ public class ViewActivity extends ApptentiveActivity {
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			String activityContentTypeString = getIntent().getStringExtra(ActivityContent.KEY);
-			String parseStringExtra = getIntent().getStringExtra("com.parse.Data");
 
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
@@ -70,39 +55,41 @@ public class ViewActivity extends ApptentiveActivity {
 						case INTERACTION:
 							String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
 							Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
-							switch (interaction.getType()) {
-								case UpgradeMessage:
-									activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-									break;
-								case EnjoymentDialog:
-									activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-									break;
-								case RatingDialog:
-									activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-									break;
-								case AppStoreRating:
-									activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-									break;
-								case FeedbackDialog:
-									activityContent = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
-									break;
-								case Survey:
-									activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
-									break;
-								case MessageCenter:
-									// For now, we use the old method.
-									getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-									finish();
-									Apptentive.showMessageCenter(this);
-									return;
-								case TextModal:
-									activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
-									break;
-								case NavigateToLink:
-									activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
-									break;
-								default:
-									break;
+							if (interaction != null) {
+								switch (interaction.getType()) {
+									case UpgradeMessage:
+										activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
+										break;
+									case EnjoymentDialog:
+										activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
+										break;
+									case RatingDialog:
+										activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
+										break;
+									case AppStoreRating:
+										activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
+										break;
+									case FeedbackDialog:
+										activityContent = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
+										break;
+									case Survey:
+										activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
+										break;
+									case MessageCenter:
+										// For now, we use the old method.
+										getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+										finish();
+										Apptentive.showMessageCenter(this);
+										return;
+									case TextModal:
+										activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
+										break;
+									case NavigateToLink:
+										activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
+										break;
+									default:
+										break;
+								}
 							}
 							if (activityContent == null) {
 								finish();
@@ -119,38 +106,7 @@ public class ViewActivity extends ApptentiveActivity {
 					Log.e("Error starting ViewActivity.", e);
 					MetricModule.sendError(this, e, null, null);
 				}
-			} else
-				// If no content was sent to this Activity, then it may have been started from a Parse push notification.
-				if (parseStringExtra != null) {
-					Log.i("Started ViewActivity from Parse push.");
-
-					// Save off the callback Activity if one was passed in.
-					pushCallbackActivityName = ApptentiveInternal.getPushCallbackActivityName();
-
-					// If the callback is null and we got here, then the developer forgot to set it.
-					if (pushCallbackActivityName != null) {
-						returnToPushCallbackActivity = true;
-						JSONObject parseJson = new JSONObject(parseStringExtra);
-						String apptentiveStringData = parseJson.optString(Apptentive.APPTENTIVE_PUSH_EXTRA_KEY);
-						JSONObject apptentiveJson = new JSONObject(apptentiveStringData);
-						ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.parse(apptentiveJson.getString(ApptentiveInternal.PUSH_ACTION));
-						switch (action) {
-							case pmc:
-								activeContentType = ActivityContent.Type.MESSAGE_CENTER;
-								break;
-							default:
-								break;
-						}
-					} else {
-						Log.a("Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()");
-						if (GlobalInfo.isAppDebuggable) {
-							Toast.makeText(this, "Push callback Activity was not set. Make sure to call Apptentive.setPushCallback()", Toast.LENGTH_LONG).show();
-						}
-						finish();
-					}
-				} else {
-					Log.e("Started ViewActivity in a bad way.");
-				}
+			}
 		} catch (Exception e) {
 			Log.e("Error creating ViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
@@ -247,8 +203,6 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean("returnToPushCallbackActivity", returnToPushCallbackActivity);
-		outState.putString("pushCallbackActivityName", pushCallbackActivityName);
 		if(activityContent != null) {
 			activityContent.onSaveInstanceState(outState);
 		}
@@ -257,8 +211,6 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		returnToPushCallbackActivity = savedInstanceState.getBoolean("returnToPushCallbackActivity", false);
-		pushCallbackActivityName = savedInstanceState.getString("pushCallbackActivityName");
 		if(activityContent != null) {
 			activityContent.onRestoreInstanceState(savedInstanceState);
 		}
@@ -268,15 +220,5 @@ public class ViewActivity extends ApptentiveActivity {
 	public void finish() {
 		super.finish();
 		overridePendingTransition(0, R.anim.slide_down_out);
-		// If we started from a Parse push, then we need to return to the callback Activity when this Activity finishes.
-		if (pushCallbackActivityName != null) {
-			Log.d("Returning to callback Activity: %s", pushCallbackActivityName);
-			Class<? extends Activity> cls = ActivityUtil.getActivityClassFromName(pushCallbackActivityName);
-			if (cls != null) {
-				Intent intent = new Intent(this, cls);
-				startActivity(intent);
-				overridePendingTransition(R.anim.slide_up_in, 0);
-			}
-		}
 	}
 }
