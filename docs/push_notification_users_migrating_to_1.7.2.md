@@ -4,12 +4,12 @@ If you are using a previous version of Apptentive with your push notification pr
 
 ## Parse
 
-Parse's API has changed in their recent versions. If you are using Parse, our integration API has been significantly improved and simplified. Some older methods were removed, as they are no longer supported in new versions of the Parse SDK. Please refer to the [Parse integration instructions](www.apptentive.com/docs/android/integration/#using-parse).
+Parse's API has changed in their recent versions. If you are using Parse, our integration API has been significantly improved and simplified. Some older methods were removed, as they are no longer supported in new versions of the Parse SDK. Please refer to the [Parse integration instructions](https://www.apptentive.com/docs/android/integration/#using-parse).
 
 ## Urban Airship
 
 The API for Urban Airship needed to change slightly in order to support the latest Urban Airship SDK. Please refer to the 
-[Urban Airship integration instructions](www.apptentive.com/docs/android/integration/#using-urban-airship).
+[Urban Airship integration instructions](https://www.apptentive.com/docs/android/integration/#using-urban-airship).
 
 ## Amazon SNS
 
