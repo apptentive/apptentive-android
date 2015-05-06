@@ -16,6 +16,7 @@ import android.widget.*;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -161,9 +162,9 @@ public class MessageCenterIntroDialog extends ApptentiveBaseDialog {
 	private void validateForm(ApptentiveDialogButton sendButton) {
 		boolean passedEmail = true;
 		if (emailRequired) {
-			passedEmail = !(email == null || email.length() == 0);
+			passedEmail = !Util.isEmpty(email) || !Util.isEmpty(PersonManager.loadPersonEmail(getContext()));
 		}
-		boolean passedMessage = !(message == null || message.length() == 0);
+		boolean passedMessage = !Util.isEmpty(message);
 
 		sendButton.setEnabled(passedEmail && passedMessage);
 	}
