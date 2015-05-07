@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -61,8 +61,8 @@ public class PayloadSendWorker {
 					if (appContext == null) {
 						return;
 					}
-					PayloadStore db = getPayloadStore(appContext);
 					while (appInForeground) {
+						PayloadStore db = getPayloadStore(appContext);
 						if (Util.isEmpty(GlobalInfo.conversationToken)) {
 							Log.i("No conversation token yet.");
 							goToSleep(NO_TOKEN_SLEEP);
