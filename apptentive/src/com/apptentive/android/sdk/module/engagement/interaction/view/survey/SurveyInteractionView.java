@@ -43,20 +43,11 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	private boolean surveySubmitted = false;
 
 	private static SurveyState surveyState;
-	private static JSONObject data;
 
 	public SurveyInteractionView(SurveyInteraction interaction) {
 		super(interaction);
 		if (surveyState == null) {
 			surveyState = new SurveyState(interaction);
-		}
-		if (data == null) {
-			data = new JSONObject();
-			try {
-				data.put("id", interaction.getId());
-			} catch (JSONException e) {
-				// Never happens.
-			}
 		}
 	}
 
@@ -114,7 +105,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 					activity.finish();
 				}
 
-				EngagementModule.engageInternal(activity, interaction, EVENT_SUBMIT, data.toString());
+				EngagementModule.engageInternal(activity, interaction, EVENT_SUBMIT);
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
 				Log.d("Survey Submitted.");
 				callListener(true);
@@ -176,15 +167,19 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	void sendMetricForQuestion(Activity activity, Question question) {
 		String questionId = question.getId();
 		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
-			String answerData = String.format("{\"id\":\"%s\",\"survey_id\":\"%s\"}", question.getId(), interaction.getId());
-			EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData);
+			JSONObject answerData = new JSONObject();
+			try {
+				answerData.put("id", question.getId());
+			} catch (JSONException e) {
+				// Never happens.
+			}
+			EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData.toString());
 			surveyState.markMetricSent(questionId);
 		}
 	}
 
 	private void cleanup() {
 		surveyState = null;
-		data = null;
 	}
 
 
@@ -192,7 +187,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	public boolean onBackPressed(Activity activity) {
 		// If this survey is required, do not let it be dismissed when the user clicks the back button.
 		if (!interaction.isRequired()) {
-			EngagementModule.engageInternal(activity, interaction, EVENT_CANCEL, data.toString());
+			EngagementModule.engageInternal(activity, interaction, EVENT_CANCEL);
 			callListener(false);
 			cleanup();
 			return true;
