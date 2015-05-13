@@ -1,3 +1,9 @@
+# 2015-05-13 skykelsey 1.7.3
+
+#### Bugs Fixed
+
+* Fixed a bug where the Feedback Dialog as launched through the Message Center would not be submittable if feedback had already been submitted, Message Center was disabled, and Email was required.
+
 # 2015-05-01 skykelsey 1.7.2
 
 #### Improvements
