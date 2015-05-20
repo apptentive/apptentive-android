@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -59,6 +58,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
 		// Hide branding if needed.
+/*
 		final View branding = findViewById(R.id.apptentive_branding_view);
 		if (branding != null) {
 			if (Configuration.load(context).isHideBranding(context)) {
@@ -71,17 +71,18 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				});
 			}
 		}
+*/
 
-		TextView titleTextView = (TextView) findViewById(R.id.apptentive_message_center_header_title);
+		TextView titleTextView = (TextView) findViewById(R.id.title);
 		String titleText = Configuration.load(context).getMessageCenterTitle();
 		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
 
-		messageListView = (ListView) findViewById(R.id.apptentive_message_center_list);
+		messageListView = (ListView) findViewById(R.id.message_list);
 		messageListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
-		messageEditText = (EditText) findViewById(R.id.apptentive_message_center_message);
+		messageEditText = (EditText) findViewById(R.id.input);
 
 		if (message != null) {
 			messageEditText.setText(message);
@@ -102,7 +103,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				message = editable.toString();
 			}
 		});
-		View send = findViewById(R.id.apptentive_message_center_send);
+		View send = findViewById(R.id.send);
 		send.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				String text = messageEditText.getText().toString().trim();
@@ -116,7 +117,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			}
 		});
 
-		View attachButton = findViewById(R.id.apptentive_message_center_attach_button);
+		View attachButton = findViewById(R.id.attach);
 		// Android devices can't take screenshots until Android OS version 4+
 		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
 		if (canTakeScreenshot) {
@@ -124,13 +125,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				public void onClick(View view) {
 					MetricModule.sendMetric(context, Event.EventLabel.message_center__attach);
 					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					intent.setType("image/*");
+					intent.setType("image");
 					context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 				}
 			});
 		} else {
 			attachButton.setVisibility(GONE);
 		}
+
 		messageAdapter = new MessageAdapter<Message>(context);
 		messageListView.setAdapter(messageAdapter);
 	}

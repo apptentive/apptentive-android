@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:paddingLeft="@dimen/apptentive_activity_side_padding"
+             android:paddingRight="@dimen/apptentive_activity_side_padding"
+             android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+             android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
+    <LinearLayout android:id="@+id/apptentive_message_center_root"
+                  android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent">
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@color/apptentive_message_center_header_background"
+                      android:gravity="center">
+            <TextView android:id="@+id/apptentive_message_center_header_title"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:gravity="center"
+                      android:paddingTop="8dp"
+                      android:paddingBottom="8dp"
+                      android:drawableLeft="@drawable/android_ic_menu_start_conversation"
+                      android:drawablePadding="5dp"
+                      android:shadowDx="0"
+                      android:shadowDy="-1"
+                      android:shadowRadius="1"
+                      android:shadowColor="@color/apptentive_message_center_header_text_shadow"
+                      android:textSize="@dimen/apptentive_text_medium_large"
+                      android:textStyle="bold"
+                      android:textColor="@color/apptentive_message_center_header_text"
+                      android:text="@string/apptentive_message_center_title"/>
+        </LinearLayout>
+        <ListView android:id="@+id/message_list"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0px"
+                  android:layout_weight="1"
+                  android:background="@color/apptentive_message_center_main_area_background"
+                  android:cacheColorHint="@android:color/transparent"
+                  android:listSelector="@android:color/transparent"
+                  android:divider="@null"/>
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center_vertical"
+                      android:background="@android:color/black">
+            <ImageView android:id="@+id/apptentive_message_center_attach_button"
+                       android:layout_width="44dp"
+                       android:layout_height="44dp"
+                       android:scaleType="fitCenter"
+                       android:clickable="true"
+                       android:src="@drawable/android_ic_action_photo"/>
+            <EditText android:id="@+id/apptentive_message_center_message"
+                      android:layout_width="0px"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:layout_marginTop="2dp"
+                      android:singleLine="false"
+                      android:textColor="@android:color/black"
+                      android:textSize="14sp"
+                      android:background="@drawable/android_textfield_default"
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:maxLines="3"
+                      android:hint="@string/apptentive_message_center_compose_hint"/>
+            <ImageView android:id="@+id/apptentive_message_center_send"
+                       android:layout_width="44dp"
+                       android:layout_height="44dp"
+                       android:scaleType="fitCenter"
+                       android:clickable="true"
+                       android:src="@drawable/android_ic_action_send"/>
+        </LinearLayout>
+        <FrameLayout android:id="@+id/apptentive_branding_view"
+                     android:layout_width="fill_parent"
+                     android:layout_height="24dp"
+                     android:background="@android:color/black">
+            <RelativeLayout android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:gravity="bottom|center_horizontal">
+                <TextView android:id="@+id/apptentive_message_center_powered_by_text"
+                          android:layout_width="wrap_content"
+                          android:layout_height="fill_parent"
+                          android:gravity="bottom"
+                          android:paddingBottom="4dp"
+                          android:paddingRight="4dp"
+                          android:textSize="12sp"
+                          android:textColor="#CCCCCC"
+                          android:text="Powered by"/>
+                <ImageView android:layout_width="100dp"
+                           android:layout_height="fill_parent"
+                           android:src="@drawable/apptentive_logo_reverse"
+                           android:layout_toRightOf="@+id/apptentive_message_center_powered_by_text"/>
+            </RelativeLayout>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

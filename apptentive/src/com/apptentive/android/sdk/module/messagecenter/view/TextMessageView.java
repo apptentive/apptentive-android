@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -25,14 +25,14 @@ public class TextMessageView extends PersonalMessageView<TextMessage> {
 	protected void init(TextMessage message) {
 		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
-		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.apptentive_message_body);
+		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
 		inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
 	}
 
 	public void updateMessage(final TextMessage newMessage) {
 		super.updateMessage(newMessage);
 		// Set content
-		TextView textView = (TextView) findViewById(R.id.apptentive_text_message_text);
+		TextView textView = (TextView) findViewById(R.id.text);
 		textView.setText(newMessage.getBody());
 	}
 }

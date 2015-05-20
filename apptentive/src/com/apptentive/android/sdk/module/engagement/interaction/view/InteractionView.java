@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.ActivityContent;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,7 +11,6 @@ import android.graphics.*;
 import android.view.View;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.util.Util;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -23,14 +22,12 @@ import java.net.URL;
  */
 public class AvatarView extends View {
 
-	private final static int RADIUS_DIPS = 7;
 	private static float radius;
 	Bitmap avatar;
 
 	public AvatarView(Context context, String urlString){
 		super(context);
 		this.setBackgroundColor(Color.TRANSPARENT);
-		radius = Util.dipsToPixelsFloat(context, RADIUS_DIPS);
 		try {
 			URL url = new URL(urlString);
 			avatar = BitmapFactory.decodeStream(url.openStream());
@@ -58,7 +55,7 @@ public class AvatarView extends View {
 		Bitmap duplicate = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		Bitmap mask = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		Canvas maskCanvas = new Canvas(mask);
-		maskCanvas.drawRoundRect(rect, radius, radius, paint);
+		maskCanvas.drawRoundRect(rect, rect.width() / 2, rect.height() / 2, paint);
 
 		matrix.setScale((float)width / avatar.getWidth(), (float)height / avatar.getHeight());
 
