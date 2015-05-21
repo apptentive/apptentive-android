@@ -15,7 +15,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
-import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
@@ -33,7 +32,7 @@ import java.util.List;
  */
 public class MessageCenterView extends FrameLayout implements MessageManager.OnSentMessageListener {
 
-	Activity context;
+	Activity activity;
 	static OnSendMessageListener onSendMessageListener;
 	ListView messageListView;
 	MessageAdapter<Message> messageAdapter;
@@ -45,16 +44,16 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	EditText messageEditText;
 
-	public MessageCenterView(Activity context, OnSendMessageListener onSendMessageListener) {
-		super(context);
-		this.context = context;
+	public MessageCenterView(Activity activity, OnSendMessageListener onSendMessageListener) {
+		super(activity.getApplicationContext());
+		this.activity = activity;
 		MessageCenterView.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
 	protected void setup() {
-		LayoutInflater inflater = context.getLayoutInflater();
+		LayoutInflater inflater = activity.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
 		// Hide branding if needed.
@@ -73,8 +72,16 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 */
 
+		ImageButton back = (ImageButton) findViewById(R.id.back);
+		back.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				activity.finish();
+			}
+		});
+
 		TextView titleTextView = (TextView) findViewById(R.id.title);
-		String titleText = Configuration.load(context).getMessageCenterTitle();
+		String titleText = Configuration.load(activity).getMessageCenterTitle();
 		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
@@ -113,7 +120,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageEditText.setText("");
 				onSendMessageListener.onSendTextMessage(text);
 				message = null;
-				Util.hideSoftKeyboard(context, view);
+				Util.hideSoftKeyboard(activity, view);
 			}
 		});
 
@@ -123,17 +130,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					MetricModule.sendMetric(context, Event.EventLabel.message_center__attach);
+					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
 					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 					intent.setType("image");
-					context.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+					activity.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 				}
 			});
 		} else {
 			attachButton.setVisibility(GONE);
 		}
 
-		messageAdapter = new MessageAdapter<Message>(context);
+		messageAdapter = new MessageAdapter<Message>(activity);
 		messageListView.setAdapter(messageAdapter);
 	}
 
@@ -185,7 +192,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
-		setMessages(MessageManager.getMessages(context));
+		setMessages(MessageManager.getMessages(activity));
 	}
 
 	public void scrollMessageListViewToBottom() {
