@@ -538,7 +538,7 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		ApptentiveMessageCenter.show(activity, true, null);
+		ApptentiveMessageCenter.show(activity, null);
 	}
 
 	/**
@@ -551,7 +551,7 @@ public class Apptentive {
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
 		try {
-			ApptentiveMessageCenter.show(activity, true, customData);
+			ApptentiveMessageCenter.show(activity, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);

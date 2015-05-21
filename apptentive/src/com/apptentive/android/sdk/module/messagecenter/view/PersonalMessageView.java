@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -50,44 +50,37 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		super.updateMessage(newMessage);
 
 		// Set timestamp
-		TextView timestampView = (TextView) findViewById(R.id.apptentive_message_timestamp);
+		TextView timestampView = (TextView) findViewById(R.id.timestamp);
 		timestampView.setText(createTimestamp(message.getCreatedAt()));
 
-		// Set name
-		TextView nameView = (TextView) findViewById(R.id.apptentive_message_sender_name);
-		String name = message.getSenderUsername();
-		if (name == null || name.equals("")) {
-			Resources resources = context.getResources();
-			name = newMessage.isOutgoingMessage() ? resources.getString(R.string.apptentive_you) : resources.getString(R.string.apptentive_developer);
-		}
-		nameView.setText(name);
-
-		// Set profile photo
-		final FrameLayout avatarFrame = (FrameLayout) findViewById(R.id.apptentive_message_avatar);
-		String photoUrl = message.getSenderProfilePhoto();
-		boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
-		if (avatarNeedsUpdate) {
-			// Perform the fetch on a new thread, and the UI update on the UI thread so we don't block everything.
-			Thread thread = new Thread() {
-				public void run() {
-					final AvatarView avatar = new AvatarView(context, message.getSenderProfilePhoto());
-					post(new Runnable() {
-						public void run() {
-							avatarFrame.addView(avatar);
-						}
-					});
-				}
-			};
-			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-				@Override
-				public void uncaughtException(Thread thread, Throwable throwable) {
-					Log.w("UncaughtException in PersonalMessageView.", throwable);
-					MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-				}
-			};
-			thread.setUncaughtExceptionHandler(handler);
-			thread.setName("Apptentive-MessageViewLoadAvatar");
-			thread.start();
+		// Set avatar
+		if (!message.isOutgoingMessage()) {
+			final FrameLayout avatarFrame = (FrameLayout) findViewById(R.id.avatar);
+			String photoUrl = message.getSenderProfilePhoto();
+			boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
+			if (avatarNeedsUpdate) {
+				// Perform the fetch on a new thread, and the UI update on the UI thread so we don't block everything.
+				Thread thread = new Thread() {
+					public void run() {
+						final AvatarView avatar = new AvatarView(context, message.getSenderProfilePhoto());
+						post(new Runnable() {
+							public void run() {
+								avatarFrame.addView(avatar);
+							}
+						});
+					}
+				};
+				Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+					@Override
+					public void uncaughtException(Thread thread, Throwable throwable) {
+						Log.w("UncaughtException in PersonalMessageView.", throwable);
+						MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
+					}
+				};
+				thread.setUncaughtExceptionHandler(handler);
+				thread.setName("Apptentive-MessageViewLoadAvatar");
+				thread.start();
+			}
 		}
 	}
 

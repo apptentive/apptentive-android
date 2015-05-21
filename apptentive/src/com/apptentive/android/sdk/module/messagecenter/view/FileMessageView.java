@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -44,7 +44,7 @@ public class FileMessageView extends PersonalMessageView<FileMessage> {
 	protected void init(FileMessage message) {
 		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
-		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.apptentive_message_body);
+		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
 		inflater.inflate(R.layout.apptentive_message_body_file, bodyLayout);
 	}
 

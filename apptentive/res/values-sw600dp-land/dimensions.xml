@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -10,4 +10,8 @@
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">274dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
+
+
+    <dimen name="apptentive_message_center_message_list_margin">100dp</dimen>
+    <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
 </resources>
