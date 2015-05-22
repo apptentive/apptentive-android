@@ -11,5 +11,5 @@
     <dimen name="apptentive_dialog_side_padding">8dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">16dp</dimen>
 
-
+    <dimen name="apptentive_message_center_header_height">48dp</dimen>
 </resources>

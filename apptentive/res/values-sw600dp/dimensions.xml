@@ -11,7 +11,4 @@
     <dimen name="apptentive_header_padding_bottom">8dp</dimen>
     <dimen name="apptentive_header_padding_left">12dp</dimen>
     <dimen name="apptentive_header_padding_right">12dp</dimen>
-
-    <dimen name="apptentive_message_center_list_margin">32dp</dimen>
-    <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
 </resources>

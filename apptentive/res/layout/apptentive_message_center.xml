@@ -14,24 +14,34 @@
               android:orientation="vertical">
     <!-- Header -->
     <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="48dp"
+                  android:layout_height="@dimen/apptentive_message_center_header_height"
                   android:background="#EF4139"
-                  android:gravity="start|center_vertical"
+                  android:gravity="top"
                   android:elevation="8dp"
-                  android:orientation="horizontal">
-        <ImageButton android:id="@+id/back"
-                     android:layout_width="48dp"
-                     android:layout_height="48dp"
-                     android:background="@null"
-                     android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
-                     android:contentDescription="Back"/>
-        <TextView android:id="@id/title"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_marginLeft="24dp"
-                  android:textColor="#FFFFFF"
-                  android:textSize="22sp"
-                  android:text="Feedback"/>
+                  android:orientation="vertical">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="48dp"
+                      android:gravity="start|center_vertical"
+                      android:orientation="horizontal">
+
+            <ImageButton android:id="@+id/back"
+                         android:layout_width="48dp"
+                         android:layout_height="48dp"
+                         android:background="@null"
+                         android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
+                         android:contentDescription="Back"/>
+            <com.apptentive.android.sdk.view.AutoResizeTextView android:id="@id/title"
+                                                                android:layout_width="match_parent"
+                                                                android:layout_height="match_parent"
+                                                                android:layout_marginLeft="24dp"
+                                                                android:layout_marginRight="24dp"
+                                                                android:gravity="start|center_vertical"
+                                                                android:textColor="#FFFFFF"
+                                                                android:textSize="22sp"
+                                                                android:singleLine="true"
+                                                                android:text="Message Center"/>
+        </LinearLayout>
     </LinearLayout>
     <!-- Content -->
     <FrameLayout android:layout_width="match_parent"
