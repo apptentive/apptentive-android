@@ -21,6 +21,8 @@ import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -34,13 +36,13 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	Activity activity;
 	static OnSendMessageListener onSendMessageListener;
-	ListView messageListView;
-	MessageAdapter<Message> messageAdapter;
+	ListView messageCenterListView;
+	MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
-	private static CharSequence message;
+	private static CharSequence messageText;
 
 	EditText messageEditText;
 
@@ -86,14 +88,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			titleTextView.setText(titleText);
 		}
 
-		messageListView = (ListView) findViewById(R.id.message_list);
-		messageListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+		messageCenterListView = (ListView) findViewById(R.id.message_list);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 		messageEditText = (EditText) findViewById(R.id.input);
 
-		if (message != null) {
-			messageEditText.setText(message);
-			messageEditText.setSelection(message.length());
+		if (messageText != null) {
+			messageEditText.setText(messageText);
+			messageEditText.setSelection(messageText.length());
 		}
 
 		messageEditText.addTextChangedListener(new TextWatcher() {
@@ -107,7 +109,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				message = editable.toString();
+				messageText = editable.toString();
 			}
 		});
 		View send = findViewById(R.id.send);
@@ -119,7 +121,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				}
 				messageEditText.setText("");
 				onSendMessageListener.onSendTextMessage(text);
-				message = null;
+				messageText = null;
 				Util.hideSoftKeyboard(activity, view);
 			}
 		});
@@ -140,27 +142,44 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			attachButton.setVisibility(GONE);
 		}
 
-		messageAdapter = new MessageAdapter<Message>(activity);
-		messageListView.setAdapter(messageAdapter);
+		messageCenterListAdapter = new MessageAdapter<MessageCenterListItem>(activity);
+		messageCenterListView.setAdapter(messageCenterListAdapter);
 	}
 
-	public void setMessages(final List<Message> messages) {
-		messageListView.post(new Runnable() {
+	public void setItems(final List<MessageCenterListItem> items) {
+		messageCenterListView.post(new Runnable() {
 			public void run() {
-				messageAdapter.clear();
-				for (Message message : messages) {
-					addMessage(message);
+				messageCenterListAdapter.clear();
+				for (MessageCenterListItem item : items) {
+					if (item instanceof Message) {
+						Message message = (Message) item;
+						if (message.isHidden()) {
+							continue;
+						}
+					}
+					messageCenterListAdapter.add(item);
 				}
 			}
 		});
 	}
 
-	public void addMessage(Message message) {
-		if (message.isHidden()) {
-			return;
+	public void addItem(MessageCenterListItem item) {
+
+		if (item instanceof Message) {
+			Message message = (Message) item;
+			if (message.isHidden()) {
+				return;
+			}
 		}
-		messageAdapter.add(message);
-		messageListView.post(new Runnable() {
+
+		if (item instanceof MessageCenterGreeting) {
+			messageCenterListAdapter.insert(item, 0);
+			//messageCenterListAdapter.notifyDataSetChanged();
+		} else {
+			messageCenterListAdapter.add(item);
+		}
+
+		messageCenterListView.post(new Runnable() {
 			public void run() {
 				scrollMessageListViewToBottom();
 			}
@@ -192,14 +211,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onSentMessage(final Message message) {
-		setMessages(MessageManager.getMessages(activity));
+		setItems(MessageManager.getMessageCenterListItems(activity));
 	}
 
 	public void scrollMessageListViewToBottom() {
-		messageListView.post(new Runnable() {
+		messageCenterListView.post(new Runnable() {
 			public void run() {
 				// Select the last row so it will scroll into view...
-				messageListView.setSelection(messageAdapter.getCount() - 1);
+				messageCenterListView.setSelection(messageCenterListAdapter.getCount() - 1);
 			}
 		});
 	}
