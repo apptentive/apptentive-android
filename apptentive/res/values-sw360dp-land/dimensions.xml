@@ -15,7 +15,7 @@
     <dimen name="apptentive_header_padding_top">0dp</dimen>
     <dimen name="apptentive_header_padding_bottom">0dp</dimen>
 
-
+    <dimen name="apptentive_message_center_header_height">48dp</dimen>
     <dimen name="apptentive_message_center_message_list_margin">24dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
 </resources>
