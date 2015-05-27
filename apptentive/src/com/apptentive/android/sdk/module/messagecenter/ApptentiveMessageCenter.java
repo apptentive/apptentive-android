@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -60,7 +61,7 @@ public class ApptentiveMessageCenter {
 				MessageManager.sendMessage(activity.getApplicationContext(), message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						messageCenterView.addMessage(message);
+						messageCenterView.addItem(message);
 					}
 				});
 				scrollToBottom();
@@ -78,7 +79,7 @@ public class ApptentiveMessageCenter {
 					MessageManager.sendMessage(activity.getApplicationContext(), message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
-							messageCenterView.addMessage(message);
+							messageCenterView.addItem(message);
 						}
 					});
 					scrollToBottom();
@@ -98,15 +99,15 @@ public class ApptentiveMessageCenter {
 		activity.setContentView(messageCenterView);
 
 		// Display the messages we already have for starters.
-		messageCenterView.setMessages(MessageManager.getMessages(activity.getApplicationContext()));
+		messageCenterView.setItems(MessageManager.getMessageCenterListItems(activity.getApplicationContext()));
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 		MessageManager.setInternalOnMessagesUpdatedListener(new MessageManager.OnNewMessagesListener() {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						List<Message> messages = MessageManager.getMessages(activity.getApplicationContext());
-						messageCenterView.setMessages(messages);
+						List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity.getApplicationContext());
+						messageCenterView.setItems(items);
 						scrollToBottom();
 					}
 				});

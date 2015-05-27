@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,6 +16,8 @@ import com.apptentive.android.sdk.model.AutomatedMessage;
 import com.apptentive.android.sdk.model.FileMessage;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.util.Constants;
@@ -81,8 +83,11 @@ public class MessageManager {
 		return false;
 	}
 
-	public static List<Message> getMessages(Context context) {
-		return getMessageStore(context).getAllMessages();
+	public static List<MessageCenterListItem> getMessageCenterListItems(Context context) {
+		List<MessageCenterListItem> messages = new ArrayList<MessageCenterListItem>();
+		messages.add(new MessageCenterGreeting()); // TODO: Generate a real greeting message from config.
+		messages.addAll(getMessageStore(context).getAllMessages());
+		return messages;
 	}
 
 	public static void sendMessage(Context context, Message message) {
