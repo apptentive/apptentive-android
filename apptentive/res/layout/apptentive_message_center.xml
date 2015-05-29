@@ -45,8 +45,7 @@
     </LinearLayout>
     <!-- Content -->
     <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="0px"
-                  android:layout_weight="1"
+                  android:layout_height="match_parent"
                   android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
                   android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
                   android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
@@ -64,7 +63,7 @@
                   android:divider="@null"/>
         <!-- Composition Area -->
         <FrameLayout android:layout_width="match_parent"
-                     android:layout_height="@dimen/apptentive_message_center_divider_line_width"
+                     android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
                      android:background="#DCDCDC"/>
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"

@@ -50,7 +50,15 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			Log.d("Unregocnized MessageCenterListItem: %s", listItem.getClass().getSimpleName());
 			return null;
 		}
+	}
 
+	@Override
+	public boolean areAllItemsEnabled() {
+		return false;
+	}
 
+	@Override
+	public boolean isEnabled(int position) {
+		return false;
 	}
 }

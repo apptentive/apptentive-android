@@ -11,4 +11,6 @@
     <dimen name="apptentive_header_padding_bottom">8dp</dimen>
     <dimen name="apptentive_header_padding_left">12dp</dimen>
     <dimen name="apptentive_header_padding_right">12dp</dimen>
+
+    <dimen name="apptentive_message_center_avatar_image_diameter">56dp</dimen>
 </resources>

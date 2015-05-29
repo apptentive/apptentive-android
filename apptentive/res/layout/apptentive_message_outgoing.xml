@@ -9,14 +9,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
-             android:background="@android:color/transparent"
-             android:layout_marginTop="4dp"
-             android:layout_marginBottom="4dp">
+             android:paddingTop="4dp"
+             android:paddingBottom="8dp"
+             android:clipToPadding="false">
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
-                 android:background="#D3D3D3"
-                 android:paddingTop="1dp"
-                 android:paddingBottom="1dp">
+                 android:paddingTop="@dimen/apptentive_message_center_fallback_divider_line_width"
+                 android:paddingBottom="@dimen/apptentive_message_center_fallback_divider_line_width"
+                 android:elevation="1.5dp"
+                 android:background="#DCDCDC">
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:padding="16dp"
@@ -31,8 +32,8 @@
                       android:padding="0dp"
                       android:textSize="12sp"
                       android:textStyle="bold"
-                      android:textColor="#666666"
-                      android:layout_gravity="left"/>
+                      android:textColor="#9E9E9E"
+                      android:layout_gravity="start"/>
         </LinearLayout>
     </FrameLayout>
 </FrameLayout>
