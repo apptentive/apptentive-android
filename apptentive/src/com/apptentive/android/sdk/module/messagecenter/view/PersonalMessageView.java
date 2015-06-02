@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -35,7 +34,13 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		if (message.isOutgoingMessage()) {
 			inflater.inflate(R.layout.apptentive_message_outgoing, this);
 		} else {
-			inflater.inflate(R.layout.apptentive_message_incoming, this);
+			try {
+				inflater.inflate(R.layout.apptentive_message_incoming, this);
+			} catch (Exception e) {
+				Log.e("Error: ", e);
+				Log.e("Caused by: ", e.getCause());
+				Log.e("Caused by: ", e.getCause().getCause());
+			}
 		}
 	}
 
@@ -55,31 +60,11 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 
 		// Set avatar
 		if (!message.isOutgoingMessage()) {
-			final FrameLayout avatarFrame = (FrameLayout) findViewById(R.id.avatar);
+			AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
 			String photoUrl = message.getSenderProfilePhoto();
 			boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
 			if (avatarNeedsUpdate) {
-				// Perform the fetch on a new thread, and the UI update on the UI thread so we don't block everything.
-				Thread thread = new Thread() {
-					public void run() {
-						final AvatarView avatar = new AvatarView(context, message.getSenderProfilePhoto());
-						post(new Runnable() {
-							public void run() {
-								avatarFrame.addView(avatar);
-							}
-						});
-					}
-				};
-				Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-					@Override
-					public void uncaughtException(Thread thread, Throwable throwable) {
-						Log.w("UncaughtException in PersonalMessageView.", throwable);
-						MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-					}
-				};
-				thread.setUncaughtExceptionHandler(handler);
-				thread.setName("Apptentive-MessageViewLoadAvatar");
-				thread.start();
+				avatarView.fetchImage(message.getSenderProfilePhoto());
 			}
 		}
 	}

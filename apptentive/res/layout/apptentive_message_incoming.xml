@@ -24,9 +24,10 @@
                       android:padding="16dp"
                       android:background="#FFFFFF"
                       android:orientation="horizontal">
-            <FrameLayout android:id="@+id/avatar"
-                         android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
-                         android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"/>
+            <com.apptentive.android.sdk.module.messagecenter.view.AvatarView android:id="@+id/avatar"
+                                                                             android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
+                                                                             android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
+                                                                             android:src="@drawable/avatar"/>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:paddingLeft="18dp"

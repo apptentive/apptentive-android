@@ -8,62 +8,191 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.graphics.*;
-import android.view.View;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.util.AttributeSet;
+import android.widget.ImageView;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+
 
 /**
  * @author Sky Kelsey
- * TODO: Save the final bitmap so it's not constructed each time onDraw is called.
  */
-public class AvatarView extends View {
+public class AvatarView extends ImageView {
 
-	private static float radius;
 	Bitmap avatar;
+	int avatarWidth;
+	int avatarHeight;
+	Matrix shaderMatrix;
+	BitmapShader shader;
+	Paint shaderPaint;
+	Rect viewRect;
+	int imageRadius;
 
-	public AvatarView(Context context, String urlString){
+	public AvatarView(Context context) {
 		super(context);
-		this.setBackgroundColor(Color.TRANSPARENT);
-		try {
-			URL url = new URL(urlString);
-			avatar = BitmapFactory.decodeStream(url.openStream());
-		} catch (MalformedURLException e) {
-			// Bad url, just use default image.
-		} catch (IOException e) {
-			Log.d("Error opening avatar from URL: \"%s\"", e, urlString);
-		} finally {
-			if(avatar == null) {
-				avatar = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
-			}
-		}
+	}
+
+	public AvatarView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
+
+	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		int width = getWidth()+1;
-		int height = getHeight()+1;
-		RectF rect = new RectF(1, 1, width-1, height-1);
+		if (getDrawable() != null) {
+			canvas.drawCircle(getWidth() / 2, getHeight() / 2, imageRadius, shaderPaint);
+		}
+	}
 
-		Matrix matrix = new Matrix();
-		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paint.setColor(Color.YELLOW);
+	@Override
+	public void setImageBitmap(Bitmap bm) {
+		super.setImageBitmap(bm);
+		avatar = bm;
+		setup();
+	}
 
-		Bitmap duplicate = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		Bitmap mask = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		Canvas maskCanvas = new Canvas(mask);
-		maskCanvas.drawRoundRect(rect, rect.width() / 2, rect.height() / 2, paint);
+	@Override
+	public void setImageDrawable(Drawable drawable) {
+		super.setImageDrawable(drawable);
+		avatar = getBitmapFromDrawable(drawable);
+		setup();
+	}
 
-		matrix.setScale((float)width / avatar.getWidth(), (float)height / avatar.getHeight());
+	@Override
+	public void setImageResource(int resId) {
+		super.setImageResource(resId);
+		avatar = getBitmapFromDrawable(getDrawable());
+		setup();
+	}
 
-		Canvas dupCanvas = new Canvas(duplicate);
-		dupCanvas.drawBitmap(avatar, matrix, null);
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-		dupCanvas.drawBitmap(mask, 0, 0, paint);
+	@Override
+	public void setImageURI(Uri uri) {
+		super.setImageURI(uri);
+		avatar = getBitmapFromDrawable(getDrawable());
+		setup();
+	}
 
-		canvas.drawBitmap(duplicate, 0, 0, null);
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		setup();
+	}
+
+	private Bitmap getBitmapFromDrawable(Drawable d) {
+		if (d == null) {
+			return null;
+		}
+
+		if (d instanceof BitmapDrawable) {
+			return ((BitmapDrawable) d).getBitmap();
+		} else {
+			try {
+				Bitmap b;
+
+				if (d instanceof ColorDrawable) {
+					b = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+				} else {
+					b = Bitmap.createBitmap(d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+				}
+
+				Canvas canvas = new Canvas(b);
+				d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+				d.draw(canvas);
+				return b;
+			} catch (OutOfMemoryError e) {
+				Log.w("Error creating bitmap.", e);
+				return null;
+			}
+		}
+	}
+
+	protected void setup() {
+		if (avatar == null) {
+			return;
+		}
+		avatarWidth = avatar.getWidth();
+		avatarHeight = avatar.getHeight();
+		shader = new BitmapShader(avatar, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+		if (shaderPaint == null) {
+			shaderPaint = new Paint();
+		}
+		shaderPaint.setAntiAlias(true);
+		shaderPaint.setShader(shader);
+
+		if (viewRect == null) {
+			viewRect = new Rect();
+		}
+		viewRect.set(0, 0, getWidth(), getHeight());
+		imageRadius = Math.min(viewRect.width() / 2, viewRect.height() / 2);
+
+		// setup the matrix
+		if (shaderMatrix == null) {
+			shaderMatrix = new Matrix();
+		}
+		shaderMatrix.set(null);
+
+		float scale;
+		float deltaX = 0.0f;
+		float deltaY = 0.0f;
+		if (avatarWidth * viewRect.height() > avatarHeight * viewRect.width()) {
+			scale = (float) viewRect.height() / avatarHeight;
+			deltaX = (viewRect.height() - avatarWidth * scale) / 2.0f;
+		} else {
+			scale = (float) viewRect.width() / avatarWidth;
+			deltaY = (viewRect.width() - avatarHeight * scale) / 2.0f;
+		}
+		shaderMatrix.setScale(scale, scale);
+		shaderMatrix.postTranslate(deltaX + 0.5f, deltaY + 0.5f);
+
+		shader.setLocalMatrix(shaderMatrix);
+		invalidate();
+	}
+
+
+	public void fetchImage(final String urlString) {
+		if (urlString == null) {
+			return;
+		}
+		Thread thread = new Thread() {
+			public void run() {
+				Bitmap bitmap = null;
+				try {
+					URL url = new URL(urlString);
+					bitmap = BitmapFactory.decodeStream(url.openStream());
+				} catch (IOException e) {
+					Log.d("Error opening avatar from URL: \"%s\"", e, urlString);
+				}
+				if (bitmap != null) {
+					final Bitmap finalBitmap = bitmap;
+					post(new Runnable() {
+						public void run() {
+							setImageBitmap(finalBitmap);
+						}
+					});
+				}
+			}
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in AvatarView.", throwable);
+				MetricModule.sendError(getContext().getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-AvatarView.fetchImage()");
+		thread.start();
+
 	}
 }
