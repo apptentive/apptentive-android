@@ -10,10 +10,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.widget.TextView;
-import com.apptentive.android.sdk.Log;
+
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -34,13 +33,7 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		if (message.isOutgoingMessage()) {
 			inflater.inflate(R.layout.apptentive_message_outgoing, this);
 		} else {
-			try {
-				inflater.inflate(R.layout.apptentive_message_incoming, this);
-			} catch (Exception e) {
-				Log.e("Error: ", e);
-				Log.e("Caused by: ", e.getCause());
-				Log.e("Caused by: ", e.getCause().getCause());
-			}
+			inflater.inflate(R.layout.apptentive_message_incoming, this);
 		}
 	}
 
