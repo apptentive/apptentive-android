@@ -8,7 +8,9 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -30,11 +32,11 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 	protected void init(T message) {
 		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
-		if (message.isOutgoingMessage()) {
-			inflater.inflate(R.layout.apptentive_message_outgoing, this);
-		} else {
+		//if (message.isOutgoingMessage()) {
+		//	inflater.inflate(R.layout.apptentive_message_outgoing, this);
+		//} else {
 			inflater.inflate(R.layout.apptentive_message_incoming, this);
-		}
+		//}
 	}
 
 	/**
@@ -50,17 +52,21 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		// Set timestamp
 		TextView timestampView = (TextView) findViewById(R.id.timestamp);
 		timestampView.setText(createTimestamp(message.getCreatedAt()));
-
-		// Set avatar
+		AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
 		if (!message.isOutgoingMessage()) {
-			AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
-			String photoUrl = message.getSenderProfilePhoto();
-			boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
-			if (avatarNeedsUpdate) {
-				avatarView.fetchImage(message.getSenderProfilePhoto());
-			}
+			avatarView.setVisibility(View.VISIBLE);
+		} else {
+			avatarView.setVisibility(View.GONE);
 		}
 	}
+
+	public void setAvatar(final Bitmap bmp) {
+		if (!message.isOutgoingMessage()) {
+			AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
+			avatarView.setImageBitmap(bmp);
+		}
+	}
+
 
 	protected String createTimestamp(Double seconds) {
 		Resources resources = context.getResources();
