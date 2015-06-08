@@ -9,16 +9,19 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.os.AsyncTask;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 
 /**
@@ -26,7 +29,8 @@ import java.net.URL;
  */
 public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
 
-	private final int TYPE_TXT = 0,TYPE_FILE = 1,TYPE_AUTO = 2,TYPE_GREETING=3;
+	private final int TYPE_TXT_IN = 0, TYPE_TXT_OUT = 1, TYPE_FILE_IN = 2, TYPE_FILE_OUT = 3,
+			TYPE_AUTO = 4, TYPE_GREETING = 5;
 
 	private Bitmap avatarCache;
 
@@ -58,9 +62,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			if (message.getBaseType() == Payload.BaseType.message) {
 				switch (message.getType()) {
 					case TextMessage:
-						return TYPE_TXT;
+						return (message.isOutgoingMessage()) ? TYPE_TXT_OUT : TYPE_TXT_IN;
 					case FileMessage:
-						return TYPE_FILE;
+						return (message.isOutgoingMessage()) ? TYPE_FILE_OUT : TYPE_FILE_IN;
 					case AutomatedMessage:
 						return TYPE_AUTO;
 				}
@@ -68,97 +72,107 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		} else if (listItem instanceof MessageCenterGreeting) {
 			return TYPE_GREETING;
 		}
-		return TYPE_TXT;
+		return TYPE_TXT_OUT;
 	}
 
 	@Override
-	public int getViewTypeCount()
-	{
-		return 4;
+	public int getViewTypeCount() {
+		return 6;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		MessageCenterListItem listItem = getItem(position);
-		TextViewHolder holder1 = null;
-		FileViewHolder holder2 = null;
-		AutoViewHolder holder3 = null;
-		GreetingViewHolder holder4 = null;
+		TextViewHolder holderTxt = null;
+		FileViewHolder holderFile = null;
+		AutoViewHolder holderAuto = null;
+		GreetingViewHolder holderGreeting = null;
 
 		int type = getItemViewType(position);
-		if(null==convertView)
-		{
+		if (null == convertView) {
 			switch (type) {
-				case TYPE_TXT:
-					holder1=new TextViewHolder();
+				case TYPE_TXT_IN:
+				case TYPE_TXT_OUT:
+					holderTxt = new TextViewHolder();
 					TextMessageView tv = new TextMessageView(parent.getContext(), (TextMessage) listItem);
-					holder1.view = tv;
+					holderTxt.view = tv;
 					convertView = tv;
-					convertView.setTag(holder1);
+					convertView.setTag(holderTxt);
 					break;
-				case TYPE_FILE:
-					holder2=new FileViewHolder();
+				case TYPE_FILE_IN:
+				case TYPE_FILE_OUT:
+					holderFile = new FileViewHolder();
 					FileMessageView fv = new FileMessageView(parent.getContext(), (FileMessage) listItem);
-					holder2.view = fv;
+					holderFile.view = fv;
 					convertView = fv;
-					convertView.setTag(holder2);
+					convertView.setTag(holderFile);
 					break;
 				case TYPE_AUTO:
-					holder3=new AutoViewHolder();
+					holderAuto = new AutoViewHolder();
 					AutomatedMessageView av = new AutomatedMessageView(parent.getContext(), (AutomatedMessage) listItem);
-					holder3.view = av;
+					holderAuto.view = av;
 					convertView = av;
-					convertView.setTag(holder3);
+					convertView.setTag(holderAuto);
 					break;
 				case TYPE_GREETING:
-					holder4=new GreetingViewHolder();
+					holderGreeting = new GreetingViewHolder();
 					MessageCenterGreetingView gv = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
 					convertView = gv;
-					holder4.view = gv;
-					convertView.setTag(holder4);
+					holderGreeting.view = gv;
+					convertView.setTag(holderGreeting);
 					break;
 				default:
 					break;
 			}
-		}
-		else
-		{
+		} else {
 			switch (type) {
-				case TYPE_TXT:
-					holder1=(TextViewHolder)convertView.getTag();
+				case TYPE_TXT_IN:
+				case TYPE_TXT_OUT:
+					holderTxt = (TextViewHolder) convertView.getTag();
 					break;
-				case TYPE_FILE:
-					holder2=(FileViewHolder)convertView.getTag();
+				case TYPE_FILE_IN:
+				case TYPE_FILE_OUT:
+					holderFile = (FileViewHolder) convertView.getTag();
 					break;
 				case TYPE_AUTO:
-					holder3=(AutoViewHolder)convertView.getTag();
+					holderAuto = (AutoViewHolder) convertView.getTag();
 					break;
 				case TYPE_GREETING:
-					holder4=(GreetingViewHolder)convertView.getTag();
+					holderGreeting = (GreetingViewHolder) convertView.getTag();
 					break;
 				default:
 					break;
 			}
 		}
-		switch (type)
-		{
-			case TYPE_TXT:
-				holder1.view.updateMessage((TextMessage) listItem);
-				boolean bShowAvatar = !((TextMessage) listItem).isOutgoingMessage();
-				if (avatarCache == null && bShowAvatar) {
-					new DownloadImageTask(holder1).execute(((TextMessage) listItem).getSenderProfilePhoto());
-				} else if (bShowAvatar) {
-					holder1.view.setAvatar(avatarCache);
+		switch (type) {
+			case TYPE_TXT_IN:
+				holderTxt.view.updateMessage((TextMessage) listItem);
+
+				if (avatarCache == null) {
+					startDownloadAvatarTask(holderTxt.view, ((TextMessage) listItem).getSenderProfilePhoto());
+				} else {
+					holderTxt.view.setAvatar(avatarCache);
 				}
 				break;
-			case TYPE_FILE:
-				holder2.view.updateMessage((FileMessage) listItem);
+			case TYPE_TXT_OUT:
+				holderTxt.view.updateMessage((TextMessage) listItem);
+				break;
+			case TYPE_FILE_IN:
+				holderFile.view.updateMessage((FileMessage) listItem);
+				if (avatarCache == null) {
+					startDownloadAvatarTask(holderFile.view, ((FileMessage) listItem).getSenderProfilePhoto());
+				} else {
+					holderFile.view.setAvatar(avatarCache);
+				}
+				break;
+			case TYPE_FILE_OUT:
+				holderFile.view.updateMessage((FileMessage) listItem);
 				break;
 			case TYPE_AUTO:
-				holder3.view.updateMessage((AutomatedMessage) listItem);
+				holderAuto.view.updateMessage((AutomatedMessage) listItem);
 				break;
 			case TYPE_GREETING:
-				holder4.view.updateMessage((MessageCenterGreeting) listItem);
+				holderGreeting.view.updateMessage((MessageCenterGreeting) listItem);
 			default:
 				break;
 		}
@@ -175,18 +189,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return false;
 	}
 
+	private void startDownloadAvatarTask(PersonalMessageView view, String imageUrl) {
+		DownloadImageTask task = new DownloadImageTask(view);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
+		} else {
+			task.execute(imageUrl);
+		}
+	}
+
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-		private TextViewHolder resultView;
+		private WeakReference<PersonalMessageView> resultView;
 
-		DownloadImageTask(TextViewHolder resultView) {
-			this.resultView = resultView;
+		DownloadImageTask(PersonalMessageView view) {
+			resultView = new WeakReference<PersonalMessageView>(view);
 		}
 
 		protected Bitmap doInBackground(String... urls) {
-			//if (avatarCache != null) {
-			//	return avatarCache;
-			//}
 			Bitmap bmp = null;
 			try {
 				bmp = this.loadImageFromNetwork(urls[0]);
@@ -198,9 +218,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		@Override
 		protected void onPostExecute(Bitmap result) {
-			super.onPostExecute(result);
+			if (result == null) {
+				return;
+			}
 			avatarCache = result;
-			resultView.view.setAvatar(result);
+			PersonalMessageView view = resultView.get();
+			if (view != null) {
+				view.setAvatar(result);
+			}
 		}
 
 		private Bitmap loadImageFromNetwork(String imageUrl) throws IOException {

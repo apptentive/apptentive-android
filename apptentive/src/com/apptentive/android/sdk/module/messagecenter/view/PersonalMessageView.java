@@ -32,11 +32,11 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 	protected void init(T message) {
 		super.init(message);
 		LayoutInflater inflater = LayoutInflater.from(context);
-		//if (message.isOutgoingMessage()) {
-		//	inflater.inflate(R.layout.apptentive_message_outgoing, this);
-		//} else {
+		if (message.isOutgoingMessage()) {
+			inflater.inflate(R.layout.apptentive_message_outgoing, this);
+		} else {
 			inflater.inflate(R.layout.apptentive_message_incoming, this);
-		//}
+		}
 	}
 
 	/**
@@ -52,17 +52,11 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		// Set timestamp
 		TextView timestampView = (TextView) findViewById(R.id.timestamp);
 		timestampView.setText(createTimestamp(message.getCreatedAt()));
-		AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
-		if (!message.isOutgoingMessage()) {
-			avatarView.setVisibility(View.VISIBLE);
-		} else {
-			avatarView.setVisibility(View.GONE);
-		}
 	}
 
 	public void setAvatar(final Bitmap bmp) {
-		if (!message.isOutgoingMessage()) {
-			AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
+		AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
+		if (avatarView != null) {
 			avatarView.setImageBitmap(bmp);
 		}
 	}
