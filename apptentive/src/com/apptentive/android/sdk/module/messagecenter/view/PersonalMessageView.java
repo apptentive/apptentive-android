@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -47,9 +48,21 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		T oldMessage = message;
 		super.updateMessage(newMessage);
 
+		Double sentTime = message.getCreatedAt();
+
 		// Set timestamp
 		TextView timestampView = (TextView) findViewById(R.id.timestamp);
-		timestampView.setText(createTimestamp(message.getCreatedAt()));
+		timestampView.setText(createTimestamp(sentTime));
+
+		// Set Progress indicator
+		View progressBar = findViewById(R.id.progress);
+		if (progressBar != null) {
+			if (sentTime == null) {
+				progressBar.setVisibility(View.VISIBLE);
+			} else {
+				progressBar.setVisibility(View.INVISIBLE);
+			}
+		}
 
 		// Set avatar
 		if (!message.isOutgoingMessage()) {
