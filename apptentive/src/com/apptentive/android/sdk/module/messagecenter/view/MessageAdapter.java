@@ -30,7 +30,7 @@ import java.net.URL;
 public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
 
 	private final int TYPE_TXT_IN = 0, TYPE_TXT_OUT = 1, TYPE_FILE_IN = 2, TYPE_FILE_OUT = 3,
-			TYPE_AUTO = 4, TYPE_GREETING = 5;
+		TYPE_AUTO = 4, TYPE_GREETING = 5;
 
 	private Bitmap avatarCache;
 
@@ -72,7 +72,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		} else if (listItem instanceof MessageCenterGreeting) {
 			return TYPE_GREETING;
 		}
-		return TYPE_TXT_OUT;
+		return IGNORE_ITEM_VIEW_TYPE;
 	}
 
 	@Override
@@ -173,8 +173,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				break;
 			case TYPE_GREETING:
 				holderGreeting.view.updateMessage((MessageCenterGreeting) listItem);
-			default:
 				break;
+			default:
+				return null;
 		}
 		return convertView;
 	}
