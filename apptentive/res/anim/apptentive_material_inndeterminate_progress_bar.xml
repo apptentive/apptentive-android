@@ -5,17 +5,21 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <translate android:duration="1000"
-               android:fromXDelta="-100%"
-               android:toXDelta="100%"
-               android:interpolator="@android:anim/accelerate_interpolator"
-               android:repeatCount="infinite"/>
-    <scale android:duration="1000"
-           android:fromXScale="0.5"
-           android:fromYScale="1"
-           android:toXScale="2"
-           android:toYScale="1"
-           android:repeatCount="infinite"
-           android:repeatMode="restart"/>
+<set
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    <scale
+        android:duration="1000"
+        android:fromXScale="0.5"
+        android:fromYScale="1"
+        android:repeatCount="infinite"
+        android:repeatMode="restart"
+        android:toXScale="2"
+        android:toYScale="1"/>
+    <translate
+        android:duration="1000"
+        android:fromXDelta="-100%"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:repeatCount="infinite"
+        android:toXDelta="200%"/>
 </set>

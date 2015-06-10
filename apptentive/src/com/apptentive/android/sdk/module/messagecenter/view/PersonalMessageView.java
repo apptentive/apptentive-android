@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
 
 /**
  * @author Sky Kelsey
@@ -56,11 +57,13 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		timestampView.setText(createTimestamp(sentTime));
 
 		// Set Progress indicator
-		View progressBar = findViewById(R.id.progressBar);
+		ApptentiveMaterialIndeterminateProgressBar progressBar = (ApptentiveMaterialIndeterminateProgressBar) findViewById(R.id.progressBar);
 		if (progressBar != null) {
 			if (sentTime == null) {
 				progressBar.setVisibility(View.VISIBLE);
+				progressBar.start();
 			} else {
+				progressBar.stop();
 				progressBar.setVisibility(View.GONE);
 			}
 		}
