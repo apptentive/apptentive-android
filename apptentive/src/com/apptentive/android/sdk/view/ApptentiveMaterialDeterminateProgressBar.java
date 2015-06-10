@@ -45,7 +45,7 @@ public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
 		try {
 			progressBarColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_progressBarColor, Color.BLUE);
 			backgroundColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_backgroundColor, desaturate(progressBarColor, 0.5f));
-			progress = (int) (attributes.getFloat(R.styleable.ApptentiveMaterialDeterminateProgressBar_progress, 0.5f) * MAX);
+			progress = attributes.getInt(R.styleable.ApptentiveMaterialDeterminateProgressBar_progress, 50);
 		} finally {
 			attributes.recycle();
 		}

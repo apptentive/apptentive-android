@@ -13,6 +13,6 @@
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
         <attr name="backgroundColor" format="color"/>
         <attr name="progressBarColor" format="color"/>
-        <attr name="progress" format="float"/>
+        <attr name="progress" format="integer"/>
     </declare-styleable>
 </resources>

@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.view;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -30,16 +29,6 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 	public ApptentiveMaterialIndeterminateProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		startAnimation();
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-	}
-
-	@Override
-	public void setProgress(int progress) {
-		super.setProgress(progress);
 	}
 
 	private void startAnimation() {

@@ -56,12 +56,12 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		timestampView.setText(createTimestamp(sentTime));
 
 		// Set Progress indicator
-		View progressBar = findViewById(R.id.progress);
+		View progressBar = findViewById(R.id.progressBar);
 		if (progressBar != null) {
 			if (sentTime == null) {
 				progressBar.setVisibility(View.VISIBLE);
 			} else {
-				progressBar.setVisibility(View.INVISIBLE);
+				progressBar.setVisibility(View.GONE);
 			}
 		}
 	}

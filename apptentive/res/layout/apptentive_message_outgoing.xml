@@ -29,7 +29,6 @@
                           android:paddingTop="16dp"
                           android:paddingLeft="16dp"
                           android:paddingRight="16dp"
-                          android:paddingBottom="10dp"
                           android:orientation="vertical">
                 <FrameLayout android:id="@+id/body"
                              android:layout_width="wrap_content"
@@ -43,12 +42,18 @@
                           android:textColor="#9E9E9E"
                           android:layout_gravity="start"/>
             </LinearLayout>
-            <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progress"
-                                                                                        android:indeterminate="true"
-                                                                                        android:layout_width="fill_parent"
-                                                                                        android:layout_height="6dp"
-                                                                                        android:background="@android:color/transparent"
-                                                                                        apptentive:progressBarColor="#EF4139"/>
+            <LinearLayout android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:minHeight="16dp"
+                          android:gravity="bottom"
+                          android:orientation="vertical">
+                <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="fill_parent"
+                        android:layout_height="6dp"
+                        android:background="@android:color/transparent"
+                        apptentive:progressBarColor="#EF4139"/>
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 </FrameLayout>
