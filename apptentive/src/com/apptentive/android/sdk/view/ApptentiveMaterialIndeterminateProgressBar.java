@@ -10,6 +10,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
 import com.apptentive.android.sdk.R;
 
 /**
@@ -19,7 +20,6 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 
 	public ApptentiveMaterialIndeterminateProgressBar(Context context) {
 		super(context);
-		startAnimation();
 	}
 
 	public ApptentiveMaterialIndeterminateProgressBar(Context context, AttributeSet attrs) {
@@ -28,10 +28,9 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 
 	public ApptentiveMaterialIndeterminateProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		startAnimation();
 	}
 
-	private void startAnimation() {
+	public void start() {
 		post(new Runnable() {
 
 			@Override
@@ -39,6 +38,17 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 				setProgress(50);
 				Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.apptentive_material_inndeterminate_progress_bar);
 				bar.startAnimation(animation);
+			}
+		});
+	}
+
+	public void stop() {
+		post(new Runnable() {
+
+			@Override
+			public void run() {
+				setProgress(0);
+				bar.clearAnimation();
 			}
 		});
 	}
