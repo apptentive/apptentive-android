@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -63,17 +64,15 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 				progressBar.setVisibility(View.INVISIBLE);
 			}
 		}
+	}
 
-		// Set avatar
-		if (!message.isOutgoingMessage()) {
-			AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
-			String photoUrl = message.getSenderProfilePhoto();
-			boolean avatarNeedsUpdate = oldMessage == null || (photoUrl != null && !photoUrl.equals(oldMessage.getSenderProfilePhoto()));
-			if (avatarNeedsUpdate) {
-				avatarView.fetchImage(message.getSenderProfilePhoto());
-			}
+	public void setAvatar(final Bitmap bmp) {
+		AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
+		if (avatarView != null) {
+			avatarView.setImageBitmap(bmp);
 		}
 	}
+
 
 	protected String createTimestamp(Double seconds) {
 		Resources resources = context.getResources();
