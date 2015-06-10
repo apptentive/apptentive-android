@@ -76,8 +76,8 @@ public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
 			pendindProgress = progress;
 		} else {
 			this.progress = progress;
-			progress = Math.max(progress, MAX);
-			progress = Math.min(progress, MIN);
+			progress = Math.min(progress, MAX);
+			progress = Math.max(progress, MIN);
 			int totalWidth = MAX - MIN;
 			double progressRatio = (double) progress / (double) totalWidth;
 			int progressWidth = (int) (getWidth() * progressRatio);
