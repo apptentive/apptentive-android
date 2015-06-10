@@ -134,7 +134,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				public void onClick(View view) {
 					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
 					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					intent.setType("image");
+					intent.setType("image/*");
 					activity.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 				}
 			});
