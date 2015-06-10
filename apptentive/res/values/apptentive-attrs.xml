@@ -9,4 +9,10 @@
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="text" format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
+        <attr name="backgroundColor" format="color"/>
+        <attr name="progressBarColor" format="color"/>
+        <attr name="progress" format="integer"/>
+    </declare-styleable>
 </resources>

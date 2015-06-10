@@ -49,9 +49,21 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		T oldMessage = message;
 		super.updateMessage(newMessage);
 
+		Double sentTime = message.getCreatedAt();
+
 		// Set timestamp
 		TextView timestampView = (TextView) findViewById(R.id.timestamp);
-		timestampView.setText(createTimestamp(message.getCreatedAt()));
+		timestampView.setText(createTimestamp(sentTime));
+
+		// Set Progress indicator
+		View progressBar = findViewById(R.id.progressBar);
+		if (progressBar != null) {
+			if (sentTime == null) {
+				progressBar.setVisibility(View.VISIBLE);
+			} else {
+				progressBar.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	public void setAvatar(final Bitmap bmp) {

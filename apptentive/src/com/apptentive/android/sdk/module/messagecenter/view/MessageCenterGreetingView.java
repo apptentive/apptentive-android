@@ -27,7 +27,7 @@ public class MessageCenterGreetingView extends FrameLayout {
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_center_greeting, this);
-        updateMessage(messageCenterGreeting);
+		updateMessage(messageCenterGreeting);
 	}
 
 	public void updateMessage(MessageCenterGreeting messageCenterGreeting) {

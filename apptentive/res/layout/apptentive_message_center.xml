@@ -60,7 +60,8 @@
                   android:background="#FAFAFA"
                   android:clipToPadding="false"
                   android:clipChildren="false"
-                  android:divider="@null"/>
+                  android:divider="@null"
+                  android:scrollbars="none"/>
         <!-- Composition Area -->
         <FrameLayout android:layout_width="match_parent"
                      android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
