@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
@@ -133,7 +132,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			attachButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
-					Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 					intent.setType("image/*");
 					activity.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 				}
