@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
@@ -133,8 +135,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				public void onClick(View view) {
 					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
 					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+					Bundle extras = new Bundle();
+					intent.addCategory(Intent.CATEGORY_OPENABLE);
+					if (Build.VERSION.SDK_INT >= 11) {
+						extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+					}
 					intent.setType("image/*");
-					activity.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+					if (!extras.isEmpty()) {
+						intent.putExtras(extras);
+					}
+					Intent chooserIntent = Intent.createChooser(intent, null);
+					activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 				}
 			});
 		} else {
@@ -190,15 +201,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 			Log.d("No attachment found.");
 			return;
 		}
-		AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
-		dialog.setImage(data);
-		dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
-			@Override
-			public void onAttachmentAccepted() {
-				onSendMessageListener.onSendFileMessage(data);
-			}
-		});
-		dialog.show();
+
+		try {
+			AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
+			dialog.setImage(data);
+			dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
+				@Override
+				public void onAttachmentAccepted() {
+					onSendMessageListener.onSendFileMessage(data);
+				}
+			});
+			dialog.show();
+		} catch (Exception e) {
+			Log.e("Error loading attachment preview.", e);
+		}
 	}
 
 	public interface OnSendMessageListener {
