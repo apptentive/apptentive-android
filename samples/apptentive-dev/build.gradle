@@ -74,9 +74,16 @@ android {
 }
 
 dependencies {
+    gradle.startParameter.taskRequests.each { taskRequest ->
+        taskRequest.args.each { taskName ->
+            String flavorName = "qa";
+            if (taskName.toLowerCase().endsWith(flavorName+"debug") || taskName.toLowerCase().endsWith(flavorName+"release")) {
+                qaCompile 'com.apptentive:apptentive-android:1.7.3-SNAPSHOT@aar'
+            }
+        }
+    }
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
-    qaCompile 'com.apptentive:apptentive-android:1.7.3-SNAPSHOT@aar'
     //rcCompile(name:'apptentive-android-1.7.2', ext:'aar')
     rcCompile 'com.apptentive:apptentive-android:1.7.2@aar'
 }
