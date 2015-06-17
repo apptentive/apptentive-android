@@ -15,8 +15,10 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * @author Sky Kelsey
@@ -39,5 +41,4 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 			inflater.inflate(R.layout.apptentive_message_incoming, this);
 		}
 	}
-
 }

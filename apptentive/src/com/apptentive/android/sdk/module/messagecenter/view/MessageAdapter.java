@@ -34,6 +34,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -313,11 +315,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	protected String createTimestamp(Double seconds) {
 		if (seconds != null) {
-			return Util.secondsToDisplayString(context.getResources().getString(R.string.apptentive_message_sent_timestamp_format), seconds);
+			Date date = new Date(Math.round(seconds * 1000));
+			DateFormat mediumDateShortTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+			return mediumDateShortTimeFormat.format(date);
 		}
 		return isInPauseState?context.getResources().getString(R.string.apptentive_paused)
-				:context.getResources().getString(R.string.apptentive_sending);
+			:context.getResources().getString(R.string.apptentive_sending);
 	}
+
 
 	private Point getBitmapDimensions(StoredFile storedFile) {
 		Point ret = null;
