@@ -15,8 +15,10 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * @author Sky Kelsey
@@ -80,7 +82,9 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 	protected String createTimestamp(Double seconds) {
 		Resources resources = context.getResources();
 		if (seconds != null) {
-			return Util.secondsToDisplayString(resources.getString(R.string.apptentive_message_sent_timestamp_format), seconds);
+			Date date = new Date(Math.round(seconds * 1000));
+			DateFormat mediumDateShortTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+			return mediumDateShortTimeFormat.format(date);
 		}
 		return resources.getString(R.string.apptentive_sending);
 	}
