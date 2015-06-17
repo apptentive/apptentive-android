@@ -22,17 +22,11 @@ public class TextMessageView extends PersonalMessageView<TextMessage> {
 		super(context, message);
 	}
 
-	protected void init(TextMessage message) {
-		super.init(message);
+	protected void init(Context context, TextMessage message) {
+		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
 		inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
 	}
 
-	public void updateMessage(final TextMessage newMessage) {
-		super.updateMessage(newMessage);
-		// Set content
-		TextView textView = (TextView) findViewById(R.id.text);
-		textView.setText(newMessage.getBody());
-	}
 }

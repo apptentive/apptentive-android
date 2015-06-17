@@ -42,7 +42,7 @@ public class MessageManager {
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
 	 *
-	 * @returns true if messages were returned, else false.
+	 * @return true if messages were returned, else false.
 	 */
 	public static boolean fetchAndStoreMessages(Context context) {
 		if (GlobalInfo.conversationToken == null) {
@@ -84,7 +84,7 @@ public class MessageManager {
 	}
 
 	public static List<MessageCenterListItem> getMessageCenterListItems(Context context) {
-		List<MessageCenterListItem> messages = new ArrayList<MessageCenterListItem>();
+		List<MessageCenterListItem> messages = new ArrayList<>();
 		messages.add(new MessageCenterGreeting()); // TODO: Generate a real greeting message from config.
 		messages.addAll(getMessageStore(context).getAllMessages());
 		return messages;
@@ -107,7 +107,7 @@ public class MessageManager {
 		Log.d("Fetching messages newer than: " + after_id);
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, after_id, null);
 
-		List<Message> ret = new ArrayList<Message>();
+		List<Message> ret = new ArrayList<>();
 		if (!response.isSuccessful()) {
 			return ret;
 		}
@@ -126,7 +126,7 @@ public class MessageManager {
 	}
 
 	public static List<Message> parseMessagesString(String messageString) throws JSONException {
-		List<Message> ret = new ArrayList<Message>();
+		List<Message> ret = new ArrayList<>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {
 			JSONArray items = root.getJSONArray("items");
@@ -141,11 +141,24 @@ public class MessageManager {
 		return ret;
 	}
 
+	public static void onResume() {
+		if (sentMessageListener != null) {
+			sentMessageListener.onResume();
+		}
+	}
+
+	public static void onPause() {
+		if (sentMessageListener != null) {
+			sentMessageListener.onPause();
+		}
+	}
+
 	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
 		if (response == null || !response.isSuccessful()) {
 			if (message instanceof FileMessage) {
 				((FileMessage) message).deleteStoredFile(context);
 			}
+			onPause();
 			return;
 		}
 		if (response.isSuccessful()) {
@@ -170,7 +183,7 @@ public class MessageManager {
 			getMessageStore(context).updateMessage(message);
 
 			if (sentMessageListener != null) {
-				sentMessageListener.onSentMessage(message);
+				sentMessageListener.onSentMessage(response, message);
 			}
 		}
 /*
@@ -202,7 +215,7 @@ public class MessageManager {
 			}
 		}
 
-		AutomatedMessage message = null;
+		AutomatedMessage message;
 
 		if (!shownAutoMessage) {
 			if (forced) {
@@ -227,10 +240,12 @@ public class MessageManager {
 	}
 
 
-// Listeners
+   // Listeners
 
 	public interface OnSentMessageListener {
-		public void onSentMessage(Message message);
+		void onSentMessage(ApptentiveHttpResponse response, Message message);
+		void onPause();
+		void onResume();
 	}
 
 	public static void setSentMessageListener(OnSentMessageListener onSentMessageListener) {

@@ -7,11 +7,13 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
+
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
@@ -23,6 +25,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
@@ -207,8 +210,10 @@ public class ApptentiveClient {
 			Log.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
 			Log.w("Timeout communicating with server.");
+			ret.setCode(-1);
 		} catch (IOException e) {
 			Log.w("Error communicating with server.", e);
+			ret.setCode(-1);
 		} finally {
 			if (httpClient != null) {
 				httpClient.getConnectionManager().shutdown();

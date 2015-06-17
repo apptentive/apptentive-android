@@ -30,8 +30,8 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 	/**
 	 * Perform any view initialization here. Make sure to call super.init() first to initialise the parent hierarchy.
 	 */
-	protected void init(T message) {
-		super.init(message);
+	protected void init(Context context, T message) {
+		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		if (message.isOutgoingMessage()) {
 			inflater.inflate(R.layout.apptentive_message_outgoing, this);
@@ -40,48 +40,4 @@ abstract public class PersonalMessageView<T extends Message> extends MessageView
 		}
 	}
 
-	/**
-	 * Call when you need to update the view with changed message contents. This should ONLY be called after the view has
-	 * been initialized with a message.
-	 *
-	 * @param newMessage The new message whose contents we want to display.
-	 */
-	public void updateMessage(final T newMessage) {
-		T oldMessage = message;
-		super.updateMessage(newMessage);
-
-		Double sentTime = message.getCreatedAt();
-
-		// Set timestamp
-		TextView timestampView = (TextView) findViewById(R.id.timestamp);
-		timestampView.setText(createTimestamp(sentTime));
-
-		// Set Progress indicator
-		ApptentiveMaterialIndeterminateProgressBar progressBar = (ApptentiveMaterialIndeterminateProgressBar) findViewById(R.id.progressBar);
-		if (progressBar != null) {
-			if (sentTime == null) {
-				progressBar.setVisibility(View.VISIBLE);
-				progressBar.start();
-			} else {
-				progressBar.stop();
-				progressBar.setVisibility(View.GONE);
-			}
-		}
-	}
-
-	public void setAvatar(final Bitmap bmp) {
-		AvatarView avatarView = (AvatarView) findViewById(R.id.avatar);
-		if (avatarView != null) {
-			avatarView.setImageBitmap(bmp);
-		}
-	}
-
-
-	protected String createTimestamp(Double seconds) {
-		Resources resources = context.getResources();
-		if (seconds != null) {
-			return Util.secondsToDisplayString(resources.getString(R.string.apptentive_message_sent_timestamp_format), seconds);
-		}
-		return resources.getString(R.string.apptentive_sending);
-	}
 }

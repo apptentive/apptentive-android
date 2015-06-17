@@ -21,6 +21,7 @@
     <string name="apptentive_required">Required</string>
     <string name="apptentive_optional">Optional</string>
     <string name="apptentive_sending">Sending…</string>
+    <string name="apptentive_paused">Paused</string>
     <string name="apptentive_version">Apptentive Version %s</string>
 
     <string name="apptentive_edittext_hint_email">Your Email Address</string>
@@ -61,6 +62,9 @@
     <string name="apptentive_message_center_title">Message Center</string>
     <string name="apptentive_message_center_compose_hint">Type a message…</string>
     <string name="apptentive_message_center_attachment_title">Send image?</string>
+    <string name="apptentive_message_center_status_error_title">:-(</string>
+    <string name="apptentive_message_center_status_error_body">Something is wrong./n We can\'t receive your message right now.</string>
+
 
     <!-- This is a Java format. -->
     <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>

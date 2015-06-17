@@ -18,19 +18,19 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeti
  */
 public class MessageCenterGreetingView extends FrameLayout {
 
-	Context context;
+	//Context context;
 	MessageCenterGreeting messageCenterGreeting;
 
 	public MessageCenterGreetingView(Context context, MessageCenterGreeting messageCenterGreeting) {
 		super(context);
-		this.context = context;
+		//this.context = context;
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_center_greeting, this);
-		updateMessage(messageCenterGreeting);
+		//updateMessage(messageCenterGreeting);
 	}
 
-	public void updateMessage(MessageCenterGreeting messageCenterGreeting) {
+	/*public void updateMessage(MessageCenterGreeting messageCenterGreeting) {
 		this.messageCenterGreeting = messageCenterGreeting;
 		String titleText = messageCenterGreeting.getTitle();
 		if (titleText != null) {
@@ -43,5 +43,5 @@ public class MessageCenterGreetingView extends FrameLayout {
 			TextView body = (TextView) findViewById(R.id.body);
 			body.setText(bodyText);
 		}
-	}
+	}*/
 }

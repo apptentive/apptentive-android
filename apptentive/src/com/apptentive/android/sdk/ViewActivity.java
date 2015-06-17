@@ -127,7 +127,8 @@ public class ViewActivity extends ApptentiveActivity {
 				AboutModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
-				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
+						WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 				ApptentiveMessageCenter.doShow(this);
 				break;
 			case INTERACTION:
