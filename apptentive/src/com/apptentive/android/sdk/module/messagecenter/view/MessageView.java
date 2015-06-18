@@ -21,17 +21,13 @@ package com.apptentive.android.sdk.module.messagecenter.view;
  */
 public abstract class MessageView<T extends Message> extends FrameLayout {
 
-	protected Context context;
-	protected T message;
-
 	public MessageView(final Context context, final T message) {
 		super(context);
-		this.context = context;
-		init(message);
-		updateMessage(message);
+		init(context, message);
+
 		if(!message.isRead()) {
 			message.setRead(true);
-			Map<String, String> data = new HashMap<String, String>();
+			Map<String, String> data = new HashMap<>();
 			data.put("message_id", message.getId());
 			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
 			post(new Runnable() {
@@ -43,10 +39,7 @@ public abstract class MessageView<T extends Message> extends FrameLayout {
 		}
 	}
 
-	protected void init(T message) {
+	protected void init(Context context, T message) {
 	}
 
-	public void updateMessage(T newMessage) {
-		message = newMessage;
-	}
 }

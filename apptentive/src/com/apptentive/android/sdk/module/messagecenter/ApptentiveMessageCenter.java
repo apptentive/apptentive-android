@@ -6,20 +6,25 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.net.Uri;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +50,7 @@ public class ApptentiveMessageCenter {
 		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
+
 	/**
 	 * @param activity The Activity Context that launched this view.
 	 */
@@ -62,6 +68,7 @@ public class ApptentiveMessageCenter {
 				messageCenterView.post(new Runnable() {
 					public void run() {
 						messageCenterView.addItem(message);
+						messageCenterView.onResume();
 					}
 				});
 				scrollToBottom();
@@ -80,6 +87,7 @@ public class ApptentiveMessageCenter {
 					messageCenterView.post(new Runnable() {
 						public void run() {
 							messageCenterView.addItem(message);
+							messageCenterView.onResume();
 						}
 					});
 					scrollToBottom();
@@ -97,9 +105,6 @@ public class ApptentiveMessageCenter {
 			((ViewGroup) messageCenterView.getParent()).removeView(messageCenterView);
 		}
 		activity.setContentView(messageCenterView);
-
-		// Display the messages we already have for starters.
-		messageCenterView.setItems(MessageManager.getMessageCenterListItems(activity.getApplicationContext()));
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 		MessageManager.setInternalOnMessagesUpdatedListener(new MessageManager.OnNewMessagesListener() {

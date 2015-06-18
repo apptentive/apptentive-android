@@ -11,7 +11,8 @@
               android:paddingTop="48dp"
               android:paddingBottom="48dp"
               android:gravity="center"
-              android:orientation="horizontal">
+              android:orientation="horizontal"
+              android:background="@color/apptentive_message_center_greeting_background">
     <FrameLayout android:layout_width="0dp"
                  android:layout_height="wrap_content"
                  android:layout_weight="1"/>
@@ -25,7 +26,7 @@
                   android:layout_height="wrap_content"
                   android:gravity="center"
                   android:textStyle="bold"
-                  android:textColor="#EF4139"
+                  android:textColor="#949494"
                   android:textSize="24dp"/>
         <TextView android:id="@+id/body"
                   android:layout_width="match_parent"

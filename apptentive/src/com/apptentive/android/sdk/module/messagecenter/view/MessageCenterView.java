@@ -16,18 +16,22 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +42,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	Activity activity;
 	static OnSendMessageListener onSendMessageListener;
 	ListView messageCenterListView;
+
+	ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
+
+	// MesssageCenterView is set to paused when it fails to send message
+	private boolean isPaused = false;
+	// Count how many paused ongoing messages
+	private int unsendMessagesCount = 0;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
@@ -60,20 +71,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
 		// Hide branding if needed.
-/*
-		final View branding = findViewById(R.id.apptentive_branding_view);
+		final View branding = findViewById(R.id.apptentive_logo_view);
 		if (branding != null) {
-			if (Configuration.load(context).isHideBranding(context)) {
+			if (Configuration.load(activity).isHideBranding(activity)) {
 				branding.setVisibility(View.GONE);
-			} else {
-				branding.setOnClickListener(new OnClickListener() {
-					public void onClick(View view) {
-						AboutModule.getInstance().show(context);
-					}
-				});
 			}
 		}
-*/
 
 		ImageButton back = (ImageButton) findViewById(R.id.back);
 		back.setOnClickListener(new OnClickListener() {
@@ -90,7 +93,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 
 		messageCenterListView = (ListView) findViewById(R.id.message_list);
-		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+		//messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 		messageEditText = (EditText) findViewById(R.id.input);
 
@@ -113,6 +116,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageText = editable.toString();
 			}
 		});
+
 		View send = findViewById(R.id.send);
 		send.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
@@ -123,7 +127,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageEditText.setText("");
 				onSendMessageListener.onSendTextMessage(text);
 				messageText = null;
-				Util.hideSoftKeyboard(activity, view);
 			}
 		});
 
@@ -151,27 +154,35 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		} else {
 			attachButton.setVisibility(GONE);
 		}
+		if (messageCenterListAdapter == null) {
+			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
+			unsendMessagesCount = countUnsendOutgoingMessages(items);
+			messages.addAll(items);
+			messageCenterListAdapter = new MessageAdapter<>(activity.getApplicationContext(), messages);
+			messageCenterListView.setAdapter(messageCenterListAdapter);
+		}
+	}
 
-		messageCenterListAdapter = new MessageAdapter<MessageCenterListItem>(activity);
-		messageCenterListView.setAdapter(messageCenterListAdapter);
+	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
+		int count = 0;
+		for (MessageCenterListItem item : items) {
+			if (item instanceof Message) {
+				Message message = (Message) item;
+				if (message.isOutgoingMessage() && message.getCreatedAt() == null) {
+					count ++;
+				}
+			}
+		}
+		return count;
 	}
 
 	public void setItems(final List<MessageCenterListItem> items) {
-		messageCenterListView.post(new Runnable() {
-			public void run() {
-				messageCenterListAdapter.clear();
-				for (MessageCenterListItem item : items) {
-					if (item instanceof Message) {
-						Message message = (Message) item;
-						if (message.isHidden()) {
-							continue;
-						}
-					}
-					messageCenterListAdapter.add(item);
-				}
-			}
-		});
+		messages.clear();
+		messages.addAll(items);
+		unsendMessagesCount = countUnsendOutgoingMessages(items);
+		messageCenterListAdapter.notifyDataSetChanged();
 	}
+
 
 	public void addItem(MessageCenterListItem item) {
 
@@ -183,17 +194,22 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 
 		if (item instanceof MessageCenterGreeting) {
-			messageCenterListAdapter.insert(item, 0);
-			//messageCenterListAdapter.notifyDataSetChanged();
+			messages.add(0, item);
+			messageCenterListAdapter.notifyDataSetChanged();
 		} else {
-			messageCenterListAdapter.add(item);
+			int messageCount = messages.size();
+			MessageCenterListItem lastitem = messages.get(messageCount - 1);
+			if (lastitem instanceof MessageCenterStatus) {
+				messages.remove(messageCount - 1);
+			}
+			messages.add(item);
+			if (!(item instanceof MessageCenterStatus))
+			{
+				unsendMessagesCount++;
+			}
+			messageCenterListAdapter.notifyDataSetChanged();
 		}
 
-		messageCenterListView.post(new Runnable() {
-			public void run() {
-				scrollMessageListViewToBottom();
-			}
-		});
 	}
 
 	public static void showAttachmentDialog(Context context, final Uri data) {
@@ -225,15 +241,66 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
-	public synchronized void onSentMessage(final Message message) {
-		setItems(MessageManager.getMessageCenterListItems(activity));
+	public synchronized void onSentMessage(ApptentiveHttpResponse response, final Message message) {
+		if (response.isSuccessful()) {
+			post(new Runnable() {
+				public void run() {
+					setItems(MessageManager.getMessageCenterListItems(activity));
+					addItem(new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null));
+					messageCenterListView.setSelection(messageCenterListAdapter.getCount() - 1);
+				}
+			});
+		}
+
+	}
+
+	public synchronized void onPause() {
+		if (!isPaused) {
+			isPaused = true;
+			post(new Runnable() {
+				public void run() {
+					int messageCount = messages.size();
+					MessageCenterListItem lastitem = messages.get(messageCount - 1);
+					if (lastitem instanceof MessageCenterStatus) {
+						messages.remove(messageCount - 1);
+					}
+					if (unsendMessagesCount > 0) {
+						addItem(new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
+						), activity.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+						messageCenterListAdapter.setPaused(isPaused);
+						messageCenterListAdapter.notifyDataSetChanged();
+						messageCenterListView.setSelection(messages.size() - 1);
+					}
+				}
+			});
+		}
+	}
+
+	public synchronized void onResume() {
+		if (isPaused) {
+			isPaused = false;
+			post(new Runnable() {
+				public void run() {
+					int messageCount = messages.size();
+					MessageCenterListItem lastitem = messages.get(messageCount - 1);
+					if (lastitem instanceof MessageCenterStatus) {
+						messages.remove(messageCount - 1);
+					}
+					if (unsendMessagesCount > 0) {
+						messageCenterListAdapter.setPaused(isPaused);
+						messageCenterListAdapter.notifyDataSetChanged();
+					}
+
+				}
+			});
+		}
 	}
 
 	public void scrollMessageListViewToBottom() {
-		messageCenterListView.post(new Runnable() {
+		post(new Runnable() {
 			public void run() {
 				// Select the last row so it will scroll into view...
-				messageCenterListView.setSelection(messageCenterListAdapter.getCount() - 1);
+				messageCenterListView.setSelection(messages.size() - 1);
 			}
 		});
 	}

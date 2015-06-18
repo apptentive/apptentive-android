@@ -22,8 +22,8 @@ public class AutomatedMessageView extends MessageView<AutomatedMessage> {
 		super(context, message);
 	}
 
-	protected void init(AutomatedMessage message) {
-		super.init(message);
+	protected void init(Context context, AutomatedMessage message) {
+		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_auto, this);
 		LinearLayout frame = (LinearLayout) findViewById(R.id.apptentive_message_auto_frame);

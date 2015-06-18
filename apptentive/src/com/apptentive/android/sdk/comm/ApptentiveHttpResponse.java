@@ -25,6 +25,10 @@ public class ApptentiveHttpResponse {
 		badPayload = false;
 	}
 
+	public boolean isException() {
+		return code < 0;
+	}
+
 	public boolean isSuccessful() {
 		return code >= 200 && code < 300;
 	}
