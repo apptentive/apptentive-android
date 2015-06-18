@@ -44,7 +44,7 @@ import java.util.List;
 public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
 
 	private static final int TYPE_TXT_IN = 0, TYPE_TXT_OUT = 1, TYPE_FILE_IN = 2, TYPE_FILE_OUT = 3,
-		TYPE_AUTO = 4, TYPE_GREETING = 5, TYPE_STATUS = 6;
+			TYPE_AUTO = 4, TYPE_GREETING = 5, TYPE_STATUS = 6;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -104,7 +104,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		AvatarView avatarView;
 
 		public void updateMessage(String messageTitle, String messageBody, String timeStamp,
-								  Bitmap fileBitmap, Bitmap avatarBitmap) {
+															Bitmap fileBitmap, Bitmap avatarBitmap) {
 			if (avatarView != null && avatarBitmap != null) {
 				avatarView.setImageBitmap(avatarBitmap);
 			}
@@ -114,10 +114,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class OutGoingMessageViewHolder extends MessageViewHolder {
 		ApptentiveMaterialIndeterminateProgressBar progressBar;
-        FrameLayout mainLayout;
+		FrameLayout mainLayout;
 
 		public void updateMessage(String messageTitle, String messageBody, boolean sent, boolean paused, String timeStamp,
-								  Bitmap fileBitmap) {
+															Bitmap fileBitmap) {
 			// Set Progress indicator
 			if (progressBar != null) {
 				if (!sent && !paused) {
@@ -130,7 +130,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 
 			if (mainLayout != null) {
-				mainLayout.setBackgroundColor((!sent && paused)?context.getResources().getColor(R.color.apptentive_message_center_toolbar):
+				mainLayout.setBackgroundColor((!sent && paused) ? context.getResources().getColor(R.color.apptentive_message_center_toolbar) :
 						context.getResources().getColor(R.color.apptentive_message_center_outgoing_frame_background));
 			}
 			super.updateMessage(messageTitle, messageBody, timeStamp, fileBitmap);
@@ -192,7 +192,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					holderOutMessage.messageBodyTextView = (TextView) tv.findViewById(R.id.text);
 					holderOutMessage.progressBar = (ApptentiveMaterialIndeterminateProgressBar) tv.findViewById(R.id.progressBar);
 					holderOutMessage.timestampView = (TextView) tv.findViewById(R.id.timestamp);
-					holderOutMessage.mainLayout =(FrameLayout) tv.findViewById(R.id.outgoing_message_frame_bg);
+					holderOutMessage.mainLayout = (FrameLayout) tv.findViewById(R.id.outgoing_message_frame_bg);
 					convertView = tv;
 					holderMessage = holderOutMessage;
 					break;
@@ -215,14 +215,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					holderOutMessage.progressBar = (ApptentiveMaterialIndeterminateProgressBar) fv.findViewById(R.id.progressBar);
 					holderOutMessage.timestampView = (TextView) fv.findViewById(R.id.timestamp);
 					holderOutMessage.fileImageView = (ImageView) fv.findViewById(R.id.apptentive_file_message_image);
-					holderOutMessage.mainLayout =(FrameLayout) fv.findViewById(R.id.outgoing_message_frame_bg);
+					holderOutMessage.mainLayout = (FrameLayout) fv.findViewById(R.id.outgoing_message_frame_bg);
 					convertView = fv;
 					holderMessage = holderOutMessage;
 					break;
 				}
 				case TYPE_GREETING: {
 					// Greeting message has: tile, body
-					holderMessage  = new MessageViewHolder();
+					holderMessage = new MessageViewHolder();
 					MessageCenterGreetingView gv = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
 					holderMessage.messageBodyTextView = (TextView) gv.findViewById(R.id.body);
 					holderMessage.messageTitleTextView = (TextView) gv.findViewById(R.id.title);
@@ -261,9 +261,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_TXT_OUT: {
 					Double sentTime = ((TextMessage) listItem).getCreatedAt();
 					timestamp = createTimestamp(sentTime);
-					((OutGoingMessageViewHolder)holderMessage).updateMessage(null, ((TextMessage) listItem).getBody(), (sentTime != null), isInPauseState, timestamp, null);
+					((OutGoingMessageViewHolder) holderMessage).updateMessage(null, ((TextMessage) listItem).getBody(), (sentTime != null), isInPauseState, timestamp, null);
+					break;
 				}
-				break;
 				case TYPE_FILE_IN:
 					if (avatarCache == null) {
 						startDownloadAvatarTask(((InComingMessageViewHolder) holderMessage).avatarView, ((FileMessage) listItem).getSenderProfilePhoto());
@@ -273,7 +273,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 						startLoadImageTask((FileMessage) listItem, position, holderMessage);
 					}
 					timestamp = createTimestamp(((FileMessage) listItem).getCreatedAt());
-					((InComingMessageViewHolder)holderMessage).updateMessage(null, null, timestamp, null, avatarCache);
+					((InComingMessageViewHolder) holderMessage).updateMessage(null, null, timestamp, null, avatarCache);
 					break;
 				case TYPE_FILE_OUT: {
 					if (position != holderMessage.position && position != pendingUpdateIndex) {
@@ -282,7 +282,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					}
 					Double sentTime = ((FileMessage) listItem).getCreatedAt();
 					timestamp = createTimestamp(((FileMessage) listItem).getCreatedAt());
-					((OutGoingMessageViewHolder)holderMessage).updateMessage(null, null, (sentTime != null), isInPauseState, timestamp, null);
+					((OutGoingMessageViewHolder) holderMessage).updateMessage(null, null, (sentTime != null), isInPauseState, timestamp, null);
 					break;
 				}
 				case TYPE_GREETING:
@@ -319,8 +319,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			DateFormat mediumDateShortTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 			return mediumDateShortTimeFormat.format(date);
 		}
-		return isInPauseState?context.getResources().getString(R.string.apptentive_paused)
-			:context.getResources().getString(R.string.apptentive_sending);
+		return isInPauseState ? context.getResources().getString(R.string.apptentive_paused)
+				: context.getResources().getString(R.string.apptentive_sending);
 	}
 
 

@@ -21,7 +21,7 @@ public class MessageCenterStatus extends JSONObject implements MessageCenterList
 	public static final String KEY_BODY = "body";
 
 	private int type;
-    private String title;
+	private String title;
 	private String body;
 
 	public MessageCenterStatus(int type, String tile, String body) {
@@ -29,6 +29,7 @@ public class MessageCenterStatus extends JSONObject implements MessageCenterList
 		this.title = tile;
 		this.body = body;
 	}
+
 	public String getTitle() {
 		try {
 			if (!isNull((KEY_TITLE))) {
