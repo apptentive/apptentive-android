@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -38,11 +38,6 @@ public class Util {
 
 	public static String dateToIso8601String(long millis) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
-	}
-
-	public static String secondsToDisplayString(String format, Double seconds) {
-		String dateString = dateToString(new SimpleDateFormat(format), new Date(Math.round(seconds * 1000)));
-		return dateString.replace("PM", "pm").replace("AM", "am");
 	}
 
 	public static String dateToString(DateFormat format, Date date) {

@@ -9,10 +9,9 @@
              android:layout_height="wrap_content"
              android:paddingBottom="5dp"
              android:paddingTop="3dp">
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#DCDCDC"/>
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="1dp"
+                 android:background="#DCDCDC"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
@@ -23,40 +22,35 @@
                   android:paddingBottom="48dp"
                   android:paddingTop="24dp">
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+        <FrameLayout android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="1"/>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:orientation="vertical">
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="4"
+                      android:gravity="center"
+                      android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#949494"
-                android:textSize="24dp"
-                android:textStyle="normal"/>
+            <TextView android:id="@+id/title"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center"
+                      android:textColor="#949494"
+                      android:textSize="24dp"
+                      android:textStyle="normal"/>
 
-            <TextView
-                android:id="@+id/body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#949494"
-                android:textSize="16dp"
-                android:textStyle="normal"/>
+            <TextView android:id="@+id/body"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center"
+                      android:textColor="#949494"
+                      android:textSize="16dp"
+                      android:textStyle="normal"/>
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+        <FrameLayout android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="1"/>
     </LinearLayout>
 </FrameLayout>

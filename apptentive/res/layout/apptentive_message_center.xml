@@ -13,150 +13,137 @@
               android:gravity="center_vertical"
               android:orientation="vertical">
     <!-- Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/apptentive_message_center_header_height"
-        android:background="#EF4139"
-        android:elevation="8dp"
-        android:gravity="top"
-        android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="@dimen/apptentive_message_center_header_height"
+                  android:background="#EF4139"
+                  android:elevation="8dp"
+                  android:gravity="top"
+                  android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="start|center_vertical"
-            android:orientation="horizontal">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="48dp"
+                      android:gravity="start|center_vertical"
+                      android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/back"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@null"
-                android:contentDescription="Back"
-                android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
+            <ImageButton android:id="@+id/back"
+                         android:layout_width="48dp"
+                         android:layout_height="48dp"
+                         android:background="@null"
+                         android:contentDescription="Back"
+                         android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
 
-            <com.apptentive.android.sdk.view.AutoResizeTextView
-                android:id="@id/title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:gravity="start|center_vertical"
-                android:singleLine="true"
-                android:text="Message Center"
-                android:textColor="#FFFFFF"
-                android:textSize="22sp"/>
+            <com.apptentive.android.sdk.view.AutoResizeTextView android:id="@id/title"
+                                                                android:layout_width="match_parent"
+                                                                android:layout_height="match_parent"
+                                                                android:layout_marginLeft="24dp"
+                                                                android:layout_marginRight="24dp"
+                                                                android:gravity="start|center_vertical"
+                                                                android:singleLine="true"
+                                                                android:text="Message Center"
+                                                                android:textColor="#FFFFFF"
+                                                                android:textSize="22sp"/>
         </LinearLayout>
     </LinearLayout>
     <!-- Content -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
-        android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
-        android:background="#D3D3D3"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
-        android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
+                  android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
+                  android:background="#D3D3D3"
+                  android:orientation="vertical"
+                  android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
+                  android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#FAFAFA"
-            android:orientation="vertical">
+        <FrameLayout android:layout_width="match_parent"
+                     android:layout_height="0dp"
+                     android:layout_weight="1"
+                     android:background="#FAFAFA"
+                     android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@+id/apptentive_logo_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <ImageView
-                    android:id="@+id/logo_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:scaleType="fitXY"
-                    android:layout_marginBottom="0dp"
-                    android:gravity="bottom|center_horizontal"
-                    android:src="@drawable/apptentive_logo_reverse"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="20dp"
-                    android:layout_centerHorizontal="true"/>
-                <TextView
-                    android:id="@+id/logo_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/apptentive_text_medium"
-                    android:text="Powered by"
-                    android:layout_above="@id/logo_image"
-                    android:layout_centerHorizontal="true"
+            <RelativeLayout android:id="@+id/apptentive_logo_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                <ImageView android:id="@+id/logo_image"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_alignParentBottom="true"
+                           android:layout_centerHorizontal="true"
+                           android:layout_marginBottom="0dp"
+                           android:gravity="bottom|center_horizontal"
+                           android:paddingBottom="20dp"
+                           android:paddingTop="10dp"
+                           android:scaleType="fitXY"
+                           android:src="@drawable/apptentive_logo_reverse"/>
+
+                <TextView android:id="@+id/logo_text"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_above="@id/logo_image"
+                          android:layout_centerHorizontal="true"
+                          android:text="Powered by"
+                          android:textSize="@dimen/apptentive_text_medium"
                     />
             </RelativeLayout>
             <!-- Message List -->
-            <ListView
-                android:id="@+id/message_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:cacheColorHint="@android:color/transparent"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:divider="@null"
-                android:transcriptMode="normal"
-                android:scrollbars="none"/>
+            <ListView android:id="@+id/message_list"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@android:color/transparent"
+                      android:cacheColorHint="@android:color/transparent"
+                      android:clipChildren="false"
+                      android:clipToPadding="false"
+                      android:divider="@null"
+                      android:scrollbars="none"
+                      android:transcriptMode="normal"/>
         </FrameLayout>
         <!-- Composition Area -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
-            android:background="#DCDCDC"/>
+        <FrameLayout android:layout_width="match_parent"
+                     android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
+                     android:background="#DCDCDC"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:elevation="8dp"
-            android:gravity="center_vertical"
-            android:minHeight="56dp"
-            android:orientation="horizontal"
-            android:paddingBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="#FFFFFF"
+                      android:elevation="8dp"
+                      android:gravity="center_vertical"
+                      android:minHeight="56dp"
+                      android:orientation="horizontal"
+                      android:paddingBottom="8dp"
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/input"
-                android:layout_width="0px"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="@string/apptentive_message_center_compose_hint"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="5"
-                android:singleLine="false"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"/>
+            <EditText android:id="@+id/input"
+                      android:layout_width="0px"
+                      android:layout_height="match_parent"
+                      android:layout_weight="1"
+                      android:background="@null"
+                      android:hint="@string/apptentive_message_center_compose_hint"
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:maxLines="5"
+                      android:singleLine="false"
+                      android:textColor="@android:color/black"
+                      android:textSize="16sp"/>
 
-            <ImageButton
-                android:id="@+id/attach"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:contentDescription="Attach"
-                android:paddingLeft="16dp"
-                android:src="@drawable/apptentive_ic_action_attach"
-                android:tint="#EF4139"/>
+            <ImageButton android:id="@+id/attach"
+                         android:layout_width="wrap_content"
+                         android:layout_height="match_parent"
+                         android:background="@null"
+                         android:contentDescription="Attach"
+                         android:paddingLeft="16dp"
+                         android:src="@drawable/apptentive_ic_action_attach"
+                         android:tint="#EF4139"/>
 
-            <ImageButton
-                android:id="@+id/send"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="Submit"
-                android:paddingLeft="16dp"
-                android:src="@drawable/apptentive_ic_action_send"
-                android:tint="#EF4139"/>
+            <ImageButton android:id="@+id/send"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:background="@null"
+                         android:contentDescription="Submit"
+                         android:paddingLeft="16dp"
+                         android:src="@drawable/apptentive_ic_action_send"
+                         android:tint="#EF4139"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
