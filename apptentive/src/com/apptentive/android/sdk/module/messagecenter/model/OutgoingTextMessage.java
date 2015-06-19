@@ -1,26 +1,27 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.Log;
+
 import org.json.JSONException;
 
 /**
  * @author Sky Kelsey
  */
-public class TextMessage extends Message {
+public class OutgoingTextMessage extends Message {
 
 	private static final String KEY_BODY = "body";
 
-	public TextMessage() {
+	public OutgoingTextMessage() {
 		super();
 	}
 
-	public TextMessage(String json) throws JSONException {
+	public OutgoingTextMessage(String json) throws JSONException {
 		super(json);
 	}
 
@@ -31,7 +32,7 @@ public class TextMessage extends Message {
 
 	public String getBody() {
 		try {
-			if(!isNull(KEY_BODY)) {
+			if (!isNull(KEY_BODY)) {
 				return getString(KEY_BODY);
 			}
 		} catch (JSONException e) {

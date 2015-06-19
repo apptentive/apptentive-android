@@ -20,7 +20,8 @@ import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -59,7 +60,7 @@ public class ApptentiveMessageCenter {
 
 		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
-				final TextMessage message = new TextMessage();
+				final OutgoingTextMessage message = new OutgoingTextMessage();
 				message.setBody(text);
 				message.setRead(true);
 				message.setCustomData(customData);
@@ -76,7 +77,7 @@ public class ApptentiveMessageCenter {
 
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
-				final FileMessage message = new FileMessage();
+				final OutgoingFileMessage message = new OutgoingFileMessage();
 				boolean successful = message.internalCreateStoredImage(activity.getApplicationContext(), uri.toString());
 				if (successful) {
 					message.setRead(true);
