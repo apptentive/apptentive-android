@@ -53,9 +53,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			TYPE_TEXT_INCOMING = 0,
 			TYPE_TEXT_OUTGOING = 1,
 			TYPE_FILE_OUTGOING = 2,
-			TYPE_GREETING = 5,
-			TYPE_STATUS = 6,
-			TYPE_AUTO = 7;
+			TYPE_GREETING = 3,
+			TYPE_STATUS = 4,
+			TYPE_AUTO = 5;
 
 	private static final int INVALID_POSITION = -1;
 
