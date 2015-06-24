@@ -6,25 +6,27 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-	import android.content.Context;
-	import com.apptentive.android.sdk.model.Event;
-	import com.apptentive.android.sdk.module.messagecenter.model.Message;
-	import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-	import com.apptentive.android.sdk.module.metric.MetricModule;
+import android.content.Context;
+import android.widget.FrameLayout;
 
-	import java.util.HashMap;
-	import java.util.Map;
+import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.metric.MetricModule;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
  */
-public abstract class MessageView<T extends Message> extends MessageCenterListItemView {
+public abstract class MessageView<T extends Message> extends FrameLayout implements MessageCenterListItemView {
 
 	public MessageView(final Context context, final T message) {
 		super(context);
 		init(context, message);
 
-		if(!message.isRead()) {
+		if (!message.isRead()) {
 			message.setRead(true);
 			Map<String, String> data = new HashMap<>();
 			data.put("message_id", message.getId());
