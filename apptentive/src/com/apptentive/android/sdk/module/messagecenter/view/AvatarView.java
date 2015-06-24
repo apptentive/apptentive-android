@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
@@ -188,15 +189,19 @@ public class AvatarView extends ImageView {
 
 	}
 
+	/**
+	 * This scales the image so that it fits within the container. The container may have empty space
+	 * at the ends, but the entire image will be displayed.
+	 */
 	private ImageScale scaleImage(int imageX, int imageY, int containerX, int containerY) {
 		ImageScale ret = new ImageScale();
-		float imageAspect = (float) imageX / imageY;
-		float containerAspect = (float) containerX / containerY;
-
-		if (imageAspect > containerAspect) { // Image aspect wider than container
+		// Compare aspects faster by multiplying out the divisors.
+		if (imageX * containerY > imageY * containerX) {
+			// Image aspect wider than container
 			ret.scale = (float) containerX / imageX;
 			ret.deltaY = ((float) containerY - (ret.scale * imageY)) / 2.0f;
-		} else { // Image aspect taller than container
+		} else {
+			// Image aspect taller than container
 			ret.scale = (float) containerY / imageY;
 			ret.deltaX = ((float) containerX - (ret.scale * imageX)) / 2.0f;
 		}
