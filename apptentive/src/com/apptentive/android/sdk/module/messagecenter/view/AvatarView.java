@@ -159,40 +159,4 @@ public class AvatarView extends ImageView {
 		invalidate();
 	}
 
-
-	public void fetchImage(final String urlString) {
-		if (urlString == null) {
-			return;
-		}
-		Thread thread = new Thread() {
-			public void run() {
-				Bitmap bitmap = null;
-				try {
-					URL url = new URL(urlString);
-					bitmap = BitmapFactory.decodeStream(url.openStream());
-				} catch (IOException e) {
-					Log.d("Error opening avatar from URL: \"%s\"", e, urlString);
-				}
-				if (bitmap != null) {
-					final Bitmap finalBitmap = bitmap;
-					post(new Runnable() {
-						public void run() {
-							setImageBitmap(finalBitmap);
-						}
-					});
-				}
-			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("UncaughtException in AvatarView.", throwable);
-				MetricModule.sendError(getContext().getApplicationContext(), throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-AvatarView.fetchImage()");
-		thread.start();
-
-	}
 }

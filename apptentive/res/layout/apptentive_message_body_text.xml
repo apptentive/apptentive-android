@@ -5,15 +5,13 @@
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:orientation="vertical"
              android:layout_width="wrap_content"
-             android:layout_height="wrap_content">
-    <TextView android:id="@+id/text"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:textColor="#000000"
-              android:textSize="16sp"
-              android:autoLink="all"/>
+             android:layout_height="wrap_content"
+             android:orientation="vertical">
+    <com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView
+        android:id="@+id/more_less_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </FrameLayout>

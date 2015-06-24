@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:paddingTop="4dp"
+             android:paddingBottom="8dp"
+             android:clipToPadding="false"
+             android:background="@android:color/transparent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="15dp"
+                      android:layout_marginBottom="15dp"
+                      android:layout_marginRight="15dp"
+                      android:layout_marginLeft="10dp"
+                      android:orientation="vertical"
+                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
+                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border"
+                      android:background="@drawable/apptentive_rounded_corner_shape">
+            <EditText android:id="@+id/composing_et"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="10dp"
+                      android:layout_margin="8dp"
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:singleLine="false"
+                      android:background="@null"
+                      android:textCursorDrawable ="@null"
+                      android:hint="@string/apptentive_message_center_compose_hint"
+                      android:textColor="@android:color/black"
+                      android:textSize="16sp"/>
+
+            <FrameLayout android:layout_width="match_parent"
+                         android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
+                         android:background="#DCDCDC"/>
+
+            <LinearLayout android:id="@+id/composing_toolbar"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_margin="2dp"
+                          android:background="@color/apptentive_message_center_outgoing_background"
+                          android:elevation="5dp"
+                          android:gravity="right"
+                          android:minHeight="40dp"
+                          android:orientation="horizontal"
+                          android:paddingBottom="5dp"
+                          android:paddingLeft="16dp"
+                          android:paddingRight="16dp"
+                          android:paddingTop="5dp">
+                <ImageButton android:id="@+id/attach"
+                             android:layout_width="wrap_content"
+                             android:layout_height="match_parent"
+                             android:background="@null"
+                             android:contentDescription="Attach"
+                             android:paddingLeft="16dp"
+                             android:src="@drawable/apptentive_ic_action_attach"
+                             android:tint="#EF4139"/>
+
+                <ImageButton android:id="@+id/send"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:background="@null"
+                             android:contentDescription="Submit"
+                             android:paddingLeft="16dp"
+                             android:src="@drawable/apptentive_ic_action_send"
+                             android:tint="#EF4139"/>
+            </LinearLayout>
+        </LinearLayout>
+        <Button android:id="@+id/cancel_composing"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true" android:layout_margin="5dp"
+                android:text="X"
+                android:textColor="#FFF"
+                android:background="@drawable/apptentive_rounded_button_shape"
+                android:gravity="center_vertical|center_horizontal" android:textSize="12sp" android:textStyle="bold"/>
+
+
+    </RelativeLayout>
+</FrameLayout>

@@ -23,7 +23,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 11
         targetSdkVersion 22
     }
 
@@ -43,7 +43,7 @@ android {
             applicationId "com.apptentive.android.dev"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_DEV,
                                     APPTENTIVE_USE_STAGING_SERVER: APPTENTIVE_USE_STAGING_SERVER_DEV,
-                                    APPTENTIVE_APP_NAME: "Apptentive Dev"];
+                                    APPTENTIVE_APP_NAME: "Apptentive Dev2"];
         }
         qa {
             applicationId "com.apptentive.android.qa"

@@ -38,6 +38,8 @@ public class MessageManager {
 	private static OnNewMessagesListener internalNewMessagesListener;
 	private static UnreadMessagesListener hostUnreadMessagesListener;
 
+	private static OnComposingActionListener composingActionListener;
+
 	/**
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
@@ -267,6 +269,41 @@ public class MessageManager {
 	public static void notifyHostUnreadMessagesListener(int unreadMessages) {
 		if (hostUnreadMessagesListener != null) {
 			hostUnreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
+		}
+	}
+
+	public static void setComposingActionListenerListener(OnComposingActionListener listener) {
+		composingActionListener = listener;
+	}
+
+	public interface OnComposingActionListener{
+		void onComposing(String str, boolean scroll);
+		void onCancelComposing();
+		void onFinishComposing();
+		void onAttachImage();
+	}
+
+	public static void onComposing(String composingStr, boolean scroll) {
+		if (composingActionListener != null) {
+			composingActionListener.onComposing(composingStr, scroll);
+		}
+	}
+
+	public static void onCancelComposing() {
+		if (composingActionListener != null) {
+			composingActionListener.onCancelComposing();
+		}
+	}
+
+	public static void onFinishComposing() {
+		if (composingActionListener != null) {
+			composingActionListener.onFinishComposing();
+		}
+	}
+
+	public static void onAttachImage() {
+		if (composingActionListener != null) {
+			composingActionListener.onAttachImage();
 		}
 	}
 }

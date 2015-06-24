@@ -12,10 +12,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.os.AsyncTask;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +27,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -44,7 +49,7 @@ import java.util.List;
 public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
 
 	private static final int TYPE_TXT_IN = 0, TYPE_TXT_OUT = 1, TYPE_FILE_IN = 2, TYPE_FILE_OUT = 3,
-			TYPE_AUTO = 4, TYPE_GREETING = 5, TYPE_STATUS = 6;
+			TYPE_AUTO = 4, TYPE_GREETING = 5, TYPE_STATUS = 6, TYPE_Composing = 7;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -59,6 +64,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private Bitmap avatarCache;
 	private Context context;
 	private int pendingUpdateIndex = INVALID_POSITION;
+	private int composingViewIndex = INVALID_POSITION;
+	private MessageCenterComposingView composingView;
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items) {
 		super(context, 0, (List<T>) items);
@@ -102,11 +109,16 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class InComingMessageViewHolder extends MessageViewHolder {
 		AvatarView avatarView;
+		CollapsibleTextView collapsible;
 
 		public void updateMessage(String messageTitle, String messageBody, String timeStamp,
 															Bitmap fileBitmap, Bitmap avatarBitmap) {
 			if (avatarView != null && avatarBitmap != null) {
 				avatarView.setImageBitmap(avatarBitmap);
+			}
+
+			if (collapsible != null) {
+				collapsible.setDesc(messageBody);
 			}
 			super.updateMessage(messageTitle, messageBody, timeStamp, fileBitmap);
 		}
@@ -115,6 +127,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private class OutGoingMessageViewHolder extends MessageViewHolder {
 		ApptentiveMaterialIndeterminateProgressBar progressBar;
 		FrameLayout mainLayout;
+		CollapsibleTextView collapsible;
 
 		public void updateMessage(String messageTitle, String messageBody, boolean sent, boolean paused, String timeStamp,
 															Bitmap fileBitmap) {
@@ -132,6 +145,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			if (mainLayout != null) {
 				mainLayout.setBackgroundColor((!sent && paused) ? context.getResources().getColor(R.color.apptentive_message_center_toolbar) :
 						context.getResources().getColor(R.color.apptentive_message_center_outgoing_frame_background));
+			}
+
+			if (collapsible != null) {
+				collapsible.setDesc(messageBody);
 			}
 			super.updateMessage(messageTitle, messageBody, timeStamp, fileBitmap);
 		}
@@ -157,17 +174,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			return TYPE_GREETING;
 		} else if (listItem instanceof MessageCenterStatus) {
 			return TYPE_STATUS;
+		} else if (listItem instanceof MessageCenterComposingItem) {
+			return TYPE_Composing;
 		}
 		return IGNORE_ITEM_VIEW_TYPE;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 7;
+		return 8;
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		MessageCenterListItem listItem = getItem(position);
 
 		int type = getItemViewType(position);
@@ -179,7 +198,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					InComingMessageViewHolder holderInMessage = new InComingMessageViewHolder();
 					TextMessageView tv = new TextMessageView(parent.getContext(), (TextMessage) listItem);
 					holderInMessage.avatarView = (AvatarView) tv.findViewById(R.id.avatar);
-					holderInMessage.messageBodyTextView = (TextView) tv.findViewById(R.id.text);
+					holderInMessage.collapsible = tv.getCollapsibleContainer();
 					holderInMessage.timestampView = (TextView) tv.findViewById(R.id.timestamp);
 					convertView = tv;
 					holderMessage = holderInMessage;
@@ -189,7 +208,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					// Outgoing message has: message, progressbar, timeStamp
 					OutGoingMessageViewHolder holderOutMessage = new OutGoingMessageViewHolder();
 					TextMessageView tv = new TextMessageView(parent.getContext(), (TextMessage) listItem);
-					holderOutMessage.messageBodyTextView = (TextView) tv.findViewById(R.id.text);
+					holderOutMessage.collapsible = tv.getCollapsibleContainer();
 					holderOutMessage.progressBar = (ApptentiveMaterialIndeterminateProgressBar) tv.findViewById(R.id.progressBar);
 					holderOutMessage.timestampView = (TextView) tv.findViewById(R.id.timestamp);
 					holderOutMessage.mainLayout = (FrameLayout) tv.findViewById(R.id.outgoing_message_frame_bg);
@@ -236,6 +255,27 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					holderMessage.messageBodyTextView = (TextView) sv.findViewById(R.id.body);
 					holderMessage.messageTitleTextView = (TextView) sv.findViewById(R.id.title);
 					convertView = sv;
+					break;
+				}
+				case TYPE_Composing: {
+					holderMessage = new MessageViewHolder();
+					if (composingView == null) {
+						composingView = new MessageCenterComposingView(context, position);
+					}
+					/*LayoutInflater inflater = LayoutInflater.from(context);
+					View cv = inflater.inflate(R.layout.apptentive_message_center_composing, parent, false);
+					et = (EditText) cv.findViewById(R.id.composing_et);
+					et.setOnTouchListener(new View.OnTouchListener() {
+						@Override
+						public boolean onTouch(View v, MotionEvent event) {
+							if (event.getAction() == MotionEvent.ACTION_UP) {
+								composingViewIndex = position;
+							}
+							return false;
+						}
+					});*/
+					focusOnEditText();
+					convertView = composingView;
 					break;
 				}
 				default:
@@ -291,11 +331,23 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_STATUS:
 					holderMessage.updateMessage(((MessageCenterStatus) listItem).getTitle(), ((MessageCenterStatus) listItem).getBody(), null, null);
 					break;
+				case TYPE_Composing:
+					//if (composingView != null) {
+					//	focusOnEditText();
+					//}
+					break;
 				default:
 					return null;
 			}
 			holderMessage.position = position;
 		}
+		/*if (et!= null) {
+			et.clearFocus();
+			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
+				et.requestFocus();
+				et.setSelection(et.getText().length());
+			}
+		}*/
 		return convertView;
 	}
 
@@ -309,9 +361,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return false;
 	}
 
+	public EditText getEditTextInComposing() {
+		if (composingView != null) {
+			return composingView.getEditText();
+		}
+		return null;
+	}
+
 	public void setPaused(boolean bPause) {
 		isInPauseState = bPause;
 	}
+
+	public void focusOnEditText() {
+		EditText et = composingView.getEditText();
+		et.requestFocus();
+	}
+ public void clearComposing() {
+	 composingView = null;
+ }
 
 	protected String createTimestamp(Double seconds) {
 		if (seconds != null) {
