@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,9 +21,14 @@ public class MessageFactory {
 			Message.Type type = Message.Type.valueOf(root.getString(Message.KEY_TYPE));
 			switch (type) {
 				case TextMessage:
-					return new TextMessage(json);
+					// This is ugly, but works.
+					Message message = new OutgoingTextMessage(json);
+					if (!message.isOutgoingMessage()) {
+						message = new IncomingTextMessage(json);
+					}
+					return message;
 				case FileMessage:
-					return new FileMessage(json);
+					return new OutgoingFileMessage(json);
 				case AutomatedMessage:
 					return new AutomatedMessage(json);
 				case unknown:

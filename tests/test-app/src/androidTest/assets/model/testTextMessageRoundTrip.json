@@ -1,0 +1,14 @@
+{
+  "id": "520a84fe4712c71b65000005",
+  "nonce": "33b042735704283c0407f22e6d6f8c6fcb0d2f073bf964f76d36ef176ec26472",
+  "type": "TextMessage",
+  "client_created_at": 1376421112,
+  "client_created_at_utc_offset": -25200,
+  "created_at": 1376421118.499,
+  "sender": {
+    "name": "Sky Kelsey",
+    "id": "4de48b826688000001000007",
+    "profile_photo": "https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG"
+  },
+  "body": "Test reply via email."
+}

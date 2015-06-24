@@ -7,18 +7,10 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
-
-import java.text.DateFormat;
-import java.util.Date;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
 
 /**
  * @author Sky Kelsey
