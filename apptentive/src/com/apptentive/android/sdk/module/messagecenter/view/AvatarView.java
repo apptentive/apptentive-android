@@ -142,18 +142,10 @@ public class AvatarView extends ImageView {
 		}
 		shaderMatrix.set(null);
 
-		float scale;
-		float deltaX = 0.0f;
-		float deltaY = 0.0f;
-		if (avatarWidth * viewRect.height() > avatarHeight * viewRect.width()) {
-			scale = (float) viewRect.height() / avatarHeight;
-			deltaX = (viewRect.height() - avatarWidth * scale) / 2.0f;
-		} else {
-			scale = (float) viewRect.width() / avatarWidth;
-			deltaY = (viewRect.width() - avatarHeight * scale) / 2.0f;
-		}
-		shaderMatrix.setScale(scale, scale);
-		shaderMatrix.postTranslate(deltaX + 0.5f, deltaY + 0.5f);
+
+		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, viewRect.width(), viewRect.height());
+		shaderMatrix.setScale(imageScale.scale, imageScale.scale);
+		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f, imageScale.deltaY + 0.5f);
 
 		shader.setLocalMatrix(shaderMatrix);
 		invalidate();
@@ -195,4 +187,31 @@ public class AvatarView extends ImageView {
 		thread.start();
 
 	}
+
+	private ImageScale scaleImage(int imageX, int imageY, int containerX, int containerY) {
+		ImageScale ret = new ImageScale();
+		float imageAspect = (float) imageX / imageY;
+		float containerAspect = (float) containerX / containerY;
+
+		if (imageAspect > containerAspect) { // Image aspect wider than container
+			ret.scale = (float) containerX / imageX;
+			ret.deltaY = ((float) containerY - (ret.scale * imageY)) / 2.0f;
+		} else { // Image aspect taller than container
+			ret.scale = (float) containerY / imageY;
+			ret.deltaX = ((float) containerX - (ret.scale * imageX)) / 2.0f;
+		}
+		return ret;
+	}
+
+	private class ImageScale {
+		public float scale = 1.0f;
+		public float deltaX = 0.0f;
+		public float deltaY = 0.0f;
+
+		@Override
+		public String toString() {
+			return String.format("scale = %f, deltaX = %f, deltaY = %f", scale, deltaX, deltaY);
+		}
+	}
+
 }
