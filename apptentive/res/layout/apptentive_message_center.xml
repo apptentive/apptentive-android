@@ -96,7 +96,8 @@
                       android:clipToPadding="false"
                       android:divider="@null"
                       android:scrollbars="none"
-                      android:transcriptMode="normal"/>
+                      android:transcriptMode="alwaysScroll"
+                      android:stackFromBottom="true"/>
         </FrameLayout>
         <!-- Composition Area -->
         <FrameLayout android:layout_width="match_parent"

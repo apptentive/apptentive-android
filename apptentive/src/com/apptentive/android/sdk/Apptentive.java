@@ -19,6 +19,7 @@ import android.provider.Settings;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -538,7 +540,7 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		ApptentiveMessageCenter.show(activity, null);
+		showMessageCenter(activity, null);
 	}
 
 	/**
@@ -549,9 +551,14 @@ public class Apptentive {
 	 * @param activity   The Activity from which to launch the Message Center
 	 * @param customData A Map of key/value Strings that will be sent with the next message.
 	 */
-	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
+	public static void showMessageCenter(Activity activity, Serializable customData) {
 		try {
-			ApptentiveMessageCenter.show(activity, customData);
+			Intent intent = new Intent();
+			intent.setClass(activity, ViewActivity.class);
+			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
+			intent.putExtra(ActivityContent.EXTRA, customData);
+			activity.startActivity(intent);
+			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);

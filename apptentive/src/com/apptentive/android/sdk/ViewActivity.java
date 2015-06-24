@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -51,6 +52,7 @@ public class ViewActivity extends ApptentiveActivity {
 						case ABOUT:
 							break;
 						case MESSAGE_CENTER:
+							activityContent = new MessageCenterActivityContent(getIntent().getSerializableExtra(ActivityContent.EXTRA));
 							break;
 						case INTERACTION:
 							String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
@@ -76,11 +78,8 @@ public class ViewActivity extends ApptentiveActivity {
 										activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 										break;
 									case MessageCenter:
-										// For now, we use the old method.
-										getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-										finish();
-										Apptentive.showMessageCenter(this);
-										return;
+										activityContent = new MessageCenterActivityContent(getIntent().getSerializableExtra(ActivityContent.EXTRA));
+										break;
 									case TextModal:
 										activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
 										break;
@@ -91,16 +90,15 @@ public class ViewActivity extends ApptentiveActivity {
 										break;
 								}
 							}
-							if (activityContent == null) {
-								finish();
-							} else {
-								activityContent.onCreate(this, savedInstanceState);
-							}
 							break;
 						default:
 							Log.w("No Activity specified. Finishing...");
-							finish();
 							break;
+					}
+					if (activityContent == null) {
+						finish();
+					} else {
+						activityContent.onCreate(this, savedInstanceState);
 					}
 				} catch (Exception e) {
 					Log.e("Error starting ViewActivity.", e);
@@ -127,9 +125,7 @@ public class ViewActivity extends ApptentiveActivity {
 				AboutModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
-				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
-						WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-				ApptentiveMessageCenter.doShow(this);
+
 				break;
 			case INTERACTION:
 				// Interactions are already set up from onCreate().
@@ -148,7 +144,7 @@ public class ViewActivity extends ApptentiveActivity {
 			case ABOUT:
 				break;
 			case MESSAGE_CENTER:
-				ApptentiveMessageCenter.onStop(this);
+				((MessageCenterActivityContent)activityContent).onStop();
 				break;
 			case INTERACTION:
 				// Interactions don't need to hear about onStop().
@@ -166,8 +162,6 @@ public class ViewActivity extends ApptentiveActivity {
 				finish = AboutModule.getInstance().onBackPressed(this);
 				break;
 			case MESSAGE_CENTER:
-				finish = ApptentiveMessageCenter.onBackPressed(this);
-				break;
 			case INTERACTION:
 				if (activityContent != null) {
 					finish = activityContent.onBackPressed(this);
@@ -186,14 +180,17 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == Activity.RESULT_OK) {
-			switch (requestCode) {
-				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
-					MessageCenterView.showAttachmentDialog(this, data.getData());
-					break;
-				default:
-					break;
-			}
+		switch (activeContentType) {
+			case ABOUT:
+				break;
+			case MESSAGE_CENTER:
+				((MessageCenterActivityContent)activityContent).onActivityResult(requestCode, resultCode, data);
+				break;
+			case INTERACTION:
+				// Interactions don't need to hear about onStop().
+				break;
+			default:
+				break;
 		}
 	}
 

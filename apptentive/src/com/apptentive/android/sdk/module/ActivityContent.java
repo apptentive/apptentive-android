@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.Log;
 public abstract class ActivityContent {
 
 	public static final String KEY = "activityContent";
+	public static final String EXTRA = "activityContentData";
 
 	protected Type type;
 
