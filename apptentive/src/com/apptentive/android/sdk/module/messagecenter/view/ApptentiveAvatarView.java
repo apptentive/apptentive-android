@@ -153,22 +153,27 @@ public class ApptentiveAvatarView extends ImageView {
 
 		if (borderPaint == null) {
 			borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			borderPaint.setStyle(Paint.Style.STROKE);
 		}
 		borderPaint.setColor(borderColor);
+		borderPaint.setStrokeWidth(border);
 
 		if (viewRect == null) {
 			viewRect = new Rect();
 		}
 		viewRect.set(0, 0, getWidth(), getHeight());
 
-		borderRadius = Math.min(viewRect.width() / 2, viewRect.height() / 2);
+		// Painting using STROKE style is measured from the center of the line, so include border in the radius calculation.
+		borderRadius = (int) (((float) Math.min(viewRect.width(), viewRect.height()) - border) / 2);
 
 		if (avatarRect == null) {
 			avatarRect = new Rect();
 		}
-		avatarRect.set(0, 0, viewRect.width() - border * 2, viewRect.height() - border * 2);
+		avatarRect.set(0, 0, viewRect.width() - border, viewRect.height() - border);
 
-		imageRadius = borderRadius - border;
+		// The image radius will now be smaller by half the border.
+		int halfBorder = (int) ((float) border / 2);
+		imageRadius = borderRadius - halfBorder;
 
 		// setup the matrix
 		if (shaderMatrix == null) {
