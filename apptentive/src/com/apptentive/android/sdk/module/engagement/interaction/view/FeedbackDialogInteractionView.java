@@ -17,9 +17,9 @@ import android.view.View;
 import android.widget.*;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.model.TextMessage;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.FeedbackDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
@@ -291,7 +291,7 @@ public class FeedbackDialogInteractionView extends InteractionView<FeedbackDialo
 			}
 		}
 		// Send the message.
-		final TextMessage textMessage = new TextMessage();
+		final OutgoingTextMessage textMessage = new OutgoingTextMessage();
 		textMessage.setBody(message.toString());
 		textMessage.setRead(true);
 		MessageManager.sendMessage(activity, textMessage);

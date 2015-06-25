@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;

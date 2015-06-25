@@ -28,6 +28,7 @@ import com.apptentive.android.sdk.util.Util;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public class MessageCenterActivity extends ApptentiveActivity {
 			customData.put(key, value);
 		}
 		clearCustomData(null);
-		Apptentive.showMessageCenter(this, customData);
+		Apptentive.showMessageCenter(this, (Serializable) customData);
 	}
 
 	public void sendAttachmentImage(View view) {

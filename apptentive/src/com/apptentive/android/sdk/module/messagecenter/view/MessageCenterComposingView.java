@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 /**
  * @author Barry Li
  */
-public class MessageCenterComposingView extends FrameLayout {
+public class MessageCenterComposingView extends FrameLayout implements MessageCenterListItemView {
 
 	private int position;
 	private EditText et;

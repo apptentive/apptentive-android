@@ -10,22 +10,23 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.TextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 
 /**
  * @author Sky Kelsey
  */
-public class TextMessageView extends PersonalMessageView<TextMessage> {
+public class IncomingTextMessageView extends PersonalMessageView<IncomingTextMessage> {
+
 
 	private CollapsibleTextView container;
 
-	public TextMessageView(Context context, TextMessage message) {
+	public IncomingTextMessageView(Context context, IncomingTextMessage message) {
 		super(context, message);
 	}
 
-	protected void init(Context context, TextMessage message) {
+	protected void init(Context context, IncomingTextMessage message) {
 		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
@@ -36,4 +37,5 @@ public class TextMessageView extends PersonalMessageView<TextMessage> {
 	public CollapsibleTextView getCollapsibleContainer() {
 		return container;
 	}
+
 }

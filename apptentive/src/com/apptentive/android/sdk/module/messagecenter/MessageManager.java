@@ -12,10 +12,10 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.AutomatedMessage;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +35,13 @@ import java.util.List;
  */
 public class MessageManager {
 
-	private static OnSentMessageListener sentMessageListener;
+	private static AfterSendMessageListener afterSendMessageListener;
 	private static OnNewMessagesListener internalNewMessagesListener;
-	private static UnreadMessagesListener hostUnreadMessagesListener;
+
+	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
+	 * Use WeakReference to prevent memory leak
+	 */
+	private static WeakReference<UnreadMessagesListener> hostUnreadMessagesListenerRef;
 
 	private static OnComposingActionListener composingActionListener;
 
@@ -143,31 +148,31 @@ public class MessageManager {
 		return ret;
 	}
 
-	public static void onResume() {
-		if (sentMessageListener != null) {
-			sentMessageListener.onResume();
+	public static void onResumeSending() {
+		if (afterSendMessageListener != null) {
+			afterSendMessageListener.onResumeSending();
 		}
 	}
 
-	public static void onPause() {
-		if (sentMessageListener != null) {
-			sentMessageListener.onPause();
+	public static void onPauseSending() {
+		if (afterSendMessageListener != null) {
+			afterSendMessageListener.onPauseSending();
 		}
 	}
 
 	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
 		if (response == null || !response.isSuccessful()) {
-			if (message instanceof FileMessage) {
-				((FileMessage) message).deleteStoredFile(context);
+			if (message instanceof OutgoingFileMessage) {
+				((OutgoingFileMessage) message).deleteStoredFile(context);
 			}
-			onPause();
+			onPauseSending();
 			return;
 		}
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (message.isHidden()) {
-				if (message instanceof FileMessage) {
-					((FileMessage) message).deleteStoredFile(context);
+				if (message instanceof OutgoingFileMessage) {
+					((OutgoingFileMessage) message).deleteStoredFile(context);
 				}
 				getMessageStore(context).deleteMessage(message.getNonce());
 				return;
@@ -184,8 +189,8 @@ public class MessageManager {
 			}
 			getMessageStore(context).updateMessage(message);
 
-			if (sentMessageListener != null) {
-				sentMessageListener.onSentMessage(response, message);
+			if (afterSendMessageListener != null) {
+				afterSendMessageListener.onMessageSent(response, message);
 			}
 		}
 /*
@@ -242,16 +247,16 @@ public class MessageManager {
 	}
 
 
-   // Listeners
+	// Listeners
 
-	public interface OnSentMessageListener {
-		void onSentMessage(ApptentiveHttpResponse response, Message message);
-		void onPause();
-		void onResume();
+	public interface AfterSendMessageListener {
+		void onMessageSent(ApptentiveHttpResponse response, Message message);
+		void onPauseSending();
+		void onResumeSending();
 	}
 
-	public static void setSentMessageListener(OnSentMessageListener onSentMessageListener) {
-		sentMessageListener = onSentMessageListener;
+	public static void setAfterSendMessageListener(AfterSendMessageListener listener) {
+		afterSendMessageListener = listener;
 	}
 
 	public interface OnNewMessagesListener {
@@ -263,12 +268,13 @@ public class MessageManager {
 	}
 
 	public static void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
-		hostUnreadMessagesListener = listener;
+		hostUnreadMessagesListenerRef = new WeakReference<>(listener);
 	}
 
 	public static void notifyHostUnreadMessagesListener(int unreadMessages) {
-		if (hostUnreadMessagesListener != null) {
-			hostUnreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
+		UnreadMessagesListener listener = hostUnreadMessagesListenerRef.get();
+		if (listener != null) {
+			listener.onUnreadMessageCountChanged(unreadMessages);
 		}
 	}
 

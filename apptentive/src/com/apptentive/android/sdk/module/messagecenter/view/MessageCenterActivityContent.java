@@ -19,12 +19,12 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.TextMessage;
+
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -56,7 +56,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendMessage(String text) {
-				final TextMessage message = new TextMessage();
+				final OutgoingTextMessage message = new OutgoingTextMessage();
 				message.setBody(text);
 				message.setRead(true);
 				message.setCustomData(customData);

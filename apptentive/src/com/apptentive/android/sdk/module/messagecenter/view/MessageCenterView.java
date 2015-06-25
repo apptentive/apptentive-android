@@ -28,14 +28,17 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.FileMessage;
+
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.model.Message;
+
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.ImageUtil;
@@ -61,6 +64,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private boolean isPaused = false;
 	// Count how many paused ongoing messages
 	private int unsendMessagesCount = 0;
+
 
 	private MessageCenterStatus statusItem;
 	private MessageCenterComposingItem composingItem;
@@ -147,13 +151,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 
-	private EditText getComposingArea() {
-		return null;
-	}
-
-	private String  getComposingText() {
-		return null;
-	}
 
 	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
 		int count = 0;
@@ -189,11 +186,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			messages.add(0, item);
 			messageCenterListAdapter.notifyDataSetChanged();
 		} else {
-			int messageCount = messages.size();
-			MessageCenterListItem lastitem = messages.get(messageCount - 1);
-			if (lastitem instanceof MessageCenterStatus) {
-				messages.remove(messageCount - 1);
-			}
+			messages.remove(statusItem);
 			messages.add(item);
 			if (item instanceof Message )
 			{
@@ -236,7 +229,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			return;
 		}
 
-		final FileMessage message = new FileMessage();
+		final OutgoingFileMessage message = new OutgoingFileMessage();
 		boolean successful = message.internalCreateStoredImage(activity.getApplicationContext(), uri.toString());
 		if (successful) {
 			StoredFile storedFile = message.getStoredFile(activity);
@@ -285,8 +278,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	public synchronized void onMessageSent(ApptentiveHttpResponse response, final Message message) {
 		if (response.isSuccessful()) {
 			post(new Runnable() {
-				public void run() {
-					setItems(MessageManager.getMessageCenterListItems(activity));
+				public void run() {setItems(MessageManager.getMessageCenterListItems(activity));
 					statusItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
 					addItem(statusItem);
 				}
@@ -300,10 +292,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			isPaused = true;
 			post(new Runnable() {
 				public void run() {
-					int messageCount = messages.size();
-					MessageCenterListItem lastitem = messages.get(messageCount - 1);
-					if (lastitem instanceof MessageCenterStatus) {
-						messages.remove(messageCount - 1);
+					if (statusItem != null) {
+						messages.remove(statusItem);
+						statusItem = null;
 					}
 					if (unsendMessagesCount > 0) {
 						messageCenterListAdapter.setPaused(isPaused);

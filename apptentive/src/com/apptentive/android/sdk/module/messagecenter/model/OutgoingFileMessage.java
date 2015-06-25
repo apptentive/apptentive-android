@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.messagecenter.model;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.FileStore;
 import com.apptentive.android.sdk.util.CountingOutputStream;
@@ -24,18 +25,18 @@ import java.io.*;
 /**
  * @author Sky Kelsey
  */
-public class FileMessage extends Message {
+public class OutgoingFileMessage extends Message {
 
 	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 
 	private static final String KEY_FILE_NAME = "file_name";
 	private static final String KEY_MIME_TYPE = "mime_type";
 
-	public FileMessage() {
+	public OutgoingFileMessage() {
 		super();
 	}
 
-	public FileMessage(String json) throws JSONException {
+	public OutgoingFileMessage(String json) throws JSONException {
 		super(json);
 	}
 
@@ -47,7 +48,7 @@ public class FileMessage extends Message {
 	/**
 	 * FileMessages are sent using a multi-part form encoded request, so they are handled differently here.
 	 *
-	 * @return A String containing just the meta data about the FileMessage.
+	 * @return A String containing just the meta data about the OutgoingFileMessage.
 	 */
 	@Override
 	public String marshallForSending() {

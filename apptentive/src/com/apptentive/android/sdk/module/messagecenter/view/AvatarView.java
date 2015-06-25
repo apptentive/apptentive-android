@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
@@ -142,21 +143,80 @@ public class AvatarView extends ImageView {
 		}
 		shaderMatrix.set(null);
 
-		float scale;
-		float deltaX = 0.0f;
-		float deltaY = 0.0f;
-		if (avatarWidth * viewRect.height() > avatarHeight * viewRect.width()) {
-			scale = (float) viewRect.height() / avatarHeight;
-			deltaX = (viewRect.height() - avatarWidth * scale) / 2.0f;
-		} else {
-			scale = (float) viewRect.width() / avatarWidth;
-			deltaY = (viewRect.width() - avatarHeight * scale) / 2.0f;
-		}
-		shaderMatrix.setScale(scale, scale);
-		shaderMatrix.postTranslate(deltaX + 0.5f, deltaY + 0.5f);
+
+		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, viewRect.width(), viewRect.height());
+		shaderMatrix.setScale(imageScale.scale, imageScale.scale);
+		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f, imageScale.deltaY + 0.5f);
 
 		shader.setLocalMatrix(shaderMatrix);
 		invalidate();
+	}
+
+
+	public void fetchImage(final String urlString) {
+		if (urlString == null) {
+			return;
+		}
+		Thread thread = new Thread() {
+			public void run() {
+				Bitmap bitmap = null;
+				try {
+					URL url = new URL(urlString);
+					bitmap = BitmapFactory.decodeStream(url.openStream());
+				} catch (IOException e) {
+					Log.d("Error opening avatar from URL: \"%s\"", e, urlString);
+				}
+				if (bitmap != null) {
+					final Bitmap finalBitmap = bitmap;
+					post(new Runnable() {
+						public void run() {
+							setImageBitmap(finalBitmap);
+						}
+					});
+				}
+			}
+		};
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				Log.w("UncaughtException in AvatarView.", throwable);
+				MetricModule.sendError(getContext().getApplicationContext(), throwable, null, null);
+			}
+		};
+		thread.setUncaughtExceptionHandler(handler);
+		thread.setName("Apptentive-AvatarView.fetchImage()");
+		thread.start();
+
+	}
+
+	/**
+	 * This scales the image so that it fits within the container. The container may have empty space
+	 * at the ends, but the entire image will be displayed.
+	 */
+	private ImageScale scaleImage(int imageX, int imageY, int containerX, int containerY) {
+		ImageScale ret = new ImageScale();
+		// Compare aspects faster by multiplying out the divisors.
+		if (imageX * containerY > imageY * containerX) {
+			// Image aspect wider than container
+			ret.scale = (float) containerX / imageX;
+			ret.deltaY = ((float) containerY - (ret.scale * imageY)) / 2.0f;
+		} else {
+			// Image aspect taller than container
+			ret.scale = (float) containerY / imageY;
+			ret.deltaX = ((float) containerX - (ret.scale * imageX)) / 2.0f;
+		}
+		return ret;
+	}
+
+	private class ImageScale {
+		public float scale = 1.0f;
+		public float deltaX = 0.0f;
+		public float deltaY = 0.0f;
+
+		@Override
+		public String toString() {
+			return String.format("scale = %f, deltaX = %f, deltaY = %f", scale, deltaX, deltaY);
+		}
 	}
 
 }

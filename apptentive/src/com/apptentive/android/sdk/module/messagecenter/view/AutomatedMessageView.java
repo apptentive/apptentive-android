@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 
 /**
  * @author Sky Kelsey

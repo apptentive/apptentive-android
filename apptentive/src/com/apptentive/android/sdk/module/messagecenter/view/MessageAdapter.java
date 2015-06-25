@@ -7,33 +7,37 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.os.AsyncTask;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.GreetingHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.HolderFactory;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingTextMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,8 +52,14 @@ import java.util.List;
  */
 public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
 
-	private static final int TYPE_TXT_IN = 0, TYPE_TXT_OUT = 1, TYPE_FILE_IN = 2, TYPE_FILE_OUT = 3,
-			TYPE_AUTO = 4, TYPE_GREETING = 5, TYPE_STATUS = 6, TYPE_Composing = 7;
+	private static final int
+			TYPE_TEXT_INCOMING = 0,
+			TYPE_TEXT_OUTGOING = 1,
+			TYPE_FILE_OUTGOING = 2,
+			TYPE_GREETING = 3,
+			TYPE_STATUS = 4,
+			TYPE_AUTO = 5,
+	    TYPE_Composing = 6;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -61,99 +71,18 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private final static int MAX_IMAGE_DISPLAY_HEIGHT = 800;
 
 	private boolean isInPauseState = false;
-	private Bitmap avatarCache;
+	private Bitmap cachedAvatar;
 	private Context context;
 	private int pendingUpdateIndex = INVALID_POSITION;
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
+	private EditText et;
+
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items) {
 		super(context, 0, (List<T>) items);
 		this.context = context;
 	}
-
-	private class MessageViewHolder {
-
-		protected int position = INVALID_POSITION;
-		protected TextView messageTitleTextView;
-		protected TextView messageBodyTextView;
-		protected ImageView fileImageView;
-
-		protected TextView timestampView;
-
-		public void updateMessage(String messageTitle, String messageBody, String timeStamp, Bitmap imageBitmap) {
-			// Set timestamp
-			if (timestampView != null & timeStamp != null) {
-				timestampView.setText(timeStamp);
-			}
-
-			if (messageTitleTextView != null && messageTitle != null) {
-				messageTitleTextView.setText(messageTitle);
-			}
-
-			if (messageBodyTextView != null) {
-				if (messageBody != null) {
-					messageBodyTextView.setVisibility(View.VISIBLE);
-					messageBodyTextView.setText(messageBody);
-				} else {
-					messageBodyTextView.setVisibility(View.GONE);
-				}
-			}
-
-			// Set avatar or screenshot
-			if (fileImageView != null && imageBitmap != null) {
-				fileImageView.setImageBitmap(imageBitmap);
-			}
-		}
-	}
-
-	private class InComingMessageViewHolder extends MessageViewHolder {
-		AvatarView avatarView;
-		CollapsibleTextView collapsible;
-
-		public void updateMessage(String messageTitle, String messageBody, String timeStamp,
-															Bitmap fileBitmap, Bitmap avatarBitmap) {
-			if (avatarView != null && avatarBitmap != null) {
-				avatarView.setImageBitmap(avatarBitmap);
-			}
-
-			if (collapsible != null) {
-				collapsible.setDesc(messageBody);
-			}
-			super.updateMessage(messageTitle, messageBody, timeStamp, fileBitmap);
-		}
-	}
-
-	private class OutGoingMessageViewHolder extends MessageViewHolder {
-		ApptentiveMaterialIndeterminateProgressBar progressBar;
-		FrameLayout mainLayout;
-		CollapsibleTextView collapsible;
-
-		public void updateMessage(String messageTitle, String messageBody, boolean sent, boolean paused, String timeStamp,
-															Bitmap fileBitmap) {
-			// Set Progress indicator
-			if (progressBar != null) {
-				if (!sent && !paused) {
-					progressBar.setVisibility(View.VISIBLE);
-					progressBar.start();
-				} else {
-					progressBar.stop();
-					progressBar.setVisibility(View.GONE);
-				}
-			}
-
-			if (mainLayout != null) {
-				mainLayout.setBackgroundColor((!sent && paused) ? context.getResources().getColor(R.color.apptentive_message_center_toolbar) :
-						context.getResources().getColor(R.color.apptentive_message_center_outgoing_frame_background));
-			}
-
-			if (collapsible != null) {
-				collapsible.setDesc(messageBody);
-			}
-			super.updateMessage(messageTitle, messageBody, timeStamp, fileBitmap);
-		}
-	}
-
 
 	@Override
 	public int getItemViewType(int position) {
@@ -163,11 +92,21 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			if (message.getBaseType() == Payload.BaseType.message) {
 				switch (message.getType()) {
 					case TextMessage:
-						return (message.isOutgoingMessage()) ? TYPE_TXT_OUT : TYPE_TXT_IN;
+						if (message instanceof IncomingTextMessage) {
+							return TYPE_TEXT_INCOMING;
+						} else if (message instanceof OutgoingTextMessage) {
+							return TYPE_TEXT_OUTGOING;
+						}
+						break;
 					case FileMessage:
-						return (message.isOutgoingMessage()) ? TYPE_FILE_OUT : TYPE_FILE_IN;
+						if (message instanceof OutgoingFileMessage) {
+							return TYPE_FILE_OUTGOING;
+						}
+						break;
 					case AutomatedMessage:
 						return TYPE_AUTO;
+					default:
+						break;
 				}
 			}
 		} else if (listItem instanceof MessageCenterGreeting) {
@@ -182,7 +121,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	@Override
 	public int getViewTypeCount() {
-		return 8;
+		return 7;
 	}
 
 	@Override
@@ -190,81 +129,36 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		MessageCenterListItem listItem = getItem(position);
 
 		int type = getItemViewType(position);
-		MessageViewHolder holderMessage = null;
+		MessageCenterListItemHolder holder = null;
 		if (null == convertView) {
+			// TODO: Do we need this switch anymore?
 			switch (type) {
-				case TYPE_TXT_IN: {
-					// Incoming message has: message, avatar, timeStamp
-					InComingMessageViewHolder holderInMessage = new InComingMessageViewHolder();
-					TextMessageView tv = new TextMessageView(parent.getContext(), (TextMessage) listItem);
-					holderInMessage.avatarView = (AvatarView) tv.findViewById(R.id.avatar);
-					holderInMessage.collapsible = tv.getCollapsibleContainer();
-					holderInMessage.timestampView = (TextView) tv.findViewById(R.id.timestamp);
-					convertView = tv;
-					holderMessage = holderInMessage;
+				case TYPE_TEXT_INCOMING:
+					convertView = new IncomingTextMessageView(parent.getContext(), (IncomingTextMessage) listItem);
 					break;
-				}
-				case TYPE_TXT_OUT: {
-					// Outgoing message has: message, progressbar, timeStamp
-					OutGoingMessageViewHolder holderOutMessage = new OutGoingMessageViewHolder();
-					TextMessageView tv = new TextMessageView(parent.getContext(), (TextMessage) listItem);
-					holderOutMessage.collapsible = tv.getCollapsibleContainer();
-					holderOutMessage.progressBar = (ApptentiveMaterialIndeterminateProgressBar) tv.findViewById(R.id.progressBar);
-					holderOutMessage.timestampView = (TextView) tv.findViewById(R.id.timestamp);
-					holderOutMessage.mainLayout = (FrameLayout) tv.findViewById(R.id.outgoing_message_frame_bg);
-					convertView = tv;
-					holderMessage = holderOutMessage;
+				case TYPE_TEXT_OUTGOING:
+					convertView = new OutgoingTextMessageView(parent.getContext(), (OutgoingTextMessage) listItem);
 					break;
-				}
-				case TYPE_FILE_IN: {
-					// Incoming File message has: avatar, file image, timeStamp
-					InComingMessageViewHolder holderInMessage = new InComingMessageViewHolder();
-					FileMessageView fv = new FileMessageView(parent.getContext(), (FileMessage) listItem);
-					holderInMessage.avatarView = (AvatarView) fv.findViewById(R.id.avatar);
-					holderInMessage.timestampView = (TextView) fv.findViewById(R.id.timestamp);
-					holderInMessage.fileImageView = (ImageView) fv.findViewById(R.id.apptentive_file_message_image);
-					convertView = fv;
-					holderMessage = holderInMessage;
+/*
+				case TYPE_FILE_INCOMING:
+					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
 					break;
-				}
-				case TYPE_FILE_OUT: {
-					// Outgoing File message has: file image, progressbar, timeStamp
-					OutGoingMessageViewHolder holderOutMessage = new OutGoingMessageViewHolder();
-					FileMessageView fv = new FileMessageView(parent.getContext(), (FileMessage) listItem);
-					holderOutMessage.progressBar = (ApptentiveMaterialIndeterminateProgressBar) fv.findViewById(R.id.progressBar);
-					holderOutMessage.timestampView = (TextView) fv.findViewById(R.id.timestamp);
-					holderOutMessage.fileImageView = (ImageView) fv.findViewById(R.id.apptentive_file_message_image);
-					holderOutMessage.mainLayout = (FrameLayout) fv.findViewById(R.id.outgoing_message_frame_bg);
-					convertView = fv;
-					holderMessage = holderOutMessage;
+*/
+				case TYPE_FILE_OUTGOING:
+					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
 					break;
-				}
-				case TYPE_GREETING: {
-					// Greeting message has: tile, body
-					holderMessage = new MessageViewHolder();
-					MessageCenterGreetingView gv = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
-					holderMessage.messageBodyTextView = (TextView) gv.findViewById(R.id.body);
-					holderMessage.messageTitleTextView = (TextView) gv.findViewById(R.id.title);
-					convertView = gv;
+				case TYPE_GREETING:
+					convertView = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
 					break;
-				}
-				case TYPE_STATUS: {
-					// Greeting message has: tile, body
-					holderMessage = new MessageViewHolder();
-					MessageCenterStatusView sv = new MessageCenterStatusView(parent.getContext(), (MessageCenterStatus) listItem);
-					holderMessage.messageBodyTextView = (TextView) sv.findViewById(R.id.body);
-					holderMessage.messageTitleTextView = (TextView) sv.findViewById(R.id.title);
-					convertView = sv;
+				case TYPE_STATUS:
+					convertView = new MessageCenterStatusView(parent.getContext(), (MessageCenterStatus) listItem);
 					break;
-				}
 				case TYPE_Composing: {
-					holderMessage = new MessageViewHolder();
 					if (composingView == null) {
 						composingView = new MessageCenterComposingView(context, position);
 					}
-					/*LayoutInflater inflater = LayoutInflater.from(context);
-					View cv = inflater.inflate(R.layout.apptentive_message_center_composing, parent, false);
-					et = (EditText) cv.findViewById(R.id.composing_et);
+
+					et = composingView.getEditText();
 					et.setOnTouchListener(new View.OnTouchListener() {
 						@Override
 						public boolean onTouch(View v, MotionEvent event) {
@@ -273,81 +167,71 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 							}
 							return false;
 						}
-					});*/
+					});
 					focusOnEditText();
 					convertView = composingView;
 					break;
 				}
 				default:
+					Log.i("Unrecognized type: %d", type);
 					break;
 			}
 			if (convertView != null) {
-				convertView.setTag(holderMessage);
+				holder = HolderFactory.createHolder((MessageCenterListItemView) convertView);
+				convertView.setTag(holder);
 			}
 		} else {
-			holderMessage = (MessageViewHolder) convertView.getTag();
+			holder = (MessageCenterListItemHolder) convertView.getTag();
 		}
 
-		if (holderMessage != null) {
-			String timestamp;
+		if (holder != null) {
 			switch (type) {
-				case TYPE_TXT_IN:
-					if (avatarCache == null) {
-						startDownloadAvatarTask(((InComingMessageViewHolder) holderMessage).avatarView, ((TextMessage) listItem).getSenderProfilePhoto());
+				case TYPE_TEXT_INCOMING: {
+					if (cachedAvatar == null) {
+						startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar, ((IncomingTextMessage) listItem).getSenderProfilePhoto());
 					}
-					timestamp = createTimestamp(((TextMessage) listItem).getCreatedAt());
-					((InComingMessageViewHolder) holderMessage).updateMessage(null, ((TextMessage) listItem).getBody(), timestamp, null, avatarCache);
-					break;
-				case TYPE_TXT_OUT: {
-					Double sentTime = ((TextMessage) listItem).getCreatedAt();
-					timestamp = createTimestamp(sentTime);
-					((OutGoingMessageViewHolder) holderMessage).updateMessage(null, ((TextMessage) listItem).getBody(), (sentTime != null), isInPauseState, timestamp, null);
+					IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
+					String timestamp = createTimestamp(((IncomingTextMessage) listItem).getCreatedAt());
+					((IncomingTextMessageHolder) holder).updateMessage(timestamp, cachedAvatar, textMessage.getBody());
 					break;
 				}
-				case TYPE_FILE_IN:
-					if (avatarCache == null) {
-						startDownloadAvatarTask(((InComingMessageViewHolder) holderMessage).avatarView, ((FileMessage) listItem).getSenderProfilePhoto());
-					}
-					if (position != holderMessage.position && position != pendingUpdateIndex) {
-						pendingUpdateIndex = position;
-						startLoadImageTask((FileMessage) listItem, position, holderMessage);
-					}
-					timestamp = createTimestamp(((FileMessage) listItem).getCreatedAt());
-					((InComingMessageViewHolder) holderMessage).updateMessage(null, null, timestamp, null, avatarCache);
+				case TYPE_TEXT_OUTGOING: {
+					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
+					String timestamp = createTimestamp(((OutgoingTextMessage) listItem).getCreatedAt());
+					((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null, textMessage.getBody());
 					break;
-				case TYPE_FILE_OUT: {
-					if (position != holderMessage.position && position != pendingUpdateIndex) {
+				}
+				case TYPE_FILE_OUTGOING: {
+					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
+					if (position != holder.position && position != pendingUpdateIndex) {
 						pendingUpdateIndex = position;
-						startLoadImageTask((FileMessage) listItem, position, holderMessage);
+						startLoadImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
 					}
-					Double sentTime = ((FileMessage) listItem).getCreatedAt();
-					timestamp = createTimestamp(((FileMessage) listItem).getCreatedAt());
-					((OutGoingMessageViewHolder) holderMessage).updateMessage(null, null, (sentTime != null), isInPauseState, timestamp, null);
+					String timestamp = createTimestamp(((OutgoingFileMessage) listItem).getCreatedAt());
+					((OutgoingFileMessageHolder) holder).updateMessage(timestamp, fileMessage.getCreatedAt() == null);
 					break;
 				}
 				case TYPE_GREETING:
-					holderMessage.updateMessage(((MessageCenterGreeting) listItem).getTitle(), ((MessageCenterGreeting) listItem).getBody(), null, null);
+					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
+					((GreetingHolder) holder).updateMessage(greeting.getTitle(), greeting.getBody());
 					break;
 				case TYPE_STATUS:
-					holderMessage.updateMessage(((MessageCenterStatus) listItem).getTitle(), ((MessageCenterStatus) listItem).getBody(), null, null);
+					MessageCenterStatus status = (MessageCenterStatus) listItem;
+					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
 					break;
 				case TYPE_Composing:
-					//if (composingView != null) {
-					//	focusOnEditText();
-					//}
 					break;
 				default:
 					return null;
 			}
-			holderMessage.position = position;
+			holder.position = position;
 		}
-		/*if (et!= null) {
-			et.clearFocus();
+		if (et!= null) {
+			//et.clearFocus();
 			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
 				et.requestFocus();
-				et.setSelection(et.getText().length());
 			}
-		}*/
+		}
 		return convertView;
 	}
 
@@ -368,17 +252,18 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return null;
 	}
 
-	public void setPaused(boolean bPause) {
-		isInPauseState = bPause;
-	}
-
 	public void focusOnEditText() {
 		EditText et = composingView.getEditText();
 		et.requestFocus();
 	}
- public void clearComposing() {
-	 composingView = null;
- }
+
+	public void clearComposing() {
+		composingView = null;
+	}
+
+	public void setPaused(boolean bPause) {
+		isInPauseState = bPause;
+	}
 
 	protected String createTimestamp(Double seconds) {
 		if (seconds != null) {
@@ -386,8 +271,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			DateFormat mediumDateShortTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 			return mediumDateShortTimeFormat.format(date);
 		}
-		return isInPauseState ? context.getResources().getString(R.string.apptentive_paused)
-				: context.getResources().getString(R.string.apptentive_sending);
+
+		int resId = isInPauseState ? R.string.apptentive_paused : R.string.apptentive_sending;
+		return context.getResources().getString(resId);
 	}
 
 
@@ -416,7 +302,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return ret;
 	}
 
-	private void startLoadImageTask(FileMessage message, int position, MessageViewHolder holder) {
+	private void startLoadImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
 		StoredFile storedFile = message.getStoredFile(context);
 		String mimeType = storedFile.getMimeType();
 		String imagePath;
@@ -424,11 +310,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (mimeType != null) {
 			imagePath = storedFile.getLocalFilePath();
 			if (mimeType.contains("image")) {
-				holder.fileImageView.setVisibility(View.INVISIBLE);
+				holder.image.setVisibility(View.INVISIBLE);
 
 				Point dimensions = getBitmapDimensions(storedFile);
 				if (dimensions != null) {
-					holder.fileImageView.setPadding(dimensions.x, dimensions.y, 0, 0);
+					holder.image.setPadding(dimensions.x, dimensions.y, 0, 0);
 				}
 			}
 			LoadImageTask task = new LoadImageTask(position, holder);
@@ -443,9 +329,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
 		private int position;
-		private WeakReference<MessageViewHolder> holderRef;
+		private WeakReference<OutgoingFileMessageHolder> holderRef;
 
-		public LoadImageTask(int position, MessageViewHolder holder) {
+		public LoadImageTask(int position, OutgoingFileMessageHolder holder) {
 			this.position = position;
 			this.holderRef = new WeakReference<>(holder);
 		}
@@ -481,14 +367,16 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			if (null == bitmap) {
 				return;
 			}
-			MessageViewHolder holder = holderRef.get();
+			OutgoingFileMessageHolder holder = holderRef.get();
 			if (holder != null && holder.position == position) {
 				if (position == pendingUpdateIndex) {
 					pendingUpdateIndex = INVALID_POSITION;
 				}
-				holder.fileImageView.setPadding(0, 0, 0, 0);
-				holder.fileImageView.setImageBitmap(bitmap);
-				holder.fileImageView.setVisibility(View.VISIBLE);
+				if (holder.image != null) {
+					holder.image.setPadding(0, 0, 0, 0);
+					holder.image.setImageBitmap(bitmap);
+					holder.image.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 	}
@@ -525,7 +413,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			if (result == null) {
 				return;
 			}
-			avatarCache = result;
+			cachedAvatar = result;
 			AvatarView view = resultView.get();
 			if (view != null) {
 				view.setImageBitmap(result);
