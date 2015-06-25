@@ -24,7 +24,7 @@
                                                                                    android:layout_width="88dp"
                                                                                    android:layout_height="88dp"
                                                                                    android:src="@drawable/avatar"
-                                                                                   apptentive:border="2dp"
+                                                                                   apptentive:borderWidth="2dp"
                                                                                    apptentive:borderSpace="1.5dp"
                                                                                    apptentive:borderColor="#EF4139"/>
         <TextView android:id="@+id/title"

@@ -29,7 +29,7 @@ import java.net.URL;
  */
 public class ApptentiveAvatarView extends ImageView {
 
-	float border;
+	float borderWidth;
 	float borderSpace;
 	int borderColor;
 	float borderRadius;
@@ -56,7 +56,7 @@ public class ApptentiveAvatarView extends ImageView {
 
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, 0);
 		try {
-			border = attributes.getDimension(R.styleable.ApptentiveAvatarView_border, 0.0f);
+			borderWidth = attributes.getDimension(R.styleable.ApptentiveAvatarView_borderWidth, 0.0f);
 			borderSpace = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_borderSpace, 0);
 			borderColor = attributes.getColor(R.styleable.ApptentiveAvatarView_borderColor, Color.BLACK);
 		} finally {
@@ -68,7 +68,7 @@ public class ApptentiveAvatarView extends ImageView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (getDrawable() != null) {
-			if (border > 0) {
+			if (borderWidth > 0) {
 				canvas.drawCircle(getWidth() / 2, getHeight() / 2, borderRadius, borderPaint);
 			}
 			canvas.drawCircle(getWidth() / 2, getHeight() / 2, imageRadius, shaderPaint);
@@ -155,20 +155,20 @@ public class ApptentiveAvatarView extends ImageView {
 			borderPaint.setStyle(Paint.Style.STROKE);
 		}
 		borderPaint.setColor(borderColor);
-		borderPaint.setStrokeWidth(border);
+		borderPaint.setStrokeWidth(borderWidth);
 
 		float containerX = (float) getWidth();
 		float containerY = (float) getHeight();
 
-		// Painting using STROKE style is measured from the center of the line, so include border in the radius calculation.
-		borderRadius = (Math.min(containerX, containerY) - border) / 2.0f;
+		// Painting using STROKE style is measured from the center of the line, so include borderWidth in the radius calculation.
+		borderRadius = (Math.min(containerX, containerY) - borderWidth) / 2.0f;
 
-		float borderInteriorX = containerX - border;
-		float borderInteriorY = containerY - border;
+		float borderInteriorX = containerX - borderWidth;
+		float borderInteriorY = containerY - borderWidth;
 
-		// The image radius will now be smaller by half the border.
-		float halfBorder = border / 2;
-		imageRadius = borderRadius - halfBorder - borderSpace;
+		// The image radius will now be smaller by half the borderWidth.
+		float halfBorderWidth = borderWidth / 2;
+		imageRadius = borderRadius - halfBorderWidth - borderSpace;
 
 		// setup the matrix
 		if (shaderMatrix == null) {
@@ -179,7 +179,7 @@ public class ApptentiveAvatarView extends ImageView {
 
 		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, (int) borderInteriorX, (int) borderInteriorY);
 		shaderMatrix.setScale(imageScale.scale, imageScale.scale);
-		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f + halfBorder, imageScale.deltaY + 0.5f + halfBorder);
+		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f + halfBorderWidth, imageScale.deltaY + 0.5f + halfBorderWidth);
 
 		shader.setLocalMatrix(shaderMatrix);
 		invalidate();
