@@ -12,10 +12,10 @@ import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.AutomatedMessage;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.Message;
-import com.apptentive.android.sdk.model.MessageFactory;
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -160,8 +160,8 @@ public class MessageManager {
 
 	public static void onSentMessage(Context context, Message message, ApptentiveHttpResponse response) {
 		if (response == null || !response.isSuccessful()) {
-			if (message instanceof FileMessage) {
-				((FileMessage) message).deleteStoredFile(context);
+			if (message instanceof OutgoingFileMessage) {
+				((OutgoingFileMessage) message).deleteStoredFile(context);
 			}
 			onPauseSending();
 			return;
@@ -169,8 +169,8 @@ public class MessageManager {
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (message.isHidden()) {
-				if (message instanceof FileMessage) {
-					((FileMessage) message).deleteStoredFile(context);
+				if (message instanceof OutgoingFileMessage) {
+					((OutgoingFileMessage) message).deleteStoredFile(context);
 				}
 				getMessageStore(context).deleteMessage(message.getNonce());
 				return;

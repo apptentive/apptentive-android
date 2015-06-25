@@ -23,7 +23,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -50,6 +50,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private boolean isPaused = false;
 	// Count how many paused ongoing messages
 	private int unsendMessagesCount = 0;
+
+	private MessageCenterStatus status;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
@@ -201,14 +203,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			messages.add(0, item);
 			messageCenterListAdapter.notifyDataSetChanged();
 		} else {
-			int messageCount = messages.size();
-			MessageCenterListItem lastitem = messages.get(messageCount - 1);
-			if (lastitem instanceof MessageCenterStatus) {
-				messages.remove(messageCount - 1);
-			}
+			messages.remove(status);
 			messages.add(item);
-			if (!(item instanceof MessageCenterStatus))
-			{
+			if (!(item instanceof MessageCenterStatus)) {
 				unsendMessagesCount++;
 			}
 			messageCenterListAdapter.notifyDataSetChanged();
@@ -250,7 +247,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			post(new Runnable() {
 				public void run() {
 					setItems(MessageManager.getMessageCenterListItems(activity));
-					addItem(new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null));
+					status = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
+					addItem(status);
 					messageCenterListView.setSelection(messageCenterListAdapter.getCount() - 1);
 				}
 			});
@@ -269,8 +267,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 						messages.remove(messageCount - 1);
 					}
 					if (unsendMessagesCount > 0) {
-						addItem(new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
-						), activity.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+						status = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
+						addItem(status);
 						messageCenterListAdapter.setPaused(isPaused);
 						messageCenterListAdapter.notifyDataSetChanged();
 						messageCenterListView.setSelection(messages.size() - 1);
@@ -285,11 +283,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			isPaused = false;
 			post(new Runnable() {
 				public void run() {
-					int messageCount = messages.size();
-					MessageCenterListItem lastitem = messages.get(messageCount - 1);
-					if (lastitem instanceof MessageCenterStatus) {
-						messages.remove(messageCount - 1);
-					}
+					messages.remove(status);
 					if (unsendMessagesCount > 0) {
 						messageCenterListAdapter.setPaused(isPaused);
 						messageCenterListAdapter.notifyDataSetChanged();

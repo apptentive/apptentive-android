@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 
@@ -17,7 +17,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus
 /**
  * @author Barry Li
  */
-public class MessageCenterStatusView extends FrameLayout {
+public class MessageCenterStatusView extends FrameLayout implements MessageCenterListItemView {
 
 
 	public MessageCenterStatusView(Context context, MessageCenterStatus status) {

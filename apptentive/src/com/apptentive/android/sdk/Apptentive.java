@@ -27,6 +27,8 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -598,7 +600,7 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentText(Context context, String text) {
 		try {
-			TextMessage message = new TextMessage();
+			OutgoingTextMessage message = new OutgoingTextMessage();
 			message.setBody(text);
 			message.setHidden(true);
 			MessageManager.sendMessage(context, message);
@@ -618,7 +620,7 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, String uri) {
 		try {
-			FileMessage message = new FileMessage();
+			OutgoingFileMessage message = new OutgoingFileMessage();
 			message.setHidden(true);
 
 			boolean successful = message.createStoredFile(context, uri);
@@ -644,7 +646,7 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, byte[] content, String mimeType) {
 		try {
-			FileMessage message = new FileMessage();
+			OutgoingFileMessage message = new OutgoingFileMessage();
 			message.setHidden(true);
 
 			boolean successful = message.createStoredFile(context, content, mimeType);
@@ -670,7 +672,7 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, InputStream is, String mimeType) {
 		try {
-			FileMessage message = new FileMessage();
+			OutgoingFileMessage message = new OutgoingFileMessage();
 			message.setHidden(true);
 
 			boolean successful = false;

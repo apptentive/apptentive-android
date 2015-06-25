@@ -4,10 +4,11 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import org.json.JSONException;
 import org.json.JSONObject;
