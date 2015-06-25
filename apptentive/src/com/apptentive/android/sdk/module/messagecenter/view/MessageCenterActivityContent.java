@@ -19,12 +19,13 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.FileMessage;
-import com.apptentive.android.sdk.model.TextMessage;
+
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -56,7 +57,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
-				final TextMessage message = new TextMessage();
+				final OutgoingTextMessage message = new OutgoingTextMessage();
 				message.setBody(text);
 				message.setRead(true);
 				message.setCustomData(customData);
@@ -73,7 +74,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
-				final FileMessage message = new FileMessage();
+				final OutgoingFileMessage message = new OutgoingFileMessage();
 				boolean successful = message.internalCreateStoredImage(context.getApplicationContext(), uri.toString());
 				if (successful) {
 					message.setRead(true);
