@@ -4,59 +4,56 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.messagecenter;
-
+package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
 import android.net.Uri;
+import android.os.Bundle;
+import android.text.Editable;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.apptentive.android.sdk.*;
-import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.Event;
+
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * @author Sky Kelsey
+ * Created by barryli on 6/23/15.
  */
-public class ApptentiveMessageCenter {
 
-	protected static MessageCenterView messageCenterView;
-	private static Map<String, String> customData;
+public class MessageCenterActivityContent extends ActivityContent {
+	private MessageCenterView messageCenterView;
+	private Map<String, String> customData;
+	private Context context;
 
-	public static void show(Activity activity, Map<String, String> customData) {
-		ApptentiveMessageCenter.customData = customData;
-
-		Intent intent = new Intent();
-		intent.setClass(activity, ViewActivity.class);
-		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
-		activity.startActivity(intent);
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+	public MessageCenterActivityContent(Serializable data) {
+		this.customData = (Map<String, String>) data;
 	}
 
+	@Override
+	public void onCreate(Activity activity, Bundle onSavedInstanceState) {
 
-	/**
-	 * @param activity The Activity Context that launched this view.
-	 */
-	public static void doShow(final Activity activity) {
-		MetricModule.sendMetric(activity.getApplicationContext(), Event.EventLabel.message_center__launch);
+		context = activity;
+		MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
 
 		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendTextMessage(String text) {
@@ -64,34 +61,34 @@ public class ApptentiveMessageCenter {
 				message.setBody(text);
 				message.setRead(true);
 				message.setCustomData(customData);
-				customData = null;
-				MessageManager.sendMessage(activity.getApplicationContext(), message);
+
+				MessageManager.sendMessage(context.getApplicationContext(), message);
 				messageCenterView.post(new Runnable() {
 					public void run() {
 						messageCenterView.addItem(message);
-						messageCenterView.onResume();
+						messageCenterView.onResumeSending();
+						messageCenterView.scrollMessageListViewToBottom();
 					}
 				});
-				scrollToBottom();
 			}
 
 			public void onSendFileMessage(Uri uri) {
 				// First, create the file, and populate some metadata about it.
 				final OutgoingFileMessage message = new OutgoingFileMessage();
-				boolean successful = message.internalCreateStoredImage(activity.getApplicationContext(), uri.toString());
+				boolean successful = message.internalCreateStoredImage(context.getApplicationContext(), uri.toString());
 				if (successful) {
 					message.setRead(true);
 					message.setCustomData(customData);
-					customData = null;
+
 					// Finally, send out the message.
-					MessageManager.sendMessage(activity.getApplicationContext(), message);
+					MessageManager.sendMessage(context.getApplicationContext(), message);
 					messageCenterView.post(new Runnable() {
 						public void run() {
 							messageCenterView.addItem(message);
-							messageCenterView.onResume();
+							messageCenterView.onResumeSending();
+							messageCenterView.scrollMessageListViewToBottom();
 						}
 					});
-					scrollToBottom();
 				} else {
 					Log.e("Unable to send file.");
 					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT).show();
@@ -112,9 +109,9 @@ public class ApptentiveMessageCenter {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity.getApplicationContext());
+						List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(context.getApplicationContext());
 						messageCenterView.setItems(items);
-						scrollToBottom();
+						messageCenterView.scrollMessageListViewToBottom();
 					}
 				});
 			}
@@ -124,13 +121,62 @@ public class ApptentiveMessageCenter {
 		MessagePollingWorker.setMessageCenterInForeground(true);
 
 		// Give the MessageCenterView a callback when a message is sent.
-		MessageManager.setSentMessageListener(messageCenterView);
+		MessageManager.setAfterSendMessageListener(messageCenterView);
 
-		scrollToBottom();
 	}
 
-	public static void clearPendingMessageCenterPushNotification(Activity activity) {
-		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		return;
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		return;
+	}
+
+	@Override
+	public boolean onBackPressed(Activity activity) {
+		clearPendingMessageCenterPushNotification();
+		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
+		savePendingComposingMessage();
+		// Set to null, otherwise they will hold reference to the activity context
+		MessageManager.setInternalOnMessagesUpdatedListener(null);
+		MessageManager.setAfterSendMessageListener(null);
+		return true;
+	}
+
+	public void onStop() {
+		clearPendingMessageCenterPushNotification();
+		// Remove listener here.
+		MessagePollingWorker.setMessageCenterInForeground(false);
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
+					messageCenterView.showAttachmentDialog(context, data.getData());
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	private void savePendingComposingMessage() {
+		Editable content = messageCenterView.getPendingComposingContent();
+
+		if (content != null) {
+			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, content.toString());
+			editor.commit();
+		}
+	}
+
+	private void clearPendingMessageCenterPushNotification() {
+		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		if (pushData != null) {
 			try {
@@ -147,29 +193,8 @@ public class ApptentiveMessageCenter {
 				}
 			} catch (JSONException e) {
 				Log.w("Error parsing JSON from push notification.", e);
-				MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
+				MetricModule.sendError(context.getApplicationContext(), e, "Parsing Push notification", pushData);
 			}
 		}
-	}
-
-	public static void scrollToBottom() {
-		messageCenterView.scrollMessageListViewToBottom();
-	}
-
-	public static void onStop(Activity activity) {
-		clearPendingMessageCenterPushNotification(activity);
-		// Remove listener here.
-		MessagePollingWorker.setMessageCenterInForeground(false);
-	}
-
-	public static boolean onBackPressed(Activity activity) {
-		clearPendingMessageCenterPushNotification(activity);
-		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
-		return true;
-	}
-
-	enum Trigger {
-		enjoyment_dialog,
-		message_center
 	}
 }

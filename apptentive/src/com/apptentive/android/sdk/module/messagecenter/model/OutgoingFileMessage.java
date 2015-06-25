@@ -8,8 +8,10 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -111,6 +113,16 @@ public class OutgoingFileMessage extends Message {
 		String localFileName = getStoredFileId();
 		File localFile = new File(localFileName);
 
+		// Retrieve image orientation
+		Cursor cursor = context.getContentResolver().query(uri,
+				new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+		int imageOrientation = 0;
+		if (cursor.getCount() == 1) {
+			cursor.moveToFirst();
+			imageOrientation = cursor.getInt(0);
+		}
+
 		// Copy the file contents over.
 		InputStream is = null;
 		CountingOutputStream cos = null;
@@ -118,7 +130,7 @@ public class OutgoingFileMessage extends Message {
 			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
 			cos = new CountingOutputStream(new BufferedOutputStream(context.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
 			System.gc();
-			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_STORED_IMAGE_EDGE, MAX_STORED_IMAGE_EDGE, null);
+			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_STORED_IMAGE_EDGE, MAX_STORED_IMAGE_EDGE, null, imageOrientation);
 			// TODO: Is JPEG what we want here?
 			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
 			cos.flush();

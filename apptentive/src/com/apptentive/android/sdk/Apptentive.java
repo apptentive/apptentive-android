@@ -21,7 +21,6 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -540,7 +539,7 @@ public class Apptentive {
 	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
-		ApptentiveMessageCenter.show(activity, null);
+		showMessageCenter(activity, null);
 	}
 
 	/**
@@ -553,7 +552,7 @@ public class Apptentive {
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
 		try {
-			ApptentiveMessageCenter.show(activity, customData);
+			ApptentiveInternal.showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);

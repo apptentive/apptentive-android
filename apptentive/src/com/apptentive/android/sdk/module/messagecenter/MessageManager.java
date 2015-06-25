@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +35,13 @@ import java.util.List;
  */
 public class MessageManager {
 
-	private static OnSentMessageListener sentMessageListener;
+	private static AfterSendMessageListener afterSendMessageListener;
 	private static OnNewMessagesListener internalNewMessagesListener;
-	private static UnreadMessagesListener hostUnreadMessagesListener;
+
+	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
+	 * Use WeakReference to prevent memory leak
+	 */
+	private static WeakReference<UnreadMessagesListener> hostUnreadMessagesListenerRef;
 
 	/**
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
@@ -141,15 +146,15 @@ public class MessageManager {
 		return ret;
 	}
 
-	public static void onResume() {
-		if (sentMessageListener != null) {
-			sentMessageListener.onResume();
+	public static void onResumeSending() {
+		if (afterSendMessageListener != null) {
+			afterSendMessageListener.onResumeSending();
 		}
 	}
 
-	public static void onPause() {
-		if (sentMessageListener != null) {
-			sentMessageListener.onPause();
+	public static void onPauseSending() {
+		if (afterSendMessageListener != null) {
+			afterSendMessageListener.onPauseSending();
 		}
 	}
 
@@ -158,7 +163,7 @@ public class MessageManager {
 			if (message instanceof OutgoingFileMessage) {
 				((OutgoingFileMessage) message).deleteStoredFile(context);
 			}
-			onPause();
+			onPauseSending();
 			return;
 		}
 		if (response.isSuccessful()) {
@@ -182,8 +187,8 @@ public class MessageManager {
 			}
 			getMessageStore(context).updateMessage(message);
 
-			if (sentMessageListener != null) {
-				sentMessageListener.onSentMessage(response, message);
+			if (afterSendMessageListener != null) {
+				afterSendMessageListener.onMessageSent(response, message);
 			}
 		}
 /*
@@ -242,14 +247,14 @@ public class MessageManager {
 
    // Listeners
 
-	public interface OnSentMessageListener {
-		void onSentMessage(ApptentiveHttpResponse response, Message message);
-		void onPause();
-		void onResume();
+	public interface AfterSendMessageListener {
+		void onMessageSent(ApptentiveHttpResponse response, Message message);
+		void onPauseSending();
+		void onResumeSending();
 	}
 
-	public static void setSentMessageListener(OnSentMessageListener onSentMessageListener) {
-		sentMessageListener = onSentMessageListener;
+	public static void setAfterSendMessageListener(AfterSendMessageListener listener) {
+		afterSendMessageListener = listener;
 	}
 
 	public interface OnNewMessagesListener {
@@ -261,12 +266,13 @@ public class MessageManager {
 	}
 
 	public static void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
-		hostUnreadMessagesListener = listener;
+		hostUnreadMessagesListenerRef = new WeakReference<>(listener);
 	}
 
 	public static void notifyHostUnreadMessagesListener(int unreadMessages) {
-		if (hostUnreadMessagesListener != null) {
-			hostUnreadMessagesListener.onUnreadMessageCountChanged(unreadMessages);
+		UnreadMessagesListener listener = hostUnreadMessagesListenerRef.get();
+		if (listener != null) {
+			listener.onUnreadMessageCountChanged(unreadMessages);
 		}
 	}
 }

@@ -37,14 +37,14 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterView extends FrameLayout implements MessageManager.OnSentMessageListener {
+public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener {
 
-	Activity activity;
-	static OnSendMessageListener onSendMessageListener;
-	ListView messageCenterListView;
+	private Activity activity;
+	private OnSendMessageListener onSendMessageListener;
+	private ListView messageCenterListView;
 
-	ArrayList<MessageCenterListItem> messages = new ArrayList<>();
-	MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
+	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
+	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
 
 	// MesssageCenterView is set to paused when it fails to send message
 	private boolean isPaused = false;
@@ -56,14 +56,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
-	private static CharSequence messageText;
+	private CharSequence messageText;
 
-	EditText messageEditText;
+	private EditText messageEditText;
 
 	public MessageCenterView(Activity activity, OnSendMessageListener onSendMessageListener) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
-		MessageCenterView.onSendMessageListener = onSendMessageListener;
+		this.onSendMessageListener = onSendMessageListener;
 		this.setId(R.id.apptentive_message_center_view);
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
@@ -95,9 +95,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 
 		messageCenterListView = (ListView) findViewById(R.id.message_list);
-		//messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 		messageEditText = (EditText) findViewById(R.id.input);
+
+		messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+				getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
 
 		if (messageText != null) {
 			messageEditText.setText(messageText);
@@ -118,6 +120,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageText = editable.toString();
 			}
 		});
+
+		messageEditText.requestFocus();
 
 		View send = findViewById(R.id.send);
 		send.setOnClickListener(new OnClickListener() {
@@ -209,7 +213,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	}
 
-	public static void showAttachmentDialog(Context context, final Uri data) {
+	public void showAttachmentDialog(Context context, final Uri data) {
 		if (data == null) {
 			Log.d("No attachment found.");
 			return;
@@ -238,7 +242,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
-	public synchronized void onSentMessage(ApptentiveHttpResponse response, final Message message) {
+	public synchronized void onMessageSent(ApptentiveHttpResponse response, final Message message) {
 		if (response.isSuccessful()) {
 			post(new Runnable() {
 				public void run() {
@@ -252,7 +256,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 
 	}
 
-	public synchronized void onPause() {
+	public synchronized void onPauseSending() {
 		if (!isPaused) {
 			isPaused = true;
 			post(new Runnable() {
@@ -274,7 +278,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 		}
 	}
 
-	public synchronized void onResume() {
+	public synchronized void onResumeSending() {
 		if (isPaused) {
 			isPaused = false;
 			post(new Runnable() {
@@ -297,5 +301,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.OnS
 				messageCenterListView.setSelection(messages.size() - 1);
 			}
 		});
+	}
+
+	// Retrieve the content from the composing area
+	public Editable getPendingComposingContent() {
+		return messageEditText.getText();
 	}
 }
