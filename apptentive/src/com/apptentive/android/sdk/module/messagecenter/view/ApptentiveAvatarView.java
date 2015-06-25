@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -16,6 +17,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.io.IOException;
@@ -25,32 +27,51 @@ import java.net.URL;
 /**
  * @author Sky Kelsey
  */
-public class AvatarView extends ImageView {
+public class ApptentiveAvatarView extends ImageView {
+
+	Rect viewRect;
+
+	int border;
+	int borderColor;
+	int borderRadius;
+	Paint borderPaint;
 
 	Bitmap avatar;
+	Rect avatarRect;
 	int avatarWidth;
 	int avatarHeight;
 	Matrix shaderMatrix;
 	BitmapShader shader;
 	Paint shaderPaint;
-	Rect viewRect;
 	int imageRadius;
 
-	public AvatarView(Context context) {
+	public ApptentiveAvatarView(Context context) {
 		super(context);
 	}
 
-	public AvatarView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public ApptentiveAvatarView(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
 	}
 
-	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public ApptentiveAvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+
+		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, 0);
+		try {
+			border = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_border, 0);
+			borderColor = attributes.getColor(R.styleable.ApptentiveAvatarView_borderColor, Color.BLACK);
+		} finally {
+			attributes.recycle();
+		}
+		setup();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (getDrawable() != null) {
+			if (border > 0) {
+				canvas.drawCircle(getWidth() / 2, getHeight() / 2, borderRadius, borderPaint);
+			}
 			canvas.drawCircle(getWidth() / 2, getHeight() / 2, imageRadius, shaderPaint);
 		}
 	}
@@ -117,7 +138,7 @@ public class AvatarView extends ImageView {
 		}
 	}
 
-	protected void setup() {
+	protected synchronized void setup() {
 		if (avatar == null) {
 			return;
 		}
@@ -126,16 +147,28 @@ public class AvatarView extends ImageView {
 		shader = new BitmapShader(avatar, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 
 		if (shaderPaint == null) {
-			shaderPaint = new Paint();
+			shaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		}
-		shaderPaint.setAntiAlias(true);
 		shaderPaint.setShader(shader);
+
+		if (borderPaint == null) {
+			borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		}
+		borderPaint.setColor(borderColor);
 
 		if (viewRect == null) {
 			viewRect = new Rect();
 		}
 		viewRect.set(0, 0, getWidth(), getHeight());
-		imageRadius = Math.min(viewRect.width() / 2, viewRect.height() / 2);
+
+		borderRadius = Math.min(viewRect.width() / 2, viewRect.height() / 2);
+
+		if (avatarRect == null) {
+			avatarRect = new Rect();
+		}
+		avatarRect.set(0, 0, viewRect.width() - border * 2, viewRect.height() - border * 2);
+
+		imageRadius = borderRadius - border;
 
 		// setup the matrix
 		if (shaderMatrix == null) {
@@ -144,9 +177,9 @@ public class AvatarView extends ImageView {
 		shaderMatrix.set(null);
 
 
-		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, viewRect.width(), viewRect.height());
+		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, avatarRect.width(), avatarRect.height());
 		shaderMatrix.setScale(imageScale.scale, imageScale.scale);
-		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f, imageScale.deltaY + 0.5f);
+		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f + border, imageScale.deltaY + 0.5f + border);
 
 		shader.setLocalMatrix(shaderMatrix);
 		invalidate();
@@ -218,5 +251,4 @@ public class AvatarView extends ImageView {
 			return String.format("scale = %f, deltaX = %f, deltaY = %f", scale, deltaX, deltaY);
 		}
 	}
-
 }

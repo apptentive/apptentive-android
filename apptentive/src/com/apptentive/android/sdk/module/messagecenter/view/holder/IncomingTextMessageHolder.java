@@ -10,19 +10,19 @@ import android.graphics.Bitmap;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.view.AvatarView;
+import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageView;
 
 /**
  * @author Sky Kelsey
  */
 public class IncomingTextMessageHolder extends MessageHolder {
-	public AvatarView avatar;
+	public ApptentiveAvatarView avatar;
 	public TextView text;
 
 	public IncomingTextMessageHolder(IncomingTextMessageView view) {
 		super(view);
-		avatar = (AvatarView) view.findViewById(R.id.avatar);
+		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
 		text = (TextView) view.findViewById(R.id.text);
 	}
 
