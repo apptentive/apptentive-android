@@ -34,4 +34,10 @@
         <attr name="floatingActionButtonShadow" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="ApptentiveAvatarView">
+        <attr name="borderWidth" format="dimension"/>
+        <attr name="borderSpace" format="dimension"/>
+        <attr name="borderColor" format="color"/>
+    </declare-styleable>
+
 </resources>

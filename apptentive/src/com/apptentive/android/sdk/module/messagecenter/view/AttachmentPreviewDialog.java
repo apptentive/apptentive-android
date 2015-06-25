@@ -8,9 +8,11 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import com.apptentive.android.sdk.R;
@@ -64,7 +66,18 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 		final Bitmap thumbnail;
 		try {
 			is = getContext().getContentResolver().openInputStream(data);
-			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null);
+
+			// Retrieve image orientation
+			Cursor cursor = getContext().getContentResolver().query(data,
+					new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+			int imageOrientation = 0;
+			if (cursor.getCount() == 1) {
+				cursor.moveToFirst();
+				imageOrientation = cursor.getInt(0);
+			}
+			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null, imageOrientation);
+
 		} catch (FileNotFoundException e) {
 			// TODO: Error toast?
 			return;

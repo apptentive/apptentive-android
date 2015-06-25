@@ -347,7 +347,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
-				imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null);
+				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
+				imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
 				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
 				Log.e("Error opening stored image.", e);
@@ -381,7 +382,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 	}
 
-	private void startDownloadAvatarTask(AvatarView view, String imageUrl) {
+	private void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl) {
 		DownloadImageTask task = new DownloadImageTask(view);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
@@ -392,9 +393,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-		private WeakReference<AvatarView> resultView;
+		private WeakReference<ApptentiveAvatarView> resultView;
 
-		DownloadImageTask(AvatarView view) {
+		DownloadImageTask(ApptentiveAvatarView view) {
 			resultView = new WeakReference<>(view);
 		}
 
@@ -414,7 +415,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return;
 			}
 			cachedAvatar = result;
-			AvatarView view = resultView.get();
+			ApptentiveAvatarView view = resultView.get();
 			if (view != null) {
 				view.setImageBitmap(result);
 			}

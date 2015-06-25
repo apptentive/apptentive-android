@@ -12,8 +12,9 @@
         <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDevDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDevDebugSources" />
-        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDevDebugAndroidTest" />
         <option name="SOURCE_GEN_TASK_NAME" value="generateDevDebugSources" />
+        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDevDebugAndroidTest" />
+        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDevDebugAndroidTestSources" />
         <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDevDebugAndroidTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />

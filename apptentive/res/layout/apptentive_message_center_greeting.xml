@@ -6,37 +6,42 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:apptentive="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:paddingTop="48dp"
-              android:paddingBottom="48dp"
+              android:paddingTop="24dp"
+              android:paddingBottom="36dp"
               android:gravity="center"
               android:orientation="horizontal"
               android:background="@color/apptentive_message_center_greeting_background">
-    <FrameLayout android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"/>
-    <LinearLayout android:layout_width="0dp"
+    <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_weight="4"
+                  android:layout_marginLeft="24dp"
+                  android:layout_marginRight="24dp"
                   android:gravity="center"
                   android:orientation="vertical">
+        <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
+                                                                                   android:layout_width="88dp"
+                                                                                   android:layout_height="88dp"
+                                                                                   android:src="@drawable/avatar"
+                                                                                   apptentive:borderWidth="2dp"
+                                                                                   apptentive:borderSpace="1.5dp"
+                                                                                   apptentive:borderColor="#EF4139"/>
         <TextView android:id="@+id/title"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:paddingTop="8dp"
                   android:gravity="center"
-                  android:textStyle="bold"
-                  android:textColor="#949494"
+                  android:textStyle="normal"
+                  android:textColor="#EF4139"
                   android:textSize="24dp"/>
         <TextView android:id="@+id/body"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:paddingTop="8dp"
                   android:gravity="center"
                   android:textStyle="normal"
                   android:textColor="#949494"
                   android:textSize="16dp"/>
     </LinearLayout>
-    <FrameLayout android:layout_width="0dp"
-                 android:layout_height="wrap_content"
-                 android:layout_weight="1"/>
 </LinearLayout>

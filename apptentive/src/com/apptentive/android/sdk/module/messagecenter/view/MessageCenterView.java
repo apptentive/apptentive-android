@@ -208,7 +208,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			int maxImageHeight = (int) (0.4 * point.x);
 			maxImageWidth = maxImageWidth > 400 ? 400 : maxImageWidth;
 			maxImageHeight = maxImageHeight > 400 ? 400 : maxImageHeight;
-			resizedBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null);
+			resizedBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
 		} catch (Exception e) {
 			Log.e("Error opening stored image.", e);
 		} catch (OutOfMemoryError e) {

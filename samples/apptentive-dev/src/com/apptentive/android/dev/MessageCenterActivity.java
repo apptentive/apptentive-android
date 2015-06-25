@@ -58,7 +58,7 @@ public class MessageCenterActivity extends ApptentiveActivity {
 			customData.put(key, value);
 		}
 		clearCustomData(null);
-		Apptentive.showMessageCenter(this, (Serializable) customData);
+		Apptentive.showMessageCenter(this, customData);
 	}
 
 	public void sendAttachmentImage(View view) {
