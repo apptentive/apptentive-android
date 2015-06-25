@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+
 import com.apptentive.android.sdk.Log;
 
 import java.io.BufferedInputStream;
@@ -52,9 +54,10 @@ public class ImageUtil {
 	 * @param minShrunkWidth  If edge of this image is greater than minShrunkWidth, the image will be shrunken such it is not smaller than minShrunkWidth.
 	 * @param minShrunkHeight If edge of this image is greater than minShrunkHeight, the image will be shrunken such it is not smaller than minShrunkHeight.
 	 * @param config          You can use this to change the number of bytes per pixel using various bitmap configurations.
+	 * @param orientation     The orientation for the image expressed as degrees
 	 * @return A bitmap whose edges are equal to or less than minShrunkEdge in length.
 	 */
-	public static Bitmap createLightweightScaledBitmapFromStream(InputStream is, int minShrunkWidth, int minShrunkHeight, Bitmap.Config config) {
+	public static Bitmap createLightweightScaledBitmapFromStream(InputStream is, int minShrunkWidth, int minShrunkHeight, Bitmap.Config config, int orientation) {
 
 		BufferedInputStream bis = new BufferedInputStream(is, 32 * 1024);
 		try {
@@ -69,8 +72,16 @@ public class ImageUtil {
 			BitmapFactory.decodeStream(bis, null, decodeBoundsOptions);
 			bis.reset();
 
-			final int width = decodeBoundsOptions.outWidth;
-			final int height = decodeBoundsOptions.outHeight;
+			int width, height;
+
+			if (orientation == 90 || orientation == 270) {
+				width = decodeBoundsOptions.outHeight;
+				height = decodeBoundsOptions.outWidth;
+			} else {
+				width = decodeBoundsOptions.outWidth;
+				height = decodeBoundsOptions.outHeight;
+			}
+
 			Log.v("Original bitmap dimensions: %d x %d", width, height);
 			int sampleRatio = Math.min(width / minShrunkWidth, height / minShrunkHeight);
 			if (sampleRatio >= 2) {
@@ -78,9 +89,18 @@ public class ImageUtil {
 			}
 			Log.v("Bitmap sample size = %d", options.inSampleSize);
 
-			Bitmap ret = BitmapFactory.decodeStream(bis, null, options);
+			Bitmap retImg = BitmapFactory.decodeStream(bis, null, options);
 			Log.d("Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
-			return ret;
+
+			if (orientation > 0) {
+				Matrix matrix = new Matrix();
+				matrix.postRotate(orientation);
+
+				retImg = Bitmap.createBitmap(retImg, 0, 0, retImg.getWidth(),
+						retImg.getHeight(), matrix, true);
+			}
+
+			return retImg;
 		} catch (IOException e) {
 			Log.e("Error resizing bitmap from InputStream.", e);
 		} finally {
@@ -98,12 +118,13 @@ public class ImageUtil {
 	 * @param maxWidth  The maximum width to scale this image to, or 0 to ignore this parameter.
 	 * @param maxHeight The maximum height to scale this image to, or 0 to ignore this parameter.
 	 * @param config    A Bitmap.Config to apply to the Bitmap as it is read in.
+	 * @param orientation     The orientation for the image expressed as degrees
 	 * @return A Bitmap scaled by maxWidth, maxHeight, and config.
 	 */
-	public static Bitmap createScaledBitmapFromStream(InputStream is, int maxWidth, int maxHeight, Bitmap.Config config) {
+	public static Bitmap createScaledBitmapFromStream(InputStream is, int maxWidth, int maxHeight, Bitmap.Config config, int orientation) {
 
 		// Start by grabbing the bitmap from file, sampling down a little first if the image is huge.
-		Bitmap tempBitmap = createLightweightScaledBitmapFromStream(is, maxWidth, maxHeight, config);
+		Bitmap tempBitmap = createLightweightScaledBitmapFromStream(is, maxWidth, maxHeight, config, orientation);
 
 		Bitmap outBitmap = tempBitmap;
 		int width = tempBitmap.getWidth();
