@@ -18,6 +18,7 @@
 
     <declare-styleable name="ApptentiveAvatarView">
         <attr name="border" format="dimension"/>
+        <attr name="borderSpace" format="dimension"/>
         <attr name="borderColor" format="color"/>
     </declare-styleable>
 
