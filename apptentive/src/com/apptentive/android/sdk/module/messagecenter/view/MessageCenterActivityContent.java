@@ -127,12 +127,12 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-
+		return;
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-
+		return;
 	}
 
 	@Override

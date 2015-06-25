@@ -25,8 +25,11 @@ public class MainActivity extends ApptentiveActivity {
 
 	private long lastUnreadMessageCount = 0;
 
+	private UnreadMessagesListener unreadMsgListener;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.main);
 
 		// OPTIONAL: To specify a different user email than what the device was setup with.
@@ -43,7 +46,7 @@ public class MainActivity extends ApptentiveActivity {
 		//Apptentive.putRatingProviderArg("package", "your.package.name");
 
 		// If you would like to be notified when there are unread messages available, set a listener like this.
-		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
+		unreadMsgListener = new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {
 				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
 				runOnUiThread(new Runnable() {
@@ -59,8 +62,12 @@ public class MainActivity extends ApptentiveActivity {
 					}
 				});
 			}
-		});
+		};
+		Apptentive.setUnreadMessagesListener(unreadMsgListener);
 
+		/* ToDo: note the difference of setting UnreadMessagesListener and OnSurveyFinishedListener,
+		 *  the latter has a memory leak.
+		 */
 		// Ad a listener to notify you when a survey is completed.
 		Apptentive.setOnSurveyFinishedListener(new OnSurveyFinishedListener() {
 			@Override

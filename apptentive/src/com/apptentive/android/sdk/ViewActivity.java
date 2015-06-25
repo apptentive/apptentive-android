@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
@@ -17,11 +16,8 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
-import com.apptentive.android.sdk.module.messagecenter.ApptentiveMessageCenter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.util.Constants;
 
 /**
  * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
