@@ -328,7 +328,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 	}
 
-	private void startDownloadAvatarTask(AvatarView view, String imageUrl) {
+	private void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl) {
 		DownloadImageTask task = new DownloadImageTask(view);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
@@ -339,9 +339,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-		private WeakReference<AvatarView> resultView;
+		private WeakReference<ApptentiveAvatarView> resultView;
 
-		DownloadImageTask(AvatarView view) {
+		DownloadImageTask(ApptentiveAvatarView view) {
 			resultView = new WeakReference<>(view);
 		}
 
@@ -361,7 +361,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return;
 			}
 			cachedAvatar = result;
-			AvatarView view = resultView.get();
+			ApptentiveAvatarView view = resultView.get();
 			if (view != null) {
 				view.setImageBitmap(result);
 			}

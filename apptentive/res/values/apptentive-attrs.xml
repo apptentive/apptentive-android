@@ -15,4 +15,11 @@
         <attr name="progressBarColor" format="color"/>
         <attr name="progress" format="integer"/>
     </declare-styleable>
+
+    <declare-styleable name="ApptentiveAvatarView">
+        <attr name="borderWidth" format="dimension"/>
+        <attr name="borderSpace" format="dimension"/>
+        <attr name="borderColor" format="color"/>
+    </declare-styleable>
+
 </resources>
