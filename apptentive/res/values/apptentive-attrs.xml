@@ -16,8 +16,10 @@
         <attr name="progress" format="integer"/>
     </declare-styleable>
 
+
     <!-- Default style attribute which will be used during construction of ApptentiveMessageCenterBadge. -->
     <attr name="apptentiveMessageCenterBadgeStyle" format="reference"/>
+
     <declare-styleable name="ApptentiveMessageCenterBadge">
         <!-- counter color -->
         <attr name="counterColor" format="color|reference"/>
@@ -28,6 +30,13 @@
             <!-- 40dp -->
             <enum name="mini" value="1"/>
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="ApptentiveAvatarView">
+        <attr name="borderWidth" format="dimension"/>
+        <attr name="borderSpace" format="dimension"/>
+        <attr name="borderColor" format="color"/>
+
     </declare-styleable>
 
 </resources>

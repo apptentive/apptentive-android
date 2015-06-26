@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -16,6 +17,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.io.IOException;
@@ -25,7 +27,13 @@ import java.net.URL;
 /**
  * @author Sky Kelsey
  */
-public class AvatarView extends ImageView {
+public class ApptentiveAvatarView extends ImageView {
+
+	float borderWidth;
+	float borderSpace;
+	int borderColor;
+	float borderRadius;
+	Paint borderPaint;
 
 	Bitmap avatar;
 	int avatarWidth;
@@ -33,24 +41,36 @@ public class AvatarView extends ImageView {
 	Matrix shaderMatrix;
 	BitmapShader shader;
 	Paint shaderPaint;
-	Rect viewRect;
-	int imageRadius;
+	float imageRadius;
 
-	public AvatarView(Context context) {
+	public ApptentiveAvatarView(Context context) {
 		super(context);
 	}
 
-	public AvatarView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public ApptentiveAvatarView(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
 	}
 
-	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public ApptentiveAvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+
+		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, 0);
+		try {
+			borderWidth = attributes.getDimension(R.styleable.ApptentiveAvatarView_borderWidth, 0.0f);
+			borderSpace = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_borderSpace, 0);
+			borderColor = attributes.getColor(R.styleable.ApptentiveAvatarView_borderColor, Color.BLACK);
+		} finally {
+			attributes.recycle();
+		}
+		setup();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (getDrawable() != null) {
+			if (borderWidth > 0) {
+				canvas.drawCircle(getWidth() / 2, getHeight() / 2, borderRadius, borderPaint);
+			}
 			canvas.drawCircle(getWidth() / 2, getHeight() / 2, imageRadius, shaderPaint);
 		}
 	}
@@ -117,7 +137,7 @@ public class AvatarView extends ImageView {
 		}
 	}
 
-	protected void setup() {
+	protected synchronized void setup() {
 		if (avatar == null) {
 			return;
 		}
@@ -126,16 +146,29 @@ public class AvatarView extends ImageView {
 		shader = new BitmapShader(avatar, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 
 		if (shaderPaint == null) {
-			shaderPaint = new Paint();
+			shaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		}
-		shaderPaint.setAntiAlias(true);
 		shaderPaint.setShader(shader);
 
-		if (viewRect == null) {
-			viewRect = new Rect();
+		if (borderPaint == null) {
+			borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			borderPaint.setStyle(Paint.Style.STROKE);
 		}
-		viewRect.set(0, 0, getWidth(), getHeight());
-		imageRadius = Math.min(viewRect.width() / 2, viewRect.height() / 2);
+		borderPaint.setColor(borderColor);
+		borderPaint.setStrokeWidth(borderWidth);
+
+		float containerX = (float) getWidth();
+		float containerY = (float) getHeight();
+
+		// Painting using STROKE style is measured from the center of the line, so include borderWidth in the radius calculation.
+		borderRadius = (Math.min(containerX, containerY) - borderWidth) / 2.0f;
+
+		float borderInteriorX = containerX - borderWidth;
+		float borderInteriorY = containerY - borderWidth;
+
+		// The image radius will now be smaller by half the borderWidth.
+		float halfBorderWidth = borderWidth / 2;
+		imageRadius = borderRadius - halfBorderWidth - borderSpace;
 
 		// setup the matrix
 		if (shaderMatrix == null) {
@@ -144,9 +177,9 @@ public class AvatarView extends ImageView {
 		shaderMatrix.set(null);
 
 
-		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, viewRect.width(), viewRect.height());
+		ImageScale imageScale = scaleImage(avatarWidth, avatarHeight, (int) borderInteriorX, (int) borderInteriorY);
 		shaderMatrix.setScale(imageScale.scale, imageScale.scale);
-		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f, imageScale.deltaY + 0.5f);
+		shaderMatrix.postTranslate(imageScale.deltaX + 0.5f + halfBorderWidth, imageScale.deltaY + 0.5f + halfBorderWidth);
 
 		shader.setLocalMatrix(shaderMatrix);
 		invalidate();
@@ -218,5 +251,4 @@ public class AvatarView extends ImageView {
 			return String.format("scale = %f, deltaX = %f, deltaY = %f", scale, deltaX, deltaY);
 		}
 	}
-
 }
