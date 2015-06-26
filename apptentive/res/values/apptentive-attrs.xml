@@ -15,4 +15,19 @@
         <attr name="progressBarColor" format="color"/>
         <attr name="progress" format="integer"/>
     </declare-styleable>
+
+    <!-- Default style attribute which will be used during construction of ApptentiveMessageCenterBadge. -->
+    <attr name="apptentiveMessageCenterBadgeStyle" format="reference"/>
+    <declare-styleable name="ApptentiveMessageCenterBadge">
+        <!-- counter color -->
+        <attr name="counterColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="badgeSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+    </declare-styleable>
+
 </resources>

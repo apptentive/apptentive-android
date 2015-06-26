@@ -44,6 +44,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 	private MessageCenterView messageCenterView;
 	private Map<String, String> customData;
 	private Context context;
+	private MessageManager.OnNewMessagesListener newMessageListener;
 
 	public MessageCenterActivityContent(Serializable data) {
 		this.customData = (Map<String, String>) data;
@@ -104,8 +105,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		}
 		activity.setContentView(messageCenterView);
 
-		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-		MessageManager.setInternalOnMessagesUpdatedListener(new MessageManager.OnNewMessagesListener() {
+		newMessageListener = new MessageManager.OnNewMessagesListener() {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
@@ -115,7 +115,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 					}
 				});
 			}
-		});
+		};
+
+		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
+		MessageManager.addInternalOnMessagesUpdatedListener(newMessageListener);
 
 		// Change to foreground polling, which polls more often.
 		MessagePollingWorker.setMessageCenterInForeground(true);
@@ -141,7 +144,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		savePendingComposingMessage();
 		// Set to null, otherwise they will hold reference to the activity context
-		MessageManager.setInternalOnMessagesUpdatedListener(null);
+		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
 		return true;
 	}
