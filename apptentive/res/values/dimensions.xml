@@ -51,4 +51,7 @@
 
     <dimen name="apptentive_message_center_fallback_divider_line_width">1dp</dimen>
     <dimen name="apptentive_message_center_avatar_image_diameter">48dp</dimen>
+
+    <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_left">0dp</dimen>
 </resources>

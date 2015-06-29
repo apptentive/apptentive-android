@@ -106,4 +106,14 @@
         <item name="android:singleLine">true</item>
         <item name="android:imeOptions">actionNext</item>
     </style>
+
+    <style name="ApptentiveAvatarView">
+        <item name="android:src">@drawable/avatar</item>
+    </style>
+
+    <style name="ApptentiveAvatarView.Greeting">
+        <item name="borderWidth">2dp</item>
+        <item name="borderSpace">1.5dp</item>
+        <item name="borderColor">@color/apptentive_tint_color</item>
+    </style>
 </resources>
