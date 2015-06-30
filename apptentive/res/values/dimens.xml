@@ -54,4 +54,7 @@
 
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
     <dimen name="apptentive_message_center_greeting_text_padding_left">0dp</dimen>
+
+    <dimen name="apptentive_message_center_badge_normal">14sp</dimen>
+    <dimen name="apptentive_message_center_badge_mini">8sp</dimen>
 </resources>

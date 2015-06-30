@@ -121,6 +121,13 @@
     </style>
 
     <style name="ApptentiveAvatarView.Message">
+
+    <style name="ApptentiveMessageCenterBadge">
+        <item name="badgeSize">normal</item>
+        <item name="counterColor">@color/apptentive_text_message_text</item>
+    </style>
+    <style name="ApptentiveMessageCenterBadge.Mini" parent="ApptentiveMessageCenterBadge">
+        <item name="badgeSize">mini</item>
     </style>
 
     <style name="ApptentiveMessageCenterGreetingContainer">
