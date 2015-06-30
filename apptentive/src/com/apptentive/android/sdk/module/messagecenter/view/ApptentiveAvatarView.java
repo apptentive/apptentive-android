@@ -54,7 +54,7 @@ public class ApptentiveAvatarView extends ImageView {
 	public ApptentiveAvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 
-		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, 0);
+		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, R.style.ApptentiveAvatarView);
 		try {
 			borderWidth = attributes.getDimension(R.styleable.ApptentiveAvatarView_borderWidth, 0.0f);
 			borderSpace = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_borderSpace, 0);

@@ -13,6 +13,9 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">false</item>
+        <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting</item>
+        <item name="apptentiveAvatarViewMessageStyle">@style/ApptentiveAvatarView.Message</item>
+        <item name="apptentiveTintColor">@color/apptentive_tint_color</item>
     </style>
 
     <style name="ApptentiveInteractionPositiveButton">
@@ -105,6 +108,19 @@
         <item name="android:completionThreshold">1</item>
         <item name="android:singleLine">true</item>
         <item name="android:imeOptions">actionNext</item>
+    </style>
+
+    <style name="ApptentiveAvatarView">
+        <item name="android:src">@drawable/avatar</item>
+        <item name="borderColor">?apptentiveTintColor</item>
+    </style>
+
+    <style name="ApptentiveAvatarView.Greeting">
+        <item name="borderWidth">2dp</item>
+        <item name="borderSpace">1.5dp</item>
+    </style>
+
+    <style name="ApptentiveAvatarView.Message">
     </style>
 
     <style name="ApptentiveMessageCenterBadge">
