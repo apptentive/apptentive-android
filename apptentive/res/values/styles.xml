@@ -121,6 +121,7 @@
     </style>
 
     <style name="ApptentiveAvatarView.Message">
+    </style>
 
     <style name="ApptentiveMessageCenterBadge">
         <item name="badgeSize">normal</item>
