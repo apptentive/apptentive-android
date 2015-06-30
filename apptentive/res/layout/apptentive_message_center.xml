@@ -15,7 +15,7 @@
     <!-- Header -->
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="@dimen/apptentive_message_center_header_height"
-                  android:background="#EF4139"
+                  android:background="?attr/apptentiveTintColor"
                   android:elevation="8dp"
                   android:gravity="top"
                   android:orientation="vertical">
@@ -135,7 +135,7 @@
                          android:contentDescription="Attach"
                          android:paddingLeft="16dp"
                          android:src="@drawable/apptentive_ic_action_attach"
-                         android:tint="#EF4139"/>
+                         android:tint="?attr/apptentiveTintColor"/>
 
             <ImageButton android:id="@+id/send"
                          android:layout_width="wrap_content"
@@ -144,7 +144,7 @@
                          android:contentDescription="Submit"
                          android:paddingLeft="16dp"
                          android:src="@drawable/apptentive_ic_action_send"
-                         android:tint="#EF4139"/>
+                         android:tint="?attr/apptentiveTintColor"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
