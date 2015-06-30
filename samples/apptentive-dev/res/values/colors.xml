@@ -17,4 +17,6 @@
     <color name="button_body">#40A0A0A0</color>
     <color name="button_border">#40FFFFFF</color>
     <color name="button_text">#EEEEEE</color>
+
+    <color name="badge_text_color">#FFFFFF</color>
 </resources>

@@ -559,13 +559,25 @@ public class Apptentive {
 		}
 	}
 
+
 	/**
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
+	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener listener)} instead.
 	 */
+	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
 		MessageManager.setHostUnreadMessagesListener(listener);
+	}
+
+	/**
+	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
+	 *
+	 * @param listener An UnreadMessageListener that you instantiate.
+	 */
+	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
+		MessageManager.addHostUnreadMessagesListener(listener);
 	}
 
 	/**
