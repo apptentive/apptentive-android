@@ -122,4 +122,30 @@
 
     <style name="ApptentiveAvatarView.Message">
     </style>
+
+    <style name="ApptentiveMessageCenterGreetingContainer">
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingBottom">24dp</item>
+        <item name="android:paddingLeft">@dimen/apptentive_message_center_greeting_side_margin</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_greeting_side_margin</item>
+        <item name="android:background">@color/apptentive_message_center_greeting_background</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">@integer/apptentive_message_center_greeting_orientation</item>
+    </style>
+
+    <style name="ApptentiveMessageCenterGreetingTitle">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/apptentiveTintColor</item>
+        <item name="android:textSize">24dp</item>
+    </style>
+
+    <style name="ApptentiveMessageCenterGreetingBody">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#949494</item>
+        <item name="android:textSize">16dp</item>
+    </style>
 </resources>
