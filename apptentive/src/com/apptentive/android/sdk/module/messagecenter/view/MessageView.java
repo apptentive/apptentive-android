@@ -34,7 +34,7 @@ public abstract class MessageView<T extends Message> extends FrameLayout impleme
 			post(new Runnable() {
 				public void run() {
 					MessageManager.updateMessage(context, message);
-					MessageManager.notifyHostUnreadMessagesListener(MessageManager.getUnreadMessageCount(context));
+					MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
 				}
 			});
 		}

@@ -80,10 +80,10 @@ public class MessageManager {
 			getMessageStore(context).addOrUpdateMessages(messagesToSave.toArray(new Message[messagesToSave.size()]));
 
 			if (incomingUnreadMessages > 0) {
-				notifyInternalNewMessagesListener();
+				notifyInternalNewMessagesListeners();
 			}
 
-			notifyHostUnreadMessagesListener(getUnreadMessageCount(context));
+			notifyHostUnreadMessagesListeners(getUnreadMessageCount(context));
 			return incomingUnreadMessages > 0;
 		}
 		return false;
@@ -279,7 +279,7 @@ public class MessageManager {
 		internalNewMessagesListeners.clear();
 	}
 
-	public static void notifyInternalNewMessagesListener() {
+	public static void notifyInternalNewMessagesListeners() {
 		for (WeakReference<OnNewMessagesListener> listenerRef: internalNewMessagesListeners) {
 			OnNewMessagesListener listener = listenerRef.get();
 			if (listener != null) {
@@ -314,7 +314,7 @@ public class MessageManager {
 		hostUnreadMessagesListeners.clear();
 	}
 
-	public static void notifyHostUnreadMessagesListener(int unreadMessages) {
+	public static void notifyHostUnreadMessagesListeners(int unreadMessages) {
 		for (WeakReference<UnreadMessagesListener> listenerRef: hostUnreadMessagesListeners) {
 			UnreadMessagesListener listener = listenerRef.get();
 			if (listener != null) {

@@ -25,6 +25,7 @@ public class MainActivity extends ApptentiveActivity {
 
 	private long lastUnreadMessageCount = 0;
 
+	// Use member variable for listener. Registering anonymous listener has potential memory leak
 	private UnreadMessagesListener unreadMsgListener;
 
 	public void onCreate(Bundle savedInstanceState) {
