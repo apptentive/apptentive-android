@@ -27,7 +27,7 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 
 public class ApptentiveMessageCenterBadge extends RelativeLayout {
 
-	private LayoutInflater mInflater;
+	private LayoutInflater inflater;
 
 	private UnreadMessagesListener unreadMessagesListener;
 
@@ -41,11 +41,11 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 */
 	public static final int SIZE_MINI = 1;
 
-	private int mSize;
-	private int mTextColor;
-	private int mCounter;
+	private int badgeSize;
+	private int badgeTextColor;
+	private int unreadMsgCounter;
 
-	private boolean mUpdateLocked;
+	private boolean bUpdateLocked;
 
 	private ImageView iv;
 	private TextView tv;
@@ -56,7 +56,7 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @return {@link #SIZE_NORMAL} or {@link #SIZE_MINI}
 	 */
 	public int getSize() {
-		return mSize;
+		return badgeSize;
 	}
 
 	/**
@@ -67,9 +67,9 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @param size {@link #SIZE_NORMAL} or {@link #SIZE_MINI}
 	 */
 	public void setSize(int size) {
-		boolean changed = mSize != size;
+		boolean changed = badgeSize != size;
 
-		mSize = size;
+		badgeSize = size;
 
 		if (changed) {
 			updateEntireBadge();
@@ -82,7 +82,7 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @return color
 	 */
 	public int getTextColor() {
-		return mTextColor;
+		return badgeTextColor;
 	}
 
 	/**
@@ -95,9 +95,9 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @param color color
 	 */
 	public void setTextColor(int color) {
-		boolean changed = mTextColor != color;
+		boolean changed = badgeTextColor != color;
 
-		mTextColor = color;
+		badgeTextColor = color;
 
 
 		if (changed) {
@@ -111,7 +111,7 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @return count
 	 */
 	public int getCounter() {
-		return mCounter;
+		return unreadMsgCounter;
 	}
 
 	/**
@@ -121,9 +121,9 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	 * @param newCount
 	 */
 	public void setCounter(int newCount) {
-		boolean changed = mCounter != newCount;
+		boolean changed = unreadMsgCounter != newCount;
 
-		mCounter = newCount;
+		unreadMsgCounter = newCount;
 
 		if (changed) {
 			updateBadgeCounter();
@@ -131,35 +131,35 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	}
 
 	public void lockUpdate() {
-		mUpdateLocked = true;
+		bUpdateLocked = true;
 	}
 
 	public void unlockUpdate() {
-		mUpdateLocked = false;
+		bUpdateLocked = false;
 	}
 
 
 	public ApptentiveMessageCenterBadge(Context context) {
 		super(context);
-		mInflater = LayoutInflater.from(context);
+		inflater = LayoutInflater.from(context);
 		init(context, null, 0);
 
 	}
 
 	public ApptentiveMessageCenterBadge(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		mInflater = LayoutInflater.from(context);
+		inflater = LayoutInflater.from(context);
 		init(context, attrs, defStyle);
 	}
 
 	public ApptentiveMessageCenterBadge(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		mInflater = LayoutInflater.from(context);
+		inflater = LayoutInflater.from(context);
 		init(context, attrs, R.attr.apptentiveMessageCenterBadgeStyle);
 	}
 
 	public void init(final Context context, AttributeSet attrs, int defStyle) {
-		final View v = mInflater.inflate(R.layout.apptentive_widget_message_center_badge, this, true);
+		final View v = inflater.inflate(R.layout.apptentive_widget_message_center_badge, this, true);
 		iv = (ImageView) v.findViewById(R.id.message_center_badge_icon);
     tv = (TextView) v.findViewById(R.id.message_center_badge_counter);
 
@@ -182,9 +182,9 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 				}
 			}
 		} finally {
-			mSize = SIZE_NORMAL;
-			mTextColor = Color.BLACK;
-			mCounter = MessageManager.getUnreadMessageCount(context);
+			badgeSize = SIZE_NORMAL;
+			badgeTextColor = Color.BLACK;
+			unreadMsgCounter = MessageManager.getUnreadMessageCount(context);
 		}
 
 		try {
@@ -199,21 +199,21 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	}
 
 	private void updateEntireBadge() {
-		if (!mUpdateLocked) {
-			if (mSize == SIZE_NORMAL) {
+		if (!bUpdateLocked) {
+			if (badgeSize == SIZE_NORMAL) {
 				tv.setTextSize(getResources().getDimension(R.dimen.apptentive_message_center_badge_normal));
 			} else {
 				tv.setTextSize(getResources().getDimension(R.dimen.apptentive_message_center_badge_mini));
 			}
 
-			tv.setTextColor(mTextColor);
+			tv.setTextColor(badgeTextColor);
 			updateBadgeCounter();
 		}
 	}
 
 	private void updateBadgeCounter() {
-		if (!mUpdateLocked) {
-			tv.setText(Integer.toString(mCounter));
+		if (!bUpdateLocked) {
+			tv.setText(Integer.toString(unreadMsgCounter));
 			invalidate();
 		}
 	}
