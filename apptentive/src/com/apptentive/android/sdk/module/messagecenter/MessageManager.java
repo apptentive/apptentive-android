@@ -267,6 +267,8 @@ public class MessageManager {
 				OnNewMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
+				} else if (listener == null) {
+					internalNewMessagesListeners.remove(listenerRef);
 				}
 			}
 			internalNewMessagesListeners.add(new WeakReference<>(newlistener));
@@ -300,6 +302,8 @@ public class MessageManager {
 				UnreadMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
+				} else if (listener == null) {
+					hostUnreadMessagesListeners.remove(listenerRef);
 				}
 			}
 			hostUnreadMessagesListeners.add(new WeakReference<>(newlistener));
