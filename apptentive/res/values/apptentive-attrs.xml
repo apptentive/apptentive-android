@@ -6,6 +6,11 @@
   -->
 
 <resources>
+
+    <attr name="apptentiveTintColor" format="reference"/>
+    <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
+    <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
+
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="text" format="string"/>
     </declare-styleable>
@@ -21,5 +26,4 @@
         <attr name="borderSpace" format="dimension"/>
         <attr name="borderColor" format="color"/>
     </declare-styleable>
-
 </resources>
