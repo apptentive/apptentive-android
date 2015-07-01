@@ -11,14 +11,12 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
@@ -163,28 +161,31 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 		iv = (ImageView) v.findViewById(R.id.message_center_badge_icon);
     tv = (TextView) v.findViewById(R.id.message_center_badge_counter);
 
+		badgeSize = SIZE_NORMAL;
+		badgeTextColor = Color.BLACK;
+		unreadMsgCounter = MessageManager.getUnreadMessageCount(context);
+
 		unreadMessagesListener = new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {
 				setCounter(unreadMessages);
 			}
 		};
-
 		Apptentive.addUnreadMessagesListener(unreadMessagesListener);
-		TypedArray a = null;
-		try {
-			if (attrs != null) {
-				Resources.Theme theme = context.getTheme();
-				if (theme != null) {
-					a = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveMessageCenterBadge, defStyle, R.style.ApptentiveMessageCenterBadge);
-					if (a == null) {
-						return;
-					}
-				}
-			}
-		} finally {
-			badgeSize = SIZE_NORMAL;
-			badgeTextColor = Color.BLACK;
-			unreadMsgCounter = MessageManager.getUnreadMessageCount(context);
+
+		TypedArray a;
+
+		if (attrs == null) {
+			return;
+		}
+
+		Resources.Theme theme = context.getTheme();
+		if (theme == null) {
+			return;
+		}
+
+		a = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveMessageCenterBadge, defStyle, R.style.ApptentiveMessageCenterBadge);
+		if (a == null) {
+			return;
 		}
 
 		try {
