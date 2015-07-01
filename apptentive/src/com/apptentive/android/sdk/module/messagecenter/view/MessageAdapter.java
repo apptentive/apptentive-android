@@ -43,8 +43,10 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +75,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private boolean isInPauseState = false;
 	private Bitmap cachedAvatar;
 	private Context context;
-	private int pendingUpdateIndex = INVALID_POSITION;
+
+	// maps to prevent redundant asynctasks
+	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
+	private ArrayList<Integer> positionsWithPendingImageTask = new ArrayList<Integer>();
+	private ArrayList<Integer> positionsWithPendingAvatarTask = new ArrayList<Integer>();
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items) {
 		super(context, 0, (List<T>) items);
@@ -115,7 +121,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	@Override
 	public int getViewTypeCount() {
-		return 7;
+		return 6;
 	}
 
 	@Override
@@ -162,14 +168,17 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (holder != null) {
 			switch (type) {
 				case TYPE_TEXT_INCOMING: {
-					if (cachedAvatar == null) {
-						startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar, ((IncomingTextMessage) listItem).getSenderProfilePhoto());
+					if (cachedAvatar == null && !positionsWithPendingAvatarTask.contains(position)) {
+						positionsWithPendingAvatarTask.add(position);
+						startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
+								((IncomingTextMessage) listItem).getSenderProfilePhoto(), position);
 					}
 					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
 					String timestamp = createTimestamp(((IncomingTextMessage) listItem).getCreatedAt());
 					((IncomingTextMessageHolder) holder).updateMessage(timestamp, cachedAvatar, textMessage.getBody());
-					if (!textMessage.isRead()) {
-						startUpdateUnreadMessageTask(textMessage);
+					if (!textMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
+						positionsWithPendingUpdateTask.add(position);
+						startUpdateUnreadMessageTask(textMessage, position);
 					}
 					break;
 				}
@@ -181,9 +190,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_FILE_OUTGOING: {
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
-					if (position != holder.position && position != pendingUpdateIndex) {
-						pendingUpdateIndex = position;
-						startLoadImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
+					if (position != holder.position && !positionsWithPendingImageTask.contains(position)) {
+						positionsWithPendingImageTask.add(position);
+						startLoadAttachedImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
 					}
 					String timestamp = createTimestamp(((OutgoingFileMessage) listItem).getCreatedAt());
 					((OutgoingFileMessageHolder) holder).updateMessage(timestamp, fileMessage.getCreatedAt() == null);
@@ -256,7 +265,48 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return ret;
 	}
 
-	private void startLoadImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
+	private void startUpdateUnreadMessageTask(IncomingTextMessage message, int position) {
+		UpdateUnreadMessageTask task = new UpdateUnreadMessageTask(position);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message);
+		} else {
+			task.execute(message);
+		}
+	}
+
+	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {
+		private int position;
+
+		public UpdateUnreadMessageTask(int position) {
+			this.position = position;
+		}
+
+		@Override
+		protected Void doInBackground(IncomingTextMessage... textMessages) {
+			textMessages[0].setRead(true);
+			Map<String, String> data = new HashMap<>();
+			data.put("message_id", textMessages[0].getId());
+			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
+			MessageManager.updateMessage(context, textMessages[0]);
+			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
+      return null;
+		}
+
+		@Override
+		protected void onCancelled() {
+			positionsWithPendingUpdateTask.remove(new Integer(position));
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			positionsWithPendingUpdateTask.remove(new Integer(position));
+		}
+
+
+	}
+
+
+	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
 		StoredFile storedFile = message.getStoredFile(context);
 		String mimeType = storedFile.getMimeType();
 		String imagePath;
@@ -271,7 +321,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					holder.image.setPadding(dimensions.x, dimensions.y, 0, 0);
 				}
 			}
-			LoadImageTask task = new LoadImageTask(position, holder);
+			LoadAttachedImageTask task = new LoadAttachedImageTask(position, holder);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagePath);
 			} else {
@@ -281,35 +331,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	}
 
-	private void startUpdateUnreadMessageTask(IncomingTextMessage message) {
-		UpdateUnreadMessageTask task = new UpdateUnreadMessageTask();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message);
-		} else {
-			task.execute(message);
-		}
-	}
-
-	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {
-
-		@Override
-		protected Void doInBackground(IncomingTextMessage... textMessages) {
-			textMessages[0].setRead(true);
-			Map<String, String> data = new HashMap<>();
-			data.put("message_id", textMessages[0].getId());
-			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
-			MessageManager.updateMessage(context, textMessages[0]);
-			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
-			return null;
-		}
-	}
-
-
-	private class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
+	private class LoadAttachedImageTask extends AsyncTask<String, Void, Bitmap> {
 		private int position;
 		private WeakReference<OutgoingFileMessageHolder> holderRef;
 
-		public LoadImageTask(int position, OutgoingFileMessageHolder holder) {
+		public LoadAttachedImageTask(int position, OutgoingFileMessageHolder holder) {
 			this.position = position;
 			this.holderRef = new WeakReference<>(holder);
 		}
@@ -342,15 +368,18 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 
 		@Override
+		protected void onCancelled() {
+			positionsWithPendingImageTask.remove(new Integer(position));
+		}
+
+		@Override
 		protected void onPostExecute(Bitmap bitmap) {
+			positionsWithPendingImageTask.remove(new Integer(position));
 			if (null == bitmap) {
 				return;
 			}
 			OutgoingFileMessageHolder holder = holderRef.get();
 			if (holder != null && holder.position == position) {
-				if (position == pendingUpdateIndex) {
-					pendingUpdateIndex = INVALID_POSITION;
-				}
 				if (holder.image != null) {
 					holder.image.setPadding(0, 0, 0, 0);
 					holder.image.setImageBitmap(bitmap);
@@ -360,8 +389,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 	}
 
-	private void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl) {
-		DownloadImageTask task = new DownloadImageTask(view);
+
+	private void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl, int position) {
+		DownloadImageTask task = new DownloadImageTask(view, position);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
 		} else {
@@ -371,10 +401,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
+		private int position;
 		private WeakReference<ApptentiveAvatarView> resultView;
 
-		DownloadImageTask(ApptentiveAvatarView view) {
+		DownloadImageTask(ApptentiveAvatarView view, int position) {
 			resultView = new WeakReference<>(view);
+			this.position = position;
 		}
 
 		protected Bitmap doInBackground(String... urls) {
@@ -388,7 +420,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 
 		@Override
+		protected void onCancelled() {
+			positionsWithPendingAvatarTask.remove(new Integer(position));
+		}
+
+		@Override
 		protected void onPostExecute(Bitmap result) {
+			positionsWithPendingAvatarTask.remove(new Integer(position));
 			if (result == null) {
 				return;
 			}
