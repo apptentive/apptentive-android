@@ -6,6 +6,7 @@ package com.apptentive.android.sdk.widget;
  * under which redistribution and use of this file is permitted.
  */
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -167,7 +168,12 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 
 		unreadMessagesListener = new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {
-				setCounter(unreadMessages);
+				((Activity)getContext()).runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						setCounter(unreadMessages);
+					}
+				});
 			}
 		};
 		Apptentive.addUnreadMessagesListener(unreadMessagesListener);

@@ -25,19 +25,6 @@ public abstract class MessageView<T extends Message> extends FrameLayout impleme
 	public MessageView(final Context context, final T message) {
 		super(context);
 		init(context, message);
-
-		if (!message.isRead()) {
-			message.setRead(true);
-			Map<String, String> data = new HashMap<>();
-			data.put("message_id", message.getId());
-			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
-			post(new Runnable() {
-				public void run() {
-					MessageManager.updateMessage(context, message);
-					MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
-				}
-			});
-		}
 	}
 
 	protected void init(Context context, T message) {

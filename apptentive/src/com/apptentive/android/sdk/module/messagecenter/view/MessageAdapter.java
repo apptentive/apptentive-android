@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
@@ -33,6 +34,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenter
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -42,7 +44,9 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -161,9 +165,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					if (cachedAvatar == null) {
 						startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar, ((IncomingTextMessage) listItem).getSenderProfilePhoto());
 					}
-					IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
+					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
 					String timestamp = createTimestamp(((IncomingTextMessage) listItem).getCreatedAt());
 					((IncomingTextMessageHolder) holder).updateMessage(timestamp, cachedAvatar, textMessage.getBody());
+					if (!textMessage.isRead()) {
+						startUpdateUnreadMessageTask(textMessage);
+					}
 					break;
 				}
 				case TYPE_TEXT_OUTGOING: {
@@ -273,6 +280,30 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 
 	}
+
+	private void startUpdateUnreadMessageTask(IncomingTextMessage message) {
+		UpdateUnreadMessageTask task = new UpdateUnreadMessageTask();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message);
+		} else {
+			task.execute(message);
+		}
+	}
+
+	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {
+
+		@Override
+		protected Void doInBackground(IncomingTextMessage... textMessages) {
+			textMessages[0].setRead(true);
+			Map<String, String> data = new HashMap<>();
+			data.put("message_id", textMessages[0].getId());
+			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
+			MessageManager.updateMessage(context, textMessages[0]);
+			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
+			return null;
+		}
+	}
+
 
 	private class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
 		private int position;

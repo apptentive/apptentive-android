@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -246,10 +247,12 @@ public class MessageManager {
 	}
 
 
-   // Listeners
+	// Listeners
 	public interface AfterSendMessageListener {
 		void onMessageSent(ApptentiveHttpResponse response, Message message);
+
 		void onPauseSending();
+
 		void onResumeSending();
 	}
 
@@ -263,12 +266,13 @@ public class MessageManager {
 
 	public static void addInternalOnMessagesUpdatedListener(OnNewMessagesListener newlistener) {
 		if (newlistener != null) {
-			for (WeakReference<OnNewMessagesListener> listenerRef : internalNewMessagesListeners) {
+			for (Iterator<WeakReference<OnNewMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
+				WeakReference<OnNewMessagesListener> listenerRef = iterator.next();
 				OnNewMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
 				} else if (listener == null) {
-					internalNewMessagesListeners.remove(listenerRef);
+					iterator.remove();
 				}
 			}
 			internalNewMessagesListeners.add(new WeakReference<>(newlistener));
@@ -280,7 +284,7 @@ public class MessageManager {
 	}
 
 	public static void notifyInternalNewMessagesListeners() {
-		for (WeakReference<OnNewMessagesListener> listenerRef: internalNewMessagesListeners) {
+		for (WeakReference<OnNewMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewMessagesListener listener = listenerRef.get();
 			if (listener != null) {
 				listener.onMessagesUpdated();
@@ -298,12 +302,13 @@ public class MessageManager {
 
 	public static void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
 		if (newlistener != null) {
-			for (WeakReference<UnreadMessagesListener> listenerRef : hostUnreadMessagesListeners) {
+			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
+				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
 				UnreadMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
 				} else if (listener == null) {
-					hostUnreadMessagesListeners.remove(listenerRef);
+					iterator.remove();
 				}
 			}
 			hostUnreadMessagesListeners.add(new WeakReference<>(newlistener));
@@ -315,11 +320,12 @@ public class MessageManager {
 	}
 
 	public static void notifyHostUnreadMessagesListeners(int unreadMessages) {
-		for (WeakReference<UnreadMessagesListener> listenerRef: hostUnreadMessagesListeners) {
+		for (WeakReference<UnreadMessagesListener> listenerRef : hostUnreadMessagesListeners) {
 			UnreadMessagesListener listener = listenerRef.get();
 			if (listener != null) {
 				listener.onUnreadMessageCountChanged(unreadMessages);
 			}
 		}
 	}
+
 }
