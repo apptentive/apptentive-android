@@ -167,6 +167,7 @@
     <style name="ApptentiveMessageCenterMessageBorder">
         <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:elevation">1.5dp</item>
         <item name="android:background">#DCDCDC</item>
     </style>
 
@@ -174,6 +175,13 @@
         <item name="android:padding">16dp</item>
         <item name="android:background">#FFFFFF</item>
         <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="ApptentiveMessageCenterMessageOutgoingBackground">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:orientation">vertical</item>
     </style>
 
     <style name="ApptentiveMessageCenterMessageContent">
@@ -188,5 +196,10 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#9E9E9E</item>
+    </style>
+
+    <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
+        <item name="android:paddingTop">10dp</item>
+        <item name="progressBarColor">?attr/apptentiveTintColor</item>
     </style>
 </resources>
