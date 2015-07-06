@@ -69,6 +69,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
+	public static final boolean CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
 
@@ -80,6 +81,7 @@ public class Constants {
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
 	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
+	public static final String MANIFEST_KEY_NEW_MESSAGE_TOAST_ENABLED = "apptentive_new_message_toast_enabled";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
 
 	// View layout shortcuts

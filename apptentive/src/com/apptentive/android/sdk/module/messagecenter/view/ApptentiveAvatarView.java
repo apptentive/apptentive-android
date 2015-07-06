@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
@@ -53,8 +54,9 @@ public class ApptentiveAvatarView extends ImageView {
 
 	public ApptentiveAvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		Resources.Theme theme = context.getTheme();
 
-		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, R.style.ApptentiveAvatarView);
+		TypedArray attributes = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, R.style.ApptentiveAvatarView);
 		try {
 			borderWidth = attributes.getDimension(R.styleable.ApptentiveAvatarView_borderWidth, 0.0f);
 			borderSpace = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_borderSpace, 0);

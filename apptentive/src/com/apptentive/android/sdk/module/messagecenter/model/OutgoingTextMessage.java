@@ -13,7 +13,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingTextMessage extends Message {
+public class OutgoingTextMessage extends ApptentiveMessage {
 
 	private static final String KEY_BODY = "body";
 

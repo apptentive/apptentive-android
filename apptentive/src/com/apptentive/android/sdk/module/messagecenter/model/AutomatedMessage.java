@@ -14,7 +14,7 @@ import com.apptentive.android.sdk.R;
 import org.json.JSONException;
 
 /**
- * A dummy Message that the client can create on behalf of the server. It will never be sent to the server.
+ * A dummy ApptentiveMessage that the client can create on behalf of the server. It will never be sent to the server.
  *
  * @author Sky Kelsey
  */

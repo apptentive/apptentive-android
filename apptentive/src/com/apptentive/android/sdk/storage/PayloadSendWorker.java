@@ -13,7 +13,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
@@ -92,8 +92,8 @@ public class PayloadSendWorker {
 						switch (payload.getBaseType()) {
 							case message:
 								MessageManager.onResumeSending();
-								response = ApptentiveClient.postMessage(appContext, (Message) payload);
-								MessageManager.onSentMessage(appContext, (Message) payload, response);
+								response = ApptentiveClient.postMessage(appContext, (ApptentiveMessage) payload);
+								MessageManager.onSentMessage(appContext, (ApptentiveMessage) payload, response);
 								break;
 							case event:
 								response = ApptentiveClient.postEvent((Event) payload);

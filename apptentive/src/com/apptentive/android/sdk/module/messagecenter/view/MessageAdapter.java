@@ -20,8 +20,8 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -46,7 +46,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -73,13 +72,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private final static int MAX_IMAGE_DISPLAY_HEIGHT = 800;
 
 	private boolean isInPauseState = false;
-	private Bitmap cachedAvatar;
 	private Context context;
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
 	private ArrayList<Integer> positionsWithPendingImageTask = new ArrayList<Integer>();
-	private ArrayList<Integer> positionsWithPendingAvatarTask = new ArrayList<Integer>();
+
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items) {
 		super(context, 0, (List<T>) items);
@@ -89,19 +87,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	@Override
 	public int getItemViewType(int position) {
 		MessageCenterListItem listItem = getItem(position);
-		if (listItem instanceof Message) {
-			Message message = (Message) listItem;
-			if (message.getBaseType() == Payload.BaseType.message) {
-				switch (message.getType()) {
+		if (listItem instanceof ApptentiveMessage) {
+			ApptentiveMessage apptentiveMessage = (ApptentiveMessage) listItem;
+			if (apptentiveMessage.getBaseType() == Payload.BaseType.message) {
+				switch (apptentiveMessage.getType()) {
 					case TextMessage:
-						if (message instanceof IncomingTextMessage) {
+						if (apptentiveMessage instanceof IncomingTextMessage) {
 							return TYPE_TEXT_INCOMING;
-						} else if (message instanceof OutgoingTextMessage) {
+						} else if (apptentiveMessage instanceof OutgoingTextMessage) {
 							return TYPE_TEXT_OUTGOING;
 						}
 						break;
 					case FileMessage:
-						if (message instanceof OutgoingFileMessage) {
+						if (apptentiveMessage instanceof OutgoingFileMessage) {
 							return TYPE_FILE_OUTGOING;
 						}
 						break;
@@ -130,11 +128,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		int type = getItemViewType(position);
 		MessageCenterListItemHolder holder = null;
+		boolean bLoadAvatar = false;
 		if (null == convertView) {
 			// TODO: Do we need this switch anymore?
 			switch (type) {
 				case TYPE_TEXT_INCOMING:
 					convertView = new IncomingTextMessageView(parent.getContext(), (IncomingTextMessage) listItem);
+					bLoadAvatar = true;
 					break;
 				case TYPE_TEXT_OUTGOING:
 					convertView = new OutgoingTextMessageView(parent.getContext(), (OutgoingTextMessage) listItem);
@@ -168,14 +168,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (holder != null) {
 			switch (type) {
 				case TYPE_TEXT_INCOMING: {
-					if (cachedAvatar == null && !positionsWithPendingAvatarTask.contains(position)) {
-						positionsWithPendingAvatarTask.add(position);
-						startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
-								((IncomingTextMessage) listItem).getSenderProfilePhoto(), position);
+					if (bLoadAvatar) {
+						ImageUtil.startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
+								((IncomingTextMessage) listItem).getSenderProfilePhoto());
 					}
 					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
 					String timestamp = createTimestamp(((IncomingTextMessage) listItem).getCreatedAt());
-					((IncomingTextMessageHolder) holder).updateMessage(timestamp, cachedAvatar, textMessage.getBody());
+					((IncomingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getBody());
 					if (!textMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(textMessage, position);
@@ -390,56 +389,4 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 
-	private void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl, int position) {
-		DownloadImageTask task = new DownloadImageTask(view, position);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
-		} else {
-			task.execute(imageUrl);
-		}
-	}
-
-	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-
-		private int position;
-		private WeakReference<ApptentiveAvatarView> resultView;
-
-		DownloadImageTask(ApptentiveAvatarView view, int position) {
-			resultView = new WeakReference<>(view);
-			this.position = position;
-		}
-
-		protected Bitmap doInBackground(String... urls) {
-			Bitmap bmp = null;
-			try {
-				bmp = this.loadImageFromNetwork(urls[0]);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return bmp;
-		}
-
-		@Override
-		protected void onCancelled() {
-			positionsWithPendingAvatarTask.remove(new Integer(position));
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap result) {
-			positionsWithPendingAvatarTask.remove(new Integer(position));
-			if (result == null) {
-				return;
-			}
-			cachedAvatar = result;
-			ApptentiveAvatarView view = resultView.get();
-			if (view != null) {
-				view.setImageBitmap(result);
-			}
-		}
-
-		private Bitmap loadImageFromNetwork(String imageUrl) throws IOException {
-			URL url = new URL(imageUrl);
-			return BitmapFactory.decodeStream(url.openStream());
-		}
-	}
 }

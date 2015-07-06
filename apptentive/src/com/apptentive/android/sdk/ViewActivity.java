@@ -121,7 +121,7 @@ public class ViewActivity extends ApptentiveActivity {
 				AboutModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
-
+				((MessageCenterActivityContent)activityContent).onStart();
 				break;
 			case INTERACTION:
 				// Interactions are already set up from onCreate().

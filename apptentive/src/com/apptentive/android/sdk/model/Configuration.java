@@ -29,6 +29,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
+	private static final String KEY_NEW_MESSAGE_TOAST_ENABLED = "new_message_toast_enabled";
 	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
 	// This one is not sent in JSON, but as a header form the server.
@@ -158,6 +159,29 @@ public class Configuration extends JSONObject {
 		}
 
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
+	}
+
+	public boolean isNewMessageToastEnabled(Context context) {
+		try {
+			JSONObject messageCenter = getMessageCenter();
+			if (messageCenter != null) {
+				if (!messageCenter.isNull(KEY_NEW_MESSAGE_TOAST_ENABLED)) {
+					return messageCenter.getBoolean(KEY_NEW_MESSAGE_TOAST_ENABLED);
+				}
+			}
+		} catch (JSONException e) {
+			// Move on.
+		}
+
+		try {
+			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			Bundle metaData = ai.metaData;
+			return metaData.getBoolean(Constants.MANIFEST_KEY_NEW_MESSAGE_TOAST_ENABLED, Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED);
+		} catch (Exception e) {
+			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_NEW_MESSAGE_TOAST_ENABLED);
+		}
+
+		return Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED;
 	}
 
 	public boolean isMessageCenterEmailRequired(Context context) {
