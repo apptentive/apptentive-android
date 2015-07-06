@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<!-- Background -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/apptentive_message_center_main_area_background"
+              android:gravity="center_vertical"
+              android:orientation="vertical">
+    <!-- Header -->
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="@dimen/apptentive_message_center_header_height"
+                  android:background="?attr/apptentiveTintColor"
+                  android:elevation="8dp"
+                  android:gravity="top"
+                  android:orientation="vertical">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="48dp"
+                      android:gravity="start|center_vertical"
+                      android:orientation="horizontal">
+
+            <ImageButton android:id="@+id/back"
+                         android:layout_width="48dp"
+                         android:layout_height="48dp"
+                         android:background="@null"
+                         android:contentDescription="Back"
+                         android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:gravity="center"
+                  android:orientation="vertical">
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Waiting to connect to the server…"/>
+    </LinearLayout>
+</LinearLayout>
