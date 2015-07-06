@@ -536,20 +536,20 @@ public class Apptentive {
 
 
 	/**
-	 * Opens the Apptentive ApptentiveMessage Center UI Activity
+	 * Opens the Apptentive Message Center UI Activity
 	 *
-	 * @param activity The Activity from which to launch the ApptentiveMessage Center
+	 * @param activity The Activity from which to launch the Message Center
 	 */
 	public static void showMessageCenter(Activity activity) {
 		showMessageCenter(activity, null);
 	}
 
 	/**
-	 * Opens the Apptentive ApptentiveMessage Center UI Activity, and allows custom data to be sent with the next message the user
+	 * Opens the Apptentive Message Center UI Activity, and allows custom data to be sent with the next message the user
 	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
-	 * @param activity   The Activity from which to launch the ApptentiveMessage Center
+	 * @param activity   The Activity from which to launch the Message Center
 	 * @param customData A Map of key/value Strings that will be sent with the next message.
 	 */
 	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
@@ -563,7 +563,7 @@ public class Apptentive {
 
 
 	/**
-	 * Set a listener to be notified when the number of unread messages in the ApptentiveMessage Center changes.
+	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
 	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener listener)} instead.
@@ -574,7 +574,7 @@ public class Apptentive {
 	}
 
 	/**
-	 * Add a listener to be notified when the number of unread messages in the ApptentiveMessage Center changes.
+	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
 	 */
@@ -583,7 +583,7 @@ public class Apptentive {
 	}
 
 	/**
-	 * Returns the number of unread messages in the ApptentiveMessage Center.
+	 * Returns the number of unread messages in the Message Center.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @return The number of unread messages.
@@ -599,7 +599,7 @@ public class Apptentive {
 
 	/**
 	 * Sends a text message to the server. This message will be visible in the conversation view on the server, but will
-	 * not be shown in the client's ApptentiveMessage Center.
+	 * not be shown in the client's Message Center.
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param text    The message you wish to send.
@@ -618,7 +618,7 @@ public class Apptentive {
 
 	/**
 	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
-	 * in the client's ApptentiveMessage Center. A local copy of this file will be made until the message is transmitted, at which
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
 	 * point the temporary file will be deleted.
 	 *
 	 * @param context The Context from which this method was called.
@@ -643,7 +643,7 @@ public class Apptentive {
 
 	/**
 	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
-	 * in the client's ApptentiveMessage Center. A local copy of this file will be made until the message is transmitted, at which
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
 	 * point the temporary file will be deleted.
 	 *
 	 * @param context  The Context from which this method was called.
@@ -669,7 +669,7 @@ public class Apptentive {
 
 	/**
 	 * Sends a file to the server. This file will be visible in the conversation view on the server, but will not be shown
-	 * in the client's ApptentiveMessage Center. A local copy of this file will be made until the message is transmitted, at which
+	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
 	 * point the temporary file will be deleted.
 	 *
 	 * @param context  The Context from which this method was called.

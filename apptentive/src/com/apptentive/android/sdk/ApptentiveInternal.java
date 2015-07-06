@@ -39,7 +39,7 @@ public class ApptentiveInternal {
 	public static final String PUSH_ACTION = "action";
 
 	public static enum PushAction {
-		pmc,       // Present ApptentiveMessage Center.
+		pmc,       // Present Message Center.
 		unknown;   // Anything unknown will not be handled.
 
 		public static PushAction parse(String name) {
