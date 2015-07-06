@@ -13,6 +13,8 @@
 
 
     <dimen name="apptentive_message_center_header_height">96dp</dimen>
-    <dimen name="apptentive_message_center_message_list_margin">100dp</dimen>
+    <dimen name="apptentive_message_center_message_list_margin">168dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
+
+    <dimen name="apptentive_message_center_greeting_side_margin">128dp</dimen>
 </resources>

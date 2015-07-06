@@ -25,7 +25,6 @@ public class MainActivity extends ApptentiveActivity {
 
 	private long lastUnreadMessageCount = 0;
 
-	private int cycle = 0;
 	private UnreadMessagesListener unreadMsgListener;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,6 @@ public class MainActivity extends ApptentiveActivity {
 
 		// Impersonate an app for ratings.
 		//Apptentive.putRatingProviderArg("package", "your.package.name");
-
 
 		// If you would like to be notified when there are unread messages available, set a listener like this.
 		unreadMsgListener = new UnreadMessagesListener() {
@@ -108,17 +106,5 @@ public class MainActivity extends ApptentiveActivity {
 			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
 		}
 */
-	}
-
-	public void testNotification(@SuppressWarnings("unused") View view) {
-		//Apptentive.showMessageCenterFloatingView(this, 0, "You have new messages");
-		if (cycle == 0) {
-			Apptentive.launchSurveyInAppNotification(this, "We would love to hear from you!", null);
-		} else if (cycle == 1){
-			Apptentive.launchRatingInAppNotification(this, "Love us? Please rate us");
-		} else {
-			Apptentive.launchUnreadMessageInAppNotification(this, "You have " + lastUnreadMessageCount  + " unread messages");
-		}
-		cycle = (++cycle)%3;
 	}
 }

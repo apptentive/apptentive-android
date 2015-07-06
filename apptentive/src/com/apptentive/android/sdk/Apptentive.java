@@ -559,49 +559,25 @@ public class Apptentive {
 		}
 	}
 
-	public static void launchSurveyInAppNotification(final Activity activity, String message, OnSurveyFinishedListener callback) {
-		try {
-			if (runningActivities > 0) {
-				Apptentive.setOnSurveyFinishedListener(callback);
-				ApptentiveInternal.addInAppNotification(activity, ApptentiveInternal.NOTIFICATION_SURVEY, message);
-			}
-		} catch (Exception e) {
-			Log.w("Error show in-app survey notification.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-
-	}
-
-	public static void launchRatingInAppNotification(final Activity activity, String message) {
-		try {
-			if (runningActivities > 0) {
-				ApptentiveInternal.addInAppNotification(activity, ApptentiveInternal.NOTIFICATION_RATE, message);
-			}
-		} catch (Exception e) {
-			Log.w("Error show in-app rating notification.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-
-	}
-
-	public static void launchUnreadMessageInAppNotification(final Activity activity, String message) {
-		try {
-			if (runningActivities > 0) {
-				ApptentiveInternal.addInAppNotification(activity, ApptentiveInternal.NOTIFICATION_MESSAGE, message);
-			}
-		} catch (Exception e) {
-			Log.w("Error show in-app rating notification.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-	}
 
 	/**
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
+	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener listener)} instead.
 	 */
+	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
 		MessageManager.setHostUnreadMessagesListener(listener);
+	}
+
+	/**
+	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
+	 *
+	 * @param listener An UnreadMessageListener that you instantiate.
+	 */
+	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
+		MessageManager.addHostUnreadMessagesListener(listener);
 	}
 
 	/**
