@@ -7,26 +7,21 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.Editable;
 import android.text.Selection;
-import android.text.Spannable;
-import android.text.SpannableString;
+
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.util.Util;;import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.apptentive.android.sdk.util.Util;
+
 
 /**
  * @author Barry Li
