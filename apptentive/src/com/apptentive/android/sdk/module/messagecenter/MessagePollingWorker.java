@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
@@ -21,16 +23,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MessagePollingWorker {
 
-	private static Context appContext;
   private static MessagePollingThread sPollingThread;
 
-
+  // The following booleans will be accessed by both ui thread and worker thread
 	private static AtomicBoolean appInForeground = new AtomicBoolean(false);
 	private static AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
 	private static AtomicBoolean threadRunning = new AtomicBoolean(false);
 
-
-	public static synchronized MessagePollingThread getMessagePollingThread() {
+	// A synchronized getter/setter to the static instance of thread object
+	public static synchronized MessagePollingThread getAndSetMessagePollingThread(boolean expect,
+																																					boolean create,
+																																					Context context) {
+		if (expect && create && context != null) {
+			sPollingThread = createPollingThread(context.getApplicationContext());
+		} else if (!expect) {
+			sPollingThread = null;
+		}
 		return sPollingThread;
 	}
 
@@ -48,10 +56,6 @@ public class MessagePollingWorker {
 		return newThread;
 	}
 
-	public static synchronized void doStartNewMessagePollingThread(Context context) {
-		appContext = context.getApplicationContext();
-		sPollingThread = createPollingThread(appContext);
-	}
 
 	private static class MessagePollingThread extends Thread {
 		private WeakReference<Context> contextRef;
@@ -72,6 +76,11 @@ public class MessagePollingWorker {
 
 					while (appInForeground.get()) {
 						if (contextRef.get() == null) {
+							threadRunning.set(false);
+							return;
+						}
+						MessagePollingThread thread = getAndSetMessagePollingThread(true, false, null);
+						if (thread != null && thread != MessagePollingThread.this) {
 							return;
 						}
 						long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
@@ -98,22 +107,29 @@ public class MessagePollingWorker {
 
 	private static void wakeUp() {
 		Log.v("Waking MessagePollingThread.");
-		getMessagePollingThread().interrupt();
+		MessagePollingThread thread = getAndSetMessagePollingThread(true, false, null);
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
+		}
 	}
 
+	// Called from main UI thread to create a new worker thread
 	public static void appWentToForeground(Context context) {
-		if (!appInForeground.getAndSet(true) && threadRunning.compareAndSet(false, true)) {
+		appInForeground.set(true);
+		if (threadRunning.compareAndSet(false, true)) {
 			/* appInForeground was "false", and set to "true"
-			*  thread was not running
+			*  thread was not running, and set to be running
 			*/
-			doStartNewMessagePollingThread(context);
+			getAndSetMessagePollingThread(true, true, context);
 		} else {
 			wakeUp();
 		}
 	}
 
+
 	public static void appWentToBackground() {
 		appInForeground.set(false);
+		wakeUp();
 	}
 
 	/**

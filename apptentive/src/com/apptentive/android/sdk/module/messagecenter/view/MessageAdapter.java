@@ -39,9 +39,9 @@ import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.FileInputStream;
-import java.io.IOException;
+
 import java.lang.ref.WeakReference;
-import java.net.URL;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -184,7 +184,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_TEXT_OUTGOING: {
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
 					String timestamp = createTimestamp(((OutgoingTextMessage) listItem).getCreatedAt());
-					((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null, textMessage.getBody());
+					((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {

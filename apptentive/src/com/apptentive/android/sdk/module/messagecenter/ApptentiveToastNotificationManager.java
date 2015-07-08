@@ -217,7 +217,9 @@ public class ApptentiveToastNotificationManager {
 
 	public void cleanUp() {
 		removeAllNotifications();
-		wManager.removeView(tContainer);
+		if (tContainer != null) {
+			wManager.removeView(tContainer);
+		}
 		sApptentiveToastNotificationManager = null;
 	}
 
