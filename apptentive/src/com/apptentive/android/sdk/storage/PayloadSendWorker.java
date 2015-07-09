@@ -13,9 +13,12 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
+
+import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Sky Kelsey
@@ -26,28 +29,36 @@ public class PayloadSendWorker {
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
 	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
 
-	private static boolean appInForeground;
-	private static boolean threadRunning;
-	private static Context appContext;
-	private static PayloadSendThread payloadSendThread;
+	private static PayloadSendThread sPayloadSendThread;
 
-	public static synchronized void doStart(Context context) {
-		appContext = context.getApplicationContext();
-		if (!threadRunning) {
-			Log.i("Starting PayloadSendWorker.");
-			threadRunning = true;
-			payloadSendThread = new PayloadSendThread();
-			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-				@Override
-				public void uncaughtException(Thread thread, Throwable throwable) {
-					Log.e("Error in PayloadSendWorker.", throwable);
-					MetricModule.sendError(appContext, throwable, null, null);
-				}
-			};
-			payloadSendThread.setUncaughtExceptionHandler(handler);
-			payloadSendThread.setName("Apptentive-PayloadSendWorker");
-			payloadSendThread.start();
+	private static AtomicBoolean appInForeground = new AtomicBoolean(false);
+	private static AtomicBoolean threadRunning = new AtomicBoolean(false);
+
+	// A synchronized getter/setter to the static instance of thread object
+	public static synchronized PayloadSendThread getAndSetPayloadSendThread(boolean expect,
+																																								boolean createNew,
+																																								Context context) {
+		if (expect && createNew && context != null) {
+			sPayloadSendThread = createPayloadSendThread(context.getApplicationContext());
+		} else if (!expect) {
+			sPayloadSendThread = null;
 		}
+		return  sPayloadSendThread;
+	}
+
+
+	private static PayloadSendThread createPayloadSendThread(final Context context) {
+		PayloadSendThread newThread = new PayloadSendThread(context);
+		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable throwable) {
+				MetricModule.sendError(context, throwable, null, null);
+			}
+		};
+		newThread.setUncaughtExceptionHandler(handler);
+		newThread.setName("Apptentive-PayloadSendWorker");
+		newThread.start();
+		return newThread;
 	}
 
 	private static PayloadStore getPayloadStore(Context context) {
@@ -55,93 +66,106 @@ public class PayloadSendWorker {
 	}
 
 	private static class PayloadSendThread extends Thread {
+		private WeakReference<Context> contextRef;
+
+		public PayloadSendThread(Context context) {
+			contextRef = new WeakReference<>(context);
+		}
+
 		public void run() {
 			try {
-				synchronized (this) {
-					Log.v("Started %s", toString());
-					if (appContext == null) {
+				Log.v("Started %s", toString());
+
+				while (appInForeground.get()) {
+					if (contextRef.get() == null) {
+						threadRunning.set(false);
 						return;
 					}
-					while (appInForeground) {
-						PayloadStore db = getPayloadStore(appContext);
-						if (Util.isEmpty(GlobalInfo.conversationToken)) {
-							Log.i("No conversation token yet.");
-							MessageManager.onPauseSending();
-							goToSleep(NO_TOKEN_SLEEP);
-							continue;
-						}
-						if (!Util.isNetworkConnectionPresent(appContext)) {
-							Log.d("Can't send payloads. No network connection.");
-							MessageManager.onPauseSending();
-							goToSleep(NO_CONNECTION_SLEEP_TIME);
-							continue;
-						}
-						Log.v("Checking for payloads to send.");
-						Payload payload;
-						payload = db.getOldestUnsentPayload();
-						if (payload == null) {
-							// There is no payload in the db.
-							goToSleep(EMPTY_QUEUE_SLEEP_TIME);
-							continue;
-						}
-						Log.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
 
-						ApptentiveHttpResponse response = null;
+					PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
+					if (thread != null && thread != PayloadSendThread.this) {
+						Log.i("something wrong");
+						return;
+					}
+
+					PayloadStore db = getPayloadStore(contextRef.get());
+					if (Util.isEmpty(GlobalInfo.conversationToken)) {
+						Log.i("No conversation token yet.");
+						MessageManager.onPauseSending();
+						goToSleep(NO_TOKEN_SLEEP);
+						continue;
+					}
+					if (!Util.isNetworkConnectionPresent(contextRef.get())) {
+						Log.d("Can't send payloads. No network connection.");
+						MessageManager.onPauseSending();
+						goToSleep(NO_CONNECTION_SLEEP_TIME);
+						continue;
+					}
+					Log.v("Checking for payloads to send.");
+					Payload payload;
+					payload = db.getOldestUnsentPayload();
+					if (payload == null) {
+						// There is no payload in the db.
+						goToSleep(EMPTY_QUEUE_SLEEP_TIME);
+						continue;
+					}
+					Log.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
+
+					ApptentiveHttpResponse response = null;
 
 
-						switch (payload.getBaseType()) {
-							case message:
-								MessageManager.onResumeSending();
-								response = ApptentiveClient.postMessage(appContext, (Message) payload);
-								MessageManager.onSentMessage(appContext, (Message) payload, response);
-								break;
-							case event:
-								response = ApptentiveClient.postEvent((Event) payload);
-								break;
-							case device:
-								response = ApptentiveClient.putDevice((Device) payload);
-								DeviceManager.onSentDeviceInfo(appContext);
-								break;
-							case sdk:
-								response = ApptentiveClient.putSdk((Sdk) payload);
-								break;
-							case app_release:
-								response = ApptentiveClient.putAppRelease((AppRelease) payload);
-								break;
-							case person:
-								response = ApptentiveClient.putPerson((Person) payload);
-								break;
-							case survey:
-								response = ApptentiveClient.postSurvey((SurveyResponse) payload);
-								break;
-							default:
-								Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
-								db.deletePayload(payload);
-								break;
-						}
+					switch (payload.getBaseType()) {
+						case message:
+							MessageManager.onResumeSending();
+							response = ApptentiveClient.postMessage(contextRef.get(), (ApptentiveMessage) payload);
+							MessageManager.onSentMessage(contextRef.get(), (ApptentiveMessage) payload, response);
+							break;
+						case event:
+							response = ApptentiveClient.postEvent((Event) payload);
+							break;
+						case device:
+							response = ApptentiveClient.putDevice((Device) payload);
+							DeviceManager.onSentDeviceInfo(contextRef.get());
+							break;
+						case sdk:
+							response = ApptentiveClient.putSdk((Sdk) payload);
+							break;
+						case app_release:
+							response = ApptentiveClient.putAppRelease((AppRelease) payload);
+							break;
+						case person:
+							response = ApptentiveClient.putPerson((Person) payload);
+							break;
+						case survey:
+							response = ApptentiveClient.postSurvey((SurveyResponse) payload);
+							break;
+						default:
+							Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
+							db.deletePayload(payload);
+							break;
+					}
 
-						// Each Payload type is handled by the appropriate handler, but if sent correctly, or failed permanently to send, it should be removed from the queue.
-						if (response != null) {
-							if (response.isSuccessful()) {
-								Log.d("Payload submission successful. Removing from send queue.");
-								db.deletePayload(payload);
-							} else if (response.isRejectedPermanently() || response.isBadPayload()) {
-								Log.d("Payload rejected. Removing from send queue.");
-								Log.v("Rejected json:", payload.toString());
-								db.deletePayload(payload);
-							} else if (response.isRejectedTemporarily()) {
-								Log.d("Unable to send JSON. Leaving in queue.");
-								if (response.isException()) {
-									MessageManager.onPauseSending();
-									goToSleep(NO_CONNECTION_SLEEP_TIME);
-								}
+					// Each Payload type is handled by the appropriate handler, but if sent correctly, or failed permanently to send, it should be removed from the queue.
+					if (response != null) {
+						if (response.isSuccessful()) {
+							Log.d("Payload submission successful. Removing from send queue.");
+							db.deletePayload(payload);
+						} else if (response.isRejectedPermanently() || response.isBadPayload()) {
+							Log.d("Payload rejected. Removing from send queue.");
+							Log.v("Rejected json:", payload.toString());
+							db.deletePayload(payload);
+						} else if (response.isRejectedTemporarily()) {
+							Log.d("Unable to send JSON. Leaving in queue.");
+							if (response.isException()) {
+								MessageManager.onPauseSending();
+								goToSleep(NO_CONNECTION_SLEEP_TIME);
 							}
 						}
 					}
 				}
 			} finally {
 				Log.v("Stopping PayloadSendThread.");
-				threadRunning = false;
+				threadRunning.set(false);
 			}
 		}
 	}
@@ -155,19 +179,26 @@ public class PayloadSendWorker {
 	}
 
 	private static void wakeUp() {
-		if (payloadSendThread != null) {
-			Log.v("Waking PayloadSendThread.");
-			payloadSendThread.interrupt();
+		PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
 		}
 	}
 
 	public static void appWentToForeground(Context context) {
-		appInForeground = true;
-		doStart(context);
+		appInForeground.set(true);
+		if (threadRunning.compareAndSet(false, true)) {
+			/* appInForeground was "false", and set to "true"
+			*  thread was not running, and set to be running
+			*/
+			getAndSetPayloadSendThread(true, true, context);
+		} else {
+			wakeUp();
+		}
 	}
 
 	public static void appWentToBackground() {
-		appInForeground = false;
+		appInForeground.set(false);
 		wakeUp();
 	}
 }

@@ -14,7 +14,7 @@ android {
     buildToolsVersion '22.0.1'
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 11
         targetSdkVersion 22
     }
 
@@ -32,3 +32,7 @@ android {
 }
 
 apply from: '../maven_push.gradle'
+
+dependencies {
+    compile 'com.android.support:support-v4:22.2.0'
+}

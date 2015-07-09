@@ -119,17 +119,21 @@ public class ViewActivity extends ApptentiveActivity {
 
 	@Override
 	protected void onStart() {
-		super.onStart();
 		switch (activeContentType) {
 			case ABOUT:
+				super.onStart();
 				AboutModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
+				((MessageCenterActivityContent) activityContent).onStart();
+				super.onStart();
 				break;
 			case MESSAGE_CENTER_ERROR:
+				super.onStart();
 				break;
 			case INTERACTION:
 				// Interactions are already set up from onCreate().
+				super.onStart();
 				break;
 			default:
 				Log.w("No Activity specified. Finishing...");

@@ -28,6 +28,8 @@ public class MainActivity extends ApptentiveActivity {
 	// Use member variable for listener. Registering anonymous listener has potential memory leak
 	private UnreadMessagesListener unreadMsgListener;
 
+	private OnSurveyFinishedListener surveyFinishedListener;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -66,16 +68,12 @@ public class MainActivity extends ApptentiveActivity {
 		};
 		Apptentive.setUnreadMessagesListener(unreadMsgListener);
 
-		/* ToDo: note the difference of setting UnreadMessagesListener and OnSurveyFinishedListener,
-		 *  the latter has a memory leak.
-		 */
-		// Ad a listener to notify you when a survey is completed.
-		Apptentive.setOnSurveyFinishedListener(new OnSurveyFinishedListener() {
+		surveyFinishedListener = new OnSurveyFinishedListener() {
 			@Override
 			public void onSurveyFinished(boolean completed) {
 				Toast.makeText(MainActivity.this, completed ? "Survey was completed." : "Survey was skipped.", Toast.LENGTH_SHORT).show();
 			}
-		});
+		};
 	}
 
 	public void launchInteractionsActivity(@SuppressWarnings("unused") View view) {

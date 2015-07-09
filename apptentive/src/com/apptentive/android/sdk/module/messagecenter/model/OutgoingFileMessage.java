@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingFileMessage extends Message {
+public class OutgoingFileMessage extends ApptentiveMessage {
 
 	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 

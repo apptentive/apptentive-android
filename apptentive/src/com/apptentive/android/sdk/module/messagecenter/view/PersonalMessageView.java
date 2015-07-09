@@ -10,12 +10,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 
 /**
  * @author Sky Kelsey
  */
-abstract public class PersonalMessageView<T extends Message> extends MessageView<T> {
+abstract public class PersonalMessageView<T extends ApptentiveMessage> extends MessageView<T> {
 
 	public PersonalMessageView(Context context, final T message) {
 		super(context, message);

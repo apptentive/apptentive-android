@@ -75,6 +75,7 @@ public class Apptentive {
 				MessagePollingWorker.appWentToForeground(activity.getApplicationContext());
 			}
 			runningActivities++;
+			MessageManager.setCurrentForgroundActivity(activity);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -99,6 +100,7 @@ public class Apptentive {
 				PayloadSendWorker.appWentToBackground();
 				MessagePollingWorker.appWentToBackground();
 			}
+			MessageManager.setCurrentForgroundActivity(null);
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -897,8 +899,9 @@ public class Apptentive {
 		syncPerson(appContext);
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+		Log.d("Conversation id: %s", appContext.
+				getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+				.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {

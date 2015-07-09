@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.tests.module.messagecenter;
 
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -30,13 +30,13 @@ public class JsonObjectBindingTest extends ApptentiveInstrumentationTestCase {
 
 	public void testParsingTextMessageResponse() {
 		String exampleResponse = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testParsingTextMessageResponse.json");
-		List<Message> messages = null;
+		List<ApptentiveMessage> apptentiveMessages = null;
 		try {
-			messages = MessageManager.parseMessagesString(exampleResponse);
+			apptentiveMessages = MessageManager.parseMessagesString(exampleResponse);
 		} catch (JSONException e) {
 		}
-		assertNotNull(messages);
-		assertEquals(messages.size(), 5);
+		assertNotNull(apptentiveMessages);
+		assertEquals(apptentiveMessages.size(), 5);
 	}
 
 	public void testTextMessageRoundTrip() {
