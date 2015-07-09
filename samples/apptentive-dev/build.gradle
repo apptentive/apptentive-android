@@ -84,7 +84,6 @@ dependencies {
     }
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
-    //rcCompile(name:'apptentive-android-1.7.2', ext:'aar')
     rcCompile 'com.apptentive:apptentive-android:1.7.2@aar'
 }
 
