@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.squareup.leakcanary.RefWatcher;
 
 /**
  * @author Sky Kelsey
