@@ -3,5 +3,5 @@
           package="com.apptentive.android.sdk"
           android:versionCode="23"
           android:versionName="1.7.3">
-    <uses-sdk android:minSdkVersion="9"/>
+    <uses-sdk android:minSdkVersion="11"/>
 </manifest>
