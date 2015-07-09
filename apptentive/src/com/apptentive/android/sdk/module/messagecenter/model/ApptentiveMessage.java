@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public abstract class Message extends ConversationItem implements MessageCenterListItem {
+public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
 
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
@@ -35,7 +35,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 	private static final String KEY_SENDER_NAME = "name";
 	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
 
-	protected Message() {
+	protected ApptentiveMessage() {
 		super();
 		setSenderId(GlobalInfo.personId);
 		state = State.sending;
@@ -44,7 +44,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 		initType();
 	}
 
-	protected Message(String json) throws JSONException {
+	protected ApptentiveMessage(String json) throws JSONException {
 		super(json);
 	}
 
@@ -58,7 +58,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 		try {
 			put(KEY_ID, id);
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_ID);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_ID);
 		}
 	}
 
@@ -86,7 +86,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 		try {
 			put(KEY_CREATED_AT, createdAt);
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_CREATED_AT);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CREATED_AT);
 		}
 	}
 
@@ -103,7 +103,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 		try {
 			put(KEY_TYPE, type.name());
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_TYPE);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_TYPE);
 		}
 	}
 
@@ -120,7 +120,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 		try {
 			put(KEY_HIDDEN, hidden);
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_HIDDEN);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_HIDDEN);
 		}
 	}
 
@@ -138,7 +138,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 			}
 			put(KEY_CUSTOM_DATA, customDataJson);
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_CUSTOM_DATA);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CUSTOM_DATA);
 		}
 	}
 
@@ -187,7 +187,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 			}
 			sender.put(KEY_SENDER_ID, senderId);
 		} catch (JSONException e) {
-			Log.e("Exception setting Message's %s field.", e, KEY_SENDER_ID);
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_SENDER_ID);
 		}
 	}
 
@@ -236,7 +236,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 			try {
 				return Type.valueOf(rawType);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown Message.Type: " + rawType);
+				Log.v("Error parsing unknown ApptentiveMessage.Type: " + rawType);
 			}
 			return unknown;
 		}
@@ -252,7 +252,7 @@ public abstract class Message extends ConversationItem implements MessageCenterL
 			try {
 				return State.valueOf(state);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown Message.State: " + state);
+				Log.v("Error parsing unknown ApptentiveMessage.State: " + state);
 			}
 			return unknown;
 		}

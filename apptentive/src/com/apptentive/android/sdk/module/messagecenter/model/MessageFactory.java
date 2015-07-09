@@ -15,18 +15,18 @@ import org.json.JSONObject;
  * @author Sky Kelsey
  */
 public class MessageFactory {
-	public static Message fromJson(String json) {
+	public static ApptentiveMessage fromJson(String json) {
 		try {
 			JSONObject root = new JSONObject(json);
-			Message.Type type = Message.Type.valueOf(root.getString(Message.KEY_TYPE));
+			ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
 			switch (type) {
 				case TextMessage:
 					// This is ugly, but works.
-					Message message = new OutgoingTextMessage(json);
-					if (!message.isOutgoingMessage()) {
-						message = new IncomingTextMessage(json);
+					ApptentiveMessage apptentiveMessage = new OutgoingTextMessage(json);
+					if (!apptentiveMessage.isOutgoingMessage()) {
+						apptentiveMessage = new IncomingTextMessage(json);
 					}
-					return message;
+					return apptentiveMessage;
 				case FileMessage:
 					return new OutgoingFileMessage(json);
 				case AutomatedMessage:

@@ -11,7 +11,7 @@ import android.content.Context;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -88,16 +88,16 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse postMessage(Context context, Message message) {
-		switch (message.getType()) {
+	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
+		switch (apptentiveMessage.getType()) {
 			case TextMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
 			case AutomatedMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, message.marshallForSending());
+				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
 			case FileMessage:
-				OutgoingFileMessage fileMessage = (OutgoingFileMessage) message;
+				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, message.marshallForSending(), storedFile);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
 			case unknown:
 				break;
 		}

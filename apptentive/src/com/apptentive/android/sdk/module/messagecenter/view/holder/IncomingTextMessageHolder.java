@@ -26,11 +26,9 @@ public class IncomingTextMessageHolder extends MessageHolder {
 		text = (TextView) view.findViewById(R.id.text);
 	}
 
-	public void updateMessage(String timestamp, Bitmap avatarBitmap, String text) {
+	public void updateMessage(String timestamp, String text) {
 		super.updateMessage(timestamp);
-		if (this.avatar != null) {
-			this.avatar.setImageBitmap(avatarBitmap);
-		}
+
 		if (this.text != null) {
 			this.text.setText(text);
 		}
