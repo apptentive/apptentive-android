@@ -12,14 +12,13 @@ import android.support.v4.app.NotificationCompat;
 import android.view.View;
 
 
-
 public class ApptentiveToastNotification {
 
 	private Context context;
 	/**
 	 * In Seconds
 	 */
-	private long duration= 5;
+	private long duration = 5;
 	/**
 	 *
 	 */
@@ -27,9 +26,9 @@ public class ApptentiveToastNotification {
 
 	private Builder builder;
 
-	private boolean isSticky=false;
+	private boolean isSticky = false;
 
-	private boolean activateStatusBar=false;
+	private boolean activateStatusBar = false;
 
 	private int code;
 	private CharSequence titleStr;
@@ -39,11 +38,11 @@ public class ApptentiveToastNotification {
 	private View customView;
 
 	private ApptentiveToastNotification(Context context) {
-		this.context=context;
+		this.context = context;
 	}
 
 
-	public static class Builder  extends  NotificationCompat.Builder {
+	public static class Builder extends NotificationCompat.Builder {
 
 
 		private ApptentiveToastNotification apptentiveNotification;
@@ -76,25 +75,25 @@ public class ApptentiveToastNotification {
 			return this;
 		}
 
-		public Builder setIcon(int icon){
+		public Builder setIcon(int icon) {
 			super.setSmallIcon(icon);
 			return this;
 		}
 
 
-		public Builder setSticky(boolean isSticky){
+		public Builder setSticky(boolean isSticky) {
 			apptentiveNotification.setSticky(isSticky);
 			return this;
 		}
 
 
-		public ApptentiveToastNotification buildApptentiveToastNotification(){
+		public ApptentiveToastNotification buildApptentiveToastNotification() {
 			apptentiveNotification.setNotification(this.build());
 			apptentiveNotification.setNotificationBuilder(this);
 			return apptentiveNotification;
 		}
 
-		private   Notification buildDefaultSilentNotification(){
+		private Notification buildDefaultSilentNotification() {
 			super.setSmallIcon(apptentiveNotification.getIcon());
 			setDefaults(0);
 			return this.build();
@@ -104,7 +103,6 @@ public class ApptentiveToastNotification {
 	protected void setIcon(int dRes) {
 		iconRes = dRes;
 	}
-
 
 
 	protected void setTitle(CharSequence titleStr) {
@@ -117,7 +115,6 @@ public class ApptentiveToastNotification {
 	}
 
 
-
 	public Context getContext() {
 		return context;
 	}
@@ -125,7 +122,6 @@ public class ApptentiveToastNotification {
 	public long getDuration() {
 		return duration;
 	}
-
 
 
 	public CharSequence getTitleStr() {
@@ -153,7 +149,7 @@ public class ApptentiveToastNotification {
 		this.notificationDelegate = notification;
 	}
 
-  public void setAvatarUrl(String imageUrl) {
+	public void setAvatarUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
 
@@ -180,7 +176,6 @@ public class ApptentiveToastNotification {
 	public Notification getDefaultSilentNotification() {
 		return getNotificationBuilder().buildDefaultSilentNotification();
 	}
-
 
 
 	public Builder getNotificationBuilder() {

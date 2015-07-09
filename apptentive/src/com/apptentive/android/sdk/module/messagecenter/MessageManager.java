@@ -22,7 +22,6 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
@@ -59,7 +58,7 @@ public class MessageManager {
 
 	private static WeakReference<Activity> currentForgroundApptentiveActivity;
 
-	private static AfterSendMessageListener afterSendMessageListener;
+	private static WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
 	private static final List<WeakReference<OnNewMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewMessagesListener>>();
 
@@ -214,14 +213,14 @@ public class MessageManager {
 	}
 
 	public static void onResumeSending() {
-		if (afterSendMessageListener != null) {
-			afterSendMessageListener.onResumeSending();
+		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
+			afterSendMessageListener.get().onResumeSending();
 		}
 	}
 
 	public static void onPauseSending() {
-		if (afterSendMessageListener != null) {
-			afterSendMessageListener.onPauseSending();
+		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
+			afterSendMessageListener.get().onPauseSending();
 		}
 	}
 
@@ -254,8 +253,8 @@ public class MessageManager {
 			}
 			getMessageStore(context).updateMessage(apptentiveMessage);
 
-			if (afterSendMessageListener != null) {
-				afterSendMessageListener.onMessageSent(response, apptentiveMessage);
+			if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
+				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
 			}
 		}
 /*
@@ -322,7 +321,12 @@ public class MessageManager {
 	}
 
 	public static void setAfterSendMessageListener(AfterSendMessageListener listener) {
-		afterSendMessageListener = listener;
+		if (listener != null) {
+			afterSendMessageListener = new WeakReference<AfterSendMessageListener>(listener);
+		}
+		else {
+			afterSendMessageListener = null;
+		}
 	}
 
 	public interface OnNewMessagesListener {

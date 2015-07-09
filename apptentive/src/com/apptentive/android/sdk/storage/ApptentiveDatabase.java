@@ -208,9 +208,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized Payload getOldestUnsentPayload() {
-		if (!payloadsDirty) {
-			return null;
-		}
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;

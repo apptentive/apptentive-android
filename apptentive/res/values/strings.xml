@@ -63,7 +63,8 @@
     <string name="apptentive_message_center_compose_hint">Type a message…</string>
     <string name="apptentive_message_center_attachment_title">Send image?</string>
     <string name="apptentive_message_center_status_error_title">:-(</string>
-    <string name="apptentive_message_center_status_error_body">Something is wrong./n We can\'t receive your message right now.</string>
+    <string name="apptentive_message_center_status_error_body">Something is wrong.\n We can\'t receive your message right now.</string>
+
 
 
     <!-- This is a Java format. -->

@@ -173,14 +173,6 @@ public class Configuration extends JSONObject {
 			// Move on.
 		}
 
-		try {
-			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-			Bundle metaData = ai.metaData;
-			return metaData.getBoolean(Constants.MANIFEST_KEY_NEW_MESSAGE_TOAST_ENABLED, Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED);
-		} catch (Exception e) {
-			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_NEW_MESSAGE_TOAST_ENABLED);
-		}
-
 		return Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED;
 	}
 
