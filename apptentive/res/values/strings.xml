@@ -64,7 +64,9 @@
     <string name="apptentive_message_center_attachment_title">Send image?</string>
     <string name="apptentive_message_center_status_error_title">:-(</string>
     <string name="apptentive_message_center_status_error_body">Something is wrong.\n We can\'t receive your message right now.</string>
-
+    <string name="apptentive_message_center_who_card_name_hint">Name</string>
+    <string name="apptentive_message_center_who_card_email_hint">Email</string>
+    <string name="apptentive_message_center_who_card_title">And who are we speaking with?</string>
 
 
     <!-- This is a Java format. -->
