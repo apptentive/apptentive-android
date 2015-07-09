@@ -23,11 +23,9 @@ import com.apptentive.android.sdk.util.Constants;
  * @author Sky Kelsey
  */
 public class MessageCenterErrorView extends FrameLayout {
-	private Activity activity;
 
 	public MessageCenterErrorView(final Activity activity) {
 		super(activity.getApplicationContext());
-		this.activity = activity;
 
 		LayoutInflater inflater = activity.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center_error, this);
@@ -36,7 +34,7 @@ public class MessageCenterErrorView extends FrameLayout {
 		back.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				MessageCenterErrorView.this.activity.finish();
+				activity.finish();
 			}
 		});
 
