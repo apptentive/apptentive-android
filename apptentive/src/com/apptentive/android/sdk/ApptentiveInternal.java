@@ -37,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class ApptentiveInternal {
 
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
-	private static OnSurveyFinishedListener onSurveyFinishedListener;
+	private static WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
 	public static final int NOTIFICATION_MESSAGE = 0;
 	public static final int NOTIFICATION_RATE = 1;
@@ -99,11 +100,15 @@ public class ApptentiveInternal {
 	}
 
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
-		ApptentiveInternal.onSurveyFinishedListener = onSurveyFinishedListener;
+		if (onSurveyFinishedListener != null) {
+			ApptentiveInternal.onSurveyFinishedListener = new WeakReference<OnSurveyFinishedListener>(onSurveyFinishedListener);
+		} else {
+			ApptentiveInternal.onSurveyFinishedListener = null;
+		}
 	}
 
 	public static OnSurveyFinishedListener getOnSurveyFinishedListener() {
-		return onSurveyFinishedListener;
+		return (onSurveyFinishedListener == null)? null : onSurveyFinishedListener.get();
 	}
 
 	/**

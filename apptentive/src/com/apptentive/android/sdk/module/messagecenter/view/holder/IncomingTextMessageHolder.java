@@ -28,11 +28,9 @@ public class IncomingTextMessageHolder extends MessageHolder {
 		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
-	public void updateMessage(String timestamp, Bitmap avatarBitmap, String text) {
+	public void updateMessage(String timestamp, String text) {
 		super.updateMessage(timestamp);
-		if (this.avatar != null) {
-			this.avatar.setImageBitmap(avatarBitmap);
-		}
+
 		if (this.text != null) {
 			this.text.setDesc(text);
 		}

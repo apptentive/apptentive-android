@@ -31,8 +31,7 @@ import com.apptentive.android.sdk.model.Event;
 
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-
-import com.apptentive.android.sdk.module.messagecenter.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
@@ -155,9 +154,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
 		int count = 0;
 		for (MessageCenterListItem item : items) {
-			if (item instanceof Message) {
-				Message message = (Message) item;
-				if (message.isOutgoingMessage() && message.getCreatedAt() == null) {
+			if (item instanceof ApptentiveMessage) {
+				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
+				if (apptentiveMessage.isOutgoingMessage() && apptentiveMessage.getCreatedAt() == null) {
 					count ++;
 				}
 			}
@@ -175,9 +174,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	public void addItem(MessageCenterListItem item) {
 
-		if (item instanceof Message) {
-			Message message = (Message) item;
-			if (message.isHidden()) {
+		if (item instanceof ApptentiveMessage) {
+			ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
+			if (apptentiveMessage.isHidden()) {
 				return;
 			}
 		}
@@ -188,7 +187,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		} else {
 			messages.remove(statusItem);
 			messages.add(item);
-			if (item instanceof Message )
+			if (item instanceof ApptentiveMessage )
 			{
 				unsendMessagesCount++;
 			}
@@ -275,7 +274,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
-	public synchronized void onMessageSent(ApptentiveHttpResponse response, final Message message) {
+	public synchronized void onMessageSent(ApptentiveHttpResponse response, final ApptentiveMessage apptentiveMessage) {
 		if (response.isSuccessful()) {
 			post(new Runnable() {
 				public void run() {setItems(MessageManager.getMessageCenterListItems(activity));

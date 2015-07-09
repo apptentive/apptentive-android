@@ -112,7 +112,7 @@
 
     <style name="ApptentiveAvatarView">
         <item name="android:src">@drawable/avatar</item>
-        <item name="borderColor">?apptentiveTintColor</item>
+        <item name="borderColor">@color/apptentive_tint_color</item>
     </style>
 
     <style name="ApptentiveAvatarView.Greeting">

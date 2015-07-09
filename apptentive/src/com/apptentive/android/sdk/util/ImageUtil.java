@@ -9,12 +9,17 @@ package com.apptentive.android.sdk.util;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
+import android.os.Build;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.URL;
 
 /**
  * @author Sky Kelsey
@@ -148,5 +153,51 @@ public class ImageUtil {
 		float widthRatio = maxWidth <= 0 ? 1.0f : (float) maxWidth / width;
 		float heightRatio = maxHeight <= 0 ? 1.0f : (float) maxHeight / height;
 		return Math.min(1.0f, Math.min(widthRatio, heightRatio)); // Don't scale above 1.0x
+	}
+
+	public static void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl) {
+		DownloadImageTask task = new DownloadImageTask(view);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl);
+		} else {
+			task.execute(imageUrl);
+		}
+	}
+
+	private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+
+		private WeakReference<ApptentiveAvatarView> resultView;
+
+		DownloadImageTask(ApptentiveAvatarView view) {
+			resultView = new WeakReference<>(view);
+		}
+
+		protected Bitmap doInBackground(String... urls) {
+			Bitmap bmp = null;
+			try {
+				bmp = this.loadImageFromNetwork(urls[0]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return bmp;
+		}
+
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			if (result == null) {
+				return;
+			}
+
+			ApptentiveAvatarView view = resultView.get();
+			if (view != null) {
+				view.setImageBitmap(result);
+			}
+		}
+
+		private Bitmap loadImageFromNetwork(String imageUrl) throws IOException {
+			URL url = new URL(imageUrl);
+			return BitmapFactory.decodeStream(url.openStream());
+		}
 	}
 }
