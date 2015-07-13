@@ -120,9 +120,6 @@ public class MessageCenterActivityContent extends ActivityContent {
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 		MessageManager.addInternalOnMessagesUpdatedListener(newMessageListener);
 
-		// Change to foreground polling, which polls more often.
-		MessagePollingWorker.setMessageCenterInForeground(true);
-
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
 
@@ -149,9 +146,12 @@ public class MessageCenterActivityContent extends ActivityContent {
 		return true;
 	}
 
+	public void onStart() {
+		MessagePollingWorker.setMessageCenterInForeground(true);
+	}
+
 	public void onStop() {
 		clearPendingMessageCenterPushNotification();
-		// Remove listener here.
 		MessagePollingWorker.setMessageCenterInForeground(false);
 	}
 

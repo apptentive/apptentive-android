@@ -1399,7 +1399,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
 		}
 
-		//// Test Message Center
+		//// Test ApptentiveMessage Center
 
 		// Don't re-prompt, since we've declined to rate.
 		{

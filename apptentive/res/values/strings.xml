@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -63,8 +63,11 @@
     <string name="apptentive_message_center_compose_hint">Type a message…</string>
     <string name="apptentive_message_center_attachment_title">Send image?</string>
     <string name="apptentive_message_center_status_error_title">:-(</string>
-    <string name="apptentive_message_center_status_error_body">Something is wrong./n We can\'t receive your message right now.</string>
+    <string name="apptentive_message_center_status_error_body">Something is wrong.\n We can\'t receive your message right now.</string>
 
+
+    <string name="apptentive_message_center_no_connection">You must connect to the internet before you can send feedback.</string>
+    <string name="apptentive_message_center_server_error">Our server had an error. Try again later.</string>
 
     <!-- This is a Java format. -->
     <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
