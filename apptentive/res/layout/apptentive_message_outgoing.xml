@@ -10,51 +10,29 @@
              xmlns:apptentive="http://schemas.android.com/apk/res-auto"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
-             android:paddingTop="4dp"
-             android:paddingBottom="8dp"
-             android:clipToPadding="false"
-             android:orientation="vertical">
-    <FrameLayout android:id="@+id/outgoing_message_frame_bg"
-                 android:layout_width="fill_parent"
+             style="@style/MessageCenterMessageFrame">
+    <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
-                 android:paddingTop="@dimen/apptentive_message_center_fallback_divider_line_width"
-                 android:paddingBottom="@dimen/apptentive_message_center_fallback_divider_line_width"
-                 android:elevation="2dp"
-                 android:background="@color/apptentive_message_center_outgoing_frame_background">
+                 style="@style/ApptentiveMessageCenterMessageBorder">
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:background="@color/apptentive_message_center_outgoing_background"
                       android:orientation="vertical">
             <LinearLayout android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:paddingTop="16dp"
-                          android:paddingLeft="16dp"
-                          android:paddingRight="16dp"
-                          android:orientation="vertical">
+                          style="@style/ApptentiveMessageCenterMessageOutgoingBackground">
                 <FrameLayout android:id="@+id/body"
                              android:layout_width="wrap_content"
                              android:layout_height="wrap_content"/>
                 <TextView android:id="@+id/timestamp"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:padding="0dp"
-                          android:textSize="12sp"
-                          android:textStyle="bold"
-                          android:textColor="#9E9E9E"
-                          android:layout_gravity="start"/>
+                          style="@style/ApptentiveMessageCenterMessageTimestamp"/>
             </LinearLayout>
-            <LinearLayout android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:minHeight="16dp"
-                          android:gravity="bottom"
-                          android:orientation="vertical">
-                <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar
-                        android:id="@+id/progressBar"
-                        android:layout_width="fill_parent"
-                        android:layout_height="6dp"
-                        android:background="@android:color/transparent"
-                        apptentive:progressBarColor="#EF4139"/>
-            </LinearLayout>
+            <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progressBar"
+                                                                                        android:layout_width="fill_parent"
+                                                                                        android:layout_height="16dp"
+                                                                                        style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"/>
         </LinearLayout>
     </FrameLayout>
 </FrameLayout>
