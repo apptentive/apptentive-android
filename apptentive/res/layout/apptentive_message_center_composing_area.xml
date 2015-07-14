@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:paddingBottom="1.5dp"
+             android:clipToPadding="false"
+             android:background="@android:color/transparent">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginBottom="5dp"
+                      android:layout_marginRight="5dp"
+                      android:layout_marginLeft="5dp"
+                      android:orientation="vertical"
+                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
+                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border"
+                      android:elevation="1.5dp"
+                      android:background="@drawable/apptentive_rounded_corner_shape">
+            <EditText android:id="@+id/composing_et"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:minLines="8"
+                      android:gravity="top"
+                      android:layout_marginTop="0dp"
+                      android:layout_margin="5dp"
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:singleLine="false"
+                      android:background="@null"
+                      android:hint="@string/apptentive_message_center_compose_hint"
+                      android:textCursorDrawable="@null"
+                      android:textColorHint="@color/apptentive_message_center_hint"
+                      android:textColor="@color/apptentive_text_message_text"
+                      android:textSize="16sp"/>
+
+        </LinearLayout>
+</FrameLayout>

@@ -6,21 +6,21 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * @author Sky Kelsey
  */
 public class MessageCenterComposingItem implements MessageCenterListItem {
-	private String composingContent;
+	public static int COMPOSING_ITEM_AREA = 0;
+	public static int COMPOSING_ITEM_ACTIONBAR = 1;
 
-	public MessageCenterComposingItem(String content) {
-		this.composingContent = content;
+	private int type;
+
+	public MessageCenterComposingItem(int type) {
+		this.type = type;
 	}
 
-	public String getComposingContent() {
-		return composingContent;
+	public int getType() {
+		return type;
 	}
 
 }

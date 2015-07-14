@@ -28,14 +28,13 @@ import com.apptentive.android.sdk.util.Util;
  */
 public class MessageCenterComposingView extends FrameLayout implements MessageCenterListItemView {
 
-	private int position;
 	private EditText et;
 
-	public MessageCenterComposingView(Context context, int position) {
+	public MessageCenterComposingView(Context context, final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
-		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing, this);
+		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
 
 		/*et.setOnFocusChangeListener(new OnFocusChangeListener() {
@@ -54,6 +53,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			private boolean doDelete = true;
 			private boolean doScroll = false;
 			private int lineCount = et.getLineCount();
+
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 			}
@@ -81,7 +81,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 						}
 					} else {
 						int newLineCount = et.getLineCount();
-						if (newLineCount > lineCount) {
+						if (newLineCount != lineCount) {
 							lineCount = newLineCount;
 							doScroll = true;
 						}
@@ -91,37 +91,11 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				MessageManager.onComposing(editable.toString(), doScroll);
+				listener.onComposing(editable.toString(), doScroll);
 				doScroll = false;
 			}
 		});
 
-		View closeButton = parentView.findViewById(R.id.cancel_composing);
-		closeButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				MessageManager.onCancelComposing();
-			}
-		});
-
-		View attachButton = findViewById(R.id.attach);
-		// Android devices can't take screenshots until Android OS version 4+
-		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
-		if (canTakeScreenshot) {
-			attachButton.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					MessageManager.onAttachImage();
-				}
-			});
-		} else {
-			attachButton.setVisibility(GONE);
-		}
-
-		View sendButton = findViewById(R.id.send);
-		sendButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				MessageManager.onFinishComposing();
-			}
-		});
 	}
 
 

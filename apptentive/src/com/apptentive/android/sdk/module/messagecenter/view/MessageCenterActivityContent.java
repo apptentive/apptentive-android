@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -53,7 +54,11 @@ public class MessageCenterActivityContent extends ActivityContent {
 	public void onCreate(Activity activity, Bundle onSavedInstanceState) {
 
 		context = activity;
-		MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
+
+		if (onSavedInstanceState == null) {
+			// Exclude rotation
+			MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
+		}
 
 		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
 			public void onSendMessage(String text) {
@@ -68,7 +73,6 @@ public class MessageCenterActivityContent extends ActivityContent {
 						messageCenterView.onResumeSending();
 					}
 				});
-				//scrollToBottom();
 			}
 		};
 
@@ -98,8 +102,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
 
-		MessageManager.setComposingActionListenerListener(messageCenterView);
+		activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
+		messageCenterView.scrollMessageListViewToBottom();
 	}
 
 	@Override
@@ -114,9 +120,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
+		messageCenterView.savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
+		messageCenterView.onCancelComposing();
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
-		savePendingComposingMessage();
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
@@ -144,16 +151,16 @@ public class MessageCenterActivityContent extends ActivityContent {
 		}
 	}
 
-	private void savePendingComposingMessage() {
-		Editable content = messageCenterView.getPendingComposingContent();
-
-		if (content != null) {
-			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, content.toString());
-			editor.commit();
-		}
+	@Override
+	public void onPause() {
+		MessageManager.onPauseSending();
 	}
+
+	@Override
+	public void onResume() {
+		MessageManager.onResumeSending();
+	}
+
 
 	private void clearPendingMessageCenterPushNotification() {
 		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

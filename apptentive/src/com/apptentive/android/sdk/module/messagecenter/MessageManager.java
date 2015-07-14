@@ -68,7 +68,6 @@ public class MessageManager {
 	 */
 	private static final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
 
-	private static OnComposingActionListener composingActionListener;
 	private static Handler sUIHandler;
 
 	private static Handler getHandlerInstance() {
@@ -398,41 +397,7 @@ public class MessageManager {
 		}
 	}
 
-	public static void setComposingActionListenerListener(OnComposingActionListener listener) {
-		composingActionListener = listener;
-	}
 
-	public interface OnComposingActionListener{
-		void onComposing(String str, boolean scroll);
-		void onCancelComposing();
-		void onFinishComposing();
-		void onAttachImage();
-	}
-
-	public static void onComposing(String composingStr, boolean scroll) {
-		if (composingActionListener != null) {
-			composingActionListener.onComposing(composingStr, scroll);
-		}
-	}
-
-	public static void onCancelComposing() {
-		if (composingActionListener != null) {
-			composingActionListener.onCancelComposing();
-		}
-	}
-
-	public static void onFinishComposing() {
-		if (composingActionListener != null) {
-			composingActionListener.onFinishComposing();
-		}
-	}
-
-	public static void onAttachImage() {
-		if (composingActionListener != null) {
-			composingActionListener.onAttachImage();
-		}
-	}
-	
 	// Set when an ApptentiveActivity onStart() is called
 	public static void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {

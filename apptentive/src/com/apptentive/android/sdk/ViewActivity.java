@@ -192,6 +192,22 @@ public class ViewActivity extends ApptentiveActivity {
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (activeContentType == ActivityContent.Type.MESSAGE_CENTER) {
+			((MessageCenterActivityContent)activityContent).onResume();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (activeContentType == ActivityContent.Type.MESSAGE_CENTER) {
+			((MessageCenterActivityContent)activityContent).onPause();
+		}
+	}
+
 	public void showAboutActivity(View view) {
 		AboutModule.getInstance().show(this);
 	}

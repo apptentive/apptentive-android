@@ -33,6 +33,9 @@ public abstract class ActivityContent {
 	 */
 	public abstract boolean onBackPressed(Activity activity);
 
+	public void onPause() {}
+	public void onResume() {}
+
 	public Type getType() {
 		return type;
 	}

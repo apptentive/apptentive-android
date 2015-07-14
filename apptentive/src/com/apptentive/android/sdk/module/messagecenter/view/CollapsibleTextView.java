@@ -6,12 +6,21 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.util.ImageUtil;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CollapsibleTextView extends LinearLayout implements View.OnClickListener {
 
@@ -29,9 +38,11 @@ public class CollapsibleTextView extends LinearLayout implements View.OnClickLis
 	private String spread;
 	private int mState;
 	private boolean flag;
+	private Context context;
 
 	public CollapsibleTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.context = context;
 		shrinkup = context.getString(R.string.apptentive_message_less);
 		spread = context.getString(R.string.apptentive_message_more);
 		View view = inflate(context, R.layout.apptentive_message_center_collapsible_textview, this);
@@ -45,8 +56,15 @@ public class CollapsibleTextView extends LinearLayout implements View.OnClickLis
 		this(context, null);
 	}
 
-	public final void setDesc(CharSequence charSequence) {
-		desc.setText(charSequence);
+	public final void setDesc(String str) {
+		SpannableString ss = new SpannableString(str);
+		Pattern p=Pattern.compile("apptentive-file-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+		Matcher m=p.matcher(str);
+		while(m.find()){
+			ImageSpan span = new ImageSpan(context, ImageUtil.resizeImageForImageView(context, m.group()));
+			ss.setSpan(span, m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		}
+		desc.setText(ss);
 		mState = COLLAPSIBLE_STATE_SPREAD;
 		flag = false;
 		requestLayout();

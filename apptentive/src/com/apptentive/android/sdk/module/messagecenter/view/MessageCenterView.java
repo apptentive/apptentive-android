@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
@@ -50,7 +51,7 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener, MessageManager.OnComposingActionListener{
+public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener, MessageAdapter.OnComposingActionListener {
 
 	private Activity activity;
 	private OnSendMessageListener onSendMessageListener;
@@ -67,11 +68,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	private MessageCenterStatus statusItem;
 	private MessageCenterComposingItem composingItem;
+	private MessageCenterComposingItem actionBarItem;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
-	private CharSequence messageText;
 
 	private EditText messageEditText;
 
@@ -110,19 +111,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 
 		messageCenterListView = (ListView) findViewById(R.id.message_list);
-		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 
 
 		messageCenterListView.setItemsCanFocus(true);
 
-		messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
-								getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
 
 		if (messageCenterListAdapter == null) {
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
-			messageCenterListAdapter = new MessageAdapter<>(activity.getApplicationContext(), messages);
+			messageCenterListAdapter = new MessageAdapter<>(activity.getApplicationContext(), messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
 
@@ -133,22 +132,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			public void onClick(View v) {
 				View fab = findViewById(R.id.composing_fab);
 				fab.setVisibility(View.INVISIBLE);
-				composingItem = new MessageCenterComposingItem(null);
-				addItem(composingItem);
-				post(new Runnable() {
-					public void run() {
-						messageEditText = messageCenterListAdapter.getEditTextInComposing();
-						messageEditText.setText(messageText);
-						messageEditText.requestFocus();
-						InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.showSoftInput(messageEditText, 0);
-					}
-				});
+				if (statusItem != null) {
+					messages.remove(statusItem);
+					statusItem = null;
+				}
+				actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
+				messages.add(actionBarItem);
+				composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
+				messages.add(composingItem);
+				messageCenterListAdapter.notifyDataSetChanged();
+				scrollMessageListViewToBottom();
 			}
 		});
 
 	}
-
 
 
 	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
@@ -157,7 +154,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			if (item instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
 				if (apptentiveMessage.isOutgoingMessage() && apptentiveMessage.getCreatedAt() == null) {
-					count ++;
+					count++;
 				}
 			}
 		}
@@ -181,46 +178,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			}
 		}
 
-		if (item instanceof MessageCenterGreeting) {
-			messages.add(0, item);
-			messageCenterListAdapter.notifyDataSetChanged();
-		} else {
-			messages.remove(statusItem);
+		//if (item instanceof MessageCenterGreeting) {
+		//	messages.add(0, item);
+			//messageCenterListAdapter.notifyDataSetChanged();
+		//} else {
+
 			messages.add(item);
-			if (item instanceof ApptentiveMessage )
-			{
+			if (item instanceof ApptentiveMessage) {
 				unsendMessagesCount++;
 			}
-			messageCenterListAdapter.notifyDataSetChanged();
-		}
-
+			//messageCenterListAdapter.notifyDataSetChanged();
+		//}
+		scrollMessageListViewToBottom();
 	}
 
-	private Bitmap resizeImageForImageView(String imagePath) {
-		Bitmap resizedBitmap = null;
-
-		FileInputStream fis = null;
-		try {
-			fis = activity.openFileInput(imagePath);
-			Point point = Util.getScreenSize(activity);
-			int maxImageWidth = (int) (0.4 * point.x);
-			int maxImageHeight = (int) (0.4 * point.x);
-			maxImageWidth = maxImageWidth > 400 ? 400 : maxImageWidth;
-			maxImageHeight = maxImageHeight > 400 ? 400 : maxImageHeight;
-			resizedBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
-		} catch (Exception e) {
-			Log.e("Error opening stored image.", e);
-		} catch (OutOfMemoryError e) {
-			// It's generally not a good idea to catch an OutOfMemoryException. But in this case, the OutOfMemoryException
-			// had to result from allocating a bitmap, so the system should be in a good state.
-			// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
-			Log.e("Ran out of memory opening image.", e);
-		} finally {
-			Util.ensureClosed(fis);
-		}
-
-		return resizedBitmap;
-	}
 
 	public void appendImageAfterCursor(final Uri uri) {
 		if (uri == null) {
@@ -239,22 +210,21 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				imagePath = storedFile.getLocalFilePath();
 				if (mimeType.contains("image")) {
 					SpannableString ss = new SpannableString(imagePath);
-					ImageSpan span = new ImageSpan(activity, resizeImageForImageView(imagePath));
+					ImageSpan span = new ImageSpan(activity, ImageUtil.resizeImageForImageView(activity, imagePath));
 					ss.setSpan(span, 0, imagePath.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					EditText editText = messageCenterListAdapter.getEditTextInComposing();
-					editText.setGravity(Gravity.CENTER);
 					Editable editable = editText.getText();
 					int start = editText.getSelectionStart();
 					// Insert a new line before the image if only if there are existing text
 					if (start > 0) {
-						editable.insert(start, "\n");
+						editable.insert(start, "\n\n");
 						start++;
 					}
 
 					editable.insert(start, ss);
-					start+=ss.length();
+					start += ss.length();
 					// Insert a new line after the image
-					editable.insert(start, "\n");
+					editable.insert(start, "\n\n\n");
 					start++;
 					editText.setText(editable);
 					editText.setSelection(start);
@@ -277,7 +247,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	public synchronized void onMessageSent(ApptentiveHttpResponse response, final ApptentiveMessage apptentiveMessage) {
 		if (response.isSuccessful()) {
 			post(new Runnable() {
-				public void run() {setItems(MessageManager.getMessageCenterListItems(activity));
+				public void run() {
+					setItems(MessageManager.getMessageCenterListItems(activity));
+					if (statusItem != null) {
+						messages.remove(statusItem);
+						statusItem = null;
+					}
 					statusItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
 					addItem(statusItem);
 				}
@@ -326,8 +301,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	@Override
+	public void onComposingViewCreated() {
+		messageEditText = messageCenterListAdapter.getEditTextInComposing();
+		String messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+				getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
+		if (messageText != null) {
+			messageEditText.setText(messageText);
+		} else {
+			messageEditText.setText("");
+		}
+		//messageEditText.requestFocus();
+	}
+
+	@Override
 	public void onComposing(String composingStr, boolean scroll) {
-		messageText = composingStr;
 		if (scroll) {
 			post(new Runnable() {
 				public void run() {
@@ -341,24 +328,27 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	@Override
 	public void onCancelComposing() {
 		if (composingItem != null) {
+			messages.remove(actionBarItem);
 			messages.remove(composingItem);
+			actionBarItem = null;
 			composingItem = null;
+			messageEditText = null;
 			messageCenterListAdapter.clearComposing();
 			messageCenterListAdapter.notifyDataSetChanged();
 			Util.hideSoftKeyboard(activity, this);
 			View fab = findViewById(R.id.composing_fab);
 			fab.setVisibility(View.VISIBLE);
-
 		}
 	}
 
 	@Override
 	public void onFinishComposing() {
+		String messageText = getPendingComposingContent().toString().trim();
 		onCancelComposing();
-		if (messageText != null) {
-			onSendMessageListener.onSendMessage(messageText.toString());
+		if (!messageText.isEmpty()) {
+			onSendMessageListener.onSendMessage(messageText);
 		}
-		messageText = null;
+		savePendingComposingMessage();
 	}
 
 	@Override
@@ -390,6 +380,16 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	// Retrieve the content from the composing area
 	public Editable getPendingComposingContent() {
-			return messageEditText.getText();
-		}
+		return (messageEditText == null) ? null : messageEditText.getText();
+	}
+
+	public void savePendingComposingMessage() {
+		Editable content = getPendingComposingContent();
+
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
+		editor.commit();
+
+	}
 }

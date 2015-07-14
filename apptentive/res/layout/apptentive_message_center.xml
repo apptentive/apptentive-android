@@ -51,31 +51,26 @@
         </LinearLayout>
         <!-- Content -->
         <FrameLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
-                      android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
-                      android:background="#FAFAFA"
-                      android:orientation="vertical"
-                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
-                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
+                     android:layout_height="match_parent"
+                     android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
+                     android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
+                     android:background="#FAFAFA"
+                     android:orientation="vertical"
+                     android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
+                     android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
 
             <!--<FrameLayout android:layout_width="match_parent"
                          android:layout_height="0dp"
                          android:layout_weight="1"
                          android:background="#FAFAFA"
                          android:orientation="vertical">-->
-                <!-- Message List -->
-                <ListView android:id="@+id/message_list"
-                          android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          android:background="@android:color/transparent"
-                          android:cacheColorHint="@android:color/transparent"
-                          android:clipChildren="false"
-                          android:clipToPadding="false"
-                          android:divider="@null"
-                          android:scrollbars="none"
-                          android:transcriptMode="alwaysScroll"
-                          />
+            <!-- Message List -->
+            <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView
+                android:id="@+id/message_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:cacheColorHint="@android:color/transparent"/>
             <!--</FrameLayout>-->
             <!-- Composition Area -->
 
