@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -29,6 +29,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
+	private static final String KEY_MESSAGE_CENTER_GREETING_IMAGE_URL= "greeting_image_url";
 	private static final String KEY_NEW_MESSAGE_TOAST_ENABLED = "new_message_toast_enabled";
 	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
@@ -197,6 +198,18 @@ public class Configuration extends JSONObject {
 		}
 
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
+	}
+
+	public String getMessageCenterGreetingImageUrl() {
+		JSONObject messageCenter = getMessageCenter();
+		if (messageCenter != null) {
+			return messageCenter.optString(KEY_MESSAGE_CENTER_GREETING_IMAGE_URL, null);
+		}
+		return null;
+	}
+
+	public boolean canShowMessageCenter(Context context) {
+		return getMessageCenterGreetingImageUrl() != null;
 	}
 
 	public boolean isHideBranding(Context context) {

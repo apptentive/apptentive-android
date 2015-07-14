@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 /**
@@ -49,6 +50,9 @@ public class ViewActivity extends ApptentiveActivity {
 							break;
 						case MESSAGE_CENTER:
 							activityContent = new MessageCenterActivityContent(getIntent().getSerializableExtra(ActivityContent.EXTRA));
+							break;
+						case MESSAGE_CENTER_ERROR:
+							activityContent = new MessageCenterErrorActivityContent();
 							break;
 						case INTERACTION:
 							String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
@@ -121,7 +125,10 @@ public class ViewActivity extends ApptentiveActivity {
 				AboutModule.getInstance().doShow(this);
 				break;
 			case MESSAGE_CENTER:
-				((MessageCenterActivityContent)activityContent).onStart();
+				((MessageCenterActivityContent) activityContent).onStart();
+				super.onStart();
+				break;
+			case MESSAGE_CENTER_ERROR:
 				super.onStart();
 				break;
 			case INTERACTION:
@@ -144,6 +151,8 @@ public class ViewActivity extends ApptentiveActivity {
 			case MESSAGE_CENTER:
 				((MessageCenterActivityContent)activityContent).onStop();
 				break;
+			case MESSAGE_CENTER_ERROR:
+				break;
 			case INTERACTION:
 				// Interactions don't need to hear about onStop().
 				break;
@@ -160,6 +169,7 @@ public class ViewActivity extends ApptentiveActivity {
 				finish = AboutModule.getInstance().onBackPressed(this);
 				break;
 			case MESSAGE_CENTER:
+			case MESSAGE_CENTER_ERROR:
 			case INTERACTION:
 				if (activityContent != null) {
 					finish = activityContent.onBackPressed(this);
@@ -184,8 +194,9 @@ public class ViewActivity extends ApptentiveActivity {
 			case MESSAGE_CENTER:
 				((MessageCenterActivityContent)activityContent).onActivityResult(requestCode, resultCode, data);
 				break;
+			case MESSAGE_CENTER_ERROR:
+				break;
 			case INTERACTION:
-				// Interactions don't need to hear about onStop().
 				break;
 			default:
 				break;

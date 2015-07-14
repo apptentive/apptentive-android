@@ -137,16 +137,6 @@
                 <rule>
                   <match>
                     <AND>
-                      <NAME>style</NAME>
-                      <XML_NAMESPACE>^$</XML_NAMESPACE>
-                    </AND>
-                  </match>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
                       <NAME>package</NAME>
                       <XML_ATTRIBUTE />
                     </AND>
@@ -199,6 +189,16 @@
                     <AND>
                       <NAME>.*:layout_.*</NAME>
                       <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <NAME>style</NAME>
+                      <XML_NAMESPACE>^$</XML_NAMESPACE>
                     </AND>
                   </match>
                 </rule>

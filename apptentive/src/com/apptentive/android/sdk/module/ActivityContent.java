@@ -43,6 +43,7 @@ public abstract class ActivityContent {
 	public enum Type {
 		ABOUT,
 		MESSAGE_CENTER,
+		MESSAGE_CENTER_ERROR,
 		INTERACTION,
 		unknown;
 
