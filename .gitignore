@@ -16,6 +16,7 @@ build/
 .idea/tasks.xml
 .idea/vcs.xml
 .idea/workspace.xml
+.idea/libraries
 
 # Eclipse
 .settings
