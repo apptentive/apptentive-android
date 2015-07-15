@@ -60,23 +60,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 			MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
 		}
 
-		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
-			public void onSendMessage(String text) {
-				final OutgoingTextMessage message = new OutgoingTextMessage();
-				message.setBody(text);
-				message.setRead(true);
-				message.setCustomData(customData);
-				MessageManager.sendMessage(context.getApplicationContext(), message);
-				messageCenterView.post(new Runnable() {
-					public void run() {
-						messageCenterView.addItem(message);
-						messageCenterView.onResumeSending();
-					}
-				});
-			}
-		};
-
-		messageCenterView = new MessageCenterView(activity, onSendMessageListener);
+		messageCenterView = new MessageCenterView(activity, customData);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {

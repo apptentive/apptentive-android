@@ -31,15 +31,6 @@ public class HolderFactory {
 		} else if (messageCenterListItemView instanceof FileMessageView) {
 			FileMessageView fileMessageView = (FileMessageView) messageCenterListItemView;
 			holder = new OutgoingFileMessageHolder(fileMessageView);
-		} else if (messageCenterListItemView instanceof MessageCenterGreetingView) {
-			MessageCenterGreetingView messageCenterGreetingView = (MessageCenterGreetingView) messageCenterListItemView;
-			holder = new GreetingHolder(messageCenterGreetingView);
-		} else if (messageCenterListItemView instanceof MessageCenterStatusView) {
-			MessageCenterStatusView messageCenterGreetingView = (MessageCenterStatusView) messageCenterListItemView;
-			holder = new StatusHolder(messageCenterGreetingView);
-		} else if (messageCenterListItemView instanceof MessageCenterComposingView ||
-				messageCenterListItemView instanceof MessageCenterComposingActionBarView) {
-			holder = new MessageCenterListItemHolder();
 		}
 		return holder;
 	}

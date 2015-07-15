@@ -77,6 +77,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 										""
 								);
 								buffer.removeSpan(link[0]);
+								listener.onDeleteImage(selStart);
 							}
 						}
 					} else {

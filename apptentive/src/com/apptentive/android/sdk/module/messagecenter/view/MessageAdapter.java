@@ -99,6 +99,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		void onFinishComposing();
 
 		void onAttachImage();
+
+		void onDeleteImage(int selectionStart);
 	}
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {
@@ -177,12 +179,20 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_FILE_OUTGOING:
 					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
 					break;
-				case TYPE_GREETING:
-					convertView = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
+				case TYPE_GREETING: {
+					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
+					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
+					newView.updateMessage(greeting.getTitle(), greeting.getBody());
+					convertView = newView;
 					break;
-				case TYPE_STATUS:
-					convertView = new MessageCenterStatusView(parent.getContext(), (MessageCenterStatus) listItem);
+				}
+				case TYPE_STATUS: {
+					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
+					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext(), statusItem);
+					newView.updateMessage(statusItem.getTitle(), statusItem.getBody());
+					convertView = newView;
 					break;
+				}
 				case TYPE_Composing: {
 					if (composingView == null) {
 						composingView = new MessageCenterComposingView(context, composingActionListener);
@@ -229,10 +239,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_TEXT_OUTGOING: {
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
-					if (position != holder.position) {
-						String timestamp = createTimestamp(((OutgoingTextMessage) listItem).getCreatedAt());
-						((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
-					}
+
+					String timestamp = createTimestamp(((OutgoingTextMessage) listItem).getCreatedAt());
+					((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
+
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {
@@ -245,19 +255,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					((OutgoingFileMessageHolder) holder).updateMessage(timestamp, fileMessage.getCreatedAt() == null);
 					break;
 				}
-				case TYPE_GREETING:
-					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
-					((GreetingHolder) holder).updateMessage(greeting.getTitle(), greeting.getBody());
-					break;
-				case TYPE_STATUS:
-					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
-					break;
-				case TYPE_Composing:
-					//composingView = (MessageCenterComposingView) convertView;
-					break;
-				case TYPE_Actions:
-					break;
 				default:
 					return null;
 			}

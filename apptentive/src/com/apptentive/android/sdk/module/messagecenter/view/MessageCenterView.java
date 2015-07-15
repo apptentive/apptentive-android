@@ -39,23 +39,29 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeti
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.ImageCacheManager;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener, MessageAdapter.OnComposingActionListener {
+public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener,
+		MessageAdapter.OnComposingActionListener {
 
 	private Activity activity;
-	private OnSendMessageListener onSendMessageListener;
 	private ListView messageCenterListView;
+	private Map<String, String> customData;
 
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
@@ -70,17 +76,22 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
 
+	private ImageCacheManager imageCache;
+
+	private final Map<Integer, OutgoingFileMessage> attachedFileMessages = new HashMap<Integer, OutgoingFileMessage>();
+
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
 
 	private EditText messageEditText;
 
-	public MessageCenterView(Activity activity, OnSendMessageListener listener) {
+	public MessageCenterView(Activity activity, Map<String, String> customData) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
-		this.onSendMessageListener = listener;
+		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
+		imageCache = new ImageCacheManager(5);
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -180,14 +191,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 		//if (item instanceof MessageCenterGreeting) {
 		//	messages.add(0, item);
-			//messageCenterListAdapter.notifyDataSetChanged();
+		//messageCenterListAdapter.notifyDataSetChanged();
 		//} else {
 
-			messages.add(item);
-			if (item instanceof ApptentiveMessage) {
-				unsendMessagesCount++;
-			}
-			//messageCenterListAdapter.notifyDataSetChanged();
+		messages.add(item);
+		if (item instanceof ApptentiveMessage) {
+			unsendMessagesCount++;
+		}
+		messageCenterListAdapter.notifyDataSetChanged();
 		//}
 		scrollMessageListViewToBottom();
 	}
@@ -225,6 +236,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 					start += ss.length();
 					// Insert a new line after the image
 					editable.insert(start, "\n\n\n");
+					attachedFileMessages.put(start, message);
 					start++;
 					editText.setText(editable);
 					editText.setSelection(start);
@@ -248,7 +260,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		if (response.isSuccessful()) {
 			post(new Runnable() {
 				public void run() {
-					setItems(MessageManager.getMessageCenterListItems(activity));
+					//setItems(MessageManager.getMessageCenterListItems(activity));
+					unsendMessagesCount--;
+					for (MessageCenterListItem message : messages) {
+						if (message instanceof ApptentiveMessage) {
+							String nonce = ((ApptentiveMessage) message).getNonce();
+							if (nonce != null) {
+								String sentNonce = apptentiveMessage.getNonce();
+								if (sentNonce != null && nonce.equals(sentNonce)) {
+									((ApptentiveMessage) message).setCreatedAt(apptentiveMessage.getCreatedAt());
+									break;
+								}
+							}
+						}
+					}
 					if (statusItem != null) {
 						messages.remove(statusItem);
 						statusItem = null;
@@ -300,6 +325,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
+
 	@Override
 	public void onComposingViewCreated() {
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
@@ -346,7 +372,25 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		String messageText = getPendingComposingContent().toString().trim();
 		onCancelComposing();
 		if (!messageText.isEmpty()) {
-			onSendMessageListener.onSendMessage(messageText);
+			OutgoingTextMessage message = new OutgoingTextMessage();
+			message.setBody(messageText);
+			message.setRead(true);
+			message.setCustomData(customData);
+			MessageManager.sendMessage(activity.getApplicationContext(), message);
+
+			addItem(message);
+			onResumeSending();
+
+			Iterator it = attachedFileMessages.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry) it.next();
+				OutgoingFileMessage fileMessage = (OutgoingFileMessage) pair.getValue();
+				fileMessage.setHidden(true);
+				fileMessage.setRead(true);
+				fileMessage.setCustomData(customData);
+				MessageManager.sendMessage(activity.getApplicationContext(), fileMessage);
+				it.remove();
+			}
 		}
 		savePendingComposingMessage();
 	}
@@ -368,6 +412,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 	}
 
+	@Override
+	public void onDeleteImage(int selectionStart) {
+		OutgoingFileMessage fileMessage = attachedFileMessages.get(selectionStart);
+		if (fileMessage != null) {
+			fileMessage.deleteStoredFile(activity);
+			attachedFileMessages.remove(selectionStart);
+		}
+	}
 
 	public void scrollMessageListViewToBottom() {
 		post(new Runnable() {
