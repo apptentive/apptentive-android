@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ConversationItem;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +29,9 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	// State and Read are not stored in JSON, only in DB.
 	private State state;
 	private boolean read = false;
+
+	// DateStamp is only stored in memory, due to how we selectively apply date labeling in the view.
+	private String datestamp;
 
 	private static final String KEY_SENDER = "sender";
 	private static final String KEY_SENDER_ID = "id";
@@ -143,7 +146,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	}
 
 	public State getState() {
-		if(state == null) {
+		if (state == null) {
 			return State.unknown;
 		}
 		return state;
@@ -217,6 +220,18 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			// Should not happen.
 		}
 		return null;
+	}
+
+	public String getDatestamp() {
+		return datestamp;
+	}
+
+	public void setDatestamp(String datestamp) {
+		this.datestamp = datestamp;
+	}
+
+	public void clearDatestamp() {
+		this.datestamp = null;
 	}
 
 	public boolean isOutgoingMessage() {

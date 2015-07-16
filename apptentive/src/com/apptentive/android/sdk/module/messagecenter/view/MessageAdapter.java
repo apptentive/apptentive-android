@@ -42,9 +42,7 @@ import java.io.FileInputStream;
 
 import java.lang.ref.WeakReference;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,8 +171,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 								((IncomingTextMessage) listItem).getSenderProfilePhoto());
 					}
 					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
-					String timestamp = createTimestamp(((IncomingTextMessage) listItem).getCreatedAt());
-					((IncomingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getBody());
+					String datestamp = ((IncomingTextMessage) listItem).getDatestamp();
+					((IncomingTextMessageHolder) holder).updateMessage(datestamp, textMessage.getBody());
 					if (!textMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(textMessage, position);
@@ -183,8 +181,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_TEXT_OUTGOING: {
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
-					String timestamp = createTimestamp(((OutgoingTextMessage) listItem).getCreatedAt());
-					((OutgoingTextMessageHolder) holder).updateMessage(timestamp, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
+					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
+					String status = createStatus(((OutgoingTextMessage) listItem).getCreatedAt());
+					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {
@@ -193,8 +192,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 						positionsWithPendingImageTask.add(position);
 						startLoadAttachedImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
 					}
-					String timestamp = createTimestamp(((OutgoingFileMessage) listItem).getCreatedAt());
-					((OutgoingFileMessageHolder) holder).updateMessage(timestamp, fileMessage.getCreatedAt() == null);
+					String datestamp = ((OutgoingFileMessage) listItem).getDatestamp();
+					String status = createStatus(((OutgoingFileMessage) listItem).getCreatedAt());
+					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, fileMessage.getCreatedAt() == null);
 					break;
 				}
 				case TYPE_GREETING:
@@ -227,15 +227,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		isInPauseState = bPause;
 	}
 
-	protected String createTimestamp(Double seconds) {
-		if (seconds != null) {
-			Date date = new Date(Math.round(seconds * 1000));
-			DateFormat mediumDateShortTimeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-			return mediumDateShortTimeFormat.format(date);
+	protected String createStatus(Double seconds) {
+		if (seconds == null) {
+			int resId = isInPauseState ? R.string.apptentive_paused : R.string.apptentive_sending;
+			return context.getResources().getString(resId);
 		}
-
-		int resId = isInPauseState ? R.string.apptentive_paused : R.string.apptentive_sending;
-		return context.getResources().getString(resId);
+		return null;
 	}
 
 

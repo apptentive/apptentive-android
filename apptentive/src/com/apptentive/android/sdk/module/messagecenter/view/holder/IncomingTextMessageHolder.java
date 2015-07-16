@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import android.graphics.Bitmap;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -27,7 +26,7 @@ public class IncomingTextMessageHolder extends MessageHolder {
 	}
 
 	public void updateMessage(String timestamp, String text) {
-		super.updateMessage(timestamp);
+		super.updateMessage(timestamp, null);
 
 		if (this.text != null) {
 			this.text.setText(text);
