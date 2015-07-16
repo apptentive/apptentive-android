@@ -25,9 +25,13 @@ public class MessageHolder extends MessageCenterListItemHolder {
 	}
 
 	public void updateMessage(String datestamp, String status) {
-		this.datestamp.setText(datestamp);
-		this.datestamp.setVisibility(datestamp != null ? View.VISIBLE : View.GONE);
-		this.status.setText(status);
-		this.status.setVisibility(status != null ? View.VISIBLE : View.GONE);
+		if (this.datestamp != null) {
+			this.datestamp.setText(datestamp);
+			this.datestamp.setVisibility(datestamp != null ? View.VISIBLE : View.GONE);
+		}
+		if (this.status != null) {
+			this.status.setText(status);
+			this.status.setVisibility(status != null ? View.VISIBLE : View.GONE);
+		}
 	}
 }
