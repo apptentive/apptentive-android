@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -122,6 +124,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
+
+		// Needed to prevent the window from being pushed up when a text input area is focused.
+		Window window = activity.getWindow();
+		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
 	}
 
