@@ -157,7 +157,16 @@ public class MessageManager {
 	public static List<MessageCenterListItem> getMessageCenterListItems(Context context) {
 		List<MessageCenterListItem> messages = new ArrayList<>();
 		messages.add(new MessageCenterGreeting()); // TODO: Generate a real greeting message from config.
-		messages.addAll(getMessageStore(context).getAllMessages());
+
+		// TODO: Once we start supporting AutomatedMessages again, revert this.
+		List<ApptentiveMessage> apptentiveMessages = getMessageStore(context).getAllMessages();
+		for (ApptentiveMessage apptentiveMessage : apptentiveMessages) {
+			if (apptentiveMessage instanceof AutomatedMessage) {
+				continue;
+			}
+			messages.add(apptentiveMessage);
+		}
+		// messages.addAll(getMessageStore(context).getAllMessages());
 		return messages;
 	}
 
