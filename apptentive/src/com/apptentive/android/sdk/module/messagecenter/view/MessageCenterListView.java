@@ -37,13 +37,12 @@ public class MessageCenterListView extends ListView {
 	}
 
 	/**
-	 * Wrapper class for sticky view and its position in the list.
+	 * Wrapper class for pinned section view and its position in the list.
 	 */
 	static class StickyWrapper {
 		public View view;
 		public int position;
 		public long id;
-		public int additionalIndent;
 	}
 
 	private final Rect touchRect = new Rect();
@@ -58,6 +57,7 @@ public class MessageCenterListView extends ListView {
 
 	// Optional delegating listener
 	OnScrollListener delegateScrollListener;
+
 
 	// shadow for being recycled
 	StickyWrapper recycledHeaderView;
@@ -98,17 +98,17 @@ public class MessageCenterListView extends ListView {
 				int headerTop = headerView.getTop();
 				int pad = getPaddingTop();
 				if (headerTop == pad) {
-					// view sticks to the top, do not render shadow
+					// view sticks to the top, no need for pinned shadow
 					destroyStickyShadow();
 				} else {
+					// section doesn't stick to the top, make sure we have a pinned shadow
 					tryCreateShadowAtPosition(firstVisibleItem, firstVisibleItem, visibleItemCount);
 				}
 
-			} else {
-			  // header is not at the first visible position
-				int headerPosition = findCurrentHeaderPosition(firstVisibleItem);
-				if (headerPosition > -1) {
-					tryCreateShadowAtPosition(headerPosition, firstVisibleItem, visibleItemCount);
+			} else { // section is not at the first visible position
+				int sectionPosition = findCurrentHeaderPosition(firstVisibleItem);
+				if (sectionPosition > -1) { // we have section position
+					tryCreateShadowAtPosition(sectionPosition, firstVisibleItem, visibleItemCount);
 				} else { // there is no section for the first visible item, destroy shadow
 					destroyStickyShadow();
 				}
@@ -149,6 +149,17 @@ public class MessageCenterListView extends ListView {
 		initShadow(true);
 	}
 
+	//-- public API methods
+
+	public void setShadowVisible(boolean visible) {
+		initShadow(visible);
+		if (stickyWrapper != null) {
+			View v = stickyWrapper.view;
+			invalidate(v.getLeft(), v.getTop(), v.getRight(), v.getBottom() + shadowHeight);
+		}
+	}
+
+	//-- pinned section drawing methods
 
 	public void initShadow(boolean visible) {
 		if (visible) {
@@ -165,7 +176,7 @@ public class MessageCenterListView extends ListView {
 	}
 
 	/**
-	 * Create shadow wrapper with a sticky view  at given position
+	 * Create shadow wrapper with a pinned view for a view at given position
 	 */
 	void createStickyShadow(int position) {
 
@@ -199,9 +210,9 @@ public class MessageCenterListView extends ListView {
 		if (heightSize > maxHeight) {
 			heightSize = maxHeight;
 		}
-    // assuming left and right additional paddings are the same
+
 		int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight() -
-				childLayout.getPaddingLeft() * 2, MeasureSpec.EXACTLY);
+				childLayout.getPaddingLeft() - childLayout.getPaddingRight(), MeasureSpec.EXACTLY);
 		int hs = MeasureSpec.makeMeasureSpec(heightSize, heightMode);
 		stickyView.measure(ws, hs);
 		stickyView.layout(0, 0, stickyView.getMeasuredWidth(), stickyView.getMeasuredHeight());
@@ -210,7 +221,6 @@ public class MessageCenterListView extends ListView {
 		stickyViewShadow.view = stickyView;
 		stickyViewShadow.position = position;
 		stickyViewShadow.id = getAdapter().getItemId(position);
-    stickyViewShadow.additionalIndent = childLayout.getPaddingLeft();
 
 		stickyWrapper = stickyViewShadow;
 	}
@@ -259,7 +269,7 @@ public class MessageCenterListView extends ListView {
 			int viewType = adapter.getItemViewType(position);
 			if (isItemSticky(adapter, viewType)) return position;
 		}
-		return -1;
+		return -1; // no candidate found
 	}
 
 	void recreateStickyShadow() {
@@ -269,7 +279,7 @@ public class MessageCenterListView extends ListView {
 			int firstVisiblePosition = getFirstVisiblePosition();
 			int headerPosition = findCurrentHeaderPosition(firstVisiblePosition);
 			if (headerPosition == -1) {
-				return;
+				return; // no views to pin, exit
 			}
 			tryCreateShadowAtPosition(headerPosition,
 					firstVisiblePosition, getLastVisiblePosition() - firstVisiblePosition + 1);
@@ -319,8 +329,7 @@ public class MessageCenterListView extends ListView {
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		super.onLayout(changed, l, t, r, b);
 		if (stickyWrapper != null) {
-			int parentWidth = r - l - getPaddingLeft() - getPaddingRight() -
-					stickyWrapper.additionalIndent * 2;
+			int parentWidth = r - l - getPaddingLeft() - getPaddingRight();
 			int shadowWidth = stickyWrapper.view.getWidth();
 			if (parentWidth != shadowWidth) {
 				recreateStickyShadow();
@@ -337,7 +346,8 @@ public class MessageCenterListView extends ListView {
 			int pLeft = getListPaddingLeft();
 			int pTop = getListPaddingTop();
 			View view = stickyWrapper.view;
-			pLeft += stickyWrapper.additionalIndent;
+			View child = ((ViewGroup) stickyWrapper.view).getChildAt(0);
+			pLeft += child.getPaddingLeft();
 			// draw child
 			canvas.save();
 
@@ -351,7 +361,7 @@ public class MessageCenterListView extends ListView {
 			if (shadowDrawable != null) {
 				shadowDrawable.setBounds(stickyWrapper.view.getLeft(),
 						stickyWrapper.view.getBottom(),
-						stickyWrapper.view.getRight() + stickyWrapper.additionalIndent,
+						stickyWrapper.view.getRight() + child.getPaddingLeft(),
 						stickyWrapper.view.getBottom() + shadowHeight);
 				shadowDrawable.draw(canvas);
 			}
@@ -416,7 +426,7 @@ public class MessageCenterListView extends ListView {
 	private boolean isStickyViewTouched(View view, float x, float y) {
 		view.getHitRect(touchRect);
 
-		touchRect.bottom = getPaddingTop();
+		touchRect.bottom += getPaddingTop();
 		touchRect.left += getPaddingLeft();
 		touchRect.right -= getPaddingRight();
 		return touchRect.contains((int) x, (int) y);

@@ -28,6 +28,9 @@ public class HolderFactory {
 		} else if (messageCenterListItemView instanceof IncomingTextMessageView) {
 			IncomingTextMessageView textMessageView = (IncomingTextMessageView) messageCenterListItemView;
 			holder = new IncomingTextMessageHolder(textMessageView);
+		} else if (messageCenterListItemView instanceof MessageCenterStatusView) {
+			MessageCenterStatusView messageCenterStatusView = (MessageCenterStatusView) messageCenterListItemView;
+			holder = new StatusHolder(messageCenterStatusView);
 		} else if (messageCenterListItemView instanceof FileMessageView) {
 			FileMessageView fileMessageView = (FileMessageView) messageCenterListItemView;
 			holder = new OutgoingFileMessageHolder(fileMessageView);

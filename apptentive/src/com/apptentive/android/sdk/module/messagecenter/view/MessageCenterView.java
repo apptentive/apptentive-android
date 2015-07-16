@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.view.*;
 import android.widget.*;
@@ -163,6 +164,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			attachButton.setVisibility(GONE);
 		}
 
+		scrollMessageListViewToBottom();
 	}
 
 
@@ -184,26 +186,61 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		messages.addAll(items);
 		unsendMessagesCount = countUnsendOutgoingMessages(items);
 		messageCenterListAdapter.notifyDataSetChanged();
-	}
-
-
-	public void addItem(MessageCenterListItem item) {
-
-		if (item instanceof ApptentiveMessage) {
-			ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
-			if (apptentiveMessage.isHidden()) {
-				return;
-			}
-		}
-
-		messages.add(item);
-		if (item instanceof ApptentiveMessage) {
-			unsendMessagesCount++;
-		}
-		messageCenterListAdapter.notifyDataSetChanged();
-		//}
 		scrollMessageListViewToBottom();
 	}
+
+
+	public void addNewStatusItem(MessageCenterListItem item) {
+		// Remove the exisiting status item in the list
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+
+		if (composingItem != null) {
+			return;
+		}
+
+		statusItem = (MessageCenterStatus)item;
+		messages.add(item);
+		messageCenterListAdapter.notifyDataSetChanged();
+
+		scrollMessageListViewToBottom();
+	}
+
+	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
+		// Remove the status message whenever a new outgoing message is added
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+
+		messages.add(message);
+		unsendMessagesCount++;
+
+		isPaused = false;
+		messageCenterListAdapter.setPaused(isPaused);
+
+		messageCenterListAdapter.notifyDataSetChanged();
+		scrollMessageListViewToBottom();
+	}
+
+	public void addNewIncomingMessageItem(ApptentiveMessage message) {
+		// Remove the status message whenever a new incoming message is added
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+
+		if (composingItem != null) {
+			messages.add(messages.size() - 2, message);
+		} else {
+			messages.add(message);
+		}
+		messageCenterListAdapter.notifyDataSetChanged();
+		scrollMessageListViewToBottom();
+	}
+
 
 
 	public void sendImage(final Uri uri) {
@@ -215,9 +252,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 			// Finally, send out the message.
 			MessageManager.sendMessage(activity.getApplicationContext(), message);
-			addItem(message);
-			onResumeSending();
-			scrollMessageListViewToBottom();
+			addNewOutGoingMessageItem(message);
+
 		} else {
 			Log.e("Unable to send file.");
 			Toast.makeText(activity, "Unable to send file.", Toast.LENGTH_SHORT).show();
@@ -265,12 +301,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 							}
 						}
 					}
-					if (statusItem != null) {
-						messages.remove(statusItem);
-						statusItem = null;
-					}
-					statusItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
-					addItem(statusItem);
+
+					MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
+					addNewStatusItem(newItem);
 				}
 			});
 		}
@@ -282,15 +315,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			isPaused = true;
 			post(new Runnable() {
 				public void run() {
-					if (statusItem != null) {
-						messages.remove(statusItem);
-						statusItem = null;
-					}
 					if (unsendMessagesCount > 0) {
 						messageCenterListAdapter.setPaused(isPaused);
-						statusItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
+						MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
 						), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
-						addItem(statusItem);
+						addNewStatusItem(newItem);
 					}
 				}
 			});
@@ -354,14 +383,13 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		String messageText = getPendingComposingContent().toString().trim();
 		onCancelComposing();
 		if (!messageText.isEmpty()) {
+
 			OutgoingTextMessage message = new OutgoingTextMessage();
 			message.setBody(messageText);
 			message.setRead(true);
 			message.setCustomData(customData);
 			MessageManager.sendMessage(activity.getApplicationContext(), message);
-
-			addItem(message);
-			onResumeSending();
+			addNewOutGoingMessageItem(message);
 		}
 		savePendingComposingMessage();
 	}

@@ -79,13 +79,16 @@ public class MessageManager {
 						case UI_THREAD_MESSAGE_ON_UNREAD_HOST:
 							notifyHostUnreadMessagesListeners(msg.arg1);
 							break;
-						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL:
-							notifyInternalNewMessagesListeners();
+						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
+							IncomingTextMessage msgToAdd = (IncomingTextMessage) msg.obj;
+							notifyInternalNewMessagesListeners(msgToAdd);
 							break;
-						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION:
+						}
+						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
 							IncomingTextMessage msgToShow = (IncomingTextMessage) msg.obj;
 							showUnreadMessageToastNotification(msgToShow);
 							break;
+						}
 						default:
 							super.handleMessage(msg);
 					}
@@ -130,13 +133,13 @@ public class MessageManager {
 						}
 					}
 					incomingUnreadMessages++;
+					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (IncomingTextMessage) apptentiveMessage);
+					msg.sendToTarget();
 				}
 			}
 			getMessageStore(appContext).addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			Message msg;
 			if (incomingUnreadMessages > 0) {
-				msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
-				msg.sendToTarget();
 				// Show toast notification only if the forground activity is not alreay message center activity
 				if (!forMessageCenter && showToast) {
 					msg =
@@ -330,7 +333,7 @@ public class MessageManager {
 	}
 
 	public interface OnNewIncomingMessagesListener {
-		public void onMessagesUpdated();
+		public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg);
 	}
 
 	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
@@ -352,11 +355,11 @@ public class MessageManager {
 		internalNewMessagesListeners.clear();
 	}
 
-	public static void notifyInternalNewMessagesListeners() {
+	public static void notifyInternalNewMessagesListeners(final IncomingTextMessage apptentiveMsg) {
 		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
-				listener.onMessagesUpdated();
+				listener.onMessagesUpdated(apptentiveMsg);
 			}
 		}
 	}

@@ -85,7 +85,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
-	private ArrayList<Integer> positionsWithPendingImageTask = new ArrayList<Integer>();
 
 	private OnComposingActionListener composingActionListener;
 
@@ -244,12 +243,17 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_FILE_OUTGOING: {
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
-					if (position != holder.position && !positionsWithPendingImageTask.contains(position)) {
-						positionsWithPendingImageTask.add(position);
+					if (holder.position != position) {
+						holder.position = position;
 						startLoadAttachedImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
 					}
 					String timestamp = createTimestamp(((OutgoingFileMessage) listItem).getCreatedAt());
 					((OutgoingFileMessageHolder) holder).updateMessage(timestamp, fileMessage.getCreatedAt() == null);
+					break;
+				}
+				case TYPE_STATUS: {
+					MessageCenterStatus status = (MessageCenterStatus) listItem;
+					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
 					break;
 				}
 				default:
@@ -394,6 +398,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
 		StoredFile storedFile = message.getStoredFile(context);
+		if (storedFile == null) {
+			return;
+		}
 		String mimeType = storedFile.getMimeType();
 		String imagePath;
 
@@ -455,12 +462,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		@Override
 		protected void onCancelled() {
-			positionsWithPendingImageTask.remove(new Integer(position));
 		}
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			positionsWithPendingImageTask.remove(new Integer(position));
 			if (null == bitmap) {
 				return;
 			}

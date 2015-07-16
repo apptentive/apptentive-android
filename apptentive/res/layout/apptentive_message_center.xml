@@ -49,7 +49,7 @@
                                                                     android:textSize="22sp"/>
                 <View android:layout_width="0dp"
                       android:layout_height="match_parent"
-                      android:layout_weight="1" />
+                      android:layout_weight="1"/>
                 <ImageButton android:id="@+id/attach"
                              android:layout_width="48dp"
                              android:layout_height="48dp"
@@ -60,7 +60,7 @@
                              android:background="@null"
                              android:contentDescription="Attach"
                              android:src="@drawable/apptentive_ic_action_attach"
-                             android:visibility="invisible"/>
+                             android:visibility="gone"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -85,7 +85,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:cacheColorHint="@android:color/transparent"/>
+                android:cacheColorHint="@android:color/transparent"
+                android:transcriptMode="alwaysScroll"
+                android:descendantFocusability="beforeDescendants"/>
             <!--</FrameLayout>-->
             <!-- Composition Area -->
 

@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
+import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -65,12 +66,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 		activity.setContentView(messageCenterView);
 
 		newIncomingMessageListener = new MessageManager.OnNewIncomingMessagesListener() {
-			public void onMessagesUpdated() {
+			public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg) {
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(context.getApplicationContext());
-						messageCenterView.setItems(items);
-						messageCenterView.scrollMessageListViewToBottom();
+						messageCenterView.addNewIncomingMessageItem(apptentiveMsg);
 					}
 				});
 			}
