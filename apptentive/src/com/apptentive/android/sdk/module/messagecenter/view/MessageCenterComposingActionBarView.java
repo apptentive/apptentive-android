@@ -35,20 +35,15 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
 
-		View attachButton = findViewById(R.id.attach);
-		// Android devices can't take screenshots until Android OS version 4+
-		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
-		if (canTakeScreenshot) {
-			attachButton.setOnClickListener(new OnClickListener() {
+		View closeButton = findViewById(R.id.BtnClose);
+		closeButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					listener.onAttachImage();
+					listener.onCancelComposing();
 				}
 			});
-		} else {
-			attachButton.setVisibility(GONE);
-		}
 
-		View sendButton = findViewById(R.id.send);
+
+		View sendButton = findViewById(R.id.BtnSend);
 		sendButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				listener.onFinishComposing();

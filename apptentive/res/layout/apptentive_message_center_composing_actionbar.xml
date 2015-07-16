@@ -16,41 +16,43 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/apptentive_message_center_outgoing_background"
-                    android:minHeight="42dp"
+                    android:minHeight="48dp"
                     android:orientation="horizontal">
+
+        <ImageButton android:id="@+id/BtnClose"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignParentLeft="true"
+                     android:layout_centerVertical="true"
+                     android:layout_marginRight="10dp"
+                     android:background="@null"
+                     android:contentDescription="Close"
+                     android:paddingLeft="10dp"
+                     android:src="@drawable/close"
+                     android:tint="?attr/apptentiveTintColor"/>
+
         <TextView android:id="@+id/composing"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_alignParentLeft="true"
+                  android:layout_toRightOf="@id/BtnClose"
                   android:layout_centerVertical="true"
                   android:singleLine="true"
                   android:textStyle="bold"
                   android:text="Composing:"
                   android:textColor="@color/apptentive_message_center_hint"
-                  android:textSize="16sp" android:layout_marginLeft="10dp"/>
-        <ImageButton android:id="@+id/send"
+                  android:textSize="16sp"
+            />
+        <ImageButton android:id="@+id/BtnSend"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:layout_alignTop="@+id/attach"
                      android:layout_alignParentRight="true"
                      android:layout_centerVertical="true"
+                     android:layout_marginRight="10dp"
                      android:background="@null"
                      android:contentDescription="Submit"
                      android:paddingLeft="16dp"
                      android:src="@drawable/apptentive_ic_action_send"
-                     android:tint="#EF4139" android:layout_marginRight="10dp"/>
-        <ImageButton android:id="@+id/attach"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_alignParentTop="true"
-                     android:layout_toLeftOf="@+id/send"
-                     android:layout_toStartOf="@+id/send"
-                     android:layout_centerVertical="true"
-                     android:background="@null"
-                     android:contentDescription="Attach"
-                     android:src="@drawable/apptentive_ic_action_attach"
-                     android:tint="#EF4139"/>
-
+                     android:tint="?attr/apptentiveTintColor"/>
 
     </RelativeLayout>
 </FrameLayout>

@@ -37,22 +37,8 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
 
-		/*et.setOnFocusChangeListener(new OnFocusChangeListener() {
-			public void onFocusChange(final View v, boolean hasFocus) {
-				v.post(new Runnable() {
-					@Override
-					public void run() {
-						v.requestFocus();
-						v.requestFocusFromTouch();
-					}
-				});
-			}
-		});*/
-
 		et.addTextChangedListener(new TextWatcher() {
-			private boolean doDelete = true;
 			private boolean doScroll = false;
-			private int lineCount = et.getLineCount();
 
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -60,40 +46,12 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-				doScroll = false;
-				if (doDelete) {
-					if (count == 0 && before == 1) {
-						//a backspace was entered
-						Editable buffer = et.getText();
-						// If the cursor is at the end of a RecipientSpan then remove the whole span
-						int selStart = Selection.getSelectionStart(buffer);
-						int selEnd = Selection.getSelectionEnd(buffer);
-						if (selStart == selEnd) {
-							ImageSpan[] link = buffer.getSpans(selStart, selEnd, ImageSpan.class);
-							if (link.length > 0) {
-								buffer.replace(
-										buffer.getSpanStart(link[0]),
-										buffer.getSpanEnd(link[0]),
-										""
-								);
-								buffer.removeSpan(link[0]);
-								listener.onDeleteImage(selStart);
-							}
-						}
-					} else {
-						int newLineCount = et.getLineCount();
-						if (newLineCount != lineCount) {
-							lineCount = newLineCount;
-							doScroll = true;
-						}
-					}
-				}
+
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
 				listener.onComposing(editable.toString(), doScroll);
-				doScroll = false;
 			}
 		});
 

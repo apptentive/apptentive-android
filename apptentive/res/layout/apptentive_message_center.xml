@@ -38,7 +38,7 @@
                              android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
 
                 <com.apptentive.android.sdk.view.AutoResizeTextView android:id="@id/title"
-                                                                    android:layout_width="match_parent"
+                                                                    android:layout_width="wrap_content"
                                                                     android:layout_height="match_parent"
                                                                     android:layout_marginLeft="24dp"
                                                                     android:layout_marginRight="24dp"
@@ -47,6 +47,21 @@
                                                                     android:text="Message Center"
                                                                     android:textColor="#FFFFFF"
                                                                     android:textSize="22sp"/>
+                <View android:layout_width="0dp"
+                      android:layout_height="match_parent"
+                      android:layout_weight="1" />
+                <ImageButton android:id="@+id/attach"
+                             android:layout_width="48dp"
+                             android:layout_height="48dp"
+                             android:layout_marginRight="10dp"
+                             android:layout_alignParentTop="true"
+                             android:layout_centerVertical="true"
+                             android:layout_alignParentRight="true"
+                             android:background="@null"
+                             android:contentDescription="Attach"
+                             android:src="@drawable/apptentive_ic_action_attach"
+                             android:visibility="invisible"/>
+
             </LinearLayout>
         </LinearLayout>
         <!-- Content -->

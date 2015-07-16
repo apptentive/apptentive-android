@@ -98,9 +98,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		void onFinishComposing();
 
-		void onAttachImage();
-
-		void onDeleteImage(int selectionStart);
 	}
 
 	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {

@@ -60,7 +60,7 @@ public class MessageManager {
 
 	private static WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
-	private static final List<WeakReference<OnNewMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewMessagesListener>>();
+	private static final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewIncomingMessagesListener>>();
 
 
 	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
@@ -329,15 +329,15 @@ public class MessageManager {
 		}
 	}
 
-	public interface OnNewMessagesListener {
+	public interface OnNewIncomingMessagesListener {
 		public void onMessagesUpdated();
 	}
 
-	public static void addInternalOnMessagesUpdatedListener(OnNewMessagesListener newlistener) {
+	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
-			for (Iterator<WeakReference<OnNewMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
-				WeakReference<OnNewMessagesListener> listenerRef = iterator.next();
-				OnNewMessagesListener listener = listenerRef.get();
+			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
+				WeakReference<OnNewIncomingMessagesListener> listenerRef = iterator.next();
+				OnNewIncomingMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
 				} else if (listener == null) {
@@ -353,8 +353,8 @@ public class MessageManager {
 	}
 
 	public static void notifyInternalNewMessagesListeners() {
-		for (WeakReference<OnNewMessagesListener> listenerRef : internalNewMessagesListeners) {
-			OnNewMessagesListener listener = listenerRef.get();
+		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
+			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
 				listener.onMessagesUpdated();
 			}

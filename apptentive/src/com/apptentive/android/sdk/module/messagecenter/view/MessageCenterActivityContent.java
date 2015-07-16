@@ -10,12 +10,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
@@ -25,7 +22,6 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -44,7 +40,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 	private MessageCenterView messageCenterView;
 	private Map<String, String> customData;
 	private Context context;
-	private MessageManager.OnNewMessagesListener newMessageListener;
+	private MessageManager.OnNewIncomingMessagesListener newIncomingMessageListener;
 
 	public MessageCenterActivityContent(Serializable data) {
 		this.customData = (Map<String, String>) data;
@@ -68,7 +64,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		}
 		activity.setContentView(messageCenterView);
 
-		newMessageListener = new MessageManager.OnNewMessagesListener() {
+		newIncomingMessageListener = new MessageManager.OnNewIncomingMessagesListener() {
 			public void onMessagesUpdated() {
 				messageCenterView.post(new Runnable() {
 					public void run() {
@@ -81,7 +77,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		};
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-		MessageManager.addInternalOnMessagesUpdatedListener(newMessageListener);
+		MessageManager.addInternalOnMessagesUpdatedListener(newIncomingMessageListener);
 
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
@@ -127,7 +123,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
-					messageCenterView.appendImageAfterCursor(data.getData());
+					messageCenterView.showAttachmentDialog(context, data.getData());
 					break;
 				default:
 					break;

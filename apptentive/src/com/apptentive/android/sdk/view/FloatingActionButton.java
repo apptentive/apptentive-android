@@ -97,9 +97,6 @@ public class FloatingActionButton extends ImageButton {
 		}
 	}
 
-	public boolean isShadow() {
-		return mShadow;
-	}
 
 	public void setShadow(boolean shadow) {
 		boolean changed = mShadow != shadow;
@@ -232,7 +229,7 @@ public class FloatingActionButton extends ImageButton {
 	 * Inflate and initialize background drawable for this view with arguments
 	 * inflated from xml or specified using {@link #setSize(int)} or {@link #setColor(int)}
 	 * <p/>
-	 * Invoked from constructor, but it's allowed to invoke this method manually from code.
+	 *
 	 */
 	public void initBackground() {
 		final int backgroundId;
@@ -290,7 +287,6 @@ public class FloatingActionButton extends ImageButton {
 		}
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-			//noinspection deprecation
 			setBackgroundDrawable(background);
 		} else {
 			setBackground(background);

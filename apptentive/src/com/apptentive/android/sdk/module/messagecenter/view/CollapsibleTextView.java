@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class CollapsibleTextView extends LinearLayout implements View.OnClickListener {
 
 	/** default text show max lines */
-	private static final int DEFAULT_MAX_LINE_COUNT = 2;
+	private static final int DEFAULT_MAX_LINE_COUNT = 5;
 
 	private static final int COLLAPSIBLE_STATE_NONE = 0;
 	private static final int COLLAPSIBLE_STATE_SHRINKUP = 1;
@@ -38,11 +38,9 @@ public class CollapsibleTextView extends LinearLayout implements View.OnClickLis
 	private String spread;
 	private int mState;
 	private boolean flag;
-	private Context context;
 
 	public CollapsibleTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.context = context;
 		shrinkup = context.getString(R.string.apptentive_message_less);
 		spread = context.getString(R.string.apptentive_message_more);
 		View view = inflate(context, R.layout.apptentive_message_center_collapsible_textview, this);
@@ -57,14 +55,7 @@ public class CollapsibleTextView extends LinearLayout implements View.OnClickLis
 	}
 
 	public final void setDesc(String str) {
-		SpannableString ss = new SpannableString(str);
-		Pattern p=Pattern.compile("apptentive-file-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-		Matcher m=p.matcher(str);
-		while(m.find()){
-			ImageSpan span = new ImageSpan(context, ImageUtil.resizeImageForImageView(context, m.group()));
-			ss.setSpan(span, m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		}
-		desc.setText(ss);
+		desc.setText(str);
 		mState = COLLAPSIBLE_STATE_SPREAD;
 		flag = false;
 		requestLayout();

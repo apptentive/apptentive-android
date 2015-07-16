@@ -10,19 +10,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.TextWatcher;
-import android.text.style.ImageSpan;
 import android.view.*;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
+
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -30,26 +24,19 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 
-import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ImageCacheManager;
-import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,10 +63,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
 
-	private ImageCacheManager imageCache;
-
-	private final Map<Integer, OutgoingFileMessage> attachedFileMessages = new HashMap<Integer, OutgoingFileMessage>();
-
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
@@ -91,7 +74,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		this.activity = activity;
 		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
-		imageCache = new ImageCacheManager(5);
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -132,7 +114,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
-			messageCenterListAdapter = new MessageAdapter<>(activity.getApplicationContext(), messages, this);
+			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
 
@@ -155,6 +137,31 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				scrollMessageListViewToBottom();
 			}
 		});
+
+		View attachButton = findViewById(R.id.attach);
+		// Android devices can't take screenshots until Android OS version 4+
+		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
+		if (canTakeScreenshot) {
+			attachButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View view) {
+					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
+					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+					Bundle extras = new Bundle();
+					intent.addCategory(Intent.CATEGORY_OPENABLE);
+					if (Build.VERSION.SDK_INT >= 11) {
+						extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+					}
+					intent.setType("image/*");
+					if (!extras.isEmpty()) {
+						intent.putExtras(extras);
+					}
+					Intent chooserIntent = Intent.createChooser(intent, null);
+					activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+				}
+			});
+		} else {
+			attachButton.setVisibility(GONE);
+		}
 
 	}
 
@@ -189,11 +196,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			}
 		}
 
-		//if (item instanceof MessageCenterGreeting) {
-		//	messages.add(0, item);
-		//messageCenterListAdapter.notifyDataSetChanged();
-		//} else {
-
 		messages.add(item);
 		if (item instanceof ApptentiveMessage) {
 			unsendMessagesCount++;
@@ -204,55 +206,45 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 
-	public void appendImageAfterCursor(final Uri uri) {
-		if (uri == null) {
-			Log.d("No attachment found.");
-			return;
-		}
-
+	public void sendImage(final Uri uri) {
 		final OutgoingFileMessage message = new OutgoingFileMessage();
 		boolean successful = message.internalCreateStoredImage(activity.getApplicationContext(), uri.toString());
 		if (successful) {
-			StoredFile storedFile = message.getStoredFile(activity);
-			String mimeType = storedFile.getMimeType();
-			String imagePath;
+			message.setRead(true);
+			message.setCustomData(customData);
 
-			if (mimeType != null) {
-				imagePath = storedFile.getLocalFilePath();
-				if (mimeType.contains("image")) {
-					SpannableString ss = new SpannableString(imagePath);
-					ImageSpan span = new ImageSpan(activity, ImageUtil.resizeImageForImageView(activity, imagePath));
-					ss.setSpan(span, 0, imagePath.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					EditText editText = messageCenterListAdapter.getEditTextInComposing();
-					Editable editable = editText.getText();
-					int start = editText.getSelectionStart();
-					// Insert a new line before the image if only if there are existing text
-					if (start > 0) {
-						editable.insert(start, "\n\n");
-						start++;
-					}
-
-					editable.insert(start, ss);
-					start += ss.length();
-					// Insert a new line after the image
-					editable.insert(start, "\n\n\n");
-					attachedFileMessages.put(start, message);
-					start++;
-					editText.setText(editable);
-					editText.setSelection(start);
-					Util.showSoftKeyboard(activity, editText);
-					//editText.setGravity(Gravity.LEFT);
-				}
-			}
+			// Finally, send out the message.
+			MessageManager.sendMessage(activity.getApplicationContext(), message);
+			addItem(message);
+			onResumeSending();
+			scrollMessageListViewToBottom();
 		} else {
-			Log.e("Unable to attach image.");
+			Log.e("Unable to send file.");
 			Toast.makeText(activity, "Unable to send file.", Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	public interface OnSendMessageListener {
-		void onSendMessage(String message);
+	public void showAttachmentDialog(Context context, final Uri data) {
+		if (data == null) {
+			Log.d("No attachment found.");
+			return;
+		}
+
+		try {
+			AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
+			dialog.setImage(data);
+			dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
+				@Override
+				public void onAttachmentAccepted() {
+					sendImage(data);
+				}
+			});
+			dialog.show();
+		} catch (Exception e) {
+			Log.e("Error loading attachment preview.", e);
+		}
 	}
+
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
@@ -260,7 +252,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		if (response.isSuccessful()) {
 			post(new Runnable() {
 				public void run() {
-					//setItems(MessageManager.getMessageCenterListItems(activity));
 					unsendMessagesCount--;
 					for (MessageCenterListItem message : messages) {
 						if (message instanceof ApptentiveMessage) {
@@ -336,19 +327,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		} else {
 			messageEditText.setText("");
 		}
-		//messageEditText.requestFocus();
 	}
 
 	@Override
 	public void onComposing(String composingStr, boolean scroll) {
-		if (scroll) {
-			post(new Runnable() {
-				public void run() {
-					messageCenterListAdapter.notifyDataSetChanged();
-					//.smoothScrollToPositionFromTop(messages.size() - 1, messageCenterListView.getHeight());
-				}
-			});
-		}
 	}
 
 	@Override
@@ -380,45 +362,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 			addItem(message);
 			onResumeSending();
-
-			Iterator it = attachedFileMessages.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry pair = (Map.Entry) it.next();
-				OutgoingFileMessage fileMessage = (OutgoingFileMessage) pair.getValue();
-				fileMessage.setHidden(true);
-				fileMessage.setRead(true);
-				fileMessage.setCustomData(customData);
-				MessageManager.sendMessage(activity.getApplicationContext(), fileMessage);
-				it.remove();
-			}
 		}
 		savePendingComposingMessage();
-	}
-
-	@Override
-	public void onAttachImage() {
-		MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		Bundle extras = new Bundle();
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		if (Build.VERSION.SDK_INT >= 11) {
-			extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
-		}
-		intent.setType("image/*");
-		if (!extras.isEmpty()) {
-			intent.putExtras(extras);
-		}
-		Intent chooserIntent = Intent.createChooser(intent, null);
-		activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
-	}
-
-	@Override
-	public void onDeleteImage(int selectionStart) {
-		OutgoingFileMessage fileMessage = attachedFileMessages.get(selectionStart);
-		if (fileMessage != null) {
-			fileMessage.deleteStoredFile(activity);
-			attachedFileMessages.remove(selectionStart);
-		}
 	}
 
 	public void scrollMessageListViewToBottom() {
