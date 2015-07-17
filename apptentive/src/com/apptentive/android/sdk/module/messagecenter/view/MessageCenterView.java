@@ -321,8 +321,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		for (MessageCenterListItem message : messages) {
 			if (message instanceof ApptentiveMessage && !(message instanceof AutomatedMessage)) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
-				Double clientCreatedAt = apptentiveMessage.getClientCreatedAt();
-				String dateStamp = createDatestamp(clientCreatedAt);
+				String dateStamp = createDatestamp(apptentiveMessage);
 				if (dateStamp != null) {
 					if (dateStampsSeen.add(dateStamp)) {
 						apptentiveMessage.setDatestamp(dateStamp);
@@ -335,11 +334,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		messageCenterListAdapter.notifyDataSetChanged();
 	}
 
-	protected String createDatestamp(Double seconds) {
-		if (seconds != null) {
-			Date date = new Date(Math.round(seconds * 1000));
-			DateFormat mediumDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
-			return mediumDateFormat.format(date);
+	protected String createDatestamp(ApptentiveMessage message) {
+		if (message != null) {
+			Double seconds = message.getClientCreatedAt();
+			if (seconds == null) {
+				seconds = message.getCreatedAt();
+			}
+			if (seconds != null) {
+				Date date = new Date(Math.round(seconds * 1000));
+				DateFormat mediumDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+				return mediumDateFormat.format(date);
+			}
 		}
 		return null;
 	}

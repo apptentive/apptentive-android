@@ -25,8 +25,8 @@ public class IncomingTextMessageHolder extends MessageHolder {
 		text = (TextView) view.findViewById(R.id.text);
 	}
 
-	public void updateMessage(String timestamp, String text) {
-		super.updateMessage(timestamp, null);
+	public void updateMessage(String datestamp, String text) {
+		super.updateMessage(datestamp, null);
 
 		if (this.text != null) {
 			this.text.setText(text);
