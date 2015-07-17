@@ -19,7 +19,7 @@
                     android:minHeight="48dp"
                     android:orientation="horizontal">
 
-        <ImageButton android:id="@+id/BtnClose"
+        <ImageButton android:id="@+id/cancel_composing"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_alignParentLeft="true"
@@ -34,11 +34,11 @@
         <TextView android:id="@+id/composing"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/BtnClose"
+                  android:layout_toRightOf="@id/cancel_composing"
                   android:layout_centerVertical="true"
                   android:singleLine="true"
                   android:textStyle="bold"
-                  android:text="Composing:"
+                  android:text="@string/apptentive_message_center_compose_title"
                   android:textColor="@color/apptentive_message_center_hint"
                   android:textSize="16sp"
             />
