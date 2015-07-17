@@ -72,12 +72,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	private Parcelable composingViewSavedState;
 
-	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable etSavedState) {
+	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable editTextSavedState) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
 		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
-		composingViewSavedState = etSavedState;
+		composingViewSavedState = editTextSavedState;
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -355,7 +355,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
-	public void clearComposingUI() {
+	public void clearComposingUi() {
 		if (composingItem != null) {
 			messages.remove(actionBarItem);
 			messages.remove(composingItem);
@@ -393,7 +393,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	@Override
 	public void onCancelComposing() {
-		clearComposingUI();
+		clearComposingUi();
 		savePendingComposingMessage();
 	}
 

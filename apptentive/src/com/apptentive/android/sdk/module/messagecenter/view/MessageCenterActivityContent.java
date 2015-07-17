@@ -23,7 +23,6 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -31,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,10 +60,10 @@ public class MessageCenterActivityContent extends ActivityContent {
 
 		boolean bRestoreListView = onSavedInstanceState != null &&
 				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
-		Parcelable etParcelable = (onSavedInstanceState == null)? null:
+		Parcelable editTextParcelable = (onSavedInstanceState == null)? null:
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
 		messageCenterView = new MessageCenterView(activity, customData,
-				etParcelable);
+				editTextParcelable);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
@@ -113,7 +111,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 	public boolean onBackPressed(Activity activity) {
 		messageCenterView.savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
-		messageCenterView.clearComposingUI();
+		messageCenterView.clearComposingUi();
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
