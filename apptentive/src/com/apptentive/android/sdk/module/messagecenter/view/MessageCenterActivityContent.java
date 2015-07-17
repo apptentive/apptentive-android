@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -38,6 +39,8 @@ import java.util.Map;
  */
 
 public class MessageCenterActivityContent extends ActivityContent {
+	final private static String LIST_INSTANCE_STATE = "list";
+	final private static String COMPOSING_EDITTEXT_STATE = "edittext";
 	private MessageCenterView messageCenterView;
 	private Map<String, String> customData;
 	private Context context;
@@ -57,7 +60,12 @@ public class MessageCenterActivityContent extends ActivityContent {
 			MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
 		}
 
-		messageCenterView = new MessageCenterView(activity, customData);
+		boolean bRestoreListView = onSavedInstanceState != null &&
+				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
+		Parcelable etParcelable = (onSavedInstanceState == null)? null:
+				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
+		messageCenterView = new MessageCenterView(activity, customData,
+				etParcelable);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
@@ -81,27 +89,31 @@ public class MessageCenterActivityContent extends ActivityContent {
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
 
+
 		activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-		messageCenterView.scrollMessageListViewToBottom();
+		if (!bRestoreListView) {
+			messageCenterView.scrollMessageListViewToBottom();
+		}
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-
+		outState.putParcelable(LIST_INSTANCE_STATE, messageCenterView.onSaveListViewInstanceState());
+		outState.putParcelable(COMPOSING_EDITTEXT_STATE, messageCenterView.onSaveEditTextInstanceState());
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-
+		messageCenterView.onRestoreListViewInstanceState(savedInstanceState.getParcelable(LIST_INSTANCE_STATE));
 	}
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
 		messageCenterView.savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
-		messageCenterView.onCancelComposing();
+		messageCenterView.clearComposingUI();
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();

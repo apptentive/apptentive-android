@@ -70,11 +70,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	private EditText messageEditText;
 
-	public MessageCenterView(Activity activity, Map<String, String> customData) {
+	private Parcelable composingViewSavedState;
+
+	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable etSavedState) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
 		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
+		composingViewSavedState = etSavedState;
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -110,34 +113,27 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 		messageCenterListView.setItemsCanFocus(true);
 
+		View fab = findViewById(R.id.composing_fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				addComposingArea();
+				messageCenterListAdapter.notifyDataSetChanged();
+				scrollMessageListViewToBottom();
+			}
+		});
 
 		if (messageCenterListAdapter == null) {
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
+			if (composingViewSavedState != null) {
+				addComposingArea();
+			}
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
 
-
-		View fab = findViewById(R.id.composing_fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				View fab = findViewById(R.id.composing_fab);
-				fab.setVisibility(View.INVISIBLE);
-				if (statusItem != null) {
-					messages.remove(statusItem);
-					statusItem = null;
-				}
-				actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
-				messages.add(actionBarItem);
-				composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
-				messages.add(composingItem);
-				messageCenterListAdapter.notifyDataSetChanged();
-				scrollMessageListViewToBottom();
-			}
-		});
 
 		View attachButton = findViewById(R.id.attach);
 		// Android devices can't take screenshots until Android OS version 4+
@@ -164,7 +160,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			attachButton.setVisibility(GONE);
 		}
 
-		scrollMessageListViewToBottom();
+		//scrollMessageListViewToBottom();
 	}
 
 
@@ -181,14 +177,18 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		return count;
 	}
 
-	public void setItems(final List<MessageCenterListItem> items) {
-		messages.clear();
-		messages.addAll(items);
-		unsendMessagesCount = countUnsendOutgoingMessages(items);
-		messageCenterListAdapter.notifyDataSetChanged();
-		scrollMessageListViewToBottom();
+	public void addComposingArea() {
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.INVISIBLE);
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+		actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
+		messages.add(actionBarItem);
+		composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
+		messages.add(composingItem);
 	}
-
 
 	public void addNewStatusItem(MessageCenterListItem item) {
 		// Remove the exisiting status item in the list
@@ -201,7 +201,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			return;
 		}
 
-		statusItem = (MessageCenterStatus)item;
+		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
 		messageCenterListAdapter.notifyDataSetChanged();
 
@@ -231,17 +231,27 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			messages.remove(statusItem);
 			statusItem = null;
 		}
-
+		int composingAreaIndex = 0;
 		if (composingItem != null) {
-			messages.add(messages.size() - 2, message);
+			composingAreaIndex = messages.size() - 2;
+			messages.add(composingAreaIndex, message);
 		} else {
 			messages.add(message);
 		}
-		messageCenterListAdapter.notifyDataSetChanged();
-		scrollMessageListViewToBottom();
+
+		int firstIndex = messageCenterListView.getFirstVisiblePosition();
+		int lastIndex = messageCenterListView.getLastVisiblePosition();
+		if (firstIndex <= composingAreaIndex && composingAreaIndex < lastIndex ) {
+			View v = messageCenterListView.getChildAt(0);
+			int top = (v == null) ? 0 : v.getTop();
+			messageCenterListAdapter.notifyDataSetChanged();
+			// Restore the position of listview to composing view
+			messageCenterListView.setSelectionFromTop(composingAreaIndex, top);
+		} else {
+			scrollMessageListViewToBottom();
+		}
+
 	}
-
-
 
 	public void sendImage(final Uri uri) {
 		final OutgoingFileMessage message = new OutgoingFileMessage();
@@ -345,25 +355,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
-
-	@Override
-	public void onComposingViewCreated() {
-		messageEditText = messageCenterListAdapter.getEditTextInComposing();
-		String messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
-				getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
-		if (messageText != null) {
-			messageEditText.setText(messageText);
-		} else {
-			messageEditText.setText("");
-		}
-	}
-
-	@Override
-	public void onComposing(String composingStr, boolean scroll) {
-	}
-
-	@Override
-	public void onCancelComposing() {
+	public void clearComposingUI() {
 		if (composingItem != null) {
 			messages.remove(actionBarItem);
 			messages.remove(composingItem);
@@ -379,11 +371,39 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	@Override
+	public void onComposingViewCreated() {
+		messageEditText = messageCenterListAdapter.getEditTextInComposing();
+		if (composingViewSavedState != null) {
+			messageEditText.onRestoreInstanceState(composingViewSavedState);
+			composingViewSavedState = null;
+		} else {
+			String messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+					getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
+			if (messageText != null) {
+				messageEditText.setText(messageText);
+			} else {
+				messageEditText.setText("");
+			}
+		}
+	}
+
+	@Override
+	public void onComposing(String composingStr, boolean scroll) {
+	}
+
+	@Override
+	public void onCancelComposing() {
+		clearComposingUI();
+		savePendingComposingMessage();
+	}
+
+	@Override
 	public void onFinishComposing() {
 		String messageText = getPendingComposingContent().toString().trim();
+		// Close all composing UI
 		onCancelComposing();
+		// Send out the new message
 		if (!messageText.isEmpty()) {
-
 			OutgoingTextMessage message = new OutgoingTextMessage();
 			message.setBody(messageText);
 			message.setRead(true);
@@ -391,7 +411,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			MessageManager.sendMessage(activity.getApplicationContext(), message);
 			addNewOutGoingMessageItem(message);
 		}
-		savePendingComposingMessage();
 	}
 
 	public void scrollMessageListViewToBottom() {
@@ -410,11 +429,23 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	public void savePendingComposingMessage() {
 		Editable content = getPendingComposingContent();
-
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
 		editor.commit();
-
 	}
+
+	public Parcelable onSaveListViewInstanceState() {
+		return messageCenterListView.onSaveInstanceState();
+	}
+
+	public void onRestoreListViewInstanceState(Parcelable state) {
+		messageCenterListView.onRestoreInstanceState(state);
+	}
+
+	public Parcelable onSaveEditTextInstanceState() {
+		savePendingComposingMessage();
+		return (messageEditText == null) ? null : messageEditText.onSaveInstanceState();
+	}
+
 }

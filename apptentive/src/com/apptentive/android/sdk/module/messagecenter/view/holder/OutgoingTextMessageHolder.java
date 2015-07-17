@@ -6,9 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import android.text.SpannableString;
 import android.view.View;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView;
