@@ -86,7 +86,6 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:cacheColorHint="@android:color/transparent"
-                android:transcriptMode="alwaysScroll"
                 android:descendantFocusability="beforeDescendants"/>
             <!--</FrameLayout>-->
             <!-- Composition Area -->
