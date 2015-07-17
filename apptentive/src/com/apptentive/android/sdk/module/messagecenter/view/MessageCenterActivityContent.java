@@ -89,7 +89,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
 
-
+		// Needed to prevent the window from being pushed up when a text input area is focused.
 		activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
