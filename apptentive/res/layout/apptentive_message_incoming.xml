@@ -6,20 +6,20 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              style="@style/MessageCenterMessageFrame">
+    <TextView android:id="@+id/datestamp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              style="@style/ApptentiveMessageCenterMessageDatestamp"/>
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
                  style="@style/ApptentiveMessageCenterMessageBorder">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical">
-            <TextView android:id="@+id/datestamp"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      style="@style/ApptentiveMessageCenterMessageDatestamp"/>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveMessageCenterMessageIncomingBackground">
@@ -37,4 +37,4 @@
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
-</FrameLayout>
+</LinearLayout>

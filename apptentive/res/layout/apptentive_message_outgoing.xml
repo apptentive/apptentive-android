@@ -6,11 +6,15 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:apptentive="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              style="@style/MessageCenterMessageFrame">
+    <TextView android:id="@+id/datestamp"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              style="@style/ApptentiveMessageCenterMessageDatestamp"
+              android:visibility="gone"/>
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
                  style="@style/ApptentiveMessageCenterMessageBorder">
@@ -18,11 +22,6 @@
                       android:layout_height="wrap_content"
                       android:background="@color/apptentive_message_center_outgoing_background"
                       android:orientation="vertical">
-            <TextView android:id="@+id/datestamp"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      style="@style/ApptentiveMessageCenterMessageDatestamp"
-                      android:visibility="gone"/>
             <LinearLayout android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveMessageCenterMessageOutgoingBackground">
@@ -41,4 +40,4 @@
                                                                                         style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"/>
         </LinearLayout>
     </FrameLayout>
-</FrameLayout>
+</LinearLayout>
