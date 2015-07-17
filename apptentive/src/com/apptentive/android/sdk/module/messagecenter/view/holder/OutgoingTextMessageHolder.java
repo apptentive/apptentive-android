@@ -7,9 +7,9 @@
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import android.view.View;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView;
 import com.apptentive.android.sdk.module.messagecenter.view.OutgoingTextMessageView;
 import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
 
@@ -18,12 +18,12 @@ import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBa
  */
 public class OutgoingTextMessageHolder extends MessageHolder {
 	public ApptentiveMaterialIndeterminateProgressBar progressBar;
-	public TextView text;
+	public CollapsibleTextView text;
 
 	public OutgoingTextMessageHolder(OutgoingTextMessageView view) {
 		super(view);
 		progressBar = (ApptentiveMaterialIndeterminateProgressBar) view.findViewById(R.id.progressBar);
-		text = (TextView) view.findViewById(R.id.text);
+		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
 	public void updateMessage(String timestamp, boolean progressBarVisible, String body) {
@@ -38,7 +38,7 @@ public class OutgoingTextMessageHolder extends MessageHolder {
 			}
 		}
 		if (this.text != null) {
-			this.text.setText(body);
+			this.text.setDesc(body);
 		}
 	}
 }

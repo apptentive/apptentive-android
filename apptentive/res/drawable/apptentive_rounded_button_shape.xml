@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+    <solid android:color="@color/apptentive_message_center_toolbar" />
+    <stroke android:width="2dp" android:color="#FFF" />
+</shape>

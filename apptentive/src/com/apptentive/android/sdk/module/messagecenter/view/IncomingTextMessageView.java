@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.R;
@@ -18,6 +19,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage
  */
 public class IncomingTextMessageView extends PersonalMessageView<IncomingTextMessage> {
 
+
+	private CollapsibleTextView container;
+
 	public IncomingTextMessageView(Context context, IncomingTextMessage message) {
 		super(context, message);
 	}
@@ -26,6 +30,12 @@ public class IncomingTextMessageView extends PersonalMessageView<IncomingTextMes
 		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
-		inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
+		View view = inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
+		container = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
+
+	public CollapsibleTextView getCollapsibleContainer() {
+		return container;
+	}
+
 }

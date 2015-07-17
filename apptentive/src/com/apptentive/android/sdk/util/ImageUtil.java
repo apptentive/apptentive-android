@@ -6,9 +6,11 @@
 
 package com.apptentive.android.sdk.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 
@@ -16,6 +18,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -153,6 +156,32 @@ public class ImageUtil {
 		float widthRatio = maxWidth <= 0 ? 1.0f : (float) maxWidth / width;
 		float heightRatio = maxHeight <= 0 ? 1.0f : (float) maxHeight / height;
 		return Math.min(1.0f, Math.min(widthRatio, heightRatio)); // Don't scale above 1.0x
+	}
+
+	public static Bitmap resizeImageForImageView(Context context, String imagePath) {
+		Bitmap resizedBitmap = null;
+
+		FileInputStream fis = null;
+		try {
+			fis = context.openFileInput(imagePath);
+			Point point = Util.getScreenSize(context);
+			int maxImageWidth = (int) (0.5 * point.x);
+			int maxImageHeight = (int) (0.5 * point.x);
+			maxImageWidth = maxImageWidth > 800 ? 800 : maxImageWidth;
+			maxImageHeight = maxImageHeight > 800 ? 800 : maxImageHeight;
+			resizedBitmap = createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
+		} catch (Exception e) {
+			Log.e("Error opening stored image.", e);
+		} catch (OutOfMemoryError e) {
+			// It's generally not a good idea to catch an OutOfMemoryException. But in this case, the OutOfMemoryException
+			// had to result from allocating a bitmap, so the system should be in a good state.
+			// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
+			Log.e("Ran out of memory opening image.", e);
+		} finally {
+			Util.ensureClosed(fis);
+		}
+
+		return resizedBitmap;
 	}
 
 	public static void startDownloadAvatarTask(ApptentiveAvatarView view, String imageUrl) {
