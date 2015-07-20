@@ -30,6 +30,10 @@ import java.net.URL;
  */
 public class ApptentiveAvatarView extends ImageView {
 
+	int paddingLeft, paddingRight, paddingTop, paddingBottom;
+
+	float containerX, containerY;
+
 	float borderWidth;
 	float borderSpace;
 	int borderColor;
@@ -70,10 +74,11 @@ public class ApptentiveAvatarView extends ImageView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (getDrawable() != null) {
+			canvas.translate(paddingLeft, paddingTop);
 			if (borderWidth > 0) {
-				canvas.drawCircle(getWidth() / 2, getHeight() / 2, borderRadius, borderPaint);
+				canvas.drawCircle(containerX / 2, containerY / 2, borderRadius, borderPaint);
 			}
-			canvas.drawCircle(getWidth() / 2, getHeight() / 2, imageRadius, shaderPaint);
+			canvas.drawCircle(containerX / 2, containerY / 2, imageRadius, shaderPaint);
 		}
 	}
 
@@ -143,6 +148,15 @@ public class ApptentiveAvatarView extends ImageView {
 		if (avatar == null) {
 			return;
 		}
+
+		paddingLeft  = getPaddingLeft();
+		paddingRight = getPaddingRight();
+		paddingTop = getPaddingTop();
+		paddingBottom = getPaddingBottom();
+
+		containerX = (float) getWidth() - paddingLeft - paddingRight;
+		containerY = (float) getHeight() - paddingTop - paddingBottom;
+
 		avatarWidth = avatar.getWidth();
 		avatarHeight = avatar.getHeight();
 		shader = new BitmapShader(avatar, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
@@ -158,9 +172,6 @@ public class ApptentiveAvatarView extends ImageView {
 		}
 		borderPaint.setColor(borderColor);
 		borderPaint.setStrokeWidth(borderWidth);
-
-		float containerX = (float) getWidth();
-		float containerY = (float) getHeight();
 
 		// Painting using STROKE style is measured from the center of the line, so include borderWidth in the radius calculation.
 		borderRadius = (Math.min(containerX, containerY) - borderWidth) / 2.0f;

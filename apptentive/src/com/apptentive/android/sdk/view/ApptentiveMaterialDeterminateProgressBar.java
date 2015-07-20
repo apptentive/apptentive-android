@@ -12,13 +12,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import com.apptentive.android.sdk.R;
 
 /**
  * @author Sky Kelsey
  */
-public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
+public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 
 	protected static final int MIN = 0;
 	protected static final int MAX = 100;
@@ -29,6 +30,7 @@ public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
 	int pendindProgress = -1;
 	int progress = 0;
 	View bar;
+	View background;
 
 	public ApptentiveMaterialDeterminateProgressBar(Context context) {
 		super(context);
@@ -61,11 +63,14 @@ public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
 	}
 
 	private void setup() {
-		setBackgroundColor(backgroundColor);
+
+		background = new FrameLayout(getContext());
+		background.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		background.setBackgroundColor(backgroundColor);
+		addView(background);
 
 		bar = new View(getContext());
-		RelativeLayout.LayoutParams params = new LayoutParams(1, 1);
-		bar.setLayoutParams(params);
+		bar.setLayoutParams(new LayoutParams(1, 1));
 		bar.setBackgroundColor(progressBarColor);
 		addView(bar);
 		setProgress(progress);
@@ -81,9 +86,9 @@ public class ApptentiveMaterialDeterminateProgressBar extends RelativeLayout {
 			int totalWidth = MAX - MIN;
 			double progressRatio = (double) progress / (double) totalWidth;
 			int progressWidth = (int) (getWidth() * progressRatio);
-			RelativeLayout.LayoutParams params = (LayoutParams) bar.getLayoutParams();
+			LayoutParams params = (LayoutParams) bar.getLayoutParams();
 			params.width = progressWidth;
-			params.height = getHeight();
+			params.height = LayoutParams.MATCH_PARENT;
 			bar.setLayoutParams(params);
 			pendindProgress = -1;
 		}

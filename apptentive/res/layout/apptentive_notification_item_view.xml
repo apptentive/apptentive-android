@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/notification_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:src="@drawable/icon_heart"/>
+
+    <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@id/notification_image"
+        android:paddingLeft="5dp"
+        android:textSize="@dimen/apptentive_text_large"
+        android:textColor="#000000"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/notification_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/notification_title"
+        android:layout_toRightOf="@id/notification_image"
+        android:ellipsize="marquee"
+        android:gravity="bottom"
+        android:paddingLeft="5dp"
+        android:singleLine="true"
+        android:textSize="@dimen/apptentive_text_small"
+        android:textColor="#000000"
+        android:typeface="monospace" />
+
+</RelativeLayout>    

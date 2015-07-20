@@ -1001,7 +1001,14 @@ public class Apptentive {
 
 		Log.v("Fetching new configuration.");
 		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
+
+		// We weren't able to connect to the internet.
+		if (response.isException()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).commit();
+			return;
+		}
 		if (!response.isSuccessful()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).commit();
 			return;
 		}
 
@@ -1017,6 +1024,7 @@ public class Apptentive {
 			config.save(context);
 		} catch (JSONException e) {
 			Log.e("Error parsing app configuration from server.", e);
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).commit();
 		}
 	}
 

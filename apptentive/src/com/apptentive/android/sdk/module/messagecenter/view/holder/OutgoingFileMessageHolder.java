@@ -34,7 +34,7 @@ public class OutgoingFileMessageHolder extends MessageHolder {
 				this.progressBar.setVisibility(View.VISIBLE);
 			} else {
 				this.progressBar.stop();
-				this.progressBar.setVisibility(View.GONE);
+				this.progressBar.setVisibility(View.INVISIBLE);
 			}
 		}
 	}

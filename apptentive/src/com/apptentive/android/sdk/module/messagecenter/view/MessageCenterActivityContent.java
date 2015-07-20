@@ -10,11 +10,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
+import android.os.Parcelable;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.view.WindowManager;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
@@ -23,9 +22,7 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -33,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,10 +37,12 @@ import java.util.Map;
  */
 
 public class MessageCenterActivityContent extends ActivityContent {
+	final private static String LIST_INSTANCE_STATE = "list";
+	final private static String COMPOSING_EDITTEXT_STATE = "edittext";
 	private MessageCenterView messageCenterView;
 	private Map<String, String> customData;
 	private Context context;
-	private MessageManager.OnNewMessagesListener newMessageListener;
+	private MessageManager.OnNewIncomingMessagesListener newIncomingMessageListener;
 
 	public MessageCenterActivityContent(Serializable data) {
 		this.customData = (Map<String, String>) data;
@@ -54,50 +52,18 @@ public class MessageCenterActivityContent extends ActivityContent {
 	public void onCreate(Activity activity, Bundle onSavedInstanceState) {
 
 		context = activity;
-		MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
 
-		MessageCenterView.OnSendMessageListener onSendMessageListener = new MessageCenterView.OnSendMessageListener() {
-			public void onSendTextMessage(String text) {
-				final OutgoingTextMessage message = new OutgoingTextMessage();
-				message.setBody(text);
-				message.setRead(true);
-				message.setCustomData(customData);
+		if (onSavedInstanceState == null) {
+			// Exclude rotation
+			MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
+		}
 
-				MessageManager.sendMessage(context.getApplicationContext(), message);
-				messageCenterView.post(new Runnable() {
-					public void run() {
-						messageCenterView.addItem(message);
-						messageCenterView.onResumeSending();
-						messageCenterView.scrollMessageListViewToBottom();
-					}
-				});
-			}
-
-			public void onSendFileMessage(Uri uri) {
-				// First, create the file, and populate some metadata about it.
-				final OutgoingFileMessage message = new OutgoingFileMessage();
-				boolean successful = message.internalCreateStoredImage(context.getApplicationContext(), uri.toString());
-				if (successful) {
-					message.setRead(true);
-					message.setCustomData(customData);
-
-					// Finally, send out the message.
-					MessageManager.sendMessage(context.getApplicationContext(), message);
-					messageCenterView.post(new Runnable() {
-						public void run() {
-							messageCenterView.addItem(message);
-							messageCenterView.onResumeSending();
-							messageCenterView.scrollMessageListViewToBottom();
-						}
-					});
-				} else {
-					Log.e("Unable to send file.");
-					Toast.makeText(messageCenterView.getContext(), "Unable to send file.", Toast.LENGTH_SHORT).show();
-				}
-			}
-		};
-
-		messageCenterView = new MessageCenterView(activity, onSendMessageListener);
+		boolean bRestoreListView = onSavedInstanceState != null &&
+				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
+		Parcelable editTextParcelable = (onSavedInstanceState == null)? null:
+				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
+		messageCenterView = new MessageCenterView(activity, customData,
+				editTextParcelable);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
@@ -105,41 +71,48 @@ public class MessageCenterActivityContent extends ActivityContent {
 		}
 		activity.setContentView(messageCenterView);
 
-		newMessageListener = new MessageManager.OnNewMessagesListener() {
-			public void onMessagesUpdated() {
+		newIncomingMessageListener = new MessageManager.OnNewIncomingMessagesListener() {
+			public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg) {
 				messageCenterView.post(new Runnable() {
 					public void run() {
-						List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(context.getApplicationContext());
-						messageCenterView.setItems(items);
-						messageCenterView.scrollMessageListViewToBottom();
+						messageCenterView.addNewIncomingMessageItem(apptentiveMsg);
 					}
 				});
 			}
 		};
 
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-		MessageManager.addInternalOnMessagesUpdatedListener(newMessageListener);
+		MessageManager.addInternalOnMessagesUpdatedListener(newIncomingMessageListener);
 
 		// Give the MessageCenterView a callback when a message is sent.
 		MessageManager.setAfterSendMessageListener(messageCenterView);
 
+		// Needed to prevent the window from being pushed up when a text input area is focused.
+		activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+		if (!bRestoreListView) {
+			messageCenterView.scrollMessageListViewToBottom();
+		}
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		return;
+		outState.putParcelable(LIST_INSTANCE_STATE, messageCenterView.onSaveListViewInstanceState());
+		outState.putParcelable(COMPOSING_EDITTEXT_STATE, messageCenterView.onSaveEditTextInstanceState());
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		return;
+		messageCenterView.onRestoreListViewInstanceState(savedInstanceState.getParcelable(LIST_INSTANCE_STATE));
 	}
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
+		messageCenterView.savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
+		messageCenterView.clearComposingUi();
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
-		savePendingComposingMessage();
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
@@ -167,16 +140,16 @@ public class MessageCenterActivityContent extends ActivityContent {
 		}
 	}
 
-	private void savePendingComposingMessage() {
-		Editable content = messageCenterView.getPendingComposingContent();
-
-		if (content != null) {
-			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, content.toString());
-			editor.commit();
-		}
+	@Override
+	public void onPause() {
+		MessageManager.onPauseSending();
 	}
+
+	@Override
+	public void onResume() {
+		MessageManager.onResumeSending();
+	}
+
 
 	private void clearPendingMessageCenterPushNotification() {
 		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

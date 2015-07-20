@@ -137,16 +137,6 @@
                 <rule>
                   <match>
                     <AND>
-                      <NAME>style</NAME>
-                      <XML_NAMESPACE>^$</XML_NAMESPACE>
-                    </AND>
-                  </match>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
                       <NAME>package</NAME>
                       <XML_ATTRIBUTE />
                     </AND>
@@ -207,6 +197,16 @@
                 <rule>
                   <match>
                     <AND>
+                      <NAME>style</NAME>
+                      <XML_NAMESPACE>^$</XML_NAMESPACE>
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
                       <NAME>.*:width</NAME>
                       <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
                     </AND>
@@ -259,5 +259,6 @@
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Apptentive" />
   </component>
 </project>

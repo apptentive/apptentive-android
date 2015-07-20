@@ -33,6 +33,9 @@ public abstract class ActivityContent {
 	 */
 	public abstract boolean onBackPressed(Activity activity);
 
+	public void onPause() {}
+	public void onResume() {}
+
 	public Type getType() {
 		return type;
 	}
@@ -40,6 +43,7 @@ public abstract class ActivityContent {
 	public enum Type {
 		ABOUT,
 		MESSAGE_CENTER,
+		MESSAGE_CENTER_ERROR,
 		INTERACTION,
 		unknown;
 

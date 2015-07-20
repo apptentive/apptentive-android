@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -60,14 +60,21 @@
     <string name="apptentive_survey_send_response">Send Response</string>
 
     <string name="apptentive_message_center_title">Message Center</string>
+    <string name="apptentive_message_center_compose_title">Compose:</string>
     <string name="apptentive_message_center_compose_hint">Type a message…</string>
     <string name="apptentive_message_center_attachment_title">Send image?</string>
+
     <string name="apptentive_message_center_status_error_title">:-(</string>
     <string name="apptentive_message_center_status_error_body">Something is wrong.\n We can\'t receive your message right now.</string>
     <string name="apptentive_message_center_who_card_name_hint">Name</string>
     <string name="apptentive_message_center_who_card_email_hint">Email</string>
     <string name="apptentive_message_center_who_card_title">And who are we speaking with?</string>
 
+    <string name="apptentive_message_less">Less&lt;&lt;</string>
+    <string name="apptentive_message_more">More&gt;&gt;</string>
+
+    <string name="apptentive_message_center_no_connection">You must connect to the internet before you can send feedback.</string>
+    <string name="apptentive_message_center_server_error">Our server had an error. Try again later.</string>
 
     <!-- This is a Java format. -->
     <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>

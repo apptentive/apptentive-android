@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.3'
+        classpath 'com.android.tools.build:gradle:1.2.3'
     }
 }
 
@@ -18,18 +18,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
 
     buildToolsVersion "22.0.1"
 
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 22
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
     }
 
     configurations.all {
@@ -42,19 +37,19 @@ android {
         dev {
             applicationId "com.apptentive.android.dev"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_DEV,
-                                    APPTENTIVE_USE_STAGING_SERVER: APPTENTIVE_USE_STAGING_SERVER_DEV,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_APP_NAME: "Apptentive Dev"];
         }
         qa {
             applicationId "com.apptentive.android.qa"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_QA,
-                                    APPTENTIVE_USE_STAGING_SERVER: APPTENTIVE_USE_STAGING_SERVER_QA,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_APP_NAME: "Apptentive QA"];
         }
         rc {
             applicationId "com.apptentive.android.rc"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_RC,
-                                    APPTENTIVE_USE_STAGING_SERVER: APPTENTIVE_USE_STAGING_SERVER_RC,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_APP_NAME: "Apptentive RC"];
         }
     }

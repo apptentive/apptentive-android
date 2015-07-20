@@ -20,4 +20,5 @@
     <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
 
     <dimen name="apptentive_message_center_greeting_side_margin">48dp</dimen>
+    <dimen name="apptentive_message_center_error_side_margin">48dp</dimen>
 </resources>

@@ -7,30 +7,32 @@
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import android.graphics.Bitmap;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
+import com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView;
 import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageView;
 
 /**
  * @author Sky Kelsey
  */
 public class IncomingTextMessageHolder extends MessageHolder {
+
 	public ApptentiveAvatarView avatar;
-	public TextView text;
+	public CollapsibleTextView text;
 
 	public IncomingTextMessageHolder(IncomingTextMessageView view) {
 		super(view);
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
-		text = (TextView) view.findViewById(R.id.text);
+		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
 	public void updateMessage(String timestamp, String text) {
 		super.updateMessage(timestamp);
 
 		if (this.text != null) {
-			this.text.setText(text);
+			this.text.setDesc(text);
 		}
 	}
 }

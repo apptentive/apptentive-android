@@ -19,6 +19,9 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
 import com.apptentive.android.sdk.Log;
 
 import java.io.*;
@@ -137,14 +140,14 @@ public class Util {
 		}
 	}
 
-/*
-	public void showSoftKeyboard(Activity activity, View target) {
+
+	public static void showSoftKeyboard(Activity activity, View target) {
 		if (activity.getCurrentFocus() != null) {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(target, 0);
 		}
 	}
-*/
+
 
 
 	public static String[] getAllUserAccountEmailAddresses(Context context) {
@@ -404,5 +407,26 @@ public class Util {
 			//
 		}
 		return null;
+	}
+
+	public static void calculateListViewHeightBasedOnChildren(ListView listView) {
+		ListAdapter listAdapter = listView.getAdapter();
+		if (listAdapter == null) {
+
+			return;
+		}
+
+		int totalHeight = 0;
+		for (int i = 0; i < listAdapter.getCount(); i++) {
+			View listItem = listAdapter.getView(i, null, listView);
+			listItem.measure(0, 0);
+			totalHeight += listItem.getMeasuredHeight();
+		}
+
+		ViewGroup.LayoutParams params = listView.getLayoutParams();
+		int newHeight = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+		int HeightDifference = params.height - newHeight;
+
+		//listView.setLayoutParams(params);
 	}
 }
