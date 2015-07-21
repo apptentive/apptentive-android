@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import com.apptentive.android.sdk.module.messagecenter.view.FileMessageView;
 import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageView;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingActionBarView;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterGreetingView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListItemView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterStatusView;
@@ -26,15 +28,12 @@ public class HolderFactory {
 		} else if (messageCenterListItemView instanceof IncomingTextMessageView) {
 			IncomingTextMessageView textMessageView = (IncomingTextMessageView) messageCenterListItemView;
 			holder = new IncomingTextMessageHolder(textMessageView);
+		} else if (messageCenterListItemView instanceof MessageCenterStatusView) {
+			MessageCenterStatusView messageCenterStatusView = (MessageCenterStatusView) messageCenterListItemView;
+			holder = new StatusHolder(messageCenterStatusView);
 		} else if (messageCenterListItemView instanceof FileMessageView) {
 			FileMessageView fileMessageView = (FileMessageView) messageCenterListItemView;
 			holder = new OutgoingFileMessageHolder(fileMessageView);
-		} else if (messageCenterListItemView instanceof MessageCenterGreetingView) {
-			MessageCenterGreetingView messageCenterGreetingView = (MessageCenterGreetingView) messageCenterListItemView;
-			holder = new GreetingHolder(messageCenterGreetingView);
-		} else if (messageCenterListItemView instanceof MessageCenterStatusView) {
-			MessageCenterStatusView messageCenterGreetingView = (MessageCenterStatusView) messageCenterListItemView;
-			holder = new StatusHolder(messageCenterGreetingView);
 		}
 		return holder;
 	}

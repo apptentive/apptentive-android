@@ -9,25 +9,30 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
+
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
+
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -37,16 +42,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener {
+public class MessageCenterView extends FrameLayout implements MessageManager.AfterSendMessageListener,
+		MessageAdapter.OnComposingActionListener {
 
 	private Activity activity;
-	private OnSendMessageListener onSendMessageListener;
 	private ListView messageCenterListView;
+	private Map<String, String> customData;
 
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
@@ -56,20 +63,25 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	// Count how many paused ongoing messages
 	private int unsendMessagesCount = 0;
 
-	private MessageCenterStatus status;
+
+	private MessageCenterStatus statusItem;
+	private MessageCenterComposingItem composingItem;
+	private MessageCenterComposingItem actionBarItem;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
 	 */
-	private CharSequence messageText;
 
 	private EditText messageEditText;
 
-	public MessageCenterView(Activity activity, OnSendMessageListener onSendMessageListener) {
+	private Parcelable composingViewSavedState;
+
+	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable editTextSavedState) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
-		this.onSendMessageListener = onSendMessageListener;
+		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
+		composingViewSavedState = editTextSavedState;
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -78,12 +90,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
 		// Hide branding if needed.
-		final View branding = findViewById(R.id.apptentive_logo_view);
+		/*final View branding = findViewById(R.id.apptentive_logo_view);
 		if (branding != null) {
 			if (Configuration.load(activity).isHideBranding(activity)) {
 				branding.setVisibility(View.GONE);
 			}
-		}
+		}*/
 
 		ImageButton back = (ImageButton) findViewById(R.id.back);
 		back.setOnClickListener(new OnClickListener() {
@@ -100,46 +112,33 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 
 		messageCenterListView = (ListView) findViewById(R.id.message_list);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 
-		messageEditText = (EditText) findViewById(R.id.input);
 
-		messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
-				getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
+		messageCenterListView.setItemsCanFocus(true);
 
-		if (messageText != null) {
-			messageEditText.setText(messageText);
-			messageEditText.setSelection(messageText.length());
+		View fab = findViewById(R.id.composing_fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				addComposingArea();
+				messageCenterListAdapter.notifyDataSetChanged();
+				scrollMessageListViewToBottom();
+			}
+		});
+
+		if (messageCenterListAdapter == null) {
+			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
+			unsendMessagesCount = countUnsendOutgoingMessages(items);
+			messages.addAll(items);
+			if (composingViewSavedState != null) {
+				addComposingArea();
+			}
+			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
+			messageCenterListView.setAdapter(messageCenterListAdapter);
+			messagesUpdated(); // Force timestamp recompilation.
 		}
 
-		messageEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				messageText = editable.toString();
-			}
-		});
-
-		messageEditText.requestFocus();
-
-		View send = findViewById(R.id.send);
-		send.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				String text = messageEditText.getText().toString().trim();
-				if (text.length() == 0) {
-					return;
-				}
-				messageEditText.setText("");
-				onSendMessageListener.onSendTextMessage(text);
-				messageText = null;
-			}
-		});
 
 		View attachButton = findViewById(R.id.attach);
 		// Android devices can't take screenshots until Android OS version 4+
@@ -165,15 +164,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		} else {
 			attachButton.setVisibility(GONE);
 		}
-		if (messageCenterListAdapter == null) {
-			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
-			unsendMessagesCount = countUnsendOutgoingMessages(items);
-			messages.addAll(items);
-			messageCenterListAdapter = new MessageAdapter<>(activity.getApplicationContext(), messages);
-			messageCenterListView.setAdapter(messageCenterListAdapter);
-			messagesUpdated(); // Force timestamp recompilation.
-		}
+
+		//scrollMessageListViewToBottom();
 	}
+
 
 	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
 		int count = 0;
@@ -181,42 +175,106 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			if (item instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
 				if (apptentiveMessage.isOutgoingMessage() && apptentiveMessage.getCreatedAt() == null) {
-					count ++;
+					count++;
 				}
 			}
 		}
 		return count;
 	}
 
-	public void setItems(final List<MessageCenterListItem> items) {
-		messages.clear();
-		messages.addAll(items);
-		unsendMessagesCount = countUnsendOutgoingMessages(items);
-		messagesUpdated();
+	public void addComposingArea() {
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.INVISIBLE);
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+		actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
+		messages.add(actionBarItem);
+		composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
+		messages.add(composingItem);
 	}
 
-
-	public void addItem(MessageCenterListItem item) {
-
-		if (item instanceof ApptentiveMessage) {
-			ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
-			if (apptentiveMessage.isHidden()) {
-				return;
-			}
+	public void addNewStatusItem(MessageCenterListItem item) {
+		// Remove the exisiting status item in the list
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
 		}
 
-		if (item instanceof MessageCenterGreeting) {
-			messages.add(0, item);
-			messagesUpdated();
+		if (composingItem != null) {
+			return;
+		}
+
+		statusItem = (MessageCenterStatus) item;
+		messages.add(item);
+		messageCenterListAdapter.notifyDataSetChanged();
+
+		scrollMessageListViewToBottom();
+	}
+
+	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
+		// Remove the status message whenever a new outgoing message is added
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+
+		messages.add(message);
+		unsendMessagesCount++;
+
+		isPaused = false;
+		messageCenterListAdapter.setPaused(isPaused);
+
+		messageCenterListAdapter.notifyDataSetChanged();
+		scrollMessageListViewToBottom();
+	}
+
+	public void addNewIncomingMessageItem(ApptentiveMessage message) {
+		// Remove the status message whenever a new incoming message is added
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+		int composingAreaIndex = 0;
+		if (composingItem != null) {
+			composingAreaIndex = messages.size() - 2;
+			messages.add(composingAreaIndex, message);
 		} else {
-			messages.remove(status);
-			messages.add(item);
-			if (!(item instanceof MessageCenterStatus)) {
-				unsendMessagesCount++;
-			}
-			messagesUpdated();
+			messages.add(message);
 		}
 
+		int firstIndex = messageCenterListView.getFirstVisiblePosition();
+		int lastIndex = messageCenterListView.getLastVisiblePosition();
+		boolean composingAreaTakesUpVisibleArea = firstIndex <= composingAreaIndex && composingAreaIndex < lastIndex;
+		if (composingAreaTakesUpVisibleArea) {
+			View v = messageCenterListView.getChildAt(0);
+			int top = (v == null) ? 0 : v.getTop();
+			messagesUpdated();
+			// Restore the position of listview to composing view
+			messageCenterListView.setSelectionFromTop(composingAreaIndex, top);
+		} else {
+			messagesUpdated();
+			scrollMessageListViewToBottom();
+		}
+
+	}
+
+	public void sendImage(final Uri uri) {
+		final OutgoingFileMessage message = new OutgoingFileMessage();
+		boolean successful = message.internalCreateStoredImage(activity.getApplicationContext(), uri.toString());
+		if (successful) {
+			message.setRead(true);
+			message.setCustomData(customData);
+
+			// Finally, send out the message.
+			MessageManager.sendMessage(activity.getApplicationContext(), message);
+			addNewOutGoingMessageItem(message);
+
+		} else {
+			Log.e("Unable to send file.");
+			Toast.makeText(activity, "Unable to send file.", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	public void showAttachmentDialog(Context context, final Uri data) {
@@ -231,7 +289,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
 				@Override
 				public void onAttachmentAccepted() {
-					onSendMessageListener.onSendFileMessage(data);
+					sendImage(data);
 				}
 			});
 			dialog.show();
@@ -240,11 +298,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
-	public interface OnSendMessageListener {
-		void onSendTextMessage(String text);
-
-		void onSendFileMessage(Uri uri);
-	}
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
@@ -252,10 +305,22 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		if (response.isSuccessful()) {
 			post(new Runnable() {
 				public void run() {
-					setItems(MessageManager.getMessageCenterListItems(activity));
-					status = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
-					addItem(status);
-					messageCenterListView.setSelection(messageCenterListAdapter.getCount() - 1);
+					unsendMessagesCount--;
+					for (MessageCenterListItem message : messages) {
+						if (message instanceof ApptentiveMessage) {
+							String nonce = ((ApptentiveMessage) message).getNonce();
+							if (nonce != null) {
+								String sentNonce = apptentiveMessage.getNonce();
+								if (sentNonce != null && nonce.equals(sentNonce)) {
+									((ApptentiveMessage) message).setCreatedAt(apptentiveMessage.getCreatedAt());
+									break;
+								}
+							}
+						}
+					}
+					messagesUpdated();
+					MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
+					addNewStatusItem(newItem);
 				}
 			});
 		}
@@ -267,17 +332,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			isPaused = true;
 			post(new Runnable() {
 				public void run() {
-					int messageCount = messages.size();
-					MessageCenterListItem lastitem = messages.get(messageCount - 1);
-					if (lastitem instanceof MessageCenterStatus) {
-						messages.remove(messageCount - 1);
-					}
 					if (unsendMessagesCount > 0) {
-						status = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
-						addItem(status);
 						messageCenterListAdapter.setPaused(isPaused);
-						messagesUpdated();
-						messageCenterListView.setSelection(messages.size() - 1);
+						MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
+						), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
+						addNewStatusItem(newItem);
 					}
 				}
 			});
@@ -289,14 +348,75 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			isPaused = false;
 			post(new Runnable() {
 				public void run() {
-					messages.remove(status);
+					if (statusItem != null) {
+						messages.remove(statusItem);
+						statusItem = null;
+					}
 					if (unsendMessagesCount > 0) {
 						messageCenterListAdapter.setPaused(isPaused);
-						messagesUpdated();
+						messageCenterListAdapter.notifyDataSetChanged();
 					}
 
 				}
 			});
+		}
+	}
+
+	public void clearComposingUi() {
+		if (composingItem != null) {
+			messages.remove(actionBarItem);
+			messages.remove(composingItem);
+			actionBarItem = null;
+			composingItem = null;
+			messageEditText = null;
+			messageCenterListAdapter.clearComposing();
+			messageCenterListAdapter.notifyDataSetChanged();
+			Util.hideSoftKeyboard(activity, this);
+			View fab = findViewById(R.id.composing_fab);
+			fab.setVisibility(View.VISIBLE);
+		}
+	}
+
+	@Override
+	public void onComposingViewCreated() {
+		messageEditText = messageCenterListAdapter.getEditTextInComposing();
+		if (composingViewSavedState != null) {
+			messageEditText.onRestoreInstanceState(composingViewSavedState);
+			composingViewSavedState = null;
+		} else {
+			String messageText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+					getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
+			if (messageText != null) {
+				messageEditText.setText(messageText);
+			} else {
+				messageEditText.setText("");
+			}
+		}
+	}
+
+	@Override
+	public void onComposing(String composingStr, boolean scroll) {
+	}
+
+	@Override
+	public void onCancelComposing() {
+		clearComposingUi();
+		savePendingComposingMessage();
+	}
+
+	@Override
+	public void onFinishComposing() {
+		String messageText = getPendingComposingContent().toString().trim();
+		// Close all composing UI
+		onCancelComposing();
+		// Send out the new message
+		if (!messageText.isEmpty()) {
+			OutgoingTextMessage message = new OutgoingTextMessage();
+			message.setBody(messageText);
+			message.setRead(true);
+			message.setCustomData(customData);
+			MessageManager.sendMessage(activity.getApplicationContext(), message);
+			addNewOutGoingMessageItem(message);
 		}
 	}
 
@@ -311,8 +431,30 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	// Retrieve the content from the composing area
 	public Editable getPendingComposingContent() {
-		return messageEditText.getText();
+		return (messageEditText == null) ? null : messageEditText.getText();
 	}
+
+	public void savePendingComposingMessage() {
+		Editable content = getPendingComposingContent();
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
+		editor.commit();
+	}
+
+	public Parcelable onSaveListViewInstanceState() {
+		return messageCenterListView.onSaveInstanceState();
+	}
+
+	public void onRestoreListViewInstanceState(Parcelable state) {
+		messageCenterListView.onRestoreInstanceState(state);
+	}
+
+	public Parcelable onSaveEditTextInstanceState() {
+		savePendingComposingMessage();
+		return (messageEditText == null) ? null : messageEditText.onSaveInstanceState();
+	}
+
 
 	Set<String> dateStampsSeen = new HashSet<>();
 	public void messagesUpdated() {
@@ -321,7 +463,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		for (MessageCenterListItem message : messages) {
 			if (message instanceof ApptentiveMessage && !(message instanceof AutomatedMessage)) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
-				String dateStamp = createDatestamp(apptentiveMessage);
+				Double clientCreatedAt = apptentiveMessage.getClientCreatedAt();
+				String dateStamp = createDatestamp(clientCreatedAt);
 				if (dateStamp != null) {
 					if (dateStampsSeen.add(dateStamp)) {
 						apptentiveMessage.setDatestamp(dateStamp);
@@ -334,19 +477,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		messageCenterListAdapter.notifyDataSetChanged();
 	}
 
-	protected String createDatestamp(ApptentiveMessage message) {
-		if (message != null) {
-			Double seconds = message.getClientCreatedAt();
-			if (seconds == null) {
-				seconds = message.getCreatedAt();
-			}
-			if (seconds != null) {
-				Date date = new Date(Math.round(seconds * 1000));
-				DateFormat mediumDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
-				return mediumDateFormat.format(date);
-			}
+	protected String createDatestamp(Double seconds) {
+		if (seconds != null) {
+			Date date = new Date(Math.round(seconds * 1000));
+			DateFormat mediumDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+			return mediumDateFormat.format(date);
 		}
 		return null;
 	}
-
 }

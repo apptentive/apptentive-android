@@ -8,7 +8,9 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
@@ -18,12 +20,25 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeti
  */
 public class MessageCenterGreetingView extends FrameLayout implements MessageCenterListItemView {
 
-	MessageCenterGreeting messageCenterGreeting;
+	public TextView title;
+	public TextView body;
+
+
+	public void updateMessage(String title, String body) {
+		if (this.title != null) {
+			this.title.setText(title);
+		}
+		if (this.body != null) {
+			this.body.setText(body);
+		}
+	}
 
 	public MessageCenterGreetingView(Context context, MessageCenterGreeting messageCenterGreeting) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
-		inflater.inflate(R.layout.apptentive_message_center_greeting, this);
+		View view = inflater.inflate(R.layout.apptentive_message_center_greeting, this);
+		title = (TextView) view.findViewById(R.id.title);
+		body = (TextView) view.findViewById(R.id.body);
 	}
 }

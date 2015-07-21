@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.ActivityContent;

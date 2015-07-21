@@ -11,10 +11,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.os.AsyncTask;
+import android.widget.EditText;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -22,6 +24,7 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -50,7 +53,8 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T> {
+public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T>
+		implements MessageCenterListView.ApptentiveMessageCenterListAdapter {
 
 	private static final int
 			TYPE_TEXT_INCOMING = 0,
@@ -58,7 +62,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			TYPE_FILE_OUTGOING = 2,
 			TYPE_GREETING = 3,
 			TYPE_STATUS = 4,
-			TYPE_AUTO = 5;
+			TYPE_AUTO = 5,
+			TYPE_Composing = 6,
+			TYPE_Actions = 7;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -71,15 +77,30 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private boolean isInPauseState = false;
 	private Context context;
+	private int composingViewIndex = INVALID_POSITION;
+	private MessageCenterComposingView composingView;
+	private EditText et;
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
-	private ArrayList<Integer> positionsWithPendingImageTask = new ArrayList<Integer>();
 
+	private OnComposingActionListener composingActionListener;
 
-	public MessageAdapter(Context context, List<MessageCenterListItem> items) {
+	public interface OnComposingActionListener {
+		void onComposingViewCreated();
+
+		void onComposing(String str, boolean scroll);
+
+		void onCancelComposing();
+
+		void onFinishComposing();
+
+	}
+
+	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {
 		super(context, 0, (List<T>) items);
 		this.context = context;
+		this.composingActionListener = listener;
 	}
 
 	@Override
@@ -111,17 +132,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			return TYPE_GREETING;
 		} else if (listItem instanceof MessageCenterStatus) {
 			return TYPE_STATUS;
+		} else if (listItem instanceof MessageCenterComposingItem) {
+			if (((MessageCenterComposingItem) listItem).getType() ==
+					MessageCenterComposingItem.COMPOSING_ITEM_AREA) {
+				return TYPE_Composing;
+			} else {
+				return TYPE_Actions;
+			}
 		}
 		return IGNORE_ITEM_VIEW_TYPE;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 6;
+		return 8;
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		MessageCenterListItem listItem = getItem(position);
 
 		int type = getItemViewType(position);
@@ -145,12 +173,32 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_FILE_OUTGOING:
 					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
 					break;
-				case TYPE_GREETING:
-					convertView = new MessageCenterGreetingView(parent.getContext(), (MessageCenterGreeting) listItem);
+				case TYPE_GREETING: {
+					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
+					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
+					newView.updateMessage(greeting.getTitle(), greeting.getBody());
+					convertView = newView;
 					break;
-				case TYPE_STATUS:
-					convertView = new MessageCenterStatusView(parent.getContext(), (MessageCenterStatus) listItem);
+				}
+				case TYPE_STATUS: {
+					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
+					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext(), statusItem);
+					newView.updateMessage(statusItem.getTitle(), statusItem.getBody());
+					convertView = newView;
 					break;
+				}
+				case TYPE_Composing: {
+					if (composingView == null) {
+						composingView = new MessageCenterComposingView(context, composingActionListener);
+						setupComposingView(position);
+					}
+					convertView = composingView;
+					break;
+				}
+				case TYPE_Actions: {
+					convertView = new MessageCenterComposingActionBarView(context, composingActionListener);
+					break;
+				}
 				default:
 					Log.i("Unrecognized type: %d", type);
 					break;
@@ -161,6 +209,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		} else {
 			holder = (MessageCenterListItemHolder) convertView.getTag();
+			if (type == TYPE_Composing && composingView == null) {
+				composingView = (MessageCenterComposingView) convertView;
+				setupComposingView(position);
+			}
 		}
 
 		if (holder != null) {
@@ -188,8 +240,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_FILE_OUTGOING: {
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
-					if (position != holder.position && !positionsWithPendingImageTask.contains(position)) {
-						positionsWithPendingImageTask.add(position);
+					if (holder.position != position) {
+						holder.position = position;
 						startLoadAttachedImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
 					}
 					String datestamp = ((OutgoingFileMessage) listItem).getDatestamp();
@@ -197,18 +249,20 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, fileMessage.getCreatedAt() == null);
 					break;
 				}
-				case TYPE_GREETING:
-					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
-					((GreetingHolder) holder).updateMessage(greeting.getTitle(), greeting.getBody());
-					break;
-				case TYPE_STATUS:
+				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
 					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
 					break;
+				}
 				default:
 					return null;
 			}
 			holder.position = position;
+		}
+		if (et != null) {
+			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
+				et.requestFocus();
+			}
 		}
 		return convertView;
 	}
@@ -221,6 +275,38 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	@Override
 	public boolean isEnabled(int position) {
 		return false;
+	}
+
+	public EditText getEditTextInComposing() {
+		if (composingView != null) {
+			return composingView.getEditText();
+		}
+		return null;
+	}
+
+	public void focusOnEditText() {
+		EditText et = composingView.getEditText();
+		et.requestFocus();
+	}
+
+	private void setupComposingView(final int position) {
+		composingActionListener.onComposingViewCreated();
+		et = composingView.getEditText();
+		et.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					composingViewIndex = position;
+				}
+				return false;
+			}
+		});
+	}
+
+	public void clearComposing() {
+		composingView = null;
+		et = null;
+		composingViewIndex = INVALID_POSITION;
 	}
 
 	public void setPaused(boolean bPause) {
@@ -270,6 +356,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		}
 	}
 
+	@Override
+	public boolean isItemSticky(int viewType) {
+		return (viewType == TYPE_Actions);
+	}
+
 	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {
 		private int position;
 
@@ -285,7 +376,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
 			MessageManager.updateMessage(context, textMessages[0]);
 			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
-      return null;
+			return null;
 		}
 
 		@Override
@@ -298,12 +389,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			positionsWithPendingUpdateTask.remove(new Integer(position));
 		}
 
-
 	}
-
 
 	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
 		StoredFile storedFile = message.getStoredFile(context);
+		if (storedFile == null) {
+			return;
+		}
 		String mimeType = storedFile.getMimeType();
 		String imagePath;
 
@@ -365,12 +457,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		@Override
 		protected void onCancelled() {
-			positionsWithPendingImageTask.remove(new Integer(position));
 		}
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			positionsWithPendingImageTask.remove(new Integer(position));
 			if (null == bitmap) {
 				return;
 			}

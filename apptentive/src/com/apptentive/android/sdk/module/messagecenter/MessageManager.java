@@ -60,7 +60,7 @@ public class MessageManager {
 
 	private static WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
-	private static final List<WeakReference<OnNewMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewMessagesListener>>();
+	private static final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewIncomingMessagesListener>>();
 
 
 	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
@@ -79,13 +79,16 @@ public class MessageManager {
 						case UI_THREAD_MESSAGE_ON_UNREAD_HOST:
 							notifyHostUnreadMessagesListeners(msg.arg1);
 							break;
-						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL:
-							notifyInternalNewMessagesListeners();
+						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
+							IncomingTextMessage msgToAdd = (IncomingTextMessage) msg.obj;
+							notifyInternalNewMessagesListeners(msgToAdd);
 							break;
-						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION:
+						}
+						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
 							IncomingTextMessage msgToShow = (IncomingTextMessage) msg.obj;
 							showUnreadMessageToastNotification(msgToShow);
 							break;
+						}
 						default:
 							super.handleMessage(msg);
 					}
@@ -130,13 +133,13 @@ public class MessageManager {
 						}
 					}
 					incomingUnreadMessages++;
+					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (IncomingTextMessage) apptentiveMessage);
+					msg.sendToTarget();
 				}
 			}
 			getMessageStore(appContext).addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			Message msg;
 			if (incomingUnreadMessages > 0) {
-				msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
-				msg.sendToTarget();
 				// Show toast notification only if the forground activity is not alreay message center activity
 				if (!forMessageCenter && showToast) {
 					msg =
@@ -338,15 +341,15 @@ public class MessageManager {
 		}
 	}
 
-	public interface OnNewMessagesListener {
-		public void onMessagesUpdated();
+	public interface OnNewIncomingMessagesListener {
+		public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg);
 	}
 
-	public static void addInternalOnMessagesUpdatedListener(OnNewMessagesListener newlistener) {
+	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
-			for (Iterator<WeakReference<OnNewMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
-				WeakReference<OnNewMessagesListener> listenerRef = iterator.next();
-				OnNewMessagesListener listener = listenerRef.get();
+			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
+				WeakReference<OnNewIncomingMessagesListener> listenerRef = iterator.next();
+				OnNewIncomingMessagesListener listener = listenerRef.get();
 				if (listener != null && listener == newlistener) {
 					return;
 				} else if (listener == null) {
@@ -361,11 +364,11 @@ public class MessageManager {
 		internalNewMessagesListeners.clear();
 	}
 
-	public static void notifyInternalNewMessagesListeners() {
-		for (WeakReference<OnNewMessagesListener> listenerRef : internalNewMessagesListeners) {
-			OnNewMessagesListener listener = listenerRef.get();
+	public static void notifyInternalNewMessagesListeners(final IncomingTextMessage apptentiveMsg) {
+		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
+			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
-				listener.onMessagesUpdated();
+				listener.onMessagesUpdated(apptentiveMsg);
 			}
 		}
 	}
@@ -405,6 +408,7 @@ public class MessageManager {
 			}
 		}
 	}
+
 
 	// Set when an ApptentiveActivity onStart() is called
 	public static void setCurrentForgroundActivity(Activity activity) {
