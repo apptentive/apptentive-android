@@ -55,6 +55,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private ListView messageCenterListView;
 	private Map<String, String> customData;
 
+	private Configuration configGlobal;
+
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
 
@@ -67,21 +69,33 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterStatus statusItem;
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
+	private MessageCenterComposingItem whoCardItem;
 
 	/**
-	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
+	 * Used to save the state of the message text box if the user closes Message Center for a moment,
+	 * , rotate device, attaches a file, etc.
 	 */
-
 	private EditText messageEditText;
-
 	private Parcelable composingViewSavedState;
 
-	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable editTextSavedState) {
+	/**
+	 * Used to save the state of the who card if the user closes Message Center for a moment,
+	 * , rotate device, attaches a file, etc.
+	 */
+	private String pendingWhoCardName;
+	private String pendingWhoCardEmail;
+	private String pendingWhoCardAvatarFile;
+
+	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable editTextSavedState,
+													 String whoCardName, String whoCardEmail, String whoCardAvatar) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
 		this.customData = customData;
 		this.setId(R.id.apptentive_message_center_view);
 		composingViewSavedState = editTextSavedState;
+		pendingWhoCardName = whoCardName;
+		pendingWhoCardEmail = whoCardEmail;
+		pendingWhoCardAvatarFile = whoCardAvatar;
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -104,9 +118,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				activity.onBackPressed();
 			}
 		});
-
+		configGlobal = Configuration.load(activity);
 		TextView titleTextView = (TextView) findViewById(R.id.title);
-		String titleText = Configuration.load(activity).getMessageCenterTitle();
+		String titleText = configGlobal.getMessageCenterTitle();
 		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
@@ -136,6 +150,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			 */
 			if (composingViewSavedState != null || items.size() == 1) {
 				addComposingArea();
+			}
+			if (pendingWhoCardName != null || pendingWhoCardEmail != null ||
+					pendingWhoCardAvatarFile != null) {
+				addWhoCard();
 			}
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
@@ -196,6 +214,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		messages.add(actionBarItem);
 		composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
 		messages.add(composingItem);
+	}
+
+	public void addWhoCard() {
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.INVISIBLE);
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+		whoCardItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD);
+		messages.add(whoCardItem);
 	}
 
 	public void addNewStatusItem(MessageCenterListItem item) {
@@ -322,8 +351,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 						}
 					}
 					messagesUpdated();
-					MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
-					addNewStatusItem(newItem);
 				}
 			});
 		}
@@ -365,6 +392,19 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
+	public void clearWhoCardUi() {
+		if (whoCardItem != null) {
+			messages.remove(whoCardItem);
+			whoCardItem = null;
+			messageCenterListAdapter.clearWhoCard();
+			messageCenterListAdapter.notifyDataSetChanged();
+			Util.hideSoftKeyboard(activity, this);
+			View fab = findViewById(R.id.composing_fab);
+			fab.setVisibility(View.VISIBLE);
+			saveWhoCardSetState();
+		}
+	}
+
 	public void clearComposingUi() {
 		if (composingItem != null) {
 			messages.remove(actionBarItem);
@@ -398,6 +438,32 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	@Override
+	public void onWhoCardViewCreated(EditText nameEt, EditText emailEt) {
+		if (pendingWhoCardName != null) {
+			nameEt.setText(pendingWhoCardName);
+		} else {
+			String nameText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+					getString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, null);
+			if (nameText != null) {
+				nameEt.setText(nameText);
+			} else {
+				nameEt.setText("");
+			}
+		}
+		if (pendingWhoCardEmail != null) {
+			emailEt.setText(pendingWhoCardEmail);
+		} else {
+			String emailText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
+					getString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, null);
+			if (emailText != null) {
+				emailEt.setText(emailText);
+			} else {
+				emailEt.setText("");
+			}
+		}
+	}
+
+	@Override
 	public void onComposing(String composingStr, boolean scroll) {
 	}
 
@@ -420,7 +486,31 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			message.setCustomData(customData);
 			MessageManager.sendMessage(activity.getApplicationContext(), message);
 			addNewOutGoingMessageItem(message);
+			SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+			if (!bWhoCardSet) {
+				addWhoCard();
+				messageCenterListAdapter.notifyDataSetChanged();
+				scrollMessageListViewToBottom();
+			}
 		}
+	}
+
+	@Override
+	public void onSkipWhoCard() {
+		clearWhoCardUi();
+	}
+
+	@Override
+	public void onSendWhoCard() {
+		clearWhoCardUi();
+	}
+
+	private void saveWhoCardSetState() {
+		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
+		editor.commit();
 	}
 
 	public void scrollMessageListViewToBottom() {
@@ -463,8 +553,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		return null;
 	}
 
+	public String onSaveWhoCardName() {
+		return messageCenterListAdapter.getWhoCardName();
+	}
+
+	public String onSaveWhoCardEmail() {
+		return messageCenterListAdapter.getWhoCardEmail();
+	}
+
+	public String onSaveWhoCardAvatar() {
+		return messageCenterListAdapter.getWhoCardAvatarFileName();
+	}
 
 	Set<String> dateStampsSeen = new HashSet<>();
+
 	public void messagesUpdated() {
 
 		dateStampsSeen.clear();

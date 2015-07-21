@@ -66,6 +66,12 @@
 
     <string name="apptentive_message_center_status_error_title">:-(</string>
     <string name="apptentive_message_center_status_error_body">Something is wrong.\n We can\'t receive your message right now.</string>
+    <string name="apptentive_message_center_who_card_name_hint">Name</string>
+    <string name="apptentive_message_center_who_card_email_hint">Email</string>
+    <string name="apptentive_message_center_who_card_title">And who are we speaking with?</string>
+    <string name="apptentive_message_center_who_card_skip">SKIP</string>
+    <string name="apptentive_message_center_who_card_me">THAT\'S ME!</string>
+
     <string name="apptentive_message_less">Less&lt;&lt;</string>
     <string name="apptentive_message_more">More&gt;&gt;</string>
 

@@ -36,7 +36,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 			});
 
 
-		View sendButton = findViewById(R.id.BtnSend);
+		View sendButton = findViewById(R.id.btn_send_message);
 		sendButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				listener.onFinishComposing();

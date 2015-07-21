@@ -42,7 +42,7 @@
                   android:textColor="@color/apptentive_message_center_hint"
                   android:textSize="16sp"
             />
-        <ImageButton android:id="@+id/BtnSend"
+        <ImageButton android:id="@+id/btn_send_message"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_alignParentRight="true"

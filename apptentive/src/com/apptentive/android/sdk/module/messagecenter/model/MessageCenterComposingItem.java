@@ -12,6 +12,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 public class MessageCenterComposingItem implements MessageCenterListItem {
 	public static int COMPOSING_ITEM_AREA = 0;
 	public static int COMPOSING_ITEM_ACTIONBAR = 1;
+	public static int COMPOSING_ITEM_WHOCARD = 2;
 
 	private int type;
 

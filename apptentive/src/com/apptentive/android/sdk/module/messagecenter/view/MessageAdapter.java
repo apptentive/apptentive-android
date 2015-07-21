@@ -30,7 +30,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListIt
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
-import com.apptentive.android.sdk.module.messagecenter.view.holder.GreetingHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.HolderFactory;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
@@ -63,8 +62,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			TYPE_GREETING = 3,
 			TYPE_STATUS = 4,
 			TYPE_AUTO = 5,
-			TYPE_Composing = 6,
-			TYPE_Actions = 7;
+			TYPE_COMPOSING_AREA = 6,
+			TYPE_COMPOSING_BAR = 7,
+			TYPE_WHOCARD = 8;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -75,11 +75,22 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private final static int MAX_IMAGE_DISPLAY_WIDTH = 800;
 	private final static int MAX_IMAGE_DISPLAY_HEIGHT = 800;
 
+	// If message sending is paused or not
 	private boolean isInPauseState = false;
+
 	private Context context;
+
+	// Variables used in composing message
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
-	private EditText et;
+	private EditText composingEditText;
+
+	// Variables used in Who Card
+	private int whoCardViewIndex = INVALID_POSITION;
+	private boolean focusOnNameField = false;
+	private MessageCenterWhoCardView whoCardView;
+	private EditText emailEditText;
+	private EditText nameEditText;
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
@@ -94,6 +105,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		void onCancelComposing();
 
 		void onFinishComposing();
+
+		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
+
+		void onSkipWhoCard();
+
+		void onSendWhoCard();
 
 	}
 
@@ -135,9 +152,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		} else if (listItem instanceof MessageCenterComposingItem) {
 			if (((MessageCenterComposingItem) listItem).getType() ==
 					MessageCenterComposingItem.COMPOSING_ITEM_AREA) {
-				return TYPE_Composing;
+				return TYPE_COMPOSING_AREA;
+			} else if (((MessageCenterComposingItem) listItem).getType() ==
+					MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR){
+				return TYPE_COMPOSING_BAR;
 			} else {
-				return TYPE_Actions;
+				return TYPE_WHOCARD;
 			}
 		}
 		return IGNORE_ITEM_VIEW_TYPE;
@@ -145,7 +165,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	@Override
 	public int getViewTypeCount() {
-		return 8;
+		return 9;
 	}
 
 	@Override
@@ -187,7 +207,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					convertView = newView;
 					break;
 				}
-				case TYPE_Composing: {
+				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
 						composingView = new MessageCenterComposingView(context, composingActionListener);
 						setupComposingView(position);
@@ -195,8 +215,16 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					convertView = composingView;
 					break;
 				}
-				case TYPE_Actions: {
+				case TYPE_COMPOSING_BAR: {
 					convertView = new MessageCenterComposingActionBarView(context, composingActionListener);
+					break;
+				}
+				case TYPE_WHOCARD: {
+					if (whoCardView == null) {
+						whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+						setupWhoCardView(position);
+					}
+					convertView = whoCardView;
 					break;
 				}
 				default:
@@ -209,7 +237,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		} else {
 			holder = (MessageCenterListItemHolder) convertView.getTag();
-			if (type == TYPE_Composing && composingView == null) {
+			if (type == TYPE_COMPOSING_AREA && composingView == null) {
 				composingView = (MessageCenterComposingView) convertView;
 				setupComposingView(position);
 			}
@@ -259,9 +287,17 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 			holder.position = position;
 		}
-		if (et != null) {
+		if (composingEditText != null) {
 			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
-				et.requestFocus();
+				composingEditText.requestFocus();
+			}
+		} else if (nameEditText != null) {
+			if (whoCardViewIndex != INVALID_POSITION && whoCardViewIndex == position) {
+				 if (focusOnNameField) {
+					 nameEditText.requestFocus();
+				 } else {
+					 emailEditText.requestFocus();
+				 }
 			}
 		}
 		return convertView;
@@ -277,6 +313,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return false;
 	}
 
+	public String getWhoCardName() {
+		if (whoCardView != null) {
+			return whoCardView.getNameField().getText().toString();
+		}
+		return null;
+	}
+
+	public String getWhoCardEmail() {
+		if (whoCardView != null) {
+			return whoCardView.getEmailField().getText().toString();
+		}
+		return null;
+	}
+
+	public String getWhoCardAvatarFileName() {
+		return null;
+	}
+
 	public EditText getEditTextInComposing() {
 		if (composingView != null) {
 			return composingView.getEditText();
@@ -284,15 +338,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return null;
 	}
 
-	public void focusOnEditText() {
-		EditText et = composingView.getEditText();
-		et.requestFocus();
-	}
-
 	private void setupComposingView(final int position) {
-		composingActionListener.onComposingViewCreated();
-		et = composingView.getEditText();
-		et.setOnTouchListener(new View.OnTouchListener() {
+		composingEditText = composingView.getEditText();
+		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -301,12 +349,46 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		composingActionListener.onComposingViewCreated();
 	}
 
 	public void clearComposing() {
 		composingView = null;
-		et = null;
+		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
+	}
+
+	private void setupWhoCardView(final int position) {
+		emailEditText = whoCardView.getEmailField();
+		emailEditText.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					whoCardViewIndex = position;
+					focusOnNameField = false;
+				}
+				return false;
+			}
+		});
+		nameEditText = whoCardView.getNameField();
+		nameEditText.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					whoCardViewIndex = position;
+					focusOnNameField = true;
+				}
+				return false;
+			}
+		});
+		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
+	}
+
+	public void clearWhoCard() {
+		whoCardView = null;
+		emailEditText = null;
+		nameEditText = null;
+		whoCardViewIndex = INVALID_POSITION;
 	}
 
 	public void setPaused(boolean bPause) {
@@ -358,7 +440,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	@Override
 	public boolean isItemSticky(int viewType) {
-		return (viewType == TYPE_Actions);
+		return (viewType == TYPE_COMPOSING_BAR);
 	}
 
 	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {

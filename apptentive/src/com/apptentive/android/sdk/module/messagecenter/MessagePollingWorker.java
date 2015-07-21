@@ -86,7 +86,7 @@ public class MessagePollingWorker {
 						long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
 						if (Util.isNetworkConnectionPresent(contextRef.get()) && conf.isMessageCenterEnabled(contextRef.get())) {
 							Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
-							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isNewMessageToastEnabled(contextRef.get()));
+							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isNewMessageToastEnabled());
 						}
 						MessagePollingWorker.goToSleep(pollingInterval);
 					}

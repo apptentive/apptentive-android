@@ -48,6 +48,12 @@ public class Constants {
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET = "messageCenterWhoCardSet";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME = "messageCenterWhoCardName";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL = "messageCenterWhoCardEmail";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_AVATAR = "messageCenterWhoCardAvatar";
+
+
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 

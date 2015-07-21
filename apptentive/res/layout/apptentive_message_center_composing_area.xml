@@ -18,8 +18,6 @@
                       android:layout_marginRight="5dp"
                       android:layout_marginLeft="5dp"
                       android:orientation="vertical"
-                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
-                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border"
                       android:elevation="1.5dp"
                       android:background="@drawable/apptentive_rounded_corner_shape">
             <EditText android:id="@+id/composing_et"

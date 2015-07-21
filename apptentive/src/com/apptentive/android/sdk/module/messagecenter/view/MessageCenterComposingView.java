@@ -8,10 +8,8 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.text.Editable;
-import android.text.Selection;
 
 import android.text.TextWatcher;
-import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -19,8 +17,6 @@ import android.widget.FrameLayout;
 
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.util.Util;
 
 
 /**

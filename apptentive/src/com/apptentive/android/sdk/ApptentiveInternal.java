@@ -162,7 +162,7 @@ public class ApptentiveInternal {
 		intent.setClass(activity, ViewActivity.class);
 
 		Configuration configuration = Configuration.load(activity.getApplicationContext());
-		if (configuration.canShowMessageCenter(activity.getApplicationContext())) {
+		if (configuration.canShowMessageCenter()) {
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
 		} else {
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.toString());

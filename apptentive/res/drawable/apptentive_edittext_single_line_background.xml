@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item>
+        <shape>
+            <solid android:color="?attr/apptentiveTintColor" />
+        </shape>
+    </item>
+
+    <!-- main color -->
+    <item
+        android:bottom="1.5dp"
+        android:left="1.5dp"
+        android:right="1.5dp">
+        <shape>
+            <solid android:color="@color/apptentive_white" />
+        </shape>
+    </item>
+
+    <!-- draw another block to cut-off the left and right bars -->
+    <item android:bottom="5.0dp">
+        <shape>
+            <solid android:color="@color/apptentive_white" />
+        </shape>
+    </item>
+
+</layer-list>
