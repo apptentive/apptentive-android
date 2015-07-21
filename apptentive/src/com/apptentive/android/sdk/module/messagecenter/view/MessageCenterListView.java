@@ -105,7 +105,7 @@ public class MessageCenterListView extends ListView {
 				}
 
 			} else {
-			  // header is not at the first visible position
+				// header is not at the first visible position
 				int headerPosition = findCurrentHeaderPosition(firstVisibleItem);
 				if (headerPosition > -1) {
 					tryCreateShadowAtPosition(headerPosition, firstVisibleItem, visibleItemCount);
@@ -199,7 +199,7 @@ public class MessageCenterListView extends ListView {
 		if (heightSize > maxHeight) {
 			heightSize = maxHeight;
 		}
-    // assuming left and right additional paddings are the same
+		// assuming left and right additional paddings are the same
 		int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight(), MeasureSpec.EXACTLY);
 		int hs = MeasureSpec.makeMeasureSpec(heightSize, heightMode);
 		stickyView.measure(ws, hs);
@@ -209,7 +209,7 @@ public class MessageCenterListView extends ListView {
 		stickyViewShadow.view = stickyView;
 		stickyViewShadow.position = position;
 		stickyViewShadow.id = getAdapter().getItemId(position);
-    stickyViewShadow.additionalIndent = childLayout.getPaddingLeft();
+		stickyViewShadow.additionalIndent = childLayout.getPaddingLeft();
 
 		stickyWrapper = stickyViewShadow;
 	}

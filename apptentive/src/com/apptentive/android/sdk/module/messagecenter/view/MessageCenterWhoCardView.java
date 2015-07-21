@@ -28,23 +28,23 @@ import com.apptentive.android.sdk.util.Constants;
  */
 public class MessageCenterWhoCardView extends FrameLayout implements MessageCenterListItemView {
 
-	private EditText et_email;
-	private EditText et_name;
+	private EditText etEmail;
+	private EditText etName;
 
 	public MessageCenterWhoCardView(Context context, final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
-		et_email = (EditText) parentView.findViewById(R.id.who_email);
-		et_name = (EditText) parentView.findViewById(R.id.who_name);
+		etEmail = (EditText) parentView.findViewById(R.id.who_email);
+		etName = (EditText) parentView.findViewById(R.id.who_name);
 
-		et_email.addTextChangedListener(new TextWatcher() {
+		etEmail.addTextChangedListener(new TextWatcher() {
 			private boolean doScroll = false;
 
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				et_email.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
+				etEmail.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
 			}
 
 			@Override
@@ -59,9 +59,9 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		});
 
 		View skipButton = findViewById(R.id.btn_skip);
-		final boolean reqired = Configuration.load(getContext()).isMessageCenterEmailRequired();
+		final boolean required = Configuration.load(getContext()).isMessageCenterEmailRequired();
 		if (skipButton != null) {
-			if (reqired) {
+			if (required) {
 				skipButton.setVisibility(INVISIBLE);
 			} else {
 				skipButton.setOnClickListener(new OnClickListener() {
@@ -73,22 +73,22 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		}
 
 		View sendButton = findViewById(R.id.btn_send);
-		if (reqired) {
+		if (required) {
 			((Button)sendButton).setText(getResources().getText(R.string.apptentive_send));
 		}
 		sendButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				if (reqired) {
-					String email = et_email.getText().toString();
+				if (required) {
+					String email = etEmail.getText().toString();
 					if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-						et_email.setTextColor(getResources().getColor(R.color.apptentive_red));
+						etEmail.setTextColor(getResources().getColor(R.color.apptentive_red));
 						return;
 					}
 				}
 				SharedPreferences prefs = getContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = prefs.edit();
-				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, et_email.getText().toString());
-				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, et_name.getText().toString());
+				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, etEmail.getText().toString());
+				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, etName.getText().toString());
 				editor.commit();
 				listener.onSendWhoCard();
 			}
@@ -97,10 +97,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	}
 
 	public EditText getNameField() {
-		return et_name;
+		return etName;
 	}
 
 	public EditText getEmailField() {
-		return et_email;
+		return etEmail;
 	}
 }

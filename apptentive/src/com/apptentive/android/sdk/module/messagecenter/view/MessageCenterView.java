@@ -55,7 +55,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private ListView messageCenterListView;
 	private Map<String, String> customData;
 
-	private Configuration config_global;
+	private Configuration configGlobal;
 
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
@@ -69,7 +69,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterStatus statusItem;
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
-  private MessageCenterComposingItem whoCardItem;
+	private MessageCenterComposingItem whoCardItem;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment,
@@ -118,9 +118,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				activity.onBackPressed();
 			}
 		});
-		config_global = Configuration.load(activity);
+		configGlobal = Configuration.load(activity);
 		TextView titleTextView = (TextView) findViewById(R.id.title);
-		String titleText = config_global.getMessageCenterTitle();
+		String titleText = configGlobal.getMessageCenterTitle();
 		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
@@ -566,6 +566,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	Set<String> dateStampsSeen = new HashSet<>();
+
 	public void messagesUpdated() {
 
 		dateStampsSeen.clear();
