@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.widget.TextView;
 import android.graphics.Bitmap;
 
 import com.apptentive.android.sdk.R;
@@ -28,8 +29,8 @@ public class IncomingTextMessageHolder extends MessageHolder {
 		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
-	public void updateMessage(String timestamp, String text) {
-		super.updateMessage(timestamp);
+	public void updateMessage(String datestamp, String text) {
+		super.updateMessage(datestamp, null);
 
 		if (this.text != null) {
 			this.text.setDesc(text);

@@ -6,12 +6,16 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:apptentive="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              style="@style/MessageCenterMessageFrame">
-    <FrameLayout android:layout_width="match_parent"
+    <TextView android:id="@+id/datestamp"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              style="@style/ApptentiveMessageCenterMessageDatestamp"
+              android:visibility="gone"/>
+    <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
                  style="@style/ApptentiveMessageCenterMessageBorder">
         <LinearLayout android:layout_width="fill_parent"
@@ -24,10 +28,11 @@
                 <FrameLayout android:id="@+id/body"
                              android:layout_width="match_parent"
                              android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/timestamp"
+                <TextView android:id="@+id/status"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveMessageCenterMessageTimestamp"/>
+                          style="@style/ApptentiveMessageCenterOutgoingMessageStatus"
+                          android:visibility="gone"/>
             </LinearLayout>
             <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progressBar"
                                                                                         android:layout_width="fill_parent"
@@ -35,4 +40,4 @@
                                                                                         style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"/>
         </LinearLayout>
     </FrameLayout>
-</FrameLayout>
+</LinearLayout>

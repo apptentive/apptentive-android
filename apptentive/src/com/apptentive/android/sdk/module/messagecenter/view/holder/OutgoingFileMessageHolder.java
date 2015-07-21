@@ -26,8 +26,8 @@ public class OutgoingFileMessageHolder extends MessageHolder {
 		image = (ImageView) view.findViewById(R.id.apptentive_file_message_image);
 	}
 
-	public void updateMessage(String timestamp, boolean progressBarVisible) {
-		super.updateMessage(timestamp);
+	public void updateMessage(String timestamp, String status, boolean progressBarVisible) {
+		super.updateMessage(timestamp, status);
 		if (this.progressBar != null) {
 			if (progressBarVisible) {
 				this.progressBar.start();
