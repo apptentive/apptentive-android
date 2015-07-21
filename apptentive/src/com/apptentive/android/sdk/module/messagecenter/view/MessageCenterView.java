@@ -28,7 +28,7 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
@@ -37,9 +37,13 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Sky Kelsey
@@ -132,6 +136,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			}
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
+			messagesUpdated(); // Force timestamp recompilation.
 		}
 
 
@@ -241,13 +246,15 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 		int firstIndex = messageCenterListView.getFirstVisiblePosition();
 		int lastIndex = messageCenterListView.getLastVisiblePosition();
-		if (firstIndex <= composingAreaIndex && composingAreaIndex < lastIndex ) {
+		boolean composingAreaTakesUpVisibleArea = firstIndex <= composingAreaIndex && composingAreaIndex < lastIndex;
+		if (composingAreaTakesUpVisibleArea) {
 			View v = messageCenterListView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
-			messageCenterListAdapter.notifyDataSetChanged();
+			messagesUpdated();
 			// Restore the position of listview to composing view
 			messageCenterListView.setSelectionFromTop(composingAreaIndex, top);
 		} else {
+			messagesUpdated();
 			scrollMessageListViewToBottom();
 		}
 
@@ -311,7 +318,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 							}
 						}
 					}
-
+					messagesUpdated();
 					MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_thank_you), null);
 					addNewStatusItem(newItem);
 				}
@@ -448,4 +455,34 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		return (messageEditText == null) ? null : messageEditText.onSaveInstanceState();
 	}
 
+
+	Set<String> dateStampsSeen = new HashSet<>();
+	public void messagesUpdated() {
+
+		dateStampsSeen.clear();
+		for (MessageCenterListItem message : messages) {
+			if (message instanceof ApptentiveMessage && !(message instanceof AutomatedMessage)) {
+				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
+				Double clientCreatedAt = apptentiveMessage.getClientCreatedAt();
+				String dateStamp = createDatestamp(clientCreatedAt);
+				if (dateStamp != null) {
+					if (dateStampsSeen.add(dateStamp)) {
+						apptentiveMessage.setDatestamp(dateStamp);
+					} else {
+						apptentiveMessage.clearDatestamp();
+					}
+				}
+			}
+		}
+		messageCenterListAdapter.notifyDataSetChanged();
+	}
+
+	protected String createDatestamp(Double seconds) {
+		if (seconds != null) {
+			Date date = new Date(Math.round(seconds * 1000));
+			DateFormat mediumDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+			return mediumDateFormat.format(date);
+		}
+		return null;
+	}
 }

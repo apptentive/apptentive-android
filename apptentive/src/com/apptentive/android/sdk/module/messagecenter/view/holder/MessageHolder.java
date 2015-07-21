@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -15,13 +16,22 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageView;
  * @author Sky Kelsey
  */
 public class MessageHolder extends MessageCenterListItemHolder {
-	public TextView timestamp;
+	public TextView datestamp;
+	public TextView status;
 
 	public MessageHolder(MessageView view) {
-		timestamp = (TextView) view.findViewById(R.id.timestamp);
+		datestamp = (TextView) view.findViewById(R.id.datestamp);
+		status = (TextView) view.findViewById(R.id.status);
 	}
 
-	public void updateMessage(String timestamp) {
-		this.timestamp.setText(timestamp);
+	public void updateMessage(String datestamp, String status) {
+		if (this.datestamp != null) {
+			this.datestamp.setText(datestamp);
+			this.datestamp.setVisibility(datestamp != null ? View.VISIBLE : View.GONE);
+		}
+		if (this.status != null) {
+			this.status.setText(status);
+			this.status.setVisibility(status != null ? View.VISIBLE : View.GONE);
+		}
 	}
 }

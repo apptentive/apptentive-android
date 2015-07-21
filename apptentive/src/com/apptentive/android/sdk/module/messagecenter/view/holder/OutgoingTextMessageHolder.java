@@ -26,8 +26,8 @@ public class OutgoingTextMessageHolder extends MessageHolder {
 		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
-	public void updateMessage(String timestamp, boolean progressBarVisible, String body) {
-		super.updateMessage(timestamp);
+	public void updateMessage(String datestamp, String status, boolean progressBarVisible, String body) {
+		super.updateMessage(datestamp, status);
 		if (this.progressBar != null) {
 			if (progressBarVisible) {
 				this.progressBar.start();

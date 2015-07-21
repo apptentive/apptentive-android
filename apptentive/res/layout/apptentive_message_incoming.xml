@@ -6,31 +6,35 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              style="@style/MessageCenterMessageFrame">
+    <TextView android:id="@+id/datestamp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              style="@style/ApptentiveMessageCenterMessageDatestamp"/>
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
                  style="@style/ApptentiveMessageCenterMessageBorder">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveMessageCenterMessageIncomingBackground">
-            <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
-                                                                                       android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
-                                                                                       android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
-                                                                                       style="?attr/apptentiveAvatarViewMessageStyle"/>
+                      android:orientation="vertical">
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveMessageCenterMessageContent">
-                <FrameLayout android:id="@+id/body"
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"/>
-                <TextView android:id="@+id/timestamp"
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          style="@style/ApptentiveMessageCenterMessageTimestamp"/>
+                          style="@style/ApptentiveMessageCenterMessageIncomingBackground">
+                <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
+                                                                                           android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
+                                                                                           android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
+                                                                                           style="?attr/apptentiveAvatarViewMessageStyle"/>
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              style="@style/ApptentiveMessageCenterMessageContent">
+                    <FrameLayout android:id="@+id/body"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
-</FrameLayout>
+</LinearLayout>
