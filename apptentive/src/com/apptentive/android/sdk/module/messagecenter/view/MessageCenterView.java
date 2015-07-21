@@ -101,7 +101,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		back.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				activity.finish();
+				activity.onBackPressed();
 			}
 		});
 
@@ -131,7 +131,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
-			if (composingViewSavedState != null) {
+			/* Add composing view when there is only greeting
+			** or if the user was in composing mode before roatation
+			 */
+			if (composingViewSavedState != null || items.size() == 1) {
 				addComposingArea();
 			}
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
@@ -452,7 +455,12 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	public Parcelable onSaveEditTextInstanceState() {
 		savePendingComposingMessage();
-		return (messageEditText == null) ? null : messageEditText.onSaveInstanceState();
+		if (messageEditText != null) {
+			// Hide keyboard if the keyboard was up prior to rotation
+			Util.hideSoftKeyboard(activity, this);
+			return messageEditText.onSaveInstanceState();
+		}
+		return null;
 	}
 
 
