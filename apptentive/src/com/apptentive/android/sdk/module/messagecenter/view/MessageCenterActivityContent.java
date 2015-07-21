@@ -37,8 +37,11 @@ import java.util.Map;
  */
 
 public class MessageCenterActivityContent extends ActivityContent {
-	final private static String LIST_INSTANCE_STATE = "list";
-	final private static String COMPOSING_EDITTEXT_STATE = "edittext";
+	private final static String LIST_INSTANCE_STATE = "list";
+	private final static String COMPOSING_EDITTEXT_STATE = "edittext";
+	private final static String WHO_CARD_NAME = "whocardname";
+	private final static String WHO_CARD_EMAIL = "whocardemail";
+	private final static String WHO_CARD_AVATAR_FILE = "whocardavatar";
 	private MessageCenterView messageCenterView;
 	private Map<String, String> customData;
 	private Context context;
@@ -62,8 +65,14 @@ public class MessageCenterActivityContent extends ActivityContent {
 				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
 		Parcelable editTextParcelable = (onSavedInstanceState == null)? null:
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
+		String whoCardName = (onSavedInstanceState == null)? null:
+				onSavedInstanceState.getString(WHO_CARD_NAME);
+		String whoCardEmail = (onSavedInstanceState == null)? null:
+				onSavedInstanceState.getString(WHO_CARD_EMAIL);
+		String whoCardAvatarFile = (onSavedInstanceState == null)? null:
+				onSavedInstanceState.getString(WHO_CARD_AVATAR_FILE);
 		messageCenterView = new MessageCenterView(activity, customData,
-				editTextParcelable);
+				editTextParcelable, whoCardName, whoCardEmail, whoCardAvatarFile);
 
 		// Remove an existing MessageCenterView and replace it with this, if it exists.
 		if (messageCenterView.getParent() != null) {
@@ -100,6 +109,9 @@ public class MessageCenterActivityContent extends ActivityContent {
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable(LIST_INSTANCE_STATE, messageCenterView.onSaveListViewInstanceState());
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, messageCenterView.onSaveEditTextInstanceState());
+		outState.putString(WHO_CARD_NAME, messageCenterView.onSaveWhoCardName());
+		outState.putString(WHO_CARD_EMAIL, messageCenterView.onSaveWhoCardEmail());
+		outState.putString(WHO_CARD_AVATAR_FILE, messageCenterView.onSaveWhoCardAvatar());
 	}
 
 	@Override

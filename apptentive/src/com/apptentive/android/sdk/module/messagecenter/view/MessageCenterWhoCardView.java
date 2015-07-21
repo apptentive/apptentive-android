@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 
+import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
+import com.apptentive.android.sdk.util.Constants;
 
 
 /**
@@ -83,6 +85,11 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 						return;
 					}
 				}
+				SharedPreferences prefs = getContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, et_email.getText().toString());
+				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, et_name.getText().toString());
+				editor.commit();
 				listener.onSendWhoCard();
 			}
 		});

@@ -77,7 +77,7 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
 	public static final boolean CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED = true;
-	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = true;
+	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
 	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
 
 	// Manifest keys

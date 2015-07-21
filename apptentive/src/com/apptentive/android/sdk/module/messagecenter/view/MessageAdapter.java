@@ -106,6 +106,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		void onFinishComposing();
 
+		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
+
 		void onSkipWhoCard();
 
 		void onSendWhoCard();
@@ -311,6 +313,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return false;
 	}
 
+	public String getWhoCardName() {
+		if (whoCardView != null) {
+			return whoCardView.getNameField().getText().toString();
+		}
+		return null;
+	}
+
+	public String getWhoCardEmail() {
+		if (whoCardView != null) {
+			return whoCardView.getEmailField().getText().toString();
+		}
+		return null;
+	}
+
+	public String getWhoCardAvatarFileName() {
+		return null;
+	}
+
 	public EditText getEditTextInComposing() {
 		if (composingView != null) {
 			return composingView.getEditText();
@@ -319,7 +339,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	private void setupComposingView(final int position) {
-		composingActionListener.onComposingViewCreated();
 		composingEditText = composingView.getEditText();
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -330,6 +349,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		composingActionListener.onComposingViewCreated();
 	}
 
 	public void clearComposing() {
@@ -361,6 +381,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
 	}
 
 	public void clearWhoCard() {
