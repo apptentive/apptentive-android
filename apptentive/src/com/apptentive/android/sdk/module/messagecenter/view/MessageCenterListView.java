@@ -200,8 +200,7 @@ public class MessageCenterListView extends ListView {
 			heightSize = maxHeight;
 		}
     // assuming left and right additional paddings are the same
-		int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight() -
-				childLayout.getPaddingLeft() * 2, MeasureSpec.EXACTLY);
+		int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight(), MeasureSpec.EXACTLY);
 		int hs = MeasureSpec.makeMeasureSpec(heightSize, heightMode);
 		stickyView.measure(ws, hs);
 		stickyView.layout(0, 0, stickyView.getMeasuredWidth(), stickyView.getMeasuredHeight());
@@ -343,15 +342,15 @@ public class MessageCenterListView extends ListView {
 
 			int clipHeight = view.getHeight() +
 					(shadowDrawable == null ? 0 : shadowHeight);
-			canvas.clipRect(pLeft, pTop, pLeft + view.getWidth(), pTop + clipHeight);
+			canvas.clipRect(pLeft, pTop, pLeft + view.getWidth() - 2 * stickyWrapper.additionalIndent, pTop + clipHeight);
 
-			canvas.translate(pLeft, pTop);
+			canvas.translate(pLeft - stickyWrapper.additionalIndent, pTop);
 			drawChild(canvas, stickyWrapper.view, getDrawingTime());
 
 			if (shadowDrawable != null) {
 				shadowDrawable.setBounds(stickyWrapper.view.getLeft(),
 						stickyWrapper.view.getBottom(),
-						stickyWrapper.view.getRight() + stickyWrapper.additionalIndent,
+						stickyWrapper.view.getRight(),
 						stickyWrapper.view.getBottom() + shadowHeight);
 				shadowDrawable.draw(canvas);
 			}

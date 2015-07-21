@@ -9,6 +9,7 @@
     <color name="apptentive_transparency">#00000000</color>
     <color name="apptentive_white">#FFFFFF</color>
     <color name="apptentive_black">#000000</color>
+    <color name="apptentive_red">#D22E32</color>
 
     <color name="apptentive_message_center_main_area_background">#ECECEC</color>
     <color name="apptentive_message_center_greeting_background">#FAFAFA</color>

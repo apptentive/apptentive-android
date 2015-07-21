@@ -11,7 +11,7 @@
 
     <!-- view background color -->
     <solid
-        android:color="@color/apptentive_message_center_outgoing_background" >
+        android:color="@color/apptentive_white" >
     </solid>
 
     <!-- view border color and width -->
@@ -21,15 +21,15 @@
     </stroke>
 
     <padding
-        android:left="4dp"
-        android:top="4dp"
-        android:right="4dp"
-        android:bottom="4dp"    >
+        android:left="1dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="1dp"    >
     </padding>
 
     <!-- Here is the corner radius -->
     <corners
-        android:radius="0dp"   >
+        android:radius="2dp"   >
     </corners>
 
 </shape>

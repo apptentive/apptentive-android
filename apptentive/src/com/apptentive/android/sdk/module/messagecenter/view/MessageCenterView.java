@@ -51,6 +51,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private ListView messageCenterListView;
 	private Map<String, String> customData;
 
+	private Configuration config_global;
+
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
 
@@ -63,6 +65,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterStatus statusItem;
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
+  private MessageCenterComposingItem whoCardItem;
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment, attaches a file, etc.
@@ -100,9 +103,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				activity.onBackPressed();
 			}
 		});
-
+		config_global = Configuration.load(activity);
 		TextView titleTextView = (TextView) findViewById(R.id.title);
-		String titleText = Configuration.load(activity).getMessageCenterTitle();
+		String titleText = config_global.getMessageCenterTitle();
 		if (titleText != null) {
 			titleTextView.setText(titleText);
 		}
@@ -191,6 +194,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		messages.add(actionBarItem);
 		composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
 		messages.add(composingItem);
+	}
+
+	public void addWhoCard() {
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.INVISIBLE);
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
+		whoCardItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD);
+		messages.add(whoCardItem);
+		messageCenterListAdapter.notifyDataSetChanged();
+
+		scrollMessageListViewToBottom();
 	}
 
 	public void addNewStatusItem(MessageCenterListItem item) {
@@ -358,6 +375,18 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 	}
 
+	public void clearWhoCardUi() {
+		if (whoCardItem != null) {
+			messages.remove(whoCardItem);
+			whoCardItem = null;
+			messageCenterListAdapter.clearWhoCard();
+			messageCenterListAdapter.notifyDataSetChanged();
+			Util.hideSoftKeyboard(activity, this);
+			View fab = findViewById(R.id.composing_fab);
+			fab.setVisibility(View.VISIBLE);
+		}
+	}
+
 	public void clearComposingUi() {
 		if (composingItem != null) {
 			messages.remove(actionBarItem);
@@ -413,7 +442,18 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			message.setCustomData(customData);
 			MessageManager.sendMessage(activity.getApplicationContext(), message);
 			addNewOutGoingMessageItem(message);
+			addWhoCard();
 		}
+	}
+
+	@Override
+	public void onSkipWhoCard() {
+		clearWhoCardUi();
+	}
+
+	@Override
+	public void onSendWhoCard() {
+		clearWhoCardUi();
 	}
 
 	public void scrollMessageListViewToBottom() {

@@ -8,25 +8,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
-             android:paddingTop="4dp"
-             android:paddingBottom="8dp"
              android:clipToPadding="false"
+             android:paddingBottom="1.5dp"
              android:background="@android:color/transparent">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_marginTop="10dp"
-                      android:layout_marginBottom="10dp"
-                      android:layout_marginRight="10dp"
-                      android:layout_marginLeft="10dp"
-                      android:orientation="vertical"
-                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
-                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border"
-                      android:background="@drawable/apptentive_layout_background_with_shadow">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginRight="10dp"
+                  android:layout_marginLeft="10dp"
+                  android:elevation="1.5dp"
+                  android:orientation="vertical"
+                  android:background="@drawable/apptentive_rounded_corner_shape">
             <TextView android:id="@+id/who_title"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -39,62 +31,55 @@
             <EditText android:id="@+id/who_name"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginTop="5dp"
-                      android:layout_marginLeft="10dp"
+                      android:layout_margin="20dp"
                       android:inputType="textCapSentences"
                       android:singleLine="true"
-                      android:background="@null"
+                      android:background="@drawable/apptentive_edittext_single_line_background"
                       android:hint="@string/apptentive_message_center_who_card_name_hint"
                       android:textColor="@color/apptentive_text_message_text"
                       android:textSize="16sp"/>
             <EditText android:id="@+id/who_email"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginTop="10dp"
-                      android:layout_marginLeft="10dp"
-                      android:inputType="textCapSentences"
+                      android:layout_margin="20dp"
                       android:singleLine="true"
-                      android:background="@null"
+                      android:background="@drawable/apptentive_edittext_single_line_background"
                       android:hint="@string/apptentive_message_center_who_card_email_hint"
                       android:textColor="@android:color/black"
-                      android:textSize="16sp"/>
+                      android:textSize="16sp" android:inputType="textEmailAddress"/>
 
-            <FrameLayout android:layout_width="match_parent"
-                         android:layout_height="@dimen/apptentive_message_center_fallback_divider_line_width"
-                         android:background="#DCDCDC"/>
 
-            <LinearLayout android:id="@+id/composing_toolbar"
+            <LinearLayout android:id="@+id/whocard_buttons"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:layout_margin="2dp"
                           android:background="@color/apptentive_message_center_outgoing_background"
-                          android:elevation="5dp"
                           android:gravity="right"
-                          android:minHeight="35dp"
+                          android:minHeight="40dp"
                           android:orientation="horizontal"
-                          android:paddingBottom="5dp"
-                          android:paddingLeft="16dp"
-                          android:paddingRight="16dp"
-                          android:paddingTop="5dp">
-                <Button android:id="@+id/bt_skip"
+                          >
+                <Button android:id="@+id/btn_skip"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="Skip"
+                        android:paddingLeft="16dp"
                         android:paddingRight="16dp"
-                        android:text="SKIP"
-                        android:tint="#EF4139" android:layout_gravity="bottom"/>
+                        android:text="@string/apptentive_message_center_who_card_skip"
+                        android:textColor="?attr/apptentiveTintColor"
+                        />
 
-                <Button android:id="@+id/bt_send"
+                <Button android:id="@+id/btn_send"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="Send"
                         android:paddingLeft="16dp"
-                        android:text="THAT'S ME!"
-                        android:tint="#EF4139" android:layout_gravity="bottom"/>
+                        android:paddingRight="16dp"
+                        android:textColor="?attr/apptentiveTintColor"
+                        android:text="@string/apptentive_message_center_who_card_me"
+                        />
             </LinearLayout>
         </LinearLayout>
 
-    </RelativeLayout>
+
 </FrameLayout>

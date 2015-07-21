@@ -162,7 +162,7 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
 	}
 
-	public boolean isNewMessageToastEnabled(Context context) {
+	public boolean isNewMessageToastEnabled() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
 			if (messageCenter != null) {
@@ -177,7 +177,7 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED;
 	}
 
-	public boolean isMessageCenterEmailRequired(Context context) {
+	public boolean isMessageCenterEmailRequired() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
 			if (messageCenter != null) {
@@ -187,14 +187,6 @@ public class Configuration extends JSONObject {
 			}
 		} catch (JSONException e) {
 			// Move on.
-		}
-
-		try {
-			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-			Bundle metaData = ai.metaData;
-			return metaData.getBoolean(Constants.MANIFEST_KEY_EMAIL_REQUIRED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED);
-		} catch (Exception e) {
-			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_EMAIL_REQUIRED);
 		}
 
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
@@ -208,7 +200,7 @@ public class Configuration extends JSONObject {
 		return null;
 	}
 
-	public boolean canShowMessageCenter(Context context) {
+	public boolean canShowMessageCenter() {
 		return getMessageCenterGreetingImageUrl() != null;
 	}
 
