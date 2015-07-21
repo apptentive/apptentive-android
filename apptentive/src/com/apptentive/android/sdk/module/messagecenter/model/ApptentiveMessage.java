@@ -30,7 +30,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	private State state;
 	private boolean read = false;
 
-	// DateStamp is only stored in memory, due to how we selectively apply date labeling in the view.
+	// datestamp is only stored in memory, due to how we selectively apply date labeling in the view.
 	private String datestamp;
 
 	private static final String KEY_SENDER = "sender";
