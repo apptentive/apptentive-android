@@ -50,6 +50,16 @@
                 <View android:layout_width="0dp"
                       android:layout_height="match_parent"
                       android:layout_weight="1"/>
+                <ImageButton android:id="@+id/profile"
+                             android:layout_width="48dp"
+                             android:layout_height="48dp"
+                             android:layout_marginRight="10dp"
+                             android:layout_alignParentTop="true"
+                             android:layout_centerVertical="true"
+                             android:layout_alignParentRight="true"
+                             android:background="@null"
+                             android:contentDescription="Profile"
+                             android:src="@drawable/apptentive_ic_profile_edit"/>
                 <ImageButton android:id="@+id/attach"
                              android:layout_width="48dp"
                              android:layout_height="48dp"

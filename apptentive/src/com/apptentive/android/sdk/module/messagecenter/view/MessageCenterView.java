@@ -162,31 +162,46 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 
 		View attachButton = findViewById(R.id.attach);
-		// Android devices can't take screenshots until Android OS version 4+
-		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
-		if (canTakeScreenshot) {
-			attachButton.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
-					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-					Bundle extras = new Bundle();
-					intent.addCategory(Intent.CATEGORY_OPENABLE);
-					if (Build.VERSION.SDK_INT >= 11) {
-						extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+		if (attachButton != null && attachButton.getVisibility() == VISIBLE) {
+			// Android devices can't take screenshots until Android OS version 4+
+			boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
+			if (canTakeScreenshot) {
+				attachButton.setOnClickListener(new OnClickListener() {
+					public void onClick(View view) {
+						MetricModule.sendMetric(activity, Event.EventLabel.message_center__attach);
+						Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+						Bundle extras = new Bundle();
+						intent.addCategory(Intent.CATEGORY_OPENABLE);
+						if (Build.VERSION.SDK_INT >= 11) {
+							extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+						}
+						intent.setType("image/*");
+						if (!extras.isEmpty()) {
+							intent.putExtras(extras);
+						}
+						Intent chooserIntent = Intent.createChooser(intent, null);
+						activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 					}
-					intent.setType("image/*");
-					if (!extras.isEmpty()) {
-						intent.putExtras(extras);
-					}
-					Intent chooserIntent = Intent.createChooser(intent, null);
-					activity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
-				}
-			});
-		} else {
-			attachButton.setVisibility(GONE);
+				});
+			} else {
+				attachButton.setVisibility(GONE);
+			}
 		}
 
-		//scrollMessageListViewToBottom();
+		View profileButton = findViewById(R.id.profile);
+		if (profileButton != null) {
+			profileButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View view) {
+					// Only allow profile editing when not already editing profile or in message composing
+					if (whoCardItem == null && composingItem == null) {
+						addWhoCard();
+						messageCenterListAdapter.notifyDataSetChanged();
+						scrollMessageListViewToBottom();
+					}
+				}
+			});
+		}
+
 	}
 
 
@@ -206,6 +221,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	public void addComposingArea() {
 		View fab = findViewById(R.id.composing_fab);
 		fab.setVisibility(View.INVISIBLE);
+		View profileButton = findViewById(R.id.profile);
+		profileButton.setVisibility(View.INVISIBLE);
 		if (statusItem != null) {
 			messages.remove(statusItem);
 			statusItem = null;
@@ -219,6 +236,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	public void addWhoCard() {
 		View fab = findViewById(R.id.composing_fab);
 		fab.setVisibility(View.INVISIBLE);
+		View profileButton = findViewById(R.id.profile);
+		profileButton.setVisibility(View.INVISIBLE);
 		if (statusItem != null) {
 			messages.remove(statusItem);
 			statusItem = null;
@@ -269,7 +288,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			statusItem = null;
 		}
 		int composingAreaIndex = 0;
-		if (composingItem != null) {
+		// If user is composing message or WhoCard, new incoming message will be inserted in front
+		if (composingItem != null || whoCardItem != null) {
 			composingAreaIndex = messages.size() - 2;
 			messages.add(composingAreaIndex, message);
 		} else {
@@ -399,9 +419,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			messageCenterListAdapter.clearWhoCard();
 			messageCenterListAdapter.notifyDataSetChanged();
 			Util.hideSoftKeyboard(activity, this);
-			View fab = findViewById(R.id.composing_fab);
-			fab.setVisibility(View.VISIBLE);
-			saveWhoCardSetState();
 		}
 	}
 
@@ -415,8 +432,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			messageCenterListAdapter.clearComposing();
 			messageCenterListAdapter.notifyDataSetChanged();
 			Util.hideSoftKeyboard(activity, this);
-			View fab = findViewById(R.id.composing_fab);
-			fab.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -470,6 +485,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	@Override
 	public void onCancelComposing() {
 		clearComposingUi();
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.VISIBLE);
+		View profileButton = findViewById(R.id.profile);
+		profileButton.setVisibility(View.VISIBLE);
 		savePendingComposingMessage();
 	}
 
@@ -497,14 +516,15 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	@Override
-	public void onSkipWhoCard() {
+	public void onCloseWhoCard() {
 		clearWhoCardUi();
+		saveWhoCardSetState();
+		View fab = findViewById(R.id.composing_fab);
+		fab.setVisibility(View.VISIBLE);
+		View profileButton = findViewById(R.id.profile);
+		profileButton.setVisibility(View.VISIBLE);
 	}
 
-	@Override
-	public void onSendWhoCard() {
-		clearWhoCardUi();
-	}
 
 	private void saveWhoCardSetState() {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

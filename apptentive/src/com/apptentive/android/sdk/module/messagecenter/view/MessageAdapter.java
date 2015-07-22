@@ -108,9 +108,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
 
-		void onSkipWhoCard();
+		void onCloseWhoCard();
 
-		void onSendWhoCard();
 
 	}
 
@@ -237,9 +236,15 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		} else {
 			holder = (MessageCenterListItemHolder) convertView.getTag();
+			/* System may recycle the view after composing view
+			** is removed and recreated
+			 */
 			if (type == TYPE_COMPOSING_AREA && composingView == null) {
 				composingView = (MessageCenterComposingView) convertView;
 				setupComposingView(position);
+			} else if (type == TYPE_WHOCARD && whoCardView == null) {
+				whoCardView = (MessageCenterWhoCardView) convertView;
+				setupWhoCardView(position);
 			}
 		}
 

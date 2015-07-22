@@ -66,7 +66,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			} else {
 				skipButton.setOnClickListener(new OnClickListener() {
 					public void onClick(View view) {
-						listener.onSkipWhoCard();
+						listener.onCloseWhoCard();
 					}
 				});
 			}
@@ -90,7 +90,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, etEmail.getText().toString());
 				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, etName.getText().toString());
 				editor.commit();
-				listener.onSendWhoCard();
+				listener.onCloseWhoCard();
 			}
 		});
 

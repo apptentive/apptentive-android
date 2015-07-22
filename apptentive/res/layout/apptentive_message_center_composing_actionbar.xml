@@ -28,7 +28,7 @@
                      android:background="@null"
                      android:contentDescription="Close"
                      android:paddingLeft="10dp"
-                     android:src="@drawable/close"
+                     android:src="@drawable/apptentive_ic_close"
                      android:tint="?attr/apptentiveTintColor"/>
 
         <TextView android:id="@+id/composing"

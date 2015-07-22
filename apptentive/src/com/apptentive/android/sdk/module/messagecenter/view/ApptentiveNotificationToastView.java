@@ -115,7 +115,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 				touchX = event.getX();
 				startY = event.getRawY();
 				pointerId = event.getPointerId(0);
-				rootView.setBackgroundDrawable(getResources().getDrawable(R.drawable.toast_bg_dark_pressed));
+				rootView.setBackgroundDrawable(getResources().getDrawable(R.drawable.apptentive_toast_bg_dark_pressed));
 				break;
 			case MotionEvent.ACTION_MOVE:
 				switch (scrollOrientationEnum) {
