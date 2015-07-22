@@ -11,7 +11,7 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:paddingLeft="9dp"
-              android:background="@drawable/toast_bg_dark"
+              android:background="@drawable/apptentive_toast_bg_dark"
               android:paddingRight="9dp"
               android:orientation="vertical">
 </LinearLayout>
