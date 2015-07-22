@@ -124,6 +124,7 @@ public class MessageCenterActivityContent extends ActivityContent {
 		messageCenterView.savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		messageCenterView.clearComposingUi();
+		messageCenterView.clearWhoCardUi();
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
