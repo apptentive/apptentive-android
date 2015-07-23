@@ -68,9 +68,6 @@ public class ViewActivity extends ApptentiveActivity {
 									case AppStoreRating:
 										activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
 										break;
-									case FeedbackDialog:
-										activityContent = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
-										break;
 									case Survey:
 										activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 										break;

@@ -427,9 +427,11 @@ public class MessageManager {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
+
+// TODO: This needs to be fixed to work with MessageCenterInteraction
 				Intent intent = new Intent();
 				intent.setClass(foreground.getApplicationContext(), ViewActivity.class);
-				intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
+//				intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
 				//intent.putExtra(ActivityContent.EXTRA, null);
 				PendingIntent pendingIntent = PendingIntent.getActivity(foreground.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
