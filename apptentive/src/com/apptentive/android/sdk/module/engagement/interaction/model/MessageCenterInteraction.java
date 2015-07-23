@@ -6,6 +6,12 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.content.Context;
+import android.content.Intent;
+
+import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.module.ActivityContent;
+
 import org.json.JSONException;
 
 /**
@@ -18,5 +24,12 @@ public class MessageCenterInteraction extends Interaction {
 
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
+	}
+
+	public static Intent generateMessageCenterErrorIntent(Context context) {
+		Intent intent = new Intent();
+		intent.setClass(context, ViewActivity.class);
+		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.name());
+		return intent;
 	}
 }

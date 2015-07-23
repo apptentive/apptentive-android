@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -162,11 +161,17 @@ public class ApptentiveInternal {
 			//intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
 			EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 		} else {
-			Intent intent = new Intent();
-			intent.setClass(activity, ViewActivity.class);
-			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.toString());
-			activity.startActivity(intent);
-			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+			showMessageCenterFallback(activity);
 		}
+	}
+
+	public static void showMessageCenterFallback(Activity activity) {
+		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(activity.getApplicationContext());
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
+	}
+
+	public static boolean canShowMessageCenterInternal(Context context) {
+		return EngagementModule.willShowInteraction(context, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 	}
 }

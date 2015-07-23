@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -428,10 +429,16 @@ public class MessageManager {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
-				Intent intent = new Intent();
-				intent.setClass(foreground.getApplicationContext(), ViewActivity.class);
-				intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ENGAGE_INTERNAL_EVENT.name());
-				intent.putExtra(ActivityContent.EVENT_NAME, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+				Intent intent;
+
+				if (Apptentive.canShowMessageCenter(foreground.getApplicationContext())) {
+					intent = new Intent();
+					intent.setClass(foreground.getApplicationContext(), ViewActivity.class);
+					intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ENGAGE_INTERNAL_EVENT.name());
+					intent.putExtra(ActivityContent.EVENT_NAME, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+				} else {
+					intent = MessageCenterInteraction.generateMessageCenterErrorIntent(foreground.getApplicationContext());
+				}
 
 				// TODO: Use a fallback intent if Message Center isn't yet available.
 
