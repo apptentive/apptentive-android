@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -22,7 +21,6 @@ import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -158,17 +156,16 @@ public class ApptentiveInternal {
 	}
 
 	public static void showMessageCenterInternal(Activity activity, Map<String, String> customData) {
-		Intent intent = new Intent();
-		intent.setClass(activity, ViewActivity.class);
-
-		Configuration configuration = Configuration.load(activity.getApplicationContext());
-		if (configuration.canShowMessageCenter()) {
-			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER.toString());
+		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", "show_message_center")) {
+			// TODO: Do something with customData.
+			//intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
+			EngagementModule.engageInternal(activity, "show_message_center");
 		} else {
+			Intent intent = new Intent();
+			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.toString());
+			activity.startActivity(intent);
+			activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 		}
-		intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
-		activity.startActivity(intent);
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 }

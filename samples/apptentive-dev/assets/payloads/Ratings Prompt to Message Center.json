@@ -23,26 +23,6 @@
       }
     },
     {
-      "id": "545bdb2f49f63bbd8b000305",
-      "type": "FeedbackDialog",
-      "version": 6,
-      "configuration": {
-        "enable_message_center": true,
-        "thank_you_body": "Your response has been saved in the Message Center, where you'll be able to view replies and send us other messages.",
-        "title": "Send Us Your Feedback",
-        "body": "We'd love to hear from you!",
-        "email_hint_text": "Email Address (required)",
-        "message_hint_text": "Tell us what you think. (required)",
-        "decline_text": "No thanks",
-        "submit_text": "Send",
-        "thank_you_title": "Thanks!",
-        "thank_you_close_text": "Close",
-        "ask_for_email": true,
-        "email_required": true,
-        "thank_you_view_messages_text": "View Messages"
-      }
-    },
-    {
       "id": "545bdb3049f63bbd8b000307",
       "type": "MessageCenter",
       "version": 2
@@ -91,12 +71,6 @@
       }
     ],
     "com.apptentive#EnjoymentDialog#no": [
-      {
-        "interaction_id": "545bdb2f49f63bbd8b000305",
-        "criteria": {}
-      }
-    ],
-    "com.apptentive#FeedbackDialog#view_messages": [
       {
         "interaction_id": "545bdb3049f63bbd8b000307",
         "criteria": {}
