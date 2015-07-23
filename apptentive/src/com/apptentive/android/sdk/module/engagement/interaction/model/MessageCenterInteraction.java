@@ -12,6 +12,10 @@ import org.json.JSONException;
  * @author Sky Kelsey
  */
 public class MessageCenterInteraction extends Interaction {
+
+	// The server guarantees that an instance of this Interaction will be targetted to the following internal event name.
+	public static final String DEFAULT_INTERNAL_EVENT_NAME = "show_message_center";
+
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
 	}

@@ -18,6 +18,7 @@ public abstract class ActivityContent {
 
 	public static final String KEY = "activityContent";
 	public static final String EXTRA = "activityContentData";
+	public static final String EVENT_NAME = "activityContentEventName";
 
 	protected Type type;
 
@@ -49,6 +50,7 @@ public abstract class ActivityContent {
 		ABOUT,
 		MESSAGE_CENTER_ERROR,
 		INTERACTION,
+		ENGAGE_INTERNAL_EVENT,
 		unknown;
 
 		public static Type parse(String type) {

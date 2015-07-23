@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
@@ -46,6 +47,12 @@ public class ViewActivity extends ApptentiveActivity {
 
 				try {
 					switch (activeContentType) {
+						case ENGAGE_INTERNAL_EVENT:
+							String eventName = getIntent().getStringExtra(ActivityContent.EVENT_NAME);
+							if (eventName != null) {
+								EngagementModule.engageInternal(this, eventName);
+							}
+							break;
 						case ABOUT:
 							break;
 						case MESSAGE_CENTER_ERROR:

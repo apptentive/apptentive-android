@@ -14,6 +14,7 @@ import android.os.Bundle;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -156,10 +157,10 @@ public class ApptentiveInternal {
 	}
 
 	public static void showMessageCenterInternal(Activity activity, Map<String, String> customData) {
-		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", "show_message_center")) {
+		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
 			// TODO: Do something with customData.
 			//intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
-			EngagementModule.engageInternal(activity, "show_message_center");
+			EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(activity, ViewActivity.class);
