@@ -1,0 +1,17 @@
+{
+  "interactions": [
+    {
+      "id": "message_center_1",
+      "type": "MessageCenter",
+      "version": 2
+    }
+  ],
+  "targets": {
+    "local#app#launch": [
+      {
+        "interaction_id": "message_center_1",
+        "criteria": {}
+      }
+    ]
+  }
+}

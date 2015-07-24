@@ -1,0 +1,45 @@
+{
+  "interactions": [
+    {
+      "type": "TextModal",
+      "name": "Centered TextModal Interaction",
+      "id": "textmodal_interaction",
+      "priority": 1,
+      "configuration": {
+        "title": "View Messages?",
+        "body": "You have a new message from the app developer",
+        "actions": [
+          {
+            "id": "action_id_1",
+            "label": "View Messages",
+            "action": "interaction",
+            "invokes": [
+              {
+                "interaction_id": "message_center_1",
+                "criteria": {}
+              }
+            ]
+          },
+          {
+            "id": "action_id_2",
+            "label": "Dismiss",
+            "action": "dismiss"
+          }
+        ]
+      }
+    },
+    {
+      "id": "message_center_1",
+      "type": "MessageCenter",
+      "version": 2
+    }
+  ],
+  "targets": {
+    "local#app#launch": [
+      {
+        "interaction_id": "textmodal_interaction",
+        "criteria": {}
+      }
+    ]
+  }
+}
