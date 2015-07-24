@@ -95,7 +95,6 @@ public abstract class Interaction extends JSONObject {
 		UpgradeMessage,
 		EnjoymentDialog,
 		RatingDialog,
-		FeedbackDialog,
 		MessageCenter,
 		AppStoreRating,
 		Survey,
@@ -131,8 +130,6 @@ public abstract class Interaction extends JSONObject {
 						return new EnjoymentDialogInteraction(interactionString);
 					case RatingDialog:
 						return new RatingDialogInteraction(interactionString);
-					case FeedbackDialog:
-						return new FeedbackDialogInteraction(interactionString);
 					case MessageCenter:
 						return new MessageCenterInteraction(interactionString);
 					case AppStoreRating:

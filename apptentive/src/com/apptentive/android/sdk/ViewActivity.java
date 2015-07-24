@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
@@ -46,10 +47,13 @@ public class ViewActivity extends ApptentiveActivity {
 
 				try {
 					switch (activeContentType) {
-						case ABOUT:
+						case ENGAGE_INTERNAL_EVENT:
+							String eventName = getIntent().getStringExtra(ActivityContent.EVENT_NAME);
+							if (eventName != null) {
+								EngagementModule.engageInternal(this, eventName);
+							}
 							break;
-						case MESSAGE_CENTER:
-							activityContent = new MessageCenterActivityContent(getIntent().getSerializableExtra(ActivityContent.EXTRA));
+						case ABOUT:
 							break;
 						case MESSAGE_CENTER_ERROR:
 							activityContent = new MessageCenterErrorActivityContent();
@@ -71,14 +75,11 @@ public class ViewActivity extends ApptentiveActivity {
 									case AppStoreRating:
 										activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
 										break;
-									case FeedbackDialog:
-										activityContent = new FeedbackDialogInteractionView((FeedbackDialogInteraction) interaction);
-										break;
 									case Survey:
 										activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 										break;
 									case MessageCenter:
-										activityContent = new MessageCenterActivityContent(getIntent().getSerializableExtra(ActivityContent.EXTRA));
+										activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
 										break;
 									case TextModal:
 										activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
@@ -124,15 +125,11 @@ public class ViewActivity extends ApptentiveActivity {
 				super.onStart();
 				AboutModule.getInstance().doShow(this);
 				break;
-			case MESSAGE_CENTER:
-				((MessageCenterActivityContent) activityContent).onStart();
-				super.onStart();
-				break;
 			case MESSAGE_CENTER_ERROR:
 				super.onStart();
 				break;
 			case INTERACTION:
-				// Interactions are already set up from onCreate().
+				activityContent.onStart();
 				super.onStart();
 				break;
 			default:
@@ -148,13 +145,10 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				break;
-			case MESSAGE_CENTER:
-				((MessageCenterActivityContent)activityContent).onStop();
-				break;
 			case MESSAGE_CENTER_ERROR:
 				break;
 			case INTERACTION:
-				// Interactions don't need to hear about onStop().
+				activityContent.onStart();
 				break;
 			default:
 				break;
@@ -168,7 +162,6 @@ public class ViewActivity extends ApptentiveActivity {
 			case ABOUT:
 				finish = AboutModule.getInstance().onBackPressed(this);
 				break;
-			case MESSAGE_CENTER:
 			case MESSAGE_CENTER_ERROR:
 			case INTERACTION:
 				if (activityContent != null) {
@@ -191,12 +184,10 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				break;
-			case MESSAGE_CENTER:
-				((MessageCenterActivityContent)activityContent).onActivityResult(requestCode, resultCode, data);
-				break;
 			case MESSAGE_CENTER_ERROR:
 				break;
 			case INTERACTION:
+				activityContent.onActivityResult(requestCode, resultCode, data);
 				break;
 			default:
 				break;
@@ -206,17 +197,13 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (activeContentType == ActivityContent.Type.MESSAGE_CENTER) {
-			((MessageCenterActivityContent)activityContent).onResume();
-		}
+		activityContent.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (activeContentType == ActivityContent.Type.MESSAGE_CENTER) {
-			((MessageCenterActivityContent)activityContent).onPause();
-		}
+		activityContent.onPause();
 	}
 
 	public void showAboutActivity(View view) {

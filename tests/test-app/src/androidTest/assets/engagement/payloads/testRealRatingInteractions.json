@@ -20,25 +20,6 @@
       }
     },
     {
-      "id": "53348cd149f63b5bdd00000d",
-      "type": "FeedbackDialog",
-      "configuration": {
-        "title": "Thanks for your feedback!",
-        "body": "Please let us know how to make Travel Keeper better for you!",
-        "email_hint_text": "Your Email Address",
-        "message_hint_text": "Tell us how we can help. (required)",
-        "decline_text": "No Thanks",
-        "submit_text": "Send",
-        "thank_you_title": "Thanks!",
-        "thank_you_body": "Your response has been saved in the Message Center, where you'll be able to view replies and send us other messages.",
-        "thank_you_close_text": "Close",
-        "thank_you_view_messages_text": "View Messages",
-        "ask_for_email": true,
-        "email_required": false,
-        "enable_message_center": true
-      }
-    },
-    {
       "id": "53348cd249f63b5bdd00000f",
       "type": "MessageCenter"
     }
@@ -85,12 +66,6 @@
       }
     ],
     "com.apptentive#EnjoymentDialog#no": [
-      {
-        "interaction_id": "53348cd149f63b5bdd00000d",
-        "criteria": {}
-      }
-    ],
-    "com.apptentive#FeedbackDialog#view_messages": [
       {
         "interaction_id": "53348cd249f63b5bdd00000f",
         "criteria": {}

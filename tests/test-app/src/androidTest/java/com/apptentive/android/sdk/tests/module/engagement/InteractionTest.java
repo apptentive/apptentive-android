@@ -1389,24 +1389,13 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
 		}
 
-		//// Test Feedback Dialog
+		// Test Message Center
 
-		// Don't re-prompt, since we've declined to rate.
 		{
 			resetDevice();
 			Log.e("TWELVE");
 			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
-		}
-
-		//// Test ApptentiveMessage Center
-
-		// Don't re-prompt, since we've declined to rate.
-		{
-			resetDevice();
-			Log.e("THIRTEEN");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#FeedbackDialog#view_messages"));
 		}
 	}
 

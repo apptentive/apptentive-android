@@ -19,7 +19,8 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Event;
 
-import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
@@ -33,10 +34,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Created by barryli on 6/23/15.
+ * @author Barry Li
  */
 
-public class MessageCenterActivityContent extends ActivityContent {
+public class MessageCenterActivityContent extends InteractionView<MessageCenterInteraction> {
+
 	private final static String LIST_INSTANCE_STATE = "list";
 	private final static String COMPOSING_EDITTEXT_STATE = "edittext";
 	private final static String WHO_CARD_NAME = "whocardname";
@@ -47,19 +49,19 @@ public class MessageCenterActivityContent extends ActivityContent {
 	private Context context;
 	private MessageManager.OnNewIncomingMessagesListener newIncomingMessageListener;
 
-	public MessageCenterActivityContent(Serializable data) {
+	public MessageCenterActivityContent(MessageCenterInteraction interaction) {
+		super(interaction);
+	}
+
+	public MessageCenterActivityContent(MessageCenterInteraction interaction, Serializable data) {
+		this(interaction);
 		this.customData = (Map<String, String>) data;
 	}
 
 	@Override
-	public void onCreate(Activity activity, Bundle onSavedInstanceState) {
+	public void doOnCreate(Activity activity, Bundle onSavedInstanceState) {
 
 		context = activity;
-
-		if (onSavedInstanceState == null) {
-			// Exclude rotation
-			MetricModule.sendMetric(context.getApplicationContext(), Event.EventLabel.message_center__launch);
-		}
 
 		boolean bRestoreListView = onSavedInstanceState != null &&
 				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
@@ -162,7 +164,6 @@ public class MessageCenterActivityContent extends ActivityContent {
 	public void onResume() {
 		MessageManager.onResumeSending();
 	}
-
 
 	private void clearPendingMessageCenterPushNotification() {
 		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

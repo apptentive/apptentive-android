@@ -561,6 +561,9 @@ public class Apptentive {
 		}
 	}
 
+	public static boolean canShowMessageCenter(Context context) {
+		return ApptentiveInternal.canShowMessageCenterInternal(context);
+	}
 
 	/**
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
