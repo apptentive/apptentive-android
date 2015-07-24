@@ -8,11 +8,13 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
+
 import org.json.JSONException;
 
 /**
@@ -37,7 +39,7 @@ public class PersonManager {
 		current.setName(name);
 
 		Object diff = JsonDiffer.getDiff(stored, current);
-		if(diff != null) {
+		if (diff != null) {
 			try {
 				storePerson(context, current);
 				return new Person(diff.toString());
