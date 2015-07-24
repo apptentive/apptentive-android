@@ -32,8 +32,8 @@
                       android:background="@null"
                       android:hint="@string/apptentive_message_center_compose_hint"
                       android:textCursorDrawable="@null"
-                      android:textColorHint="@color/apptentive_message_center_hint"
-                      android:textColor="@color/apptentive_text_message_text"
+                      android:textColorHint="?attr/apptentive_material_hint_text"
+                      android:textColor="?attr/apptentive_material_primary_text"
                       android:textSize="16sp"/>
 
         </LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <!-- NORMAL -->
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <!-- LIGHT -->
+    <style name="ApptentiveTheme.Light.TranslucentStatus" parent="ApptentiveTheme.Light">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.Light.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <!-- LIGHT DARK TOOLBAR -->
+    <style name="ApptentiveTheme.Light.DarkToolbar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+</resources>

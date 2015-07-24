@@ -29,7 +29,7 @@
                      android:contentDescription="Close"
                      android:paddingLeft="10dp"
                      android:src="@drawable/apptentive_ic_close"
-                     android:tint="?attr/apptentiveTintColor"/>
+                     android:tint="?attr/colorAccent"/>
 
         <TextView android:id="@+id/composing"
                   android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                   android:singleLine="true"
                   android:textStyle="bold"
                   android:text="@string/apptentive_message_center_compose_title"
-                  android:textColor="@color/apptentive_message_center_hint"
+                  android:textColor="?attr/apptentive_material_secondary_text"
                   android:textSize="16sp"
             />
         <ImageButton android:id="@+id/btn_send_message"
@@ -52,7 +52,7 @@
                      android:contentDescription="Submit"
                      android:paddingLeft="16dp"
                      android:src="@drawable/apptentive_ic_action_send"
-                     android:tint="?attr/apptentiveTintColor"/>
+                     android:tint="?attr/colorAccent"/>
 
     </RelativeLayout>
 </FrameLayout>
