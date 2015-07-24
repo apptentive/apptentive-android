@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 
-import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,9 +17,9 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.util.Constants;
 
 
 /**
@@ -28,23 +27,23 @@ import com.apptentive.android.sdk.util.Constants;
  */
 public class MessageCenterWhoCardView extends FrameLayout implements MessageCenterListItemView {
 
-	private EditText etEmail;
-	private EditText etName;
+	private EditText emailEditText;
+	private EditText nameEditText;
 
 	public MessageCenterWhoCardView(Context context, final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
-		etEmail = (EditText) parentView.findViewById(R.id.who_email);
-		etName = (EditText) parentView.findViewById(R.id.who_name);
+		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
+		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
 
-		etEmail.addTextChangedListener(new TextWatcher() {
+		emailEditText.addTextChangedListener(new TextWatcher() {
 			private boolean doScroll = false;
 
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				etEmail.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
+				emailEditText.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
 			}
 
 			@Override
@@ -79,17 +78,14 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		sendButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				if (required) {
-					String email = etEmail.getText().toString();
+					String email = emailEditText.getText().toString();
 					if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-						etEmail.setTextColor(getResources().getColor(R.color.apptentive_red));
+						emailEditText.setTextColor(getResources().getColor(R.color.apptentive_red));
 						return;
 					}
 				}
-				SharedPreferences prefs = getContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, etEmail.getText().toString());
-				editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, etName.getText().toString());
-				editor.commit();
+				Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString());
+				Apptentive.setPersonName(getContext(), nameEditText.getText().toString());
 				listener.onCloseWhoCard();
 			}
 		});
@@ -97,10 +93,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	}
 
 	public EditText getNameField() {
-		return etName;
+		return nameEditText;
 	}
 
 	public EditText getEmailField() {
-		return etEmail;
+		return emailEditText;
 	}
 }

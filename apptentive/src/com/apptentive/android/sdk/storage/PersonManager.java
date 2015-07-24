@@ -109,9 +109,9 @@ public class PersonManager {
 		return prefs.getString(Constants.PREF_KEY_PERSON_NAME, null);
 	}
 
-	public static void storePersonName(Context context, String email) {
+	public static void storePersonName(Context context, String name) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, email).apply();
+		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, name).apply();
 	}
 
 	public static Person getStoredPerson(Context context) {
