@@ -33,9 +33,8 @@ public class Constants {
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
 	public static final String PREF_KEY_PERSON_DATA = "personData";
-	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
-	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
+	public static final String PREF_KEY_PERSON_NAME = "personName";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
@@ -108,6 +107,8 @@ public class Constants {
 	public static final String PREF_KEY_RATING_STATE = "ratingState";
 	public static final String PREF_KEY_RATING_EVENTS = "events";
 	public static final String PREF_KEY_RATING_USES = "uses";
+	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
+	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
 
 	/**
 	 * A list of mobile carrier network types as Strings.

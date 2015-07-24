@@ -115,28 +115,31 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Sets the initial user email address. This email address will be sent to the Apptentive server to allow out of app
+	 * Sets the user's email address. This email address will be sent to the Apptentive server to allow out of app
 	 * communication, and to help provide more context about this user. This email will be the definitive email address
 	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
-	 * idempotent.
+	 * idempotent. Calls to this method will overwrite any previously entered email, so if you don't want to overwrite
+	 * the email provided by the user, make sure to check the value before you call this method.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param email   The user's email address.
 	 */
-	public static void setInitialUserEmail(Context context, String email) {
-		PersonManager.storeInitialPersonEmail(context, email);
+	public static void setPersonEmail(Context context, String email) {
+		PersonManager.storePersonEmail(context, email);
 	}
 
 	/**
-	 * Sets the initial user name. This name will be sent to the Apptentive server and displayed in conversations you have
+	 * Sets the user's name. This name will be sent to the Apptentive server and displayed in conversations you have
 	 * with this person. This name will be the definitive username for this user, unless one is provided directly by the
-	 * user through an Apptentive UI. Calls to this method are idempotent.
+	 * user through an Apptentive UI. Calls to this method are idempotent. Calls to this method will overwrite any
+	 * previously entered email, so if you don't want to overwrite the email provided by the user, make sure to check
+	 * the value before you call this method.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param name    The user's name.
 	 */
-	public static void setInitialUserName(Context context, String name) {
-		PersonManager.storeInitialPersonUserName(context, name);
+	public static void setPersonName(Context context, String name) {
+		PersonManager.storePersonName(context, name);
 	}
 
 	/**
