@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,11 +8,13 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
+
 import org.json.JSONException;
 
 /**
@@ -28,16 +30,13 @@ public class PersonManager {
 		current.setCustomData(customData);
 
 		String email = loadPersonEmail(context);
-		if (email == null) {
-			email = loadInitialPersonEmail(context);
-		}
 		current.setEmail(email);
 
-		String name = loadInitialPersonUserName(context);
+		String name = loadPersonName(context);
 		current.setName(name);
 
 		Object diff = JsonDiffer.getDiff(stored, current);
-		if(diff != null) {
+		if (diff != null) {
 			try {
 				storePerson(context, current);
 				return new Person(diff.toString());
@@ -60,12 +59,9 @@ public class PersonManager {
 		current.setCustomData(customData);
 
 		String email = loadPersonEmail(context);
-		if (email == null) {
-			email = loadInitialPersonEmail(context);
-		}
 		current.setEmail(email);
 
-		String name = loadInitialPersonUserName(context);
+		String name = loadPersonName(context);
 		current.setName(name);
 
 		storePerson(context, current);
@@ -91,31 +87,11 @@ public class PersonManager {
 	public static void storeCustomPersonData(Context context, CustomData deviceData) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String personDataString = deviceData.toString();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_DATA, personDataString).commit();
+		prefs.edit().putString(Constants.PREF_KEY_PERSON_DATA, personDataString).apply();
 	}
 
 	private static Person generateCurrentPerson() {
 		return new Person();
-	}
-
-	public static String loadInitialPersonEmail(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		return prefs.getString(Constants.PREF_KEY_PERSON_INITIAL_EMAIL, null);
-	}
-
-	public static void storeInitialPersonEmail(Context context, String email) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_INITIAL_EMAIL, email).commit();
-	}
-
-	public static String loadInitialPersonUserName(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		return prefs.getString(Constants.PREF_KEY_PERSON_INITIAL_USER_NAME, null);
-	}
-
-	public static void storeInitialPersonUserName(Context context, String name) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_INITIAL_USER_NAME, name).commit();
 	}
 
 	public static String loadPersonEmail(Context context) {
@@ -125,7 +101,17 @@ public class PersonManager {
 
 	public static void storePersonEmail(Context context, String email) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_EMAIL, email).commit();
+		prefs.edit().putString(Constants.PREF_KEY_PERSON_EMAIL, email).apply();
+	}
+
+	public static String loadPersonName(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		return prefs.getString(Constants.PREF_KEY_PERSON_NAME, null);
+	}
+
+	public static void storePersonName(Context context, String name) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, name).apply();
 	}
 
 	public static Person getStoredPerson(Context context) {
@@ -141,6 +127,6 @@ public class PersonManager {
 
 	private static void storePerson(Context context, Person Person) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_PERSON, Person.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_PERSON, Person.toString()).apply();
 	}
 }

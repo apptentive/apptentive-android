@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -57,17 +57,17 @@ public class DataActivity extends ApptentiveActivity {
 		Apptentive.removeCustomPersonData(this, key);
 	}
 
-	public void setInitialPersonEmail(@SuppressWarnings("unused") View view) {
-		EditText emailText = (EditText) findViewById(R.id.set_initial_person_email);
+	public void setPersonEmail(@SuppressWarnings("unused") View view) {
+		EditText emailText = (EditText) findViewById(R.id.set_person_email);
 		String email = (emailText).getText().toString().trim();
 		emailText.setText(null);
-		PersonManager.storeInitialPersonEmail(this, email);
+		PersonManager.storePersonEmail(this, email);
 	}
 
-	public void setInitialPersonUserName(@SuppressWarnings("unused") View view) {
-		EditText userNameText = (EditText) findViewById(R.id.set_initial_person_user_name);
+	public void setPersonName(@SuppressWarnings("unused") View view) {
+		EditText userNameText = (EditText) findViewById(R.id.set_person_name);
 		String userName = (userNameText).getText().toString().trim();
 		userNameText.setText(null);
-		PersonManager.storeInitialPersonUserName(this, userName);
+		PersonManager.storePersonName(this, userName);
 	}
 }

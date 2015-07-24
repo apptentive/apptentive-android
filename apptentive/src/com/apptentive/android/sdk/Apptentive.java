@@ -16,6 +16,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
@@ -33,6 +34,7 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,28 +115,31 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
-	 * Sets the initial user email address. This email address will be sent to the Apptentive server to allow out of app
+	 * Sets the user's email address. This email address will be sent to the Apptentive server to allow out of app
 	 * communication, and to help provide more context about this user. This email will be the definitive email address
 	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
-	 * idempotent.
+	 * idempotent. Calls to this method will overwrite any previously entered email, so if you don't want to overwrite
+	 * the email provided by the user, make sure to check the value before you call this method.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param email   The user's email address.
 	 */
-	public static void setInitialUserEmail(Context context, String email) {
-		PersonManager.storeInitialPersonEmail(context, email);
+	public static void setPersonEmail(Context context, String email) {
+		PersonManager.storePersonEmail(context, email);
 	}
 
 	/**
-	 * Sets the initial user name. This name will be sent to the Apptentive server and displayed in conversations you have
+	 * Sets the user's name. This name will be sent to the Apptentive server and displayed in conversations you have
 	 * with this person. This name will be the definitive username for this user, unless one is provided directly by the
-	 * user through an Apptentive UI. Calls to this method are idempotent.
+	 * user through an Apptentive UI. Calls to this method are idempotent. Calls to this method will overwrite any
+	 * previously entered email, so if you don't want to overwrite the email provided by the user, make sure to check
+	 * the value before you call this method.
 	 *
 	 * @param context The context from which this method is called.
-	 * @param name   The user's name.
+	 * @param name    The user's name.
 	 */
-	public static void setInitialUserName(Context context, String name) {
-		PersonManager.storeInitialPersonUserName(context, name);
+	public static void setPersonName(Context context, String name) {
+		PersonManager.storePersonName(context, name);
 	}
 
 	/**
@@ -343,8 +348,8 @@ public class Apptentive {
 	 * <p/>
 	 * Push notifications will not be delivered to this app install until our server receives the APID.
 	 *
-	 * @param context The Context from which this method is called.
-	 * @param channelId    The Android Channel ID.
+	 * @param context   The Context from which this method is called.
+	 * @param channelId The Android Channel ID.
 	 */
 	public static void addUrbanAirshipPushIntegration(Context context, String channelId) {
 		if (channelId != null) {
@@ -389,7 +394,6 @@ public class Apptentive {
 	 *
 	 * @param context     The Context from which this method was called.
 	 * @param deviceToken The deviceToken returned from
-	 *
 	 */
 	public static void addParsePushIntegration(Context context, String deviceToken) {
 		if (deviceToken != null) {
@@ -707,10 +711,10 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity  The Activity from which this method is called.
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param activity The Activity from which this method is called.
+	 * @param event    A unique String representing the line this method is called on. For instance, you may want to have
+	 *                 the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                 call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Activity activity, String event) {
@@ -723,10 +727,10 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity  The Activity from which this method is called.
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param activity   The Activity from which this method is called.
+	 * @param event      A unique String representing the line this method is called on. For instance, you may want to have
+	 *                   the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                   call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
 	 *                   is sent to the server for tracking information in the context of the engaged Event.
 	 * @return true if the an interaction was shown, else false.
@@ -741,12 +745,12 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity  The Activity from which this method is called.
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *                  the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
-	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
-	 *                   is sent to the server for tracking information in the context of the engaged Event.
+	 * @param activity     The Activity from which this method is called.
+	 * @param event        A unique String representing the line this method is called on. For instance, you may want to have
+	 *                     the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                     call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param customData   A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
+	 *                     is sent to the server for tracking information in the context of the engaged Event.
 	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send structured data that has
 	 *                     specific meaning to the server. By using an {@link ExtendedData} object instead of arbitrary
 	 *                     customData, special meaning can be derived. Supported objects include {@link TimeExtendedData},
@@ -779,6 +783,7 @@ public class Apptentive {
 
 	/**
 	 * Pass in a listener. The listener will be called whenever a survey is finished.
+	 *
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
@@ -808,7 +813,7 @@ public class Apptentive {
 			try {
 				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
-				if (metaData != null ) {
+				if (metaData != null) {
 					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
@@ -837,10 +842,10 @@ public class Apptentive {
 			if ((Util.isEmpty(apiKey))) {
 				if (GlobalInfo.isAppDebuggable) {
 					AlertDialog alertDialog = new AlertDialog.Builder(activity)
-						.setTitle("Error")
-						.setMessage(errorString)
-						.setPositiveButton("OK", null)
-						.create();
+							.setTitle("Error")
+							.setMessage(errorString)
+							.setPositiveButton("OK", null)
+							.create();
 					alertDialog.setCanceledOnTouchOutside(false);
 					alertDialog.show();
 				}

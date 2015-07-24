@@ -34,6 +34,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -151,8 +152,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			if (composingViewSavedState != null || items.size() == 1) {
 				addComposingArea();
 			}
-			if (pendingWhoCardName != null || pendingWhoCardEmail != null ||
-					pendingWhoCardAvatarFile != null) {
+			if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addWhoCard();
 			}
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
@@ -416,6 +416,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		if (whoCardItem != null) {
 			messages.remove(whoCardItem);
 			whoCardItem = null;
+			pendingWhoCardName = null;
+			pendingWhoCardEmail = null;
+			pendingWhoCardAvatarFile = null;
 			messageCenterListAdapter.clearWhoCard();
 			messageCenterListAdapter.notifyDataSetChanged();
 			Util.hideSoftKeyboard(activity, this);
@@ -453,28 +456,16 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	@Override
-	public void onWhoCardViewCreated(EditText nameEt, EditText emailEt) {
+	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText) {
 		if (pendingWhoCardName != null) {
-			nameEt.setText(pendingWhoCardName);
+			nameEditText.setText(pendingWhoCardName);
 		} else {
-			String nameText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
-					getString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME, null);
-			if (nameText != null) {
-				nameEt.setText(nameText);
-			} else {
-				nameEt.setText("");
-			}
+			nameEditText.setText(PersonManager.loadPersonName(getContext()));
 		}
 		if (pendingWhoCardEmail != null) {
-			emailEt.setText(pendingWhoCardEmail);
+			emailEditText.setText(pendingWhoCardEmail);
 		} else {
-			String emailText = activity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).
-					getString(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL, null);
-			if (emailText != null) {
-				emailEt.setText(emailText);
-			} else {
-				emailEt.setText("");
-			}
+			emailEditText.setText(PersonManager.loadPersonEmail(getContext()));
 		}
 	}
 
