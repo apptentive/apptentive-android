@@ -26,7 +26,7 @@
         <meta-data android:name="apptentive_api_key"
                    android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
-                  android:theme="@style/Apptentive.Theme.Transparent"/>
+                  android:theme="@style/ApptentiveTheme.Light"/>
         <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
