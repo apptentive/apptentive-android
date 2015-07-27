@@ -146,7 +146,12 @@ public class ViewActivity extends ApptentiveActivity {
 							activityContent = new MessageCenterErrorActivityContent();
 							break;
 						case INTERACTION:
-							String interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
+							String interactionString;
+							if (savedInstanceState != null) {
+								interactionString = savedInstanceState.getString(Interaction.JSON_STRING);
+							} else {
+								interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
+							}
 							Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
 							if (interaction != null) {
 								switch (interaction.getType()) {

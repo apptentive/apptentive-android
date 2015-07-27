@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
@@ -30,6 +31,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListIt
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.HolderFactory;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
@@ -153,7 +155,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					MessageCenterComposingItem.COMPOSING_ITEM_AREA) {
 				return TYPE_COMPOSING_AREA;
 			} else if (((MessageCenterComposingItem) listItem).getType() ==
-					MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR){
+					MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR) {
 				return TYPE_COMPOSING_BAR;
 			} else {
 				return TYPE_WHOCARD;
@@ -226,6 +228,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					convertView = whoCardView;
 					break;
 				}
+				case TYPE_AUTO:
+					convertView = new AutomatedMessageView(parent.getContext(), (AutomatedMessage) listItem);
+					break;
 				default:
 					Log.i("Unrecognized type: %d", type);
 					break;
@@ -287,6 +292,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
 					break;
 				}
+				case TYPE_AUTO: {
+					AutomatedMessage autoMessage = (AutomatedMessage) listItem;
+					String dateStamp = ((AutomatedMessage) listItem).getDatestamp();
+					((AutomatedMessageHolder) holder).updateMessage(dateStamp, autoMessage);
+					break;
+				}
 				default:
 					return null;
 			}
@@ -298,11 +309,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		} else if (nameEditText != null) {
 			if (whoCardViewIndex != INVALID_POSITION && whoCardViewIndex == position) {
-				 if (focusOnNameField) {
-					 nameEditText.requestFocus();
-				 } else {
-					 emailEditText.requestFocus();
-				 }
+				if (focusOnNameField) {
+					nameEditText.requestFocus();
+				} else {
+					emailEditText.requestFocus();
+				}
 			}
 		}
 		return convertView;

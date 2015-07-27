@@ -71,7 +71,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
 	private MessageCenterComposingItem whoCardItem;
-
+	private AutomatedMessage contextualMessage;
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment,
 	 * , rotate device, attaches a file, etc.
@@ -87,7 +87,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private String pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
 
-	public MessageCenterView(Activity activity, Map<String, String> customData, Parcelable editTextSavedState,
+
+	public MessageCenterView(Activity activity, Map<String, String> customData,
+													 String contextualMessageBody,
+													 Parcelable editTextSavedState,
 													 String whoCardName, String whoCardEmail, String whoCardAvatar) {
 		super(activity.getApplicationContext());
 		this.activity = activity;
@@ -97,6 +100,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		pendingWhoCardName = whoCardName;
 		pendingWhoCardEmail = whoCardEmail;
 		pendingWhoCardAvatarFile = whoCardAvatar;
+		if (contextualMessageBody != null) {
+			contextualMessage = AutomatedMessage.createAutoMessage(null, contextualMessageBody);
+		}
 		setup(); // TODO: Move this into a configuration changed handler?
 	}
 
@@ -146,10 +152,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
+
+			if (contextualMessage != null) {
+				addContextualMessage();
+			}
 			/* Add composing
 			** if the user was in composing mode before roatation
 			 */
-			if (composingViewSavedState != null) {
+			else if (composingViewSavedState != null) {
 				addComposingArea();
 			}
 			/* Add who card
@@ -211,7 +221,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	}
 
-
 	public int countUnsendOutgoingMessages(final List<MessageCenterListItem> items) {
 		int count = 0;
 		for (MessageCenterListItem item : items) {
@@ -225,15 +234,20 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		return count;
 	}
 
+	public void addContextualMessage() {
+		// Clear any pending composing message to present an empty composing area
+		savePendingComposingMessage();
+		clearStatus();
+		messages.add(contextualMessage);
+		addComposingArea();
+	}
+
 	public void addComposingArea() {
 		View fab = findViewById(R.id.composing_fab);
 		fab.setVisibility(View.INVISIBLE);
 		View profileButton = findViewById(R.id.profile);
 		profileButton.setVisibility(View.INVISIBLE);
-		if (statusItem != null) {
-			messages.remove(statusItem);
-			statusItem = null;
-		}
+		clearStatus();
 		actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
 		messages.add(actionBarItem);
 		composingItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_AREA);
@@ -245,20 +259,13 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		fab.setVisibility(View.INVISIBLE);
 		View profileButton = findViewById(R.id.profile);
 		profileButton.setVisibility(View.INVISIBLE);
-		if (statusItem != null) {
-			messages.remove(statusItem);
-			statusItem = null;
-		}
+		clearStatus();
 		whoCardItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD);
 		messages.add(whoCardItem);
 	}
 
 	public void addNewStatusItem(MessageCenterListItem item) {
-		// Remove the exisiting status item in the list
-		if (statusItem != null) {
-			messages.remove(statusItem);
-			statusItem = null;
-		}
+		clearStatus();
 
 		if (composingItem != null) {
 			return;
@@ -272,11 +279,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
-		// Remove the status message whenever a new outgoing message is added
-		if (statusItem != null) {
-			messages.remove(statusItem);
-			statusItem = null;
-		}
+		clearStatus();
 
 		messages.add(message);
 		unsendMessagesCount++;
@@ -289,11 +292,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	}
 
 	public void addNewIncomingMessageItem(ApptentiveMessage message) {
-		// Remove the status message whenever a new incoming message is added
-		if (statusItem != null) {
-			messages.remove(statusItem);
-			statusItem = null;
-		}
+		clearStatus();
 		int composingAreaIndex = 0;
 		// If user is composing message or WhoCard, new incoming message will be inserted in front
 		if (composingItem != null || whoCardItem != null) {
@@ -317,6 +316,14 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			scrollMessageListViewToBottom();
 		}
 
+	}
+
+	private void clearStatus() {
+		// Remove the status message whenever a new incoming message is added
+		if (statusItem != null) {
+			messages.remove(statusItem);
+			statusItem = null;
+		}
 	}
 
 	public void sendImage(final Uri uri) {
@@ -482,6 +489,10 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	@Override
 	public void onCancelComposing() {
+		if (contextualMessage != null) {
+			messages.remove(contextualMessage);
+			contextualMessage = null;
+		}
 		clearComposingUi();
 		View fab = findViewById(R.id.composing_fab);
 		fab.setVisibility(View.VISIBLE);
@@ -492,6 +503,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	@Override
 	public void onFinishComposing() {
+		if (contextualMessage != null) {
+			unsendMessagesCount++;
+			MessageManager.sendMessage(activity.getApplicationContext(), contextualMessage);
+			contextualMessage = null;
+		}
 		String messageText = getPendingComposingContent().toString().trim();
 		// Close all composing UI
 		onCancelComposing();
@@ -540,11 +556,23 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		});
 	}
 
+	public void scrollMessageListViewToBottomDelayed() {
+		postDelayed(new Runnable() {
+			public void run() {
+				// Select the last row so it will scroll into view...
+				messageCenterListView.setSelection(messages.size() - 1);
+			}
+		}, 200);
+	}
+
 	// Retrieve the content from the composing area
 	public Editable getPendingComposingContent() {
 		return (messageEditText == null) ? null : messageEditText.getText();
 	}
 
+	/* When no composing view is presented in the list view, calling this method
+	 * will clear the pending composing message previously saved in shared preference
+	 */
 	public void savePendingComposingMessage() {
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -583,16 +611,21 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		return messageCenterListAdapter.getWhoCardAvatarFileName();
 	}
 
+	// Return true if contextual message needs to be saved
+	public boolean onSaveContextualMessage() {
+		return (contextualMessage != null);
+	}
+
 	Set<String> dateStampsSeen = new HashSet<>();
 
 	public void messagesUpdated() {
 
 		dateStampsSeen.clear();
 		for (MessageCenterListItem message : messages) {
-			if (message instanceof ApptentiveMessage && !(message instanceof AutomatedMessage)) {
+			if (message instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
-				Double clientCreatedAt = apptentiveMessage.getClientCreatedAt();
-				String dateStamp = createDatestamp(clientCreatedAt);
+				Double sentOrReceivedAt = apptentiveMessage.getCreatedAt();
+				String dateStamp = createDatestamp(sentOrReceivedAt);
 				if (dateStamp != null) {
 					if (dateStampsSeen.add(dateStamp)) {
 						apptentiveMessage.setDatestamp(dateStamp);

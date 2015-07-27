@@ -166,9 +166,6 @@ public class MessageManager {
 		// TODO: Once we start supporting AutomatedMessages again, revert this.
 		List<ApptentiveMessage> apptentiveMessages = getMessageStore(context).getAllMessages();
 		for (ApptentiveMessage apptentiveMessage : apptentiveMessages) {
-			if (apptentiveMessage instanceof AutomatedMessage) {
-				continue;
-			}
 			messages.add(apptentiveMessage);
 		}
 		// messages.addAll(getMessageStore(context).getAllMessages());
@@ -337,8 +334,7 @@ public class MessageManager {
 	public static void setAfterSendMessageListener(AfterSendMessageListener listener) {
 		if (listener != null) {
 			afterSendMessageListener = new WeakReference<AfterSendMessageListener>(listener);
-		}
-		else {
+		} else {
 			afterSendMessageListener = null;
 		}
 	}
@@ -416,7 +412,7 @@ public class MessageManager {
 	public static void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {
 			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
-		} else if (currentForgroundApptentiveActivity != null){
+		} else if (currentForgroundApptentiveActivity != null) {
 			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(currentForgroundApptentiveActivity.get(), false);
 			if (manager != null) {
 				manager.cleanUp();

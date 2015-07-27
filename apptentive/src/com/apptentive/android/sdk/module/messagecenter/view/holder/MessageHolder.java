@@ -19,6 +19,7 @@ public class MessageHolder extends MessageCenterListItemHolder {
 	public TextView datestamp;
 	public TextView status;
 
+
 	public MessageHolder(MessageView view) {
 		datestamp = (TextView) view.findViewById(R.id.datestamp);
 		status = (TextView) view.findViewById(R.id.status);

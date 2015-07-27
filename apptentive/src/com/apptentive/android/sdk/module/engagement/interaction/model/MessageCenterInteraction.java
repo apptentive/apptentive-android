@@ -39,6 +39,8 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_PROFILE_EDIT_SKIP_BUTTON = "edit_skip_button";
 	public static final String KEY_PROFILE_INIT_SAVE_BUTTON = "init_save_button";
 	public static final String KEY_PROFILE_EDIT_SAVE_BUTTON = "edit_save_button";
+	public static final String KEY_CONTEXTUAL_MESSAGE = "automated_message";
+	public static final String KEY_CONTEXTUAL_MESSAGE_BODY = "body";
 
 	// The server guarantees that an instance of this Interaction will be targetted to the following internal event name.
 	public static final String DEFAULT_INTERNAL_EVENT_NAME = "show_message_center";
@@ -197,6 +199,38 @@ public class MessageCenterInteraction extends Interaction {
 			return null;
 		}
 		return profile.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null);
+	}
+
+
+	public JSONObject getContextualMessage() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return null;
+		}
+		return configuration.optJSONObject(KEY_CONTEXTUAL_MESSAGE);
+	}
+
+	public String getContextualMessageBody() {
+		JSONObject auto_msg = getContextualMessage();
+		if (auto_msg == null) {
+			return null;
+		}
+		return auto_msg.optString(KEY_CONTEXTUAL_MESSAGE_BODY, null);
+	}
+
+	public void clearContextualMessage() {
+		JSONObject auto_msg = getContextualMessage();
+		if (auto_msg == null) {
+			return;
+		}
+		try {
+			auto_msg.put(KEY_CONTEXTUAL_MESSAGE_BODY, null);
+			InteractionConfiguration configuration = getConfiguration();
+			configuration.put(KEY_CONTEXTUAL_MESSAGE, auto_msg);
+			put(Interaction.KEY_CONFIGURATION, configuration);
+		} catch (JSONException e) {
+			// catch and do nothing
+		}
 	}
 
 	public static Intent generateMessageCenterErrorIntent(Context context) {
