@@ -25,6 +25,7 @@
     <!-- 12% von #000000 -> 1F -->
     <color name="divider">#1F000000</color>
 
+    <color name="disabled_text">#B9B9B9</color>
 
     <!-- Material DEFAULT colors -->
     <!-- chained the primary, primaryDark, primaryLight, accent colors for compatibility -->

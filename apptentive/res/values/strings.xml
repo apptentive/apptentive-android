@@ -27,7 +27,7 @@
     <string name="apptentive_edittext_hint_email">Your Email Address</string>
     <string name="apptentive_edittext_hint_email_required">Email Address (required)</string>
 
-    <string name="apptentive_powered_by_apptentive">Powered by Apptentive</string>
+    <string name="apptentive_powered_by_apptentive">Powered by</string>
     <string name="apptentive_about_title">About Apptentive</string>
     <string name="apptentive_about_description">Apptentive is a feedback and communication service which allows the people who make this app to quickly get your feedback and better listen to you.</string>
     <string name="apptentive_about_description_link">Find out more at apptentive.com</string>

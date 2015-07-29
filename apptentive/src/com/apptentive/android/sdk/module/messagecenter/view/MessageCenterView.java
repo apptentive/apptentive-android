@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +16,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.view.*;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
 
@@ -37,6 +47,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.WeakReferenceHandler;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -54,7 +65,11 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	private Activity activity;
 	private ListView messageCenterListView;
+	private View messageCenterFooter;
 	private Map<String, String> customData;
+
+	AnimatorSet showAnimatorSet;
+	AnimatorSet dismissAnimatorSet;
 
 	private Configuration configGlobal;
 
@@ -87,6 +102,87 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	private String pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
 
+	protected static final int MSG_SHOW_BRANDING = 1;
+	protected static final int MSG_HIDE_BRANDING = 2;
+	protected static final int MSG_SCROLL_TO_BOTTOM = 3;
+	protected static final int MSG_SCROLL_FROM_TOP = 4;
+	protected static final int MSG_MESSAGE_SENT = 5;
+	protected static final int MSG_PAUSE_SENDING = 6;
+	protected static final int MSG_RESUME_SENDING = 7;
+
+
+	private final Handler.Callback messageCenterViewCallback = new Handler.Callback() {
+
+		public boolean handleMessage(Message msg) {
+
+			switch (msg.what) {
+				case MSG_SHOW_BRANDING:
+					animateShow();
+					break;
+				case MSG_HIDE_BRANDING:
+					animateHide();
+					break;
+				case MSG_SCROLL_TO_BOTTOM:
+					messageCenterListAdapter.notifyDataSetChanged();
+					messageCenterListView.setSelection(messages.size() - 1);
+					break;
+				case MSG_SCROLL_FROM_TOP:
+					int index = msg.arg1;
+					int top = msg.arg2;
+					messageCenterListAdapter.notifyDataSetChanged();
+					messageCenterListView.setSelectionFromTop(index, top);
+					break;
+				case MSG_MESSAGE_SENT:
+					unsendMessagesCount--;
+					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
+					for (MessageCenterListItem message : messages) {
+						if (message instanceof ApptentiveMessage) {
+							String nonce = ((ApptentiveMessage) message).getNonce();
+							if (nonce != null) {
+								String sentNonce = apptentiveMessage.getNonce();
+								if (sentNonce != null && nonce.equals(sentNonce)) {
+									((ApptentiveMessage) message).setCreatedAt(apptentiveMessage.getCreatedAt());
+									break;
+								}
+							}
+						}
+					}
+					updateMessageTimeStamps();
+					messageCenterListAdapter.notifyDataSetChanged();
+					break;
+				case MSG_PAUSE_SENDING:
+					if (!isPaused) {
+						isPaused = true;
+						if (unsendMessagesCount > 0) {
+							messageCenterListAdapter.setPaused(isPaused);
+							MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION,
+									activity.getResources().getString(R.string.apptentive_message_center_status_error_title
+									), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
+							addNewStatusItem(newItem);
+						}
+					}
+					break;
+				case MSG_RESUME_SENDING:
+					if (isPaused) {
+						isPaused = false;
+						if (statusItem != null) {
+							messages.remove(statusItem);
+							statusItem = null;
+						}
+						if (unsendMessagesCount > 0) {
+							messageCenterListAdapter.setPaused(isPaused);
+							messageCenterListAdapter.notifyDataSetChanged();
+						}
+					}
+					break;
+				default:
+					return false;
+			}
+			return true;
+		}
+	};
+
+	final Handler messageCenterViewHandler = WeakReferenceHandler.create(messageCenterViewCallback);
 
 	public MessageCenterView(Activity activity, Map<String, String> customData,
 													 String contextualMessageBody,
@@ -110,14 +206,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		LayoutInflater inflater = activity.getLayoutInflater();
 		inflater.inflate(R.layout.apptentive_message_center, this);
 
-		// Hide branding if needed.
-		/*final View branding = findViewById(R.id.apptentive_logo_view);
-		if (branding != null) {
-			if (Configuration.load(activity).isHideBranding(activity)) {
-				branding.setVisibility(View.GONE);
-			}
-		}*/
-
 		ImageButton back = (ImageButton) findViewById(R.id.back);
 		back.setOnClickListener(new OnClickListener() {
 			@Override
@@ -138,13 +226,27 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 		messageCenterListView.setItemsCanFocus(true);
 
+		messageCenterFooter = findViewById(R.id.footer_bar);
+		// Hide branding if needed.
+		if (messageCenterFooter != null) {
+			if (Configuration.load(activity).isHideBranding(activity)) {
+				messageCenterFooter = null;
+			} else {
+				messageCenterFooter.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// launch About
+					}
+				});
+			}
+		}
+
 		View fab = findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				addComposingArea();
-				messageCenterListAdapter.notifyDataSetChanged();
-				scrollMessageListViewToBottom();
+				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		});
 
@@ -170,11 +272,13 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			} else if (items.size() == 1) {
 				// If there is only greeting message, show composing
 				addComposingArea();
+			} else if (messageCenterFooter != null) {
+				messageCenterFooter.setVisibility(View.VISIBLE);
 			}
 
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
-			messagesUpdated(); // Force timestamp recompilation.
+			updateMessageTimeStamps(); // Force timestamp recompilation.
 		}
 
 
@@ -212,8 +316,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 					// Only allow profile editing when not already editing profile or in message composing
 					if (whoCardItem == null && composingItem == null) {
 						addWhoCard();
-						messageCenterListAdapter.notifyDataSetChanged();
-						scrollMessageListViewToBottom();
+						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 					}
 				}
 			});
@@ -246,7 +349,8 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		View fab = findViewById(R.id.composing_fab);
 		fab.setVisibility(View.INVISIBLE);
 		View profileButton = findViewById(R.id.profile);
-		profileButton.setVisibility(View.INVISIBLE);
+		profileButton.setVisibility(View.GONE);
+		hideBranding();
 		clearStatus();
 		actionBarItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR);
 		messages.add(actionBarItem);
@@ -259,6 +363,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		fab.setVisibility(View.INVISIBLE);
 		View profileButton = findViewById(R.id.profile);
 		profileButton.setVisibility(View.INVISIBLE);
+		hideBranding();
 		clearStatus();
 		whoCardItem = new MessageCenterComposingItem(MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD);
 		messages.add(whoCardItem);
@@ -273,9 +378,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
-		messageCenterListAdapter.notifyDataSetChanged();
-
-		scrollMessageListViewToBottom();
+		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
@@ -287,8 +390,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		isPaused = false;
 		messageCenterListAdapter.setPaused(isPaused);
 
-		messageCenterListAdapter.notifyDataSetChanged();
-		scrollMessageListViewToBottom();
+		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
 	public void addNewIncomingMessageItem(ApptentiveMessage message) {
@@ -308,12 +410,13 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		if (composingAreaTakesUpVisibleArea) {
 			View v = messageCenterListView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
-			messagesUpdated();
+			updateMessageTimeStamps();
 			// Restore the position of listview to composing view
-			messageCenterListView.setSelectionFromTop(composingAreaIndex, top);
+			messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+					composingAreaIndex, top));
 		} else {
-			messagesUpdated();
-			scrollMessageListViewToBottom();
+			updateMessageTimeStamps();
+			messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 		}
 
 	}
@@ -369,61 +472,17 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 	// We should never get a message passed in that is not appropriate for the view it goes into.
 	public synchronized void onMessageSent(ApptentiveHttpResponse response, final ApptentiveMessage apptentiveMessage) {
 		if (response.isSuccessful()) {
-			post(new Runnable() {
-				public void run() {
-					unsendMessagesCount--;
-					for (MessageCenterListItem message : messages) {
-						if (message instanceof ApptentiveMessage) {
-							String nonce = ((ApptentiveMessage) message).getNonce();
-							if (nonce != null) {
-								String sentNonce = apptentiveMessage.getNonce();
-								if (sentNonce != null && nonce.equals(sentNonce)) {
-									((ApptentiveMessage) message).setCreatedAt(apptentiveMessage.getCreatedAt());
-									break;
-								}
-							}
-						}
-					}
-					messagesUpdated();
-				}
-			});
+			messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_MESSAGE_SENT,
+					apptentiveMessage));
 		}
-
 	}
 
 	public synchronized void onPauseSending() {
-		if (!isPaused) {
-			isPaused = true;
-			post(new Runnable() {
-				public void run() {
-					if (unsendMessagesCount > 0) {
-						messageCenterListAdapter.setPaused(isPaused);
-						MessageCenterStatus newItem = new MessageCenterStatus(MessageCenterStatus.STATUS_CONFIRMATION, activity.getResources().getString(R.string.apptentive_message_center_status_error_title
-						), activity.getResources().getString(R.string.apptentive_message_center_status_error_body));
-						addNewStatusItem(newItem);
-					}
-				}
-			});
-		}
+		messageCenterViewHandler.sendEmptyMessage(MSG_PAUSE_SENDING);
 	}
 
 	public synchronized void onResumeSending() {
-		if (isPaused) {
-			isPaused = false;
-			post(new Runnable() {
-				public void run() {
-					if (statusItem != null) {
-						messages.remove(statusItem);
-						statusItem = null;
-					}
-					if (unsendMessagesCount > 0) {
-						messageCenterListAdapter.setPaused(isPaused);
-						messageCenterListAdapter.notifyDataSetChanged();
-					}
-
-				}
-			});
-		}
+		messageCenterViewHandler.sendEmptyMessage(MSG_RESUME_SENDING);
 	}
 
 	public void clearWhoCardUi() {
@@ -498,6 +557,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		fab.setVisibility(View.VISIBLE);
 		View profileButton = findViewById(R.id.profile);
 		profileButton.setVisibility(View.VISIBLE);
+		showBranding();
 		savePendingComposingMessage();
 	}
 
@@ -523,8 +583,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 			if (!bWhoCardSet) {
 				addWhoCard();
-				messageCenterListAdapter.notifyDataSetChanged();
-				scrollMessageListViewToBottom();
+				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		}
 	}
@@ -537,6 +596,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		fab.setVisibility(View.VISIBLE);
 		View profileButton = findViewById(R.id.profile);
 		profileButton.setVisibility(View.VISIBLE);
+		animateShow();
 	}
 
 
@@ -547,22 +607,9 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		editor.commit();
 	}
 
-	public void scrollMessageListViewToBottom() {
-		post(new Runnable() {
-			public void run() {
-				// Select the last row so it will scroll into view...
-				messageCenterListView.setSelection(messages.size() - 1);
-			}
-		});
-	}
 
 	public void scrollMessageListViewToBottomDelayed() {
-		postDelayed(new Runnable() {
-			public void run() {
-				// Select the last row so it will scroll into view...
-				messageCenterListView.setSelection(messages.size() - 1);
-			}
-		}, 200);
+		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, 100);
 	}
 
 	// Retrieve the content from the composing area
@@ -618,8 +665,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 
 	Set<String> dateStampsSeen = new HashSet<>();
 
-	public void messagesUpdated() {
-
+	public void updateMessageTimeStamps() {
 		dateStampsSeen.clear();
 		for (MessageCenterListItem message : messages) {
 			if (message instanceof ApptentiveMessage) {
@@ -635,7 +681,6 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				}
 			}
 		}
-		messageCenterListAdapter.notifyDataSetChanged();
 	}
 
 	protected String createDatestamp(Double seconds) {
@@ -646,4 +691,56 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 		}
 		return null;
 	}
+
+	private void showBranding() {
+		if (messageCenterFooter != null) {
+			messageCenterViewHandler.removeMessages(MSG_HIDE_BRANDING);
+			messageCenterViewHandler.removeMessages(MSG_SHOW_BRANDING);
+			messageCenterViewHandler.sendEmptyMessage(MSG_SHOW_BRANDING);
+		}
+	}
+
+	private void hideBranding() {
+		if (messageCenterFooter != null) {
+			messageCenterViewHandler.removeMessages(MSG_HIDE_BRANDING);
+			messageCenterViewHandler.removeMessages(MSG_SHOW_BRANDING);
+			messageCenterViewHandler.sendEmptyMessage(MSG_HIDE_BRANDING);
+		}
+	}
+
+	private void animateShow() {
+		// Clear previous animations
+		if (dismissAnimatorSet != null && dismissAnimatorSet.isRunning()) {
+			dismissAnimatorSet.cancel();
+		}
+		if (showAnimatorSet == null || !showAnimatorSet.isRunning()) {
+			showAnimatorSet = new AnimatorSet();
+			// Bring the view back
+			messageCenterFooter.setVisibility(View.VISIBLE);
+			ObjectAnimator footerAnimator = ObjectAnimator.ofFloat(messageCenterFooter, "translationY", messageCenterFooter.getTranslationY(), 0f);
+			ArrayList<Animator> animators = new ArrayList<>();
+			animators.add(footerAnimator);
+			showAnimatorSet.setDuration(300);
+			showAnimatorSet.playTogether(animators);
+			showAnimatorSet.start();
+		}
+	}
+
+	private void animateHide() {
+		// Clear previous animations
+		if (showAnimatorSet != null && showAnimatorSet.isRunning()) {
+			showAnimatorSet.cancel();
+		}
+		if (dismissAnimatorSet == null || !dismissAnimatorSet.isRunning()) {
+			dismissAnimatorSet = new AnimatorSet();
+			ObjectAnimator footerAnimator = ObjectAnimator.ofFloat(messageCenterFooter, "translationY",
+					messageCenterFooter.getTranslationY(), messageCenterFooter.getHeight());
+			ArrayList<Animator> animators = new ArrayList<>();
+			animators.add(footerAnimator);
+			dismissAnimatorSet.setDuration(200);
+			dismissAnimatorSet.playTogether(animators);
+			dismissAnimatorSet.start();
+		}
+	}
+
 }

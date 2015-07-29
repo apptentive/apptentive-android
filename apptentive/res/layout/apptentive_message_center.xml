@@ -75,32 +75,71 @@
             </LinearLayout>
         </LinearLayout>
         <!-- Content -->
-        <FrameLayout android:layout_width="match_parent"
-                     android:layout_height="match_parent"
-                     android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
-                     android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
-                     android:background="#FAFAFA"
-                     android:orientation="vertical"
-                     android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
-                     android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_marginLeft="@dimen/apptentive_message_center_message_list_margin"
+                      android:layout_marginRight="@dimen/apptentive_message_center_message_list_margin"
+                      android:background="#FAFAFA"
+                      android:orientation="vertical"
+                      android:paddingLeft="@dimen/apptentive_message_center_message_list_side_border"
+                      android:paddingRight="@dimen/apptentive_message_center_message_list_side_border">
 
-            <!--<FrameLayout android:layout_width="match_parent"
+            <FrameLayout android:layout_width="match_parent"
                          android:layout_height="0dp"
                          android:layout_weight="1"
                          android:background="#FAFAFA"
-                         android:orientation="vertical">-->
-            <!-- Message List -->
-            <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView
-                android:id="@+id/message_list"
+                         android:orientation="vertical">
+                <!-- Message List -->
+                <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView
+                    android:id="@+id/message_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:cacheColorHint="@android:color/transparent"
+                    android:descendantFocusability="beforeDescendants"/>
+            </FrameLayout>
+            <!-- footer view -->
+            <LinearLayout
+                android:id="@+id/footer_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:cacheColorHint="@android:color/transparent"
-                android:descendantFocusability="beforeDescendants"/>
-            <!--</FrameLayout>-->
-            <!-- Composition Area -->
+                android:orientation="vertical"
+                android:visibility="gone">
+                <FrameLayout android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:paddingTop="@dimen/apptentive_message_center_fallback_divider_line_width"
+                             android:background="@color/disabled_text">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/apptentive_message_center_footer_height"
+                        android:orientation="horizontal"
+                        android:background="@color/apptentive_message_center_outgoing_background">
 
-        </FrameLayout>
+                        <TextView
+                            android:id="@+id/powerby"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/disabled_text"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:text="@string/apptentive_powered_by_apptentive"
+                            />
+                        <ImageView
+                            android:id="@+id/logo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/powerby"
+                            android:layout_toRightOf="@+id/powerby"
+                            android:src="@drawable/apptentive_ic_branding"/>
+                    </RelativeLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
     <com.apptentive.android.sdk.view.FloatingActionButton
         android:id="@+id/composing_fab"
