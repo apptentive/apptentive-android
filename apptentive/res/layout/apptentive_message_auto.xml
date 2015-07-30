@@ -6,36 +6,31 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:background="#FAFAFA"
-             android:paddingTop="3dp"
-             android:paddingBottom="5dp"
-             android:paddingLeft="10dp"
-             android:paddingRight="10dp">
-    <LinearLayout android:id="@+id/apptentive_message_auto_frame"
-                  android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:orientation="vertical"
-                  android:paddingTop="10dp"
-                  android:paddingBottom="10dp">
-        <TextView android:id="@+id/apptentive_message_auto_title"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:gravity="center"
-                  android:textStyle="bold"
-                  android:textColor="@color/apptentive_message_auto_text"
-                  android:textSize="18sp"/>
-        <FrameLayout android:layout_width="fill_parent"
-                     android:layout_height="1dp"
-                     android:background="@color/apptentive_message_auto_separator"/>
-        <TextView android:id="@+id/apptentive_message_auto_body"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:paddingTop="8dp"
-                  android:paddingLeft="10dp"
-                  android:paddingRight="10dp"
-                  android:textColor="@color/apptentive_message_auto_text"/>
-    </LinearLayout>
-</FrameLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              style="@style/MessageCenterMessageFrame">
+    <TextView android:id="@+id/datestamp"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              style="@style/ApptentiveMessageCenterMessageDatestamp"
+              android:visibility="gone"/>
+    <FrameLayout android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 style="@style/ApptentiveMessageCenterMessageBorder">
+        <LinearLayout android:id="@+id/apptentive_message_auto_frame"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:orientation="vertical"
+                      android:paddingTop="10dp"
+                      android:paddingBottom="10dp">
+            <TextView android:id="@+id/apptentive_message_auto_body"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:paddingTop="8dp"
+                      android:paddingLeft="10dp"
+                      android:paddingRight="10dp"
+                      android:textColor="@color/apptentive_message_auto_text"/>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

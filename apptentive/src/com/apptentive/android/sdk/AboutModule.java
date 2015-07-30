@@ -36,7 +36,6 @@ public class AboutModule {
 		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
 		activity.startActivity(intent);
-		activity.overridePendingTransition(R.anim.slide_up_in, 0);
 	}
 
 	void doShow(final Activity activity) {

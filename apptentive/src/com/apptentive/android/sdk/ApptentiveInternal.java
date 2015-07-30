@@ -168,7 +168,6 @@ public class ApptentiveInternal {
 	public static void showMessageCenterFallback(Activity activity) {
 		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(activity.getApplicationContext());
 		activity.startActivity(intent);
-		activity.overridePendingTransition(R.anim.slide_up_in, R.anim.slide_down_out);
 	}
 
 	public static boolean canShowMessageCenterInternal(Context context) {

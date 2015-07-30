@@ -9,7 +9,7 @@
 
     <item>
         <shape>
-            <solid android:color="?attr/apptentiveTintColor" />
+            <solid android:color="?attr/colorPrimary" />
         </shape>
     </item>
 

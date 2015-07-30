@@ -21,9 +21,10 @@
         <attr name="apptentive_material_selected_text" format="color|reference" />
         <!-- header attrs-->
         <attr name="apptentive_material_header_selection_text" format="color|reference" />
+        <attr name="apptentive_material_pressed_highlight" format="color|reference" />
     </declare-styleable>
 
-    <attr name="apptentiveTintColor" format="color"/>
+
 
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>

@@ -24,10 +24,10 @@
                      android:layout_height="wrap_content"
                      android:layout_alignParentLeft="true"
                      android:layout_centerVertical="true"
+                     android:layout_marginLeft="10dp"
                      android:layout_marginRight="10dp"
-                     android:background="@null"
                      android:contentDescription="Close"
-                     android:paddingLeft="10dp"
+                     android:background="@drawable/apptentive_imagebutton_highlight"
                      android:src="@drawable/apptentive_ic_close"
                      android:tint="?attr/colorAccent"/>
 
@@ -48,9 +48,9 @@
                      android:layout_alignParentRight="true"
                      android:layout_centerVertical="true"
                      android:layout_marginRight="10dp"
-                     android:background="@null"
+                     android:background="@drawable/apptentive_imagebutton_highlight"
                      android:contentDescription="Submit"
-                     android:paddingLeft="16dp"
+                     android:clickable="true"
                      android:src="@drawable/apptentive_ic_action_send"
                      android:tint="?attr/colorAccent"/>
 
