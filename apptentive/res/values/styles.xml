@@ -27,6 +27,7 @@
         <item name="apptentive_material_header_selection_text">
             @color/apptentive_material_header_selection_text
         </item>
+        <item name="apptentive_material_pressed_highlight">@color/apptentive_material_dark_pressed_highlight</item>
 
         <!-- Here we setting apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting</item>
@@ -34,6 +35,7 @@
 
         <!-- Apptentive specific values -->
         <item name="windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/apptentive_activity_frame</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -74,6 +76,7 @@
         <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
         <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
         <item name="apptentive_material_header_selection_text">@color/apptentive_material_header_selection_text</item>
+        <item name="apptentive_material_pressed_highlight">@color/apptentive_material_pressed_highlight</item>
     </style>
 
     <style name="ApptentiveBaseTheme.Light" parent="ApptentiveBaseVersionBaseTheme.Light"></style>
@@ -112,6 +115,7 @@
         <item name="apptentive_material_header_selection_text">
             @color/apptentive_material_header_selection_text
         </item>
+        <item name="apptentive_material_pressed_highlight">@color/apptentive_material_dark_background</item>
     </style>
 
     <style name="ApptentiveBaseTheme.Light.DarkToolbar" parent="ApptentiveBaseVersionBaseTheme.Light.DarkToolbar"></style>

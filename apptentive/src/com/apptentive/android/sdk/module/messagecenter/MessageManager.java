@@ -163,7 +163,6 @@ public class MessageManager {
 		List<MessageCenterListItem> messages = new ArrayList<>();
 		messages.add(new MessageCenterGreeting()); // TODO: Generate a real greeting message from config.
 
-		// TODO: Once we start supporting AutomatedMessages again, revert this.
 		List<ApptentiveMessage> apptentiveMessages = getMessageStore(context).getAllMessages();
 		for (ApptentiveMessage apptentiveMessage : apptentiveMessages) {
 			messages.add(apptentiveMessage);

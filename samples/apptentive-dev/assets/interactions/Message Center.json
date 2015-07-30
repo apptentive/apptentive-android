@@ -3,7 +3,7 @@
   "type": "MessageCenter",
   "configuration": {
     "automated_message": {
-      "body": "We're sorry to hear that you don't love blah! Is there anything we could do to make it better?"
+      "body": "We're sorry to hear that you don't love this app! Is there anything we could do to make it better?"
     }
   }
 }

@@ -33,7 +33,7 @@
                 <ImageButton android:id="@+id/back"
                              android:layout_width="48dp"
                              android:layout_height="48dp"
-                             android:background="@null"
+                             android:background="@drawable/apptentive_imagebutton_highlight"
                              android:contentDescription="Back"
                              android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
 
@@ -57,7 +57,7 @@
                              android:layout_alignParentTop="true"
                              android:layout_centerVertical="true"
                              android:layout_alignParentRight="true"
-                             android:background="@null"
+                             android:background="@drawable/apptentive_imagebutton_highlight"
                              android:contentDescription="Profile"
                              android:src="@drawable/apptentive_ic_profile_edit"/>
                 <ImageButton android:id="@+id/attach"

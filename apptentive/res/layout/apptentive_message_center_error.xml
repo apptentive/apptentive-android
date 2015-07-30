@@ -15,7 +15,7 @@
     <!-- Header -->
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="@dimen/apptentive_message_center_header_height"
-                  android:background="?attr/apptentiveTintColor"
+                  android:background="?attr/colorPrimary"
                   android:elevation="8dp"
                   android:gravity="top"
                   android:orientation="vertical">
