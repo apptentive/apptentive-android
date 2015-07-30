@@ -146,15 +146,22 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(activity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			messages.addAll(items);
-			/* Add composing view when there is only greeting
-			** or if the user was in composing mode before roatation
+			/* Add composing
+			** if the user was in composing mode before roatation
 			 */
-			if (composingViewSavedState != null || items.size() == 1) {
+			if (composingViewSavedState != null) {
 				addComposingArea();
 			}
-			if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
+			/* Add who card
+			** if the user was in composing Who card mode before roatation
+			 */
+			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addWhoCard();
+			} else if (items.size() == 1) {
+				// If there is only greeting message, show composing
+				addComposingArea();
 			}
+
 			messageCenterListAdapter = new MessageAdapter<>(activity, messages, this);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 			messagesUpdated(); // Force timestamp recompilation.

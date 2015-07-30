@@ -6,17 +6,129 @@
   -->
 
 <resources>
-    <style name="Apptentive.Theme.Transparent" parent="android:Theme">
+    <!-- Default/Dark with no Action Bar -->
+    <style name="ApptentiveBaseVersionBaseTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Setting appcompat’s color theming attrs -->
+        <item name="colorPrimary">@color/apptentive_material_primary</item>
+        <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
+        <item name="colorAccent">@color/apptentive_material_accent</item>
+
+        <!-- Apptentive material specific attributes/values -->
+        <item name="apptentive_material_background">@color/apptentive_material_dark_background</item>
+        <item name="apptentive_material_icons">@color/apptentive_material_dark_icons</item>
+        <item name="apptentive_material_primary_text">@color/apptentive_material_dark_primary_text</item>
+        <item name="apptentive_material_primary_icon">@color/apptentive_material_dark_primary_icon</item>
+        <item name="apptentive_material_secondary_text">@color/apptentive_material_dark_secondary_text
+        </item>
+        <item name="apptentive_material_hint_text">@color/apptentive_material_dark_hint_text</item>
+        <item name="apptentive_material_divider">@color/apptentive_material_dark_divider</item>
+        <item name="apptentive_material_selected">@color/apptentive_material_dark_selected</item>
+        <item name="apptentive_material_selected_text">@color/apptentive_material_dark_selected_text</item>
+        <item name="apptentive_material_header_selection_text">
+            @color/apptentive_material_header_selection_text
+        </item>
+
+        <!-- Here we setting apptentive widget styles -->
+        <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting</item>
+        <item name="apptentiveAvatarViewMessageStyle">@style/ApptentiveAvatarView.Message</item>
+
+        <!-- Apptentive specific values -->
+        <item name="windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/apptentive_activity_frame</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">false</item>
-        <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting</item>
-        <item name="apptentiveAvatarViewMessageStyle">@style/ApptentiveAvatarView.Message</item>
-        <item name="apptentiveTintColor">@color/apptentive_tint_color</item>
     </style>
+
+
+    <style name="ApptentiveBaseTheme" parent="ApptentiveBaseVersionBaseTheme"></style>
+
+    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"></style>
+
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme"></style>
+
+    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
+        <item name="windowActionBar">true</item>
+        <item name="android:windowNoTitle">false</item>
+    </style>
+
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar"></style>
+
+    <!-- LIGHT Base Theme-->
+    <style name="ApptentiveBaseVersionBaseTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!-- Setting appcompat’s color theming attrs -->
+        <item name="colorPrimary">@color/apptentive_material_primary</item>
+        <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
+        <item name="colorAccent">@color/apptentive_material_accent</item>
+
+        <!-- Apptentive Material specific values -->
+        <item name="apptentive_material_background">@color/apptentive_material_background</item>
+        <item name="apptentive_material_icons">@color/apptentive_material_icons</item>
+        <item name="apptentive_material_primary_text">@color/apptentive_material_primary_text</item>
+        <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
+        <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
+        <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
+        <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
+        <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
+        <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
+        <item name="apptentive_material_header_selection_text">@color/apptentive_material_header_selection_text</item>
+    </style>
+
+    <style name="ApptentiveBaseTheme.Light" parent="ApptentiveBaseVersionBaseTheme.Light"></style>
+
+    <style name="ApptentiveTheme.Light" parent="ApptentiveBaseTheme.Light"></style>
+
+    <style name="ApptentiveTheme.Light.TranslucentStatus" parent="ApptentiveTheme.Light"></style>
+
+    <style name="ApptentiveTheme.Light.ActionBar" parent="ApptentiveTheme.Light">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
+
+    <style name="ApptentiveTheme.Light.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.ActionBar"></style>
+
+    <!-- LIGHT DARK ACTIONBAR -->
+    <style name="ApptentiveBaseVersionBaseTheme.Light.DarkToolbar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Setting appcompat’s color theming attrs -->
+        <item name="colorPrimary">@color/apptentive_material_primary</item>
+        <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
+        <item name="colorAccent">@color/apptentive_material_accent</item>
+
+        <!-- Apptentive specific values -->
+        <item name="apptentive_material_background">@color/apptentive_material_background</item>
+        <item name="apptentive_material_icons">@color/apptentive_material_icons</item>
+        <item name="apptentive_material_primary_text">@color/apptentive_material_primary_text</item>
+        <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
+        <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
+        <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
+        <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
+        <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
+        <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
+        <item name="apptentive_material_header_selection_text">
+            @color/apptentive_material_header_selection_text
+        </item>
+    </style>
+
+    <style name="ApptentiveBaseTheme.Light.DarkToolbar" parent="ApptentiveBaseVersionBaseTheme.Light.DarkToolbar"></style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar" parent="ApptentiveBaseTheme.Light.DarkToolbar"></style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar" parent="ApptentiveTheme.Light.DarkToolbar">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+        <!-- only set this if we use an ActionBar -->
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark</item>
+    </style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
+
 
     <style name="ApptentiveInteractionPositiveButton">
         <item name="android:background">@drawable/apptentive_dialog_positive_button</item>
@@ -112,7 +224,7 @@
 
     <style name="ApptentiveAvatarView">
         <item name="android:src">@drawable/avatar</item>
-        <item name="borderColor">@color/apptentive_tint_color</item>
+        <item name="borderColor">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveAvatarView.Greeting">
@@ -133,12 +245,12 @@
 
     <style name="FloatingActionButton" parent="android:Widget.ImageButton">
         <item name="floatingActionButtonSize">normal</item>
-        <item name="floatingActionButtonColor">?attr/apptentiveTintColor</item>
+        <item name="floatingActionButtonColor">?attr/colorAccent</item>
     </style>
 
     <style name="FloatingActionButton.Mini" parent="FloatingActionButton">
         <item name="floatingActionButtonSize">mini</item>
-        <item name="floatingActionButtonColor">?attr/apptentiveTintColor</item>
+        <item name="floatingActionButtonColor">?attr/colorAccent</item>
     </style>
 
 
@@ -156,7 +268,7 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/apptentiveTintColor</item>
+        <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:textSize">24dp</item>
     </style>
 
@@ -222,6 +334,6 @@
 
     <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
         <item name="android:paddingTop">10dp</item>
-        <item name="progressBarColor">?attr/apptentiveTintColor</item>
+        <item name="progressBarColor">?attr/colorAccent</item>
     </style>
 </resources>

@@ -7,6 +7,22 @@
 
 <resources>
 
+    <declare-styleable name="ApptentiveMaterial">
+        <attr name="apptentive_material_background" format="color|reference" />
+
+        <attr name="apptentive_material_icons" format="color|reference" />
+        <attr name="apptentive_material_primary_text" format="color|reference" />
+        <attr name="apptentive_material_primary_icon" format="color|reference" />
+        <attr name="apptentive_material_secondary_text" format="color|reference" />
+        <attr name="apptentive_material_hint_text" format="color|reference" />
+        <attr name="apptentive_material_divider" format="color|reference" />
+
+        <attr name="apptentive_material_selected" format="color|reference" />
+        <attr name="apptentive_material_selected_text" format="color|reference" />
+        <!-- header attrs-->
+        <attr name="apptentive_material_header_selection_text" format="color|reference" />
+    </declare-styleable>
+
     <attr name="apptentiveTintColor" format="color"/>
 
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
