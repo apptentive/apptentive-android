@@ -29,6 +29,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
 
+import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -235,7 +236,7 @@ public class MessageCenterView extends FrameLayout implements MessageManager.Aft
 				messageCenterFooter.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// launch About
+						AboutModule.getInstance().show(activity);
 					}
 				});
 			}

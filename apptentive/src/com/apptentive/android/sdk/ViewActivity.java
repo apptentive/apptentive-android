@@ -119,6 +119,7 @@ public class ViewActivity extends ApptentiveActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		boolean activityContentRequired = true;
 		getDelegate().installViewFactory();
 		getDelegate().onCreate(savedInstanceState);
 
@@ -141,6 +142,7 @@ public class ViewActivity extends ApptentiveActivity {
 							}
 							break;
 						case ABOUT:
+							activityContentRequired = false;
 							break;
 						case MESSAGE_CENTER_ERROR:
 							activityContent = new MessageCenterErrorActivityContent();
@@ -183,15 +185,17 @@ public class ViewActivity extends ApptentiveActivity {
 										break;
 								}
 							}
-							break;
+							break; // end INTERACTION
 						default:
 							Log.w("No Activity specified. Finishing...");
 							break;
 					}
-					if (activityContent == null) {
-						finish();
-					} else {
-						activityContent.onCreate(this, savedInstanceState);
+					if (activityContentRequired) {
+						if (activityContent == null) {
+							finish();
+						} else {
+							activityContent.onCreate(this, savedInstanceState);
+						}
 					}
 				} catch (Exception e) {
 					Log.e("Error starting ViewActivity.", e);
@@ -290,13 +294,17 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		activityContent.onResume();
+		if (activityContent != null) {
+			activityContent.onResume();
+		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		activityContent.onPause();
+		if (activityContent != null) {
+			activityContent.onPause();
+		}
 	}
 
 	public void showAboutActivity(View view) {
@@ -323,5 +331,11 @@ public class ViewActivity extends ApptentiveActivity {
 	public void finish() {
 		super.finish();
 		overridePendingTransition(0, R.anim.slide_down_out);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		overridePendingTransition(R.anim.slide_up_in, 0);
 	}
 }
