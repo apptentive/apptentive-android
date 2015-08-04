@@ -197,14 +197,16 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
 					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
-					newView.updateMessage(greeting.getTitle(), greeting.getBody());
+					newView.updateMessage(greeting.title, greeting.body);
+					ImageUtil.startDownloadAvatarTask(newView.avatar,
+							((MessageCenterGreeting) listItem).avatar);
 					convertView = newView;
 					break;
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
 					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext(), statusItem);
-					newView.updateMessage(statusItem.getTitle(), statusItem.getBody());
+					newView.updateMessage(statusItem.title, statusItem.body);
 					convertView = newView;
 					break;
 				}
@@ -289,7 +291,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
+					((StatusHolder) holder).updateMessage(status.title, status.body);
 					break;
 				}
 				case TYPE_AUTO: {

@@ -53,7 +53,6 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 	}
 
-
 	public EditText getEditText() {
 		return et;
 	}

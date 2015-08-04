@@ -91,13 +91,13 @@ public class PayloadSendWorker {
 					PayloadStore db = getPayloadStore(contextRef.get());
 					if (Util.isEmpty(GlobalInfo.conversationToken)) {
 						Log.i("No conversation token yet.");
-						MessageManager.onPauseSending();
+						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						goToSleep(NO_TOKEN_SLEEP);
 						continue;
 					}
 					if (!Util.isNetworkConnectionPresent(contextRef.get())) {
 						Log.d("Can't send payloads. No network connection.");
-						MessageManager.onPauseSending();
+						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
 						goToSleep(NO_CONNECTION_SLEEP_TIME);
 						continue;
 					}
@@ -157,7 +157,7 @@ public class PayloadSendWorker {
 						} else if (response.isRejectedTemporarily()) {
 							Log.d("Unable to send JSON. Leaving in queue.");
 							if (response.isException()) {
-								MessageManager.onPauseSending();
+								MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 								goToSleep(NO_CONNECTION_SLEEP_TIME);
 							}
 						}

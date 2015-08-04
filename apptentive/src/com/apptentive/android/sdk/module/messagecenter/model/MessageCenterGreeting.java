@@ -12,30 +12,15 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterGreeting extends JSONObject implements MessageCenterListItem {
-	public static final String KEY_TITLE = "title";
-	public static final String KEY_BODY = "body";
+public class MessageCenterGreeting implements MessageCenterListItem {
+	public final String title;
+	public final String body;
+	public final String avatar;
 
-	public String getTitle() {
-		try {
-			if (!isNull((KEY_TITLE))) {
-				return getString(KEY_TITLE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return "Hello.";
-	}
-
-	public String getBody() {
-		try {
-			if (!isNull((KEY_BODY))) {
-				return getString(KEY_BODY);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return "I'm Samantha. I work at Apptentive. Please tell me what we can do to improve the app.";
+	public MessageCenterGreeting(String title, String body, String avatar) {
+		this.title = title;
+		this.body = body;
+		this.avatar = avatar;
 	}
 
 

@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeti
  */
 public class MessageCenterGreetingView extends FrameLayout implements MessageCenterListItemView {
 
+	public ApptentiveAvatarView avatar;
 	public TextView title;
 	public TextView body;
 
@@ -40,5 +41,6 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 		View view = inflater.inflate(R.layout.apptentive_message_center_greeting, this);
 		title = (TextView) view.findViewById(R.id.title);
 		body = (TextView) view.findViewById(R.id.body);
+		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
 	}
 }

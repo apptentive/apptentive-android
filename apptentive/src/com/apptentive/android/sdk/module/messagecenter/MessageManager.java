@@ -52,6 +52,10 @@ import java.util.List;
  */
 public class MessageManager {
 
+	// The reason od message sending errors
+	public static int SEND_PAUSE_REASON_NETWORK = 1;
+	public static int SEND_PAUSE_REASON_SERVER = 2;
+
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
 	private static final int UI_THREAD_MESSAGE_ON_UNREAD_HOST = 1;
@@ -161,13 +165,7 @@ public class MessageManager {
 
 	public static List<MessageCenterListItem> getMessageCenterListItems(Context context) {
 		List<MessageCenterListItem> messages = new ArrayList<>();
-		messages.add(new MessageCenterGreeting()); // TODO: Generate a real greeting message from config.
-
-		List<ApptentiveMessage> apptentiveMessages = getMessageStore(context).getAllMessages();
-		for (ApptentiveMessage apptentiveMessage : apptentiveMessages) {
-			messages.add(apptentiveMessage);
-		}
-		// messages.addAll(getMessageStore(context).getAllMessages());
+		messages.addAll(getMessageStore(context).getAllMessages());
 		return messages;
 	}
 
@@ -228,9 +226,9 @@ public class MessageManager {
 		}
 	}
 
-	public static void onPauseSending() {
+	public static void onPauseSending(int reason_code) {
 		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-			afterSendMessageListener.get().onPauseSending();
+			afterSendMessageListener.get().onPauseSending(reason_code);
 		}
 	}
 
@@ -239,7 +237,7 @@ public class MessageManager {
 			if (apptentiveMessage instanceof OutgoingFileMessage) {
 				((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
 			}
-			onPauseSending();
+			onPauseSending(SEND_PAUSE_REASON_SERVER);
 			return;
 		}
 		if (response.isSuccessful()) {
@@ -325,7 +323,7 @@ public class MessageManager {
 	public interface AfterSendMessageListener {
 		void onMessageSent(ApptentiveHttpResponse response, ApptentiveMessage apptentiveMessage);
 
-		void onPauseSending();
+		void onPauseSending(int reason);
 
 		void onResumeSending();
 	}

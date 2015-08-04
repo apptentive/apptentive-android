@@ -53,6 +53,9 @@ public class AutomatedMessage extends OutgoingTextMessage {
 	}
 
 	public static AutomatedMessage createAutoMessage(String title, String body) {
+		if (title == null && body == null) {
+			return null;
+		}
 		AutomatedMessage message = new AutomatedMessage();
 		message.setTitle(title);
 		message.setBody(body);
