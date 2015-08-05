@@ -147,6 +147,31 @@
     <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
 
 
+    <style name="ApptentiveWidget.CardView" parent="android:Widget">
+        <item name="android:layout_marginBottom">@dimen/apptentive_message_center_card_margin</item>
+        <item name="android:layout_marginLeft">@dimen/apptentive_message_center_card_margin</item>
+        <item name="android:layout_marginRight">@dimen/apptentive_message_center_card_margin</item>
+        <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:background">#DCDCDC</item>
+    </style>
+
+    <style name="ApptentiveWidget.CardContent.Outgoing" parent="android:Widget">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="ApptentiveWidget.CardContent.Incoming" parent="android:Widget">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
     <style name="ApptentiveInteractionPositiveButton">
         <item name="android:background">@drawable/apptentive_dialog_positive_button</item>
         <item name="android:textColor">@drawable/apptentive_dialog_positive_button_text</item>
@@ -252,20 +277,20 @@
     <style name="ApptentiveAvatarView.Message">
     </style>
 
-    <style name="ApptentiveMessageCenterBadge">
+    <style name="ApptentiveWidget.NewMessageBadge" parent="android:Widget">
         <item name="badgeSize">normal</item>
         <item name="counterColor">@color/apptentive_text_message_text</item>
     </style>
-    <style name="ApptentiveMessageCenterBadge.Mini" parent="ApptentiveMessageCenterBadge">
+    <style name="ApptentiveWidget.NewMessageBadge.Mini" parent="ApptentiveWidget.NewMessageBadge">
         <item name="badgeSize">mini</item>
     </style>
 
-    <style name="FloatingActionButton" parent="android:Widget.ImageButton">
+    <style name="ApptentiveWidget.FloatingActionButton" parent="android:Widget.ImageButton">
         <item name="floatingActionButtonSize">normal</item>
         <item name="floatingActionButtonColor">?attr/colorAccent</item>
     </style>
 
-    <style name="FloatingActionButton.Mini" parent="FloatingActionButton">
+    <style name="ApptentiveWidget.FloatingActionButton.Mini" parent="ApptentiveWidget.FloatingActionButton">
         <item name="floatingActionButtonSize">mini</item>
         <item name="floatingActionButtonColor">?attr/colorAccent</item>
     </style>
@@ -312,19 +337,6 @@
         <item name="android:background">#DCDCDC</item>
     </style>
 
-    <style name="ApptentiveMessageCenterMessageIncomingBackground">
-        <item name="android:padding">16dp</item>
-        <item name="android:background">#FFFFFF</item>
-        <item name="android:orientation">horizontal</item>
-    </style>
-
-    <style name="ApptentiveMessageCenterMessageOutgoingBackground">
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:orientation">vertical</item>
-    </style>
-
     <style name="ApptentiveMessageCenterMessageContent">
         <item name="android:paddingLeft">18dp</item>
         <item name="android:gravity">left</item>
@@ -350,7 +362,8 @@
     </style>
 
     <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
-        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
         <item name="progressBarColor">?attr/colorAccent</item>
     </style>
 </resources>

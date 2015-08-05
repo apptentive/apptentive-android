@@ -188,7 +188,7 @@ public class FloatingActionButton extends ImageButton {
 				return;
 			}
 
-			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, R.style.FloatingActionButton);
+			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, R.style.ApptentiveWidget_FloatingActionButton);
 			if (a == null) {
 				return;
 			}

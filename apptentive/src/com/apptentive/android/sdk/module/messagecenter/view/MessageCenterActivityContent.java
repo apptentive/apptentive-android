@@ -771,11 +771,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		editor.commit();
 	}
 
-
-	public void scrollMessageListViewToBottomDelayed() {
-		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, 100);
-	}
-
 	// Retrieve the content from the composing area
 	public Editable getPendingComposingContent() {
 		return (messageEditText == null) ? null : messageEditText.getText();
