@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 
 
 /**
@@ -26,13 +27,16 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 	private EditText et;
 
-	public MessageCenterComposingView(Context context, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterComposingView(Context context, final MessageCenterComposingItem item,
+																		final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
-
+		if (item.str_2 != null) {
+			et.setHint(item.str_2);
+		}
 		et.addTextChangedListener(new TextWatcher() {
 			private boolean doScroll = false;
 
@@ -56,4 +60,5 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	public EditText getEditText() {
 		return et;
 	}
+
 }

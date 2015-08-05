@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -385,7 +386,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				public void onClick(View view) {
 					// Only allow profile editing when not already editing profile or in message composing
 					if (whoCardItem == null && composingItem == null) {
-						addWhoCard(WHO_CARD_MODE_EDIT);
+						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+						if (!bWhoCardSet) {
+							addWhoCard(WHO_CARD_MODE_INIT);
+						} else {
+							addWhoCard(WHO_CARD_MODE_EDIT);
+						}
 						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 					}
 				}
@@ -871,6 +878,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			ArrayList<Animator> animators = new ArrayList<>();
 			animators.add(footerAnimator);
 			dismissAnimatorSet.setDuration(200);
+			dismissAnimatorSet.addListener(
+					new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationStart(Animator animator) {
+
+						}
+
+						@Override
+						public void onAnimationEnd(Animator animator) {
+							messageCenterFooter.setVisibility(View.GONE);
+						}
+					}
+			);
+
 			dismissAnimatorSet.playTogether(animators);
 			dismissAnimatorSet.start();
 		}

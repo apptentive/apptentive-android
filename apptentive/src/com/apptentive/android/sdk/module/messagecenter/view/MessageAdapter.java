@@ -212,19 +212,22 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(context, composingActionListener);
+						composingView = new MessageCenterComposingView(context,
+								(MessageCenterComposingItem)listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					convertView = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					convertView = new MessageCenterComposingActionBarView(context, composingActionListener);
+					convertView = new MessageCenterComposingActionBarView(context,
+							(MessageCenterComposingItem)listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
 						whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}
 					convertView = whoCardView;
@@ -251,6 +254,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				setupComposingView(position);
 			} else if (type == TYPE_WHOCARD && whoCardView == null) {
 				whoCardView = (MessageCenterWhoCardView) convertView;
+				whoCardView.updateUi((MessageCenterComposingItem) listItem);
 				setupWhoCardView(position);
 			}
 		}

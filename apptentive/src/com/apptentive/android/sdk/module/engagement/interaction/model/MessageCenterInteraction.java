@@ -92,7 +92,7 @@ public class MessageCenterInteraction extends Interaction {
 		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_AREA,
-				composer.optString(KEY_COMPOSER_TITLE, null),
+				null,
 				composer.optString(KEY_COMPOSER_HINT_TEXT, null),
 				null,
 				null,
@@ -107,7 +107,7 @@ public class MessageCenterInteraction extends Interaction {
 		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR,
-				null,
+				composer.optString(KEY_COMPOSER_TITLE, null),
 				null,
 				null,
 				composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
@@ -125,8 +125,8 @@ public class MessageCenterInteraction extends Interaction {
 				profile.optString(KEY_PROFILE_INIT_TITLE, null),
 				profile.optString(KEY_PROFILE_INIT_NAME_HINT, null),
 				profile.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profile.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null),
-				profile.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null));
+				profile.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
+				profile.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 	}
 
 	public MessageCenterComposingItem getWhoCardEdit() {
@@ -140,8 +140,8 @@ public class MessageCenterInteraction extends Interaction {
 				profile.optString(KEY_PROFILE_EDIT_TITLE, null),
 				profile.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
 				profile.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-				profile.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null),
-				profile.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null));
+				profile.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
+				profile.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 	}
 
 
