@@ -7,7 +7,7 @@
 
 <resources>
     <!-- Add overridden Dialog design to base themes -->
-    <style name="ApptentiveBaseTheme" parent="ApptentiveBaseVersionBaseTheme">
+    <style name="ApptentiveBaseTheme" parent="ApptentiveBaseVersionBaseTheme.Dark">
         <item name="android:dialogTheme">@style/ApptentiveBaseTheme.Dialog</item>
         <item name="android:alertDialogTheme">@style/ApptentiveBaseTheme.AlertDialog</item>
     </style>

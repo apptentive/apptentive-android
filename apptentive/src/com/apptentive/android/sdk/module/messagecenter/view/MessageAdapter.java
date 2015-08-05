@@ -197,32 +197,37 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
 					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
-					newView.updateMessage(greeting.getTitle(), greeting.getBody());
+					newView.updateMessage(greeting.title, greeting.body);
+					ImageUtil.startDownloadAvatarTask(newView.avatar,
+							((MessageCenterGreeting) listItem).avatar);
 					convertView = newView;
 					break;
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
 					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext(), statusItem);
-					newView.updateMessage(statusItem.getTitle(), statusItem.getBody());
+					newView.updateMessage(statusItem.title, statusItem.body);
 					convertView = newView;
 					break;
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(context, composingActionListener);
+						composingView = new MessageCenterComposingView(context,
+								(MessageCenterComposingItem)listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					convertView = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					convertView = new MessageCenterComposingActionBarView(context, composingActionListener);
+					convertView = new MessageCenterComposingActionBarView(context,
+							(MessageCenterComposingItem)listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
 						whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}
 					convertView = whoCardView;
@@ -249,6 +254,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				setupComposingView(position);
 			} else if (type == TYPE_WHOCARD && whoCardView == null) {
 				whoCardView = (MessageCenterWhoCardView) convertView;
+				whoCardView.updateUi((MessageCenterComposingItem) listItem);
 				setupWhoCardView(position);
 			}
 		}
@@ -289,7 +295,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.getTitle(), status.getBody());
+					((StatusHolder) holder).updateMessage(status.title, status.body);
 					break;
 				}
 				case TYPE_AUTO: {

@@ -15,11 +15,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 
 
 /**
@@ -27,17 +29,22 @@ import com.apptentive.android.sdk.model.Configuration;
  */
 public class MessageCenterWhoCardView extends FrameLayout implements MessageCenterListItemView {
 
+	private MessageAdapter.OnComposingActionListener listener;
 	private EditText emailEditText;
 	private EditText nameEditText;
+	private TextView title;
+	private Button skipButton;
+	private Button sendButton;
 
-	public MessageCenterWhoCardView(Context context, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterWhoCardView(Context context,
+																	final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
-
+    this.listener = listener;
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
-		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
-		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
+		title = (TextView) parentView.findViewById(R.id.who_title);
 
+		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
 		emailEditText.addTextChangedListener(new TextWatcher() {
 			private boolean doScroll = false;
 
@@ -57,39 +64,53 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			}
 		});
 
-		View skipButton = findViewById(R.id.btn_skip);
-		final boolean required = Configuration.load(getContext()).isMessageCenterEmailRequired();
-		if (skipButton != null) {
-			if (required) {
-				skipButton.setVisibility(INVISIBLE);
-			} else {
-				skipButton.setOnClickListener(new OnClickListener() {
-					public void onClick(View view) {
-						listener.onCloseWhoCard();
-					}
-				});
-			}
+		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
+
+		skipButton = (Button) findViewById(R.id.btn_skip);
+
+		sendButton = (Button) findViewById(R.id.btn_send);
+	}
+
+	public void updateUi(final MessageCenterComposingItem item) {
+		if (item.str_1 != null) {
+			title.setText(item.str_1);
+		}
+		if (item.str_2 != null) {
+			nameEditText.setHint(item.str_2);
+		}
+		if (item.str_3 != null) {
+			emailEditText.setHint(item.str_3);
 		}
 
-		View sendButton = findViewById(R.id.btn_send);
-		if (required) {
-			((Button)sendButton).setText(getResources().getText(R.string.apptentive_send));
-		}
-		sendButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View view) {
-				if (required) {
-					String email = emailEditText.getText().toString();
-					if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-						emailEditText.setTextColor(getResources().getColor(R.color.apptentive_red));
-						return;
-					}
+		if (item.button_1 == null) {
+			skipButton.setVisibility(INVISIBLE);
+		} else {
+			skipButton.setVisibility(VISIBLE);
+			skipButton.setText(item.button_1);
+			skipButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View view) {
+					listener.onCloseWhoCard();
 				}
-				Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString());
-				Apptentive.setPersonName(getContext(), nameEditText.getText().toString());
-				listener.onCloseWhoCard();
-			}
-		});
+			});
+		}
 
+		if (item.button_2 != null) {
+			sendButton.setText(item.button_2);
+			sendButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View view) {
+					if (item.button_1 == null) {
+						String email = emailEditText.getText().toString();
+						if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+							emailEditText.setTextColor(getResources().getColor(R.color.apptentive_red));
+							return;
+						}
+					}
+					Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString());
+					Apptentive.setPersonName(getContext(), nameEditText.getText().toString());
+					listener.onCloseWhoCard();
+				}
+			});
+		}
 	}
 
 	public EditText getNameField() {

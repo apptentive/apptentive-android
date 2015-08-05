@@ -38,6 +38,7 @@ public class ApptentiveHttpResponse {
 	}
 
 	public boolean isRejectedTemporarily() {
+		// Not successful and not in the range of [400, 500)
 		return !(isSuccessful() || isRejectedPermanently());
 	}
 

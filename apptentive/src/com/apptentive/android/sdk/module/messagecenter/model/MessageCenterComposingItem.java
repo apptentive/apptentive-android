@@ -14,10 +14,27 @@ public class MessageCenterComposingItem implements MessageCenterListItem {
 	public static int COMPOSING_ITEM_ACTIONBAR = 1;
 	public static int COMPOSING_ITEM_WHOCARD = 2;
 
-	private int type;
+	public final int type;
+	/*
+	* Refer to https://apptentive.atlassian.net/wiki/display/APPTENTIVE/Message+Center+Interaction
+	* for how following strings are mapped to different composing view strings
+	 */
+	public final String str_1;
+	public final String str_2;
+	public final String str_3;
+	public final String button_1;
+	public final String button_2;
 
-	public MessageCenterComposingItem(int type) {
+
+
+	public MessageCenterComposingItem(int type, String str_1, String str_2, String str_3,
+																		String button_1, String button_2) {
 		this.type = type;
+		this.str_1 = str_1;
+		this.str_2 = str_2;
+		this.str_3 = str_3;
+		this.button_1 = button_1;
+		this.button_2 = button_2;
 	}
 
 	public int getType() {
