@@ -213,7 +213,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
 						composingView = new MessageCenterComposingView(context,
-								(MessageCenterComposingItem)listItem, composingActionListener);
+								(MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					convertView = composingView;
@@ -221,7 +221,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_COMPOSING_BAR: {
 					convertView = new MessageCenterComposingActionBarView(context,
-							(MessageCenterComposingItem)listItem, composingActionListener);
+							(MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
@@ -419,10 +419,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	protected String createStatus(Double seconds) {
 		if (seconds == null) {
-			int resId = isInPauseState ? R.string.apptentive_paused : R.string.apptentive_sending;
-			return context.getResources().getString(resId);
+			return isInPauseState ? context.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return null;
+		return context.getResources().getString(R.string.apptentive_sent);
 	}
 
 

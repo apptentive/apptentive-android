@@ -21,7 +21,8 @@
     <string name="apptentive_required">Required</string>
     <string name="apptentive_optional">Optional</string>
     <string name="apptentive_sending">Sending…</string>
-    <string name="apptentive_paused">Paused</string>
+    <string name="apptentive_failed">Failed</string>
+    <string name="apptentive_sent">Sent</string>
     <string name="apptentive_version">Apptentive Version %s</string>
 
     <string name="apptentive_edittext_hint_email">Your Email Address</string>

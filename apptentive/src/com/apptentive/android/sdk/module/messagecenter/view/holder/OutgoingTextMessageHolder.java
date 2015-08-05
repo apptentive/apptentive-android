@@ -18,27 +18,27 @@ import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBa
  */
 public class OutgoingTextMessageHolder extends MessageHolder {
 	public ApptentiveMaterialIndeterminateProgressBar progressBar;
-	public CollapsibleTextView text;
+	public CollapsibleTextView messageContentView;
 
 	public OutgoingTextMessageHolder(OutgoingTextMessageView view) {
 		super(view);
 		progressBar = (ApptentiveMaterialIndeterminateProgressBar) view.findViewById(R.id.progressBar);
-		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
+		messageContentView = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
 	}
 
 	public void updateMessage(String datestamp, String status, boolean progressBarVisible, String body) {
 		super.updateMessage(datestamp, status);
-		if (this.progressBar != null) {
+		if (progressBar != null) {
 			if (progressBarVisible) {
-				this.progressBar.start();
-				this.progressBar.setVisibility(View.VISIBLE);
+				progressBar.start();
+				progressBar.setVisibility(View.VISIBLE);
 			} else {
-				this.progressBar.stop();
-				this.progressBar.setVisibility(View.INVISIBLE);
+				progressBar.stop();
+				progressBar.setVisibility(View.GONE);
 			}
 		}
-		if (this.text != null) {
-			this.text.setDesc(body);
+		if (messageContentView != null) {
+			messageContentView.setDesc(body);
 		}
 	}
 }
