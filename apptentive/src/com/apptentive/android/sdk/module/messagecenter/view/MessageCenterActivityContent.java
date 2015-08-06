@@ -21,9 +21,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.text.Editable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -36,7 +34,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -47,7 +44,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
@@ -275,13 +271,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
-		ImageButton back = (ImageButton) viewActivity.findViewById(R.id.back);
-		back.setOnClickListener(new View.OnClickListener() {
+		ImageButton backButton = (ImageButton) viewActivity.findViewById(R.id.back);
+		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				viewActivity.onBackPressed();
 			}
 		});
+		int pressedColor = Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_pressed_highlight,
+				R.color.apptentive_material_pressed_highlight);
+		Util.setBackground(backButton, Util.getSelectableImageButtonBackground(pressedColor));
 
 		TextView titleTextView = (TextView) viewActivity.findViewById(R.id.title);
 		String titleText = interaction.getTitle();
@@ -375,6 +374,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 					}
 				});
+				Util.setBackground(attachButton, Util.getSelectableImageButtonBackground(pressedColor));
 			} else {
 				attachButton.setVisibility(View.GONE);
 			}
@@ -397,6 +397,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					}
 				}
 			});
+			Util.setBackground(profileButton, Util.getSelectableImageButtonBackground(pressedColor));
 		}
 
 	}

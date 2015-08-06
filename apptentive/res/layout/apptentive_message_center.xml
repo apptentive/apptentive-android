@@ -26,14 +26,13 @@
                       android:orientation="vertical">
 
             <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="48dp"
+                          android:layout_height="match_parent"
                           android:gravity="start|center_vertical"
                           android:orientation="horizontal">
 
                 <ImageButton android:id="@+id/back"
-                             android:layout_width="48dp"
-                             android:layout_height="48dp"
-                             android:background="@drawable/apptentive_imagebutton_highlight"
+                             android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+                             android:layout_height="match_parent"
                              android:contentDescription="Back"
                              android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
 
@@ -51,18 +50,17 @@
                       android:layout_height="match_parent"
                       android:layout_weight="1"/>
                 <ImageButton android:id="@+id/profile"
-                             android:layout_width="48dp"
-                             android:layout_height="48dp"
+                             android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+                             android:layout_height="match_parent"
                              android:layout_marginRight="10dp"
                              android:layout_alignParentTop="true"
                              android:layout_centerVertical="true"
                              android:layout_alignParentRight="true"
-                             android:background="@drawable/apptentive_imagebutton_highlight"
                              android:contentDescription="Profile"
                              android:src="@drawable/apptentive_ic_profile_edit"/>
                 <ImageButton android:id="@+id/attach"
-                             android:layout_width="48dp"
-                             android:layout_height="48dp"
+                             android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+                             android:layout_height="match_parent"
                              android:layout_marginRight="10dp"
                              android:layout_alignParentTop="true"
                              android:layout_centerVertical="true"
