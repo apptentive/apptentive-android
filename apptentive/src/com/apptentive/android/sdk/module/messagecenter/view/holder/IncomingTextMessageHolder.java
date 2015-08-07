@@ -7,12 +7,10 @@
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import android.widget.TextView;
-import android.graphics.Bitmap;
 
 import com.apptentive.android.sdk.R;
 
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
-import com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView;
 import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageView;
 
 /**
@@ -21,19 +19,19 @@ import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageV
 public class IncomingTextMessageHolder extends MessageHolder {
 
 	public ApptentiveAvatarView avatar;
-	public CollapsibleTextView text;
+	public TextView text;
 
 	public IncomingTextMessageHolder(IncomingTextMessageView view) {
 		super(view);
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
-		text = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
+		text = (TextView) view.findViewById(R.id.more_less_container);
 	}
 
 	public void updateMessage(String datestamp, String text) {
 		super.updateMessage(datestamp, null);
 
 		if (this.text != null) {
-			this.text.setDesc(text);
+			this.text.setText(text);
 		}
 	}
 }

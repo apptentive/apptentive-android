@@ -278,9 +278,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				viewActivity.onBackPressed();
 			}
 		});
-		int pressedColor = Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_pressed_highlight,
-				R.color.apptentive_material_pressed_highlight);
-		Util.setBackground(backButton, Util.getSelectableImageButtonBackground(pressedColor));
 
 		TextView titleTextView = (TextView) viewActivity.findViewById(R.id.title);
 		String titleText = interaction.getTitle();
@@ -374,7 +371,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
 					}
 				});
-				Util.setBackground(attachButton, Util.getSelectableImageButtonBackground(pressedColor));
 			} else {
 				attachButton.setVisibility(View.GONE);
 			}
@@ -397,7 +393,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					}
 				}
 			});
-			Util.setBackground(profileButton, Util.getSelectableImageButtonBackground(pressedColor));
 		}
 
 	}

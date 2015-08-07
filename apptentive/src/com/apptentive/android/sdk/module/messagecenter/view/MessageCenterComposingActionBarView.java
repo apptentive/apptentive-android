@@ -43,7 +43,6 @@ public class MessageCenterComposingActionBarView extends FrameLayout
 				listener.onCancelComposing();
 			}
 		});
-		Util.setBackground(closeButton, Util.getSelectableImageButtonBackground(pressedColor));
 		TextView composing = (TextView) findViewById(R.id.composing);
 
 		if (item.str_1 != null) {
@@ -59,7 +58,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout
 				listener.onFinishComposing();
 			}
 		});
-		Util.setBackground(sendButton, Util.getSelectableImageButtonBackground(pressedColor));
+
 	}
 
 }

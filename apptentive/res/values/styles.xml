@@ -15,7 +15,7 @@
 
         <!-- Apptentive material specific attributes/values -->
         <item name="apptentive_material_background">@color/apptentive_material_dark_background</item>
-        <item name="apptentive_material_icons">@color/apptentive_material_dark_icons</item>
+        <item name="apptentive_material_toolbar_foreground">@color/apptentive_material_dark_toolbar_foreground</item>
         <item name="apptentive_material_primary_text">@color/apptentive_material_dark_primary_text</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_dark_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_dark_secondary_text
@@ -67,7 +67,7 @@
 
         <!-- Apptentive Material specific values -->
         <item name="apptentive_material_background">@color/apptentive_material_background</item>
-        <item name="apptentive_material_icons">@color/apptentive_material_icons</item>
+        <item name="apptentive_material_toolbar_foreground">@color/apptentive_material_toolbar_foreground</item>
         <item name="apptentive_material_primary_text">@color/apptentive_material_primary_text</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
@@ -117,7 +117,7 @@
 
         <!-- Apptentive specific values -->
         <item name="apptentive_material_background">@color/apptentive_material_background</item>
-        <item name="apptentive_material_icons">@color/apptentive_material_icons</item>
+        <item name="apptentive_material_toolbar_foreground">@color/apptentive_material_toolbar_foreground</item>
         <item name="apptentive_material_primary_text">@color/apptentive_material_primary_text</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
@@ -146,30 +146,58 @@
 
     <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
 
+    <style name="ApptentiveTheme.Widget" />
 
-    <style name="ApptentiveWidget.CardView" parent="android:Widget">
+    <style name="ApptentiveTheme.Widget.CardView" parent="android:Widget">
         <item name="android:layout_marginBottom">@dimen/apptentive_message_center_card_margin</item>
         <item name="android:layout_marginLeft">@dimen/apptentive_message_center_card_margin</item>
         <item name="android:layout_marginRight">@dimen/apptentive_message_center_card_margin</item>
         <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
-        <item name="android:background">#DCDCDC</item>
     </style>
 
-    <style name="ApptentiveWidget.CardContent.Outgoing" parent="android:Widget">
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
+    <style name="ApptentiveTheme.Widget.CardContent.Outgoing" parent="android:Widget">
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">106dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
         <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/apptentive_message_center_outgoing_background</item>
     </style>
 
-    <style name="ApptentiveWidget.CardContent.Incoming" parent="android:Widget">
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
+    <style name="ApptentiveTheme.Widget.CardContent.Incoming" parent="android:Widget">
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
         <item name="android:orientation">horizontal</item>
+        <item name="android:background">@color/apptentive_message_center_incoming_background</item>
+    </style>
+
+    <style name="ApptentiveTheme.Widget.Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Message" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">left</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Status" parent="ApptentiveTheme.TextViewStyle.Message">
+        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.TimeStamp" parent="ApptentiveTheme.TextViewStyle.Status">
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:gravity">left|bottom</item>
+        <item name="android:minHeight">70dp</item>
     </style>
 
     <style name="ApptentiveInteractionPositiveButton">
@@ -301,7 +329,7 @@
         <item name="android:paddingBottom">24dp</item>
         <item name="android:paddingLeft">@dimen/apptentive_message_center_greeting_side_margin</item>
         <item name="android:paddingRight">@dimen/apptentive_message_center_greeting_side_margin</item>
-        <item name="android:background">@color/apptentive_message_center_greeting_background</item>
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="android:gravity">center</item>
         <item name="android:orientation">@integer/apptentive_message_center_greeting_orientation</item>
     </style>
@@ -310,7 +338,7 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="android:textSize">24dp</item>
     </style>
 
@@ -318,7 +346,7 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#949494</item>
+        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="android:textSize">16dp</item>
     </style>
 
@@ -347,9 +375,9 @@
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:gravity">left|bottom</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#9E9E9E</item>
+        <item name="android:textColor">#737373</item>
         <item name="android:minHeight">56dp</item>
     </style>
 

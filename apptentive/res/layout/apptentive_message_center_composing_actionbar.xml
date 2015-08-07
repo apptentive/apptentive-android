@@ -27,6 +27,8 @@
                      android:layout_marginRight="10dp"
                      android:contentDescription="Close"
                      android:src="@drawable/apptentive_ic_close"
+                     android:background="?android:attr/selectableItemBackground"
+                     android:scaleType="fitCenter"
                      android:tint="?attr/colorAccent"/>
 
         <TextView android:id="@+id/composing"
@@ -45,7 +47,8 @@
                      android:layout_alignParentRight="true"
                      android:layout_centerVertical="true"
                      android:layout_marginRight="10dp"
-                     android:background="@color/apptentive_transparency"
+                     android:background="?android:attr/selectableItemBackground"
+                     android:scaleType="fitCenter"
                      android:clickable="true"
                      android:src="@drawable/apptentive_ic_action_send"
                      android:tint="?attr/colorAccent"/>

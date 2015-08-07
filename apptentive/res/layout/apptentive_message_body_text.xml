@@ -9,9 +9,9 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:orientation="vertical">
-    <com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView
+    <TextView
         android:id="@+id/more_less_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="match_parent"
+        style="@style/ApptentiveTheme.TextViewStyle.Message"/>
 </FrameLayout>
