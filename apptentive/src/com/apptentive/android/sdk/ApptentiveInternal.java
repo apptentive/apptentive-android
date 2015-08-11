@@ -156,13 +156,13 @@ public class ApptentiveInternal {
 	}
 
 	public static void showMessageCenterInternal(Activity activity, Map<String, String> customData) {
-		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
+		//if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
 			// TODO: Do something with customData.
 			//intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
 			EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
-		} else {
-			showMessageCenterFallback(activity);
-		}
+		//} else {
+		//	showMessageCenterFallback(activity);
+		//}
 	}
 
 	public static void showMessageCenterFallback(Activity activity) {
