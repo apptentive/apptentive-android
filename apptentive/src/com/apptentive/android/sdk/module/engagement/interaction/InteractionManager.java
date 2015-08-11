@@ -31,14 +31,14 @@ public class InteractionManager {
 
 	public static Interactions getInteractions(Context context) {
 		if (interactions == null) {
-			loadInteractions(context);
+			interactions = loadInteractions(context);
 		}
 		return interactions;
 	}
 
 	public static Targets getTargets(Context context) {
 		if (targets == null) {
-			loadTargets(context);
+			targets = loadTargets(context);
 		}
 		return targets;
 	}
