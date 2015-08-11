@@ -21,9 +21,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.text.Editable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -36,7 +34,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -47,7 +44,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
@@ -275,8 +271,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
-		ImageButton back = (ImageButton) viewActivity.findViewById(R.id.back);
-		back.setOnClickListener(new View.OnClickListener() {
+		ImageButton backButton = (ImageButton) viewActivity.findViewById(R.id.back);
+		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				viewActivity.onBackPressed();
@@ -769,11 +765,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
 		editor.commit();
-	}
-
-
-	public void scrollMessageListViewToBottomDelayed() {
-		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, 100);
 	}
 
 	// Retrieve the content from the composing area

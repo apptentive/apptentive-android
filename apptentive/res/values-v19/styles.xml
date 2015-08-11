@@ -34,4 +34,13 @@
     <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar.ActionBar">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Message" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">left</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
 </resources>
