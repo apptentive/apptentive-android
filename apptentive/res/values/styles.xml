@@ -149,9 +149,11 @@
     <style name="ApptentiveTheme.Widget" />
 
     <style name="ApptentiveTheme.Widget.CardView" parent="android:Widget">
-        <item name="android:layout_marginBottom">@dimen/apptentive_message_center_card_margin</item>
-        <item name="android:layout_marginLeft">@dimen/apptentive_message_center_card_margin</item>
-        <item name="android:layout_marginRight">@dimen/apptentive_message_center_card_margin</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="ApptentiveTheme.Widget.CardView.Message">
         <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
     </style>
@@ -176,28 +178,45 @@
 
     <style name="ApptentiveTheme.Widget.Divider">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:layout_height">2dp</item>
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-    <style name="ApptentiveTheme.TextViewStyle.Message" parent="@android:style/TextAppearance">
-        <item name="android:textSize">14sp</item>
+    <style name="ApptentiveTheme.TextViewStyle" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14dp</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:gravity">left</item>
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="ApptentiveTheme.TextViewStyle.Status" parent="ApptentiveTheme.TextViewStyle.Message">
+    <style name="ApptentiveTheme.TextViewStyle.Message">
+        <item name="android:gravity">left</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Status">
         <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="ApptentiveTheme.TextViewStyle.TimeStamp" parent="ApptentiveTheme.TextViewStyle.Status">
+    <style name="ApptentiveTheme.TextViewStyle.TimeStamp">
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:gravity">left|bottom</item>
         <item name="android:minHeight">70dp</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Toolbar">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
+        <item name="android:textSize">24dp</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Greeting" parent="ApptentiveTheme.TextViewStyle.Toolbar">
+        <item name="android:paddingTop">8dp</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle.Greeting.Body">
+        <item name="android:textSize">16dp</item>
     </style>
 
     <style name="ApptentiveInteractionPositiveButton">
@@ -294,15 +313,16 @@
 
     <style name="ApptentiveAvatarView">
         <item name="android:src">@drawable/avatar</item>
-        <item name="borderColor">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveAvatarView.Greeting">
+        <item name="borderColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="borderWidth">2dp</item>
         <item name="borderSpace">1.5dp</item>
     </style>
 
     <style name="ApptentiveAvatarView.Message">
+        <item name="borderColor">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveWidget.NewMessageBadge" parent="android:Widget">
@@ -331,23 +351,7 @@
         <item name="android:paddingRight">@dimen/apptentive_message_center_greeting_side_margin</item>
         <item name="android:background">?attr/colorPrimary</item>
         <item name="android:gravity">center</item>
-        <item name="android:orientation">@integer/apptentive_message_center_greeting_orientation</item>
-    </style>
-
-    <style name="ApptentiveMessageCenterGreetingTitle">
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
-        <item name="android:textSize">24dp</item>
-    </style>
-
-    <style name="ApptentiveMessageCenterGreetingBody">
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:gravity">@integer/apptentive_message_center_greeting_text_gravity</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:orientation">horizontal</item>
     </style>
 
     <style name="MessageCenterMessageFrame">
