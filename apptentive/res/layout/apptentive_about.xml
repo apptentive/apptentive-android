@@ -23,13 +23,35 @@
                           android:layout_height="wrap_content"
                           android:orientation="vertical"
                           android:background="@drawable/apptentive_activity_background">
-                <TextView android:layout_width="fill_parent"
+                <RelativeLayout android:id="@+id/composing_toolbar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/apptentive_message_center_outgoing_background"
+                                android:minHeight="@dimen/apptentive_message_center_icon_dimension"
+                                android:orientation="horizontal">
+
+                <ImageButton android:id="@+id/close_about"
+                             android:layout_width="wrap_content"
+                             android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                             android:layout_alignParentLeft="true"
+                             android:layout_centerVertical="true"
+                             android:paddingLeft="10dp"
+                             android:paddingRight="10dp"
+                             android:contentDescription="Close"
+                             android:src="@drawable/apptentive_ic_close"
+                             android:background="?android:attr/selectableItemBackground"
+                             android:scaleType="fitCenter"
+                             android:tint="?attr/colorAccent"/>
+                <TextView android:layout_width="wrap_content"
                           android:layout_height="48dp"
                           android:gravity="center"
+                          android:layout_toRightOf="@id/close_about"
+                          android:layout_centerVertical="true"
                           android:textColor="@color/apptentive_about_title"
                           android:textStyle="bold"
                           android:textSize="@dimen/apptentive_text_large"
                           android:text="@string/apptentive_about_title"/>
+                </RelativeLayout>
                 <FrameLayout android:layout_width="fill_parent"
                              android:layout_height="4dp"
                              android:background="@color/apptentive_survey_separator"/>

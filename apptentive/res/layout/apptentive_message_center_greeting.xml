@@ -5,25 +5,31 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              style="@style/ApptentiveMessageCenterGreetingContainer">
-    <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
-                                                                               android:layout_width="88dp"
-                                                                               android:layout_height="88dp"
-                                                                               style="?attr/apptentiveAvatarViewGreetingStyle"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:clipToPadding="false"
+             android:background="@android:color/transparent"
+             android:paddingBottom="5dp">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
-                  android:orientation="vertical">
-        <TextView android:id="@+id/title"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  style="@style/ApptentiveMessageCenterGreetingTitle"/>
-        <TextView android:id="@+id/body"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  style="@style/ApptentiveMessageCenterGreetingBody"/>
+                  style="@style/ApptentiveMessageCenterGreetingContainer">
+        <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
+                                                                                   android:layout_width="88dp"
+                                                                                   android:layout_height="88dp"
+                                                                                   style="?attr/apptentiveAvatarViewGreetingStyle"/>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
+                      android:orientation="vertical">
+            <TextView android:id="@+id/title"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      style="@style/ApptentiveTheme.TextViewStyle.Greeting"/>
+            <TextView android:id="@+id/body"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      style="@style/ApptentiveTheme.TextViewStyle.Greeting.Body"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

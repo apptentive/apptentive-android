@@ -31,16 +31,35 @@ public class AboutModule {
 	private AboutModule() {
 	}
 
-	public void show(Activity activity) {
+	/**
+	 * Show About
+	 *
+	 * @param activity The launching activity
+	 * @param showBrandingBand  If true, show branding band on About page
+	 */
+	public void show(Activity activity, boolean showBrandingBand) {
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
+		intent.putExtra(ActivityContent.EXTRA, showBrandingBand);
 		activity.startActivity(intent);
 	}
 
-	void doShow(final Activity activity) {
+	void doShow(final Activity activity, boolean showBrandingBand) {
 		activity.setContentView(R.layout.apptentive_about);
-		activity.findViewById(R.id.apptentive_branding_view).setClickable(false); // Don't let the about view launch itself.
+		if (!showBrandingBand) {
+			activity.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
+		} else {
+			activity.findViewById(R.id.apptentive_branding_view).setClickable(false); // Don't let the about view launch itself.
+		}
+
+		View close = activity.findViewById(R.id.close_about);
+		close.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				activity.finish();
+			}
+		});
 
 		TextView information = (TextView) activity.findViewById(R.id.about_description_link);
 		information.setOnClickListener(new View.OnClickListener() {

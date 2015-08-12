@@ -20,9 +20,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.support.v4.view.ViewCompat;
 import android.text.Editable;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -71,7 +73,8 @@ import java.util.Set;
 public class MessageCenterActivityContent extends InteractionView<MessageCenterInteraction>
 		implements MessageManager.AfterSendMessageListener,
 		MessageAdapter.OnComposingActionListener,
-		MessageManager.OnNewIncomingMessagesListener {
+		MessageManager.OnNewIncomingMessagesListener,
+		AbsListView.OnScrollListener {
 
 	// keys used to save instance in the event of rotation
 	private final static String LIST_INSTANCE_STATE = "list";
@@ -85,6 +88,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private static final int WHO_CARD_MODE_EDIT = 2;
 
 	private Activity viewActivity;
+	private View messageCenterHeader;
+	private View headerDivider;
 	private ListView messageCenterListView; // List of apptentive messages
 	private View messageCenterFooter; // For showing branding
 	private EditText messageEditText; // Composing area
@@ -277,10 +282,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			titleTextView.setText(titleText);
 		}
 
+		messageCenterHeader = viewActivity.findViewById(R.id.header_bar);
+		headerDivider = viewActivity.findViewById(R.id.header_divider);
+		int defaultColor = Util.getThemeColor(viewActivity, R.attr.colorPrimary);
+		int brightColor = Util.lighter(defaultColor, 0.5f);
+		headerDivider.setBackgroundColor(brightColor);
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setItemsCanFocus(true);
-
+		messageCenterListView.setOnScrollListener(this);
 		// Setup branding footer
 		messageCenterFooter = viewActivity.findViewById(R.id.footer_bar);
 
@@ -292,7 +302,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterFooter.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						AboutModule.getInstance().show(viewActivity);
+						AboutModule.getInstance().show(viewActivity, false);
 					}
 				});
 			}
@@ -751,6 +761,40 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg) {
 		messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_MESSAGE_ADD_INCOMING,
 				apptentiveMsg));
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+	}
+
+	/* Show header elevation when listview can scroll up; flatten header when listview
+	 * scrolls to the top; For pre-llolipop devices, fallback to a divider
+	 */
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		boolean bCanScrollUp;
+		if (android.os.Build.VERSION.SDK_INT < 14) {
+			bCanScrollUp = view.getChildCount() > 0
+					&& (view.getFirstVisiblePosition() > 0 ||
+					view.getChildAt(0).getTop() < view.getPaddingTop());
+		} else {
+			bCanScrollUp = ViewCompat.canScrollVertically(view, -1);
+		}
+		if (bCanScrollUp) {
+			if (android.os.Build.VERSION.SDK_INT > 21) {
+				messageCenterHeader.setElevation(8);
+			}
+			else {
+				headerDivider.setVisibility(View.VISIBLE);
+			}
+		} else {
+			if (android.os.Build.VERSION.SDK_INT > 21) {
+				messageCenterHeader.setElevation(0);
+			} else {
+				headerDivider.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	private void saveWhoCardSetState() {

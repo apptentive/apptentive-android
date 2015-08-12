@@ -40,6 +40,8 @@ public class ViewActivity extends ApptentiveActivity {
 	private ActivityContent activityContent;
 	private ActivityContent.Type activeContentType;
 
+	private boolean activityExtraBoolean;
+
 	// Use AppCompatDelegate istead of extending AppCompatActivity
 	private AppCompatDelegate appCompatDelegate;
 
@@ -143,6 +145,7 @@ public class ViewActivity extends ApptentiveActivity {
 							break;
 						case ABOUT:
 							activityContentRequired = false;
+							activityExtraBoolean = getIntent().getBooleanExtra(ActivityContent.EXTRA, true);
 							break;
 						case MESSAGE_CENTER_ERROR:
 							activityContent = new MessageCenterErrorActivityContent();
@@ -219,7 +222,7 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				super.onStart();
-				AboutModule.getInstance().doShow(this);
+				AboutModule.getInstance().doShow(this, activityExtraBoolean);
 				break;
 			case MESSAGE_CENTER_ERROR:
 				super.onStart();
@@ -308,7 +311,7 @@ public class ViewActivity extends ApptentiveActivity {
 	}
 
 	public void showAboutActivity(View view) {
-		AboutModule.getInstance().show(this);
+		AboutModule.getInstance().show(this, true);
 	}
 
 	@Override
