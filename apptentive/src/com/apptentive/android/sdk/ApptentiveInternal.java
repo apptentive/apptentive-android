@@ -36,6 +36,9 @@ public class ApptentiveInternal {
 	private static Map<String, String> ratingProviderArgs;
 	private static WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
+	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
+	private static Map<String, String> customData;
+
 	public static final String PUSH_ACTION = "action";
 
 	public static enum PushAction {
@@ -157,9 +160,11 @@ public class ApptentiveInternal {
 
 	public static void showMessageCenterInternal(Activity activity, Map<String, String> customData) {
 		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
-			// TODO: Do something with customData.
-			//intent.putExtra(ActivityContent.EXTRA, (customData instanceof Serializable)? (Serializable)customData : null);
-			EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			ApptentiveInternal.customData = customData;
+			boolean interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			if (!interactionShown) {
+				ApptentiveInternal.customData = null;
+			}
 		} else {
 			showMessageCenterFallback(activity);
 		}
@@ -172,5 +177,11 @@ public class ApptentiveInternal {
 
 	public static boolean canShowMessageCenterInternal(Context context) {
 		return EngagementModule.willShowInteraction(context, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+	}
+
+	public static Map<String, String> getAndClearCustomData() {
+		Map<String, String> customData = ApptentiveInternal.customData;
+		ApptentiveInternal.customData = null;
+		return customData;
 	}
 }

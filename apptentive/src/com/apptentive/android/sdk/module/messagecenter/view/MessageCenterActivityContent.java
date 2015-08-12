@@ -57,13 +57,11 @@ import com.apptentive.android.sdk.util.WeakReferenceHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -86,7 +84,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private static final int WHO_CARD_MODE_INIT = 1;
 	private static final int WHO_CARD_MODE_EDIT = 2;
 
-	private Map<String, String> customData;
 	private Activity viewActivity;
 	private ListView messageCenterListView; // List of apptentive messages
 	private View messageCenterFooter; // For showing branding
@@ -228,11 +225,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	public MessageCenterActivityContent(MessageCenterInteraction interaction) {
 		super(interaction);
-	}
-
-	public MessageCenterActivityContent(MessageCenterInteraction interaction, Serializable data) {
-		this(interaction);
-		this.customData = (Map<String, String>) data;
 	}
 
 	@Override
@@ -427,6 +419,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
+		ApptentiveInternal.getAndClearCustomData();
 		return true;
 	}
 
@@ -590,7 +583,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		boolean successful = message.internalCreateStoredImage(viewActivity.getApplicationContext(), uri.toString());
 		if (successful) {
 			message.setRead(true);
-			message.setCustomData(customData);
+			message.setCustomData(ApptentiveInternal.getAndClearCustomData());
 
 			// Finally, send out the message.
 			MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
@@ -734,7 +727,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			OutgoingTextMessage message = new OutgoingTextMessage();
 			message.setBody(messageText);
 			message.setRead(true);
-			message.setCustomData(customData);
+			message.setCustomData(ApptentiveInternal.getAndClearCustomData());
 			MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
 			addNewOutGoingMessageItem(message);
 			SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

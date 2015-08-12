@@ -31,7 +31,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -148,14 +147,11 @@ public class MessageManager {
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the forground activity is not alreay message center activity
 				if (!forMessageCenter && showToast) {
-					msg =
-							getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
+					msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
 					msg.sendToTarget();
 				}
 			}
-
-			msg =
-					getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
+			msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
 			msg.sendToTarget();
 
 			return incomingUnreadMessages > 0;
@@ -438,7 +434,8 @@ public class MessageManager {
 				PendingIntent pendingIntent = PendingIntent.getActivity(foreground.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
 				final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
-				builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title)).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+				builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
+						.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
 						.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
 						.setContentIntent(pendingIntent)
 						.setFullScreenIntent(pendingIntent, false);
