@@ -13,7 +13,7 @@ import android.view.ViewGroup;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.7.3";
+	public static final String APPTENTIVE_SDK_VERSION = "2.0.0";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
