@@ -15,8 +15,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListAdapter;
@@ -147,7 +151,6 @@ public class Util {
 			imm.showSoftInput(target, 0);
 		}
 	}
-
 
 
 	public static String[] getAllUserAccountEmailAddresses(Context context) {
@@ -429,4 +432,89 @@ public class Util {
 
 		//listView.setLayoutParams(params);
 	}
+
+	/**
+	 * helper method to set the background depending on the android version
+	 *
+	 * @param v
+	 * @param d
+	 */
+	public static void setBackground(View v, Drawable d) {
+		if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			v.setBackgroundDrawable(d);
+		} else {
+			v.setBackground(d);
+		}
+	}
+
+	/**
+	 * helper method to set the background depending on the android version
+	 *
+	 * @param v
+	 * @param drawableRes
+	 */
+	public static void setBackground(View v, int drawableRes) {
+		setBackground(v, getCompatDrawable(v.getContext(), drawableRes));
+	}
+
+	/**
+	 * helper method to get the drawable by its resource id, specific to the correct android version
+	 *
+	 * @param c
+	 * @param drawableRes
+	 * @return
+	 */
+	public static Drawable getCompatDrawable(Context c, int drawableRes) {
+		Drawable d = null;
+		try {
+			if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+				d = c.getResources().getDrawable(drawableRes);
+			} else {
+				d = c.getResources().getDrawable(drawableRes, c.getTheme());
+			}
+		} catch (Exception ex) {
+		}
+		return d;
+	}
+
+	public static int getThemeColor(Context ctx, int attr) {
+		TypedValue tv = new TypedValue();
+		if (ctx.getTheme().resolveAttribute(attr, tv, true)) {
+			return tv.data;
+		}
+		return 0;
+	}
+
+	/**
+	 * helper method to get the color by attr (if defined in the style) or by resource.
+	 *
+	 * @param ctx
+	 * @param attr attribute that defines the color
+	 * @param res  color resource id
+	 * @return
+	 */
+	public static int getThemeColorFromAttrOrRes(Context ctx, int attr, int res) {
+		int color = getThemeColor(ctx, attr);
+		// If this color is not styled, use the default from the resource
+		if (color == 0) {
+			color = ctx.getResources().getColor(res);
+		}
+		return color;
+	}
+
+
+	/**
+	 * helper method to generate the ImageButton background with specified highlight color.
+	 *
+	 * @param selected_color the color shown as highlight
+	 * @return
+	 */
+	public static StateListDrawable getSelectableImageButtonBackground(int selected_color) {
+		ColorDrawable selectedColor = new ColorDrawable(selected_color);
+		StateListDrawable states = new StateListDrawable();
+		states.addState(new int[]{android.R.attr.state_pressed}, selectedColor);
+		states.addState(new int[]{android.R.attr.state_activated}, selectedColor);
+		return states;
+	}
+
 }

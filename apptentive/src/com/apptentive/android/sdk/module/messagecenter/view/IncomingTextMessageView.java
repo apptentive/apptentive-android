@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
@@ -20,8 +21,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage
 public class IncomingTextMessageView extends PersonalMessageView<IncomingTextMessage> {
 
 
-	private CollapsibleTextView container;
-
 	public IncomingTextMessageView(Context context, IncomingTextMessage message) {
 		super(context, message);
 	}
@@ -30,12 +29,8 @@ public class IncomingTextMessageView extends PersonalMessageView<IncomingTextMes
 		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		FrameLayout bodyLayout = (FrameLayout) findViewById(R.id.body);
-		View view = inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
-		container = (CollapsibleTextView) view.findViewById(R.id.more_less_container);
+		inflater.inflate(R.layout.apptentive_message_body_text,  bodyLayout);
 	}
 
-	public CollapsibleTextView getCollapsibleContainer() {
-		return container;
-	}
 
 }

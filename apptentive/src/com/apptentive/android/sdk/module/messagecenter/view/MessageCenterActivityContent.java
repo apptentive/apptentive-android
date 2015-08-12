@@ -263,8 +263,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
-		ImageButton back = (ImageButton) viewActivity.findViewById(R.id.back);
-		back.setOnClickListener(new View.OnClickListener() {
+		ImageButton backButton = (ImageButton) viewActivity.findViewById(R.id.back);
+		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				viewActivity.onBackPressed();
@@ -758,11 +758,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
 		editor.commit();
-	}
-
-
-	public void scrollMessageListViewToBottomDelayed() {
-		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, 100);
 	}
 
 	// Retrieve the content from the composing area

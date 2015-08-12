@@ -12,9 +12,6 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.AutomatedMessageView;
-import com.apptentive.android.sdk.module.messagecenter.view.CollapsibleTextView;
-import com.apptentive.android.sdk.module.messagecenter.view.OutgoingTextMessageView;
-import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar;
 
 /**
  * @author Barry Li

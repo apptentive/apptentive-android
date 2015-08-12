@@ -19,6 +19,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.util.Util;
 
 
 public class FloatingActionButton extends ImageButton {
@@ -144,6 +145,25 @@ public class FloatingActionButton extends ImageButton {
 		mColorStateList = colorStateList;
 
 		if (changed) {
+			if (!mColorStateList.isStateful()) {
+				// Programatically generate pressed color if not specified by floatingActionButtonColor
+				int defaultColor = mColorStateList.getDefaultColor();
+				float[] hsv = new float[3];
+				Color.colorToHSV(defaultColor, hsv);
+				hsv[2] *= 0.8f;
+				int darkColor = Color.HSVToColor(hsv);
+				mColorStateList = new ColorStateList(
+						new int[][]{
+								new int[]{android.R.attr.state_pressed},
+								new int[]{}
+						},
+						new int[] {
+								darkColor,
+								defaultColor,
+						}
+				);
+
+			}
 			updateBackground();
 		}
 	}
@@ -188,7 +208,7 @@ public class FloatingActionButton extends ImageButton {
 				return;
 			}
 
-			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, R.style.FloatingActionButton);
+			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, R.style.ApptentiveWidget_FloatingActionButton);
 			if (a == null) {
 				return;
 			}
@@ -286,11 +306,7 @@ public class FloatingActionButton extends ImageButton {
 			}
 		}
 
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-			setBackgroundDrawable(background);
-		} else {
-			setBackground(background);
-		}
+		Util.setBackground(this, background);
 	}
 
 	private void initCircleDrawable(Drawable circle) {
@@ -305,7 +321,6 @@ public class FloatingActionButton extends ImageButton {
 		if (mCircleDrawable != null && mColorStateList != null) {
 			mCircleDrawable.setColor(mColorStateList.getColorForState(getDrawableState(), mColor));
 
-			// NOTE maybe this line is required only for Gingerbread
 			invalidate();
 		}
 	}
