@@ -146,7 +146,8 @@ public class MessageCenterInteraction extends Interaction {
 			return new MessageCenterComposingItem(
 					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
 					profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
-					profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
+					// Hide name field if profile is required and never set
+					null,
 					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
 					profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
 					profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
@@ -155,7 +156,7 @@ public class MessageCenterInteraction extends Interaction {
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
 				profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
-				null,
+				profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
 				profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
 				profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
 				profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),

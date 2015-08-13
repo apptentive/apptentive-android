@@ -33,6 +33,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private EditText emailEditText;
 	private EditText nameEditText;
 	private TextView title;
+	private TextView emailTip;
 	private Button skipButton;
 	private Button sendButton;
 
@@ -66,6 +67,8 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
 
+		emailTip = (TextView) parentView.findViewById(R.id.email_tip);
+
 		skipButton = (Button) findViewById(R.id.btn_skip);
 
 		sendButton = (Button) findViewById(R.id.btn_send);
@@ -79,10 +82,17 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			nameEditText.setVisibility(VISIBLE);
 			nameEditText.setHint(item.str_2);
 		} else {
-			nameEditText.setVisibility(View.GONE);
+			nameEditText.setVisibility(GONE);
 		}
 		if (item.str_3 != null) {
 			emailEditText.setHint(item.str_3);
+		}
+
+		if (item.str_4 != null) {
+			emailTip.setVisibility(VISIBLE);
+			emailTip.setText(item.str_4);
+		} else {
+			emailTip.setVisibility(GONE);
 		}
 
 		if (item.button_1 == null) {
