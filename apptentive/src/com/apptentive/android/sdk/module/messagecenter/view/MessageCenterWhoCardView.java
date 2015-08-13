@@ -76,7 +76,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			title.setText(item.str_1);
 		}
 		if (item.str_2 != null) {
+			nameEditText.setVisibility(VISIBLE);
 			nameEditText.setHint(item.str_2);
+		} else {
+			nameEditText.setVisibility(View.GONE);
 		}
 		if (item.str_3 != null) {
 			emailEditText.setHint(item.str_3);
