@@ -73,15 +73,16 @@ dependencies {
         taskRequest.args.each { taskName ->
             String flavorName = "qa";
             if (taskName.toLowerCase().endsWith(flavorName+"debug") || taskName.toLowerCase().endsWith(flavorName+"release")) {
-                qaCompile 'com.apptentive:apptentive-android:1.7.3-SNAPSHOT@aar'
+                qaCompile 'com.apptentive:apptentive-android:2.0.0-SNAPSHOT@aar'
             }
         }
     }
     compile 'com.android.support:support-v4:22.+'
     compile 'com.android.support:appcompat-v7:22.+'
+    compile 'com.android.support:cardview-v7:22.+'
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
-    rcCompile 'com.apptentive:apptentive-android:1.7.2@aar'
+    rcCompile 'com.apptentive:apptentive-android:1.7.3@aar'
 }
 
 task run(type: Exec) {
