@@ -76,8 +76,8 @@
     <string name="apptentive_message_less">Less&lt;&lt;</string>
     <string name="apptentive_message_more">More&gt;&gt;</string>
 
-    <string name="apptentive_message_center_no_connection">You must connect to the internet before you can send feedback.</string>
-    <string name="apptentive_message_center_server_error">Our server had an error. Try again later.</string>
+    <string name="apptentive_message_center_no_connection">Please connect to the internet to send feedback.</string>
+    <string name="apptentive_message_center_server_error">It looks like we\'re having trouble accessing feedback. Please wait a bit and try again.</string>
 
     <!-- This is a Java format. -->
     <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
