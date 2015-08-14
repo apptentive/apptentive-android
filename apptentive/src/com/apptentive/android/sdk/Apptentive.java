@@ -266,6 +266,16 @@ public class Apptentive {
 	// ****************************************************************************************
 
 	/**
+	 * The key to use to store a Map of Apptentive Push integration settings.
+	 */
+	public static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
+
+	/**
+	 * The key to use to specify the GCM Registration ID within Apptentive Push integration settings.
+	 */
+	public static final String INTEGRATION_APPTENTIVE_PUSH_REGISTRATION_ID = "token";
+
+	/**
 	 * The key to use to store a Map of Urban Airship configuration settings.
 	 */
 	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
@@ -337,6 +347,24 @@ public class Apptentive {
 			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
 	}
+
+	/**
+	 * Configures your app to receive Apptentive push notifications. Use this method if you do not
+	 * currently use a push provider, and would like to receive push notifications sent from
+	 * Apptentive. You must first set up your app to GCM, per our documentation.
+	 *
+	 * @param context   The Context from which this method is called.
+	 * @param registrationId The GCM Registration ID.
+	 */
+	public static void addApptentivePushIntegration(Context context, String registrationId) {
+		if (registrationId != null) {
+			Log.d("Setting up Apptentive Push Notifications with Registration ID: %s", registrationId);
+			Map<String, String> config = new HashMap<String, String>();
+			config.put(Apptentive.INTEGRATION_APPTENTIVE_PUSH_REGISTRATION_ID, registrationId);
+			addIntegration(context, Apptentive.INTEGRATION_APPTENTIVE_PUSH, config);
+		}
+	}
+
 
 	/**
 	 * Configures Apptentive to work with Urban Airship push notifications. You must first set up your app to work with
