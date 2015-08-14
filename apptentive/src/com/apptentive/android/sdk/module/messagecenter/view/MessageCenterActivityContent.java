@@ -180,6 +180,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
+					MessageCenterStatus newItem = interaction.getRegularStatus(viewActivity);
+					if (newItem != null) {
+						addNewStatusItem(newItem);
+					}
 					messageCenterListAdapter.notifyDataSetChanged();
 					break;
 				}
@@ -321,7 +325,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(viewActivity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			// Add greeting message
-			items.add(interaction.getGreeting());
+			items.add(0, interaction.getGreeting());
 			messages.addAll(items);
 
 			if (contextualMessage != null) {
