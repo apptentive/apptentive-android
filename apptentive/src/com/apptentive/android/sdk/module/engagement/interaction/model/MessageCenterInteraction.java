@@ -34,6 +34,8 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_GREETING_TITLE = "title";
 	public static final String KEY_GREETING_BODY = "body";
 	public static final String KEY_GREETING_IMAGE = "image_url";
+	public static final String KEY_STATUS = "status";
+	public static final String KEY_STATUS_BODY = "body";
 	public static final String KEY_AUTOMATED_MESSAGE = "automated_message";
 	public static final String KEY_AUTOMATED_MESSAGE_BODY = "body";
 	public static final String KEY_ERROR = "error_messages";
@@ -229,6 +231,23 @@ public class MessageCenterInteraction extends Interaction {
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.name());
 		return intent;
+	}
+
+	// Regular status showes customer's hours, expected time until response
+	public MessageCenterStatus getRegularStatus(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return null;
+		}
+		JSONObject status = configuration.optJSONObject(KEY_STATUS);
+		if (status == null) {
+			return null;
+		}
+		String status_body = status.optString(KEY_STATUS_BODY);
+		if (status_body == null || status_body.isEmpty()) {
+			return null;
+		}
+		return new MessageCenterStatus(null, status_body);
 	}
 
 	public MessageCenterStatus getErrorStatusServer(Context context) {

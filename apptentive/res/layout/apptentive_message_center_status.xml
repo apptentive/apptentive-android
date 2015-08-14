@@ -20,7 +20,7 @@
                   android:gravity="center"
                   android:orientation="horizontal"
                   android:paddingBottom="48dp"
-                  android:paddingTop="24dp">
+                  android:paddingTop="10dp">
 
         <FrameLayout android:layout_width="0dp"
                      android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:gravity="center"
-                      android:textColor="#949494"
+                      android:textColor="?attr/apptentive_material_hint_text"
                       android:textSize="24dp"
                       android:textStyle="normal"/>
 
@@ -44,7 +44,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:gravity="center"
-                      android:textColor="#949494"
+                      android:textColor="?attr/apptentive_material_hint_text"
                       android:textSize="16dp"
                       android:textStyle="normal"/>
         </LinearLayout>
