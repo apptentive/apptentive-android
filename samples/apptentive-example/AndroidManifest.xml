@@ -27,10 +27,5 @@
                    android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/ApptentiveTheme.Light"/>
-        <receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>
