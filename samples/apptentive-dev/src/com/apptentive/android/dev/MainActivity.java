@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.apptentive.android.dev.push.RegistrationIntentService;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -73,6 +75,10 @@ public class MainActivity extends ApptentiveActivity {
 				Toast.makeText(MainActivity.this, completed ? "Survey was completed." : "Survey was skipped.", Toast.LENGTH_SHORT).show();
 			}
 		};
+
+		// Start IntentService to register this application with GCM.
+		Intent intent = new Intent(this, RegistrationIntentService.class);
+		startService(intent);
 	}
 
 	public void launchInteractionsActivity(@SuppressWarnings("unused") View view) {
