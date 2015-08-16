@@ -268,44 +268,6 @@ public class MessageManager {
 */
 	}
 
-	/**
-	 * This method will show either a Welcome or a No Love AutomatedMessage. If a No Love message has been shown, no other
-	 * AutomatedMessage shall be shown, and no AutomatedMessage shall be shown twice.
-	 *
-	 * @param context The context from which this method is called.
-	 * @param forced  If true, show a Welcome AutomatedMessage, else show a NoLove AutomatedMessage.
-	 */
-	public static void createMessageCenterAutoMessage(Context context, boolean forced) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-		boolean shownAutoMessage = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, false);
-
-		// Migrate old values if needed.
-		boolean shownManual = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL, false);
-		boolean shownNoLove = prefs.getBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE, false);
-		if (!shownAutoMessage) {
-			if (shownManual || shownNoLove) {
-				shownAutoMessage = true;
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
-			}
-		}
-
-		AutomatedMessage message;
-
-		if (!shownAutoMessage) {
-			if (forced) {
-				message = AutomatedMessage.createWelcomeMessage(context);
-			} else {
-				message = AutomatedMessage.createNoLoveMessage(context);
-			}
-			if (message != null) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE, true).commit();
-				getMessageStore(context).addOrUpdateMessages(message);
-				ApptentiveDatabase.getInstance(context).addPayload(message);
-			}
-		}
-	}
-
 	private static MessageStore getMessageStore(Context context) {
 		return ApptentiveDatabase.getInstance(context);
 	}
