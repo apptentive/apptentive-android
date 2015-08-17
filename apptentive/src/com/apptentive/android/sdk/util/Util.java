@@ -155,52 +155,38 @@ public class Util {
 
 	public static String[] getAllUserAccountEmailAddresses(Context context) {
 		List<String> emails = new ArrayList<String>();
-		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-			AccountManager accountManager = AccountManager.get(context);
-			try {
-				Account[] accounts = accountManager.getAccountsByType("com.google");
-				for (Account account : accounts) {
-					emails.add(account.name);
-				}
-			} catch (VerifyError e) {
-				// Ignore here because the phone is on a pre API Level 5 SDK.
+		AccountManager accountManager = AccountManager.get(context);
+		Account[] accounts = null;
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
+			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+				accounts = accountManager.getAccountsByType("com.google");
+			}
+		}
+		if (accounts != null) {
+			for (Account account : accounts) {
+				emails.add(account.name);
 			}
 		}
 		return emails.toArray(new String[emails.size()]);
 	}
 
-	public static String getUserEmail(Context context) {
-		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-			String email = getEmail(context);
-			if (email != null) {
-				return email;
+	private static String getUserEmail(Context context) {
+		AccountManager accountManager = AccountManager.get(context);
+		Account[] accounts = null;
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
+			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+				accounts = accountManager.getAccountsByType("com.google");
+			}
+		}
+
+		if (accounts != null && accounts.length > 0) {
+			// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
+			Account account = accounts[accounts.length - 1];
+			if (account != null) {
+				return account.name;
 			}
 		}
 		return null;
-	}
-
-	private static String getEmail(Context context) {
-		AccountManager accountManager = AccountManager.get(context);
-		Account account = getAccount(accountManager);
-		if (account == null) {
-			return null;
-		} else {
-			return account.name;
-		}
-	}
-
-	private static Account getAccount(AccountManager accountManager) {
-		Account account = null;
-		try {
-			Account[] accounts = accountManager.getAccountsByType("com.google");
-			if (accounts.length > 0) {
-				// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
-				account = accounts[accounts.length - 1];
-			}
-		} catch (VerifyError e) {
-			// Ignore here because the phone is on a pre API Level 5 SDK.
-		}
-		return account;
 	}
 
 	public static boolean isNetworkConnectionPresent(Context context) {
