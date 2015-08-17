@@ -50,12 +50,14 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_PROFILE_INIT_TITLE = "title";
 	public static final String KEY_PROFILE_INIT_NAME_HINT = "name_hint";
 	public static final String KEY_PROFILE_INIT_EMAIL_HINT = "email_hint";
+	public static final String KEY_PROFILE_INIT_EMAIL_TIP = "email_tip";
 	public static final String KEY_PROFILE_INIT_SKIP_BUTTON = "skip_button";
 	public static final String KEY_PROFILE_INIT_SAVE_BUTTON = "save_button";
 	public static final String KEY_PROFILE_EDIT = "edit";
 	public static final String KEY_PROFILE_EDIT_TITLE = "title";
 	public static final String KEY_PROFILE_EDIT_NAME_HINT = "name_hint";
 	public static final String KEY_PROFILE_EDIT_EMAIL_HINT = "email_hint";
+	public static final String KEY_PROFILE_EDIT_EMAIL_TIP = "email_tip";
 	public static final String KEY_PROFILE_EDIT_SKIP_BUTTON = "skip_button";
 	public static final String KEY_PROFILE_EDIT_SAVE_BUTTON = "save_button";
 
@@ -96,6 +98,7 @@ public class MessageCenterInteraction extends Interaction {
 				composer.optString(KEY_COMPOSER_HINT_TEXT, null),
 				null,
 				null,
+				null,
 				null);
 	}
 
@@ -110,8 +113,28 @@ public class MessageCenterInteraction extends Interaction {
 				composer.optString(KEY_COMPOSER_TITLE, null),
 				null,
 				null,
+				null,
 				composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
 				null);
+	}
+
+	//When enabled, display Who Card to request profile info
+	public boolean getWhoCardRequestEnabled() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return false;
+		}
+		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
+		return profile.optBoolean(KEY_PROFILE_REQUEST, true);
+	}
+
+	public boolean getWhoCardRequired() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return false;
+		}
+		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
+		return profile.optBoolean(KEY_PROFILE_REQUIRE, false);
 	}
 
 	public MessageCenterComposingItem getWhoCardInit() {
@@ -119,14 +142,27 @@ public class MessageCenterInteraction extends Interaction {
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_INIT);
+		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
+		JSONObject profile_init = profile.optJSONObject(KEY_PROFILE_INIT);
+		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
+			return new MessageCenterComposingItem(
+					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
+					profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
+					// Hide name field if profile is required and never set
+					null,
+					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
+					profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
+					profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
+					profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+		}
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
-				profile.optString(KEY_PROFILE_INIT_TITLE, null),
-				profile.optString(KEY_PROFILE_INIT_NAME_HINT, null),
-				profile.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profile.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
-				profile.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+				profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
+				profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
+				profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
+				profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
+				profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
+				profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 	}
 
 	public MessageCenterComposingItem getWhoCardEdit() {
@@ -140,6 +176,7 @@ public class MessageCenterInteraction extends Interaction {
 				profile.optString(KEY_PROFILE_EDIT_TITLE, null),
 				profile.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
 				profile.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
+				profile.optString(KEY_PROFILE_EDIT_EMAIL_TIP, null),
 				profile.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
 				profile.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 	}
@@ -194,6 +231,23 @@ public class MessageCenterInteraction extends Interaction {
 		intent.setClass(context, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.name());
 		return intent;
+	}
+
+	// Regular status showes customer's hours, expected time until response
+	public MessageCenterStatus getRegularStatus(Context context) {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return null;
+		}
+		JSONObject status = configuration.optJSONObject(KEY_STATUS);
+		if (status == null) {
+			return null;
+		}
+		String status_body = status.optString(KEY_STATUS_BODY);
+		if (status_body == null || status_body.isEmpty()) {
+			return null;
+		}
+		return new MessageCenterStatus(null, status_body);
 	}
 
 	public MessageCenterStatus getErrorStatusServer(Context context) {

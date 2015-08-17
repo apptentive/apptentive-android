@@ -180,6 +180,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
+					MessageCenterStatus newItem = interaction.getRegularStatus(viewActivity);
+					if (newItem != null) {
+						addNewStatusItem(newItem);
+					}
 					messageCenterListAdapter.notifyDataSetChanged();
 					break;
 				}
@@ -321,7 +325,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(viewActivity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
 			// Add greeting message
-			messages.add(interaction.getGreeting());
+			items.add(0, interaction.getGreeting());
 			messages.addAll(items);
 
 			if (contextualMessage != null) {
@@ -339,8 +343,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addWhoCard(pendingWhoCardMode);
 			} else if (items.size() == 1) {
-				// If there is only greeting message, show composing
-				addComposingArea();
+				/* If there is only greeting message, show composing.
+				 * If Who Card is required, show Who Card first
+				 */
+				if (!addWhoCardInitRequired()) {
+					addComposingArea();
+				}
 			} else if (messageCenterFooter != null) {
 				messageCenterFooter.setVisibility(View.VISIBLE);
 			}
@@ -505,7 +513,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		savePendingComposingMessage();
 		clearStatus();
 		messages.add(contextualMessage);
-		addComposingArea();
+		if (!addWhoCardInitRequired()) {
+			addComposingArea();
+		}
 	}
 
 	public void addComposingArea() {
@@ -518,7 +528,21 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messages.add(composingItem);
 	}
 
+	private boolean addWhoCardInitRequired() {
+		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+		if (interaction.getWhoCardRequestEnabled() &&
+				interaction.getWhoCardRequired() && !bWhoCardSet) {
+			addWhoCard(WHO_CARD_MODE_INIT);
+			return true;
+		}
+		return false;
+	}
+
 	public void addWhoCard(int mode) {
+		if (!interaction.getWhoCardRequestEnabled()) {
+			return;
+		}
 		pendingWhoCardMode = mode;
 		fab.setVisibility(View.INVISIBLE);
 		hideBranding();
@@ -752,7 +776,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	@Override
 	public void onCloseWhoCard() {
 		clearWhoCardUi();
+
+		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 		saveWhoCardSetState();
+		if (!bWhoCardSet && interaction.getWhoCardRequired()) {
+			addComposingArea();
+			return;
+		}
 		fab.setVisibility(View.VISIBLE);
 		animateShow();
 	}
@@ -782,14 +813,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			bCanScrollUp = ViewCompat.canScrollVertically(view, -1);
 		}
 		if (bCanScrollUp) {
-			if (android.os.Build.VERSION.SDK_INT > 21) {
+			if (android.os.Build.VERSION.SDK_INT > 20) {
 				messageCenterHeader.setElevation(8);
-			}
-			else {
+			} else {
 				headerDivider.setVisibility(View.VISIBLE);
 			}
 		} else {
-			if (android.os.Build.VERSION.SDK_INT > 21) {
+			if (android.os.Build.VERSION.SDK_INT > 20) {
 				messageCenterHeader.setElevation(0);
 			} else {
 				headerDivider.setVisibility(View.GONE);
