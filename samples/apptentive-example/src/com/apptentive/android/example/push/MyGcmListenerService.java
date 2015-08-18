@@ -27,10 +27,10 @@ public class MyGcmListenerService extends GcmListenerService {
 	@Override
 	public void onMessageReceived(String from, Bundle data) {
 		String title = data.getString("gcm.notification.title");
-		String text = data.getString("gcm.notification.body");
+		String body = data.getString("gcm.notification.body");
 		Log.e("From: " + from);
 		Log.e("Title: " + title);
-		Log.e("Text: " + text);
+		Log.e("Body: " + body);
 
 		/**
 		 * Production applications would usually process the message here.
@@ -43,16 +43,16 @@ public class MyGcmListenerService extends GcmListenerService {
 		 * In some cases it may be useful to show a notification indicating to the user
 		 * that a message was received.
 		 */
-		sendNotification(title, text);
+		sendNotification(title, body);
 	}
 
 	/**
 	 * Create and show a simple notification containing the received GCM message.
 	 *
-	 * @param title GCM title received.
-	 * @param text GCM message received.
+	 * @param title GCM message title received.
+	 * @param body  GCM message body received.
 	 */
-	private void sendNotification(String title, String text) {
+	private void sendNotification(String title, String body) {
 		Intent intent = new Intent(this, ExampleActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -62,7 +62,7 @@ public class MyGcmListenerService extends GcmListenerService {
 		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.notification)
 				.setContentTitle(title)
-				.setContentText(text)
+				.setContentText(body)
 				.setAutoCancel(true)
 				.setSound(defaultSoundUri)
 				.setContentIntent(pendingIntent);
