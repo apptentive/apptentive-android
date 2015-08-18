@@ -13,8 +13,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
-
 
 /**
  * @author Barry Li
@@ -24,7 +22,7 @@ public class MessageCenterStatusView extends FrameLayout implements MessageCente
 	public TextView title;
 	public TextView body;
 
-	public MessageCenterStatusView(Context context, MessageCenterStatus status) {
+	public MessageCenterStatusView(Context context) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
@@ -35,10 +33,16 @@ public class MessageCenterStatusView extends FrameLayout implements MessageCente
 
 	public void updateMessage(String title, String body) {
 		if (this.title != null) {
+			this.title.setVisibility(View.VISIBLE);
 			this.title.setText(title);
+		} else {
+			this.title.setVisibility(View.GONE);
 		}
 		if (this.body != null) {
+			this.body.setVisibility(View.VISIBLE);
 			this.body.setText(body);
+		} else {
+			this.body.setVisibility(View.GONE);
 		}
 	}
 

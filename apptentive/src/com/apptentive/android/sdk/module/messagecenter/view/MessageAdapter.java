@@ -205,7 +205,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
-					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext(), statusItem);
+					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext());
 					newView.updateMessage(statusItem.title, statusItem.body);
 					convertView = newView;
 					break;
