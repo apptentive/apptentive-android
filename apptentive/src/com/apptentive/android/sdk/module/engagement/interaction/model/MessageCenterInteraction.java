@@ -30,6 +30,9 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_COMPOSER_TITLE = "title";
 	public static final String KEY_COMPOSER_HINT_TEXT = "hint_text";
 	public static final String KEY_COMPOSER_SEND_BUTTON = "send_button";
+	public static final String KEY_COMPOSER_CLOSE_BODY = "close_confirm_body";
+	public static final String KEY_COMPOSER_CLOSE_DISCARD = "close_discard_button";
+	public static final String KEY_COMPOSER_CLOSE_CANCEL = "close_cancel_button";
 	public static final String KEY_GREETING = "greeting";
 	public static final String KEY_GREETING_TITLE = "title";
 	public static final String KEY_GREETING_BODY = "body";
@@ -111,9 +114,9 @@ public class MessageCenterInteraction extends Interaction {
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR,
 				composer.optString(KEY_COMPOSER_TITLE, null),
-				null,
-				null,
-				null,
+				composer.optString(KEY_COMPOSER_CLOSE_BODY, null),
+				composer.optString(KEY_COMPOSER_CLOSE_DISCARD, null),
+				composer.optString(KEY_COMPOSER_CLOSE_CANCEL, null),
 				composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
 				null);
 	}
