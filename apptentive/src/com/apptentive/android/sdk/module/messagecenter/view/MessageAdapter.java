@@ -87,7 +87,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private Activity activity;
 	private Context context;
 
-	private Interaction interaction;
+	private MessageCenterInteraction interaction;
 
 	// Variables used in composing message
 	private int composingViewIndex = INVALID_POSITION;
@@ -371,6 +371,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	private void setupComposingView(final int position) {
+		EngagementModule.engageInternal(activity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		composingEditText = composingView.getEditText();
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -385,6 +386,20 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	public void clearComposing() {
+
+		JSONObject data = new JSONObject();
+		try {
+			if (composingEditText != null) {
+				String text = composingEditText.getText().toString();
+				data.put("body_length", text.length());
+			} else {
+				data.put("body_length", 0);
+			}
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(activity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
+
 		composingView = null;
 		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
