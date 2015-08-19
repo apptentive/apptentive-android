@@ -40,18 +40,21 @@ android {
             applicationId "com.apptentive.android.dev"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_DEV,
                                     APPTENTIVE_USE_STAGING_SERVER: "false",
+                                    APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveSdkOverride",
                                     APPTENTIVE_APP_NAME: "Apptentive Dev"];
         }
         qa {
             applicationId "com.apptentive.android.qa"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_QA,
                                     APPTENTIVE_USE_STAGING_SERVER: "false",
+                                    APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveTheme.Light",
                                     APPTENTIVE_APP_NAME: "Apptentive QA"];
         }
         rc {
             applicationId "com.apptentive.android.rc"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_RC,
                                     APPTENTIVE_USE_STAGING_SERVER: "false",
+                                    APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveSdkOverride",
                                     APPTENTIVE_APP_NAME: "Apptentive RC"];
         }
     }

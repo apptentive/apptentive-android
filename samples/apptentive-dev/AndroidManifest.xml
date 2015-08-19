@@ -92,7 +92,7 @@
         <meta-data android:name="apptentive_api_key" android:value="${APPTENTIVE_API_KEY}"/>
         <meta-data android:name="apptentive_use_staging_server" android:value="${APPTENTIVE_USE_STAGING_SERVER}"/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
-                  android:theme="@style/ApptentiveSdkOverride"/>
+                  android:theme="${APPTENTIVE_VIEW_ACTIVITY_THEME}"/>
 
         <!-- Required for GCM -->
         <receiver android:name="com.google.android.gms.gcm.GcmReceiver"
