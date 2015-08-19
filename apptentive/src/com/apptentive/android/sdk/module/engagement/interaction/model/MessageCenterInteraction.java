@@ -65,6 +65,28 @@ public class MessageCenterInteraction extends Interaction {
 	// The server guarantees that an instance of this Interaction will be targetted to the following internal event name.
 	public static final String DEFAULT_INTERNAL_EVENT_NAME = "show_message_center";
 
+	// Events
+	public static final String EVENT_NAME_CLOSE = "close";
+	public static final String EVENT_NAME_CANCEL = "cancel";
+	public static final String EVENT_NAME_ATTACH = "attach";
+	public static final String EVENT_NAME_READ = "read";
+	public static final String EVENT_NAME_NO_INTERACTION_NO_INTERNET = "no_interaction_no_internet";
+	public static final String EVENT_NAME_NO_INTERACTION_ERROR = "no_interaction_error";
+	public static final String EVENT_NAME_NO_INTERACTION_ATTEMPTING = "no_interaction_attempting";
+	public static final String EVENT_NAME_NO_INTERACTION_CLOSE = "no_interaction_close";
+	public static final String EVENT_NAME_GREETING_MESSAGE = "greeting_message";
+	public static final String EVENT_NAME_COMPOSE_OPEN = "compose_open";
+	public static final String EVENT_NAME_COMPOSE_CLOSE = "compose_close";
+	public static final String EVENT_NAME_KEYBOARD_OPEN = "keyboard_open";
+	public static final String EVENT_NAME_KEYBOARD_CLOSE = "keyboard_close";
+	public static final String EVENT_NAME_STATUS = "status";
+	public static final String EVENT_NAME_MESSAGE_HTTP_ERROR = "message_http_error";
+	public static final String EVENT_NAME_MESSAGE_NETWORK_ERROR = "message_network_error";
+	public static final String EVENT_NAME_PROFILE_OPEN = "profile_open";
+	public static final String EVENT_NAME_PROFILE_CLOSE = "profile_close";
+	public static final String EVENT_NAME_PROFILE_NAME = "profile_name";
+	public static final String EVENT_NAME_PROFILE_EMAIL = "profile_email";
+	public static final String EVENT_NAME_PROFILE_SUBMIT = "profile_submit";
 
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
