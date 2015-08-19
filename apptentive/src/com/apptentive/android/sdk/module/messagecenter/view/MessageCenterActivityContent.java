@@ -354,7 +354,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterFooter.setVisibility(View.VISIBLE);
 			}
 
-			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this);
+			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 			updateMessageTimeStamps(); // Force timestamp recompilation.
 		}

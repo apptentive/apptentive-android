@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
@@ -86,6 +87,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private Activity activity;
 	private Context context;
 
+	private Interaction interaction;
+
 	// Variables used in composing message
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
@@ -122,11 +125,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	/**
 	 * @param context Must be a Context with theme set, such as an Activity
 	 */
-	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {
+	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
 		super(context, 0, (List<T>) items);
 		this.activity = (Activity) context;
 		this.context = activity.getApplicationContext();
 		this.composingActionListener = listener;
+		this.interaction = interaction;
 	}
 
 	@Override
@@ -487,7 +491,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(activity, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+			EngagementModule.engageInternal(activity, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 			MessageManager.updateMessage(context, textMessages[0]);
 			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
 			return null;
