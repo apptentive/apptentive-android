@@ -272,11 +272,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
-		ImageButton backButton = (ImageButton) viewActivity.findViewById(R.id.back);
-		backButton.setOnClickListener(new View.OnClickListener() {
+		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close);
+		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				viewActivity.onBackPressed();
+				viewActivity.finish();
 			}
 		});
 
