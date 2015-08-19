@@ -37,6 +37,9 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private Button skipButton;
 	private Button sendButton;
 
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
 	public MessageCenterWhoCardView(Context context,
 																	final MessageAdapter.OnComposingActionListener listener) {
 		super(context);

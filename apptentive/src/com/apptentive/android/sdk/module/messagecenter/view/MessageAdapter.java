@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -80,6 +81,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	// If message sending is paused or not
 	private boolean isInPauseState = false;
 
+	private Activity activity;
 	private Context context;
 
 	// Variables used in composing message
@@ -115,9 +117,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	}
 
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
 	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {
 		super(context, 0, (List<T>) items);
-		this.context = context;
+		this.activity = (Activity) context;
+		this.context = activity.getApplicationContext();
 		this.composingActionListener = listener;
 	}
 
@@ -212,21 +218,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(context,
-								(MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(activity, (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					convertView = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					convertView = new MessageCenterComposingActionBarView(context,
-							(MessageCenterComposingItem) listItem, composingActionListener);
+					convertView = new MessageCenterComposingActionBarView(activity, (MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
-						whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+						whoCardView = new MessageCenterWhoCardView(activity, composingActionListener);
 						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}

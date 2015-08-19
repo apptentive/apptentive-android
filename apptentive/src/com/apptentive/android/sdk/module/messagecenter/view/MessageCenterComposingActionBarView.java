@@ -17,25 +17,22 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.util.Util;
 
 
 /**
  * @author Barry Li
  */
-public class MessageCenterComposingActionBarView extends FrameLayout
-		implements MessageCenterListItemView {
+public class MessageCenterComposingActionBarView extends FrameLayout implements MessageCenterListItemView {
 
-
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
 	public MessageCenterComposingActionBarView(Context context, final MessageCenterComposingItem item,
 																						 final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
-
-		int pressedColor = Util.getThemeColorFromAttrOrRes(context, R.attr.apptentive_material_pressed_highlight,
-				R.color.apptentive_material_pressed_highlight);
 
 		View closeButton = findViewById(R.id.cancel_composing);
 		closeButton.setOnClickListener(new OnClickListener() {
