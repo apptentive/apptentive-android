@@ -36,8 +36,8 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Event;
 
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -276,6 +276,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE);
 				viewActivity.finish();
 			}
 		});
@@ -366,7 +367,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			if (canTakeScreenshot) {
 				attachButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View view) {
-						MetricModule.sendMetric(viewActivity, Event.EventLabel.message_center__attach);
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACH);
 						Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 						Bundle extras = new Bundle();
 						intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -433,11 +434,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		clearPendingMessageCenterPushNotification();
 		clearComposingUi();
 		clearWhoCardUi();
-		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
 		ApptentiveInternal.getAndClearCustomData();
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 		return true;
 	}
 
