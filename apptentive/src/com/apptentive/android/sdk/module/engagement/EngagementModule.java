@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
@@ -30,6 +29,10 @@ public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Activity activity, String eventName) {
 		return engage(activity, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
+	}
+
+	public static synchronized boolean engageInternal(Activity activity, String eventName, String data) {
+		return engage(activity, "com.apptentive", "app", null, eventName,  data, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName) {
