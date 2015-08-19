@@ -276,6 +276,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				cleanup();
 				EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE);
 				viewActivity.finish();
 			}
@@ -430,6 +431,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
+		cleanup();
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+		return true;
+	}
+
+	public boolean cleanup() {
 		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		clearComposingUi();
@@ -438,7 +445,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
 		ApptentiveInternal.getAndClearCustomData();
-		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 		return true;
 	}
 
