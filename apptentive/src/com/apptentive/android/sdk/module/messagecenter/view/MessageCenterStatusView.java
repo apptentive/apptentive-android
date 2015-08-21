@@ -19,7 +19,6 @@ import com.apptentive.android.sdk.R;
  */
 public class MessageCenterStatusView extends FrameLayout implements MessageCenterListItemView {
 
-	public TextView title;
 	public TextView body;
 
 	public MessageCenterStatusView(Context context) {
@@ -27,17 +26,10 @@ public class MessageCenterStatusView extends FrameLayout implements MessageCente
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View view = inflater.inflate(R.layout.apptentive_message_center_status, this);
-		title = (TextView) view.findViewById(R.id.title);
 		body = (TextView) view.findViewById(R.id.body);
 	}
 
-	public void updateMessage(String title, String body) {
-		if (this.title != null) {
-			this.title.setVisibility(View.VISIBLE);
-			this.title.setText(title);
-		} else {
-			this.title.setVisibility(View.GONE);
-		}
+	public void updateMessage(String body) {
 		if (this.body != null) {
 			this.body.setVisibility(View.VISIBLE);
 			this.body.setText(body);
