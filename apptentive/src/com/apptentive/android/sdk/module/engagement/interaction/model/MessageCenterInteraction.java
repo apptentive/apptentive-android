@@ -73,10 +73,6 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String EVENT_NAME_CANCEL = "cancel";
 	public static final String EVENT_NAME_ATTACH = "attach";
 	public static final String EVENT_NAME_READ = "read";
-	public static final String EVENT_NAME_NO_INTERACTION_NO_INTERNET = "no_interaction_no_internet";
-	public static final String EVENT_NAME_NO_INTERACTION_ERROR = "no_interaction_error";
-	public static final String EVENT_NAME_NO_INTERACTION_ATTEMPTING = "no_interaction_attempting";
-	public static final String EVENT_NAME_NO_INTERACTION_CLOSE = "no_interaction_close";
 	public static final String EVENT_NAME_GREETING_MESSAGE = "greeting_message";
 	public static final String EVENT_NAME_COMPOSE_OPEN = "compose_open";
 	public static final String EVENT_NAME_COMPOSE_CLOSE = "compose_close";
