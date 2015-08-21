@@ -568,6 +568,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
 		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
@@ -705,6 +706,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onComposingViewCreated() {
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
 		if (composingViewSavedState != null) {
 			messageEditText.onRestoreInstanceState(composingViewSavedState);
@@ -740,17 +742,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onCancelComposing() {
-		if (contextualMessage != null) {
-			messages.remove(contextualMessage);
-			contextualMessage = null;
+		JSONObject data = new JSONObject();
+		try {
+			int bodyLength = getPendingComposingContent().toString().trim().length();
+			data.put("body_length", bodyLength);
+		} catch (JSONException e) {
+			//
 		}
-		clearComposingUi();
-		View fab = viewActivity.findViewById(R.id.composing_fab);
-		fab.setVisibility(View.VISIBLE);
-		View profileButton = viewActivity.findViewById(R.id.profile);
-		profileButton.setVisibility(View.VISIBLE);
-		showBranding();
-		savePendingComposingMessage();
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
+		cleanUpComposing();
 	}
 
 	@Override
@@ -762,7 +762,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 		String messageText = getPendingComposingContent().toString().trim();
 		// Close all composing UI
-		onCancelComposing();
+		cleanUpComposing();
 		// Send out the new message
 		if (!messageText.isEmpty()) {
 			OutgoingTextMessage message = new OutgoingTextMessage();
@@ -778,6 +778,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		}
+	}
+
+	public void cleanUpComposing() {
+		if (contextualMessage != null) {
+			messages.remove(contextualMessage);
+			contextualMessage = null;
+		}
+		clearComposingUi();
+		View fab = viewActivity.findViewById(R.id.composing_fab);
+		fab.setVisibility(View.VISIBLE);
+		View profileButton = viewActivity.findViewById(R.id.profile);
+		profileButton.setVisibility(View.VISIBLE);
+		showBranding();
+		savePendingComposingMessage();
 	}
 
 	@Override
