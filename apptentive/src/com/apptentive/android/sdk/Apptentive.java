@@ -1038,29 +1038,21 @@ public class Apptentive {
 		Log.v("Fetching new configuration.");
 		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
 
-		// We weren't able to connect to the internet.
-		if (response.isException()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).commit();
-			return;
-		}
-		if (!response.isSuccessful()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).commit();
-			return;
-		}
-
 		try {
-			String cacheControl = response.getHeaders().get("Cache-Control");
-			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if (cacheSeconds == null) {
-				cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+			Map<String, String> headers = response.getHeaders();
+			if (headers != null) {
+				String cacheControl = headers.get("Cache-Control");
+				Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+				if (cacheSeconds == null) {
+					cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+				}
+				Log.d("Caching configuration for %d seconds.", cacheSeconds);
+				Configuration config = new Configuration(response.getContent());
+				config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+				config.save(context);
 			}
-			Log.d("Caching configuration for %d seconds.", cacheSeconds);
-			Configuration config = new Configuration(response.getContent());
-			config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-			config.save(context);
 		} catch (JSONException e) {
 			Log.e("Error parsing app configuration from server.", e);
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).commit();
 		}
 	}
 
