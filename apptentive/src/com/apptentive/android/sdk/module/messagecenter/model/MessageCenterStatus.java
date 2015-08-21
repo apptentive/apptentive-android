@@ -19,8 +19,8 @@ public class MessageCenterStatus extends JSONObject implements MessageCenterList
 	public final String title;
 	public final String body;
 
-	public MessageCenterStatus(String tile, String body) {
-		this.title = tile;
+	public MessageCenterStatus(String title, String body) {
+		this.title = title;
 		this.body = body;
 	}
 

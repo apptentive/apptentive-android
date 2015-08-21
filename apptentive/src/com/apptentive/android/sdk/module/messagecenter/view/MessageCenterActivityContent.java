@@ -180,7 +180,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
-					MessageCenterStatus newItem = interaction.getRegularStatus(viewActivity);
+					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null) {
 						addNewStatusItem(newItem);
 					}
@@ -195,11 +195,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 							int reason = msg.arg1;
 							if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
 								EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
-								MessageCenterStatus newItem = interaction.getErrorStatusNetwork(viewActivity);
+								MessageCenterStatus newItem = interaction.getErrorStatusNetwork();
 								addNewStatusItem(newItem);
 							} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
 								EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
-								MessageCenterStatus newItem = interaction.getErrorStatusServer(viewActivity);
+								MessageCenterStatus newItem = interaction.getErrorStatusServer();
 								addNewStatusItem(newItem);
 							}
 						}

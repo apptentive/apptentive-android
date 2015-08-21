@@ -255,7 +255,7 @@ public class MessageCenterInteraction extends Interaction {
 	}
 
 	// Regular status showes customer's hours, expected time until response
-	public MessageCenterStatus getRegularStatus(Context context) {
+	public MessageCenterStatus getRegularStatus() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
@@ -271,33 +271,27 @@ public class MessageCenterInteraction extends Interaction {
 		return new MessageCenterStatus(null, status_body);
 	}
 
-	public MessageCenterStatus getErrorStatusServer(Context context) {
+	public MessageCenterStatus getErrorStatusServer() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject error_status = configuration.optJSONObject(KEY_ERROR);
-		if (error_status == null) {
+		JSONObject errorStatus = configuration.optJSONObject(KEY_ERROR);
+		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(error_status.optString(KEY_ERROR_HTTP_TITLE,
-				context.getResources().getString(R.string.apptentive_message_center_status_error_title)),
-				error_status.optString(KEY_ERROR_HTTP_BODY,
-						context.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_TITLE), errorStatus.optString(KEY_ERROR_HTTP_BODY));
 	}
 
-	public MessageCenterStatus getErrorStatusNetwork(Context context) {
+	public MessageCenterStatus getErrorStatusNetwork() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject error_status = configuration.optJSONObject(KEY_ERROR);
-		if (error_status == null) {
+		JSONObject errorStatus = configuration.optJSONObject(KEY_ERROR);
+		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(error_status.optString(KEY_ERROR_NETWORK_TITLE,
-				context.getResources().getString(R.string.apptentive_message_center_status_error_title)),
-				error_status.optString(KEY_ERROR_NETWORK_BODY,
-						context.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_TITLE), errorStatus.optString(KEY_ERROR_NETWORK_BODY));
 	}
 }
