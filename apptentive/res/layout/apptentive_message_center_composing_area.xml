@@ -30,7 +30,6 @@
                       android:inputType="textCapSentences|textMultiLine"
                       android:singleLine="false"
                       android:background="@null"
-                      android:hint="@string/apptentive_message_center_compose_hint"
                       android:textCursorDrawable="@null"
                       android:textColorHint="?attr/apptentive_material_hint_text"
                       android:textColor="?attr/apptentive_material_primary_text"

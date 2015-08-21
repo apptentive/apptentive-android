@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Saisir une réponse…</string>
   <string name="apptentive_survey_send_response">Envoyer la Réponse</string>
   <string name="apptentive_message_center_title">Centre de messages</string>
-  <string name="apptentive_message_center_compose_hint">Taper un message…</string>
-  <string name="apptentive_message_center_attachment_title">Envoyer une image?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play introuvable. Veuillez installer Google Play pour pouvoir noter cette application.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore introuvable. Veuillez installer Amazon Appstore pour pouvoir noter cette application.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market introuvable. Veuillez installer MiKandi Market pour pouvoir noter cette application.</string>

@@ -27,15 +27,13 @@
                   android:gravity="left"
                   android:textColor="@color/apptentive_text_message_text"
                   android:textSize="16sp"
-                  android:textStyle="normal"
-                  android:text="@string/apptentive_message_center_who_card_title"/>
+                  android:textStyle="normal"/>
         <EditText android:id="@+id/who_name"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_margin="20dp"
                   android:inputType="textCapSentences"
                   android:singleLine="true"
-                  android:hint="@string/apptentive_message_center_who_card_name_hint"
                   android:textColorHint="?attr/apptentive_material_hint_text"
                   android:textColor="?attr/apptentive_material_primary_text"
                   android:textSize="16sp"/>
@@ -46,7 +44,6 @@
                   android:layout_marginTop="20dp"
                   android:layout_marginBottom="2dp"
                   android:singleLine="true"
-                  android:hint="@string/apptentive_message_center_who_card_email_hint"
                   android:textColorHint="?attr/apptentive_material_hint_text"
                   android:textColor="?attr/apptentive_material_primary_text"
                   android:textSize="16sp"
@@ -75,9 +72,7 @@
                     android:contentDescription="Skip"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
-                    android:text="@string/apptentive_message_center_who_card_skip"
-                    android:textColor="?attr/colorAccent"
-                />
+                    android:textColor="?attr/colorAccent"/>
 
             <Button android:id="@+id/btn_send"
                     android:layout_width="wrap_content"
@@ -86,9 +81,7 @@
                     android:contentDescription="Send"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
-                    android:textColor="?attr/colorAccent"
-                    android:text="@string/apptentive_message_center_who_card_me"
-                />
+                    android:textColor="?attr/colorAccent"/>
         </LinearLayout>
     </LinearLayout>
 

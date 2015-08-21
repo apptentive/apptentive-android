@@ -29,8 +29,6 @@
     <string name="apptentive_survey_singleline_hint">Bir yanıt girin&#8230;</string>
     <string name="apptentive_survey_send_response">Yanıtı Gönder</string>
     <string name="apptentive_message_center_title">Mesaj Merkezi</string>
-    <string name="apptentive_message_center_compose_hint">Bir mesaj yaz&#8230;</string>
-    <string name="apptentive_message_center_attachment_title">Resmi Gönder?</string>
     <string name="apptentive_rating_provider_no_google_play">Google Play bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Google Play\'i kurun.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Amazon Appstore\'u kurun.</string>
     <string name="apptentive_rating_provider_no_mikandi">MİKandi Market bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce MİKandi Market\'i kurun.</string>

@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Antwort eingeben…</string>
   <string name="apptentive_survey_send_response">Antwort senden</string>
   <string name="apptentive_message_center_title">Mitteilungszentrale</string>
-  <string name="apptentive_message_center_compose_hint">Nachricht eingeben…</string>
-  <string name="apptentive_message_center_attachment_title">Bild senden?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play nicht gefunden. Bitte installiere Google Play, bevor du diese App bewertest.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon App-Shop nicht gefunden. Bitte installiere Amazon App-Shop, bevor du diese App bewertest.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market nicht gefunden. Bitte installiere Mikandi Market, bevor du diese App bewertest.</string>
