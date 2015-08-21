@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.model.ExtendedData;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
@@ -34,13 +36,12 @@ public class MessageCenterErrorView extends FrameLayout {
 		back.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				cleanup(activity);
 				activity.finish();
 			}
 		});
 
-		SharedPreferences prefs = getContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean serverErrorLastAttempt = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false);
-		if (serverErrorLastAttempt) {
+		if (wasLastAttemptServerError(getContext())) {
 			((ImageView) findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_icon_server_error);
 			((TextView) findViewById(R.id.message)).setText(R.string.apptentive_message_center_server_error);
 		} else {
@@ -48,5 +49,14 @@ public class MessageCenterErrorView extends FrameLayout {
 			((TextView) findViewById(R.id.message)).setText(R.string.apptentive_message_center_no_connection);
 		}
 
+	}
+
+	public static boolean wasLastAttemptServerError(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		return prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false);
+	}
+
+	public void cleanup(Activity activity) {
+		EngagementModule.engage(activity, "com.apptentive", "MessageCenter", null, MessageCenterErrorActivityContent.EVENT_NAME_NO_INTERACTION_CLOSE, null, null, (ExtendedData[]) null);
 	}
 }

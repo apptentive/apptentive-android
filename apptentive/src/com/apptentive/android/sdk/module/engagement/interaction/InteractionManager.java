@@ -90,18 +90,28 @@ public class InteractionManager {
 	private static void fetchAndStoreInteractions(Context context) {
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
-		if (response != null && response.isSuccessful()) {
-			String interactionsPayloadString = response.getContent();
-
-			// Store new integration cache expiration.
-			String cacheControl = response.getHeaders().get("Cache-Control");
-			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if (cacheSeconds == null) {
-				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
-			}
-			updateCacheExpiration(context, cacheSeconds);
-			storeInteractionsPayloadString(context, interactionsPayloadString);
+		// We weren't able to connect to the internet.
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (response.isException()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
+			return;
 		}
+		// We got a server error.
+		if (!response.isSuccessful()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
+			return;
+		}
+
+		String interactionsPayloadString = response.getContent();
+
+		// Store new integration cache expiration.
+		String cacheControl = response.getHeaders().get("Cache-Control");
+		Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+		if (cacheSeconds == null) {
+			cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+		}
+		updateCacheExpiration(context, cacheSeconds);
+		storeInteractionsPayloadString(context, interactionsPayloadString);
 	}
 
 	/**

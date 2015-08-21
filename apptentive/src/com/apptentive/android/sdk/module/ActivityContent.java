@@ -22,7 +22,7 @@ public abstract class ActivityContent {
 
 	protected Type type;
 
-	public abstract void onCreate(Activity activity, Bundle onSavedInstanceState);
+	public abstract void onCreate(Activity activity, Bundle savedInstanceState);
 	public abstract void onSaveInstanceState(Bundle outState);
 	public abstract void onRestoreInstanceState(Bundle savedInstanceState);
 
