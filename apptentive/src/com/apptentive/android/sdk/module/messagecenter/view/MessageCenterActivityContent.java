@@ -396,6 +396,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					if (whoCardItem == null && composingItem == null) {
 						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "button");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+
 						if (!bWhoCardSet) {
 							addWhoCard(WHO_CARD_MODE_INIT);
 						} else {
@@ -773,7 +783,17 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			addNewOutGoingMessageItem(message);
 			SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+
 			if (!bWhoCardSet) {
+				JSONObject data = new JSONObject();
+				try {
+					data.put("required", interaction.getWhoCardRequired());
+					data.put("trigger", "automatic");
+				} catch (JSONException e) {
+					//
+				}
+				EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+
 				addWhoCard(WHO_CARD_MODE_INIT);
 				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
@@ -795,7 +815,34 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onCloseWhoCard() {
+	public void onSubmitWhoCard(String buttonLabel) {
+		JSONObject data = new JSONObject();
+		try {
+			data.put("required", interaction.getWhoCardRequired());
+			data.put("button_label", buttonLabel);
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
+
+		cleanupWhoCard();
+	}
+
+	@Override
+	public void onCloseWhoCard(String buttonLabel) {
+		JSONObject data = new JSONObject();
+		try {
+			data.put("required", interaction.getWhoCardRequired());
+			data.put("button_label", buttonLabel);
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
+
+		cleanupWhoCard();
+	}
+
+	private void cleanupWhoCard() {
 		clearWhoCardUi();
 
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);

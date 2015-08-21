@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 
 
@@ -105,7 +104,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			skipButton.setText(item.button_1);
 			skipButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					listener.onCloseWhoCard();
+					listener.onCloseWhoCard(item.button_1);
 				}
 			});
 		}
@@ -123,7 +122,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 					}
 					Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString());
 					Apptentive.setPersonName(getContext(), nameEditText.getText().toString());
-					listener.onCloseWhoCard();
+					listener.onSubmitWhoCard(item.button_2);
 				}
 			});
 		}

@@ -117,9 +117,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
 
-		void onCloseWhoCard();
+		void onSubmitWhoCard(String buttonLabel);
 
-
+		void onCloseWhoCard(String buttonLabel);
 	}
 
 	/**
