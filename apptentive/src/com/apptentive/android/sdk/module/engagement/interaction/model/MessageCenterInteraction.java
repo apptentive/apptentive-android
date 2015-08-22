@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import android.content.Context;
 import android.content.Intent;
 
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
@@ -261,11 +262,11 @@ public class MessageCenterInteraction extends Interaction {
 		if (status == null) {
 			return null;
 		}
-		String status_body = status.optString(KEY_STATUS_BODY);
-		if (status_body == null || status_body.isEmpty()) {
+		String statusBody = status.optString(KEY_STATUS_BODY);
+		if (statusBody == null || statusBody.isEmpty()) {
 			return null;
 		}
-		return new MessageCenterStatus(status_body);
+		return new MessageCenterStatus(statusBody, null);
 	}
 
 	public MessageCenterStatus getErrorStatusServer() {
@@ -277,7 +278,7 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY), R.drawable.apptentive_icon_server_error);
 	}
 
 	public MessageCenterStatus getErrorStatusNetwork() {
@@ -289,6 +290,6 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY), R.drawable.apptentive_icon_no_connection);
 	}
 }

@@ -14,8 +14,10 @@ import org.json.JSONObject;
 public class MessageCenterStatus extends JSONObject implements MessageCenterListItem {
 
 	public final String body;
+	public final Integer icon;
 
-	public MessageCenterStatus(String body) {
+	public MessageCenterStatus(String body, Integer icon) {
 		this.body = body;
+		this.icon = icon;
 	}
 }

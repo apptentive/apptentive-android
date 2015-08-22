@@ -10,6 +10,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -19,23 +20,35 @@ import com.apptentive.android.sdk.R;
  */
 public class MessageCenterStatusView extends FrameLayout implements MessageCenterListItemView {
 
-	public TextView body;
+	public TextView bodyTextView;
+	public ImageView iconImageView;
 
 	public MessageCenterStatusView(Context context) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View view = inflater.inflate(R.layout.apptentive_message_center_status, this);
-		body = (TextView) view.findViewById(R.id.body);
+		bodyTextView = (TextView) view.findViewById(R.id.body);
+		iconImageView = (ImageView) view.findViewById(R.id.icon);
 	}
 
-	public void updateMessage(String body) {
-		if (this.body != null) {
-			this.body.setVisibility(View.VISIBLE);
-			this.body.setText(body);
-		} else {
-			this.body.setVisibility(View.GONE);
+	public void updateMessage(String body, Integer icon) {
+		if (bodyTextView != null) {
+			if (body != null) {
+				bodyTextView.setText(body);
+				bodyTextView.setVisibility(View.VISIBLE);
+			} else {
+				bodyTextView.setVisibility(View.GONE);
+			}
+		}
+
+		if (iconImageView != null) {
+			if (icon != null) {
+				iconImageView.setImageResource(icon);
+				iconImageView.setVisibility(View.VISIBLE);
+			} else {
+				iconImageView.setVisibility(View.GONE);
+			}
 		}
 	}
-
 }
