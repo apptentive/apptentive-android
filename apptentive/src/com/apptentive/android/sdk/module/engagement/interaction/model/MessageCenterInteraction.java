@@ -42,9 +42,7 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_AUTOMATED_MESSAGE = "automated_message";
 	public static final String KEY_AUTOMATED_MESSAGE_BODY = "body";
 	public static final String KEY_ERROR = "error_messages";
-	public static final String KEY_ERROR_HTTP_TITLE = "http_error_title";
 	public static final String KEY_ERROR_HTTP_BODY = "http_error_body";
-	public static final String KEY_ERROR_NETWORK_TITLE = "network_error_title";
 	public static final String KEY_ERROR_NETWORK_BODY = "network_error_body";
 	public static final String KEY_PROFILE = "profile";
 	public static final String KEY_PROFILE_REQUEST = "request";
@@ -254,7 +252,7 @@ public class MessageCenterInteraction extends Interaction {
 		return intent;
 	}
 
-	// Regular status showes customer's hours, expected time until response
+	// Regular status shows customer's hours, expected time until response
 	public MessageCenterStatus getRegularStatus() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
@@ -264,11 +262,11 @@ public class MessageCenterInteraction extends Interaction {
 		if (status == null) {
 			return null;
 		}
-		String status_body = status.optString(KEY_STATUS_BODY);
-		if (status_body == null || status_body.isEmpty()) {
+		String statusBody = status.optString(KEY_STATUS_BODY);
+		if (statusBody == null || statusBody.isEmpty()) {
 			return null;
 		}
-		return new MessageCenterStatus(null, status_body);
+		return new MessageCenterStatus(statusBody, null);
 	}
 
 	public MessageCenterStatus getErrorStatusServer() {
@@ -280,7 +278,7 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_TITLE), errorStatus.optString(KEY_ERROR_HTTP_BODY));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY), R.drawable.apptentive_icon_server_error);
 	}
 
 	public MessageCenterStatus getErrorStatusNetwork() {
@@ -292,6 +290,6 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_TITLE), errorStatus.optString(KEY_ERROR_NETWORK_BODY));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY), R.drawable.apptentive_icon_no_connection);
 	}
 }
