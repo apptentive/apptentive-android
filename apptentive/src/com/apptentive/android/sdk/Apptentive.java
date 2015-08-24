@@ -353,7 +353,7 @@ public class Apptentive {
 	 * currently use a push provider, and would like to receive push notifications sent from
 	 * Apptentive. You must first set up your app to GCM, per our documentation.
 	 *
-	 * @param context   The Context from which this method is called.
+	 * @param context        The Context from which this method is called.
 	 * @param registrationId The GCM Registration ID.
 	 */
 	public static void addApptentivePushIntegration(Context context, String registrationId) {
@@ -571,9 +571,10 @@ public class Apptentive {
 	 * Opens the Apptentive Message Center UI Activity
 	 *
 	 * @param activity The Activity from which to launch the Message Center
+	 * @return true if Message Center was shown, else false.
 	 */
-	public static void showMessageCenter(Activity activity) {
-		showMessageCenter(activity, null);
+	public static boolean showMessageCenter(Activity activity) {
+		return showMessageCenter(activity, null);
 	}
 
 	/**
@@ -583,14 +584,16 @@ public class Apptentive {
 	 *
 	 * @param activity   The Activity from which to launch the Message Center
 	 * @param customData A Map of key/value Strings that will be sent with the next message.
+	 * @return true if Message Center was shown, else false.
 	 */
-	public static void showMessageCenter(Activity activity, Map<String, String> customData) {
+	public static boolean showMessageCenter(Activity activity, Map<String, String> customData) {
 		try {
-			ApptentiveInternal.showMessageCenterInternal(activity, customData);
+			return ApptentiveInternal.showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
+		return false;
 	}
 
 	public static boolean canShowMessageCenter(Context context) {

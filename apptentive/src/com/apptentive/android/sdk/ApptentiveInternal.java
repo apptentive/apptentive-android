@@ -158,16 +158,18 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	public static void showMessageCenterInternal(Activity activity, Map<String, String> customData) {
+	public static boolean showMessageCenterInternal(Activity activity, Map<String, String> customData) {
+		boolean interactionShown = false;
 		if (EngagementModule.willShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
 			ApptentiveInternal.customData = customData;
-			boolean interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
 				ApptentiveInternal.customData = null;
 			}
 		} else {
 			showMessageCenterFallback(activity);
 		}
+		return interactionShown;
 	}
 
 	public static void showMessageCenterFallback(Activity activity) {
