@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,13 +11,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
+
+import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.util.Constants;
 
 /**
  * @author Sky Kelsey
  */
 public class AboutModule {
+
+	private static final String INTERACTION_NAME = "About";
+
+	private static final String EVENT_NAME_LAUNCH = "launch";
+	private static final String EVENT_NAME_CLOSE = "close";
+	private static final String EVENT_NAME_CANCEL = "cancel";
 
 	private static AboutModule instance = null;
 
@@ -38,6 +47,7 @@ public class AboutModule {
 	 * @param showBrandingBand  If true, show branding band on About page
 	 */
 	public void show(Activity activity, boolean showBrandingBand) {
+		EngagementModule.engage(activity, "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
 		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
@@ -57,6 +67,7 @@ public class AboutModule {
 		close.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				EngagementModule.engage(activity, "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
 				activity.finish();
 			}
 		});
@@ -85,7 +96,7 @@ public class AboutModule {
 	}
 
 	boolean onBackPressed(Activity activity) {
+		EngagementModule.engage(activity, "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
 		return true;
 	}
-
 }

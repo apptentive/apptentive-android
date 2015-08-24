@@ -29,12 +29,12 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterCompos
 /**
  * @author Barry Li
  */
-public class MessageCenterComposingActionBarView extends FrameLayout
-		implements MessageCenterListItemView {
+public class MessageCenterComposingActionBarView extends FrameLayout implements MessageCenterListItemView {
 
-
-	public MessageCenterComposingActionBarView(final Context context, final MessageCenterComposingItem item,
-																						 final MessageAdapter.OnComposingActionListener listener) {
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
+	public MessageCenterComposingActionBarView(final Context context, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);

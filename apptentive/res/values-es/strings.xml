@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Escribe una respuesta…</string>
   <string name="apptentive_survey_send_response">Enviar respuesta</string>
   <string name="apptentive_message_center_title">Centro de mensajes</string>
-  <string name="apptentive_message_center_compose_hint">Escribe un mensaje…</string>
-  <string name="apptentive_message_center_attachment_title">¿Enviar imagen?</string>
   <string name="apptentive_rating_provider_no_google_play">No se halló Google Play. Instala Google Play antes de valorar esta aplicación.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">No se halló Amazon Appstore. Instala Amazon Appstore antes de valorar esta aplicación.</string>
   <string name="apptentive_rating_provider_no_mikandi">No se halló MiKandi Market. Instala MiKandi Market antes de valorar esta aplicación.</string>

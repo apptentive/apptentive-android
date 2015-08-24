@@ -12,45 +12,34 @@
     <FrameLayout android:layout_width="match_parent"
                  android:layout_height="1dp"
                  android:background="#DCDCDC"/>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
+    <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:background="@color/apptentive_message_center_status_background"
                   android:gravity="center"
                   android:orientation="horizontal"
                   android:paddingBottom="48dp"
                   android:paddingTop="10dp">
-
-        <FrameLayout android:layout_width="0dp"
-                     android:layout_height="wrap_content"
-                     android:layout_weight="1"/>
-
-        <LinearLayout android:layout_width="0dp"
+        <LinearLayout android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:layout_weight="4"
+                      android:paddingLeft="@dimen/apptentive_message_center_status_side_padding"
+                      android:paddingRight="@dimen/apptentive_message_center_status_side_padding"
                       android:gravity="center"
-                      android:orientation="vertical">
-
-            <TextView android:id="@+id/title"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:textColor="?attr/apptentive_material_hint_text"
-                      android:textSize="24dp"
-                      android:textStyle="normal"/>
-
+                      android:orientation="@integer/apptentive_message_center_status_orientation">
+            <ImageView android:id="@+id/icon"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:paddingTop="12dp"
+                       android:paddingBottom="12dp"
+                       android:paddingRight="16dp"
+                       android:paddingLeft="16dp"
+                android:scaleType="center"/>
             <TextView android:id="@+id/body"
-                      android:layout_width="match_parent"
+                      android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:gravity="center"
+                      android:gravity="@integer/apptentive_message_center_status_text_gravity"
                       android:textColor="?attr/apptentive_material_hint_text"
-                      android:textSize="16dp"
+                      android:textSize="16sp"
                       android:textStyle="normal"/>
         </LinearLayout>
-
-        <FrameLayout android:layout_width="0dp"
-                     android:layout_height="wrap_content"
-                     android:layout_weight="1"/>
     </LinearLayout>
 </FrameLayout>

@@ -42,9 +42,7 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_AUTOMATED_MESSAGE = "automated_message";
 	public static final String KEY_AUTOMATED_MESSAGE_BODY = "body";
 	public static final String KEY_ERROR = "error_messages";
-	public static final String KEY_ERROR_HTTP_TITLE = "http_error_title";
 	public static final String KEY_ERROR_HTTP_BODY = "http_error_body";
-	public static final String KEY_ERROR_NETWORK_TITLE = "network_error_title";
 	public static final String KEY_ERROR_NETWORK_BODY = "network_error_body";
 	public static final String KEY_PROFILE = "profile";
 	public static final String KEY_PROFILE_REQUEST = "request";
@@ -68,6 +66,24 @@ public class MessageCenterInteraction extends Interaction {
 	// The server guarantees that an instance of this Interaction will be targetted to the following internal event name.
 	public static final String DEFAULT_INTERNAL_EVENT_NAME = "show_message_center";
 
+	// Events
+	public static final String EVENT_NAME_CLOSE = "close";
+	public static final String EVENT_NAME_CANCEL = "cancel";
+	public static final String EVENT_NAME_ATTACH = "attach";
+	public static final String EVENT_NAME_READ = "read";
+	public static final String EVENT_NAME_GREETING_MESSAGE = "greeting_message";
+	public static final String EVENT_NAME_COMPOSE_OPEN = "compose_open";
+	public static final String EVENT_NAME_COMPOSE_CLOSE = "compose_close";
+	public static final String EVENT_NAME_KEYBOARD_OPEN = "keyboard_open";
+	public static final String EVENT_NAME_KEYBOARD_CLOSE = "keyboard_close";
+	public static final String EVENT_NAME_STATUS = "status";
+	public static final String EVENT_NAME_MESSAGE_HTTP_ERROR = "message_http_error";
+	public static final String EVENT_NAME_MESSAGE_NETWORK_ERROR = "message_network_error";
+	public static final String EVENT_NAME_PROFILE_OPEN = "profile_open";
+	public static final String EVENT_NAME_PROFILE_CLOSE = "profile_close";
+	public static final String EVENT_NAME_PROFILE_NAME = "profile_name";
+	public static final String EVENT_NAME_PROFILE_EMAIL = "profile_email";
+	public static final String EVENT_NAME_PROFILE_SUBMIT = "profile_submit";
 
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
@@ -236,8 +252,8 @@ public class MessageCenterInteraction extends Interaction {
 		return intent;
 	}
 
-	// Regular status showes customer's hours, expected time until response
-	public MessageCenterStatus getRegularStatus(Context context) {
+	// Regular status shows customer's hours, expected time until response
+	public MessageCenterStatus getRegularStatus() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
@@ -246,40 +262,34 @@ public class MessageCenterInteraction extends Interaction {
 		if (status == null) {
 			return null;
 		}
-		String status_body = status.optString(KEY_STATUS_BODY);
-		if (status_body == null || status_body.isEmpty()) {
+		String statusBody = status.optString(KEY_STATUS_BODY);
+		if (statusBody == null || statusBody.isEmpty()) {
 			return null;
 		}
-		return new MessageCenterStatus(null, status_body);
+		return new MessageCenterStatus(statusBody, null);
 	}
 
-	public MessageCenterStatus getErrorStatusServer(Context context) {
+	public MessageCenterStatus getErrorStatusServer() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject error_status = configuration.optJSONObject(KEY_ERROR);
-		if (error_status == null) {
+		JSONObject errorStatus = configuration.optJSONObject(KEY_ERROR);
+		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(error_status.optString(KEY_ERROR_HTTP_TITLE,
-				context.getResources().getString(R.string.apptentive_message_center_status_error_title)),
-				error_status.optString(KEY_ERROR_HTTP_BODY,
-						context.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY), R.drawable.apptentive_icon_server_error);
 	}
 
-	public MessageCenterStatus getErrorStatusNetwork(Context context) {
+	public MessageCenterStatus getErrorStatusNetwork() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject error_status = configuration.optJSONObject(KEY_ERROR);
-		if (error_status == null) {
+		JSONObject errorStatus = configuration.optJSONObject(KEY_ERROR);
+		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(error_status.optString(KEY_ERROR_NETWORK_TITLE,
-				context.getResources().getString(R.string.apptentive_message_center_status_error_title)),
-				error_status.optString(KEY_ERROR_NETWORK_BODY,
-						context.getResources().getString(R.string.apptentive_message_center_status_error_body)));
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY), R.drawable.apptentive_icon_no_connection);
 	}
 }

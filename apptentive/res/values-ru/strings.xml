@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Введите ответ...</string>
   <string name="apptentive_survey_send_response">Отравить отзыв</string>
   <string name="apptentive_message_center_title">Центр сообщений</string>
-  <string name="apptentive_message_center_compose_hint">Введите сообщение...</string>
-  <string name="apptentive_message_center_attachment_title">Отправить фото?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play не найден. Установите Google Play, чтобы оценить это приложение.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore не найден. Установите Amazon Appstore, чтобы оценить это приложение.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market не найден. Установите MiKandi Market, чтобы оценить это приложение.</string>

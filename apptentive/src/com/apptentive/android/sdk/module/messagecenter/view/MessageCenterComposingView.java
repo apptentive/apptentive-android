@@ -27,6 +27,9 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 	private EditText et;
 
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
 	public MessageCenterComposingView(Context context, final MessageCenterComposingItem item,
 																		final MessageAdapter.OnComposingActionListener listener) {
 		super(context);
