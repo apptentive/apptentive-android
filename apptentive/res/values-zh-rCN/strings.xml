@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">请输入答案......</string>
   <string name="apptentive_survey_send_response">发送回复</string>
   <string name="apptentive_message_center_title">消息中心</string>
-  <string name="apptentive_message_center_compose_hint">键入一条消息......</string>
-  <string name="apptentive_message_center_attachment_title">发送图像？</string>
   <string name="apptentive_rating_provider_no_google_play">找不到谷歌市场。在对这个应用程序进行评分之前，请安装谷歌市场。</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">找不到亚马逊应用程序商店。在对这个应用程序进行评分之前，请安装亚马逊应用程序商店。</string>
   <string name="apptentive_rating_provider_no_mikandi">找不到 MiKandi 市场。在对这个应用程序进行评分之前，请安装 MiKandi 市场。</string>

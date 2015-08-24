@@ -8,7 +8,6 @@ package com.apptentive.android.dev;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -75,6 +74,17 @@ public class MainActivity extends ApptentiveActivity {
 				Toast.makeText(MainActivity.this, completed ? "Survey was completed." : "Survey was skipped.", Toast.LENGTH_SHORT).show();
 			}
 		};
+
+		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable e) {
+				Log.e("UncaughtException", e);
+				while (e.getCause() != null) {
+					e = e.getCause();
+					Log.e("Cause by:", e);
+				}
+			}
+		});
 
 		// Start IntentService to register this application with GCM.
 		Intent intent = new Intent(this, RegistrationIntentService.class);

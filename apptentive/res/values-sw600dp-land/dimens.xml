@@ -19,5 +19,8 @@
     <dimen name="apptentive_message_center_footer_height">64dp</dimen>
 
     <dimen name="apptentive_message_center_greeting_side_margin">128dp</dimen>
+
+    <dimen name="apptentive_message_center_status_side_padding">32dp</dimen>
+
     <dimen name="apptentive_message_center_error_side_margin">128dp</dimen>
 </resources>

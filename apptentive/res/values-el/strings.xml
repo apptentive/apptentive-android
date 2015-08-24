@@ -29,8 +29,6 @@
     <string name="apptentive_survey_singleline_hint">Συμπληρώστε μια απάντηση&#8230;</string>
     <string name="apptentive_survey_send_response">Αποστολή απάντησης</string>
     <string name="apptentive_message_center_title">Κέντρο μηνυμάτων</string>
-    <string name="apptentive_message_center_compose_hint">Πληκτρολογήστε ένα μήνυμα&#8230;</string>
-    <string name="apptentive_message_center_attachment_title">Αποστολή εικόνας;</string>
     <string name="apptentive_rating_provider_no_google_play">Δεν βρέθηκε το Google Play. Εγκαταστήστε το Google Play για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Το Amazon Appstore δεν βρέθηκε. Εγκαταστήστε το Amazon Appstore για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
     <string name="apptentive_rating_provider_no_mikandi">Το MiKandi Market δεν βρέθηκε. Εγκαταστήστε το MiKandi Market για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>

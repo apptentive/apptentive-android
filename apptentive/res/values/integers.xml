@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <!-- http://developer.android.com/reference/android/widget/LinearLayout.html#attr_android:orientation -->
+    <integer name="apptentive_orientation_horizontal">0</integer>
+    <integer name="apptentive_orientation_vertical">1</integer>
+
+    <!-- http://developer.android.com/reference/android/view/Gravity.html -->
+    <integer name="apptentive_gravity_center">17</integer>
+    <integer name="apptentive_gravity_left">3</integer>
+
+    <integer name="apptentive_message_center_status_orientation">@integer/apptentive_orientation_vertical</integer>
+    <integer name="apptentive_message_center_status_text_gravity">@integer/apptentive_gravity_center</integer>
+</resources>

@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">回答を入力。。。</string>
   <string name="apptentive_survey_send_response">回答を送信</string>
   <string name="apptentive_message_center_title">メッセージ センター</string>
-  <string name="apptentive_message_center_compose_hint">メッセージを入力。。。</string>
-  <string name="apptentive_message_center_attachment_title">画像を送信しますか？</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play が見つかりませんでした。このアプリを評価する前に、Google Play をインストールしてください。</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon App ストアが見つかりませんでした。このアプリを評価する前に、Amazon Appストアをインストールして下さい。</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market が見つかりませんでした。このアプリを評価する前に、MiKandi Market をインストールして下さい。</string>

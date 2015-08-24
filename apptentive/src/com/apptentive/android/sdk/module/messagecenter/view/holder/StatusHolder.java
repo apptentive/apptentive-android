@@ -15,18 +15,13 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterStatusV
  * @author Sky Kelsey
  */
 public class StatusHolder extends MessageCenterListItemHolder {
-	public TextView title;
 	public TextView body;
 
 	public StatusHolder(MessageCenterStatusView view) {
-		title = (TextView) view.findViewById(R.id.title);
 		body = (TextView) view.findViewById(R.id.body);
 	}
 
-	public void updateMessage(String title, String body) {
-		if (this.title != null) {
-			this.title.setText(title);
-		}
+	public void updateMessage(String body) {
 		if (this.body != null) {
 			this.body.setText(body);
 		}

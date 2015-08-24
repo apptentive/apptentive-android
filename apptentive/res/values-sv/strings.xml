@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Ange ett svar…</string>
   <string name="apptentive_survey_send_response">Skicka svar</string>
   <string name="apptentive_message_center_title">Meddelande-center</string>
-  <string name="apptentive_message_center_compose_hint">Skriv ett meddelande…</string>
-  <string name="apptentive_message_center_attachment_title">Skicka bild?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play hittades inte. Installera Google Play innan du betygsätter appen.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore hittades inte. Installera Amazon Appstore innan du betygsätter appen.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market hittades inte. Installera MiKandi Market innan du betygsätter appen.</string>

@@ -229,13 +229,19 @@ public class MessageManager {
 	}
 
 	public static void onSentMessage(Context context, ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
-		if (response == null || !response.isSuccessful()) {
+
+		if (response.isRejectedPermanently() || response.isBadPayload()) {
 			if (apptentiveMessage instanceof OutgoingFileMessage) {
 				((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
 			}
+			return;
+		}
+
+		if (response.isRejectedTemporarily()) {
 			onPauseSending(SEND_PAUSE_REASON_SERVER);
 			return;
 		}
+
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {

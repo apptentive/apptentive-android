@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Angiv et svar…</string>
   <string name="apptentive_survey_send_response">Send besvarelse</string>
   <string name="apptentive_message_center_title">Beskeder</string>
-  <string name="apptentive_message_center_compose_hint">Skriv en besked…</string>
-  <string name="apptentive_message_center_attachment_title">Sende et billede?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play blev ikke fundet. Installer Google Play, før du bedømmer appen.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore blev ikke fundet. Installer Amazon Appstore, før du bedømmer appen.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market blev ikke fundet. Installer MiKandi Market, før du bedømmer appen.</string>

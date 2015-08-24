@@ -28,6 +28,7 @@ public class PayloadSendWorker {
 	private static final int NO_TOKEN_SLEEP = 5000;
 	private static final int EMPTY_QUEUE_SLEEP_TIME = 5000;
 	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
+	private static final int SERVER_ERROR_SLEEP_TIME = 5000;
 
 	private static PayloadSendThread sPayloadSendThread;
 
@@ -159,6 +160,8 @@ public class PayloadSendWorker {
 							if (response.isException()) {
 								MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 								goToSleep(NO_CONNECTION_SLEEP_TIME);
+							} else {
+								goToSleep(SERVER_ERROR_SLEEP_TIME);
 							}
 						}
 					}
