@@ -14,7 +14,7 @@
     <TextView android:id="@+id/datestamp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveMessageCenterMessageDatestamp"/>
+              style="@style/ApptentiveTheme.TextViewStyle.TimeStamp"/>
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

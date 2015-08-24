@@ -28,7 +28,7 @@ public class IncomingTextMessageHolder extends MessageHolder {
 	}
 
 	public void updateMessage(String datestamp, String text) {
-		super.updateMessage(datestamp, null);
+		super.updateMessage(datestamp, 0, null);
 
 		if (this.text != null) {
 			this.text.setText(text);

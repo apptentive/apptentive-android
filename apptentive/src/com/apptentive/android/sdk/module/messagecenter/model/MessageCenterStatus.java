@@ -18,10 +18,12 @@ public class MessageCenterStatus extends JSONObject implements MessageCenterList
 
 	public final String title;
 	public final String body;
+	public final boolean isEmpty;
 
 	public MessageCenterStatus(String tile, String body) {
 		this.title = tile;
 		this.body = body;
+		this.isEmpty = (tile == null && body == null)? true:false;
 	}
 
 

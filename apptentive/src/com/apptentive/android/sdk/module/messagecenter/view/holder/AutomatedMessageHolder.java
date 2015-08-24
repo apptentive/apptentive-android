@@ -25,7 +25,7 @@ public class AutomatedMessageHolder extends MessageHolder {
 	}
 
 	public void updateMessage(String dateStamp, final AutomatedMessage newMessage) {
-		super.updateMessage(dateStamp, null);
+		super.updateMessage(dateStamp, 0, null);
 		body.setText(newMessage.getBody());
 	}
 }

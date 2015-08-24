@@ -91,7 +91,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private View messageCenterHeader;
 	private View headerDivider;
 	private ListView messageCenterListView; // List of apptentive messages
-	private View messageCenterFooter; // For showing branding
 	private EditText messageEditText; // Composing area
 	private View fab;
 
@@ -125,12 +124,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private String pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
 
-	// Animators for branding footer
-	AnimatorSet showAnimatorSet;
-	AnimatorSet dismissAnimatorSet;
 
-	protected static final int MSG_SHOW_BRANDING = 1;
-	protected static final int MSG_HIDE_BRANDING = 2;
 	protected static final int MSG_SCROLL_TO_BOTTOM = 3;
 	protected static final int MSG_SCROLL_FROM_TOP = 4;
 	protected static final int MSG_MESSAGE_SENT = 5;
@@ -144,14 +138,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		public boolean handleMessage(Message msg) {
 
 			switch (msg.what) {
-				case MSG_SHOW_BRANDING: {
-					animateShow();
-					break;
-				}
-				case MSG_HIDE_BRANDING: {
-					animateHide();
-					break;
-				}
 				case MSG_SCROLL_TO_BOTTOM: {
 					messageCenterListAdapter.notifyDataSetChanged();
 					messageCenterListView.setSelection(messages.size() - 1);
@@ -295,22 +281,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setItemsCanFocus(true);
 		messageCenterListView.setOnScrollListener(this);
-		// Setup branding footer
-		messageCenterFooter = viewActivity.findViewById(R.id.footer_bar);
-
-		if (messageCenterFooter != null) {
-			String brandingStr = interaction.getBranding();
-			if (brandingStr == null) {
-				messageCenterFooter = null;
-			} else {
-				messageCenterFooter.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						AboutModule.getInstance().show(viewActivity, false);
-					}
-				});
-			}
-		}
 
 		fab = viewActivity.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -320,7 +290,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		});
-
 		if (messageCenterListAdapter == null) {
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(viewActivity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
@@ -349,8 +318,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				if (!addWhoCardInitRequired()) {
 					addComposingArea();
 				}
-			} else if (messageCenterFooter != null) {
-				messageCenterFooter.setVisibility(View.VISIBLE);
+			} else {
+				addNewStatusItem(new MessageCenterStatus(null, null));
 			}
 
 			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this);
@@ -431,8 +400,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public boolean onBackPressed(Activity activity) {
 		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
-		clearComposingUi();
-		clearWhoCardUi();
+		clearComposingUi(null);
+		clearWhoCardUi(null);
 		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
@@ -513,6 +482,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		savePendingComposingMessage();
 		clearStatus();
 		messages.add(contextualMessage);
+		// If addWhoCardInitRequired returns true, it will add WhoCard
 		if (!addWhoCardInitRequired()) {
 			addComposingArea();
 		}
@@ -520,7 +490,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	public void addComposingArea() {
 		fab.setVisibility(View.INVISIBLE);
-		hideBranding();
 		clearStatus();
 		actionBarItem = interaction.getComposerBar();
 		messages.add(actionBarItem);
@@ -545,7 +514,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 		pendingWhoCardMode = mode;
 		fab.setVisibility(View.INVISIBLE);
-		hideBranding();
 		clearStatus();
 		whoCardItem = (mode == WHO_CARD_MODE_INIT) ? interaction.getWhoCardInit()
 				: interaction.getWhoCardEdit();
@@ -577,28 +545,48 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public void addNewIncomingMessageItem(ApptentiveMessage message) {
-		clearStatus();
-		int composingAreaIndex = 0;
-		// If user is composing message or WhoCard, new incoming message will be inserted in front
-		if (composingItem != null || whoCardItem != null) {
-			composingAreaIndex = messages.size() - 2;
-			messages.add(composingAreaIndex, message);
+		boolean hasEmptyStatus = false;
+		boolean needEmptyStatus = false;
+		if (statusItem != null && statusItem.isEmpty) {
+			hasEmptyStatus = true;
 		} else {
-			messages.add(message);
+			clearStatus();
 		}
+		// Determine where to insert the new incoming message
+		int insertIndex = messages.size();
+		if (composingItem != null) {
+			// when in composing mode, there are composing action bar and composing area
+			insertIndex -= 2;
+			if (contextualMessage != null) {
+				insertIndex--;
+			}
+		} else if (whoCardItem != null) {
+			insertIndex -= 1;
+			if (contextualMessage != null) {
+				insertIndex--;
+			}
+		} else if (hasEmptyStatus) {
+			insertIndex -= 1;
+		} else {
+			needEmptyStatus = true;
+		}
+		messages.add(insertIndex, message);
 
 		int firstIndex = messageCenterListView.getFirstVisiblePosition();
 		int lastIndex = messageCenterListView.getLastVisiblePosition();
-		boolean composingAreaTakesUpVisibleArea = firstIndex <= composingAreaIndex && composingAreaIndex < lastIndex;
+		boolean composingAreaTakesUpVisibleArea = firstIndex <= insertIndex && insertIndex < lastIndex;
 		if (composingAreaTakesUpVisibleArea) {
 			View v = messageCenterListView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
 			updateMessageTimeStamps();
 			// Restore the position of listview to composing view
 			messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-					composingAreaIndex, top));
+					insertIndex, top));
 		} else {
 			updateMessageTimeStamps();
+			if (needEmptyStatus) {
+				addNewStatusItem(new MessageCenterStatus(null, null));
+			}
 			messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 		}
 
@@ -608,6 +596,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		// Remove the status message whenever a new incoming message is added
 		if (statusItem != null) {
 			messages.remove(statusItem);
+			messageCenterListAdapter.notifyDataSetChanged();
 			statusItem = null;
 		}
 	}
@@ -669,30 +658,31 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterViewHandler.sendEmptyMessage(MSG_RESUME_SENDING);
 	}
 
-	public void clearWhoCardUi() {
+	public void clearWhoCardUi(Animator.AnimatorListener al) {
 		if (whoCardItem != null) {
-			messages.remove(whoCardItem);
-			whoCardItem = null;
-			pendingWhoCardName = null;
-			pendingWhoCardEmail = null;
-			pendingWhoCardAvatarFile = null;
-			pendingWhoCardMode = 0;
-			messageCenterListAdapter.clearWhoCard();
-			messageCenterListAdapter.notifyDataSetChanged();
-			Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+			if (al != null) {
+				deleteItemWithAnimation(messageCenterListAdapter.getWhoCardView(), al);
+			} else {
+				whoCardItem = null;
+				pendingWhoCardName = null;
+				pendingWhoCardEmail = null;
+				pendingWhoCardAvatarFile = null;
+				pendingWhoCardMode = 0;
+				messageCenterListAdapter.clearWhoCard();
+			}
 		}
 	}
 
-	public void clearComposingUi() {
+	public void clearComposingUi(Animator.AnimatorListener al) {
 		if (composingItem != null) {
-			messages.remove(actionBarItem);
-			messages.remove(composingItem);
-			actionBarItem = null;
-			composingItem = null;
-			messageEditText = null;
-			messageCenterListAdapter.clearComposing();
-			messageCenterListAdapter.notifyDataSetChanged();
-			Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+			if (al != null) {
+				deleteItemWithAnimation(messageCenterListAdapter.getComposingAreaView(), al);
+			} else {
+				actionBarItem = null;
+				composingItem = null;
+				messageEditText = null;
+				messageCenterListAdapter.clearComposing();
+			}
 		}
 	}
 
@@ -728,7 +718,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onComposing(String composingStr, boolean scroll) {
+	public void onComposing(String composingStr) {
 	}
 
 	@Override
@@ -737,13 +727,36 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			messages.remove(contextualMessage);
 			contextualMessage = null;
 		}
-		clearComposingUi();
-		View fab = viewActivity.findViewById(R.id.composing_fab);
-		fab.setVisibility(View.VISIBLE);
-		View profileButton = viewActivity.findViewById(R.id.profile);
-		profileButton.setVisibility(View.VISIBLE);
-		showBranding();
-		savePendingComposingMessage();
+		clearComposingUi(new Animator.AnimatorListener() {
+
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				messages.remove(actionBarItem);
+				messages.remove(composingItem);
+				actionBarItem = null;
+				composingItem = null;
+				messageEditText = null;
+				messageCenterListAdapter.clearComposing();
+				messageCenterListAdapter.needInflateComposing = true;
+				messageCenterListAdapter.notifyDataSetChanged();
+				Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+				showFab();
+				// messageEditText has been set to null, pending composing message will reset
+				savePendingComposingMessage();
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		});
 	}
 
 	@Override
@@ -753,39 +766,94 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			MessageManager.sendMessage(viewActivity.getApplicationContext(), contextualMessage);
 			contextualMessage = null;
 		}
-		String messageText = getPendingComposingContent().toString().trim();
+		final String messageText = getPendingComposingContent().toString().trim();
 		// Close all composing UI
-		onCancelComposing();
-		// Send out the new message
-		if (!messageText.isEmpty()) {
-			OutgoingTextMessage message = new OutgoingTextMessage();
-			message.setBody(messageText);
-			message.setRead(true);
-			message.setCustomData(ApptentiveInternal.getAndClearCustomData());
-			MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
-			addNewOutGoingMessageItem(message);
-			SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-			if (!bWhoCardSet) {
-				addWhoCard(WHO_CARD_MODE_INIT);
-				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		clearComposingUi(new Animator.AnimatorListener() {
+
+			@Override
+			public void onAnimationStart(Animator animation) {
 			}
-		}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				messages.remove(actionBarItem);
+				messages.remove(composingItem);
+				actionBarItem = null;
+				composingItem = null;
+				messageEditText = null;
+				messageCenterListAdapter.clearComposing();
+				messageCenterListAdapter.needInflateComposing = true;
+				messageCenterListAdapter.notifyDataSetChanged();
+				savePendingComposingMessage();
+				// Send out the new message
+				if (!messageText.isEmpty()) {
+					OutgoingTextMessage message = new OutgoingTextMessage();
+					message.setBody(messageText);
+					message.setRead(true);
+					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
+					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
+					addNewOutGoingMessageItem(message);
+					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+					if (!bWhoCardSet) {
+						addWhoCard(WHO_CARD_MODE_INIT);
+						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+						return;
+					}
+				}
+				Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+				showFab();
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		});
 	}
 
 	@Override
 	public void onCloseWhoCard() {
-		clearWhoCardUi();
+		clearWhoCardUi(new Animator.AnimatorListener() {
 
-		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-		saveWhoCardSetState();
-		if (!bWhoCardSet && interaction.getWhoCardRequired()) {
-			addComposingArea();
-			return;
-		}
-		fab.setVisibility(View.VISIBLE);
-		animateShow();
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				messages.remove(whoCardItem);
+				messageCenterListAdapter.needInflateWhoCard = true;
+				whoCardItem = null;
+				pendingWhoCardName = null;
+				pendingWhoCardEmail = null;
+				pendingWhoCardAvatarFile = null;
+				pendingWhoCardMode = 0;
+				messageCenterListAdapter.clearWhoCard();
+				messageCenterListAdapter.notifyDataSetChanged();
+				SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+				saveWhoCardSetState();
+				if (!bWhoCardSet && interaction.getWhoCardRequired()) {
+					addComposingArea();
+				} else {
+					Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+					showFab();
+				}
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		});
+
 	}
 
 	@Override
@@ -890,69 +958,19 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		return null;
 	}
 
-	private void showBranding() {
-		if (messageCenterFooter != null) {
-			messageCenterViewHandler.removeMessages(MSG_HIDE_BRANDING);
-			messageCenterViewHandler.removeMessages(MSG_SHOW_BRANDING);
-			messageCenterViewHandler.sendEmptyMessage(MSG_SHOW_BRANDING);
+
+	private void deleteItemWithAnimation(final View v, final Animator.AnimatorListener al) {
+		if (v == null) {
+			return;
 		}
+		AnimatorSet animatorSet = Util.buildListViewRowRemoveAnimator(v, al);
+		animatorSet.start();
 	}
 
-	private void hideBranding() {
-		if (messageCenterFooter != null) {
-			messageCenterViewHandler.removeMessages(MSG_HIDE_BRANDING);
-			messageCenterViewHandler.removeMessages(MSG_SHOW_BRANDING);
-			messageCenterViewHandler.sendEmptyMessage(MSG_HIDE_BRANDING);
-		}
-	}
-
-	private void animateShow() {
-		// Clear previous animations
-		if (dismissAnimatorSet != null && dismissAnimatorSet.isRunning()) {
-			dismissAnimatorSet.cancel();
-		}
-		if (showAnimatorSet == null || !showAnimatorSet.isRunning()) {
-			showAnimatorSet = new AnimatorSet();
-			// Bring the view back
-			messageCenterFooter.setVisibility(View.VISIBLE);
-			ObjectAnimator footerAnimator = ObjectAnimator.ofFloat(messageCenterFooter, "translationY", messageCenterFooter.getTranslationY(), 0f);
-			ArrayList<Animator> animators = new ArrayList<>();
-			animators.add(footerAnimator);
-			showAnimatorSet.setDuration(300);
-			showAnimatorSet.playTogether(animators);
-			showAnimatorSet.start();
-		}
-	}
-
-	private void animateHide() {
-		// Clear previous animations
-		if (showAnimatorSet != null && showAnimatorSet.isRunning()) {
-			showAnimatorSet.cancel();
-		}
-		if (dismissAnimatorSet == null || !dismissAnimatorSet.isRunning()) {
-			dismissAnimatorSet = new AnimatorSet();
-			ObjectAnimator footerAnimator = ObjectAnimator.ofFloat(messageCenterFooter, "translationY",
-					messageCenterFooter.getTranslationY(), messageCenterFooter.getHeight());
-			ArrayList<Animator> animators = new ArrayList<>();
-			animators.add(footerAnimator);
-			dismissAnimatorSet.setDuration(200);
-			dismissAnimatorSet.addListener(
-					new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationStart(Animator animator) {
-
-						}
-
-						@Override
-						public void onAnimationEnd(Animator animator) {
-							messageCenterFooter.setVisibility(View.GONE);
-						}
-					}
-			);
-
-			dismissAnimatorSet.playTogether(animators);
-			dismissAnimatorSet.start();
-		}
+	private void showFab() {
+		// add an empty status at the bottom so that fab does not block any message
+		addNewStatusItem(new MessageCenterStatus(null, null));
+		fab.setVisibility(View.VISIBLE);
 	}
 
 }

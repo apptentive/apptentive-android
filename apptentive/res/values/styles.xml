@@ -21,6 +21,7 @@
         <item name="apptentive_material_secondary_text">@color/apptentive_material_dark_secondary_text
         </item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_dark_hint_text</item>
+        <item name="apptentive_material_disabled_text">@color/apptentive_material_dark_disabled_text</item>
         <item name="apptentive_material_divider">@color/apptentive_material_dark_divider</item>
         <item name="apptentive_material_selected">@color/apptentive_material_dark_selected</item>
         <item name="apptentive_material_selected_text">@color/apptentive_material_dark_selected_text</item>
@@ -72,6 +73,7 @@
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
+        <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text</item>
         <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
         <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
         <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
@@ -122,6 +124,7 @@
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text</item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
+        <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text</item>
         <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
         <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
         <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
@@ -158,9 +161,14 @@
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
     </style>
 
+    <style name="ApptentiveTheme.Widget.CardView.Composing">
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
     <style name="ApptentiveTheme.Widget.CardContent.Outgoing" parent="android:Widget">
         <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">106dp</item>
+        <item name="android:paddingRight">16dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:orientation">vertical</item>
@@ -183,19 +191,18 @@
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle" parent="@android:style/TextAppearance">
-        <item name="android:textSize">14dp</item>
+        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:gravity">left</item>
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="ApptentiveTheme.TextViewStyle.Message">
-        <item name="android:gravity">left</item>
-    </style>
-
     <style name="ApptentiveTheme.TextViewStyle.Status">
-        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
+        <item name="android:textColor">?attr/apptentive_material_disabled_text</item>
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.TimeStamp">
@@ -375,16 +382,6 @@
         <item name="android:orientation">vertical</item>
     </style>
 
-    <style name="ApptentiveMessageCenterMessageDatestamp">
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:gravity">left|bottom</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#737373</item>
-        <item name="android:minHeight">56dp</item>
-    </style>
-
     <style name="ApptentiveMessageCenterOutgoingMessageStatus">
         <item name="android:padding">0dp</item>
         <item name="android:gravity">left</item>
@@ -394,8 +391,7 @@
     </style>
 
     <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
         <item name="progressBarColor">?attr/colorAccent</item>
     </style>
 </resources>
