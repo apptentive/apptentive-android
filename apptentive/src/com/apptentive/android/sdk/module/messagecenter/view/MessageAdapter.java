@@ -23,7 +23,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
@@ -84,7 +83,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	// If message sending is paused or not
 	private boolean isInPauseState = false;
 
-	private Context context;
+	private Context activityContext;
 
 	private MessageCenterInteraction interaction;
 
@@ -123,12 +122,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		void onCloseWhoCard(String buttonLabel);
 	}
 
-	/**
-	 * @param context Must be a Context with theme set, such as an Activity
-	 */
-	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
-		super(context, 0, (List<T>) items);
-		this.context = context;
+	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
+		super(activityContext, 0, (List<T>) items);
+		this.activityContext = activityContext;
 		this.composingActionListener = listener;
 		this.interaction = interaction;
 	}
@@ -225,21 +221,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(context,
-								(MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					view = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					view = new MessageCenterComposingActionBarView(context,
-							(MessageCenterComposingItem) listItem, composingActionListener);
+					view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
-						whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+						whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
 						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}
@@ -264,14 +258,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			 */
 			if (type == TYPE_COMPOSING_AREA) {
 				if (needInflateComposing || composingView == null) {
-					composingView = new MessageCenterComposingView(context,
+					composingView = new MessageCenterComposingView(activityContext,
 							(MessageCenterComposingItem) listItem, composingActionListener);
 					setupComposingView(position);
 				}
 				view = composingView;
 			} else if (type == TYPE_WHOCARD) {
 				if (needInflateWhoCard || whoCardView == null) {
-					whoCardView = new MessageCenterWhoCardView(context, composingActionListener);
+					whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
 					whoCardView.updateUi((MessageCenterComposingItem) listItem);
 					setupWhoCardView(position);
 				}
@@ -460,19 +454,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	protected String createStatus(Double seconds) {
 		if (seconds == null) {
-			return isInPauseState ? context.getResources().getString(R.string.apptentive_failed) : null;
+			return isInPauseState ? activityContext.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return context.getResources().getString(R.string.apptentive_sent);
+		return activityContext.getResources().getString(R.string.apptentive_sent);
 	}
 
 	protected int getStatusColor(Double seconds) {
 		if (seconds == null) {
 			// failed color (red)
-			return isInPauseState ? Util.getThemeColorFromAttrOrRes(context, R.attr.apptentive_material_selected_text,
+			return isInPauseState ? Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_selected_text,
 					R.color.apptentive_material_selected_text) : 0;
 		}
 		// other status color
-		return Util.getThemeColorFromAttrOrRes(context, R.attr.apptentive_material_disabled_text,
+		return Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_text,
 				R.color.apptentive_material_disabled_text);
 	}
 
@@ -480,13 +474,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		Point ret = null;
 		FileInputStream fis = null;
 		try {
-			fis = context.openFileInput(storedFile.getLocalFilePath());
+			fis = activityContext.openFileInput(storedFile.getLocalFilePath());
 
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
 			BitmapFactory.decodeStream(fis, null, options);
 
-			Point point = Util.getScreenSize(context);
+			Point point = Util.getScreenSize(activityContext.getApplicationContext());
 			int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 			int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 			maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
@@ -532,9 +526,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal((Activity)context, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
-			MessageManager.updateMessage(context, textMessages[0]);
-			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
+			if (activityContext instanceof Activity) {
+				EngagementModule.engageInternal((Activity) activityContext, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+			}
+			MessageManager.updateMessage(activityContext.getApplicationContext(), textMessages[0]);
+			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(activityContext.getApplicationContext()));
 			return null;
 		}
 
@@ -551,7 +547,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
-		StoredFile storedFile = message.getStoredFile(context);
+		StoredFile storedFile = message.getStoredFile(activityContext.getApplicationContext());
 		if (storedFile == null) {
 			return;
 		}
@@ -592,8 +588,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			FileInputStream fis = null;
 			Bitmap imageBitmap = null;
 			try {
-				fis = context.openFileInput(paths[0]);
-				Point point = Util.getScreenSize(context);
+				fis = activityContext.openFileInput(paths[0]);
+				Point point = Util.getScreenSize(activityContext.getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;

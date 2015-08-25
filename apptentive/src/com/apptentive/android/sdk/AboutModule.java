@@ -57,6 +57,9 @@ public class AboutModule {
 
 	void doShow(final Activity activity, boolean showBrandingBand) {
 		activity.setContentView(R.layout.apptentive_about);
+
+		final String packageName = activity.getPackageName();
+
 		if (!showBrandingBand) {
 			activity.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
 		} else {
@@ -76,7 +79,7 @@ public class AboutModule {
 		information.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com"));
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://www.apptentive.com/?source=%s", packageName)));
 				activity.startActivity(browserIntent);
 			}
 		});
@@ -85,7 +88,7 @@ public class AboutModule {
 		privacy.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apptentive.com/privacy"));
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://www.apptentive.com/privacy/?source=%s", packageName)));
 				activity.startActivity(browserIntent);
 			}
 		});

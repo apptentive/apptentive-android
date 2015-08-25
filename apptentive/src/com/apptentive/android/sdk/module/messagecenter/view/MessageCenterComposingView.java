@@ -27,14 +27,10 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 	private EditText et;
 
-	/**
-	 * @param context Must be a Context with theme set, such as an Activity
-	 */
-	public MessageCenterComposingView(Context context, final MessageCenterComposingItem item,
-																		final MessageAdapter.OnComposingActionListener listener) {
-		super(context);
+	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
+		super(activityContext);
 
-		LayoutInflater inflater = LayoutInflater.from(context);
+		LayoutInflater inflater = LayoutInflater.from(activityContext);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
 		if (item.str_2 != null) {
@@ -61,5 +57,4 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	public EditText getEditText() {
 		return et;
 	}
-
 }
