@@ -36,14 +36,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private Button skipButton;
 	private Button sendButton;
 
-	/**
-	 * @param context Must be a Context with theme set, such as an Activity
-	 */
-	public MessageCenterWhoCardView(Context context,
-																	final MessageAdapter.OnComposingActionListener listener) {
-		super(context);
-    this.listener = listener;
-		LayoutInflater inflater = LayoutInflater.from(context);
+	public MessageCenterWhoCardView(Context activityContext, final MessageAdapter.OnComposingActionListener listener) {
+		super(activityContext);
+		this.listener = listener;
+		LayoutInflater inflater = LayoutInflater.from(activityContext);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
 		title = (TextView) parentView.findViewById(R.id.who_title);
 

@@ -31,13 +31,10 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterCompos
  */
 public class MessageCenterComposingActionBarView extends FrameLayout implements MessageCenterListItemView {
 
-	/**
-	 * @param context Must be a Context with theme set, such as an Activity
-	 */
-	public MessageCenterComposingActionBarView(final Context context, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
-		super(context);
+	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
+		super(activityContext);
 
-		LayoutInflater inflater = LayoutInflater.from(context);
+		LayoutInflater inflater = LayoutInflater.from(activityContext);
 		inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
 
 		View closeButton = findViewById(R.id.cancel_composing);
@@ -50,7 +47,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 				bundle.putString("STR_3", item.str_3);
 				bundle.putString("STR_4", item.str_4);
 				editNameDialog.setArguments(bundle);
-				editNameDialog.show(((Activity) context).getFragmentManager(), "CloseConfirmationDialog");
+				editNameDialog.show(((Activity) activityContext).getFragmentManager(), "CloseConfirmationDialog");
 			}
 		});
 
