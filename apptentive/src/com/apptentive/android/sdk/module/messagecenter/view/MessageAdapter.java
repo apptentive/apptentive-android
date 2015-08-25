@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -101,6 +102,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private EditText emailEditText;
 	private EditText nameEditText;
 
+	// Variables to track showing animation on incoming/outgoing messages
+	private int lastAnimatedPosition;
+	private boolean showAnimation;
+
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
 
@@ -180,8 +185,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		final View view;
-		MessageCenterListItem listItem = getItem(position);
+		showAnimation = false;
 
+		MessageCenterListItem listItem = getItem(position);
 		int type = getItemViewType(position);
 		MessageCenterListItemHolder holder = null;
 		boolean bLoadAvatar = false;
@@ -213,9 +219,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_STATUS: {
-					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
 					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext());
-					newView.updateMessage(statusItem.body, statusItem.icon);
 					view = newView;
 					break;
 				}
@@ -279,6 +283,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (holder != null) {
 			switch (type) {
 				case TYPE_TEXT_INCOMING: {
+					showAnimation = true;
 					if (bLoadAvatar) {
 						ImageUtil.startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
 								((IncomingTextMessage) listItem).getSenderProfilePhoto());
@@ -293,6 +298,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_TEXT_OUTGOING: {
+					showAnimation = true;
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
 					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
 					Double createdTime = ((OutgoingTextMessage) listItem).getCreatedAt();
@@ -303,6 +309,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {
+					showAnimation = true;
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
 					if (holder.position != position) {
 						holder.position = position;
@@ -318,7 +325,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.body);
+					((StatusHolder) holder).updateMessage(status.body, status.icon);
 					break;
 				}
 				case TYPE_AUTO: {
@@ -344,6 +351,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					emailEditText.requestFocus();
 				}
 			}
+		}
+		if (showAnimation && position > lastAnimatedPosition) {
+			AnimatorSet set = Util.buildListViewRowShowAnimator(view, null, null);
+			set.start();
+			lastAnimatedPosition = position;
 		}
 		return view;
 	}
@@ -385,6 +397,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void setupComposingView(final int position) {
 		composingEditText = composingView.getEditText();
+		composingViewIndex = position;
 		needInflateComposing = false;
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -395,6 +408,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, null, null);
+		set.start();
 		composingActionListener.onComposingViewCreated();
 	}
 
@@ -430,6 +445,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, null, null);
+		set.start();
 		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
 	}
 

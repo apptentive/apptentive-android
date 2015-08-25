@@ -32,23 +32,4 @@ public class MessageCenterStatusView extends FrameLayout implements MessageCente
 		iconImageView = (ImageView) view.findViewById(R.id.icon);
 	}
 
-	public void updateMessage(String body, Integer icon) {
-		if (bodyTextView != null) {
-			if (body != null) {
-				bodyTextView.setText(body);
-				bodyTextView.setVisibility(View.VISIBLE);
-			} else {
-				bodyTextView.setVisibility(View.GONE);
-			}
-		}
-
-		if (iconImageView != null) {
-			if (icon != null) {
-				iconImageView.setImageResource(icon);
-				iconImageView.setVisibility(View.VISIBLE);
-			} else {
-				iconImageView.setVisibility(View.GONE);
-			}
-		}
-	}
 }

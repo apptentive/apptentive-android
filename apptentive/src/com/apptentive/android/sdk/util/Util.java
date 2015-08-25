@@ -49,8 +49,7 @@ public class Util {
 	public static final String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
 	public static final String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
 
-	public static final int ANIMATION_DURATION = 500;
-	protected static final long DEFAULTANIMATIONDELAYMILLIS = 150;
+	public static final int ANIMATION_DURATION = 300;
 
 	public static String dateToIso8601String(long millis) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
@@ -520,33 +519,48 @@ public class Util {
 	}
 
 	public static AnimatorSet buildListViewRowRemoveAnimator(final View view,
-																													 Animator.AnimatorListener al) {
+																													 Animator.AnimatorListener al,
+																													 ValueAnimator.AnimatorUpdateListener vl
+																													 ) {
 
 		AnimatorSet animatorSet = new AnimatorSet();
 		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", 0, 90);
 		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
 		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
-		final int height = view.getMeasuredHeight();
-		valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+		if (vl != null) {
+			valueAnimator.addUpdateListener(vl);
+		}
 
-			@Override
-			public void onAnimationUpdate(ValueAnimator animation) {
-				Float value = (Float) animation.getAnimatedValue();
-				if (value >= 1) {
-					view.setVisibility(View.GONE);
-				} else {
-					view.getLayoutParams().height = height
-							- (int) (height * value);
-					view.requestLayout();
-				}
-			}
-		});
+		animX.setDuration(ANIMATION_DURATION);
+		animAlpha.setDuration(ANIMATION_DURATION);
+		valueAnimator.setDuration(ANIMATION_DURATION + ANIMATION_DURATION + 100);
+		animatorSet.playTogether(animX, animAlpha, valueAnimator);
+		if (al != null) {
+			animatorSet.addListener(al);
+		}
+		return animatorSet;
+	}
+
+	public static AnimatorSet buildListViewRowShowAnimator(final View view,
+																													 Animator.AnimatorListener al,
+																													 ValueAnimator.AnimatorUpdateListener vl
+	) {
+
+		AnimatorSet animatorSet = new AnimatorSet();
+		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", -90, 0);
+		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
+		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
+		if (vl != null) {
+			valueAnimator.addUpdateListener(vl);
+		}
 
 		animX.setDuration(ANIMATION_DURATION);
 		animAlpha.setDuration(ANIMATION_DURATION);
 		valueAnimator.setDuration(ANIMATION_DURATION);
 		animatorSet.playTogether(animX, animAlpha, valueAnimator);
-		animatorSet.addListener(al);
+		if (al != null) {
+			animatorSet.addListener(al);
+		}
 		return animatorSet;
 	}
 

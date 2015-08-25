@@ -45,7 +45,7 @@
     <dimen name="apptentive_dialog_button_spacing">8dp</dimen>
     <dimen name="apptentive_dialog_button_text">15sp</dimen>
 
-    <dimen name="apptentive_message_center_header_height">48dp</dimen>
+    <dimen name="apptentive_message_center_header_height">56dp</dimen>
     <dimen name="apptentive_message_center_icon_dimension">48dp</dimen>
     <dimen name="apptentive_message_center_message_list_margin">0dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">0dp</dimen>
