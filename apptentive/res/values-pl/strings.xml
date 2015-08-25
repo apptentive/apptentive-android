@@ -63,7 +63,7 @@
     <string name="apptentive_message_center_attachment_title">Wysłać obraz?</string>
 
     <!-- This is a Java format. -->
-    <string name="apptentive_message_sent_timestamp_format">MMM dd, rrrr h:mma</string>
+    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
 
     <string name="apptentive_message_auto_body_manual">Oto nasze Centrum wiadomości. Jeśli masz jakieś pytania, sugestie, wątpliwości lub po prostu chcesz się z nami skontaktować, napisz do nas. Uwielbiamy być w kontakcie z naszymi Klientami!</string>
     <string name="apptentive_message_auto_body_no_love">Co możemy zrobić, abyś rozkochać Cię w naszej aplikacji? Doceniamy Twoją konstruktywną opinię.</string>
