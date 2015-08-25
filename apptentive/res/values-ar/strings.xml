@@ -29,8 +29,6 @@
     <string name="apptentive_survey_singleline_hint">قم بإدخال إجابة...</string>
     <string name="apptentive_survey_send_response">إرسال الرد</string>
     <string name="apptentive_message_center_title">مركز الرسائل</string>
-    <string name="apptentive_message_center_compose_hint">اكتب رسالة...</string>
-    <string name="apptentive_message_center_attachment_title">إرسال الصورة؟</string>
     <string name="apptentive_rating_provider_no_google_play">لم يتم العثور على غوغل بلاي. الرجاء تثبيت غوغل بلاي قبل تقييم هذا التطبيق.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">لم يتم العثور على أمازون ابستور. الرجاء تثبيت أمازون ابستور قبل تقييم هذا التطبيق.</string>
     <string name="apptentive_rating_provider_no_mikandi">لم يتم العثور على ميكاندي ماركت. الرجاء تثبيت ميكاندي ماركت قبل تقييم هذا التطبيق.</string>

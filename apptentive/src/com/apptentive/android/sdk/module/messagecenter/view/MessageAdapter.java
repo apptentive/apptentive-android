@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +22,9 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
@@ -38,18 +42,18 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenter
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 
 import java.lang.ref.WeakReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Sky Kelsey
@@ -82,6 +86,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private Context context;
 
+	private MessageCenterInteraction interaction;
+
 	// Variables used in composing message
 	public boolean needInflateComposing;
 	private int composingViewIndex = INVALID_POSITION;
@@ -112,15 +118,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
 
-		void onCloseWhoCard();
+		void onSubmitWhoCard(String buttonLabel);
 
-
+		void onCloseWhoCard(String buttonLabel);
 	}
 
-	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener) {
+	/**
+	 * @param context Must be a Context with theme set, such as an Activity
+	 */
+	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
 		super(context, 0, (List<T>) items);
 		this.context = context;
 		this.composingActionListener = listener;
+		this.interaction = interaction;
 	}
 
 	@Override
@@ -209,7 +219,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_STATUS: {
 					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
 					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext());
-					newView.updateMessage(statusItem.title, statusItem.body);
+					newView.updateMessage(statusItem.body, statusItem.icon);
 					view = newView;
 					break;
 				}
@@ -314,7 +324,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.title, status.body);
+					((StatusHolder) holder).updateMessage(status.body);
 					break;
 				}
 				case TYPE_AUTO: {
@@ -515,9 +525,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		@Override
 		protected Void doInBackground(IncomingTextMessage... textMessages) {
 			textMessages[0].setRead(true);
-			Map<String, String> data = new HashMap<>();
-			data.put("message_id", textMessages[0].getId());
-			MetricModule.sendMetric(context, Event.EventLabel.message_center__read, null, data);
+			JSONObject data = new JSONObject();
+			try {
+				data.put("message_id", textMessages[0].getId());
+				data.put("message_type", textMessages[0].getType().name());
+			} catch (JSONException e) {
+				//
+			}
+			EngagementModule.engageInternal((Activity)context, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 			MessageManager.updateMessage(context, textMessages[0]);
 			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
 			return null;

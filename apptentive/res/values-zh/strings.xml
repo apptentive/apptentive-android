@@ -29,8 +29,6 @@
     <string name="apptentive_survey_singleline_hint">請輸入回答......</string>
     <string name="apptentive_survey_send_response">傳送回應</string>
     <string name="apptentive_message_center_title">訊息中心</string>
-    <string name="apptentive_message_center_compose_hint">輸入一條訊息......</string>
-    <string name="apptentive_message_center_attachment_title">傳送圖像嗎？</string>
     <string name="apptentive_rating_provider_no_google_play">找不到 Google Play。評等此應用程式前，請安裝 Google Play。</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">找不到 Amazon Appstore。評等此應用程式之前，請安裝 Amazon Appstore。</string>
     <string name="apptentive_rating_provider_no_mikandi">找不到 MiKandi Market。評等此應用程式之前，請安裝 MiKandi Market。</string>

@@ -29,8 +29,6 @@
   <string name="apptentive_survey_singleline_hint">Voer een antwoord in…</string>
   <string name="apptentive_survey_send_response">Verstuur antwoord</string>
   <string name="apptentive_message_center_title">Berichten</string>
-  <string name="apptentive_message_center_compose_hint">Typ een bericht…</string>
-  <string name="apptentive_message_center_attachment_title">Afbeelding verzenden?</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play is niet gevonden. Installeer Google Play voordat u deze app beoordeelt.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore is niet gevonden. Installeer Amazon Appstore voordat u deze app beoordeelt.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market is niet gevonden. Installeer MiKandi Market voordat u deze app beoordeelt.</string>

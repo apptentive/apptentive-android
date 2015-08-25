@@ -29,8 +29,6 @@
     <string name="apptentive_survey_singleline_hint">답변을 입력하세요...</string>
     <string name="apptentive_survey_send_response">답변 보내기</string>
     <string name="apptentive_message_center_title">메시지 센터</string>
-    <string name="apptentive_message_center_compose_hint">메시지를 입력하세요...</string>
-    <string name="apptentive_message_center_attachment_title">이미지를 보냅니까?</string>
     <string name="apptentive_rating_provider_no_google_play">Google Play를 찾지 못했습니다. 이 앱을 평가하기 전에 Google Play를 설치해주십시오.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore를 찾지 못했습니다. 이 앱을 평가하기 전에 Amazon Appstore를 설치해주십시오.</string>
     <string name="apptentive_rating_provider_no_mikandi">MiKandi Market을 찾지 못했습니다. 이 앱을 평가하기 전에 MiKandi Market을 설치해주십시오.</string>

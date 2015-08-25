@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -15,15 +14,15 @@ import org.json.JSONObject;
 public class MessageCenterStatus extends JSONObject implements MessageCenterListItem {
 
 
-
-	public final String title;
-	public final String body;
+	
 	public final boolean isEmpty;
+	public final String body;
+	public final Integer icon;
 
-	public MessageCenterStatus(String tile, String body) {
-		this.title = tile;
+	public MessageCenterStatus(String body, Integer icon) {
 		this.body = body;
-		this.isEmpty = (tile == null && body == null)? true:false;
+		this.isEmpty = (body == null && icon == null)? true:false;
+		this.icon = icon;
 	}
 
 

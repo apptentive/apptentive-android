@@ -36,8 +36,8 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Event;
 
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -166,7 +166,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
-					MessageCenterStatus newItem = interaction.getRegularStatus(viewActivity);
+					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null) {
 						addNewStatusItem(newItem);
 					}
@@ -180,10 +180,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 							messageCenterListAdapter.setPaused(isPaused);
 							int reason = msg.arg1;
 							if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
-								MessageCenterStatus newItem = interaction.getErrorStatusNetwork(viewActivity);
+								EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
+								MessageCenterStatus newItem = interaction.getErrorStatusNetwork();
 								addNewStatusItem(newItem);
 							} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
-								MessageCenterStatus newItem = interaction.getErrorStatusServer(viewActivity);
+								EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
+								MessageCenterStatus newItem = interaction.getErrorStatusServer();
 								addNewStatusItem(newItem);
 							}
 						}
@@ -258,11 +260,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
-		ImageButton backButton = (ImageButton) viewActivity.findViewById(R.id.back);
-		backButton.setOnClickListener(new View.OnClickListener() {
+		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close);
+		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				viewActivity.onBackPressed();
+				cleanup();
+				EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE);
+				viewActivity.finish();
 			}
 		});
 
@@ -322,7 +326,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				addNewStatusItem(new MessageCenterStatus(null, null));
 			}
 
-			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this);
+			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 			updateMessageTimeStamps(); // Force timestamp recompilation.
 		}
@@ -335,7 +339,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			if (canTakeScreenshot) {
 				attachButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View view) {
-						MetricModule.sendMetric(viewActivity, Event.EventLabel.message_center__attach);
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACH);
 						Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 						Bundle extras = new Bundle();
 						intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -363,6 +367,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					if (whoCardItem == null && composingItem == null) {
 						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "button");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+
 						if (!bWhoCardSet) {
 							addWhoCard(WHO_CARD_MODE_INIT);
 						} else {
@@ -398,11 +412,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
+		cleanup();
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+		return true;
+	}
+
+	public boolean cleanup() {
 		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		clearComposingUi(null);
 		clearWhoCardUi(null);
-		MetricModule.sendMetric(activity, Event.EventLabel.message_center__close);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
@@ -529,6 +548,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
 		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
@@ -688,6 +708,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onComposingViewCreated() {
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
 		if (composingViewSavedState != null) {
 			messageEditText.onRestoreInstanceState(composingViewSavedState);
@@ -727,6 +748,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			messages.remove(contextualMessage);
 			contextualMessage = null;
 		}
+		JSONObject data = new JSONObject();
+		try {
+			int bodyLength = getPendingComposingContent().toString().trim().length();
+			data.put("body_length", bodyLength);
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
+		
 		clearComposingUi(new Animator.AnimatorListener() {
 
 			@Override
@@ -800,6 +830,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 					if (!bWhoCardSet) {
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "automatic");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+
 						addWhoCard(WHO_CARD_MODE_INIT);
 						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 						return;
@@ -816,7 +855,34 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onCloseWhoCard() {
+	public void onSubmitWhoCard(String buttonLabel) {
+		JSONObject data = new JSONObject();
+		try {
+			data.put("required", interaction.getWhoCardRequired());
+			data.put("button_label", buttonLabel);
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
+
+		cleanupWhoCard();
+	}
+
+	@Override
+	public void onCloseWhoCard(String buttonLabel) {
+		JSONObject data = new JSONObject();
+		try {
+			data.put("required", interaction.getWhoCardRequired());
+			data.put("button_label", buttonLabel);
+		} catch (JSONException e) {
+			//
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
+
+		cleanupWhoCard();
+	}
+	
+	public void cleanupWhoCard() {
 		clearWhoCardUi(new Animator.AnimatorListener() {
 
 			@Override
