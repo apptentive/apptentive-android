@@ -282,7 +282,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		int brightColor = Util.lighter(defaultColor, 0.5f);
 		headerDivider.setBackgroundColor(brightColor);
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
-		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
 		messageCenterListView.setItemsCanFocus(true);
 		messageCenterListView.setOnScrollListener(this);
 
@@ -548,8 +548,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
-		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
-		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		if (!statusItem.isEmpty) {
+			EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
+			messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		}
 	}
 
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
