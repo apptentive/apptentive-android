@@ -1,3 +1,9 @@
+# 2015-08-125skykelsey 1.7.4
+
+#### Improvements
+
+* Added Polish translations.
+
 # 2015-05-13 skykelsey 1.7.3
 
 #### Bugs Fixed
