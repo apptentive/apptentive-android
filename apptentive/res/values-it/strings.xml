@@ -12,10 +12,12 @@
   <string name="apptentive_thanks">Grazie!</string>
   <string name="apptentive_no_thanks">No grazie</string>
   <string name="apptentive_thank_you">Grazie</string>
-  <string name="apptentive_required">Obbligatorio</string>
+  <string name="apptentive_required">obbligatorio</string>
   <string name="apptentive_optional">Facoltativo</string>
+  <string name="apptentive_failed">Non riuscito</string>
+  <string name="apptentive_sent">Inviato</string>
   <string name="apptentive_version">Apptentive versione %s</string>
-  <string name="apptentive_powered_by_apptentive">Con tecnologia Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Con tecnologia</string>
   <string name="apptentive_about_title">Info su Apptentive</string>
   <string name="apptentive_about_description">Apptentive è un servizio di feedback e comunicazione che consente ai produttori di questa app di ricevere rapidamente i tuoi commenti e di soddisfare al meglio le tue esigenze.</string>
   <string name="apptentive_about_description_link">Ulteriori info su apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">Classifica %s</string>
   <string name="apptentive_rating_remind">Visualizza in seguito</string>
   <string name="apptentive_rating_error">Non è possibile trovare questa app nello store. Visita lo store per trovarla e valutarla.</string>
-  <string name="apptentive_survey_singleline_hint">Immetti una risposta…</string>
+  <string name="apptentive_survey_singleline_hint">Immetti una risposta&#8230;</string>
   <string name="apptentive_survey_send_response">Invia risposta</string>
   <string name="apptentive_message_center_title">Centro messaggi</string>
+  <string name="apptentive_message_center_no_connection">Per inviare i commenti, collegati a Internet.</string>
+  <string name="apptentive_message_center_server_error">Stiamo riscontrando problemi ad accedere ai commenti. Attendi qualche istante, quindi riprova.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play non trovato. Installa Google Play prima di classificare questa app.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore non trovato. Installa Amazon Appstore prima di classificare questa app.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market non trovato. Installa MiKandi Market prima di classificare questa app.</string>

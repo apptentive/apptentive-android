@@ -14,8 +14,10 @@
     <string name="apptentive_thank_you">شكراً لك</string>
     <string name="apptentive_required">مطلوب</string>
     <string name="apptentive_optional">اختياري</string>
+    <string name="apptentive_failed">فشل</string>
+    <string name="apptentive_sent">تم الإرسال</string>
     <string name="apptentive_version">الإصدار %s من أبتينتيف</string>
-    <string name="apptentive_powered_by_apptentive">بواسطة أبتينتيف</string>
+    <string name="apptentive_powered_by_apptentive">بواسطة</string>
     <string name="apptentive_about_title">نبذة عن أبتينتيف</string>
     <string name="apptentive_about_description">أبتينتيف هي خدمة لإرسال الآراء والتواصل تسمح لمطوري هذا التطبيق بالحصول بسرعة على ملاحظاتك والاستماع إليك بشكل أفضل.</string>
     <string name="apptentive_about_description_link">اعرف المزيد عبر apptentive.com</string>
@@ -29,6 +31,8 @@
     <string name="apptentive_survey_singleline_hint">قم بإدخال إجابة...</string>
     <string name="apptentive_survey_send_response">إرسال الرد</string>
     <string name="apptentive_message_center_title">مركز الرسائل</string>
+    <string name="apptentive_message_center_no_connection">برجاء الاتصال بالإنترنت لإرسال التعليقات.</string>
+    <string name="apptentive_message_center_server_error">يبدو أننا نصادف مشكلة في الوصول إلى التعليقات. برجاء الانتظار قليلاً وأعد المحاولة.</string>
     <string name="apptentive_rating_provider_no_google_play">لم يتم العثور على غوغل بلاي. الرجاء تثبيت غوغل بلاي قبل تقييم هذا التطبيق.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">لم يتم العثور على أمازون ابستور. الرجاء تثبيت أمازون ابستور قبل تقييم هذا التطبيق.</string>
     <string name="apptentive_rating_provider_no_mikandi">لم يتم العثور على ميكاندي ماركت. الرجاء تثبيت ميكاندي ماركت قبل تقييم هذا التطبيق.</string>

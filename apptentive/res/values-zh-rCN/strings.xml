@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">谢谢</string>
   <string name="apptentive_required">必填</string>
   <string name="apptentive_optional">可选</string>
+  <string name="apptentive_failed">失败</string>
+  <string name="apptentive_sent">已发送</string>
   <string name="apptentive_version">Apptentive 版本 %s</string>
-  <string name="apptentive_powered_by_apptentive">运营商： Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">运营商：</string>
   <string name="apptentive_about_title">关于 Apptentive</string>
   <string name="apptentive_about_description">Apptentive 是一种反馈和交流服务，能让应用程序的制作者快速获取您的反馈，以更好地倾听您的声音。</string>
   <string name="apptentive_about_description_link">访问 apptentive.com， 了解更多内容</string>
@@ -23,13 +25,15 @@
   <string name="apptentive_about_privacy_link">访问 Apptentive 的私隐政策</string>
   <string name="apptentive_do_you_love_this_app">您喜爱 %s 吗？</string>
   <string name="apptentive_rating_message_fs">很高兴地得知您喜爱 %s！如果您能给我们评分，这会对我们很有帮助。非常感谢您的陪伴。</string>
-  <string name="apptentive_rate_this_app">评分 %s</string>
+  <string name="apptentive_rate_this_app">为 %s 评分</string>
   <string name="apptentive_rating_remind">以后提醒我</string>
   <string name="apptentive_rating_error">我们无法在商店中找到这个应用程序。请访问商店，找到它并给它评分。</string>
-  <string name="apptentive_survey_singleline_hint">请输入答案......</string>
+  <string name="apptentive_survey_singleline_hint">请输入答案&#8230;&#8230;</string>
   <string name="apptentive_survey_send_response">发送回复</string>
   <string name="apptentive_message_center_title">消息中心</string>
-  <string name="apptentive_rating_provider_no_google_play">找不到谷歌市场。在对这个应用程序进行评分之前，请安装谷歌市场。</string>
-  <string name="apptentive_rating_provider_no_amazon_appstore">找不到亚马逊应用程序商店。在对这个应用程序进行评分之前，请安装亚马逊应用程序商店。</string>
+  <string name="apptentive_message_center_no_connection">请连接到互联网以发送反馈。</string>
+  <string name="apptentive_message_center_server_error">访问反馈时似乎遇到问题，请稍等片刻并重试。</string>
+  <string name="apptentive_rating_provider_no_google_play">找不到 Google Play。在对这个应用程序进行评分之前，请安装 Google Play。</string>
+  <string name="apptentive_rating_provider_no_amazon_appstore">找不到亚马逊 App Store。在对这个应用程序进行评分之前，请安装亚马逊 App Store。</string>
   <string name="apptentive_rating_provider_no_mikandi">找不到 MiKandi 市场。在对这个应用程序进行评分之前，请安装 MiKandi 市场。</string>
 </resources>
