@@ -77,8 +77,8 @@
                     <Button android:layout_width="fill_parent"
                             android:layout_height="fill_parent"
                             android:gravity="center_horizontal"
-                            android:text="willShowInteraction()"
-                            android:onClick="willShowInteraction"/>
+                            android:text="canShowInteraction()"
+                            android:onClick="canShowInteraction"/>
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="fill_parent"
