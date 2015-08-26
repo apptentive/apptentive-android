@@ -212,7 +212,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
 					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
-					newView.updateMessage(greeting.title, greeting.body);
 					ImageUtil.startDownloadAvatarTask(newView.avatar,
 							((MessageCenterGreeting) listItem).avatar);
 					view = newView;

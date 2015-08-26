@@ -6,13 +6,17 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 
 /**
@@ -21,26 +25,34 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeti
 public class MessageCenterGreetingView extends FrameLayout implements MessageCenterListItemView {
 
 	public ApptentiveAvatarView avatar;
-	public TextView title;
-	public TextView body;
 
 
-	public void updateMessage(String title, String body) {
-		if (this.title != null) {
-			this.title.setText(title);
-		}
-		if (this.body != null) {
-			this.body.setText(body);
-		}
+	public void updateUi(String title, String body) {
+
 	}
 
-	public MessageCenterGreetingView(Context context, MessageCenterGreeting messageCenterGreeting) {
+	public MessageCenterGreetingView(final Context context, MessageCenterGreeting messageCenterGreeting) {
 		super(context);
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View view = inflater.inflate(R.layout.apptentive_message_center_greeting, this);
-		title = (TextView) view.findViewById(R.id.title);
-		body = (TextView) view.findViewById(R.id.body);
+		TextView title = (TextView) view.findViewById(R.id.title);
+		TextView body = (TextView) view.findViewById(R.id.body);
+		if (title != null) {
+			title.setText(messageCenterGreeting.title);
+		}
+		if (body != null) {
+			body.setText(messageCenterGreeting.body);
+		}
+
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
+
+		ImageButton infoButton = (ImageButton) findViewById(R.id.btn_info);
+		infoButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View view) {
+				if (context instanceof ViewActivity)
+				AboutModule.getInstance().show((Activity) context, false);
+			}
+		});
 	}
 }

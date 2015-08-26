@@ -215,7 +215,7 @@
     <style name="ApptentiveTheme.TextViewStyle.Toolbar">
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
-        <item name="android:textSize">24dp</item>
+        <item name="android:textSize">24sp</item>
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.Greeting" parent="ApptentiveTheme.TextViewStyle.Toolbar">
@@ -223,7 +223,7 @@
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.Greeting.Body">
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="ApptentiveInteractionPositiveButton">
@@ -347,17 +347,16 @@
 
     <style name="ApptentiveWidget.FloatingActionButton.Mini" parent="ApptentiveWidget.FloatingActionButton">
         <item name="floatingActionButtonSize">mini</item>
-        <item name="floatingActionButtonColor">?attr/colorAccent</item>
     </style>
 
 
     <style name="ApptentiveMessageCenterGreetingContainer">
         <item name="android:paddingTop">24dp</item>
-        <item name="android:paddingBottom">24dp</item>
+        <item name="android:paddingBottom">0dp</item>
         <item name="android:paddingLeft">@dimen/apptentive_message_center_greeting_side_margin</item>
-        <item name="android:paddingRight">@dimen/apptentive_message_center_greeting_side_margin</item>
+        <item name="android:paddingRight">0dp</item>
         <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:gravity">center</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>
     </style>
 
