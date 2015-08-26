@@ -23,7 +23,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
@@ -84,8 +83,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	// If message sending is paused or not
 	private boolean isInPauseState = false;
 
-	private Activity activity;
-	private Context context;
+	private Context activityContext;
 
 	private MessageCenterInteraction interaction;
 
@@ -122,13 +120,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		void onCloseWhoCard(String buttonLabel);
 	}
 
-	/**
-	 * @param context Must be a Context with theme set, such as an Activity
-	 */
-	public MessageAdapter(Context context, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
-		super(context, 0, (List<T>) items);
-		this.activity = (Activity) context;
-		this.context = activity.getApplicationContext();
+	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
+		super(activityContext, 0, (List<T>) items);
+		this.activityContext = activityContext;
 		this.composingActionListener = listener;
 		this.interaction = interaction;
 	}
@@ -224,19 +218,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(activity, (MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					convertView = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					convertView = new MessageCenterComposingActionBarView(activity, (MessageCenterComposingItem) listItem, composingActionListener);
+					convertView = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
-						whoCardView = new MessageCenterWhoCardView(activity, composingActionListener);
+						whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
 						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}
@@ -429,9 +423,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	protected String createStatus(Double seconds) {
 		if (seconds == null) {
-			return isInPauseState ? context.getResources().getString(R.string.apptentive_failed) : null;
+			return isInPauseState ? activityContext.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return context.getResources().getString(R.string.apptentive_sent);
+		return activityContext.getResources().getString(R.string.apptentive_sent);
 	}
 
 
@@ -439,13 +433,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		Point ret = null;
 		FileInputStream fis = null;
 		try {
-			fis = context.openFileInput(storedFile.getLocalFilePath());
+			fis = activityContext.openFileInput(storedFile.getLocalFilePath());
 
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
 			BitmapFactory.decodeStream(fis, null, options);
 
-			Point point = Util.getScreenSize(context);
+			Point point = Util.getScreenSize(activityContext.getApplicationContext());
 			int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 			int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 			maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
@@ -491,9 +485,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(activity, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
-			MessageManager.updateMessage(context, textMessages[0]);
-			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(context));
+			if (activityContext instanceof Activity) {
+				EngagementModule.engageInternal((Activity) activityContext, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+			}
+			MessageManager.updateMessage(activityContext.getApplicationContext(), textMessages[0]);
+			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(activityContext.getApplicationContext()));
 			return null;
 		}
 
@@ -510,7 +506,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
-		StoredFile storedFile = message.getStoredFile(context);
+		StoredFile storedFile = message.getStoredFile(activityContext.getApplicationContext());
 		if (storedFile == null) {
 			return;
 		}
@@ -551,8 +547,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			FileInputStream fis = null;
 			Bitmap imageBitmap = null;
 			try {
-				fis = context.openFileInput(paths[0]);
-				Point point = Util.getScreenSize(context);
+				fis = activityContext.openFileInput(paths[0]);
+				Point point = Util.getScreenSize(activityContext.getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
