@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -168,6 +167,22 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
+					// After the message is sent, check if Who Card need to be shown for the 1st time
+					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+					if (!bWhoCardSet) {
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "automatic");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+						addWhoCard(WHO_CARD_MODE_INIT);
+						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+						break;
+					}
 					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null) {
 						addNewStatusItem(newItem);
@@ -430,7 +445,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public boolean cleanup() {
-		savePendingComposingMessage();
+		saveOrClearPendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		clearComposingUi(null, null);
 		clearWhoCardUi(null, null);
@@ -510,7 +525,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	public void addContextualMessage() {
 		// Clear any pending composing message to present an empty composing area
-		savePendingComposingMessage();
+		saveOrClearPendingComposingMessage();
 		clearStatus();
 		messages.add(contextualMessage);
 		// If addWhoCardInitRequired returns true, it will add WhoCard
@@ -803,7 +818,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 				showFab();
 				// messageEditText has been set to null, pending composing message will reset
-				savePendingComposingMessage();
+				saveOrClearPendingComposingMessage();
 			}
 
 			@Override
@@ -843,27 +858,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterListAdapter.clearComposing();
 				messageCenterListAdapter.needInflateComposing = true;
 				messageCenterListAdapter.notifyDataSetChanged();
-				savePendingComposingMessage();
-				// Send out the new message
+				saveOrClearPendingComposingMessage();
+				// Send out the new message. The delay is added to ensure the CardView showing animation
+				// is visible after the keyboard is hidden
 				if (!messageText.isEmpty()) {
 					messageCenterViewHandler.sendMessageDelayed(messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
 							messageText), DEFAULT_DELAYMILLIS);
-					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-					if (!bWhoCardSet) {
-						JSONObject data = new JSONObject();
-						try {
-							data.put("required", interaction.getWhoCardRequired());
-							data.put("trigger", "automatic");
-						} catch (JSONException e) {
-							//
-						}
-						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-
-						addWhoCard(WHO_CARD_MODE_INIT);
-						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-						return;
-					}
 				}
 				showFab();
 			}
@@ -999,7 +999,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	/* When no composing view is presented in the list view, calling this method
 	 * will clear the pending composing message previously saved in shared preference
 	 */
-	public void savePendingComposingMessage() {
+	public void saveOrClearPendingComposingMessage() {
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
@@ -1009,7 +1009,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 
 	private Parcelable saveEditTextInstanceState() {
-		savePendingComposingMessage();
+		saveOrClearPendingComposingMessage();
 		if (messageEditText != null) {
 			// Hide keyboard if the keyboard was up prior to rotation
 			Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
