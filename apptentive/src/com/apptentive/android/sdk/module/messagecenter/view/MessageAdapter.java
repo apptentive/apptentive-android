@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
@@ -212,7 +213,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
 					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
-					newView.updateMessage(greeting.title, greeting.body);
 					ImageUtil.startDownloadAvatarTask(newView.avatar,
 							((MessageCenterGreeting) listItem).avatar);
 					view = newView;
@@ -408,7 +408,24 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
-		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, null, null);
+		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		}, null);
 		set.start();
 		composingActionListener.onComposingViewCreated();
 	}
@@ -445,7 +462,28 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
-		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, null, null);
+		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				if (focusOnNameField) {
+					Util.showSoftKeyboard((Activity) activityContext, nameEditText);
+				} else {
+					Util.showSoftKeyboard((Activity) activityContext, emailEditText);
+				}
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		}, null);
 		set.start();
 		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
 	}

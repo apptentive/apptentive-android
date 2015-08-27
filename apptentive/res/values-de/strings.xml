@@ -12,10 +12,12 @@
   <string name="apptentive_thanks">Danke!</string>
   <string name="apptentive_no_thanks">Nein, danke</string>
   <string name="apptentive_thank_you">Vielen Dank</string>
-  <string name="apptentive_required">Erforderlich</string>
+  <string name="apptentive_required">erforderlich</string>
   <string name="apptentive_optional">Optional</string>
+  <string name="apptentive_failed">Fehlgeschlagen</string>
+  <string name="apptentive_sent">Gesendet</string>
   <string name="apptentive_version">Apptentive Version %s</string>
-  <string name="apptentive_powered_by_apptentive">Unterstützt von Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Powered by</string>
   <string name="apptentive_about_title">Über Apptentive</string>
   <string name="apptentive_about_description">Apptentive  ist ein Feedback- und Kommunikations-Service, der es den Entwicklern dieser App ermöglicht, auf schnelle Weise dein Feedback zu erhalten und besser darauf zu reagieren.</string>
   <string name="apptentive_about_description_link">Mehr Informationen auf apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">%s bewerten</string>
   <string name="apptentive_rating_remind">Später erinnern</string>
   <string name="apptentive_rating_error">Wir konnten die App im Store nicht finden. Besuche bitte den Store, um die App zu finden und zu bewerten.</string>
-  <string name="apptentive_survey_singleline_hint">Antwort eingeben…</string>
+  <string name="apptentive_survey_singleline_hint">Antwort eingeben&#8230;</string>
   <string name="apptentive_survey_send_response">Antwort senden</string>
   <string name="apptentive_message_center_title">Mitteilungszentrale</string>
+  <string name="apptentive_message_center_no_connection">Bitte stelle eine Verbindung zum Internet her, um Feedback zu senden.</string>
+  <string name="apptentive_message_center_server_error">Es scheint Schwierigkeiten mit dem Zugriff auf Feedback zu geben. Bitte warte ein wenig und versuche es erneut.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play nicht gefunden. Bitte installiere Google Play, bevor du diese App bewertest.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon App-Shop nicht gefunden. Bitte installiere Amazon App-Shop, bevor du diese App bewertest.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market nicht gefunden. Bitte installiere Mikandi Market, bevor du diese App bewertest.</string>

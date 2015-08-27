@@ -121,11 +121,6 @@ public class ViewActivity extends ApptentiveActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		boolean activityContentRequired = true;
-		getDelegate().installViewFactory();
-		getDelegate().onCreate(savedInstanceState);
-
-		super.onCreate(savedInstanceState);
 
 		try {
 
@@ -134,6 +129,15 @@ public class ViewActivity extends ApptentiveActivity {
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
+        if (activeContentType == ActivityContent.Type.ABOUT) {
+					setTheme(R.style.ApptentiveTheme_Light);
+				}
+
+				boolean activityContentRequired = true;
+				getDelegate().installViewFactory();
+				getDelegate().onCreate(savedInstanceState);
+
+				super.onCreate(savedInstanceState);
 
 				try {
 					switch (activeContentType) {
@@ -222,7 +226,7 @@ public class ViewActivity extends ApptentiveActivity {
 		switch (activeContentType) {
 			case ABOUT:
 				super.onStart();
-				AboutModule.getInstance().doShow(this, activityExtraBoolean);
+				AboutModule.getInstance().setupView(this, activityExtraBoolean);
 				break;
 			case MESSAGE_CENTER_ERROR:
 				super.onStart();
