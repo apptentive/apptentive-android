@@ -127,21 +127,13 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
 	}
 
-	public boolean isMessageCenterEnabled(Context context) {
+	public boolean isMessageCenterEnabled() {
 		try {
 			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
 				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
 			}
 		} catch (JSONException e) {
 			// Move on.
-		}
-
-		try {
-			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-			Bundle metaData = ai.metaData;
-			return metaData.getBoolean(Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED);
-		} catch (Exception e) {
-			Log.w("Unexpected error while reading default %s manifest setting.", e, Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED);
 		}
 
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
