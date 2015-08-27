@@ -105,10 +105,10 @@ public class InteractionsActivity extends ApptentiveActivity {
 		doEngage(true);
 	}
 
-	public void willShowInteraction(@SuppressWarnings("unused") View view) {
+	public void canShowInteraction(@SuppressWarnings("unused") View view) {
 		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
-		boolean willShowInteraction = Apptentive.willShowInteraction(this, eventName.getText().toString());
-		Toast.makeText(this, willShowInteraction ? "Interaction will show." : "Interaction will NOT show.", Toast.LENGTH_SHORT).show();
+		boolean canShowInteraction = Apptentive.canShowInteraction(this, eventName.getText().toString());
+		Toast.makeText(this, canShowInteraction ? "Interaction can show." : "Interaction CANNOT show.", Toast.LENGTH_SHORT).show();
 	}
 
 	public void interaction(@SuppressWarnings("unused") View view) {

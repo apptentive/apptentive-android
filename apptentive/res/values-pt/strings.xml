@@ -14,8 +14,10 @@
     <string name="apptentive_thank_you">Obrigado</string>
     <string name="apptentive_required">Obrigatório</string>
     <string name="apptentive_optional">Opcional</string>
+    <string name="apptentive_failed">Falha</string>
+    <string name="apptentive_sent">Enviada</string>
     <string name="apptentive_version">Apptentive versão %s</string>
-    <string name="apptentive_powered_by_apptentive">Usa Apptentive</string>
+    <string name="apptentive_powered_by_apptentive">Usa</string>
     <string name="apptentive_about_title">Sobre o Apptentive</string>
     <string name="apptentive_about_description">Apptentive é um serviço de feedback e comunicação que permite que as pessoas que fizeram esse aplicativo recebam rapidamente seu feedback e escutem melhor o que você tem a dizer.</string>
     <string name="apptentive_about_description_link">Descubra mais em apptentive.com</string>
@@ -29,6 +31,8 @@
     <string name="apptentive_survey_singleline_hint">Digitar uma resposta&#8230;</string>
     <string name="apptentive_survey_send_response">Enviar resposta</string>
     <string name="apptentive_message_center_title">Central de mensagens</string>
+    <string name="apptentive_message_center_no_connection">Conecte-se à internet para enviar feedback.</string>
+    <string name="apptentive_message_center_server_error">Parece que estamos com problema para acessar o feedback. Aguarde um momento e tente novamente.</string>
     <string name="apptentive_rating_provider_no_google_play">Não foi encontrado o Google Play. Instale o Google Play antes de classificar esse aplicativo.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">A Amazon Appstore não foi encontrada. Instale a Amazon Appstore antes de classificar esse aplicativo.</string>
     <string name="apptentive_rating_provider_no_mikandi">O MiKandi Market não foi encontrado. Instale o MiKandi Market antes de classificar esse aplicativo.</string>
