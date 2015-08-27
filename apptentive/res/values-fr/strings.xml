@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">Merci</string>
   <string name="apptentive_required">Obligatoire</string>
   <string name="apptentive_optional">Facultatif</string>
+  <string name="apptentive_failed">A échoué</string>
+  <string name="apptentive_sent">Envoyé</string>
   <string name="apptentive_version">Version Apptentive %s</string>
-  <string name="apptentive_powered_by_apptentive">Optimisé par Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Optimisée par</string>
   <string name="apptentive_about_title">À propos d\'Apptentive</string>
   <string name="apptentive_about_description">Apptentive est un service de commentaires  et communication qui permet aux personnes qui travaillent sur cette application de rapidement prendre connaissance de vos remarques et d\'ainsi rester à votre écoute.</string>
   <string name="apptentive_about_description_link">En apprendre davantage à apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">Noter %s</string>
   <string name="apptentive_rating_remind">Me le rappeler ultérieurement</string>
   <string name="apptentive_rating_error">Nous ne sommes pas en mesure de trouver cette application dans le magasin. Veuillez visiter le magasin pour l\'y rechercher et la noter.</string>
-  <string name="apptentive_survey_singleline_hint">Saisir une réponse…</string>
+  <string name="apptentive_survey_singleline_hint">Saisir une réponse...</string>
   <string name="apptentive_survey_send_response">Envoyer la Réponse</string>
   <string name="apptentive_message_center_title">Centre de messages</string>
+  <string name="apptentive_message_center_no_connection">Veuillez vous connecter à internet pour envoyer vos commentaires.</string>
+  <string name="apptentive_message_center_server_error">Il semblerait que nous ayons des difficultés à accéder aux commentaires. Veuillez réessayer dans quelques minutes.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play introuvable. Veuillez installer Google Play pour pouvoir noter cette application.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore introuvable. Veuillez installer Amazon Appstore pour pouvoir noter cette application.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market introuvable. Veuillez installer MiKandi Market pour pouvoir noter cette application.</string>

@@ -14,8 +14,10 @@
     <string name="apptentive_thank_you">Teşekkür Ederiz</string>
     <string name="apptentive_required">Gerekli</string>
     <string name="apptentive_optional">İsteğe bağlı</string>
+    <string name="apptentive_failed">Başarısız</string>
+    <string name="apptentive_sent">Gönderildi</string>
     <string name="apptentive_version">Apptentive sürüm %s</string>
-    <string name="apptentive_powered_by_apptentive">Apptentive tarafından desteklenir</string>
+    <string name="apptentive_powered_by_apptentive">Destekleyen</string>
     <string name="apptentive_about_title">Apptentive hakkında</string>
     <string name="apptentive_about_description">Apptentive, bu uygulamayı yapan insanların geribildiriminizi çabucak almalarına ve sizi daha iyi dinlemelerine izin veren bir geribildirim ve iletişim hizmetidir.</string>
     <string name="apptentive_about_description_link">apptentive.com\'da daha fazlasını öğrenin</string>
@@ -29,6 +31,8 @@
     <string name="apptentive_survey_singleline_hint">Bir yanıt girin&#8230;</string>
     <string name="apptentive_survey_send_response">Yanıtı Gönder</string>
     <string name="apptentive_message_center_title">Mesaj Merkezi</string>
+    <string name="apptentive_message_center_no_connection">Gerilbildirim göndermek için lütfen İnternet\'e bağlanın.</string>
+    <string name="apptentive_message_center_server_error">Geribildiriminize erişmekte sorun yaşıyoruz gibi görünüyor. Lütfen biraz bekleyin ve yeniden deneyin.</string>
     <string name="apptentive_rating_provider_no_google_play">Google Play bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Google Play\'i kurun.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce Amazon Appstore\'u kurun.</string>
     <string name="apptentive_rating_provider_no_mikandi">MİKandi Market bulunamadı. Lütfen bu uygulamayı derecelendirmeden önce MİKandi Market\'i kurun.</string>

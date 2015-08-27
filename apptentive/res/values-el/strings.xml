@@ -14,8 +14,10 @@
     <string name="apptentive_thank_you">Ευχαριστούμε</string>
     <string name="apptentive_required">Υποχρεωτικό</string>
     <string name="apptentive_optional">Προαιρετικό</string>
+    <string name="apptentive_failed">Απέτυχε</string>
+    <string name="apptentive_sent">Στάλθηκε</string>
     <string name="apptentive_version">Έκδοση Apptentive %s</string>
-    <string name="apptentive_powered_by_apptentive">Με την υποστήριξη της Apptentive</string>
+    <string name="apptentive_powered_by_apptentive">Με την υποστήριξη της</string>
     <string name="apptentive_about_title">Σχετικά με την Apptentive</string>
     <string name="apptentive_about_description">Η Apptentive είναι μια υπηρεσία παροχής σχολίων και επικοινωνίας με την οποία τα άτομα που έχουν φτιάξει αυτή την εφαρμογή μπορούν να λαμβάνουν γρήγορα τα σχόλιά σας και να ενημερώνονται καλύτερα για τη γνώμη σας.</string>
     <string name="apptentive_about_description_link">Διαβάστε περισσότερα στη διεύθυνση apptentive.com</string>
@@ -29,6 +31,8 @@
     <string name="apptentive_survey_singleline_hint">Συμπληρώστε μια απάντηση&#8230;</string>
     <string name="apptentive_survey_send_response">Αποστολή απάντησης</string>
     <string name="apptentive_message_center_title">Κέντρο μηνυμάτων</string>
+    <string name="apptentive_message_center_no_connection">Παρακαλώ συνδεθείτε στο Διαδίκτυο για να στείλετε τα σχόλιά σας.</string>
+    <string name="apptentive_message_center_server_error">Φαίνεται ότι δεν είναι δυνατή η πρόσβαση στα σχόλια. Περιμένετε λίγο και προσπαθήστε ξανά.</string>
     <string name="apptentive_rating_provider_no_google_play">Δεν βρέθηκε το Google Play. Εγκαταστήστε το Google Play για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Το Amazon Appstore δεν βρέθηκε. Εγκαταστήστε το Amazon Appstore για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>
     <string name="apptentive_rating_provider_no_mikandi">Το MiKandi Market δεν βρέθηκε. Εγκαταστήστε το MiKandi Market για να μπορείτε να βαθμολογήσετε αυτή την εφαρμογή.</string>

@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">ありがとうございます</string>
   <string name="apptentive_required">必須</string>
   <string name="apptentive_optional">任意</string>
+  <string name="apptentive_failed">失敗しました</string>
+  <string name="apptentive_sent">送信済</string>
   <string name="apptentive_version">Apptentive バージョン %s</string>
-  <string name="apptentive_powered_by_apptentive">Apptentive によって供給されています</string>
+  <string name="apptentive_powered_by_apptentive">次により提供されています</string>
   <string name="apptentive_about_title">Apptentive について</string>
   <string name="apptentive_about_description">Apptentive は、お客様の声をこのアプリの作成者に迅速に伝えて、貴重なご意見により耳を傾けやすくするフィードバック及びコミュニケーションサービスです。</string>
   <string name="apptentive_about_description_link">詳細は apptentive.com まで</string>
@@ -29,6 +31,8 @@
   <string name="apptentive_survey_singleline_hint">回答を入力。。。</string>
   <string name="apptentive_survey_send_response">回答を送信</string>
   <string name="apptentive_message_center_title">メッセージ センター</string>
+  <string name="apptentive_message_center_no_connection">フィードバックを送信するにはインターネットに接続して下さい。</string>
+  <string name="apptentive_message_center_server_error">フィードバックへのアクセスに問題が生じたようです。少々お待ちの上再度お試し下さい。</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play が見つかりませんでした。このアプリを評価する前に、Google Play をインストールしてください。</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon App ストアが見つかりませんでした。このアプリを評価する前に、Amazon Appストアをインストールして下さい。</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market が見つかりませんでした。このアプリを評価する前に、MiKandi Market をインストールして下さい。</string>
