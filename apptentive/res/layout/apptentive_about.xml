@@ -48,7 +48,7 @@
                                  android:layout_toRightOf="@id/close_about"
                                  android:layout_centerVertical="true"
                                  android:contentDescription="Apptentive"
-                                 android:src="@drawable/apptentive_ic_branding"
+                                 android:src="@drawable/apptentive_ic_about"
                                  android:background="@null"
                                  android:scaleType="fitCenter"
                                  android:tint="?attr/apptentive_material_toolbar_foreground"/>
