@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,8 +7,6 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
@@ -86,7 +84,7 @@ public class MessagePollingWorker {
 						long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
 						if (Util.isNetworkConnectionPresent(contextRef.get()) && conf.isMessageCenterEnabled(contextRef.get())) {
 							Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
-							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isNewMessageToastEnabled());
+							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 						}
 						MessagePollingWorker.goToSleep(pollingInterval);
 					}
