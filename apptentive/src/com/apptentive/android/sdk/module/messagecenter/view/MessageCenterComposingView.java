@@ -37,8 +37,6 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			et.setHint(item.str_2);
 		}
 		et.addTextChangedListener(new TextWatcher() {
-			private boolean doScroll = false;
-
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 			}
@@ -50,7 +48,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				listener.onComposing(editable.toString(), doScroll);
+				listener.onComposing(editable.toString());
 			}
 		});
 

@@ -13,7 +13,7 @@
     <TextView android:id="@+id/datestamp"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveMessageCenterMessageDatestamp"
+              style="@style/ApptentiveTheme.TextViewStyle.TimeStamp"
               android:visibility="gone"/>
     <FrameLayout android:layout_width="fill_parent"
                  android:layout_height="wrap_content"

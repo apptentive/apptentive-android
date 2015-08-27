@@ -15,6 +15,7 @@
         <attr name="apptentive_material_primary_icon" format="color|reference" />
         <attr name="apptentive_material_secondary_text" format="color|reference" />
         <attr name="apptentive_material_hint_text" format="color|reference" />
+        <attr name="apptentive_material_disabled_text" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />
 
         <attr name="apptentive_material_selected" format="color|reference" />

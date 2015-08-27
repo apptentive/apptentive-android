@@ -67,9 +67,9 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		emailTip = (TextView) parentView.findViewById(R.id.email_tip);
 
-		skipButton = (Button) findViewById(R.id.btn_skip);
+		skipButton = (Button) parentView.findViewById(R.id.btn_skip);
 
-		sendButton = (Button) findViewById(R.id.btn_send);
+		sendButton = (Button) parentView.findViewById(R.id.btn_send);
 	}
 
 	public void updateUi(final MessageCenterComposingItem item) {

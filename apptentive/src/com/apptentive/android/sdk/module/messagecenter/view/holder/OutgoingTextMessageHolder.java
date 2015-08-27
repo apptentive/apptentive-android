@@ -26,8 +26,9 @@ public class OutgoingTextMessageHolder extends MessageHolder {
 		messageContentView = (TextView) view.findViewById(R.id.more_less_container);
 	}
 
-	public void updateMessage(String datestamp, String status, boolean progressBarVisible, String body) {
-		super.updateMessage(datestamp, status);
+	public void updateMessage(String datestamp, String status, int statusColor,
+														boolean progressBarVisible, String body) {
+		super.updateMessage(datestamp, statusColor, status);
 		if (progressBar != null) {
 			if (progressBarVisible) {
 				progressBar.start();

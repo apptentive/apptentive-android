@@ -25,15 +25,14 @@
                       android:layout_height="wrap_content"
                       android:minLines="8"
                       android:gravity="top"
+                      android:background="@null"
                       android:layout_marginTop="0dp"
-                      android:layout_margin="5dp"
+                      android:layout_marginLeft="5dp"
                       android:inputType="textCapSentences|textMultiLine"
                       android:singleLine="false"
-                      android:background="@null"
-                      android:textCursorDrawable="@null"
                       android:textColorHint="?attr/apptentive_material_hint_text"
                       android:textColor="?attr/apptentive_material_primary_text"
-                      android:textSize="16sp"/>
+                      android:textSize="@dimen/apptentive_text_medium_small"/>
 
         </LinearLayout>
 </FrameLayout>

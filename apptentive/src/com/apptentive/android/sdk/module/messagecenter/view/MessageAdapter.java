@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -88,16 +90,22 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private MessageCenterInteraction interaction;
 
 	// Variables used in composing message
+	public boolean needInflateComposing;
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
 	private EditText composingEditText;
 
 	// Variables used in Who Card
+	public boolean needInflateWhoCard;
 	private int whoCardViewIndex = INVALID_POSITION;
 	private boolean focusOnNameField = false;
 	private MessageCenterWhoCardView whoCardView;
 	private EditText emailEditText;
 	private EditText nameEditText;
+
+	// Variables to track showing animation on incoming/outgoing messages
+	private int lastAnimatedPosition;
+	private boolean showAnimation;
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
@@ -107,7 +115,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	public interface OnComposingActionListener {
 		void onComposingViewCreated();
 
-		void onComposing(String str, boolean scroll);
+		void onComposing(String str);
 
 		void onCancelComposing();
 
@@ -177,8 +185,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		MessageCenterListItem listItem = getItem(position);
+		final View view;
+		showAnimation = false;
 
+		MessageCenterListItem listItem = getItem(position);
 		int type = getItemViewType(position);
 		MessageCenterListItemHolder holder = null;
 		boolean bLoadAvatar = false;
@@ -186,11 +196,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			// TODO: Do we need this switch anymore?
 			switch (type) {
 				case TYPE_TEXT_INCOMING:
-					convertView = new IncomingTextMessageView(parent.getContext(), (IncomingTextMessage) listItem);
+					view = new IncomingTextMessageView(parent.getContext(), (IncomingTextMessage) listItem);
 					bLoadAvatar = true;
 					break;
 				case TYPE_TEXT_OUTGOING:
-					convertView = new OutgoingTextMessageView(parent.getContext(), (OutgoingTextMessage) listItem);
+					view = new OutgoingTextMessageView(parent.getContext(), (OutgoingTextMessage) listItem);
 					break;
 /*
 				case TYPE_FILE_INCOMING:
@@ -198,22 +208,19 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 */
 				case TYPE_FILE_OUTGOING:
-					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
+					view = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
 					break;
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
 					MessageCenterGreetingView newView = new MessageCenterGreetingView(parent.getContext(), greeting);
-					newView.updateMessage(greeting.title, greeting.body);
 					ImageUtil.startDownloadAvatarTask(newView.avatar,
 							((MessageCenterGreeting) listItem).avatar);
-					convertView = newView;
+					view = newView;
 					break;
 				}
 				case TYPE_STATUS: {
-					MessageCenterStatus statusItem = (MessageCenterStatus) listItem;
 					MessageCenterStatusView newView = new MessageCenterStatusView(parent.getContext());
-					newView.updateMessage(statusItem.body, statusItem.icon);
-					convertView = newView;
+					view = newView;
 					break;
 				}
 				case TYPE_COMPOSING_AREA: {
@@ -221,11 +228,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
-					convertView = composingView;
+					view = composingView;
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					convertView = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+					view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
@@ -234,38 +241,49 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 						whoCardView.updateUi((MessageCenterComposingItem) listItem);
 						setupWhoCardView(position);
 					}
-					convertView = whoCardView;
+					view = whoCardView;
 					break;
 				}
 				case TYPE_AUTO:
-					convertView = new AutomatedMessageView(parent.getContext(), (AutomatedMessage) listItem);
+					view = new AutomatedMessageView(parent.getContext(), (AutomatedMessage) listItem);
 					break;
 				default:
+					view = null;
 					Log.i("Unrecognized type: %d", type);
 					break;
 			}
-			if (convertView != null) {
-				holder = HolderFactory.createHolder((MessageCenterListItemView) convertView);
-				convertView.setTag(holder);
+			if (view != null) {
+				holder = HolderFactory.createHolder((MessageCenterListItemView) view);
+				view.setTag(holder);
 			}
 		} else {
-			holder = (MessageCenterListItemHolder) convertView.getTag();
 			/* System may recycle the view after composing view
 			** is removed and recreated
 			 */
-			if (type == TYPE_COMPOSING_AREA && composingView == null) {
-				composingView = (MessageCenterComposingView) convertView;
-				setupComposingView(position);
-			} else if (type == TYPE_WHOCARD && whoCardView == null) {
-				whoCardView = (MessageCenterWhoCardView) convertView;
-				whoCardView.updateUi((MessageCenterComposingItem) listItem);
-				setupWhoCardView(position);
+			if (type == TYPE_COMPOSING_AREA) {
+				if (needInflateComposing || composingView == null) {
+					composingView = new MessageCenterComposingView(activityContext,
+							(MessageCenterComposingItem) listItem, composingActionListener);
+					setupComposingView(position);
+				}
+				view = composingView;
+			} else if (type == TYPE_WHOCARD) {
+				if (needInflateWhoCard || whoCardView == null) {
+					whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
+					whoCardView.updateUi((MessageCenterComposingItem) listItem);
+					setupWhoCardView(position);
+				}
+				view = whoCardView;
+			} else {
+				view = convertView;
+				holder = (MessageCenterListItemHolder) convertView.getTag();
 			}
 		}
 
 		if (holder != null) {
 			switch (type) {
 				case TYPE_TEXT_INCOMING: {
+					showAnimation = true;
 					if (bLoadAvatar) {
 						ImageUtil.startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
 								((IncomingTextMessage) listItem).getSenderProfilePhoto());
@@ -280,26 +298,34 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_TEXT_OUTGOING: {
+					showAnimation = true;
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
 					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
-					String status = createStatus(((OutgoingTextMessage) listItem).getCreatedAt());
-					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, textMessage.getCreatedAt() == null && !isInPauseState, textMessage.getBody());
+					Double createdTime = ((OutgoingTextMessage) listItem).getCreatedAt();
+					String status = createStatus(createdTime);
+					int statusTextColor = getStatusColor(createdTime);
+					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
+							createdTime == null && !isInPauseState, textMessage.getBody());
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {
+					showAnimation = true;
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
 					if (holder.position != position) {
 						holder.position = position;
-						startLoadAttachedImageTask((OutgoingFileMessage) listItem, position, (OutgoingFileMessageHolder) holder);
+						startLoadAttachedImageTask(fileMessage, position, (OutgoingFileMessageHolder) holder);
 					}
-					String datestamp = ((OutgoingFileMessage) listItem).getDatestamp();
-					String status = createStatus(((OutgoingFileMessage) listItem).getCreatedAt());
-					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, fileMessage.getCreatedAt() == null);
+					String datestamp = fileMessage.getDatestamp();
+					Double createdTime = fileMessage.getCreatedAt();
+					String status = createStatus(createdTime);
+					int statusTextColor = getStatusColor(createdTime);
+					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
+							createdTime == null && !isInPauseState);
 					break;
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.body);
+					((StatusHolder) holder).updateMessage(status.body, status.icon);
 					break;
 				}
 				case TYPE_AUTO: {
@@ -326,7 +352,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 			}
 		}
-		return convertView;
+		if (showAnimation && position > lastAnimatedPosition) {
+			AnimatorSet set = Util.buildListViewRowShowAnimator(view, null, null);
+			set.start();
+			lastAnimatedPosition = position;
+		}
+		return view;
 	}
 
 	@Override
@@ -366,6 +397,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void setupComposingView(final int position) {
 		composingEditText = composingView.getEditText();
+		composingViewIndex = position;
+		needInflateComposing = false;
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -375,6 +408,25 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		}, null);
+		set.start();
 		composingActionListener.onComposingViewCreated();
 	}
 
@@ -386,6 +438,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void setupWhoCardView(final int position) {
 		emailEditText = whoCardView.getEmailField();
+		whoCardViewIndex = position;
+		focusOnNameField = true;
+		needInflateWhoCard = false;
 		emailEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -407,7 +462,38 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
+		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				if (focusOnNameField) {
+					Util.showSoftKeyboard((Activity) activityContext, nameEditText);
+				} else {
+					Util.showSoftKeyboard((Activity) activityContext, emailEditText);
+				}
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+		}, null);
+		set.start();
 		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
+	}
+
+	public View getWhoCardView() {
+		return whoCardView;
+	}
+
+	public View getComposingAreaView() {
+		return composingView;
 	}
 
 	public void clearWhoCard() {
@@ -428,6 +514,16 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return activityContext.getResources().getString(R.string.apptentive_sent);
 	}
 
+	protected int getStatusColor(Double seconds) {
+		if (seconds == null) {
+			// failed color (red)
+			return isInPauseState ? Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_selected_text,
+					R.color.apptentive_material_selected_text) : 0;
+		}
+		// other status color
+		return Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_text,
+				R.color.apptentive_material_disabled_text);
+	}
 
 	private Point getBitmapDimensions(StoredFile storedFile) {
 		Point ret = null;

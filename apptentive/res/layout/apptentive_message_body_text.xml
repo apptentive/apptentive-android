@@ -12,6 +12,6 @@
     <TextView
         android:id="@+id/more_less_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/ApptentiveTheme.TextViewStyle.Message"/>
+        android:layout_height="wrap_content"
+        style="@style/ApptentiveTheme.TextViewStyle"/>
 </FrameLayout>

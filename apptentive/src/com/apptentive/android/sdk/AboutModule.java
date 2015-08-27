@@ -55,7 +55,7 @@ public class AboutModule {
 		activity.startActivity(intent);
 	}
 
-	void doShow(final Activity activity, boolean showBrandingBand) {
+	void setupView(final Activity activity, boolean showBrandingBand) {
 		activity.setContentView(R.layout.apptentive_about);
 
 		final String packageName = activity.getPackageName();
@@ -93,9 +93,6 @@ public class AboutModule {
 			}
 		});
 
-		TextView version = (TextView) activity.findViewById(R.id.version);
-		String versionString = activity.getResources().getString(R.string.apptentive_version);
-		version.setText(String.format(versionString, Constants.APPTENTIVE_SDK_VERSION));
 	}
 
 	boolean onBackPressed(Activity activity) {
