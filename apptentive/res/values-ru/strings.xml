@@ -12,10 +12,12 @@
   <string name="apptentive_thanks">Спасибо!</string>
   <string name="apptentive_no_thanks">Нет, спасибо</string>
   <string name="apptentive_thank_you">Спасибо</string>
-  <string name="apptentive_required">Обязательно</string>
+  <string name="apptentive_required">обязательно</string>
   <string name="apptentive_optional">По желанию</string>
+  <string name="apptentive_failed">Ошибка</string>
+  <string name="apptentive_sent">Отправлено</string>
   <string name="apptentive_version">Версия Apptentive %s</string>
-  <string name="apptentive_powered_by_apptentive">На базе технологии Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Разработано</string>
   <string name="apptentive_about_title">О Apptentive</string>
   <string name="apptentive_about_description">Apptentive это сервис обратной связи, позволяющий разработчикам этого приложения быстро получить ваш отзыв и прислушаться к нему.</string>
   <string name="apptentive_about_description_link">Узнайте больше на apptentive.com</string>
@@ -29,6 +31,8 @@
   <string name="apptentive_survey_singleline_hint">Введите ответ...</string>
   <string name="apptentive_survey_send_response">Отравить отзыв</string>
   <string name="apptentive_message_center_title">Центр сообщений</string>
+  <string name="apptentive_message_center_no_connection">Чтобы отправить отзыв, подключитесь к Интернету.</string>
+  <string name="apptentive_message_center_server_error">При открытии отзыва возникла проблема. Немного подождите и повторите попытку.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play не найден. Установите Google Play, чтобы оценить это приложение.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore не найден. Установите Amazon Appstore, чтобы оценить это приложение.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market не найден. Установите MiKandi Market, чтобы оценить это приложение.</string>

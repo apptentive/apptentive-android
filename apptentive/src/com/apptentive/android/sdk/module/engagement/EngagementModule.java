@@ -79,12 +79,12 @@ public class EngagementModule {
 		}
 	}
 
-	public static boolean willShowInteraction(Context context, String vendor, String interaction, String eventName) {
+	public static boolean canShowInteraction(Context context, String vendor, String interaction, String eventName) {
 		String eventLabel = generateEventLabel(vendor, interaction, eventName);
-		return willShowInteraction(context, eventLabel);
+		return canShowInteraction(context, eventLabel);
 	}
 
-	private static boolean willShowInteraction(Context context, String eventLabel) {
+	private static boolean canShowInteraction(Context context, String eventLabel) {
 		Interaction interaction = InteractionManager.getApplicableInteraction(context, eventLabel);
 		return interaction != null;
 	}

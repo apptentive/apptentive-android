@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">Tak</string>
   <string name="apptentive_required">Påkrævet</string>
   <string name="apptentive_optional">Valgfri</string>
+  <string name="apptentive_failed">Mislykkedes</string>
+  <string name="apptentive_sent">Sendt</string>
   <string name="apptentive_version">Apptentive version %s</string>
-  <string name="apptentive_powered_by_apptentive">Leveret af Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Leveret af</string>
   <string name="apptentive_about_title">Om Apptentive</string>
   <string name="apptentive_about_description">Apptentive er en feedback- og kommunikationstjeneste, som sætter de folk, som står bag denne app, i stand til hurtigere at få din feedback og bedre at lytte til dig.</string>
   <string name="apptentive_about_description_link">Find ud af mere på apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">Bedøm %s</string>
   <string name="apptentive_rating_remind">Påmind mig senere</string>
   <string name="apptentive_rating_error">Vi kunne ikke finde denne app i butikken. Besøg butikken for at finde og bedømme den.</string>
-  <string name="apptentive_survey_singleline_hint">Angiv et svar…</string>
+  <string name="apptentive_survey_singleline_hint">Angiv et svar&#8230;</string>
   <string name="apptentive_survey_send_response">Send besvarelse</string>
   <string name="apptentive_message_center_title">Beskeder</string>
+  <string name="apptentive_message_center_no_connection">Du skal oprette forbindelse til internettet for at sende feedback.</string>
+  <string name="apptentive_message_center_server_error">Det ser ud til, at vi har problemer med at få adgang til feedback. Vent lidt og prøv igen.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play blev ikke fundet. Installer Google Play, før du bedømmer appen.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore blev ikke fundet. Installer Amazon Appstore, før du bedømmer appen.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market blev ikke fundet. Installer MiKandi Market, før du bedømmer appen.</string>

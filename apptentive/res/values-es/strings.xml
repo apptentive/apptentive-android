@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">Gracias</string>
   <string name="apptentive_required">Obligatorio</string>
   <string name="apptentive_optional">Opcional</string>
+  <string name="apptentive_failed">Error</string>
+  <string name="apptentive_sent">Enviado</string>
   <string name="apptentive_version">Versión de Apptentive %s</string>
-  <string name="apptentive_powered_by_apptentive">Con tecnología Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Desarrollado por</string>
   <string name="apptentive_about_title">Acerca de Apptentive</string>
   <string name="apptentive_about_description">Apptentive es un servicio de opinión y comunicación que le permite a los desarrolladores de esta aplicación recibir tus comentarios y establecer un mejor contacto.</string>
   <string name="apptentive_about_description_link">Descubre más acerca de apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">Valorar %s</string>
   <string name="apptentive_rating_remind">Recordármelo más tarde</string>
   <string name="apptentive_rating_error">No pudimos encontrar esta aplicación en la tienda. Visita la tienda para encontrarla y valorarla.</string>
-  <string name="apptentive_survey_singleline_hint">Escribe una respuesta…</string>
+  <string name="apptentive_survey_singleline_hint">Escribe una respuesta&#8230;</string>
   <string name="apptentive_survey_send_response">Enviar respuesta</string>
   <string name="apptentive_message_center_title">Centro de mensajes</string>
+  <string name="apptentive_message_center_no_connection">Conectarse a internet para enviar comentarios.</string>
+  <string name="apptentive_message_center_server_error">Parece que tenemos problemas para acceder a los comentarios. Espera un poco y vuelve a intentarlo.</string>
   <string name="apptentive_rating_provider_no_google_play">No se halló Google Play. Instala Google Play antes de valorar esta aplicación.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">No se halló Amazon Appstore. Instala Amazon Appstore antes de valorar esta aplicación.</string>
   <string name="apptentive_rating_provider_no_mikandi">No se halló MiKandi Market. Instala MiKandi Market antes de valorar esta aplicación.</string>

@@ -14,8 +14,10 @@
   <string name="apptentive_thank_you">Bedankt</string>
   <string name="apptentive_required">Verplicht</string>
   <string name="apptentive_optional">Optioneel</string>
+  <string name="apptentive_failed">Mislukt</string>
+  <string name="apptentive_sent">Verzonden</string>
   <string name="apptentive_version">Versie %s van Apptentive</string>
-  <string name="apptentive_powered_by_apptentive">Mogelijk gemaakt door Apptentive</string>
+  <string name="apptentive_powered_by_apptentive">Mogelijk gemaakt door</string>
   <string name="apptentive_about_title">Over Apptentive</string>
   <string name="apptentive_about_description">Apptentive is een feedback- en communicatieservice waarmee diegenen die deze app hebben gemaakt sneller uw feedback kunnen ontvangen en beter naar u kunnen luisteren.</string>
   <string name="apptentive_about_description_link">Meer informatie op apptentive.com</string>
@@ -26,9 +28,11 @@
   <string name="apptentive_rate_this_app">Beoordeel %s</string>
   <string name="apptentive_rating_remind">Herinner me later</string>
   <string name="apptentive_rating_error">We kunnen deze app niet vinden in de winkel. Bezoek de winkel om de app te vinden en beoordelen.</string>
-  <string name="apptentive_survey_singleline_hint">Voer een antwoord in…</string>
+  <string name="apptentive_survey_singleline_hint">Voer een antwoord in&#8230;</string>
   <string name="apptentive_survey_send_response">Verstuur antwoord</string>
   <string name="apptentive_message_center_title">Berichten</string>
+  <string name="apptentive_message_center_no_connection">Maak verbinding met internet om feedback te verzenden.</string>
+  <string name="apptentive_message_center_server_error">Zo te zien is de feedback niet bereikbaar. Wacht even en probeer het straks opnieuw.</string>
   <string name="apptentive_rating_provider_no_google_play">Google Play is niet gevonden. Installeer Google Play voordat u deze app beoordeelt.</string>
   <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore is niet gevonden. Installeer Amazon Appstore voordat u deze app beoordeelt.</string>
   <string name="apptentive_rating_provider_no_mikandi">MiKandi Market is niet gevonden. Installeer MiKandi Market voordat u deze app beoordeelt.</string>
