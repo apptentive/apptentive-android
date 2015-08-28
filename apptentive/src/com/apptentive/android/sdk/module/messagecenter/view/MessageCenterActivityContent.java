@@ -167,22 +167,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
-					// After the message is sent, check if Who Card need to be shown for the 1st time
-					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-					if (!bWhoCardSet) {
-						JSONObject data = new JSONObject();
-						try {
-							data.put("required", interaction.getWhoCardRequired());
-							data.put("trigger", "automatic");
-						} catch (JSONException e) {
-							//
-						}
-						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-						addWhoCard(WHO_CARD_MODE_INIT);
-						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-						break;
-					}
 					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null) {
 						addNewStatusItem(newItem);
@@ -197,7 +181,23 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					message.setRead(true);
 					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
 					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
-					addNewOutGoingMessageItem(message);
+					// After the message is sent, check if Who Card need to be shown for the 1st time
+					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+					if (!bWhoCardSet) {
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "automatic");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+						addWhoCard(WHO_CARD_MODE_INIT);
+						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+					} else {
+						addNewOutGoingMessageItem(message);
+					}
 					break;
 				}
 				case MSG_PAUSE_SENDING: {
@@ -779,10 +779,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onCancelComposing() {
-		if (contextualMessage != null) {
-			messages.remove(contextualMessage);
-			contextualMessage = null;
-		}
 		JSONObject data = new JSONObject();
 		try {
 			int bodyLength = getPendingComposingContent().toString().trim().length();
@@ -807,6 +803,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
+				if (contextualMessage != null) {
+					messages.remove(contextualMessage);
+					contextualMessage = null;
+				}
 				messages.remove(actionBarItem);
 				messages.remove(composingItem);
 				actionBarItem = null;

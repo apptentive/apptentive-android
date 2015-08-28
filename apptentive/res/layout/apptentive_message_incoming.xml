@@ -30,7 +30,12 @@
                     style="?attr/apptentiveAvatarViewMessageStyle"/>
                 <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
+                              android:orientation="vertical"
                               style="@style/ApptentiveMessageCenterMessageContent">
+                    <TextView android:id="@+id/sender_name"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              style="@style/ApptentiveTheme.TextViewStyle"/>
                     <FrameLayout android:id="@+id/body"
                                  android:layout_width="match_parent"
                                  android:layout_height="wrap_content"/>

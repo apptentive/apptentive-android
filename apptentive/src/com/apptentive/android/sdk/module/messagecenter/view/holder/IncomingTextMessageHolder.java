@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -19,19 +20,28 @@ import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageV
 public class IncomingTextMessageHolder extends MessageHolder {
 
 	public ApptentiveAvatarView avatar;
-	public TextView text;
+	private TextView messageBody;
+	private TextView nameView;
 
 	public IncomingTextMessageHolder(IncomingTextMessageView view) {
 		super(view);
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
-		text = (TextView) view.findViewById(R.id.more_less_container);
+		messageBody = (TextView) view.findViewById(R.id.more_less_container);
+		nameView = (TextView) view.findViewById(R.id.sender_name);
 	}
 
-	public void updateMessage(String datestamp, String text) {
+	public void updateMessage(String name, String datestamp, String text) {
 		super.updateMessage(datestamp, 0, null);
 
-		if (this.text != null) {
-			this.text.setText(text);
+		if (messageBody != null) {
+			messageBody.setText(text);
+		}
+
+		if (name != null && !name.isEmpty()) {
+			nameView.setVisibility(View.VISIBLE);
+			nameView.setText(name);
+		} else {
+			nameView.setVisibility(View.GONE);
 		}
 	}
 }
