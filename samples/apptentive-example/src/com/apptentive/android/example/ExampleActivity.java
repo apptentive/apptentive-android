@@ -44,8 +44,7 @@ public class ExampleActivity extends Activity {
 		super.onWindowFocusChanged(hasFocus);
 		// Only engage if this window is gaining focus.
 		if (hasFocus) {
-			// If you plan on showing your own views, first make sure Apptentive hasn't already shown one.
-			boolean apptentiveShowedInteraction = Apptentive.engage(this, "init");
+			Apptentive.handleOpenedPushNotification(this);
 		}
 	}
 
