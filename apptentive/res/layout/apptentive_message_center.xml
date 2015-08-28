@@ -87,6 +87,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/apptentive_transparency"
+                    android:paddingBottom="60dp"
+                    android:clipToPadding="false"
                     android:cacheColorHint="@color/apptentive_transparency"/>
             </FrameLayout>
         </LinearLayout>
