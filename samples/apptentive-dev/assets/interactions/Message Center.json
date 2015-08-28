@@ -1,30 +1,36 @@
 {
-  "id": "message_center_interaction",
+  "id": "message_center_interaction_id",
   "type": "MessageCenter",
+  "version": 2,
   "configuration": {
-    "title": "Message Center Title",
-    "branding": "Powered By Apptentive",
+    "title": "Message Center",
+    "branding": "Powered by Apptentive",
     "composer": {
       "title": "New Message",
       "hint_text": "Please leave detailed feedback",
-      "send_button": "Send"
+      "send_button": "Send",
+      "send_start": "Sending...",
+      "send_ok": "Sent",
+      "send_fail": "Failed",
+      "close_text": "Close",
+      "close_confirm_body": "Are you sure you want to discard this message?",
+      "close_discard_button": "Discard",
+      "close_cancel_button": "Cancel"
     },
     "greeting": {
-      "title": "Greeting Title!",
-      "body": "Greeting Body. We'd love to get feedback from you on our app.",
+      "title": "Hello!",
+      "body": "We'd love to get feedback from you on our app. The more details you can provide, the better.",
       "image_url": "https://dfuvhehs12k8c.cloudfront.net/assets/app-icon/good-mark-400889c96ea2b5ec8a8e896ea5d7597b.png"
     },
     "status": {
-      "body": "Status message. We will respond to your message soon."
+      "body": "We will respond to your message soon."
     },
     "automated_message": {
-      "body": "We're sorry to hear that you don't love Sky's App!  Is there anything we could do to make it better?"
+      "body": "Please let us know how to make Temp Dev App better for you!"
     },
     "error_messages": {
-      "http_error_title": "It looks like we're having trouble sending your message.",
-      "http_error_body": "We've saved it and will try sending it again soon.",
-      "network_error_title": "It looks like you aren't connected to the Internet right now.",
-      "network_error_body": "We've saved your message and will try again when we detect a connection."
+      "http_error_body": "It looks like we're having trouble sending your message. We've saved it and will try sending it again soon.",
+      "network_error_body": "It looks like you aren't connected to the Internet right now. We've saved your message and will try again when we detect a connection."
     },
     "profile": {
       "request": true,
@@ -45,6 +51,4 @@
       }
     }
   }
-}
-}
 }
