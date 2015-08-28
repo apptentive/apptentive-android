@@ -28,7 +28,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP = "notification_popup";
-	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = "enable";
+	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = "enabled";
 
 	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
