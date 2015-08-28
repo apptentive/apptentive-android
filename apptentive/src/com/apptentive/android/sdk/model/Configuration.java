@@ -24,13 +24,12 @@ public class Configuration extends JSONObject {
 	private static final String KEY_METRICS_ENABLED = "metrics_enabled";
 	private static final String KEY_APP_DISPLAY_NAME = "app_display_name";
 	private static final String KEY_MESSAGE_CENTER = "message_center";
-	private static final String KEY_MESSAGE_CENTER_TITLE = "title";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
 	private static final String KEY_MESSAGE_CENTER_BG_POLL = "bg_poll";
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
-	private static final String KEY_MESSAGE_CENTER_EMAIL_REQUIRED = "email_required";
-	private static final String KEY_MESSAGE_CENTER_GREETING_IMAGE_URL= "greeting_image_url";
-	private static final String KEY_NEW_MESSAGE_TOAST_ENABLED = "new_message_toast_enabled";
+	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP = "notification_popup";
+	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = "enabled";
+
 	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
 	// This one is not sent in JSON, but as a header form the server.
@@ -47,7 +46,7 @@ public class Configuration extends JSONObject {
 
 	public void save(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).apply();
 	}
 
 	public static Configuration load(Context context) {
@@ -100,20 +99,6 @@ public class Configuration extends JSONObject {
 		return null;
 	}
 
-	public String getMessageCenterTitle() {
-		try {
-			JSONObject messageCenter = getMessageCenter();
-			if (messageCenter != null) {
-				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_TITLE)) {
-					return messageCenter.getString(KEY_MESSAGE_CENTER_TITLE);
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
 	public int getMessageCenterFgPoll() {
 		try {
 			JSONObject messageCenter = getMessageCenter();
@@ -142,7 +127,7 @@ public class Configuration extends JSONObject {
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
 	}
 
-	public boolean isMessageCenterEnabled(Context context) {
+	public boolean isMessageCenterEnabled() {
 		try {
 			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
 				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
@@ -151,57 +136,20 @@ public class Configuration extends JSONObject {
 			// Move on.
 		}
 
-		try {
-			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-			Bundle metaData = ai.metaData;
-			return metaData.getBoolean(Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED);
-		} catch (Exception e) {
-			Log.w("Unexpected error while reading default %s manifest setting.", e, Constants.MANIFEST_KEY_MESSAGE_CENTER_ENABLED);
-		}
-
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
 	}
 
-	public boolean isNewMessageToastEnabled() {
-		try {
-			JSONObject messageCenter = getMessageCenter();
-			if (messageCenter != null) {
-				if (!messageCenter.isNull(KEY_NEW_MESSAGE_TOAST_ENABLED)) {
-					return messageCenter.getBoolean(KEY_NEW_MESSAGE_TOAST_ENABLED);
-				}
-			}
-		} catch (JSONException e) {
-			// Move on.
-		}
-
-		return Constants.CONFIG_DEFAULT_NEW_MESSAGE_TOAST_ENABLED;
-	}
-
-	public boolean isMessageCenterEmailRequired() {
-		try {
-			JSONObject messageCenter = getMessageCenter();
-			if (messageCenter != null) {
-				if (!messageCenter.isNull(KEY_MESSAGE_CENTER_EMAIL_REQUIRED)) {
-					return messageCenter.getBoolean(KEY_MESSAGE_CENTER_EMAIL_REQUIRED);
-				}
-			}
-		} catch (JSONException e) {
-			// Move on.
-		}
-
-		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED;
-	}
-
-	public String getMessageCenterGreetingImageUrl() {
+	public boolean isMessageCenterNotificationPopupEnabled() {
 		JSONObject messageCenter = getMessageCenter();
 		if (messageCenter != null) {
-			return messageCenter.optString(KEY_MESSAGE_CENTER_GREETING_IMAGE_URL, null);
+			if (!messageCenter.isNull(KEY_MESSAGE_CENTER_NOTIFICATION_POPUP)) {
+				JSONObject notificationPopup = messageCenter.optJSONObject(KEY_MESSAGE_CENTER_NOTIFICATION_POPUP);
+				if (notificationPopup != null) {
+					return notificationPopup.optBoolean(KEY_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED);
+				}
+			}
 		}
-		return null;
-	}
-
-	public boolean canShowMessageCenter() {
-		return getMessageCenterGreetingImageUrl() != null;
+		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED;
 	}
 
 	public boolean isHideBranding(Context context) {
