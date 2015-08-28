@@ -114,11 +114,8 @@ public class MainActivity extends ApptentiveActivity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-/*
 		if (hasFocus) {
-			boolean ret = Apptentive.engage(this, "init");
-			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
+			Apptentive.handleOpenedPushNotification(this);
 		}
-*/
 	}
 }

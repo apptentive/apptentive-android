@@ -478,10 +478,11 @@ public class Apptentive {
 	}
 
 	/**
-	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use this method when a
-	 * push notification is opened, and you only have access to a Bundle of extras that were included in the push
-	 * notification. have access to a push Intent Bundle containing an "apptentive" key. This will generally be used only
-	 * with Urban Airship integrations. Calling this method for a push that did not come from Apptentive has no effect.
+	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use
+	 * this method when a push notification is opened, and you only have access to a push Intent
+	 * Bundle containing an "apptentive" key. This will generally be used with direct Apptentive Push
+	 * notifications, or when using Urban Airship as a puch provider. Calling this method for a push
+	 * that did not come from Apptentive has no effect.
 	 *
 	 * @param context The context from which this method was called.
 	 * @param bundle  The Bundle contained in the push notification.
@@ -496,14 +497,13 @@ public class Apptentive {
 	}
 
 	/**
-	 * Launches Apptentive features based on a push notification Intent. Before you call this, you must call
-	 * {@link Apptentive#setPendingPushNotification(Context, Intent)} in your Broadcast receiver when a push notification
-	 * is opened by the user. This method must be called from the Activity that you launched from the
-	 * BroadcastReceiver. This method will only handle Apptentive originated push notifications, so call is any time you
-	 * receive a push.
-	 * <p/>
-	 * <strong>Note: </strong>If you are using Parse, do not use this method. Instead, see the Apptentive
-	 * <a href="http://www.apptentive.com/docs/android/integration/"> integration guide</a> for Parse.
+	 * Launches Apptentive features based on a push notification Intent. Before you call this, you
+	 * must call {@link Apptentive#setPendingPushNotification(Context, Intent)} or
+	 * {@link Apptentive#setPendingPushNotification(Context, Bundle)} in your Broadcast receiver when
+	 * a push notification is opened by the user. This method must be called from the Activity that
+	 * you launched from the BroadcastReceiver. This method will only handle Apptentive originated
+	 * push notifications, so you can and should call it any time your push notification launches an
+	 * Activity.
 	 *
 	 * @param activity The Activity from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
@@ -511,7 +511,7 @@ public class Apptentive {
 	public static boolean handleOpenedPushNotification(Activity activity) {
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
-		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit(); // Remove our data so this won't run twice.
+		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
 		if (pushData != null) {
 			Log.i("Handling opened Apptentive push notification.");
 			try {
@@ -793,11 +793,11 @@ public class Apptentive {
 	}
 
 	/**
-	 * @deprecated Use {@link Apptentive#canShowInteraction}() instead. The behavior is identical. Only the name has changed.
 	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
 	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
+	 * @deprecated Use {@link Apptentive#canShowInteraction}() instead. The behavior is identical. Only the name has changed.
 	 */
 	public static synchronized boolean willShowInteraction(Context context, String event) {
 		return canShowInteraction(context, event);
