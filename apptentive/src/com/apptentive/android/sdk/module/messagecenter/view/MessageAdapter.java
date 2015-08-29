@@ -281,6 +281,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			} else if (type == TYPE_WHOCARD) {
 				if (whoCardView == null) {
 					whoCardView = (MessageCenterWhoCardView) convertView;
+					whoCardView.updateUi((MessageCenterComposingItem) listItem);
 					setupWhoCardView(position);
 				}
 				view = whoCardView;
@@ -357,22 +358,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (composingEditText != null) {
 			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
 				composingEditText.requestFocus();
-				if (forceShowKeyboard) {
-					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
-				}
 			}
 		} else if (nameEditText != null) {
 			if (whoCardViewIndex != INVALID_POSITION && whoCardViewIndex == position) {
 				if (focusOnNameField) {
 					nameEditText.requestFocus();
-					if (forceShowKeyboard) {
-						Util.showSoftKeyboard((Activity) activityContext, nameEditText);
-					}
 				} else {
 					emailEditText.requestFocus();
-					if (forceShowKeyboard) {
-						Util.showSoftKeyboard((Activity) activityContext, emailEditText);
-					}
 				}
 			}
 		}
