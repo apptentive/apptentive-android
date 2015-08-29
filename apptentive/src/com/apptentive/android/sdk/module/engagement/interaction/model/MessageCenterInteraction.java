@@ -51,7 +51,7 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_PROFILE_INIT_TITLE = "title";
 	public static final String KEY_PROFILE_INIT_NAME_HINT = "name_hint";
 	public static final String KEY_PROFILE_INIT_EMAIL_HINT = "email_hint";
-	public static final String KEY_PROFILE_INIT_EMAIL_TIP = "email_tip";
+	public static final String KEY_PROFILE_INIT_EMAIL_EXPLANATION = "email_explanation";
 	public static final String KEY_PROFILE_INIT_SKIP_BUTTON = "skip_button";
 	public static final String KEY_PROFILE_INIT_SAVE_BUTTON = "save_button";
 	public static final String KEY_PROFILE_EDIT = "edit";
@@ -170,8 +170,8 @@ public class MessageCenterInteraction extends Interaction {
 					// Hide name field if profile is required and never set
 					null,
 					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-					profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
-					profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
+					profile_init.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
+					null,
 					profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 		}
 		return new MessageCenterComposingItem(
@@ -179,7 +179,7 @@ public class MessageCenterInteraction extends Interaction {
 				profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
 				profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
 				profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profile_init.optString(KEY_PROFILE_INIT_EMAIL_TIP, null),
+				profile_init.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
 				profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
 				profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 	}

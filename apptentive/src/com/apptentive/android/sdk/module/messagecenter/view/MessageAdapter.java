@@ -95,6 +95,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private MessageCenterComposingView composingView;
 	private EditText composingEditText;
 
+	private MessageCenterComposingActionBarView composingActionBarView;
+
 	// Variables used in Who Card
 	public boolean needInflateWhoCard;
 	private int whoCardViewIndex = INVALID_POSITION;
@@ -115,7 +117,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	public interface OnComposingActionListener {
 		void onComposingViewCreated();
 
-		void onComposing(String str);
+		void beforeComposingTextChanged(String str);
+		void onComposingTextChanged(String str);
+		void afterComposingTextChanged(String str);
 
 		void onCancelComposing();
 
@@ -232,7 +236,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-				  view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+					if (composingActionBarView == null) {
+						composingActionBarView = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+					}
+					view = composingActionBarView;
 					break;
 				}
 				case TYPE_WHOCARD: {
@@ -274,7 +281,13 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					setupWhoCardView(position);
 				}
 				view = whoCardView;
-			} else {
+			} else if (type == TYPE_COMPOSING_BAR) {
+				if (composingActionBarView == null) {
+					composingActionBarView = (MessageCenterComposingActionBarView) convertView;
+				}
+				view = composingActionBarView;
+			}
+			else {
 				view = convertView;
 				holder = (MessageCenterListItemHolder) convertView.getTag();
 			}
@@ -432,6 +445,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	public void clearComposing() {
+		composingActionBarView = null;
 		composingView = null;
 		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
@@ -453,16 +467,20 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		});
 		nameEditText = whoCardView.getNameField();
-		nameEditText.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					whoCardViewIndex = position;
-					focusOnNameField = true;
+		if (nameEditText.getVisibility() == View.VISIBLE) {
+			nameEditText.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					if (event.getAction() == MotionEvent.ACTION_UP) {
+						whoCardViewIndex = position;
+						focusOnNameField = true;
+					}
+					return false;
 				}
-				return false;
-			}
-		});
+			});
+		} else {
+			focusOnNameField = false;
+		}
 		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
@@ -495,6 +513,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	public View getComposingAreaView() {
 		return composingView;
+	}
+
+	public MessageCenterComposingActionBarView getComposingActionBarView () {
+		return composingActionBarView;
 	}
 
 	public void clearWhoCard() {
