@@ -43,18 +43,23 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
 		title = (TextView) parentView.findViewById(R.id.who_title);
 
+		sendButton = (Button) parentView.findViewById(R.id.btn_send);
+
 		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
+
 		emailEditText.addTextChangedListener(new TextWatcher() {
-			private boolean doScroll = false;
 
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				emailEditText.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
+				sendButton.setEnabled(false);
 			}
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
+				if (!charSequence.toString().isEmpty()) {
+					sendButton.setEnabled(true);
+				}
 			}
 
 			@Override
@@ -69,7 +74,6 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		skipButton = (Button) parentView.findViewById(R.id.btn_skip);
 
-		sendButton = (Button) parentView.findViewById(R.id.btn_send);
 	}
 
 	public void updateUi(final MessageCenterComposingItem item) {

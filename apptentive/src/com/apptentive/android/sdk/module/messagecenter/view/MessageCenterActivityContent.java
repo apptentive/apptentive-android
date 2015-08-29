@@ -167,6 +167,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageTimeStamps();
+					MessageCenterStatus newItem = interaction.getRegularStatus();
+					if (newItem != null && whoCardItem == null && composingItem == null) {
+						addNewStatusItem(newItem);
+					}
+					messageCenterListAdapter.notifyDataSetChanged();
+					break;
+				}
+				case MSG_START_SENDING: {
+					String messageText = (String) msg.obj;
+					OutgoingTextMessage message = new OutgoingTextMessage();
+					message.setBody(messageText);
+					message.setRead(true);
+					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
+					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
 					// After the message is sent, check if Who Card need to be shown for the 1st time
 					SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
@@ -181,23 +195,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						addWhoCard(WHO_CARD_MODE_INIT);
 						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-						break;
+					} else {
+						addNewOutGoingMessageItem(message);
 					}
-					MessageCenterStatus newItem = interaction.getRegularStatus();
-					if (newItem != null) {
-						addNewStatusItem(newItem);
-					}
-					messageCenterListAdapter.notifyDataSetChanged();
-					break;
-				}
-				case MSG_START_SENDING: {
-					String messageText = (String) msg.obj;
-					OutgoingTextMessage message = new OutgoingTextMessage();
-					message.setBody(messageText);
-					message.setRead(true);
-					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
-					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
-					addNewOutGoingMessageItem(message);
 					break;
 				}
 				case MSG_PAUSE_SENDING: {
@@ -309,7 +309,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		int brightColor = Util.lighter(defaultColor, 0.5f);
 		headerDivider.setBackgroundColor(brightColor);
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
-		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 		messageCenterListView.setItemsCanFocus(true);
 		messageCenterListView.setOnScrollListener(this);
 
@@ -318,7 +318,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			@Override
 			public void onClick(View v) {
 				addComposingArea();
-				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+				messageCenterListAdapter.notifyDataSetChanged();
 			}
 		});
 		if (messageCenterListAdapter == null) {
@@ -349,8 +349,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				if (!addWhoCardInitRequired()) {
 					addComposingArea();
 				}
-			} else {
-				addNewStatusItem(new MessageCenterStatus(null, null));
 			}
 
 			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
@@ -409,7 +407,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						} else {
 							addWhoCard(WHO_CARD_MODE_EDIT);
 						}
-						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+						messageCenterListAdapter.notifyDataSetChanged();
 					}
 				}
 			});
@@ -575,10 +573,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
-		if (!statusItem.isEmpty) {
-			EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
-			messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-		}
+
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
+		messageCenterListAdapter.notifyDataSetChanged();
+
 	}
 
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
@@ -586,23 +584,18 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		messages.add(message);
 		unsendMessagesCount++;
-    // Add empty elevation for FAB
-		addNewStatusItem(new MessageCenterStatus(null, null));
 
 		isPaused = false;
 		messageCenterListAdapter.setPaused(isPaused);
 
-		messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		messageCenterListAdapter.notifyDataSetChanged();
 	}
 
 	public void addNewIncomingMessageItem(ApptentiveMessage message) {
 		boolean hasEmptyStatus = false;
 		boolean needEmptyStatus = false;
-		if (statusItem != null && statusItem.isEmpty) {
-			hasEmptyStatus = true;
-		} else {
-			clearStatus();
-		}
+		clearStatus();
+
 		// Determine where to insert the new incoming message
 		int insertIndex = messages.size();
 		if (composingItem != null) {
@@ -616,10 +609,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			if (contextualMessage != null) {
 				insertIndex--;
 			}
-		} else if (hasEmptyStatus) {
-			insertIndex -= 1;
-		} else {
-			needEmptyStatus = true;
 		}
 		messages.add(insertIndex, message);
 
@@ -635,10 +624,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					insertIndex, top));
 		} else {
 			updateMessageTimeStamps();
-			if (needEmptyStatus) {
-				addNewStatusItem(new MessageCenterStatus(null, null));
-			}
-			messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+			messageCenterListAdapter.notifyDataSetChanged();
 		}
 
 	}
@@ -779,10 +765,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onCancelComposing() {
-		if (contextualMessage != null) {
-			messages.remove(contextualMessage);
-			contextualMessage = null;
-		}
 		JSONObject data = new JSONObject();
 		try {
 			int bodyLength = getPendingComposingContent().toString().trim().length();
@@ -797,34 +779,38 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		clearComposingUi(new Animator.AnimatorListener() {
 
-			@Override
-			public void onAnimationStart(Animator animation) {
-			}
+											 @Override
+											 public void onAnimationStart(Animator animation) {
+											 }
 
-			@Override
-			public void onAnimationRepeat(Animator animation) {
-			}
+											 @Override
+											 public void onAnimationRepeat(Animator animation) {
+											 }
 
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				messages.remove(actionBarItem);
-				messages.remove(composingItem);
-				actionBarItem = null;
-				composingItem = null;
-				messageEditText = null;
-				messageCenterListAdapter.clearComposing();
-				messageCenterListAdapter.needInflateComposing = true;
-				messageCenterListAdapter.notifyDataSetChanged();
-				Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
-				showFab();
-				// messageEditText has been set to null, pending composing message will reset
-				saveOrClearPendingComposingMessage();
-			}
+											 @Override
+											 public void onAnimationEnd(Animator animation) {
+												 if (contextualMessage != null) {
+													 messages.remove(contextualMessage);
+													 contextualMessage = null;
+												 }
+												 messages.remove(actionBarItem);
+												 messages.remove(composingItem);
+												 actionBarItem = null;
+												 composingItem = null;
+												 messageEditText = null;
+												 messageCenterListAdapter.clearComposing();
+												 messageCenterListAdapter.needInflateComposing = true;
+												 messageCenterListAdapter.notifyDataSetChanged();
+												 Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+												 showFab();
+												 // messageEditText has been set to null, pending composing message will reset
+												 saveOrClearPendingComposingMessage();
+											 }
 
-			@Override
-			public void onAnimationCancel(Animator animation) {
-			}
-		},
+											 @Override
+											 public void onAnimationCancel(Animator animation) {
+											 }
+										 },
 				createValueAnimatiorListenerHelper(messageCenterListAdapter.getComposingAreaView()));
 	}
 
@@ -839,39 +825,39 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		// Close all composing UI
 		clearComposingUi(new Animator.AnimatorListener() {
 
-			@Override
-			public void onAnimationStart(Animator animation) {
-			}
+											 @Override
+											 public void onAnimationStart(Animator animation) {
+											 }
 
-			@Override
-			public void onAnimationRepeat(Animator animation) {
-			}
+											 @Override
+											 public void onAnimationRepeat(Animator animation) {
+											 }
 
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
-				messages.remove(actionBarItem);
-				messages.remove(composingItem);
-				actionBarItem = null;
-				composingItem = null;
-				messageEditText = null;
-				messageCenterListAdapter.clearComposing();
-				messageCenterListAdapter.needInflateComposing = true;
-				messageCenterListAdapter.notifyDataSetChanged();
-				saveOrClearPendingComposingMessage();
-				// Send out the new message. The delay is added to ensure the CardView showing animation
-				// is visible after the keyboard is hidden
-				if (!messageText.isEmpty()) {
-					messageCenterViewHandler.sendMessageDelayed(messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
-							messageText), DEFAULT_DELAYMILLIS);
-				}
-				showFab();
-			}
+											 @Override
+											 public void onAnimationEnd(Animator animation) {
+												 Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+												 messages.remove(actionBarItem);
+												 messages.remove(composingItem);
+												 actionBarItem = null;
+												 composingItem = null;
+												 messageEditText = null;
+												 messageCenterListAdapter.clearComposing();
+												 messageCenterListAdapter.needInflateComposing = true;
+												 messageCenterListAdapter.notifyDataSetChanged();
+												 saveOrClearPendingComposingMessage();
+												 // Send out the new message. The delay is added to ensure the CardView showing animation
+												 // is visible after the keyboard is hidden
+												 if (!messageText.isEmpty()) {
+													 messageCenterViewHandler.sendMessageDelayed(messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
+															 messageText), DEFAULT_DELAYMILLIS);
+												 }
+												 showFab();
+											 }
 
-			@Override
-			public void onAnimationCancel(Animator animation) {
-			}
-		},
+											 @Override
+											 public void onAnimationCancel(Animator animation) {
+											 }
+										 },
 				createValueAnimatiorListenerHelper(messageCenterListAdapter.getComposingAreaView()));
 	}
 
@@ -942,7 +928,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					}
 				},
 				createValueAnimatiorListenerHelper(messageCenterListAdapter.getWhoCardView())
-				);
+		);
 	}
 
 	@Override
@@ -1058,8 +1044,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	private void showFab() {
-		// add an empty status at the bottom so that fab does not block any message
-		addNewStatusItem(new MessageCenterStatus(null, null));
 		fab.setVisibility(View.VISIBLE);
 	}
 

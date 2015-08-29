@@ -54,6 +54,8 @@
     <dimen name="apptentive_message_center_card_margin">0dp</dimen>
     <dimen name="apptentive_message_center_fallback_divider_line_width">2dp</dimen>
     <dimen name="apptentive_message_center_avatar_image_diameter">48dp</dimen>
+    <dimen name="apptentive_message_center_card_view_content_margin">16dp</dimen>
+    <dimen name="apptentive_message_center_card_control_margin">8dp</dimen>
 
     <dimen name="floating_action_button_size_normal">56dp</dimen>
     <dimen name="floating_action_button_size_mini">40dp</dimen>

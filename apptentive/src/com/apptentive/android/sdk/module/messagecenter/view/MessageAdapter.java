@@ -232,7 +232,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-					view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+				  view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
 					break;
 				}
 				case TYPE_WHOCARD: {
@@ -290,7 +290,8 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					}
 					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
 					String datestamp = ((IncomingTextMessage) listItem).getDatestamp();
-					((IncomingTextMessageHolder) holder).updateMessage(datestamp, textMessage.getBody());
+					((IncomingTextMessageHolder) holder).updateMessage(textMessage.getSenderUsername(),
+							datestamp, textMessage.getBody());
 					if (!textMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(textMessage, position);
