@@ -204,6 +204,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						addWhoCard(WHO_CARD_MODE_INIT);
+						messageCenterListAdapter.setForceShowKeyboard(true);
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
 					}
@@ -327,6 +328,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			@Override
 			public void onClick(View v) {
 				addComposingArea();
+				messageCenterListAdapter.setForceShowKeyboard(true);
 				messageCenterListAdapter.notifyDataSetChanged();
 			}
 		});
@@ -416,6 +418,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						} else {
 							addWhoCard(WHO_CARD_MODE_EDIT);
 						}
+						messageCenterListAdapter.setForceShowKeyboard(true);
 						messageCenterListAdapter.notifyDataSetChanged();
 					}
 				}
@@ -718,12 +721,21 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 															 ValueAnimator.AnimatorUpdateListener vl, long delay) {
 		if (composingItem != null) {
 			if (al != null) {
+				deleteItemWithAnimation(messageCenterListAdapter.getComposingActionBarView(), null, null, delay);
 				deleteItemWithAnimation(messageCenterListAdapter.getComposingAreaView(), al, vl, delay);
 			} else {
+				if (contextualMessage != null) {
+					messages.remove(contextualMessage);
+					contextualMessage = null;
+				}
+				messages.remove(actionBarItem);
+				messages.remove(composingItem);
 				actionBarItem = null;
 				composingItem = null;
 				messageEditText = null;
 				messageCenterListAdapter.clearComposing();
+				messageCenterListAdapter.notifyDataSetChanged();
+				showFab();
 			}
 		}
 	}
@@ -763,16 +775,24 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void beforeComposingTextChanged(String str) {
-		messageCenterListAdapter.getComposingActionBarView().sendButton.setEnabled(false);
-		messageCenterListAdapter.getComposingActionBarView().showConfirmation = false;
+	public void beforeComposingTextChanged(CharSequence str) {
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		if (barView != null) {
+			barView.sendButton.setEnabled(false);
+			barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+			barView.showConfirmation = false;
+		}
 	}
 
 	@Override
-	public void onComposingTextChanged(String str) {
+	public void onComposingTextChanged(CharSequence str) {
 		if (!TextUtils.isEmpty(str)) {
-			messageCenterListAdapter.getComposingActionBarView().sendButton.setEnabled(true);
-			messageCenterListAdapter.getComposingActionBarView().showConfirmation = true;
+			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+			if (barView != null) {
+				barView.sendButton.setEnabled(true);
+				barView.sendButton.setColorFilter(null);
+				barView.showConfirmation = true;
+			}
 		}
 	}
 
@@ -783,6 +803,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onCancelComposing() {
+		messageCenterListAdapter.setForceShowKeyboard(false);
 		Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 
 		JSONObject data = new JSONObject();
@@ -816,7 +837,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 composingItem = null;
 												 messageEditText = null;
 												 messageCenterListAdapter.clearComposing();
-												 messageCenterListAdapter.needInflateComposing = true;
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 showFab();
 												 // messageEditText has been set to null, pending composing message will reset
@@ -829,10 +849,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 										 },
 				createValueAnimatiorListenerHelper(messageCenterListAdapter.getComposingAreaView()),
 				DEFAULT_DELAYMILLIS);
+		//clearComposingUi(null, null, 0);
 	}
 
 	@Override
 	public void onFinishComposing() {
+		messageCenterListAdapter.setForceShowKeyboard(false);
 		Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 		if (contextualMessage != null) {
 			unsendMessagesCount++;
@@ -859,7 +881,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 composingItem = null;
 												 messageEditText = null;
 												 messageCenterListAdapter.clearComposing();
-												 messageCenterListAdapter.needInflateComposing = true;
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 saveOrClearPendingComposingMessage();
 												 // Send out the new message. The delay is added to ensure the CardView showing animation
@@ -908,6 +929,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public void cleanupWhoCard() {
+		messageCenterListAdapter.setForceShowKeyboard(false);
 		Util.hideSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 		clearWhoCardUi(
 				new Animator.AnimatorListener() {
@@ -923,7 +945,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					@Override
 					public void onAnimationEnd(Animator animation) {
 						messages.remove(whoCardItem);
-						messageCenterListAdapter.needInflateWhoCard = true;
 						whoCardItem = null;
 						pendingWhoCardName = null;
 						pendingWhoCardEmail = null;
@@ -936,6 +957,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						saveWhoCardSetState();
 						if (!bWhoCardSet && interaction.getWhoCardRequired()) {
 							addComposingArea();
+							messageCenterListAdapter.setForceShowKeyboard(true);
 							messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
 						} else {
 							showFab();
@@ -1076,12 +1098,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			public void onAnimationUpdate(ValueAnimator animation) {
 				Float value = (Float) animation.getAnimatedValue();
 				if (value >= 1) {
-					view.setVisibility(View.GONE);
 					showFab();
 				} else {
-					view.getLayoutParams().height = height
-							- (int) (height * value);
-					view.requestLayout();
 					fab.setVisibility(View.VISIBLE);
 					fab.setAlpha(value);
 					fab.setScaleX(value);

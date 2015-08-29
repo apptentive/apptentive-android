@@ -39,17 +39,16 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		et.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				listener.beforeComposingTextChanged(charSequence.toString());
+				listener.beforeComposingTextChanged(charSequence);
 			}
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-				listener.onComposingTextChanged(charSequence.toString());
+				listener.onComposingTextChanged(charSequence);
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				listener.afterComposingTextChanged(editable.toString());
 			}
 		});
 
