@@ -132,7 +132,7 @@ public class ApptentiveClient {
 			URL httpUrl = new URL(uri);
 			connection = (HttpURLConnection) httpUrl.openConnection();
 
-			connection.setRequestProperty("USER_AGENT", getUserAgentString());
+			connection.setRequestProperty("User-Agent", getUserAgentString());
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
@@ -146,26 +146,10 @@ public class ApptentiveClient {
 					connection.setRequestMethod("GET");
 					break;
 				case PUT:
-					connection.setRequestMethod("PUT");
+					sendPostPutRequest(connection, "PUT", body);
+					break;
 				case POST:
-					connection.setRequestMethod("POST");
-					connection.setDoInput(true);
-					connection.setDoOutput(true); // sets POST method implicitly
-					connection.setUseCaches(false);
-					connection.setRequestProperty("Content-Type", "application/json");
-					if (!TextUtils.isEmpty(body)) {
-						BufferedWriter writer = null;
-						try {
-							OutputStream outputStream = connection.getOutputStream();
-							writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-							writer.write(body);
-						} finally {
-							if (null != writer) {
-								writer.flush();
-								Util.ensureClosed(writer);
-							}
-						}
-					}
+					sendPostPutRequest(connection, "POST", body);
 					break;
 				default:
 					Log.e(Constants.LOG_TAG, "Unrecognized method: ", method.name());
@@ -227,10 +211,10 @@ public class ApptentiveClient {
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w(Constants.LOG_TAG, "Error communicating with server.", e);
-			} catch (SocketTimeoutException e) {
+		} catch (SocketTimeoutException e) {
 			Log.w(Constants.LOG_TAG, "Timeout communicating with server.", e);
 			ret.setCode(-1);
-			} catch (final MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
 		} catch (final IOException e) {
 			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
@@ -240,6 +224,30 @@ public class ApptentiveClient {
 			//connection.disconnect();
 		}
 		return ret;
+	}
+
+	private static void sendPostPutRequest(final HttpURLConnection connection,
+																				 final String requestMethod, String body)
+			throws IOException {
+
+		connection.setRequestMethod(requestMethod);
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setUseCaches(false);
+		connection.setRequestProperty("Content-Type", "application/json");
+		if (!TextUtils.isEmpty(body)) {
+			BufferedWriter writer = null;
+			try {
+				OutputStream outputStream = connection.getOutputStream();
+				writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+				writer.write(body);
+			} finally {
+				if (null != writer) {
+					writer.flush();
+					Util.ensureClosed(writer);
+				}
+			}
+		}
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
