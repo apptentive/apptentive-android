@@ -456,7 +456,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	public void clearComposing() {
-		lastAnimatedMessagePosition--;
 		composingView = null;
 		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
