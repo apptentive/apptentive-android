@@ -225,13 +225,19 @@ public class ApptentiveClient {
 				Util.ensureClosed(eis);
 				Util.ensureClosed(ebaos);
 			}
-
-		} catch (final MalformedURLException e) {
+		} catch (IllegalArgumentException e) {
+			Log.w(Constants.LOG_TAG, "Error communicating with server.", e);
+			} catch (SocketTimeoutException e) {
+			Log.w(Constants.LOG_TAG, "Timeout communicating with server.", e);
+			ret.setCode(-1);
+			} catch (final MalformedURLException e) {
 			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
 		} catch (final IOException e) {
 			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
+			ret.setCode(-1);
 		} finally {
-
+			//uncomment this if socket is not be reused
+			//connection.disconnect();
 		}
 		return ret;
 	}
@@ -371,8 +377,10 @@ public class ApptentiveClient {
 			Log.e("Error constructing url for file upload.", e);
 		} catch (SocketTimeoutException e) {
 			Log.w("Timeout communicating with server.");
+			ret.setCode(-1);
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
+			ret.setCode(-1);
 		} finally {
 			Util.ensureClosed(is);
 			Util.ensureClosed(os);
