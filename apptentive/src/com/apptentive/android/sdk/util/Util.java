@@ -236,6 +236,9 @@ public class Util {
 
 	public static Integer parseCacheControlHeader(String cacheControlHeader) {
 		if (cacheControlHeader != null) {
+			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
+			int indexOfLastBracket = cacheControlHeader.lastIndexOf("]");
+			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket+1, indexOfLastBracket);
 			String[] cacheControlParts = cacheControlHeader.split(",");
 			for (String part : cacheControlParts) {
 				part = part.trim();
