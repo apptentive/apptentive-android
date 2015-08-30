@@ -376,9 +376,6 @@ public class ApptentiveClient {
 		} finally {
 			Util.ensureClosed(is);
 			Util.ensureClosed(os);
-			if (null != connection) {
-				connection.disconnect();
-			}
 		}
 		return ret;
 	}
