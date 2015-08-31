@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.util.Util;
 
 
 /**
@@ -32,11 +33,11 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private EditText emailEditText;
 	private EditText nameEditText;
 	private TextView title;
-	private TextView emailTip;
+	private TextView emailExplanation;
 	private Button skipButton;
 	private Button sendButton;
 
-	public MessageCenterWhoCardView(Context activityContext, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnComposingActionListener listener) {
 		super(activityContext);
 		this.listener = listener;
 		LayoutInflater inflater = LayoutInflater.from(activityContext);
@@ -51,7 +52,8 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				emailEditText.setTextColor(getResources().getColor(R.color.apptentive_text_message_text));
+				emailEditText.setTextColor(Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_primary_text,
+						R.color.apptentive_material_primary_text));
 				sendButton.setEnabled(false);
 			}
 
@@ -70,7 +72,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
 
-		emailTip = (TextView) parentView.findViewById(R.id.email_tip);
+		emailExplanation = (TextView) parentView.findViewById(R.id.email_explanation);
 
 		skipButton = (Button) parentView.findViewById(R.id.btn_skip);
 
@@ -91,10 +93,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		}
 
 		if (item.str_4 != null) {
-			emailTip.setVisibility(VISIBLE);
-			emailTip.setText(item.str_4);
+			emailExplanation.setVisibility(VISIBLE);
+			emailExplanation.setText(item.str_4);
 		} else {
-			emailTip.setVisibility(GONE);
+			emailExplanation.setVisibility(GONE);
 		}
 
 		if (item.button_1 == null) {
