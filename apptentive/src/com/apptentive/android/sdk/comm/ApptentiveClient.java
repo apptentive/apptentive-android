@@ -22,7 +22,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -121,9 +120,18 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
+	/**
+	 * Perform a Http request.
+	 *
+	 * @param oauthToken authorization token for the current connection
+	 * @param uri        server url.
+	 * @param method     Get/Post/Put
+	 * @param body       Data to be POSTed/Put, not used for GET
+	 * @return ApptentiveHttpResponse containg content and response returned from the server.
+	 */
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
-		Log.d(Constants.LOG_TAG, "Performing request to %s", uri);
+		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -152,14 +160,14 @@ public class ApptentiveClient {
 					sendPostPutRequest(connection, "POST", body);
 					break;
 				default:
-					Log.e(Constants.LOG_TAG, "Unrecognized method: ", method.name());
+					Log.e("Unrecognized method: " + method.name());
 					return ret;
 			}
 
 			int responseCode = connection.getResponseCode();
 			ret.setCode(responseCode);
 			ret.setReason(connection.getResponseMessage());
-			Log.d(Constants.LOG_TAG, "Response Status Line: ", connection.getResponseMessage());
+			Log.d("Response Status Line: " + connection.getResponseMessage());
 
 			// Get the Http response header values
 			Map<String, String> headers = new HashMap<String, String>();
@@ -180,48 +188,29 @@ public class ApptentiveClient {
 					}
 					ret.setContent(Util.readStringFromInputStream(nis, "UTF-8"));
 					if (responseCode >= 200 && responseCode < 300) {
-						Log.v(Constants.LOG_TAG, "Response: ", ret.getContent());
+						Log.v("Response: " + ret.getContent());
 					} else {
-						Log.w(Constants.LOG_TAG, "Response: ", ret.getContent());
+						Log.w("Response: " + ret.getContent());
 					}
 				}
 			} finally {
 				Util.ensureClosed(nis);
 			}
 
-			// Read the error response.
-			InputStream eis = null;
-			ByteArrayOutputStream ebaos = null;
-			try {
-				eis = connection.getErrorStream();
-				ebaos = new ByteArrayOutputStream();
-				byte[] eBuf = new byte[1024];
-				int eRead;
-				while (eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
-					ebaos.write(eBuf, 0, eRead);
-				}
-				if (ebaos.size() > 0) {
-					ret.setContent(ebaos.toString());
-				}
-			} catch (IOException e) {
-				Log.w("Can't read error stream.", e);
-			} finally {
-				Util.ensureClosed(eis);
-				Util.ensureClosed(ebaos);
-			}
 		} catch (IllegalArgumentException e) {
-			Log.w(Constants.LOG_TAG, "Error communicating with server.", e);
+			Log.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
-			Log.w(Constants.LOG_TAG, "Timeout communicating with server.", e);
-			ret.setCode(-1);
+			Log.w("Timeout communicating with server.", e);
 		} catch (final MalformedURLException e) {
-			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
+			Log.w("ClientProtocolException", e);
 		} catch (final IOException e) {
-			Log.w(Constants.LOG_TAG, "ClientProtocolException", e);
-			ret.setCode(-1);
-		} finally {
-			//uncomment this if socket is not be reused
-			//connection.disconnect();
+			Log.w("ClientProtocolException", e);
+			// Read the error response.
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
+			}
 		}
 		return ret;
 	}
@@ -248,6 +237,32 @@ public class ApptentiveClient {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Reads error message from response and returns it as a string.
+	 *
+	 * @param con current connection
+	 * @return String with error message contents.
+	 * @throws IOException
+	 */
+	private static String getErrorInResponse(HttpURLConnection con) throws IOException {
+		assert (con != null);
+		BufferedReader in = null;
+		StringBuffer errStream = null;
+		try {
+			errStream = new StringBuffer();
+			InputStream errorStream = con.getErrorStream();
+			assert (errorStream != null);
+			in = new BufferedReader(new InputStreamReader(errorStream));
+			String errStr;
+			while ((errStr = in.readLine()) != null) {
+				errStream.append(errStr);
+			}
+		} finally {
+			Util.ensureClosed(in);
+		}
+		return (errStream != null) ? (errStream.toString()) : null;
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
@@ -349,32 +364,9 @@ public class ApptentiveClient {
 					nbaos.write(eBuf, 0, eRead);
 				}
 				ret.setContent(nbaos.toString());
-			} catch (IOException e) {
-				Log.w("Can't read return stream.", e);
 			} finally {
 				Util.ensureClosed(nis);
 				Util.ensureClosed(nbaos);
-			}
-
-			// Read the error response.
-			InputStream eis = null;
-			ByteArrayOutputStream ebaos = null;
-			try {
-				eis = connection.getErrorStream();
-				ebaos = new ByteArrayOutputStream();
-				byte[] eBuf = new byte[1024];
-				int eRead;
-				while (eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
-					ebaos.write(eBuf, 0, eRead);
-				}
-				if (ebaos.size() > 0) {
-					ret.setContent(ebaos.toString());
-				}
-			} catch (IOException e) {
-				Log.w("Can't read error stream.", e);
-			} finally {
-				Util.ensureClosed(eis);
-				Util.ensureClosed(ebaos);
 			}
 
 			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
@@ -385,10 +377,13 @@ public class ApptentiveClient {
 			Log.e("Error constructing url for file upload.", e);
 		} catch (SocketTimeoutException e) {
 			Log.w("Timeout communicating with server.");
-			ret.setCode(-1);
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
-			ret.setCode(-1);
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
+			}
 		} finally {
 			Util.ensureClosed(is);
 			Util.ensureClosed(os);

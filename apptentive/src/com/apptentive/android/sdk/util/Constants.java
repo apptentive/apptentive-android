@@ -106,11 +106,6 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
 
 	/**
-	 * Apptentive log tag
-	 */
-	public static final String LOG_TAG = "apptentive";
-
-	/**
 	 * A list of mobile carrier network types as Strings.
 	 * From {@link android.telephony.TelephonyManager TelephonyManager}
 	 * @see android.telephony.TelephonyManager
