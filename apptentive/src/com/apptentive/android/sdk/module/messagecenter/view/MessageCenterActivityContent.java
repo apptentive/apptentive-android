@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -790,7 +791,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 			if (barView != null) {
 				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(null);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+						R.color.colorAccent));
 				barView.showConfirmation = true;
 			}
 		}
