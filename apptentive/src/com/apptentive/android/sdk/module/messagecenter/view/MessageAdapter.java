@@ -90,13 +90,15 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private MessageCenterInteraction interaction;
 
 	// Variables used in composing message
-	public boolean needInflateComposing;
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
 	private EditText composingEditText;
 
+	private MessageCenterComposingActionBarView composingActionBarView;
+
+	private boolean forceShowKeyboard = true;
+
 	// Variables used in Who Card
-	public boolean needInflateWhoCard;
 	private int whoCardViewIndex = INVALID_POSITION;
 	private boolean focusOnNameField = false;
 	private MessageCenterWhoCardView whoCardView;
@@ -104,8 +106,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private EditText nameEditText;
 
 	// Variables to track showing animation on incoming/outgoing messages
-	private int lastAnimatedPosition;
-	private boolean showAnimation;
+	private int lastAnimatedMessagePosition;
+	private boolean showMessageAnimation;
+
+	private boolean showComposingBarAnimation = true;
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
@@ -115,7 +119,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	public interface OnComposingActionListener {
 		void onComposingViewCreated();
 
-		void onComposing(String str);
+		void beforeComposingTextChanged(CharSequence str);
+
+		void onComposingTextChanged(CharSequence str);
+
+		void afterComposingTextChanged(String str);
 
 		void onCancelComposing();
 
@@ -186,7 +194,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		final View view;
-		showAnimation = false;
+		showMessageAnimation = false;
 
 		MessageCenterListItem listItem = getItem(position);
 		int type = getItemViewType(position);
@@ -232,7 +240,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_COMPOSING_BAR: {
-				  view = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+					if (composingActionBarView == null) {
+						composingActionBarView = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+					}
+					showComposingBarAnimation();
+					view = composingActionBarView;
 					break;
 				}
 				case TYPE_WHOCARD: {
@@ -261,19 +273,22 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			** is removed and recreated
 			 */
 			if (type == TYPE_COMPOSING_AREA) {
-				if (needInflateComposing || composingView == null) {
-					composingView = new MessageCenterComposingView(activityContext,
-							(MessageCenterComposingItem) listItem, composingActionListener);
+				if (composingView == null) {
+					composingView = (MessageCenterComposingView) convertView;
 					setupComposingView(position);
 				}
 				view = composingView;
 			} else if (type == TYPE_WHOCARD) {
-				if (needInflateWhoCard || whoCardView == null) {
-					whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
+				if (whoCardView == null) {
+					whoCardView = (MessageCenterWhoCardView) convertView;
 					whoCardView.updateUi((MessageCenterComposingItem) listItem);
 					setupWhoCardView(position);
 				}
 				view = whoCardView;
+			} else if (type == TYPE_COMPOSING_BAR) {
+				composingActionBarView = (MessageCenterComposingActionBarView) convertView;
+				showComposingBarAnimation();
+				view = composingActionBarView;
 			} else {
 				view = convertView;
 				holder = (MessageCenterListItemHolder) convertView.getTag();
@@ -283,7 +298,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		if (holder != null) {
 			switch (type) {
 				case TYPE_TEXT_INCOMING: {
-					showAnimation = true;
+					showMessageAnimation = true;
 					if (bLoadAvatar) {
 						ImageUtil.startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
 								((IncomingTextMessage) listItem).getSenderProfilePhoto());
@@ -299,7 +314,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_TEXT_OUTGOING: {
-					showAnimation = true;
+					showMessageAnimation = true;
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
 					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
 					Double createdTime = ((OutgoingTextMessage) listItem).getCreatedAt();
@@ -310,7 +325,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					break;
 				}
 				case TYPE_FILE_OUTGOING: {
-					showAnimation = true;
+					showMessageAnimation = true;
 					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
 					if (holder.position != position) {
 						holder.position = position;
@@ -353,10 +368,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				}
 			}
 		}
-		if (showAnimation && position > lastAnimatedPosition) {
+		if (showMessageAnimation && position > lastAnimatedMessagePosition) {
 			AnimatorSet set = Util.buildListViewRowShowAnimator(view, null, null);
 			set.start();
-			lastAnimatedPosition = position;
+			lastAnimatedMessagePosition = position;
 		}
 		return view;
 	}
@@ -369,6 +384,14 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	@Override
 	public boolean isEnabled(int position) {
 		return false;
+	}
+
+	private void showComposingBarAnimation() {
+		if (showComposingBarAnimation) {
+			AnimatorSet set = Util.buildListViewRowShowAnimator(composingActionBarView, null, null);
+			set.start();
+			showComposingBarAnimation = false;
+		}
 	}
 
 	public String getWhoCardName() {
@@ -399,7 +422,6 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	private void setupComposingView(final int position) {
 		composingEditText = composingView.getEditText();
 		composingViewIndex = position;
-		needInflateComposing = false;
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -420,7 +442,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
+				if (forceShowKeyboard) {
 					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
+				}
 			}
 
 			@Override
@@ -432,16 +456,17 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 	}
 
 	public void clearComposing() {
+		lastAnimatedMessagePosition--;
 		composingView = null;
 		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
+		showComposingBarAnimation = true;
 	}
 
 	private void setupWhoCardView(final int position) {
 		emailEditText = whoCardView.getEmailField();
 		whoCardViewIndex = position;
 		focusOnNameField = true;
-		needInflateWhoCard = false;
 		emailEditText.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -453,16 +478,20 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		});
 		nameEditText = whoCardView.getNameField();
-		nameEditText.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					whoCardViewIndex = position;
-					focusOnNameField = true;
+		if (nameEditText.getVisibility() == View.VISIBLE) {
+			nameEditText.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					if (event.getAction() == MotionEvent.ACTION_UP) {
+						whoCardViewIndex = position;
+						focusOnNameField = true;
+					}
+					return false;
 				}
-				return false;
-			}
-		});
+			});
+		} else {
+			focusOnNameField = false;
+		}
 		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
@@ -474,10 +503,12 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				if (focusOnNameField) {
-					Util.showSoftKeyboard((Activity) activityContext, nameEditText);
-				} else {
-					Util.showSoftKeyboard((Activity) activityContext, emailEditText);
+				if (forceShowKeyboard) {
+					if (focusOnNameField) {
+						Util.showSoftKeyboard((Activity) activityContext, nameEditText);
+					} else {
+						Util.showSoftKeyboard((Activity) activityContext, emailEditText);
+					}
 				}
 			}
 
@@ -497,6 +528,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		return composingView;
 	}
 
+	public MessageCenterComposingActionBarView getComposingActionBarView() {
+		return composingActionBarView;
+	}
+
 	public void clearWhoCard() {
 		whoCardView = null;
 		emailEditText = null;
@@ -506,6 +541,10 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	public void setPaused(boolean bPause) {
 		isInPauseState = bPause;
+	}
+
+	public void setForceShowKeyboard(boolean bVal) {
+		forceShowKeyboard = bVal;
 	}
 
 	protected String createStatus(Double seconds) {

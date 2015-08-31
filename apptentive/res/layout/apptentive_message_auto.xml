@@ -30,7 +30,7 @@
                       android:paddingTop="8dp"
                       android:paddingLeft="10dp"
                       android:paddingRight="10dp"
-                      android:textColor="@color/apptentive_message_auto_text"/>
+                      android:textColor="?attr/apptentive_material_primary_text"/>
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

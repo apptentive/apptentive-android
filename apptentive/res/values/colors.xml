@@ -12,7 +12,7 @@
     <color name="colorPrimaryLight">#E57373</color>
     <color name="colorAccent">#FF5252</color>
 
-    <color name="window_background">#EEEEEE</color>
+    <color name="window_background">#ECECEC</color>
 
     <!-- Material DEFAULT text / items colors -->
     <color name="icons">#FFF</color>
@@ -77,25 +77,11 @@
     <color name="apptentive_black">#000000</color>
     <color name="apptentive_red">#D22E32</color>
 
-    <color name="apptentive_message_center_main_area_background">#ECECEC</color>
-    <color name="apptentive_message_center_greeting_background">@color/apptentive_material_primary</color>
-    <color name="apptentive_message_center_status_background">#ECECEC</color>
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
-    <color name="apptentive_message_center_outgoing_frame_background">#DCDCDC</color>
     <color name="apptentive_message_center_incoming_background">#F2F2F2</color>
 
-    <color name="apptentive_message_center_header_background">#222222</color>
-    <color name="apptentive_message_center_header_text">@color/apptentive_white</color>
-    <color name="apptentive_message_center_header_text_shadow">#AAFFFFFF</color>
-    <color name="apptentive_text_message_text">@color/apptentive_black</color>
-    <color name="apptentive_message_sender_text">#222222</color>
-    <color name="apptentive_message_center_timestamp">#737373</color>
-    <color name="apptentive_message_center_hint">#949494</color>
-
-    <color name="apptentive_message_center_toolbar">@color/primary</color>
 
     <color name="apptentive_message_auto_separator">#BBBBBB</color>
-    <color name="apptentive_message_auto_text">@color/apptentive_black</color>
 
     <color name="apptentive_dialog_background">@color/apptentive_white</color>
     <color name="apptentive_dialog_form_text">@color/apptentive_black</color>

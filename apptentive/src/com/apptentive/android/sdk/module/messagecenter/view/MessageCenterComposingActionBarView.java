@@ -31,6 +31,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterCompos
  */
 public class MessageCenterComposingActionBarView extends FrameLayout implements MessageCenterListItemView {
 
+	public boolean showConfirmation = true;
+	public ImageButton sendButton;
+
 	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
 		super(activityContext);
 
@@ -40,14 +43,18 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		View closeButton = findViewById(R.id.cancel_composing);
 		closeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				CloseConfirmationDialog editNameDialog = new CloseConfirmationDialog();
-				editNameDialog.listener = listener;
-				Bundle bundle = new Bundle();
-				bundle.putString("STR_2", item.str_2);
-				bundle.putString("STR_3", item.str_3);
-				bundle.putString("STR_4", item.str_4);
-				editNameDialog.setArguments(bundle);
-				editNameDialog.show(((Activity) activityContext).getFragmentManager(), "CloseConfirmationDialog");
+				if (showConfirmation) {
+					CloseConfirmationDialog editNameDialog = new CloseConfirmationDialog();
+					editNameDialog.listener = listener;
+					Bundle bundle = new Bundle();
+					bundle.putString("STR_2", item.str_2);
+					bundle.putString("STR_3", item.str_3);
+					bundle.putString("STR_4", item.str_4);
+					editNameDialog.setArguments(bundle);
+					editNameDialog.show(((Activity) activityContext).getFragmentManager(), "CloseConfirmationDialog");
+				} else {
+					listener.onCancelComposing();
+				}
 			}
 		});
 
@@ -57,7 +64,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 			composing.setText(item.str_1);
 		}
 
-		ImageButton sendButton = (ImageButton) findViewById(R.id.btn_send_message);
+		sendButton = (ImageButton) findViewById(R.id.btn_send_message);
 		if (item.button_1 != null) {
 			sendButton.setContentDescription(item.button_1);
 		}

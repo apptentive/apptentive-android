@@ -334,7 +334,7 @@
 
     <style name="ApptentiveWidget.NewMessageBadge" parent="android:Widget">
         <item name="badgeSize">normal</item>
-        <item name="counterColor">@color/apptentive_text_message_text</item>
+        <item name="counterColor">@color/apptentive_material_primary_text</item>
     </style>
     <style name="ApptentiveWidget.NewMessageBadge.Mini" parent="ApptentiveWidget.NewMessageBadge">
         <item name="badgeSize">mini</item>

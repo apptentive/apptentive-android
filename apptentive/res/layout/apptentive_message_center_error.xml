@@ -10,7 +10,7 @@
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/apptentive_message_center_main_area_background"
+              android:background="?attr/apptentive_material_background"
               android:gravity="center_vertical"
               android:orientation="vertical">
     <!-- Header -->
