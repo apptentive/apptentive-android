@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
@@ -15,20 +16,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
-
-import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -133,95 +120,149 @@ public class ApptentiveClient {
 		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
+	/**
+	 * Perform a Http request.
+	 *
+	 * @param oauthToken authorization token for the current connection
+	 * @param uri        server url.
+	 * @param method     Get/Post/Put
+	 * @param body       Data to be POSTed/Put, not used for GET
+	 * @return ApptentiveHttpResponse containg content and response returned from the server.
+	 */
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
-		HttpClient httpClient = null;
-		InputStream is = null;
+		HttpURLConnection connection = null;
 		try {
-			HttpRequestBase request;
-			httpClient = new DefaultHttpClient();
+			URL httpUrl = new URL(uri);
+			connection = (HttpURLConnection) httpUrl.openConnection();
+
+			connection.setRequestProperty("User-Agent", getUserAgentString());
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
+			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			connection.setRequestProperty("Accept-Encoding", "gzip");
+			connection.setRequestProperty("Accept", "application/json");
+			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
+
 			switch (method) {
 				case GET:
-					request = new HttpGet(uri);
+					connection.setRequestMethod("GET");
 					break;
 				case PUT:
-					request = new HttpPut(uri);
-					request.setHeader("Content-Type", "application/json");
-					Log.d("PUT body: " + body);
-					((HttpPut) request).setEntity(new StringEntity(body, "UTF-8"));
+					sendPostPutRequest(connection, "PUT", body);
 					break;
 				case POST:
-					request = new HttpPost(uri);
-					request.setHeader("Content-Type", "application/json");
-					Log.d("POST body: " + body);
-					((HttpPost) request).setEntity(new StringEntity(body, "UTF-8"));
+					sendPostPutRequest(connection, "POST", body);
 					break;
 				default:
 					Log.e("Unrecognized method: " + method.name());
 					return ret;
 			}
 
-			HttpParams httpParams = request.getParams();
-			HttpConnectionParams.setConnectionTimeout(httpParams, DEFAULT_HTTP_CONNECT_TIMEOUT);
-			HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_HTTP_SOCKET_TIMEOUT);
-			httpParams.setParameter("http.useragent", getUserAgentString());
-			request.setHeader("Authorization", "OAuth " + oauthToken);
-			request.setHeader("Accept-Encoding", "gzip");
-			request.setHeader("Accept", "application/json");
-			request.setHeader("X-API-Version", String.valueOf(API_VERSION));
+			int responseCode = connection.getResponseCode();
+			ret.setCode(responseCode);
+			ret.setReason(connection.getResponseMessage());
+			Log.d("Response Status Line: " + connection.getResponseMessage());
 
-			HttpResponse response = httpClient.execute(request);
-			int code = response.getStatusLine().getStatusCode();
-			ret.setCode(code);
-			ret.setReason(response.getStatusLine().getReasonPhrase());
-			Log.d("Response Status Line: " + response.getStatusLine().toString());
-
-			HeaderIterator headerIterator = response.headerIterator();
-			if (headerIterator != null) {
-				Map<String, String> headers = new HashMap<String, String>();
-				while (headerIterator.hasNext()) {
-					Header header = (Header) headerIterator.next();
-					headers.put(header.getName(), header.getValue());
-					//Log.v("Header: %s = %s", header.getName(), header.getValue());
-				}
-				ret.setHeaders(headers);
+			// Get the Http response header values
+			Map<String, String> headers = new HashMap<String, String>();
+			Map<String, List<String>> map = connection.getHeaderFields();
+			for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+				headers.put(entry.getKey(), entry.getValue().toString());
 			}
+			ret.setHeaders(headers);
 
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				is = entity.getContent();
-				if (is != null) {
+			// Read the normal content response
+			InputStream nis = null;
+			try {
+				nis = connection.getInputStream();
+				if (nis != null) {
 					String contentEncoding = ret.getHeaders().get("Content-Encoding");
-					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("gzip")) {
-						is = new GZIPInputStream(is);
+					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("[gzip]")) {
+						nis = new GZIPInputStream(nis);
 					}
-					ret.setContent(Util.readStringFromInputStream(is, "UTF-8"));
-					if (code >= 200 && code < 300) {
+					ret.setContent(Util.readStringFromInputStream(nis, "UTF-8"));
+					if (responseCode >= 200 && responseCode < 300) {
 						Log.v("Response: " + ret.getContent());
 					} else {
 						Log.w("Response: " + ret.getContent());
 					}
 				}
+			} finally {
+				Util.ensureClosed(nis);
 			}
+
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
-			Log.w("Timeout communicating with server.");
-			ret.setCode(-1);
-		} catch (IOException e) {
-			Log.w("Error communicating with server.", e);
-			ret.setCode(-1);
-		} finally {
-			if (httpClient != null) {
-				httpClient.getConnectionManager().shutdown();
+			Log.w("Timeout communicating with server.", e);
+		} catch (final MalformedURLException e) {
+			Log.w("ClientProtocolException", e);
+		} catch (final IOException e) {
+			Log.w("ClientProtocolException", e);
+			// Read the error response.
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
 			}
-			Util.ensureClosed(is);
 		}
 		return ret;
+	}
+
+	private static void sendPostPutRequest(final HttpURLConnection connection,
+																				 final String requestMethod, String body)
+			throws IOException {
+
+		connection.setRequestMethod(requestMethod);
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setUseCaches(false);
+		connection.setRequestProperty("Content-Type", "application/json");
+		if (!TextUtils.isEmpty(body)) {
+			BufferedWriter writer = null;
+			try {
+				OutputStream outputStream = connection.getOutputStream();
+				writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+				writer.write(body);
+			} finally {
+				if (null != writer) {
+					writer.flush();
+					Util.ensureClosed(writer);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Reads error message from response and returns it as a string.
+	 *
+	 * @param con current connection
+	 * @return String with error message contents.
+	 * @throws IOException
+	 */
+	private static String getErrorInResponse(HttpURLConnection con) throws IOException {
+		assert (con != null);
+		BufferedReader in = null;
+		StringBuffer errStream = null;
+		try {
+			errStream = new StringBuffer();
+			InputStream errorStream = con.getErrorStream();
+			assert (errorStream != null);
+			in = new BufferedReader(new InputStreamReader(errorStream));
+			String errStr;
+			while ((errStr = in.readLine()) != null) {
+				errStream.append(errStr);
+			}
+		} finally {
+			Util.ensureClosed(in);
+		}
+		return (errStream != null) ? (errStream.toString()) : null;
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
@@ -243,7 +284,7 @@ public class ApptentiveClient {
 		String twoHyphens = "--";
 		String boundary = UUID.randomUUID().toString();
 
-		HttpURLConnection connection;
+		HttpURLConnection connection = null;
 		DataOutputStream os = null;
 		InputStream is = null;
 
@@ -323,32 +364,9 @@ public class ApptentiveClient {
 					nbaos.write(eBuf, 0, eRead);
 				}
 				ret.setContent(nbaos.toString());
-			} catch (IOException e) {
-				Log.w("Can't read return stream.", e);
 			} finally {
 				Util.ensureClosed(nis);
 				Util.ensureClosed(nbaos);
-			}
-
-			// Read the error response.
-			InputStream eis = null;
-			ByteArrayOutputStream ebaos = null;
-			try {
-				eis = connection.getErrorStream();
-				ebaos = new ByteArrayOutputStream();
-				byte[] eBuf = new byte[1024];
-				int eRead;
-				while (eis != null && (eRead = eis.read(eBuf, 0, 1024)) > 0) {
-					ebaos.write(eBuf, 0, eRead);
-				}
-				if (ebaos.size() > 0) {
-					ret.setContent(ebaos.toString());
-				}
-			} catch (IOException e) {
-				Log.w("Can't read error stream.", e);
-			} finally {
-				Util.ensureClosed(eis);
-				Util.ensureClosed(ebaos);
 			}
 
 			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
@@ -361,6 +379,11 @@ public class ApptentiveClient {
 			Log.w("Timeout communicating with server.");
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
+			}
 		} finally {
 			Util.ensureClosed(is);
 			Util.ensureClosed(os);
