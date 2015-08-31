@@ -29,9 +29,9 @@
         android:layout_marginTop="6dp"
         android:layout_toLeftOf="@+id/toast_timestamp"
         android:layout_toRightOf="@id/toast_avatar"
-        android:text="title"
-        android:textColor="@color/apptentive_message_center_header_text"
-        android:textSize="16dp" />
+        android:text="Message Title"
+        android:textColor="?attr/apptentive_material_toolbar_foreground"
+        android:textSize="@dimen/apptentive_text_medium_small" />
 
     <TextView
         android:id="@+id/toast_timestamp"
@@ -41,7 +41,7 @@
         android:layout_alignTop="@id/toast_title"
         android:paddingRight="2dp"
         android:text="00:00"
-        android:textColor="@color/apptentive_message_center_timestamp" />
+        android:textColor="?attr/apptentive_material_toolbar_foreground" />
 
 
     <TextView
@@ -53,8 +53,8 @@
         android:layout_marginRight="5dp"
         android:layout_toRightOf="@id/toast_avatar"
         android:maxLines="2"
-        android:text="apptentiveMessage"
-        android:textColor="@color/apptentive_message_center_header_text"
-        android:textSize="14dp" />
+        android:text="Apptentive Message Body"
+        android:textColor="?attr/apptentive_material_toolbar_foreground"
+        android:textSize="@dimen/apptentive_text_small" />
 
 </RelativeLayout>
