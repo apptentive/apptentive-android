@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -26,10 +28,17 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 
 	public ApptentiveAvatarView avatar;
 
+	// Prevent info button being clicked multiple time, resulting multiple About
+	protected static final int DELAY_TIME = 100;
 
-	public void updateUi(String title, String body) {
+	protected Handler mClickHandler = new Handler() {
 
-	}
+		public void handleMessage(Message msg) {
+
+			findViewById(msg.what).setClickable(true);
+			super.handleMessage(msg);
+		}
+	};
 
 	public MessageCenterGreetingView(final Context context, MessageCenterGreeting messageCenterGreeting) {
 		super(context);
@@ -50,6 +59,8 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 		ImageButton infoButton = (ImageButton) findViewById(R.id.btn_info);
 		infoButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
+				view.setClickable(false);
+				mClickHandler.sendEmptyMessageDelayed(view.getId(), DELAY_TIME);
 				if (context instanceof ViewActivity)
 				AboutModule.getInstance().show((Activity) context, false);
 			}

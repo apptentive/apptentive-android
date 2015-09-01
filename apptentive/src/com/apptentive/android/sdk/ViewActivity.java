@@ -130,7 +130,7 @@ public class ViewActivity extends ApptentiveActivity {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
         if (activeContentType == ActivityContent.Type.ABOUT) {
-					setTheme(R.style.ApptentiveTheme_Light);
+					setTheme(R.style.ApptentiveTheme_About);
 				}
 
 				boolean activityContentRequired = true;

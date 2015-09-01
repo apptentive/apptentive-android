@@ -27,7 +27,5 @@ public class AutomatedMessageView extends MessageView<AutomatedMessage> {
 		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_auto, this);
-		LinearLayout frame = (LinearLayout) findViewById(R.id.apptentive_message_auto_frame);
-		frame.setBackgroundDrawable(new ZeroMinSizeDrawable(context.getResources(), R.drawable.apptentive_paper_bg));
 	}
 }
