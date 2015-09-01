@@ -190,4 +190,8 @@ public class Configuration extends JSONObject {
 			Log.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 		}
 	}
+
+	public boolean hasConfigurationCacheExpired() {
+		return getConfigurationCacheExpirationMillis() < System.currentTimeMillis();
+	}
 }

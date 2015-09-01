@@ -962,6 +962,11 @@ public class Apptentive {
 			Log.d("App release was updated.");
 			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
 		}
+		// Invalidate cache timeout for Interactions and Configuration. We want to always fetch them anew when the app is updated.
+		InteractionManager.updateCacheExpiration(context, 0);
+		Configuration config = Configuration.load(context);
+		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
+		config.save(context);
 	}
 
 	private synchronized static void asyncFetchConversationToken(final Context context) {
@@ -1031,49 +1036,40 @@ public class Apptentive {
 	}
 
 	/**
-	 * Fetches the app configuration from the server and stores the keys into our SharedPreferences.
-	 *
-	 * @param force If true, will always fetch configuration. If false, only fetches configuration if the cached
-	 *              configuration has expired.
+	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
 	 */
-	private static void fetchAppConfiguration(Context context, boolean force) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void fetchAppConfiguration(Context context) {
+		boolean force = GlobalInfo.isAppDebuggable;
 
 		// Don't get the app configuration unless forced, or the cache has expired.
-		if (!force) {
-			Configuration config = Configuration.load(prefs);
-			Long expiration = config.getConfigurationCacheExpirationMillis();
-			if (System.currentTimeMillis() < expiration) {
-				Log.v("Using cached configuration.");
-				return;
-			}
-		}
-
-		Log.v("Fetching new configuration.");
-		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
-
-		try {
-			Map<String, String> headers = response.getHeaders();
-			if (headers != null) {
-				String cacheControl = headers.get("Cache-Control");
-				Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-				if (cacheSeconds == null) {
-					cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+		if (force || Configuration.load(context).hasConfigurationCacheExpired()) {
+			Log.i("Fetching new Configuration.");
+			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
+			try {
+				Map<String, String> headers = response.getHeaders();
+				if (headers != null) {
+					String cacheControl = headers.get("Cache-Control");
+					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+					if (cacheSeconds == null) {
+						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+					}
+					Log.d("Caching configuration for %d seconds.", cacheSeconds);
+					Configuration config = new Configuration(response.getContent());
+					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+					config.save(context);
 				}
-				Log.d("Caching configuration for %d seconds.", cacheSeconds);
-				Configuration config = new Configuration(response.getContent());
-				config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-				config.save(context);
+			} catch (JSONException e) {
+				Log.e("Error parsing app configuration from server.", e);
 			}
-		} catch (JSONException e) {
-			Log.e("Error parsing app configuration from server.", e);
+		} else {
+			Log.v("Using cached Configuration.");
 		}
 	}
 
 	private static void asyncFetchAppConfiguration(final Context context) {
 		Thread thread = new Thread() {
 			public void run() {
-				fetchAppConfiguration(context, GlobalInfo.isAppDebuggable);
+				fetchAppConfiguration(context);
 			}
 		};
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
