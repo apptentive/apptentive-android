@@ -119,9 +119,9 @@ public class Apptentive {
 	 * communication, and to help provide more context about this user. This email will be the definitive email address
 	 * for this user, unless one is provided directly by the user through an Apptentive UI. Calls to this method are
 	 * idempotent. Calls to this method will overwrite any previously entered email, so if you don't want to overwrite
-	 * the email provided by the user, make sure to check the value before you call this method.
+	 * the email provided by the user, make sure to check the value with {@link #getPersonEmail(Context)} before you call this method.
 	 *
-	 * @param context The context from which this method is called.
+	 * @param context The Context from which this method is called.
 	 * @param email   The user's email address.
 	 */
 	public static void setPersonEmail(Context context, String email) {
@@ -129,11 +129,22 @@ public class Apptentive {
 	}
 
 	/**
+	 * Retrieves the user's email address. This address may be set via {@link #setPersonEmail(Context, String)},
+	 * or by the user through Message Center.
+	 *
+	 * @param context The Context from which this method is called.
+	 * @return
+	 */
+	public static String getPersonEmail(Context context) {
+		return PersonManager.loadPersonEmail(context);
+	}
+
+	/**
 	 * Sets the user's name. This name will be sent to the Apptentive server and displayed in conversations you have
 	 * with this person. This name will be the definitive username for this user, unless one is provided directly by the
 	 * user through an Apptentive UI. Calls to this method are idempotent. Calls to this method will overwrite any
 	 * previously entered email, so if you don't want to overwrite the email provided by the user, make sure to check
-	 * the value before you call this method.
+	 * the value with {@link #getPersonName(Context)} before you call this method.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param name    The user's name.
@@ -141,6 +152,18 @@ public class Apptentive {
 	public static void setPersonName(Context context, String name) {
 		PersonManager.storePersonName(context, name);
 	}
+
+	/**
+	 * Retrieves the user's name. This name may be set via {@link #setPersonName(Context, String)},
+	 * or by the user through Message Center.
+	 *
+	 * @param context The Context from which this method is called.
+	 * @return
+	 */
+	public static String getPersonName(Context context) {
+		return PersonManager.loadPersonName(context);
+	}
+
 
 	/**
 	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
