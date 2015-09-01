@@ -923,6 +923,11 @@ public class Apptentive {
 				GlobalInfo.appDisplayName = "this app";
 			}
 
+			String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
+			if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
+				onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
+			}
+
 			// Grab the conversation token from shared preferences.
 			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
 				GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
@@ -949,9 +954,7 @@ public class Apptentive {
 		syncPerson(appContext);
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		Log.d("Conversation id: %s", appContext.
-				getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
-				.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+		Log.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
@@ -962,7 +965,21 @@ public class Apptentive {
 			Log.d("App release was updated.");
 			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
 		}
-		// Invalidate cache timeout for Interactions and Configuration. We want to always fetch them anew when the app is updated.
+		invalidateCaches(context);
+	}
+
+	private static void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
+		Log.i("Sdk version changed: %s => %s", previousSdkVersion, currentSdkVersion);
+		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
+		invalidateCaches(context);
+	}
+
+	/**
+	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
+	 *
+	 * @param context
+	 */
+	private static void invalidateCaches(Context context) {
 		InteractionManager.updateCacheExpiration(context, 0);
 		Configuration config = Configuration.load(context);
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
