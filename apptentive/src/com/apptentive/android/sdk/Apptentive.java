@@ -521,8 +521,8 @@ public class Apptentive {
 
 	/**
 	 * Launches Apptentive features based on a push notification Intent. Before you call this, you
-	 * must call {@link Apptentive#setPendingPushNotification(Context, Intent)} or
-	 * {@link Apptentive#setPendingPushNotification(Context, Bundle)} in your Broadcast receiver when
+	 * must call {@link #setPendingPushNotification(Context, Intent)} or
+	 * {@link #setPendingPushNotification(Context, Bundle)} in your Broadcast receiver when
 	 * a push notification is opened by the user. This method must be called from the Activity that
 	 * you launched from the BroadcastReceiver. This method will only handle Apptentive originated
 	 * push notifications, so you can and should call it any time your push notification launches an
@@ -627,7 +627,7 @@ public class Apptentive {
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
 	 * @param listener An UnreadMessageListener that you instantiate.
-	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener listener)} instead.
+	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
 	 */
 	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
@@ -820,7 +820,7 @@ public class Apptentive {
 	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
-	 * @deprecated Use {@link Apptentive#canShowInteraction}() instead. The behavior is identical. Only the name has changed.
+	 * @deprecated Use {@link #canShowInteraction(Context, String)}() instead. The behavior is identical. Only the name has changed.
 	 */
 	public static synchronized boolean willShowInteraction(Context context, String event) {
 		return canShowInteraction(context, event);
@@ -828,7 +828,7 @@ public class Apptentive {
 
 	/**
 	 * This method can be used to determine if a call to one of the <strong><code>engage()</code></strong> methods such as
-	 * {@link com.apptentive.android.sdk.Apptentive#engage(android.app.Activity, String)} using the same event name will
+	 * {@link #engage(Activity, String)} using the same event name will
 	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
 	 * displayed before you create a UI Button, etc.
 	 *
