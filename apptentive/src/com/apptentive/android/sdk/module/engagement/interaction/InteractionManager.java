@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -65,8 +67,10 @@ public class InteractionManager {
 			return;
 		}
 
-		if (hasCacheExpired(context)) {
-			Log.d("Interaction cache has expired. Fetching new interactions.");
+		boolean force = GlobalInfo.isAppDebuggable;
+
+		if (force || hasCacheExpired(context)) {
+			Log.i("Fetching new Interactions.");
 			Thread thread = new Thread() {
 				public void run() {
 					fetchAndStoreInteractions(context);
@@ -83,7 +87,7 @@ public class InteractionManager {
 			thread.setName("Apptentive-FetchInteractions");
 			thread.start();
 		} else {
-			Log.d("Interaction cache has not expired. Using existing interactions.");
+			Log.v("Using cached Interactions.");
 		}
 	}
 
@@ -185,7 +189,7 @@ public class InteractionManager {
 		return expiration < System.currentTimeMillis();
 	}
 
-	private static void updateCacheExpiration(Context context, long duration) {
+	public static void updateCacheExpiration(Context context, long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();

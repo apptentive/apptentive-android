@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.util;
 
-import android.view.ViewGroup;
-
 /**
  * @author Sky Kelsey
  */
@@ -35,6 +33,8 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_DATA = "personData";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
 	public static final String PREF_KEY_PERSON_NAME = "personName";
+
+	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
