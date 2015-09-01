@@ -43,6 +43,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenter
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
+import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -369,7 +370,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		}
 		if (showMessageAnimation && position > lastAnimatedMessagePosition) {
-			AnimatorSet set = Util.buildListViewRowShowAnimator(view, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(view, null, null);
 			set.start();
 			lastAnimatedMessagePosition = position;
 		}
@@ -388,7 +389,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void showComposingBarAnimation() {
 		if (showComposingBarAnimation) {
-			AnimatorSet set = Util.buildListViewRowShowAnimator(composingActionBarView, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingActionBarView, null, null);
 			set.start();
 			showComposingBarAnimation = false;
 		}
@@ -431,7 +432,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
-		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
+		AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
 			}
@@ -491,7 +492,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		} else {
 			focusOnNameField = false;
 		}
-		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
+		AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
 			}
