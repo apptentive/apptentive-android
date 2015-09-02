@@ -318,8 +318,7 @@ public class MessageCenterListView extends ListView {
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		super.onLayout(changed, l, t, r, b);
 		if (stickyWrapper != null) {
-			int parentWidth = r - l - getPaddingLeft() - getPaddingRight() -
-					stickyWrapper.additionalIndent * 2;
+			int parentWidth = r - l - getPaddingLeft() - getPaddingRight();
 			int shadowWidth = stickyWrapper.view.getWidth();
 			if (parentWidth != shadowWidth) {
 				recreateStickyShadow();
@@ -336,6 +335,7 @@ public class MessageCenterListView extends ListView {
 			int pLeft = getListPaddingLeft();
 			int pTop = getListPaddingTop();
 			View view = stickyWrapper.view;
+			int headerTop = view.getTop();
 			pLeft += stickyWrapper.additionalIndent;
 			// draw child
 			canvas.save();
@@ -344,7 +344,7 @@ public class MessageCenterListView extends ListView {
 					(shadowDrawable == null ? 0 : shadowHeight);
 			canvas.clipRect(pLeft, pTop, pLeft + view.getWidth() - 2 * stickyWrapper.additionalIndent, pTop + clipHeight);
 
-			canvas.translate(pLeft - stickyWrapper.additionalIndent, pTop);
+			canvas.translate(pLeft - stickyWrapper.additionalIndent, pTop - headerTop);
 			drawChild(canvas, stickyWrapper.view, getDrawingTime());
 
 			if (shadowDrawable != null) {
