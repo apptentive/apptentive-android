@@ -792,7 +792,18 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onComposingTextChanged(CharSequence str) {
-		if (!TextUtils.isEmpty(str)) {
+	}
+
+	@Override
+	public void afterComposingTextChanged(String str) {
+		if (str == null || str.trim().isEmpty()) {
+			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+			if (barView != null) {
+				barView.sendButton.setEnabled(false);
+				barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+				barView.showConfirmation = false;
+			}
+		} else {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 			if (barView != null) {
 				barView.sendButton.setEnabled(true);
@@ -801,11 +812,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				barView.showConfirmation = true;
 			}
 		}
-	}
-
-	@Override
-	public void afterComposingTextChanged(String str) {
-
 	}
 
 	@Override
