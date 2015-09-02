@@ -14,13 +14,10 @@
     </string-array>
 
     <string-array name="events">
-        <item>init</item>
-        <item>event_1</item>
-        <item>event_2</item>
-        <item>event_3</item>
-        <item>test_survey_interaction</item>
-        <item>app.launch</item>
-        <item>test_event</item>
+        <item>ratings_event</item>
+        <item>note_event</item>
+        <item>survey_event</item>
+        <item>show_message_center</item>
     </string-array>
 
     <string-array name="attachment_files">
