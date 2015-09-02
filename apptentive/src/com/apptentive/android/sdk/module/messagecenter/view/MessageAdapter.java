@@ -32,8 +32,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
@@ -60,7 +61,7 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T>
+public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> extends ArrayAdapter<T>
 		implements MessageCenterListView.ApptentiveMessageCenterListAdapter {
 
 	private static final int
@@ -317,9 +318,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_TEXT_OUTGOING: {
 					showMessageAnimation = true;
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
-					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
-					Double createdTime = ((OutgoingTextMessage) listItem).getCreatedAt();
-					String status = createStatus(createdTime);
+					String datestamp = textMessage.getDatestamp();
+					Double createdTime = textMessage.getCreatedAt();
+					String status = createStatus(createdTime, textMessage.isLastSent());
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
 							createdTime == null && !isInPauseState, textMessage.getBody());
@@ -334,7 +335,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					}
 					String datestamp = fileMessage.getDatestamp();
 					Double createdTime = fileMessage.getCreatedAt();
-					String status = createStatus(createdTime);
+					String status = createStatus(createdTime, fileMessage.isLastSent());
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
 							createdTime == null && !isInPauseState);
@@ -547,11 +548,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		forceShowKeyboard = bVal;
 	}
 
-	protected String createStatus(Double seconds) {
+	protected String createStatus(Double seconds, boolean showSent) {
 		if (seconds == null) {
 			return isInPauseState ? activityContext.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return activityContext.getResources().getString(R.string.apptentive_sent);
+		return (showSent) ? activityContext.getResources().getString(R.string.apptentive_sent) : null;
 	}
 
 	protected int getStatusColor(Double seconds) {

@@ -8,10 +8,6 @@ package com.apptentive.android.sdk.util;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -31,8 +27,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 
 import java.io.*;
 import java.text.DateFormat;

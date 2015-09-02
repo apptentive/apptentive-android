@@ -12,7 +12,7 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterGreeting implements MessageCenterListItem {
+public class MessageCenterGreeting implements MessageCenterUtil.MessageCenterListItem {
 	public final String title;
 	public final String body;
 	public final String avatar;

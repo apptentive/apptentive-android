@@ -80,7 +80,7 @@
         <item name="apptentive_material_header_selection_text">@color/apptentive_material_header_selection_text</item>
         <item name="apptentive_material_pressed_highlight">@color/apptentive_material_pressed_highlight</item>
 
-        <!-- Here we setting apptheentive widget styles -->
+        <!-- Here we setting apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/ApptentiveAvatarView.Message</item>
 
@@ -105,7 +105,7 @@
         <item name="windowNoTitle">false</item>
     </style>
 
-    <style name="ApptentiveTheme.About" parent="ApptentiveBaseTheme.Light">
+    <style name="ApptentiveTheme.About" parent="ApptentiveTheme.Light">
         <item name="colorPrimary">@color/apptentive_red</item>
     </style>
 

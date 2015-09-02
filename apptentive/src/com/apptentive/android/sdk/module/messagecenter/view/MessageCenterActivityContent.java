@@ -13,7 +13,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,8 +45,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -174,7 +174,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 							}
 						}
 					}
-					updateMessageTimeStamps();
+					updateMessageSentStates();
 					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null && whoCardItem == null && composingItem == null) {
 						addNewStatusItem(newItem);
@@ -364,7 +364,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				}
 			}
 
-			updateMessageTimeStamps(); // Force timestamp recompilation.
+			updateMessageSentStates(); // Force timestamp recompilation.
 			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
@@ -627,12 +627,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		if (composingAreaTakesUpVisibleArea) {
 			View v = messageCenterListView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
-			updateMessageTimeStamps();
+			updateMessageSentStates();
 			// Restore the position of listview to composing view
 			messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 					insertIndex, top));
 		} else {
-			updateMessageTimeStamps();
+			updateMessageSentStates();
 			messageCenterListAdapter.notifyDataSetChanged();
 		}
 
@@ -1051,10 +1051,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	Set<String> dateStampsSeen = new HashSet<>();
 
-	public void updateMessageTimeStamps() {
+	public void updateMessageSentStates() {
 		dateStampsSeen.clear();
+		MessageCenterUtil.OutgoingItem lastSent = null;
 		for (MessageCenterListItem message : messages) {
 			if (message instanceof ApptentiveMessage) {
+				// Update timestamps
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
 				Double sentOrReceivedAt = apptentiveMessage.getCreatedAt();
 				String dateStamp = createDatestamp(sentOrReceivedAt);
@@ -1065,7 +1067,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						apptentiveMessage.clearDatestamp();
 					}
 				}
+
+				//Find last sent
+				if (apptentiveMessage instanceof OutgoingTextMessage ||
+						apptentiveMessage instanceof OutgoingFileMessage) {
+					if (apptentiveMessage.getCreatedAt() != null) {
+						lastSent = (MessageCenterUtil.OutgoingItem) apptentiveMessage;
+						lastSent.setLastSent(false);
+					}
+
+				}
 			}
+		}
+		if (lastSent != null) {
+			lastSent.setLastSent(true);
 		}
 	}
 
