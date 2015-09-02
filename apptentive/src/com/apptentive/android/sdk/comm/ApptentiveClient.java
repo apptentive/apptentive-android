@@ -215,9 +215,9 @@ public class ApptentiveClient {
 		return ret;
 	}
 
-	private static void sendPostPutRequest(final HttpURLConnection connection,
-																				 final String requestMethod, String body)
-			throws IOException {
+	private static void sendPostPutRequest(final HttpURLConnection connection, final String requestMethod, String body) throws IOException {
+
+		Log.d("%s body: %s", requestMethod, body);
 
 		connection.setRequestMethod(requestMethod);
 		connection.setDoInput(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -90,7 +90,7 @@ public class DeviceManager {
 	public static void storeCustomDeviceData(Context context, CustomData deviceData) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String deviceDataString = deviceData.toString();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).commit();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).apply();
 	}
 
 	public static CustomData loadIntegrationConfig(Context context) {
@@ -112,7 +112,7 @@ public class DeviceManager {
 	public static void storeIntegrationConfig(Context context, CustomData integrationConfig) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String integrationConfigString = integrationConfig.toString();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, integrationConfigString).commit();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, integrationConfigString).apply();
 	}
 
 	private static Device generateNewDevice(Context context) {
@@ -164,7 +164,7 @@ public class DeviceManager {
 
 	private static void storeDevice(Context context, Device device) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE, device.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_DEVICE, device.toString()).apply();
 	}
 
 	public static void onSentDeviceInfo(Context appContext) {
