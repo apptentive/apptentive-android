@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-
 /**
  * @author Sky Kelsey
  */

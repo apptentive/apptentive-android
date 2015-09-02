@@ -105,6 +105,10 @@
         <item name="windowNoTitle">false</item>
     </style>
 
+    <style name="ApptentiveTheme.About" parent="ApptentiveTheme.Light">
+        <item name="colorPrimary">@color/apptentive_red</item>
+    </style>
+
     <style name="ApptentiveTheme.Light.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.ActionBar"></style>
 
     <!-- LIGHT DARK ACTIONBAR -->

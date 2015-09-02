@@ -6,9 +6,17 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-/**
- * @author Sky Kelsey
- */
-public interface MessageCenterListItem {
+public class MessageCenterUtil {
+
+	public interface MessageCenterListItem {
+
+	}
+
+	public interface OutgoingItem {
+
+		public void setLastSent(boolean bVal);
+		public boolean isLastSent();
+
+	}
 
 }

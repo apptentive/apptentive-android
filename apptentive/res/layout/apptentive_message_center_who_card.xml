@@ -37,7 +37,6 @@
                   android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
                   android:inputType="textCapSentences"
                   android:singleLine="true"
-                  android:textIsSelectable="true"
                   android:textColorHint="?attr/apptentive_material_hint_text"
                   android:textColor="?attr/apptentive_material_primary_text"
                   android:textSize="@dimen/apptentive_text_medium_small"/>
@@ -56,7 +55,6 @@
                       android:textColorHint="?attr/apptentive_material_hint_text"
                       android:textColor="?attr/apptentive_material_primary_text"
                       android:textSize="@dimen/apptentive_text_medium_small"
-                      android:textIsSelectable="true"
                       android:inputType="textEmailAddress"/>
 
             <TextView android:id="@+id/email_explanation"

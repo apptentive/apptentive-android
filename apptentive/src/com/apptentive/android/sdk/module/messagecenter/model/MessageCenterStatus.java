@@ -11,7 +11,7 @@ import org.json.JSONObject;
 /**
  * @author Sky Kelsey
  */
-public class MessageCenterStatus extends JSONObject implements MessageCenterListItem {
+public class MessageCenterStatus extends JSONObject implements MessageCenterUtil.MessageCenterListItem {
 
 	public final String body;
 	public final Integer icon;

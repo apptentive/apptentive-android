@@ -32,8 +32,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
@@ -43,6 +44,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenter
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
+import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -59,7 +61,7 @@ import java.util.List;
 /**
  * @author Sky Kelsey
  */
-public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapter<T>
+public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> extends ArrayAdapter<T>
 		implements MessageCenterListView.ApptentiveMessageCenterListAdapter {
 
 	private static final int
@@ -316,9 +318,9 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				case TYPE_TEXT_OUTGOING: {
 					showMessageAnimation = true;
 					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
-					String datestamp = ((OutgoingTextMessage) listItem).getDatestamp();
-					Double createdTime = ((OutgoingTextMessage) listItem).getCreatedAt();
-					String status = createStatus(createdTime);
+					String datestamp = textMessage.getDatestamp();
+					Double createdTime = textMessage.getCreatedAt();
+					String status = createStatus(createdTime, textMessage.isLastSent());
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
 							createdTime == null && !isInPauseState, textMessage.getBody());
@@ -333,7 +335,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 					}
 					String datestamp = fileMessage.getDatestamp();
 					Double createdTime = fileMessage.getCreatedAt();
-					String status = createStatus(createdTime);
+					String status = createStatus(createdTime, fileMessage.isLastSent());
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
 							createdTime == null && !isInPauseState);
@@ -369,7 +371,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 			}
 		}
 		if (showMessageAnimation && position > lastAnimatedMessagePosition) {
-			AnimatorSet set = Util.buildListViewRowShowAnimator(view, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(view, null, null);
 			set.start();
 			lastAnimatedMessagePosition = position;
 		}
@@ -388,7 +390,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 
 	private void showComposingBarAnimation() {
 		if (showComposingBarAnimation) {
-			AnimatorSet set = Util.buildListViewRowShowAnimator(composingActionBarView, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingActionBarView, null, null);
 			set.start();
 			showComposingBarAnimation = false;
 		}
@@ -431,7 +433,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 				return false;
 			}
 		});
-		AnimatorSet set = Util.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
+		AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
 			}
@@ -491,7 +493,7 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		} else {
 			focusOnNameField = false;
 		}
-		AnimatorSet set = Util.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
+		AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationStart(Animator animation) {
 			}
@@ -546,11 +548,11 @@ public class MessageAdapter<T extends MessageCenterListItem> extends ArrayAdapte
 		forceShowKeyboard = bVal;
 	}
 
-	protected String createStatus(Double seconds) {
+	protected String createStatus(Double seconds, boolean showSent) {
 		if (seconds == null) {
 			return isInPauseState ? activityContext.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return activityContext.getResources().getString(R.string.apptentive_sent);
+		return (showSent) ? activityContext.getResources().getString(R.string.apptentive_sent) : null;
 	}
 
 	protected int getStatusColor(Double seconds) {

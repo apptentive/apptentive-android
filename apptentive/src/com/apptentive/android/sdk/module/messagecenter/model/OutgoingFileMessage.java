@@ -27,12 +27,14 @@ import java.io.*;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingFileMessage extends ApptentiveMessage {
+public class OutgoingFileMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
 
 	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 
 	private static final String KEY_FILE_NAME = "file_name";
 	private static final String KEY_MIME_TYPE = "mime_type";
+
+	private boolean isLast;
 
 	public OutgoingFileMessage() {
 		super();
@@ -244,5 +246,15 @@ public class OutgoingFileMessage extends ApptentiveMessage {
 	public void deleteStoredFile(Context context) {
 		FileStore fileStore = ApptentiveDatabase.getInstance(context);
 		fileStore.deleteStoredFile(getStoredFileId());
+	}
+
+	@Override
+	public boolean isLastSent() {
+		return isLast;
+	}
+
+	@Override
+	public void setLastSent(boolean bVal) {
+		isLast = bVal;
 	}
 }

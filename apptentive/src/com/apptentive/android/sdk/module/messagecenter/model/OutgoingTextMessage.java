@@ -13,9 +13,11 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingTextMessage extends ApptentiveMessage {
+public class OutgoingTextMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
 
 	private static final String KEY_BODY = "body";
+
+	private boolean isLast;
 
 	public OutgoingTextMessage() {
 		super();
@@ -47,5 +49,15 @@ public class OutgoingTextMessage extends ApptentiveMessage {
 		} catch (JSONException e) {
 			Log.e("Unable to set message body.");
 		}
+	}
+
+	@Override
+	public boolean isLastSent() {
+		return isLast;
+	}
+
+	@Override
+	public void setLastSent(boolean bVal) {
+		isLast = bVal;
 	}
 }

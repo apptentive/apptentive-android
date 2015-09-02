@@ -7,10 +7,10 @@
 
 <resources>
     <!-- Material DEFAULT colors -->
-    <color name="colorPrimary">#DC2636</color>
-    <color name="colorPrimaryDark">#B91523</color>
+    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
     <color name="colorPrimaryLight">#E57373</color>
-    <color name="colorAccent">#FF5252</color>
+    <color name="colorAccent">#1E88E5</color>
 
     <color name="window_background">#ECECEC</color>
 
@@ -75,7 +75,7 @@
     <color name="apptentive_transparency">#00000000</color>
     <color name="apptentive_white">#FFFFFF</color>
     <color name="apptentive_black">#000000</color>
-    <color name="apptentive_red">#D22E32</color>
+    <color name="apptentive_red">#DC2636</color>
 
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
     <color name="apptentive_message_center_incoming_background">#F2F2F2</color>
