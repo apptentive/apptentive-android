@@ -96,6 +96,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private ListView messageCenterListView; // List of apptentive messages
 	private EditText messageEditText; // Composing area
 	private View fab;
+	private View profileButton;
 
 	// Data backing of the listview
 	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
@@ -334,6 +335,38 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageCenterListAdapter.notifyDataSetChanged();
 			}
 		});
+
+		profileButton = viewActivity.findViewById(R.id.profile);
+		if (profileButton != null) {
+			profileButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View view) {
+					// Only allow profile editing when not already editing profile or in message composing
+					if (whoCardItem == null && composingItem == null) {
+						hideProfileButton();
+						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+
+						JSONObject data = new JSONObject();
+						try {
+							data.put("required", interaction.getWhoCardRequired());
+							data.put("trigger", "button");
+						} catch (JSONException e) {
+							//
+						}
+						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+
+						if (!bWhoCardSet) {
+							addWhoCard(WHO_CARD_MODE_INIT);
+						} else {
+							addWhoCard(WHO_CARD_MODE_EDIT);
+						}
+						messageCenterListAdapter.setForceShowKeyboard(true);
+						messageCenterListAdapter.notifyDataSetChanged();
+					}
+				}
+			});
+		}
+
 		if (messageCenterListAdapter == null) {
 			List<MessageCenterListItem> items = MessageManager.getMessageCenterListItems(viewActivity);
 			unsendMessagesCount = countUnsendOutgoingMessages(items);
@@ -369,7 +402,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
 
-
 		View attachButton = viewActivity.findViewById(R.id.attach);
 		if (attachButton != null && attachButton.getVisibility() == View.VISIBLE) {
 			// Android devices can't take screenshots until Android OS version 4+
@@ -395,36 +427,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			} else {
 				attachButton.setVisibility(View.GONE);
 			}
-		}
-
-		View profileButton = viewActivity.findViewById(R.id.profile);
-		if (profileButton != null) {
-			profileButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					// Only allow profile editing when not already editing profile or in message composing
-					if (whoCardItem == null && composingItem == null) {
-						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-
-						JSONObject data = new JSONObject();
-						try {
-							data.put("required", interaction.getWhoCardRequired());
-							data.put("trigger", "button");
-						} catch (JSONException e) {
-							//
-						}
-						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-
-						if (!bWhoCardSet) {
-							addWhoCard(WHO_CARD_MODE_INIT);
-						} else {
-							addWhoCard(WHO_CARD_MODE_EDIT);
-						}
-						messageCenterListAdapter.setForceShowKeyboard(true);
-						messageCenterListAdapter.notifyDataSetChanged();
-					}
-				}
-			});
 		}
 
 	}
@@ -548,6 +550,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	public void addComposingArea() {
 		hideFab();
+		hideProfileButton();
 		clearStatus();
 		actionBarItem = interaction.getComposerBar();
 		messages.add(actionBarItem);
@@ -567,6 +570,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public void addWhoCard(int mode) {
+		hideProfileButton();
 		if (!interaction.getWhoCardRequestEnabled()) {
 			return;
 		}
@@ -842,6 +846,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 messageCenterListAdapter.clearComposing();
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 showFab();
+												 showProfileButton();
 												 // messageEditText has been set to null, pending composing message will reset
 												 saveOrClearPendingComposingMessage();
 											 }
@@ -893,6 +898,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 															 messageText), DEFAULT_DELAYMILLIS);
 												 }
 												 showFab();
+												 showProfileButton();
 											 }
 
 											 @Override
@@ -964,6 +970,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 							messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
 						} else {
 							showFab();
+							showProfileButton();
 						}
 					}
 
@@ -1110,6 +1117,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	private void hideFab() {
 		AnimationUtil.scaleFadeOutGone(fab);
+	}
+
+	private void showProfileButton() {
+		AnimationUtil.fadeIn(profileButton, null);
+	}
+
+	private void hideProfileButton() {
+		AnimationUtil.fadeOutGone(profileButton);
 	}
 
 }
