@@ -288,66 +288,14 @@ public class Apptentive {
 	// THIRD PARTY INTEGRATIONS
 	// ****************************************************************************************
 
-	/**
-	 * The key to use to store a Map of Apptentive Push integration settings.
-	 */
-	public static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
+	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
+	private static final String INTEGRATION_PARSE = "parse";
+	private static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
+	private static final String INTEGRATION_AWS_SNS = "aws_sns";
 
-	/**
-	 * The key to use to specify the GCM Registration ID within Apptentive Push integration settings.
-	 */
-	public static final String INTEGRATION_APPTENTIVE_PUSH_REGISTRATION_ID = "token";
+	private static final String INTEGRATION_PUSH_TOKEN = "token";
 
-	/**
-	 * The key to use to store a Map of Urban Airship configuration settings.
-	 */
-	public static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
-
-	/**
-	 * The key to use to specify the Urban Airship Channel ID within Apptentive's push integration Map.
-	 */
-	public static final String INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID = "token";
-
-	/**
-	 * The key to use to store a Map of Amazon SNS configuration settings.
-	 */
-	public static final String INTEGRATION_AWS_SNS = "aws_sns";
-
-	/**
-	 * The key to use to specify the Amazon SNS Registration ID within Apptentive's push integration Map.
-	 */
-	public static final String INTEGRATION_AWS_SNS_TOKEN = "token";
-
-	/**
-	 * The key to use to store a Map of Parse configuration settings.
-	 */
-	public static final String INTEGRATION_PARSE = "parse";
-
-	/**
-	 * The key to use to specify the Parse channel ID within Apptentive's push integration Map.
-	 */
-	public static final String INTEGRATION_PARSE_DEVICE_TOKEN = "token";
-
-	/**
-	 * Allows you to pass in third party integration details. Supported push providers:
-	 * <ul>
-	 * <li>
-	 * Urban Airship
-	 * </li>
-	 * <li>
-	 * Amazon SNS via GCM
-	 * </li>
-	 * <li>
-	 * Parse
-	 * </li>
-	 * </ul>
-	 *
-	 * @param context     The Context from which this method is called.
-	 * @param integration The name of the integration. Integrations known at the time this SDK was released are listed below.
-	 * @param config      A String to String Map of key/value pairs representing all necessary configuration data Apptentive needs
-	 *                    to use the specific third party integration.
-	 */
-	public static void addIntegration(Context context, String integration, Map<String, String> config) {
+	private static void addIntegration(Context context, String integration, Map<String, String> config) {
 		if (integration == null || config == null) {
 			return;
 		}
@@ -372,89 +320,99 @@ public class Apptentive {
 	}
 
 	/**
-	 * Configures your app to receive Apptentive push notifications. Use this method if you do not
-	 * currently use a push provider, and would like to receive push notifications sent from
-	 * Apptentive. You must first set up your app to GCM, per our documentation.
-	 *
-	 * @param context        The Context from which this method is called.
-	 * @param registrationId The GCM Registration ID.
+	 * Call {@link #setPushNotificationIntegration(Context, int, String)} with this value to allow Apptentive to send pushes
+	 * to this device without a third party push provider. Requires a valid GCM configuration.
 	 */
-	public static void addApptentivePushIntegration(Context context, String registrationId) {
-		if (registrationId != null) {
-			Log.d("Setting up Apptentive Push Notifications with Registration ID: %s", registrationId);
-			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_APPTENTIVE_PUSH_REGISTRATION_ID, registrationId);
-			addIntegration(context, Apptentive.INTEGRATION_APPTENTIVE_PUSH, config);
-		}
-	}
-
+	public static final int PUSH_PROVIDER_APPTENTIVE = 0;
 
 	/**
-	 * Configures Apptentive to work with Urban Airship push notifications. You must first set up your app to work with
-	 * Urban Airship to use this integration. This method must be called when you finish initializing Urban Airship. Since
-	 * Urban Airship creates a Channel ID after it connects to its server, the Channel ID may be null at first. The
-	 * preferred method of retrieving the Channel ID is to listen to the
-	 * <code>PushManager.ACTION_REGISTRATION_FINISHED</code> Intent in your {@link android.content.BroadcastReceiver}. You
-	 * can alternately find the Channel ID by calling <a href="http://docs.urbanairship.com/reference/libraries/android/latest/reference/com/urbanairship/push/PushManager.html#getChannelId%28%29">PushManager.shared().getChannelId()</a>
-	 * <p/>
-	 * Push notifications will not be delivered to this app install until our server receives the APID.
-	 *
-	 * @param context   The Context from which this method is called.
-	 * @param channelId The Android Channel ID.
+	 * Call {@link #setPushNotificationIntegration(Context, int, String)} with this value to allow Apptentive to send pushes
+	 * to this device through your existing Parse Push integration. Requires a valid Parse integration.
 	 */
-	public static void addUrbanAirshipPushIntegration(Context context, String channelId) {
-		if (channelId != null) {
-			Log.d("Setting Urban Airship Channel ID: %s", channelId);
-			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_URBAN_AIRSHIP_CHANNEL_ID, channelId);
-			addIntegration(context, Apptentive.INTEGRATION_URBAN_AIRSHIP, config);
-		}
-	}
+	public static final int PUSH_PROVIDER_PARSE = 1;
 
 	/**
-	 * Configures Apptentive to work with Amazon Web Services (AWS) Simple Notification Service (SNS) push notifications.
-	 * You must first set up your app to work with AWS SNS to use this integration. This method must be called when you
-	 * finish initializing AWS SNS using
-	 * <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
-	 * GoogleCloudMessaging.register(String... senderIds)</a>,
-	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
-	 * <p/>
-	 * Push notifications will not be delivered to this app install until our server receives the Registration ID.
-	 *
-	 * @param context        The Context from which this method was called.
-	 * @param registrationId The registrationId returned from
-	 *                       <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
-	 *                       GoogleCloudMessaging.register(String... senderIds)</a>.
+	 * Call {@link #setPushNotificationIntegration(Context, int, String)} with this value to allow Apptentive to send pushes
+	 * to this device through your existing Urban Airship Push integration. Requires a valid Urban
+	 * Airship Push integration.
 	 */
-	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
-		if (registrationId != null) {
-			Log.d("Setting Amazon AWS token: %s", registrationId);
-			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_AWS_SNS_TOKEN, registrationId);
-			addIntegration(context, Apptentive.INTEGRATION_AWS_SNS, config);
-		}
-	}
+	public static final int PUSH_PROVIDER_URBAN_AIRSHIP = 2;
 
 	/**
-	 * Configures Apptentive to work with Parse push notifications. You must first set up your app to work with Parse to
-	 * use this integration. You must call this method, and pass in the Parse deviceToken when you finish initializing
-	 * Parse push notifications in your app. Please see our <a href="http://www.apptentive.com/docs/android/integration/">
-	 * integration guide</a> for instructions.
-	 * <p/>
-	 * Push notifications will not be delivered to this app install until our server receives the deviceToken.
-	 *
-	 * @param context     The Context from which this method was called.
-	 * @param deviceToken The deviceToken returned from
+	 * Call {@link #setPushNotificationIntegration(Context, int, String)} with this value to allow Apptentive to send pushes
+	 * to this device through your existing Amazon AWS SNS integration. Requires a valid Amazon AWS SNS
+	 * integration.
 	 */
-	public static void addParsePushIntegration(Context context, String deviceToken) {
-		if (deviceToken != null) {
-			Log.d("Setting Parse Device Token: %s", deviceToken);
-			Map<String, String> config = new HashMap<String, String>();
-			config.put(Apptentive.INTEGRATION_PARSE_DEVICE_TOKEN, deviceToken);
-			addIntegration(context, Apptentive.INTEGRATION_PARSE, config);
+	public static final int PUSH_PROVIDER_AMAZON_AWS_SNS = 3;
+
+	/**
+	 * Sends push provider information to our server to allow us to send pushes to this device when
+	 * you reply to your customers. Only one push provider is allowed to be active at a time, so you
+	 * should only call this method once. Please see our
+	 * <a href="http://www.apptentive.com/docs/android/integration/#push-notifications">integration guide</a> for
+	 * instructions.
+	 *
+	 * @param pushProvider One of the following:
+	 *                     <ul>
+	 *                     <li>{@link #PUSH_PROVIDER_APPTENTIVE}</li>
+	 *                     <li>{@link #PUSH_PROVIDER_PARSE}</li>
+	 *                     <li>{@link #PUSH_PROVIDER_URBAN_AIRSHIP}</li>
+	 *                     <li>{@link #PUSH_PROVIDER_AMAZON_AWS_SNS}</li>
+	 *                     </ul>
+	 * @param token        The push provider token you receive from your push provider. The format is push provider specific.
+	 *                     <dl>
+	 *                     <dt>Apptentive</dt>
+	 *                     <dd>If you are using Apptentive to send pushes directly to GCM, pass in the GCM Registration ID, which you can
+	 *                     <a href="https://github.com/googlesamples/google-services/blob/73f8a4fcfc93da08a40b96df3537bb9b6ef1b0fa/android/gcm/app/src/main/java/gcm/play/android/samples/com/gcmquickstart/RegistrationIntentService.java#L51">access like this</a>.
+	 *                     </dd>
+	 *                     <dt>Parse</dt>
+	 *                     <dd>The Parse <a href="https://parse.com/docs/android/guide#push-notifications">deviceToken</a></dd>
+	 *                     <dt>Urban Airship</dt>
+	 *                     <dd>The Urban Airship Channel ID, which you can
+	 *                     <a href="https://github.com/urbanairship/android-samples/blob/8ad77e5e81a1b0507c6a2c45a5c30a1e2da851e9/PushSample/src/com/urbanairship/push/sample/IntentReceiver.java#L43">access like this</a>.
+	 *                     </dd>
+	 *                     <dt>Amazon AWS SNS</dt>
+	 *                     <dd>The GCM Registration ID, which you can <a href="http://docs.aws.amazon.com/sns/latest/dg/mobile-push-gcm.html#registration-id-gcm">access like this</a>.</dd>
+	 *                     </dl>
+	 */
+	public static void setPushNotificationIntegration(Context context, int pushProvider, String token) {
+		try {
+			CustomData integrationConfig = getIntegrationConfigurationWithoutPushProviders(context);
+			JSONObject pushObject = new JSONObject();
+			pushObject.put(INTEGRATION_PUSH_TOKEN, token);
+			switch (pushProvider) {
+				case PUSH_PROVIDER_APPTENTIVE:
+					integrationConfig.put(INTEGRATION_APPTENTIVE_PUSH, pushObject);
+					break;
+				case PUSH_PROVIDER_PARSE:
+					integrationConfig.put(INTEGRATION_PARSE, pushObject);
+					break;
+				case PUSH_PROVIDER_URBAN_AIRSHIP:
+					integrationConfig.put(INTEGRATION_URBAN_AIRSHIP, pushObject);
+					break;
+				case PUSH_PROVIDER_AMAZON_AWS_SNS:
+					integrationConfig.put(INTEGRATION_AWS_SNS, pushObject);
+					break;
+				default:
+					Log.e("Invalid pushProvider: %d", pushProvider);
+					return;
+			}
+			DeviceManager.storeIntegrationConfig(context, integrationConfig);
+			syncDevice(context);
+		} catch (JSONException e) {
+			Log.e("Error setting push integration.", e);
+			return;
 		}
 	}
 
+	private static CustomData getIntegrationConfigurationWithoutPushProviders(Context context) {
+		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
+		integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
+		integrationConfig.remove(INTEGRATION_PARSE);
+		integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
+		integrationConfig.remove(INTEGRATION_AWS_SNS);
+		return integrationConfig;
+	}
 
 	// ****************************************************************************************
 	// PUSH NOTIFICATIONS
