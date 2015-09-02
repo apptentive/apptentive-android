@@ -415,7 +415,7 @@ public class MessageCenterListView extends ListView {
 	private boolean isStickyViewTouched(View view, float x, float y) {
 		view.getHitRect(touchRect);
 
-		touchRect.bottom += getPaddingTop();
+		touchRect.bottom += getPaddingTop() - view.getTop();
 		touchRect.left += getPaddingLeft();
 		touchRect.right -= getPaddingRight();
 		return touchRect.contains((int) x, (int) y);
