@@ -49,6 +49,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				listener.afterComposingTextChanged(editable.toString());
 			}
 		});
 

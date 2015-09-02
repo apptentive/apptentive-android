@@ -92,7 +92,6 @@ public class AnimationUtil {
 
 		ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, "alpha", ALPHA_DEFAULT);
 
-		alphaAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 		if (al != null) {
 			alphaAnimator.addListener(al);
 		}
@@ -100,6 +99,10 @@ public class AnimationUtil {
 	}
 
 	private static void fadeOut(final View view, final int endVisibility) {
+		if (view.getAlpha() == 0 || view.getVisibility() == endVisibility) {
+			return;
+		}
+
 		ObjectAnimator animation = ObjectAnimator.ofFloat(view, "alpha", ALPHA_MIN);
 
 		animation.setDuration(ANIMATION_DURATION);
