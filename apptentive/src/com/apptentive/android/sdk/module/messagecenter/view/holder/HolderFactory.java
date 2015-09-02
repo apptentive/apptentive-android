@@ -6,13 +6,9 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.AutomatedMessageView;
 import com.apptentive.android.sdk.module.messagecenter.view.FileMessageView;
 import com.apptentive.android.sdk.module.messagecenter.view.IncomingTextMessageView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingActionBarView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterGreetingView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListItemView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterStatusView;
 import com.apptentive.android.sdk.module.messagecenter.view.OutgoingTextMessageView;

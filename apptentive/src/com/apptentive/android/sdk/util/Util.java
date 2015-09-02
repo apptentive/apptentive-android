@@ -8,10 +8,6 @@ package com.apptentive.android.sdk.util;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -31,8 +27,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -48,8 +42,6 @@ public class Util {
 	// These date formats are as close as Java can get to ISO 8601 without royally screwing up.
 	public static final String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
 	public static final String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
-
-	public static final int ANIMATION_DURATION = 300;
 
 	public static String dateToIso8601String(long millis) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
@@ -519,52 +511,6 @@ public class Util {
 		int green = (int) ((Color.green(color) * (1 - factor) / 255 + factor) * 255);
 		int blue = (int) ((Color.blue(color) * (1 - factor) / 255 + factor) * 255);
 		return Color.argb(Color.alpha(color), red, green, blue);
-	}
-
-	public static AnimatorSet buildListViewRowRemoveAnimator(final View view,
-																													 Animator.AnimatorListener al,
-																													 ValueAnimator.AnimatorUpdateListener vl
-																													 ) {
-
-		AnimatorSet animatorSet = new AnimatorSet();
-		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", 0, 90);
-		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
-		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
-		if (vl != null) {
-			valueAnimator.addUpdateListener(vl);
-		}
-
-		animX.setDuration(ANIMATION_DURATION);
-		animAlpha.setDuration(ANIMATION_DURATION);
-		valueAnimator.setDuration(ANIMATION_DURATION + ANIMATION_DURATION + 100);
-		animatorSet.playTogether(animX, animAlpha, valueAnimator);
-		if (al != null) {
-			animatorSet.addListener(al);
-		}
-		return animatorSet;
-	}
-
-	public static AnimatorSet buildListViewRowShowAnimator(final View view,
-																													 Animator.AnimatorListener al,
-																													 ValueAnimator.AnimatorUpdateListener vl
-	) {
-
-		AnimatorSet animatorSet = new AnimatorSet();
-		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", -90, 0);
-		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
-		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
-		if (vl != null) {
-			valueAnimator.addUpdateListener(vl);
-		}
-
-		animX.setDuration(ANIMATION_DURATION);
-		animAlpha.setDuration(ANIMATION_DURATION);
-		valueAnimator.setDuration(ANIMATION_DURATION);
-		animatorSet.playTogether(animX, animAlpha, valueAnimator);
-		if (al != null) {
-			animatorSet.addListener(al);
-		}
-		return animatorSet;
 	}
 
 }

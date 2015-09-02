@@ -27,14 +27,12 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONArray;
@@ -159,8 +157,8 @@ public class MessageManager {
 		return false;
 	}
 
-	public static List<MessageCenterListItem> getMessageCenterListItems(Context context) {
-		List<MessageCenterListItem> messages = new ArrayList<>();
+	public static List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
+		List<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<>();
 		messages.addAll(getMessageStore(context).getAllMessages());
 		return messages;
 	}

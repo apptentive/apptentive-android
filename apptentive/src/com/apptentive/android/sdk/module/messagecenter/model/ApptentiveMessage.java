@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ConversationItem;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
+public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterUtil.MessageCenterListItem {
 
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
