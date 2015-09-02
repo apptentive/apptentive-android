@@ -34,7 +34,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.interactions);
 
-		// Populate an auto=complete text view of event names that can be engaged.
+		// Populate an auto-complete text view of event names that can be engaged.
 		final AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
 		String[] events = getResources().getStringArray(R.array.events);
 		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_spinner_dropdown_item, events);
