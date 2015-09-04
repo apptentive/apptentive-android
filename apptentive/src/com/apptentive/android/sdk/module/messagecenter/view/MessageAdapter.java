@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.os.AsyncTask;
 import android.widget.EditText;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
@@ -252,7 +253,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
 						whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
-						whoCardView.updateUi((MessageCenterComposingItem) listItem);
+						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(activityContext),
+								Apptentive.getPersonEmail(activityContext));
 						setupWhoCardView(position);
 					}
 					view = whoCardView;
@@ -283,7 +285,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			} else if (type == TYPE_WHOCARD) {
 				if (whoCardView == null) {
 					whoCardView = (MessageCenterWhoCardView) convertView;
-					whoCardView.updateUi((MessageCenterComposingItem) listItem);
+					whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(activityContext),
+							Apptentive.getPersonEmail(activityContext));
 					setupWhoCardView(position);
 				}
 				view = whoCardView;

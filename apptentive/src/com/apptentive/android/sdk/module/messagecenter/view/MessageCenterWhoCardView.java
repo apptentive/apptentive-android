@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private Button skipButton;
 	private Button sendButton;
 
+	private TextWatcher nameTextWatcher;
+	private TextWatcher emailTextWatcher;
+	private boolean emailIsValid;
+
 	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnComposingActionListener listener) {
 		super(activityContext);
 		this.listener = listener;
@@ -48,28 +53,6 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
 
-		emailEditText.addTextChangedListener(new TextWatcher() {
-
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				emailEditText.setTextColor(Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_primary_text,
-						R.color.apptentive_material_primary_text));
-				sendButton.setEnabled(false);
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-				if (!charSequence.toString().isEmpty()) {
-					sendButton.setEnabled(true);
-				}
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-
-			}
-		});
-
 		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
 
 		emailExplanation = (TextView) parentView.findViewById(R.id.email_explanation);
@@ -78,7 +61,16 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 	}
 
-	public void updateUi(final MessageCenterComposingItem item) {
+	/**
+	 * Update Who Card UI under different scenarios, defined in {@link com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem}
+	 *
+	 *
+	 * @param item  The generic object containing the data to update composing view.
+	 * @param name  Stored profile name, maybe null
+	 * @param email Stored profile email, maybe null
+	 * @return
+	 */
+	public void updateUi(final MessageCenterComposingItem item, String name, String email) {
 		if (item.str_1 != null) {
 			title.setText(item.str_1);
 		}
@@ -115,19 +107,88 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			sendButton.setText(item.button_2);
 			sendButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					if (item.button_1 == null) {
-						String email = emailEditText.getText().toString();
-						if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-							emailEditText.setTextColor(getResources().getColor(R.color.apptentive_red));
-							return;
-						}
-					}
-					Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString());
-					Apptentive.setPersonName(getContext(), nameEditText.getText().toString());
+					Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString().trim());
+					Apptentive.setPersonName(getContext(), nameEditText.getText().toString().trim());
 					listener.onSubmitWhoCard(item.button_2);
 				}
 			});
+			sendButton.setEnabled(false);
 		}
+
+		if (nameTextWatcher != null) {
+			nameEditText.removeTextChangedListener(nameTextWatcher);
+		}
+
+		if (!TextUtils.isEmpty(name)) {
+			nameEditText.setText(name);
+		}
+
+		nameTextWatcher = new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				// Disable send button when the content hasn't change yet
+				sendButton.setEnabled(false);
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				// If email field content is valid, any change in name field would enable send button
+				if (emailIsValid) {
+					sendButton.setEnabled(true);
+				}
+			}
+		};
+
+		nameEditText.addTextChangedListener(nameTextWatcher);
+
+		if (emailTextWatcher != null) {
+			emailEditText.removeTextChangedListener(emailTextWatcher);
+		}
+
+		// email passed into updateUi() is saved profile email, it must have been validated
+		if (!TextUtils.isEmpty(email)) {
+			emailEditText.setText(email);
+			emailIsValid = true;
+		}
+
+		emailTextWatcher = new TextWatcher() {
+
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+				// Disable send button when the content hasn't change yet
+				sendButton.setEnabled(false);
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				String emailContent = editable.toString();
+				if (android.util.Patterns.EMAIL_ADDRESS.matcher(emailContent).matches()) {
+					// email must be in valid format after the change. If it is, enable send button
+					sendButton.setEnabled(true);
+					emailIsValid = true;
+				} else
+					// Allow user remove email completely when editing prifle of "Email Requested"
+					if (TextUtils.isEmpty(emailContent.trim()) && item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT) {
+						sendButton.setEnabled(true);
+						emailIsValid = true;
+					} else {
+						// email not valid after change, so disable the send button
+						sendButton.setEnabled(false);
+						emailIsValid = false;
+					}
+			}
+		};
+
+		emailEditText.addTextChangedListener(emailTextWatcher);
+
 	}
 
 	public EditText getNameField() {
