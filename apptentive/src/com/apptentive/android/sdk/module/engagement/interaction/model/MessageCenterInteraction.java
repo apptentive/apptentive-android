@@ -165,7 +165,7 @@ public class MessageCenterInteraction extends Interaction {
 		JSONObject profile_init = profile.optJSONObject(KEY_PROFILE_INIT);
 		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
 			return new MessageCenterComposingItem(
-					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
+					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_INIT,
 					profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
 					// Hide name field if profile is required and never set
 					null,
@@ -175,7 +175,7 @@ public class MessageCenterInteraction extends Interaction {
 					profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 		}
 		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
+				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT,
 				profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
 				profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
 				profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
@@ -189,15 +189,18 @@ public class MessageCenterInteraction extends Interaction {
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
+		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
+		JSONObject profile_edit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
+		boolean isRequired = profile.optBoolean(KEY_PROFILE_REQUIRE, false);
 		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD,
-				profile.optString(KEY_PROFILE_EDIT_TITLE, null),
-				profile.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-				profile.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-				profile.optString(KEY_PROFILE_EDIT_EMAIL_TIP, null),
-				profile.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-				profile.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
+				(isRequired) ? MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT :
+						MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
+				profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_TIP, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 	}
 
 

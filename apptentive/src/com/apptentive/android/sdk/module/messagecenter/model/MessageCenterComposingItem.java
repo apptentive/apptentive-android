@@ -12,7 +12,11 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 public class MessageCenterComposingItem implements MessageCenterUtil.MessageCenterListItem {
 	public static int COMPOSING_ITEM_AREA = 0;
 	public static int COMPOSING_ITEM_ACTIONBAR = 1;
-	public static int COMPOSING_ITEM_WHOCARD = 2;
+	// Scenarios of presenting Who Card
+	public static int COMPOSING_ITEM_WHOCARD_REQUIRED_INIT = 2;
+	public static int COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT = 3;
+	public static int COMPOSING_ITEM_WHOCARD_REQUESTED_INIT = 4;
+	public static int COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT = 5;
 
 	public final int type;
 	/*

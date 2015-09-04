@@ -762,22 +762,18 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				messageEditText.setText("");
 			}
 		}
-		Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
 	@Override
 	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText) {
 		if (pendingWhoCardName != null) {
 			nameEditText.setText(pendingWhoCardName);
-		} else {
-			nameEditText.setText(PersonManager.loadPersonName(viewActivity.getApplicationContext()));
 		}
 		if (pendingWhoCardEmail != null) {
 			emailEditText.setText(pendingWhoCardEmail);
-		} else {
-			emailEditText.setText(PersonManager.loadPersonEmail(viewActivity.getApplicationContext()));
 		}
-		Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
+		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
 	@Override
