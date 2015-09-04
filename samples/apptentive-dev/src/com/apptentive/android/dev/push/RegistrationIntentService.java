@@ -35,7 +35,7 @@ public class RegistrationIntentService extends IntentService {
 			String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 			Apptentive.setPushNotificationIntegration(getApplicationContext(), Apptentive.PUSH_PROVIDER_APPTENTIVE, token);
 		} catch (IOException e) {
-			Log.e("Unable to get instanceId tokan.", e);
+			Log.e("Unable to get instanceId token.", e);
 		}
 	}
 }
