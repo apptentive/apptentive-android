@@ -91,11 +91,11 @@ public class InteractionManager {
 		}
 	}
 
-	private static void fetchAndStoreInteractions(Context context) {
-		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
+	private static void fetchAndStoreInteractions(Context appContext) {
+		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(appContext);
 
 		// We weren't able to connect to the internet.
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		if (response.isException()) {
 			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
 			return;
@@ -114,8 +114,8 @@ public class InteractionManager {
 		if (cacheSeconds == null) {
 			cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
 		}
-		updateCacheExpiration(context, cacheSeconds);
-		storeInteractionsPayloadString(context, interactionsPayloadString);
+		updateCacheExpiration(appContext, cacheSeconds);
+		storeInteractionsPayloadString(appContext, interactionsPayloadString);
 	}
 
 	/**

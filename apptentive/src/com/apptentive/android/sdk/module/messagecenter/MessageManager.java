@@ -118,7 +118,7 @@ public class MessageManager {
 		// Fetch the messages.
 		String lastId = getMessageStore(appContext).getLastReceivedMessageId();
 		Log.d("Fetching messages after last id: " + lastId);
-		List<ApptentiveMessage> messagesToSave = fetchMessages(lastId);
+		List<ApptentiveMessage> messagesToSave = fetchMessages(appContext, lastId);
 
 		IncomingTextMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
@@ -176,9 +176,9 @@ public class MessageManager {
 		getMessageStore(context).deleteAllMessages();
 	}
 
-	private static List<ApptentiveMessage> fetchMessages(String after_id) {
-		Log.d("Fetching messages newer than: " + after_id);
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, after_id, null);
+	private static List<ApptentiveMessage> fetchMessages(Context appContext, String afterId) {
+		Log.d("Fetching messages newer than: " + afterId);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(appContext, null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
 		if (!response.isSuccessful()) {

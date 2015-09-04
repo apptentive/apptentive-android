@@ -57,12 +57,12 @@ public class ApptentiveClient {
 
 	public static boolean useStagingServer = false;
 
-	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
-		return performHttpRequest(GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
+	public static ApptentiveHttpResponse getConversationToken(Context appContext, ConversationTokenRequest conversationTokenRequest) {
+		return performHttpRequest(appContext, GlobalInfo.apiKey, ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
 	}
 
-	public static ApptentiveHttpResponse getAppConfiguration() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
+	public static ApptentiveHttpResponse getAppConfiguration(Context appContext) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -70,17 +70,17 @@ public class ApptentiveClient {
 	 *
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
-	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
+	public static ApptentiveHttpResponse getMessages(Context appContext, Integer count, String afterId, String beforeId) {
 		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(GlobalInfo.conversationToken, uri, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		switch (apptentiveMessage.getType()) {
 			case TextMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
+				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
 			case AutomatedMessage:
-				return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
+				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
 			case FileMessage:
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
@@ -91,50 +91,56 @@ public class ApptentiveClient {
 		return new ApptentiveHttpResponse();
 	}
 
-	public static ApptentiveHttpResponse postEvent(Event event) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+	public static ApptentiveHttpResponse postEvent(Context appContext, Event event) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putDevice(Device device) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+	public static ApptentiveHttpResponse putDevice(Context appContext, Device device) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
+	public static ApptentiveHttpResponse putSdk(Context appContext, Sdk sdk) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+	public static ApptentiveHttpResponse putAppRelease(Context appContext, AppRelease appRelease) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putPerson(Person person) {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
+	public static ApptentiveHttpResponse putPerson(Context appContext, Person person) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
+	public static ApptentiveHttpResponse postSurvey(Context appContext, SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse getInteractions() {
-		return performHttpRequest(GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
+	public static ApptentiveHttpResponse getInteractions(Context appContext) {
+		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
 	/**
 	 * Perform a Http request.
 	 *
+	 * @param appContext The ApplicationContext from which this method is called.
 	 * @param oauthToken authorization token for the current connection
 	 * @param uri        server url.
 	 * @param method     Get/Post/Put
 	 * @param body       Data to be POSTed/Put, not used for GET
 	 * @return ApptentiveHttpResponse containg content and response returned from the server.
 	 */
-	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
+	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+		if (!Util.isNetworkConnectionPresent(appContext)) {
+			Log.d("Network unavailable.");
+			return ret;
+		}
+
 		HttpURLConnection connection = null;
 		try {
 			URL httpUrl = new URL(uri);
@@ -265,11 +271,15 @@ public class ApptentiveClient {
 		return (errStream != null) ? (errStream.toString()) : null;
 	}
 
-	private static ApptentiveHttpResponse performMultipartFilePost(Context context, String oauthToken, String uri, String postBody, StoredFile storedFile) {
+	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
 		uri = getEndpointBase() + uri;
 		Log.d("Performing multipart request to %s", uri);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+		if (!Util.isNetworkConnectionPresent(appContext)) {
+			Log.d("Network unavailable.");
+			return ret;
+		}
 
 		if (storedFile == null) {
 			Log.e("StoredFile is null. Unable to send.");
@@ -289,7 +299,7 @@ public class ApptentiveClient {
 		InputStream is = null;
 
 		try {
-			is = context.openFileInput(storedFile.getLocalFilePath());
+			is = appContext.openFileInput(storedFile.getLocalFilePath());
 
 			// Set up the request.
 			URL url = new URL(uri);

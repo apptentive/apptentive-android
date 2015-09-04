@@ -48,12 +48,12 @@ public class PayloadSendWorker {
 	}
 
 
-	private static PayloadSendThread createPayloadSendThread(final Context context) {
-		PayloadSendThread newThread = new PayloadSendThread(context);
+	private static PayloadSendThread createPayloadSendThread(final Context appContext) {
+		PayloadSendThread newThread = new PayloadSendThread(appContext);
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				MetricModule.sendError(context, throwable, null, null);
+				MetricModule.sendError(appContext, throwable, null, null);
 			}
 		};
 		newThread.setUncaughtExceptionHandler(handler);
@@ -69,8 +69,8 @@ public class PayloadSendWorker {
 	private static class PayloadSendThread extends Thread {
 		private WeakReference<Context> contextRef;
 
-		public PayloadSendThread(Context context) {
-			contextRef = new WeakReference<>(context);
+		public PayloadSendThread(Context appContext) {
+			contextRef = new WeakReference<>(appContext);
 		}
 
 		public void run() {
@@ -122,23 +122,23 @@ public class PayloadSendWorker {
 							MessageManager.onSentMessage(contextRef.get(), (ApptentiveMessage) payload, response);
 							break;
 						case event:
-							response = ApptentiveClient.postEvent((Event) payload);
+							response = ApptentiveClient.postEvent(contextRef.get(), (Event) payload);
 							break;
 						case device:
-							response = ApptentiveClient.putDevice((Device) payload);
+							response = ApptentiveClient.putDevice(contextRef.get(), (Device) payload);
 							DeviceManager.onSentDeviceInfo(contextRef.get());
 							break;
 						case sdk:
-							response = ApptentiveClient.putSdk((Sdk) payload);
+							response = ApptentiveClient.putSdk(contextRef.get(), (Sdk) payload);
 							break;
 						case app_release:
-							response = ApptentiveClient.putAppRelease((AppRelease) payload);
+							response = ApptentiveClient.putAppRelease(contextRef.get(), (AppRelease) payload);
 							break;
 						case person:
-							response = ApptentiveClient.putPerson((Person) payload);
+							response = ApptentiveClient.putPerson(contextRef.get(), (Person) payload);
 							break;
 						case survey:
-							response = ApptentiveClient.postSurvey((SurveyResponse) payload);
+							response = ApptentiveClient.postSurvey(contextRef.get(), (SurveyResponse) payload);
 							break;
 						default:
 							Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());

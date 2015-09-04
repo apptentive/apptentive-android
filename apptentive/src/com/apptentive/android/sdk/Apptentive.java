@@ -1000,7 +1000,7 @@ public class Apptentive {
 		request.setPerson(PersonManager.storePersonAndReturnIt(context));
 
 		// TODO: Allow host app to send a user id, if available.
-		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
+		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(context, request);
 		if (response == null) {
 			Log.w("Got null response fetching ConversationToken.");
 			return;
@@ -1042,7 +1042,7 @@ public class Apptentive {
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if (force || Configuration.load(context).hasConfigurationCacheExpired()) {
 			Log.i("Fetching new Configuration.");
-			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
+			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(context);
 			try {
 				Map<String, String> headers = response.getHeaders();
 				if (headers != null) {
