@@ -460,17 +460,17 @@ public class Apptentive {
 
 	/**
 	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use
-	 * this method when a push notification is opened, and you only have access to a push Intent
+	 * this method when a push notification is opened, and you only have access to a push data
 	 * Bundle containing an "apptentive" key. This will generally be used with direct Apptentive Push
-	 * notifications, or when using Urban Airship as a puch provider. Calling this method for a push
+	 * notifications, or when using Urban Airship as a push provider. Calling this method for a push
 	 * that did not come from Apptentive has no effect.
 	 *
 	 * @param context The context from which this method was called.
-	 * @param bundle  The Bundle contained in the push notification.
-	 * @return true if pushBundle came from Apptentive.
+	 * @param data    A Bundle containing the GCM data object from the push notification.
+	 * @return true if data came from Apptentive.
 	 */
-	public static boolean setPendingPushNotification(Context context, Bundle bundle) {
-		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+	public static boolean setPendingPushNotification(Context context, Bundle data) {
+		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
 		if (apptentive != null) {
 			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
 		}
@@ -577,6 +577,13 @@ public class Apptentive {
 		return false;
 	}
 
+	/**
+	 * Our SDK must connect to our server at least once to download initial configuration for Message
+	 * Center. Call this method to see whether or not Message Center can be displayed.
+	 *
+	 * @param context The context from which this method is called.
+	 * @return true if a call to {@link #showMessageCenter(Activity)} will display Message Center, else false.
+	 */
 	public static boolean canShowMessageCenter(Context context) {
 		return ApptentiveInternal.canShowMessageCenterInternal(context);
 	}
@@ -595,7 +602,9 @@ public class Apptentive {
 	/**
 	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate.
+	 * @param listener An UnreadMessageListener that you instantiate. Do not pass in an anonymous class.
+	 *                 Instead, create your listener as an instance variable and pass that in. This
+	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
 		MessageManager.addHostUnreadMessagesListener(listener);
@@ -1000,7 +1009,7 @@ public class Apptentive {
 		request.setPerson(PersonManager.storePersonAndReturnIt(context));
 
 		// TODO: Allow host app to send a user id, if available.
-		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
+		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(context, request);
 		if (response == null) {
 			Log.w("Got null response fetching ConversationToken.");
 			return;
@@ -1042,7 +1051,7 @@ public class Apptentive {
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if (force || Configuration.load(context).hasConfigurationCacheExpired()) {
 			Log.i("Fetching new Configuration.");
-			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
+			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(context);
 			try {
 				Map<String, String> headers = response.getHeaders();
 				if (headers != null) {
