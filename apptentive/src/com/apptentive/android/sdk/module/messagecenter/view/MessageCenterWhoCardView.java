@@ -169,14 +169,14 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				String emailContent = editable.toString();
-				if (android.util.Patterns.EMAIL_ADDRESS.matcher(emailContent).matches()) {
+				String emailContent = editable.toString().trim();
+				if (Util.isEmailValid(emailContent)) {
 					// email must be in valid format after the change. If it is, enable send button
 					sendButton.setEnabled(true);
 					emailIsValid = true;
 				} else
 					// Allow user remove email completely when editing prifle of "Email Requested"
-					if (TextUtils.isEmpty(emailContent.trim()) && item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT) {
+					if (TextUtils.isEmpty(emailContent) && item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT) {
 						sendButton.setEnabled(true);
 						emailIsValid = true;
 					} else {
