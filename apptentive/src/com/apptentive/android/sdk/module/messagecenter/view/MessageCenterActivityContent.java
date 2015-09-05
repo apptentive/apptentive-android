@@ -386,7 +386,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addWhoCard(pendingWhoCardMode);
-			} else if (items.size() == 1) {
+			} else if (messages.size() == 1) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
