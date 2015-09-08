@@ -153,6 +153,9 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		if (!TextUtils.isEmpty(email)) {
 			emailEditText.setText(email);
 			emailIsValid = true;
+		} else if (item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
+			// Allow user only change name with email being blank if profile is requested initially
+			emailIsValid = true;
 		}
 
 		emailTextWatcher = new TextWatcher() {
