@@ -237,9 +237,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				case MSG_RESUME_SENDING: {
 					if (isPaused) {
 						isPaused = false;
-						if (statusItem != null) {
-							messages.remove(statusItem);
-							statusItem = null;
+						if (unsendMessagesCount > 0) {
+							clearStatus();
 						}
 
 						messageCenterListAdapter.setPaused(isPaused);
