@@ -125,8 +125,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	 * , rotate device, attaches a file, etc.
 	 */
 	private int pendingWhoCardMode;
-	private String pendingWhoCardName;
-	private String pendingWhoCardEmail;
+	private Parcelable pendingWhoCardName;
+	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
 
 
@@ -275,9 +275,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		composingViewSavedState = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
 		pendingWhoCardName = (onSavedInstanceState == null) ? null :
-				onSavedInstanceState.getString(WHO_CARD_NAME);
+				onSavedInstanceState.getParcelable(WHO_CARD_NAME);
 		pendingWhoCardEmail = (onSavedInstanceState == null) ? null :
-				onSavedInstanceState.getString(WHO_CARD_EMAIL);
+				onSavedInstanceState.getParcelable(WHO_CARD_EMAIL);
 		pendingWhoCardAvatarFile = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getString(WHO_CARD_AVATAR_FILE);
 		pendingWhoCardMode = (onSavedInstanceState == null) ? 0 :
@@ -433,8 +433,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable(LIST_INSTANCE_STATE, messageCenterListView.onSaveInstanceState());
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
-		outState.putString(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardName());
-		outState.putString(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmail());
+		outState.putParcelable(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardNameState());
+		outState.putParcelable(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmailState());
 		outState.putString(WHO_CARD_AVATAR_FILE, messageCenterListAdapter.getWhoCardAvatarFileName());
 		outState.putInt(WHO_CARD_MODE, pendingWhoCardMode);
 		if (contextualMessage == null) {
@@ -753,10 +753,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	@Override
 	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText) {
 		if (pendingWhoCardName != null) {
-			nameEditText.setText(pendingWhoCardName);
+			nameEditText.onRestoreInstanceState(pendingWhoCardName);
+			pendingWhoCardName = null;
 		}
 		if (pendingWhoCardEmail != null) {
-			emailEditText.setText(pendingWhoCardEmail);
+			emailEditText.onRestoreInstanceState(pendingWhoCardEmail);
+			pendingWhoCardEmail = null;
 		}
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}

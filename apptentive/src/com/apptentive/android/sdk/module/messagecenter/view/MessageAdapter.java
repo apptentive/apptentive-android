@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Parcelable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -399,16 +400,16 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		}
 	}
 
-	public String getWhoCardName() {
+	public Parcelable getWhoCardNameState() {
 		if (whoCardView != null) {
-			return whoCardView.getNameField().getText().toString();
+			return whoCardView.getNameField().onSaveInstanceState();
 		}
 		return null;
 	}
 
-	public String getWhoCardEmail() {
+	public Parcelable getWhoCardEmailState() {
 		if (whoCardView != null) {
-			return whoCardView.getEmailField().getText().toString();
+			return whoCardView.getEmailField().onSaveInstanceState();
 		}
 		return null;
 	}
