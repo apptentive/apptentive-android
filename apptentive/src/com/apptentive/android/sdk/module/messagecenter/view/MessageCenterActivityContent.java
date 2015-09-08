@@ -767,7 +767,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 		if (barView != null) {
 			barView.sendButton.setEnabled(false);
-			barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+			barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+					R.color.apptentive_material_dark_disabled_icon));
 			barView.showConfirmation = false;
 		}
 	}
@@ -780,14 +781,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void afterComposingTextChanged(String str) {
 		if (str == null || str.trim().isEmpty()) {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null) {
+			if (barView != null && barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(false);
-				barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+						R.color.apptentive_material_dark_disabled_icon));
 				barView.showConfirmation = false;
 			}
 		} else {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null) {
+			if (barView != null && barView.showConfirmation == false) {
 				barView.sendButton.setEnabled(true);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
 						R.color.colorAccent));
