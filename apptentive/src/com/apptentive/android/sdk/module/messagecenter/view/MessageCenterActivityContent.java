@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -51,7 +52,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.M
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -385,11 +385,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addWhoCard(pendingWhoCardMode);
-			} else if (messages.size() == 1) {
+			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
-				if (!addWhoCardInitIfRequired()) {
+				if (messages.size() == 1) {
 					addComposingArea();
 				}
 			}
@@ -526,8 +526,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		saveOrClearPendingComposingMessage();
 		clearStatus();
 		messages.add(contextualMessage);
-		// If addWhoCardInitIfRequired returns true, it will add WhoCard
-		if (!addWhoCardInitIfRequired()) {
+		// If checkAddWhoCardIfRequired returns true, it will add WhoCard
+		if (!checkAddWhoCardIfRequired()) {
 			addComposingArea();
 		}
 	}
@@ -542,13 +542,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messages.add(composingItem);
 	}
 
-	private boolean addWhoCardInitIfRequired() {
+	private boolean checkAddWhoCardIfRequired() {
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-		if (interaction.getWhoCardRequestEnabled() &&
-				interaction.getWhoCardRequired() && !bWhoCardSet) {
-			addWhoCard(WHO_CARD_MODE_INIT);
-			return true;
+		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
+			if (!bWhoCardSet) {
+				addWhoCard(WHO_CARD_MODE_INIT);
+				return true;
+			} else {
+				String savedEmail = Apptentive.getPersonEmail(viewActivity);
+				if (TextUtils.isEmpty(savedEmail)) {
+					addWhoCard(WHO_CARD_MODE_EDIT);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -767,7 +774,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 		if (barView != null) {
 			barView.sendButton.setEnabled(false);
-			barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+			barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+					R.color.apptentive_material_dark_disabled_icon));
 			barView.showConfirmation = false;
 		}
 	}
@@ -780,14 +788,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void afterComposingTextChanged(String str) {
 		if (str == null || str.trim().isEmpty()) {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null) {
+			if (barView != null && barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(false);
-				barView.sendButton.setColorFilter(R.color.apptentive_material_disabled_text);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+						R.color.apptentive_material_dark_disabled_icon));
 				barView.showConfirmation = false;
 			}
 		} else {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null) {
+			if (barView != null && barView.showConfirmation == false) {
 				barView.sendButton.setEnabled(true);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
 						R.color.colorAccent));
@@ -949,10 +958,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						pendingWhoCardMode = 0;
 						messageCenterListAdapter.clearWhoCard();
 						messageCenterListAdapter.notifyDataSetChanged();
-						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 						saveWhoCardSetState();
-						if (!bWhoCardSet && interaction.getWhoCardRequired()) {
+						if (messages.size() == 1 && interaction.getWhoCardRequired()) {
 							addComposingArea();
 							messageCenterListAdapter.setForceShowKeyboard(true);
 							messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
@@ -1123,7 +1130,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private void prepareMessages(final List<MessageCenterListItem> originalItems) {
 		messages.clear();
 		unsendMessagesCount = 0;
-    // Loop through each message item retrieved from database
+		// Loop through each message item retrieved from database
 		for (MessageCenterListItem item : originalItems) {
 			if (item instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;

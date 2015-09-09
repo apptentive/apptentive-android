@@ -91,6 +91,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			emailExplanation.setVisibility(GONE);
 		}
 
+		skipButton.setEnabled(true);
 		if (item.button_1 == null) {
 			skipButton.setVisibility(INVISIBLE);
 		} else {
@@ -153,9 +154,11 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		if (!TextUtils.isEmpty(email)) {
 			emailEditText.setText(email);
 			emailIsValid = true;
-		} else if (item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
-			// Allow user only change name with email being blank if profile is requested initially
+		} else if (item.getType() >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
+			// Allow user only change name with email being blank if profile is requested
 			emailIsValid = true;
+		} else {
+			skipButton.setEnabled(false);
 		}
 
 		emailTextWatcher = new TextWatcher() {
@@ -179,7 +182,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 					emailIsValid = true;
 				} else
 					// Allow user remove email completely when editing prifle of "Email Requested"
-					if (TextUtils.isEmpty(emailContent) && item.getType() == MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT) {
+					if (TextUtils.isEmpty(emailContent) && item.getType() >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
 						sendButton.setEnabled(true);
 						emailIsValid = true;
 					} else {

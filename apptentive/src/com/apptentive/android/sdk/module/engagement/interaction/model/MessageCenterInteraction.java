@@ -58,7 +58,7 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_PROFILE_EDIT_TITLE = "title";
 	public static final String KEY_PROFILE_EDIT_NAME_HINT = "name_hint";
 	public static final String KEY_PROFILE_EDIT_EMAIL_HINT = "email_hint";
-	public static final String KEY_PROFILE_EDIT_EMAIL_TIP = "email_tip";
+	public static final String KEY_PROFILE_EDIT_EMAIL_EXPLANATION = "email_explanation";
 	public static final String KEY_PROFILE_EDIT_SKIP_BUTTON = "skip_button";
 	public static final String KEY_PROFILE_EDIT_SAVE_BUTTON = "save_button";
 
@@ -198,7 +198,7 @@ public class MessageCenterInteraction extends Interaction {
 				profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_TIP, null),
+				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 	}
