@@ -761,8 +761,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
 			if (messageText != null) {
 				messageEditText.setText(messageText);
-			} else {
-				messageEditText.setText("");
 			}
 		}
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
@@ -1036,14 +1034,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
-		editor.commit();
+		editor.apply();
 	}
 
 	private void saveStatusMessageState(boolean bShown) {
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, bShown);
-		editor.commit();
+		editor.apply();
 	}
 
 	// Retrieve the content from the composing area
@@ -1059,7 +1057,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
-		editor.commit();
+		editor.apply();
 	}
 
 
