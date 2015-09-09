@@ -6,7 +6,7 @@
   -->
 
 <resources>
-    <!-- Default Dark -->
+    <!-- Default (Light) -->
     <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -25,7 +25,7 @@
     </style>
 
 
-    <!-- Light -->
+    <!-- Dark -->
     <style name="ApptentiveTheme.Dark.TranslucentStatus" parent="ApptentiveTheme.Dark">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
