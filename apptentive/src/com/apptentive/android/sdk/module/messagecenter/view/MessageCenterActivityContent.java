@@ -959,7 +959,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						messageCenterListAdapter.clearWhoCard();
 						messageCenterListAdapter.notifyDataSetChanged();
 						saveWhoCardSetState();
-						if (messages.size() == 1 && interaction.getWhoCardRequired()) {
+						// If Who card is required, it might be displayed before proceeding to composing, for instance
+						// when there was a contextual message or it was the first message. We need to resume composing
+						// after dismissing Who Card
+						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
 							addComposingArea();
 							messageCenterListAdapter.setForceShowKeyboard(true);
 							messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
