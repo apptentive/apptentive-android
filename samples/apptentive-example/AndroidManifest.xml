@@ -40,7 +40,7 @@
         <meta-data android:name="apptentive_api_key"
                    android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
-                  android:theme="@style/ApptentiveTheme.Light"/>
+                  android:theme="@style/ApptentiveTheme"/>
 
         <!-- Required for GCM -->
         <receiver android:name="com.google.android.gms.gcm.GcmReceiver"
