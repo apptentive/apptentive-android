@@ -47,7 +47,7 @@ android {
             applicationId "com.apptentive.android.qa"
             manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_QA,
                                     APPTENTIVE_USE_STAGING_SERVER: "false",
-                                    APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveTheme.Light",
+                                    APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveTheme",
                                     APPTENTIVE_APP_NAME: "Apptentive QA"];
         }
         rc {
