@@ -1,28 +1,36 @@
-# 2015-05-13 skykelsey 1.7.3
+# 2015-09-09 - 2.0.0
+
+#### Improvements
+
+* Message Center: We've completely rebuilt Message Center from the ground up. Our new Message Center uses Material Design throughout, and features streamlined and optimized behavior to help you get feedback from your customers, or start conversations. Message Center is now much more configurable from the server, so you can make changes to text and behavior after you release your app.
+* Apptentive Push: We can now send push notifications to your GCM enabled device without going through a third party push provider. See the [integrations section](https://be.apptentive.com/apps/current/settings/integrations), and check out the [documentation](http://www.apptentive.com/docs/android/integration/#push-notifications).
+* Polish localization.
+
+# 2015-05-13 - 1.7.3
 
 #### Bugs Fixed
 
 * Fixed a bug where the Feedback Dialog as launched through the Message Center would not be submittable if feedback had already been submitted, Message Center was disabled, and Email was required.
 
-# 2015-05-01 skykelsey 1.7.2
+# 2015-05-01 - 1.7.2
 
 #### Improvements
 
 * Updated our Push Notification API to work with Parse 1.8.3 and Urban Airship 6.0.1. If you were using either of these
  push notification providers in a prior version, please see our [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
 
-# 2015-04-24 skykelsey 1.7.1
+# 2015-04-24 - 1.7.1
 
 * Fixed a bug where HTTP response inputstreams weren't being closed.
 * Fixed a bug that prevented the Feedback Thank You dialog from displaying under some circumstances.
 
-# 2015-4-23 skykelsey 1.6.7
+# 2015-4-23 - 1.6.7
 
 #### Bugs fixed
 
 * Fixed a bug where HTTP response inputstreams weren't being closed.
 
-# 2015-02-10 skykelsey 1.7.0
+# 2015-02-10 - 1.7.0
 
 This release includes support for Notes, which allows you to send messages to your customers and gives them the option
  to take surveys, navigate directly to content within your app, and more. Notes is currently in beta with select 
@@ -38,7 +46,7 @@ This release includes support for Notes, which allows you to send messages to yo
 
 * Fixed a bug that allowed internal analytics to send multiple launch events per displayed Interaction.
 
-# 2014-11-25 skykelsey 1.6.6
+# 2014-11-25 - 1.6.6
 
 #### Improvements
 
@@ -49,20 +57,20 @@ This release includes support for Notes, which allows you to send messages to yo
 
 * Fixed a bug that prevented feedback from being submitted when email is required, but already supplied.
 
-# 2014-11-17 skykelsey 1.6.5
+# 2014-11-17 - 1.6.5
 
 #### Improvements
 
 * Minor improvements to prepare for updated Trigger.io module.
 
-# 2014-10-20 skykelsey 1.6.4
+# 2014-10-20 1.6.4
 
 #### Improvements
 
 * Dim background when dialogs are shown.
 * Request gzip compression from server to save bandwidth.
 
-# 2014-10-15 skykelsey 1.6.2
+# 2014-10-15 - 1.6.2
 
 #### Improvements
 
@@ -73,21 +81,21 @@ This release includes support for Notes, which allows you to send messages to yo
 * Deprecated NetworkStateReceiver.
 * Added method for checking to see if an Interaction will show for a given Event.
 
-# 2014-09-28 skykelsey 1.6.1
+# 2014-09-28 - 1.6.1
 
 #### Bugs fixed
 
 * Fix enable Message Center setting.
 * Use proper extension when uploading Attachment files.
 
-# 2014-09-17 skykelsey 1.5.2
+# 2014-09-17 - 1.5.2
 
 #### Major changes
 
 * Don't check for messages while Message Center is disabled.
 * If no network connection is present, network worker threads will go back to sleep instead of exit.
 
-# 2014-09-12 skykelsey 1.6.0
+# 2014-09-12 - 1.6.0
 
 #### Major changes
 
@@ -106,7 +114,7 @@ This release includes support for Notes, which allows you to send messages to yo
 
 If you were using a previous version, see [Migrating to 1.6.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.6.0.md)
 
-# 2014-07-16 skykelsey 1.5.1
+# 2014-07-16 - 1.5.1
 
 #### Major changes
 
@@ -126,7 +134,7 @@ If you were using a previous version, see [Migrating to 1.6.0](https://github.co
 * During development only, if you forget to specify an API key, we will display a dialog to let you know. Previously we only logged it.
 
 
-# 2014-05-27 skykelsey 1.5.0
+# 2014-05-27 - 1.5.0
 
 #### Major changes
 
@@ -138,13 +146,13 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 
 * Fixed a potential crash in the Feedback Dialog if submitted with blank feedback.
 
-# 2014-04-28 skykelsey 1.4.3
+# 2014-04-28 - 1.4.3
 
 #### Bugs fixed
 
 * ANDROID-323 Localized strings not properly populated with app name.
 
-# 2014-04-18 skykelsey 1.4.2
+# 2014-04-18 - 1.4.2
 
 #### Major changes
 
@@ -154,14 +162,14 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 
 * Improved robustness of message polling.
 
-# 2014-04-14 skykelsey 1.4.1
+# 2014-04-14 - 1.4.1
 
 #### Bugs fixed
 
 * ANDROID-318 Surveys targeting custom person data don't return until the second time they are requested.
 * Event Labels were being encoded incorrectly.
 
-# 2014-04-07 skykelsey 1.4.0
+# 2014-04-07 - 1.4.0
 
 #### Major changes
 
@@ -171,13 +179,13 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Introduced background polling for messages. We will poll for new messages every 60 seconds whie the app is up, or every 8 seconds while our Message Center is in the foreground.
 * Improved performance and robustness of SDK.
 
-# 2014-04-03 skykelsey 1.3.1
+# 2014-04-03 - 1.3.1
 
 #### Major changes
 
 * Add setting to allow Message Center to be disabled by default, even before it has connected to the server.
 
-# 2014-02-24 skykelsey 1.3.0
+# 2014-02-24 - 1.3.0
 
 #### Major changes
 
@@ -185,19 +193,19 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Added the ability to send Upgrade Messages to your users. Now you can notify users of new features targeted to specific builds or versions of your app, even if they have opted to auto-update your app in the app store.
 * Added the ability to send hidden attachments to the server. You can now send texts, logs, images, and other files to the server to help provide better support. These files are visible to you in teh conversation view, but are not shown to the end user.
 
-# 2014-01-20 skykelsey 1.2.7
+# 2014-01-20 - 1.2.7
 
 #### Bugs fixed
 
 * ANDROID-239 PACKAGE_RESTARTED permission causes app to wake often
 
-# 2014-01-19 skykelsey 1.2.6
+# 2014-01-19 - 1.2.6
 
 #### Bugs fixed
 
 * ANDROID-238 Survey module doesn't respect "multiple_responses" flag
 
-# 2013-12-17 skykelsey  1.2.5
+# 2013-12-17 -  1.2.5
 
 #### Major changes
 
@@ -205,7 +213,7 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Add the ability to pass push notification intents into Apptentive code, and have Apptentive perform actions. Push integration currently supports Urban Airship, and can be configured in your app settings.
 * ANDROID-224 Allow survey thank you dialog to contain links.
 
-# 2013-12-12 skykelsey 1.2.4
+# 2013-12-12 - 1.2.4
 
 #### Major changes
 
@@ -217,7 +225,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-223 Trim Survey text responses
 * Fixed a bug where the rating flow could launch twice, especially on devices running KitKat.
 
-# 2013-11-13 skykelsey 1.2.3
+# 2013-11-13 - 1.2.3
 
 #### Major changes
 
@@ -228,19 +236,19 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 
 * Fixed a potential crash in survey fetching code.
 
-# 2013-11-05 skykelsey 1.2.2
+# 2013-11-05 - 1.2.2
 
 #### Bugs fixed
 
 * Fix memory leak cause by hanging on to Activity context in database code.
 
-# 2013-10-21 skykelsey 1.2.1
+# 2013-10-21 - 1.2.1
 
 #### Bugs fixed
 
 * ANDROID-188 Rating logic doesn't respect 0 values with OR
 
-# 2013-10-17 skykelsey 1.2.0
+# 2013-10-17 - 1.2.0
 
 #### Major changes
 
@@ -259,13 +267,13 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-181 Surveys can be sent twice
 * ANDROID-173 Database locking issue
 
-# 2013-09-15 skykelsey 1.1.2
+# 2013-09-15 - 1.1.2
 
 #### Bugs fixed
 
 * ANDROID-155 Message Center can't scroll
 
-# 2013-08-31 skykelsey 1.1.1
+# 2013-08-31 - 1.1.1
 
 #### Bugs fixed
 
@@ -273,7 +281,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-142 Save the text entered in Message Center if the user closes it.
 * ANDROID-145 Dev app can crash in tablet portrait mode.
 
-# 2013-08-29 skykelsey 1.1.0
+# 2013-08-29 - 1.1.0
 
 #### Major changes
 
@@ -282,7 +290,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * New clean UI for about page.
 * Added ability to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
 
-# 2013-08-16 skykelsey 1.0.4
+# 2013-08-16 - 1.0.4
 
 #### Major changes
 
@@ -294,46 +302,46 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-132 Radio Version is not being set in Device object
 * ANDROID-134 Rating logic does not respect 0 values
 
-# 2013-07-19 skykelsey 1.0.3
+# 2013-07-19 - 1.0.3
 
 #### Bugs Fixed
 
 * ANDROID-130 Lower part of message center is transparent.
 
-# 2013-06-28 skykelsey 1.0.2
+# 2013-06-28 - 1.0.2
 
 #### Major changes
 
 * Replaced Feedback with new Message Center. Message Center allows two way communication between the app developer and customers, and the implementation is 100% native, and requires no active network. App users can send messages and attach screenshots, and receive a reply in-app. If they choose to specify an email address, they can also be contacted through email.
 
-# 2013-04-10 skykelsey v0.6.5
+# 2013-04-10 - v0.6.5
 
 #### Bugs fixed
 
 * Fix XML examples in README.
 * ANDROID-82 Populate the feedback source field with "enjoyment_dialog" when launched from the ratings prompt
 
-# 2013-12-19 skykelsey v0.6.4
+# 2013-12-19 - v0.6.4
 
 #### Bugs fixed
 
 * ANDROID-114 Rating Dialog comes up twice.
 
-# 2012-12-18 skykelsey v0.6.3
+# 2012-12-18 - v0.6.3
 
 #### Bugs fixed
 
 * ANDROID-112 Bug in rating flow.
 * ANDROID-113 Bug in rating flow.
 
-# 2012-12-14 skykelsey v0.6.2
+# 2012-12-14 - v0.6.2
 
 #### Bugs fixed
 
 * ANDROID-109 Google Play opens up on top of host application when rating app
 * ANDROID-110 Ratings prompt doesn't respect zero value settings.
 
-# 2012-10-10 skykelsey v0.6.1
+# 2012-10-10 - v0.6.1
 
 #### Major changes
 
@@ -344,7 +352,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-95 Come up with a new way to detect app starts and stops
 * ANDROID-96 Crash on pre API 5 phones
 
-# 2012-10-10 skykelsey v0.6.0
+# 2012-10-10 - v0.6.0
 
 #### Major Changes
 
@@ -357,7 +365,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-96 Fix two bugs. Add an android for a resource that needed it, and allow pre API level 5 devices to work.
 * ANDROID-97 Starting apps takes 30 seconds when server is slow and host app uses AsyncTask. Solution is to simply stop using AsyncTasks altogether.
 
-# 2012-09-13 skykelsey v0.5.2
+# 2012-09-13 - v0.5.2
 
 #### Bugs fixed
 
@@ -365,7 +373,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-85 Example app has API key in the resources file, but also requires updating the manifest
 * ANDROID-89 Add callback after survey completion
 
-# 2012-09-12 skykelsey v0.5.1
+# 2012-09-12 - v0.5.1
 
 #### Major changes
 
@@ -377,7 +385,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-83: App crashes when no permissions are set for the app
 * ANDROID-88: Android initialization needs rework
 
-# 2012-08-15 skykelsey v0.5.0
+# 2012-08-15 - v0.5.0
 
 #### Major changes
 
