@@ -6,7 +6,7 @@
   -->
 
 <resources>
-    <!-- NORMAL -->
+    <!-- DEFAULT (LIGHT) -->
     <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
@@ -16,12 +16,12 @@
     </style>
 
 
-    <!-- LIGHT -->
-    <style name="ApptentiveTheme.Light.TranslucentStatus" parent="ApptentiveTheme.Light">
+    <!-- DARK -->
+    <style name="ApptentiveTheme.Dark.TranslucentStatus" parent="ApptentiveTheme.Dark">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveTheme.Light.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.ActionBar">
+    <style name="ApptentiveTheme.Dark.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Dark.ActionBar">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 

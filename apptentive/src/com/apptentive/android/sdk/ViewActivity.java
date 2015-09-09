@@ -125,12 +125,57 @@ public class ViewActivity extends ApptentiveActivity {
 		try {
 
 			String activityContentTypeString = getIntent().getStringExtra(ActivityContent.KEY);
-
+			Interaction interaction = null;
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
-        if (activeContentType == ActivityContent.Type.ABOUT) {
+				if (activeContentType == ActivityContent.Type.ABOUT) {
 					setTheme(R.style.ApptentiveTheme_About);
+				} else if (activeContentType == ActivityContent.Type.INTERACTION) {
+					String interactionString;
+					if (savedInstanceState != null) {
+						interactionString = savedInstanceState.getString(Interaction.JSON_STRING);
+					} else {
+						interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
+					}
+					interaction = Interaction.Factory.parseInteraction(interactionString);
+					if (interaction != null) {
+						switch (interaction.getType()) {
+							case UpgradeMessage:
+								activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case EnjoymentDialog:
+								activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case RatingDialog:
+								activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case AppStoreRating:
+								activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case Survey:
+								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case MessageCenter:
+								activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
+								break;
+							case TextModal:
+								activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							case NavigateToLink:
+								activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
+								setTheme(R.style.ApptentiveTheme_Transparent);
+								break;
+							default:
+								break;
+						}
+					}
 				}
 
 				boolean activityContentRequired = true;
@@ -155,43 +200,6 @@ public class ViewActivity extends ApptentiveActivity {
 							activityContent = new MessageCenterErrorActivityContent();
 							break;
 						case INTERACTION:
-							String interactionString;
-							if (savedInstanceState != null) {
-								interactionString = savedInstanceState.getString(Interaction.JSON_STRING);
-							} else {
-								interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
-							}
-							Interaction interaction = Interaction.Factory.parseInteraction(interactionString);
-							if (interaction != null) {
-								switch (interaction.getType()) {
-									case UpgradeMessage:
-										activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-										break;
-									case EnjoymentDialog:
-										activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-										break;
-									case RatingDialog:
-										activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-										break;
-									case AppStoreRating:
-										activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-										break;
-									case Survey:
-										activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
-										break;
-									case MessageCenter:
-										activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
-										break;
-									case TextModal:
-										activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
-										break;
-									case NavigateToLink:
-										activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
-										break;
-									default:
-										break;
-								}
-							}
 							break; // end INTERACTION
 						default:
 							Log.w("No Activity specified. Finishing...");

@@ -180,6 +180,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					MessageCenterStatus newItem = interaction.getRegularStatus();
 					if (newItem != null && whoCardItem == null && composingItem == null) {
 						addNewStatusItem(newItem);
+						saveStatusMessageState(true);
 					}
 					messageCenterListAdapter.notifyDataSetChanged();
 
@@ -326,6 +327,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterListView.setItemsCanFocus(true);
 		messageCenterListView.setOnScrollListener(this);
 
+		final SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
 		fab = viewActivity.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -343,7 +346,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					// Only allow profile editing when not already editing profile or in message composing
 					if (whoCardItem == null && composingItem == null) {
 						hideProfileButton();
-						SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 						boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 
 						JSONObject data = new JSONObject();
@@ -391,6 +393,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				 */
 				if (messages.size() == 1) {
 					addComposingArea();
+				} else {
+					// Finally check if status message need to be restored
+					boolean bStatusShown = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, false);
+					if (bStatusShown) {
+						MessageCenterStatus newItem = interaction.getRegularStatus();
+						if (newItem != null && whoCardItem == null && composingItem == null) {
+							addNewStatusItem(newItem);
+						}
+					}
 				}
 			}
 
@@ -638,6 +649,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		if (statusItem != null) {
 			messages.remove(statusItem);
 			statusItem = null;
+			saveStatusMessageState(false);
 		}
 	}
 
@@ -749,8 +761,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
 			if (messageText != null) {
 				messageEditText.setText(messageText);
-			} else {
-				messageEditText.setText("");
 			}
 		}
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
@@ -959,7 +969,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						messageCenterListAdapter.clearWhoCard();
 						messageCenterListAdapter.notifyDataSetChanged();
 						saveWhoCardSetState();
-						if (messages.size() == 1 && interaction.getWhoCardRequired()) {
+						// If Who card is required, it might be displayed before proceeding to composing, for instance
+						// when there was a contextual message or it was the first message. We need to resume composing
+						// after dismissing Who Card
+						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
 							addComposingArea();
 							messageCenterListAdapter.setForceShowKeyboard(true);
 							messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
@@ -1021,7 +1034,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
-		editor.commit();
+		editor.apply();
+	}
+
+	private void saveStatusMessageState(boolean bShown) {
+		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, bShown);
+		editor.apply();
 	}
 
 	// Retrieve the content from the composing area
@@ -1037,7 +1057,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
-		editor.commit();
+		editor.apply();
 	}
 
 
