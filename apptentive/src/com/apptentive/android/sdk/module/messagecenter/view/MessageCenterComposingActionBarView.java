@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.util.Util;
 
 
 /**
@@ -31,7 +32,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterCompos
  */
 public class MessageCenterComposingActionBarView extends FrameLayout implements MessageCenterListItemView {
 
-	public boolean showConfirmation = true;
+	public boolean showConfirmation = false;
 	public ImageButton sendButton;
 
 	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
@@ -74,6 +75,9 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 			}
 		});
 
+		sendButton.setEnabled(false);
+		sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_icon,
+				R.color.apptentive_material_dark_disabled_icon));
 	}
 
 	public static class CloseConfirmationDialog extends DialogFragment {
