@@ -28,7 +28,7 @@ public class ExampleActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// Start IntentService to register this application with GCM.
+		// GCM: Start IntentService to register this application.
 		Intent intent = new Intent(this, RegistrationIntentService.class);
 		startService(intent);
 	}
