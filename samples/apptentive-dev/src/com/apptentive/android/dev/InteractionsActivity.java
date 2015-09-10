@@ -226,4 +226,16 @@ public class InteractionsActivity extends ApptentiveActivity {
 	private Interaction loadInteractionFromAsset(String fileName) {
 		return Interaction.Factory.parseInteraction(FileUtil.loadTextAssetAsString(this, fileName));
 	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		findViewById(R.id.cover_image).setVisibility(View.VISIBLE);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		findViewById(R.id.cover_image).setVisibility(View.GONE);
+	}
 }
