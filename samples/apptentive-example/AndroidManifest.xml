@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- -->
 
     <!-- Required for GCM -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -17,6 +18,7 @@
     <permission android:name="com.apptentive.android.example.permission.C2D_MESSAGE"
                 android:protectionLevel="signature"/>
     <uses-permission android:name="com.apptentive.android.example.gcm.permission.C2D_MESSAGE"/>
+    <!-- -->
 
     <uses-sdk android:minSdkVersion="11"
               android:targetSdkVersion="22"/>
@@ -41,6 +43,7 @@
                    android:value=""/>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"
                   android:theme="@style/ApptentiveTheme"/>
+        <!-- -->
 
         <!-- Required for GCM -->
         <receiver android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -68,5 +71,7 @@
         <service android:name=".push.RegistrationIntentService"
                  android:exported="false">
         </service>
+        <!-- -->
+
     </application>
 </manifest>
