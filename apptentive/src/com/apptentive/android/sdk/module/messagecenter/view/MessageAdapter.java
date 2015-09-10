@@ -462,8 +462,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	public void clearComposing() {
+		// Composing view may be recylcled for later usage. Clear the content from previous usage
+		if (composingEditText != null) {
+			composingEditText.setText("");
+			composingEditText = null;
+		}
 		composingView = null;
-		composingEditText = null;
 		composingViewIndex = INVALID_POSITION;
 		showComposingBarAnimation = true;
 	}
