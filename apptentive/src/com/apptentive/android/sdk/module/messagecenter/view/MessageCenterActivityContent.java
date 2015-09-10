@@ -177,13 +177,20 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageSentStates();
-					MessageCenterStatus newItem = interaction.getRegularStatus();
-					if (newItem != null && whoCardItem == null && composingItem == null) {
-						addNewStatusItem(newItem);
-						saveStatusMessageState(true);
+					if (whoCardItem == null && composingItem == null) {
+						MessageCenterStatus newItem = interaction.getRegularStatus();
+						if (newItem != null) {
+							addNewStatusItem(newItem);
+							saveStatusMessageState(true);
+						}
 					}
-					messageCenterListAdapter.notifyDataSetChanged();
-
+					// Update the sent message, make sure it stays in view
+					int firstIndex = messageCenterListView.getFirstVisiblePosition();
+					View v = messageCenterListView.getChildAt(0);
+					int top = (v == null) ? 0 : v.getTop();
+					updateMessageSentStates();
+					messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+							firstIndex, top));
 					break;
 				}
 				case MSG_START_SENDING: {
@@ -324,7 +331,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		int brightColor = Util.lighter(defaultColor, 0.5f);
 		headerDivider.setBackgroundColor(brightColor);
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
-		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setItemsCanFocus(true);
 		messageCenterListView.setOnScrollListener(this);
 
@@ -337,7 +344,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			public void onClick(View v) {
 				addComposingArea();
 				messageCenterListAdapter.setForceShowKeyboard(true);
-				messageCenterListAdapter.notifyDataSetChanged();
+				messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		});
 
@@ -365,7 +372,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 							addWhoCard(WHO_CARD_MODE_EDIT);
 						}
 						messageCenterListAdapter.setForceShowKeyboard(true);
-						messageCenterListAdapter.notifyDataSetChanged();
+						messageCenterViewHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 					}
 				}
 			});
