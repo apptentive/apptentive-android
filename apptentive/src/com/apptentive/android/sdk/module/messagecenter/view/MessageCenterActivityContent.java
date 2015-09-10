@@ -301,6 +301,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	protected void setup() {
+
 		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close);
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -328,6 +329,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterListView.setOnScrollListener(this);
 
 		final SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean showKeyboard = true;
 
 		fab = viewActivity.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -375,6 +377,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 			if (contextualMessage != null) {
 				addContextualMessage();
+				showKeyboard = false;
 			}
 			/* Add composing
 			** if the user was in composing mode before roatation
@@ -393,6 +396,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				 */
 				if (messages.size() == 1) {
 					addComposingArea();
+					showKeyboard = false;
 				} else {
 					// Finally check if status message need to be restored
 					boolean bStatusShown = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, false);
@@ -403,10 +407,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 				}
+			} else {
+				// Hide keyboard when Who Card is required and the 1st thing to show
+				showKeyboard = false;
 			}
 
 			updateMessageSentStates(); // Force timestamp recompilation.
 			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
+			messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
 
