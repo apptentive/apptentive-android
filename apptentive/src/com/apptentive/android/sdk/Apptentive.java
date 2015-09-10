@@ -356,7 +356,7 @@ public class Apptentive {
 	 * Configures Apptentive to work with Amazon Web Services (AWS) Simple Notification Service (SNS) push notifications.
 	 * You must first set up your app to work with AWS SNS to use this integration. This method must be called when you
 	 * finish initializing AWS SNS using
-	 * <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
+	 * <a href="https://developers.google.com/android/reference/com/google/android/gms/gcm/GoogleCloudMessaging#register%28java.lang.String...%29">
 	 * GoogleCloudMessaging.register(String... senderIds)</a>,
 	 * which returns the Registration ID. You will need to pass this returned Registration ID into this method.
 	 * <p/>
@@ -364,7 +364,7 @@ public class Apptentive {
 	 *
 	 * @param context        The Context from which this method was called.
 	 * @param registrationId The registrationId returned from
-	 *                       <a href="http://developer.android.com/reference/com/google/android/gms/gcm/GoogleCloudMessaging.html#register%28java.lang.String...%29">
+	 *                       <a href="https://developers.google.com/android/reference/com/google/android/gms/gcm/GoogleCloudMessaging#register%28java.lang.String...%29">
 	 *                       GoogleCloudMessaging.register(String... senderIds)</a>.
 	 */
 	public static void addAmazonSnsPushIntegration(Context context, String registrationId) {
