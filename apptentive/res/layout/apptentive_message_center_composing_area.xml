@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:paddingBottom="1.5dp"
+             android:clipToPadding="false"
+             android:background="@android:color/transparent">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginBottom="5dp"
+                      android:layout_marginRight="5dp"
+                      android:layout_marginLeft="5dp"
+                      android:orientation="vertical"
+                      android:elevation="1.5dp"
+                      android:background="@drawable/apptentive_rounded_corner_shape">
+            <EditText android:id="@+id/composing_et"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:minLines="8"
+                      android:gravity="top"
+                      android:background="@null"
+                      android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
+                      android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
+                      android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
+                      android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
+
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:singleLine="false"
+                      android:textColorHint="?attr/apptentive_material_hint_text"
+                      android:textColor="?attr/apptentive_material_primary_text"
+                      android:textSize="@dimen/apptentive_text_medium_small"/>
+
+        </LinearLayout>
+</FrameLayout>

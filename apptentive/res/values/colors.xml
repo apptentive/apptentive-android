@@ -6,76 +6,146 @@
   -->
 
 <resources>
-    <color name="apptentive_message_center_main_area_background">#E0E0E0</color>
-    <color name="apptentive_message_center_header_background">#222222</color>
-    <color name="apptentive_message_center_header_text">#FFFFFF</color>
-    <color name="apptentive_message_center_header_text_shadow">#AAFFFFFF</color>
-    <color name="apptentive_text_message_text">#000000</color>
-    <color name="apptentive_message_sender_text">#222222</color>
-    <color name="apptentive_message_center_timestamp">#999999</color>
+    <!-- Material DEFAULT colors -->
+    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorPrimaryLight">#E57373</color>
+    <color name="colorAccent">#1E88E5</color>
+
+    <color name="window_background">#ECECEC</color>
+
+    <!-- Material DEFAULT text / items colors -->
+    <color name="icons">#FFF</color>
+    <!-- 87% von #000000 -> DE -->
+    <color name="primary_text">#DE000000</color>
+    <!-- 54% von #000000 -> 8A -->
+    <color name="secondary_text">#8A000000</color>
+    <!-- 26% von #000000 -> 42 -->
+    <color name="hint_text">#42000000</color>
+    <!-- 12% von #000000 -> 1F -->
+    <color name="divider">#1F000000</color>
+
+    <color name="disabled_text">#B8B8B8</color>
+
+    <color name="disabled_icon">#DCDCDF</color>
+
+    <!-- Material DEFAULT colors -->
+    <!-- chained the primary, primaryDark, primaryLight, accent colors for compatibility -->
+    <color name="primary">@color/colorPrimary</color>
+    <color name="primary_dark">@color/colorPrimaryDark</color>
+    <color name="primary_light">@color/colorPrimaryLight</color>
+    <color name="accent">@color/colorAccent</color>
+
+    <color name="apptentive_material_primary">@color/primary</color>
+    <color name="apptentive_material_primary_dark">@color/primary_dark</color>
+    <color name="apptentive_material_primary_light">@color/primary_light</color>
+    <color name="apptentive_material_accent">@color/accent</color>
+
+    <!-- Apptentive Material default Light colors -->
+    <color name="apptentive_material_background">@color/window_background</color>
+    <!-- Apptentive Material DEFAULT text / items colors -->
+    <color name="apptentive_material_toolbar_foreground">@color/icons</color>
+    <color name="apptentive_material_primary_text">@color/primary_text</color>
+    <color name="apptentive_material_primary_icon">@color/secondary_text</color>
+    <color name="apptentive_material_secondary_text">@color/secondary_text</color>
+    <color name="apptentive_material_hint_text">@color/hint_text</color>
+    <color name="apptentive_material_disabled_text">@color/disabled_text</color>
+    <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>
+    <color name="apptentive_material_divider">@color/divider</color>
+    <!-- Apptentive Material DEFAULT drawer colors -->
+    <color name="apptentive_material_selected">#E8E8E8</color>
+    <color name="apptentive_material_selected_text">#F44336</color>
+    <color name="apptentive_material_header_selection_text">#FFF</color>
+    <color name="apptentive_material_pressed_highlight">#1F000033</color>
+
+    <!-- Apptentive Material DEFAULT DARK colors -->
+    <color name="apptentive_material_dark_background">#303030</color>
+    <!-- Apptentive Material DEFAULT DARK text / items colors -->
+    <color name="apptentive_material_dark_toolbar_foreground">#000</color>
+    <color name="apptentive_material_dark_primary_text">#DEFFFFFF</color>
+    <color name="apptentive_material_dark_primary_icon">#8AFFFFFF</color>
+    <color name="apptentive_material_dark_secondary_text">#8AFFFFFF</color>
+    <color name="apptentive_material_dark_hint_text">#42FFFFFF</color>
+    <color name="apptentive_material_dark_disabled_text">#42FFFFFF</color>
+    <color name="apptentive_material_dark_disabled_icon">#42FFFFFF</color>
+    <color name="apptentive_material_dark_divider">#1FFFFFFF</color>
+    <!-- Apptentive Material DEFAULT DARK drawer colors -->
+    <color name="apptentive_material_dark_selected">#202020</color>
+    <color name="apptentive_material_dark_selected_text">#F44336</color>
+    <color name="apptentive_material_dark_header_selection_text">#FFF</color>
+    <color name="apptentive_material_dark_pressed_highlight">#1F000033</color>
+
+
+    <color name="apptentive_transparency">#00000000</color>
+    <color name="apptentive_white">#FFFFFF</color>
+    <color name="apptentive_black">#000000</color>
+    <color name="apptentive_red">#DC2636</color>
+
+    <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
+    <color name="apptentive_message_center_incoming_background">#F2F2F2</color>
+
 
     <color name="apptentive_message_auto_separator">#BBBBBB</color>
-    <color name="apptentive_message_auto_text">#000000</color>
 
-    <color name="apptentive_dialog_background">#FFFFFF</color>
-    <color name="apptentive_dialog_form_text">#000000</color>
+    <color name="apptentive_dialog_background">@color/apptentive_white</color>
+    <color name="apptentive_dialog_form_text">@color/apptentive_black</color>
 
     <color name="apptentive_dialog_button_negative">#DDDDDD</color>
-    <color name="apptentive_dialog_button_negative_text">#000000</color>
+    <color name="apptentive_dialog_button_negative_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_negative_disabled">#EBEBEB</color>
     <color name="apptentive_dialog_button_negative_disabled_text">#B9B9B9</color>
     <color name="apptentive_dialog_button_negative_focused">#B3B3B3</color>
-    <color name="apptentive_dialog_button_negative_focused_text">#000000</color>
+    <color name="apptentive_dialog_button_negative_focused_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_negative_pressed">#B3B3B3</color>
-    <color name="apptentive_dialog_button_negative_pressed_text">#000000</color>
+    <color name="apptentive_dialog_button_negative_pressed_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_negative_border_focused">#25A5CF</color>
 
     <color name="apptentive_dialog_button_positive">#56B8D8</color>
-    <color name="apptentive_dialog_button_positive_text">#000000</color>
+    <color name="apptentive_dialog_button_positive_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_positive_disabled">#D6E9F0</color>
     <color name="apptentive_dialog_button_positive_disabled_text">#9BB8C2</color>
     <color name="apptentive_dialog_button_positive_focused">#2699BF</color>
-    <color name="apptentive_dialog_button_positive_focused_text">#000000</color>
+    <color name="apptentive_dialog_button_positive_focused_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_positive_pressed">#2699BF</color>
-    <color name="apptentive_dialog_button_positive_pressed_text">#000000</color>
+    <color name="apptentive_dialog_button_positive_pressed_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_button_positive_border_focused">#00769D</color>
 
     <color name="apptentive_activity_frame">#99000000</color>
-    <color name="apptentive_activity_background">#FFFFFF</color>
+    <color name="apptentive_activity_background">@color/apptentive_white</color>
 
-    <color name="apptentive_survey_title_text">#000000</color>
+    <color name="apptentive_survey_title_text">@color/apptentive_black</color>
     <color name="apptentive_survey_separator">#56B8D8</color>
     <color name="apptentive_survey_content_background">#D7D7D7</color>
-    <color name="apptentive_survey_question_background">#FFFFFF</color>
-    <color name="apptentive_survey_question_instruction_text">#000000</color>
+    <color name="apptentive_survey_question_background">@color/apptentive_white</color>
+    <color name="apptentive_survey_question_instruction_text">@color/apptentive_black</color>
     <color name="apptentive_survey_question_instruction_text_valid">#56B8D8</color>
     <color name="apptentive_survey_question_instruction_background_valid">#D6E9F0</color>
     <color name="apptentive_survey_question_instruction_text_invalid">#BB6F6F</color>
     <color name="apptentive_survey_question_instruction_background_invalid">#EEDDDD</color>
-    <color name="apptentive_survey_question_text">#000000</color>
-    <color name="apptentive_survey_question_answer_text">#000000</color>
+    <color name="apptentive_survey_question_text">@color/apptentive_black</color>
+    <color name="apptentive_survey_question_answer_text">@color/apptentive_black</color>
     <color name="apptentive_survey_question_separator">#DDDDDD</color>
-    <color name="apptentive_survey_answer_text">#000000</color>
+    <color name="apptentive_survey_answer_text">@color/apptentive_black</color>
     <color name="apptentive_survey_footer_background">@android:color/transparent</color>
     <color name="apptentive_survey_thank_you_dialog_border">#56B8D8</color>
 
-    <color name="apptentive_branding_text">#000000</color>
+    <color name="apptentive_branding_text">@color/apptentive_black</color>
 
-    <color name="apptentive_about_title">#000000</color>
-    <color name="apptentive_about_text">#000000</color>
+    <color name="apptentive_about_title">@color/apptentive_black</color>
+    <color name="apptentive_about_text">@color/apptentive_black</color>
     <color name="apptentive_about_link">#004444</color>
     <color name="apptentive_about_version">#AAAAAA</color>
 
 
     <color name="apptentive_dialog_primary">#FAFAFA</color>
     <color name="apptentive_dialog_secondary">#FAFAFA</color>
-    <color name="apptentive_dialog_title_text">#000000</color>
+    <color name="apptentive_dialog_title_text">@color/apptentive_black</color>
     <color name="apptentive_dialog_body_text">#757575</color>
     <color name="apptentive_dialog_button_text_enabled">#5D96F5</color>
     <color name="apptentive_dialog_button_text_disabled">#757575</color>
     <color name="apptentive_dialog_hint_text">#757575</color>
 
-    <color name="apptentive_dialog_button_default">#00000000</color>
+    <color name="apptentive_dialog_button_default">@color/apptentive_transparency</color>
     <color name="apptentive_dialog_button_hovered">#44999999</color>
     <color name="apptentive_dialog_button_focused">#44999999</color>
     <color name="apptentive_dialog_button_pressed">#66999999</color>

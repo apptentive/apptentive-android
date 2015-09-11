@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +74,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	private static final String QUERY_MESSAGE_GET_BY_NONCE = "SELECT * FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_NONCE + " = ?";
 	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
 	private static final String QUERY_MESSAGE_GET_ALL_IN_ORDER = "SELECT * FROM " + TABLE_MESSAGE + " ORDER BY COALESCE(" + MESSAGE_KEY_ID + ", 'z') ASC";
-	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + Message.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
+	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + ApptentiveMessage.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
 	private static final String QUERY_MESSAGE_UNREAD = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_READ + " = " + FALSE + " AND " + MESSAGE_KEY_ID + " NOTNULL";
 
 
@@ -206,9 +208,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized Payload getOldestUnsentPayload() {
-		if (!payloadsDirty) {
-			return null;
-		}
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -237,35 +236,35 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	/**
 	 * Saves the message into the message table, and also into the payload table so it can be sent to the server.
 	 */
-	public synchronized void addOrUpdateMessages(Message... messages) {
+	public synchronized void addOrUpdateMessages(ApptentiveMessage... apptentiveMessages) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
-			for (Message message : messages) {
+			for (ApptentiveMessage apptentiveMessage : apptentiveMessages) {
 				Cursor cursor = null;
 				try {
-					cursor = db.rawQuery(QUERY_MESSAGE_GET_BY_NONCE, new String[]{message.getNonce()});
+					cursor = db.rawQuery(QUERY_MESSAGE_GET_BY_NONCE, new String[]{apptentiveMessage.getNonce()});
 					if (cursor.moveToFirst()) {
 						// Update
 						String databaseId = cursor.getString(0);
 						ContentValues messageValues = new ContentValues();
-						messageValues.put(MESSAGE_KEY_ID, message.getId());
-						messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
-						if (message.isRead()) { // A message can't be unread after being read.
+						messageValues.put(MESSAGE_KEY_ID, apptentiveMessage.getId());
+						messageValues.put(MESSAGE_KEY_STATE, apptentiveMessage.getState().name());
+						if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
 							messageValues.put(MESSAGE_KEY_READ, TRUE);
 						}
-						messageValues.put(MESSAGE_KEY_JSON, message.toString());
+						messageValues.put(MESSAGE_KEY_JSON, apptentiveMessage.toString());
 						db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
 					} else {
 						// Insert
 						db.beginTransaction();
 						ContentValues messageValues = new ContentValues();
-						messageValues.put(MESSAGE_KEY_ID, message.getId());
-						messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
-						messageValues.put(MESSAGE_KEY_NONCE, message.getNonce());
-						messageValues.put(MESSAGE_KEY_STATE, message.getState().name());
-						messageValues.put(MESSAGE_KEY_READ, message.isRead() ? TRUE : FALSE);
-						messageValues.put(MESSAGE_KEY_JSON, message.toString());
+						messageValues.put(MESSAGE_KEY_ID, apptentiveMessage.getId());
+						messageValues.put(MESSAGE_KEY_CLIENT_CREATED_AT, apptentiveMessage.getClientCreatedAt());
+						messageValues.put(MESSAGE_KEY_NONCE, apptentiveMessage.getNonce());
+						messageValues.put(MESSAGE_KEY_STATE, apptentiveMessage.getState().name());
+						messageValues.put(MESSAGE_KEY_READ, apptentiveMessage.isRead() ? TRUE : FALSE);
+						messageValues.put(MESSAGE_KEY_JSON, apptentiveMessage.toString());
 						db.insert(TABLE_MESSAGE, null, messageValues);
 						db.setTransactionSuccessful();
 						db.endTransaction();
@@ -279,21 +278,21 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized void updateMessage(Message message) {
+	public synchronized void updateMessage(ApptentiveMessage apptentiveMessage) {
 		SQLiteDatabase db = null;
 		try {
 			db = this.getWritableDatabase();
 			db.beginTransaction();
 			ContentValues values = new ContentValues();
-			values.put(MESSAGE_KEY_ID, message.getId());
-			values.put(MESSAGE_KEY_CLIENT_CREATED_AT, message.getClientCreatedAt());
-			values.put(MESSAGE_KEY_NONCE, message.getNonce());
-			values.put(MESSAGE_KEY_STATE, message.getState().name());
-			if (message.isRead()) { // A message can't be unread after being read.
+			values.put(MESSAGE_KEY_ID, apptentiveMessage.getId());
+			values.put(MESSAGE_KEY_CLIENT_CREATED_AT, apptentiveMessage.getClientCreatedAt());
+			values.put(MESSAGE_KEY_NONCE, apptentiveMessage.getNonce());
+			values.put(MESSAGE_KEY_STATE, apptentiveMessage.getState().name());
+			if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
 				values.put(MESSAGE_KEY_READ, TRUE);
 			}
-			values.put(MESSAGE_KEY_JSON, message.toString());
-			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{message.getNonce()});
+			values.put(MESSAGE_KEY_JSON, apptentiveMessage.toString());
+			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{apptentiveMessage.getNonce()});
 			db.setTransactionSuccessful();
 		} finally {
 			if (db != null) {
@@ -303,8 +302,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized List<Message> getAllMessages() {
-		List<Message> messages = new ArrayList<Message>();
+	public synchronized List<ApptentiveMessage> getAllMessages() {
+		List<ApptentiveMessage> apptentiveMessages = new ArrayList<ApptentiveMessage>();
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
@@ -313,22 +312,22 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(6);
-					Message message = MessageFactory.fromJson(json);
-					if (message == null) {
+					ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
+					if (apptentiveMessage == null) {
 						Log.e("Error parsing Record json from database: %s", json);
 						continue;
 					}
-					message.setDatabaseId(cursor.getLong(0));
-					message.setState(Message.State.parse(cursor.getString(4)));
-					message.setRead(cursor.getInt(5) == TRUE);
-					messages.add(message);
+					apptentiveMessage.setDatabaseId(cursor.getLong(0));
+					apptentiveMessage.setState(ApptentiveMessage.State.parse(cursor.getString(4)));
+					apptentiveMessage.setRead(cursor.getInt(5) == TRUE);
+					apptentiveMessages.add(apptentiveMessage);
 				} while (cursor.moveToNext());
 			}
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
-		return messages;
+		return apptentiveMessages;
 	}
 
 	public synchronized String getLastReceivedMessageId() {

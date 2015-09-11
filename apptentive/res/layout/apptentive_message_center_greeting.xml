@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:clipToPadding="false"
+             android:background="@android:color/transparent"
+             android:paddingBottom="5dp">
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/ApptentiveMessageCenterGreetingContainer"
+                    android:clipToPadding="false">
+        <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
+                                                                                   android:layout_width="88dp"
+                                                                                   android:layout_height="88dp"
+                                                                                   android:layout_centerVertical="true"
+                                                                                   style="?attr/apptentiveAvatarViewGreetingStyle"
+                                                                                   android:gravity="center_vertical"
+                                                                                   android:src="@drawable/avatar"/>
+
+        <LinearLayout android:id="@+id/greeting_content"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_toRightOf="@id/avatar"
+                      android:layout_centerVertical="true"
+                      android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
+                      android:layout_marginRight="@dimen/apptentive_message_center_icon_dimension"
+                      android:layout_marginBottom="@dimen/apptentive_message_center_icon_dimension"
+                      android:gravity="left"
+                      android:orientation="vertical">
+            <TextView android:id="@+id/title"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      style="@style/ApptentiveTheme.TextViewStyle.Greeting"
+                      android:text="Hello"/>
+            <TextView android:id="@+id/body"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      style="@style/ApptentiveTheme.TextViewStyle.Greeting.Body"/>
+        </LinearLayout>
+        <ImageButton android:id="@+id/btn_info"
+                     android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_alignParentRight="true"
+                     android:layout_alignParentBottom="true"
+                     android:layout_marginRight="10dp"
+                     android:contentDescription="About"
+                     android:background="?android:attr/selectableItemBackground"
+                     android:src="@drawable/apptentive_ic_info"/>
+    </RelativeLayout>
+</FrameLayout>

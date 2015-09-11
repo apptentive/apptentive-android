@@ -63,7 +63,6 @@ public class ActivityLifecycleManager {
 	 */
 	private static final int SESSION_TIMEOUT_SECONDS = 10;
 
-	private static Context appContext = null;
 	private static PersistentSessionQueue queue = null;
 
 	private static void sendEvent(Activity activity, SessionEvent event) {
@@ -161,11 +160,8 @@ public class ActivityLifecycleManager {
 	}
 
 	private static void init(Context context) {
-		if (appContext == null) {
-			appContext = context.getApplicationContext();
-		}
 		if (queue == null) {
-			queue = new SharedPreferencesPersistentSessionQueue(appContext);
+			queue = new SharedPreferencesPersistentSessionQueue(context.getApplicationContext());
 		}
 	}
 

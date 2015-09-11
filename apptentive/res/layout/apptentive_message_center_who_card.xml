@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:clipToPadding="false"
+             android:paddingBottom="1.5dp"
+             android:background="@android:color/transparent">
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginRight="10dp"
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginBottom="5dp"
+                  android:elevation="1.5dp"
+                  android:orientation="vertical"
+                  android:background="@drawable/apptentive_rounded_corner_shape">
+        <TextView android:id="@+id/who_title"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
+                  android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
+                  android:layout_marginTop="@dimen/apptentive_message_center_card_view_content_margin"
+                  android:gravity="left"
+                  android:textColor="?attr/apptentive_material_primary_text"
+                  android:textSize="@dimen/apptentive_text_medium_small"
+                  android:textStyle="normal"/>
+        <EditText android:id="@+id/who_name"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
+                  android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
+                  android:inputType="textCapSentences"
+                  android:singleLine="true"
+                  android:textColorHint="?attr/apptentive_material_hint_text"
+                  android:textColor="?attr/apptentive_material_primary_text"
+                  android:textSize="@dimen/apptentive_text_medium_small"/>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
+                      android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
+                      android:layout_marginTop="@dimen/apptentive_message_center_card_control_margin"
+                      android:layout_marginBottom="24dp"
+                      android:orientation="vertical"
+                      android:background="@color/apptentive_transparency">
+            <EditText android:id="@+id/who_email"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:singleLine="true"
+                      android:textColorHint="?attr/apptentive_material_hint_text"
+                      android:textColor="?attr/apptentive_material_primary_text"
+                      android:textSize="@dimen/apptentive_text_medium_small"
+                      android:inputType="textEmailAddress"/>
+
+            <TextView android:id="@+id/email_explanation"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:gravity="left"
+                      android:textColor="?attr/apptentive_material_secondary_text"
+                      android:textSize="@dimen/apptentive_text_small"
+                      android:textStyle="normal"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/whocard_buttons"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@color/apptentive_message_center_outgoing_background"
+                      android:gravity="right"
+                      android:minHeight="44dp"
+                      android:orientation="horizontal">
+            <Button android:id="@+id/btn_skip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="Skip"
+                    android:textColor="?attr/colorAccent"/>
+
+            <Button android:id="@+id/btn_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="Send"
+                    android:textColor="?attr/colorAccent"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</FrameLayout>

@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
@@ -30,6 +29,10 @@ public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Activity activity, String eventName) {
 		return engage(activity, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
+	}
+
+	public static synchronized boolean engageInternal(Activity activity, String eventName, String data) {
+		return engage(activity, "com.apptentive", "app", null, eventName,  data, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName) {
@@ -73,16 +76,15 @@ public class EngagementModule {
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
 			activity.startActivity(intent);
-			activity.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
 	}
 
-	public static boolean willShowInteraction(Context context, String vendor, String interaction, String eventName) {
+	public static boolean canShowInteraction(Context context, String vendor, String interaction, String eventName) {
 		String eventLabel = generateEventLabel(vendor, interaction, eventName);
-		return willShowInteraction(context, eventLabel);
+		return canShowInteraction(context, eventLabel);
 	}
 
-	private static boolean willShowInteraction(Context context, String eventLabel) {
+	private static boolean canShowInteraction(Context context, String eventLabel) {
 		Interaction interaction = InteractionManager.getApplicableInteraction(context, eventLabel);
 		return interaction != null;
 	}

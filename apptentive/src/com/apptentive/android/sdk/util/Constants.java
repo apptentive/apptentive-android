@@ -6,14 +6,12 @@
 
 package com.apptentive.android.sdk.util;
 
-import android.view.ViewGroup;
-
 /**
  * @author Sky Kelsey
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "1.7.4";
+	public static final String APPTENTIVE_SDK_VERSION = "2.0.0";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
@@ -33,9 +31,10 @@ public class Constants {
 	public static final String PREF_KEY_APP_RELEASE = "app_release";
 	public static final String PREF_KEY_PERSON = "person";
 	public static final String PREF_KEY_PERSON_DATA = "personData";
-	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
-	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
+	public static final String PREF_KEY_PERSON_NAME = "personName";
+
+	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
@@ -44,7 +43,12 @@ public class Constants {
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE = "autoMessageShownAutoMessage";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
+
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
+	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
+
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET = "messageCenterWhoCardSet";
 
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
@@ -67,8 +71,8 @@ public class Constants {
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS = 15;
 	public static final int CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS = 60;
-	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = true;
-	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_EMAIL_REQUIRED = false;
+	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = false;
+	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = false;
 	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
 
 	// Manifest keys
@@ -77,16 +81,12 @@ public class Constants {
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
-	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
-	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
-
-	// View layout shortcuts
-	public static final ViewGroup.LayoutParams ROW_LAYOUT  = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-	public static final ViewGroup.LayoutParams ITEM_LAYOUT = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
+	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
+	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
 	public static final String PREF_KEY_SURVEYS = "surveys";
 	public static final String PREF_KEY_SURVEYS_CACHE_EXPIRATION = "surveyCacheExpiration";
@@ -99,6 +99,8 @@ public class Constants {
 	public static final String PREF_KEY_RATING_STATE = "ratingState";
 	public static final String PREF_KEY_RATING_EVENTS = "events";
 	public static final String PREF_KEY_RATING_USES = "uses";
+	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
+	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
 
 	/**
 	 * A list of mobile carrier network types as Strings.

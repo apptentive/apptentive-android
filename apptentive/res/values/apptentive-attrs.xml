@@ -6,7 +6,78 @@
   -->
 
 <resources>
+
+    <declare-styleable name="ApptentiveMaterial">
+        <attr name="apptentive_material_background" format="color|reference" />
+
+        <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
+        <attr name="apptentive_material_primary_text" format="color|reference" />
+        <attr name="apptentive_material_primary_icon" format="color|reference" />
+        <attr name="apptentive_material_secondary_text" format="color|reference" />
+        <attr name="apptentive_material_hint_text" format="color|reference" />
+        <attr name="apptentive_material_disabled_text" format="color|reference" />
+        <attr name="apptentive_material_disabled_icon" format="color|reference" />
+        <attr name="apptentive_material_divider" format="color|reference" />
+
+        <attr name="apptentive_material_selected" format="color|reference" />
+        <attr name="apptentive_material_selected_text" format="color|reference" />
+        <!-- header attrs-->
+        <attr name="apptentive_material_header_selection_text" format="color|reference" />
+        <attr name="apptentive_material_pressed_highlight" format="color|reference" />
+    </declare-styleable>
+
+
+
+    <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
+    <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
+
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="text" format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
+        <attr name="backgroundColor" format="color"/>
+        <attr name="progressBarColor" format="color"/>
+        <attr name="progress" format="integer"/>
+    </declare-styleable>
+
+
+    <!-- Default style attribute which will be used during construction of ApptentiveMessageCenterBadge. -->
+    <attr name="apptentiveMessageCenterBadgeStyle" format="reference"/>
+
+    <declare-styleable name="ApptentiveMessageCenterBadge">
+        <!-- counter color -->
+        <attr name="counterColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="badgeSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+    </declare-styleable>
+
+    <attr name="apptentiveFabStyle" format="reference"/>
+
+    <declare-styleable name="FloatingActionButton">
+        <!-- Background color -->
+        <attr name="floatingActionButtonColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="floatingActionButtonSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+        <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
+        <attr name="floatingActionButtonImplicitElevation" format="boolean"/>
+        <!-- Show shadow or not, default value is true -->
+        <attr name="floatingActionButtonShadow" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ApptentiveAvatarView">
+        <attr name="borderWidth" format="dimension"/>
+        <attr name="borderSpace" format="dimension"/>
+        <attr name="borderColor" format="color"/>
     </declare-styleable>
 </resources>

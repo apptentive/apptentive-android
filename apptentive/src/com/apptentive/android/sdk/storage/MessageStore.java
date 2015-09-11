@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.model.Message;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ import java.util.List;
  */
 public interface MessageStore extends PayloadStore {
 
-	public void addOrUpdateMessages(Message... message);
+	public void addOrUpdateMessages(ApptentiveMessage... apptentiveMessage);
 
-	public void updateMessage(Message message);
+	public void updateMessage(ApptentiveMessage apptentiveMessage);
 
-	public List<Message> getAllMessages();
+	public List<ApptentiveMessage> getAllMessages();
 
 	public String getLastReceivedMessageId();
 

@@ -12,8 +12,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveActivity;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 
 import java.util.List;
 
@@ -21,6 +27,7 @@ import java.util.List;
  * @author Sky Kelsey
  */
 public class TestsActivity extends ApptentiveActivity {
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,4 +81,5 @@ public class TestsActivity extends ApptentiveActivity {
 	public void throwNpe(@SuppressWarnings("unused") View view) {
 		throw new NullPointerException("This is just an exception to test out how the SDK handles it.");
 	}
+
 }

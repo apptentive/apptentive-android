@@ -8,8 +8,10 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import android.app.Activity;
 import android.content.Context;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,12 +22,13 @@ public abstract class Interaction extends JSONObject {
 
 	public static final String KEY_NAME = "interaction";
 
-	public  static final String KEY_ID = "id";
+	public static final String KEY_ID = "id";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION = "version";
-	private static final String KEY_CONFIGURATION = "configuration";
+	protected static final String KEY_CONFIGURATION = "configuration";
 
 	public static final String EVENT_NAME_LAUNCH = "launch";
+	public final static String JSON_STRING = "json";
 
 	public Interaction(String json) throws JSONException {
 		super(json);
@@ -95,7 +98,6 @@ public abstract class Interaction extends JSONObject {
 		UpgradeMessage,
 		EnjoymentDialog,
 		RatingDialog,
-		FeedbackDialog,
 		MessageCenter,
 		AppStoreRating,
 		Survey,
@@ -131,8 +133,6 @@ public abstract class Interaction extends JSONObject {
 						return new EnjoymentDialogInteraction(interactionString);
 					case RatingDialog:
 						return new RatingDialogInteraction(interactionString);
-					case FeedbackDialog:
-						return new FeedbackDialogInteraction(interactionString);
 					case MessageCenter:
 						return new MessageCenterInteraction(interactionString);
 					case AppStoreRating:

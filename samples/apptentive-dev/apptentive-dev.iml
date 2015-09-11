@@ -13,14 +13,17 @@
         <option name="ASSEMBLE_TASK_NAME" value="assembleDevDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDevDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDevDebugAndroidTest" />
-        <option name="SOURCE_GEN_TASK_NAME" value="generateDevDebugSources" />
-        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDevDebugAndroidTestSources" />
+        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDevDebugAndroidTestSources" />
+        <afterSyncTasks>
+          <task>generateDevDebugAndroidTestSources</task>
+          <task>generateDevDebugSources</task>
+        </afterSyncTasks>
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/dev/debug" />
     <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/dev/debug" />
     <exclude-output />
@@ -29,8 +32,9 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/dev/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/dev/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/dev/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/google-services/dev/debug" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/dev/debug" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/dev/debug" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/dev/debug" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/devDebug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/devDebug/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/devDebug/assets" type="java-resource" />
@@ -43,7 +47,7 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/dev/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/dev/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/dev/debug" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/dev/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/dev/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/dev/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/dev/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/dev/assets" type="java-resource" />
@@ -86,6 +90,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.8.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-gcm/7.8.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
@@ -101,9 +107,15 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android 4.0.3 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="cardview-v7-23.0.1" level="project" />
+    <orderEntry type="library" exported="" name="appcompat-v7-23.0.1" level="project" />
+    <orderEntry type="library" exported="" name="play-services-gcm-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="HockeySDK-3.5.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-base-7.8.0" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-23.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.0.1" level="project" />
     <orderEntry type="module" module-name="apptentive" exported="" />
   </component>
 </module>

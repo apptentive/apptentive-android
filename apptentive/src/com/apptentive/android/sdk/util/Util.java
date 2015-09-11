@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -15,10 +15,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
 import com.apptentive.android.sdk.Log;
 
 import java.io.*;
@@ -38,11 +45,6 @@ public class Util {
 
 	public static String dateToIso8601String(long millis) {
 		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
-	}
-
-	public static String secondsToDisplayString(String format, Double seconds) {
-		String dateString = dateToString(new SimpleDateFormat(format), new Date(Math.round(seconds * 1000)));
-		return dateString.replace("PM", "pm").replace("AM", "am");
 	}
 
 	public static String dateToString(DateFormat format, Date date) {
@@ -135,71 +137,56 @@ public class Util {
 	/**
 	 * Internal use only.
 	 */
-	public static void hideSoftKeyboard(Activity activity, View view) {
+	public static void hideSoftKeyboard(Context context, View view) {
 		if (view != null) {
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
 
-/*
-	public void showSoftKeyboard(Activity activity, View target) {
+
+	public static void showSoftKeyboard(Activity activity, View target) {
 		if (activity.getCurrentFocus() != null) {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(target, 0);
 		}
 	}
-*/
 
 
 	public static String[] getAllUserAccountEmailAddresses(Context context) {
 		List<String> emails = new ArrayList<String>();
-		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-			AccountManager accountManager = AccountManager.get(context);
-			try {
-				Account[] accounts = accountManager.getAccountsByType("com.google");
-				for (Account account : accounts) {
-					emails.add(account.name);
-				}
-			} catch (VerifyError e) {
-				// Ignore here because the phone is on a pre API Level 5 SDK.
+		AccountManager accountManager = AccountManager.get(context);
+		Account[] accounts = null;
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
+			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+				accounts = accountManager.getAccountsByType("com.google");
+			}
+		}
+		if (accounts != null) {
+			for (Account account : accounts) {
+				emails.add(account.name);
 			}
 		}
 		return emails.toArray(new String[emails.size()]);
 	}
 
-	public static String getUserEmail(Context context) {
-		if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-			String email = getEmail(context);
-			if (email != null) {
-				return email;
+	private static String getUserEmail(Context context) {
+		AccountManager accountManager = AccountManager.get(context);
+		Account[] accounts = null;
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
+			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
+				accounts = accountManager.getAccountsByType("com.google");
+			}
+		}
+
+		if (accounts != null && accounts.length > 0) {
+			// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
+			Account account = accounts[accounts.length - 1];
+			if (account != null) {
+				return account.name;
 			}
 		}
 		return null;
-	}
-
-	private static String getEmail(Context context) {
-		AccountManager accountManager = AccountManager.get(context);
-		Account account = getAccount(accountManager);
-		if (account == null) {
-			return null;
-		} else {
-			return account.name;
-		}
-	}
-
-	private static Account getAccount(AccountManager accountManager) {
-		Account account = null;
-		try {
-			Account[] accounts = accountManager.getAccountsByType("com.google");
-			if (accounts.length > 0) {
-				// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
-				account = accounts[accounts.length - 1];
-			}
-		} catch (VerifyError e) {
-			// Ignore here because the phone is on a pre API Level 5 SDK.
-		}
-		return account;
 	}
 
 	public static boolean isNetworkConnectionPresent(Context context) {
@@ -241,6 +228,9 @@ public class Util {
 
 	public static Integer parseCacheControlHeader(String cacheControlHeader) {
 		if (cacheControlHeader != null) {
+			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
+			int indexOfLastBracket = cacheControlHeader.lastIndexOf("]");
+			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket+1, indexOfLastBracket);
 			String[] cacheControlParts = cacheControlHeader.split(",");
 			for (String part : cacheControlParts) {
 				part = part.trim();
@@ -410,4 +400,118 @@ public class Util {
 		}
 		return null;
 	}
+
+	public static void calculateListViewHeightBasedOnChildren(ListView listView) {
+		ListAdapter listAdapter = listView.getAdapter();
+		if (listAdapter == null) {
+
+			return;
+		}
+
+		int totalHeight = 0;
+		for (int i = 0; i < listAdapter.getCount(); i++) {
+			View listItem = listAdapter.getView(i, null, listView);
+			listItem.measure(0, 0);
+			totalHeight += listItem.getMeasuredHeight();
+		}
+
+		ViewGroup.LayoutParams params = listView.getLayoutParams();
+		int newHeight = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+		int HeightDifference = params.height - newHeight;
+
+		//listView.setLayoutParams(params);
+	}
+
+	/**
+	 * helper method to set the background depending on the android version
+	 *
+	 * @param v
+	 * @param d
+	 */
+	public static void setBackground(View v, Drawable d) {
+		if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			v.setBackgroundDrawable(d);
+		} else {
+			v.setBackground(d);
+		}
+	}
+
+	/**
+	 * helper method to set the background depending on the android version
+	 *
+	 * @param v
+	 * @param drawableRes
+	 */
+	public static void setBackground(View v, int drawableRes) {
+		setBackground(v, getCompatDrawable(v.getContext(), drawableRes));
+	}
+
+	/**
+	 * helper method to get the drawable by its resource id, specific to the correct android version
+	 *
+	 * @param c
+	 * @param drawableRes
+	 * @return
+	 */
+	public static Drawable getCompatDrawable(Context c, int drawableRes) {
+		Drawable d = null;
+		try {
+			if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+				d = c.getResources().getDrawable(drawableRes);
+			} else {
+				d = c.getResources().getDrawable(drawableRes, c.getTheme());
+			}
+		} catch (Exception ex) {
+		}
+		return d;
+	}
+
+	public static int getThemeColor(Context ctx, int attr) {
+		TypedValue tv = new TypedValue();
+		if (ctx.getTheme().resolveAttribute(attr, tv, true)) {
+			return tv.data;
+		}
+		return 0;
+	}
+
+	/**
+	 * helper method to get the color by attr (if defined in the style) or by resource.
+	 *
+	 * @param ctx
+	 * @param attr attribute that defines the color
+	 * @param res  color resource id
+	 * @return
+	 */
+	public static int getThemeColorFromAttrOrRes(Context ctx, int attr, int res) {
+		int color = getThemeColor(ctx, attr);
+		// If this color is not styled, use the default from the resource
+		if (color == 0) {
+			color = ctx.getResources().getColor(res);
+		}
+		return color;
+	}
+
+
+	/**
+	 * helper method to generate the ImageButton background with specified highlight color.
+	 *
+	 * @param selected_color the color shown as highlight
+	 * @return
+	 */
+	public static StateListDrawable getSelectableImageButtonBackground(int selected_color) {
+		ColorDrawable selectedColor = new ColorDrawable(selected_color);
+		StateListDrawable states = new StateListDrawable();
+		states.addState(new int[]{android.R.attr.state_pressed}, selectedColor);
+		states.addState(new int[]{android.R.attr.state_activated}, selectedColor);
+		return states;
+	}
+
+	public static int lighter(int color, float factor) {
+		int red = (int) ((Color.red(color) * (1 - factor) / 255 + factor) * 255);
+		int green = (int) ((Color.green(color) * (1 - factor) / 255 + factor) * 255);
+		int blue = (int) ((Color.blue(color) * (1 - factor) / 255 + factor) * 255);
+		return Color.argb(Color.alpha(color), red, green, blue);
+	}
+
 }
+

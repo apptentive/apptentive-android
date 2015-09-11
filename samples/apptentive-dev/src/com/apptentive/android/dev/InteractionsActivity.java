@@ -34,7 +34,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.interactions);
 
-		// Populate an auto=complete text view of event names that can be engaged.
+		// Populate an auto-complete text view of event names that can be engaged.
 		final AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
 		String[] events = getResources().getStringArray(R.array.events);
 		ArrayAdapter<String> eventAdapter = new ArrayAdapter<String>(InteractionsActivity.this, android.R.layout.simple_spinner_dropdown_item, events);
@@ -105,10 +105,10 @@ public class InteractionsActivity extends ApptentiveActivity {
 		doEngage(true);
 	}
 
-	public void willShowInteraction(@SuppressWarnings("unused") View view) {
+	public void canShowInteraction(@SuppressWarnings("unused") View view) {
 		AutoCompleteTextView eventName = (AutoCompleteTextView) findViewById(R.id.event_name);
-		boolean willShowInteraction = Apptentive.willShowInteraction(this, eventName.getText().toString());
-		Toast.makeText(this, willShowInteraction ? "Interaction will show." : "Interaction will NOT show.", Toast.LENGTH_SHORT).show();
+		boolean canShowInteraction = Apptentive.canShowInteraction(this, eventName.getText().toString());
+		Toast.makeText(this, canShowInteraction ? "Interaction can show." : "Interaction CANNOT show.", Toast.LENGTH_SHORT).show();
 	}
 
 	public void interaction(@SuppressWarnings("unused") View view) {
@@ -225,5 +225,17 @@ public class InteractionsActivity extends ApptentiveActivity {
 
 	private Interaction loadInteractionFromAsset(String fileName) {
 		return Interaction.Factory.parseInteraction(FileUtil.loadTextAssetAsString(this, fileName));
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		findViewById(R.id.cover_image).setVisibility(View.VISIBLE);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		findViewById(R.id.cover_image).setVisibility(View.GONE);
 	}
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <!-- DEFAULT (LIGHT) -->
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <!-- DARK -->
+    <style name="ApptentiveTheme.Dark.TranslucentStatus" parent="ApptentiveTheme.Dark">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.Dark.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Dark.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <!-- LIGHT DARK TOOLBAR -->
+    <style name="ApptentiveTheme.Light.DarkToolbar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar.ActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextViewStyle" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
+        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">left</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+</resources>

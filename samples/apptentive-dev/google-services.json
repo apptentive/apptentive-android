@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_id": "apptentive-dev-app",
+    "project_number": "181763740572",
+    "name": "Apptentive Dev App"
+  },
+  "client": [
+    {
+      "client_info": {
+        "client_id": "android:com.apptentive.android.dev",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.apptentive.android.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "client_id": "android:com.apptentive.android.qa",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.apptentive.android.qa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "ARTIFACT_VERSION": "1"
+}

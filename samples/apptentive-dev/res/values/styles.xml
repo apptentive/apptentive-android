@@ -29,4 +29,21 @@
     <style name="DropDownListViewStyle" parent="@android:style/Widget.Holo.DropDownItem">
         <item name="android:textSize">@dimen/apptentive_text_small</item>
     </style>
+
+    <style name="ApptentiveSdkOverride" parent="ApptentiveTheme">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="apptentiveAvatarViewGreetingStyle">@style/ApptentiveAvatarView.Greeting.Override</item>
+        <item name="apptentiveAvatarViewMessageStyle">@style/ApptentiveAvatarView.Message.Override</item>
+    </style>
+
+    <style name="ApptentiveAvatarView.Greeting.Override">
+    </style>
+
+    <style name="ApptentiveAvatarView.Message.Override">
+        <item name="borderWidth">2dp</item>
+        <item name="borderSpace">1.5dp</item>
+    </style>
+
 </resources>

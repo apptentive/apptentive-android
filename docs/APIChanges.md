@@ -1,5 +1,40 @@
 This document tracks changes to the API between versions.
 
+# 2.0.0
+
+* Modified `showMessageCenter()` to return a boolean. Returns true if Message Center was shown, else false.
+* Added a method `canShowMessageCenter()` for checking to see if Message Center is available to be shown. The Apptentive SDK needs to connect to our server at least once after upgrading to 2.0.0 in order for Message Center to be able to display.
+* Deprecated `setUnreadMessagesListener()` and added `addUnreadMessagesListener()` in its place.
+* Removed existing push provider token setup methods and replaced them with a unified method for setting the device token and specifying the provider.
+* Replaced `setInitialUserName()` and `setInitialUserEmail()` with `setPersonName()` and `setPersonEmail()`. The new methods will override what you previously set. Because we now allow your customer to supply their name and email through Message Center, you may want to check to see if these fields are set by calling `getPersonName()` and `getPersonEmail()` before you overwrite them.
+
+| Removed Methods |
+| --------------- |
+| `public static void setInitialUserName(Context context, String name)` |
+| `public static void setInitialUserEmail(Context context, String email)` |
+| `public static void addAmazonSnsPushIntegration(Context context, String registrationId)` |
+| `public static void addParsePushIntegration(Context context, String deviceToken)` |
+| `public static void addUrbanAirshipPushIntegration(Context context, String channelId)` |
+
+| Added Methods |
+| ------------- |
+| [public static void getPersonName(Context context)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonName-android.content.Context) |
+| [public static void setPersonName(Context context, String name)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPersonName-android.content.Context-java.lang.String) |
+| [public static void getPersonEmail(Context context)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonEmail-android.content.Context) |
+| [public static void setPersonEmail(Context context, String email)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPersonEmail-android.content.Context-java.lang.String) |
+| [public static void canShowMessageCenter(Context context)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#canShowMessageCenter-android.content.Context) |
+| [public static void addUnreadMessagesListener(UnreadMessagesListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addUnreadMessagesListener-com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener) |
+| [public static void setPushNotificationIntegration(Context context, int pushProvider, String token)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPushNotificationIntegration-android.content.Context-int-java.lang.String) |
+
+| Modified Methods |
+| ---------------- |
+| [public static boolean showMessageCenter(Activity activity)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-android.app.Activity) |
+
+| Deprecated Methods |
+| ------------------ |
+| [public static void setUnreadMessagesListener(UnreadMessagesListener listener)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setUnreadMessagesListener-com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener) |
+
+
 # 1.7.2
 
 * Removed a method to set the callback Activity that Apptentive will return to after handling a push notification. This
@@ -8,7 +43,7 @@ This document tracks changes to the API between versions.
 
 | Removed Methods |
 | --------------- |
-| [public static void setParsePushCallback(Class<? extends Activity> activity)]() |
+| public static void setParsePushCallback(Class<? extends Activity> activity) |
 
 * Added new methods to work with Urban Airship's new integration style. Again, please see the [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
 

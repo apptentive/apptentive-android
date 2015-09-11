@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import com.apptentive.android.sdk.Log;
 
@@ -16,10 +17,12 @@ import com.apptentive.android.sdk.Log;
 public abstract class ActivityContent {
 
 	public static final String KEY = "activityContent";
+	public static final String EXTRA = "activityContentData";
+	public static final String EVENT_NAME = "activityContentEventName";
 
 	protected Type type;
 
-	public abstract void onCreate(Activity activity, Bundle onSavedInstanceState);
+	public abstract void onCreate(Activity activity, Bundle savedInstanceState);
 	public abstract void onSaveInstanceState(Bundle outState);
 	public abstract void onRestoreInstanceState(Bundle savedInstanceState);
 
@@ -32,14 +35,22 @@ public abstract class ActivityContent {
 	 */
 	public abstract boolean onBackPressed(Activity activity);
 
+	public void onStart() {}
+	public void onResume() {}
+	public void onPause() {}
+	public void onStop() {}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {}
+
 	public Type getType() {
 		return type;
 	}
 
 	public enum Type {
 		ABOUT,
-		MESSAGE_CENTER,
+		MESSAGE_CENTER_ERROR,
 		INTERACTION,
+		ENGAGE_INTERNAL_EVENT,
 		unknown;
 
 		public static Type parse(String type) {

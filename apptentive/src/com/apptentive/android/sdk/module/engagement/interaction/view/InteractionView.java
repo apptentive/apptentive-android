@@ -8,9 +8,9 @@ package com.apptentive.android.sdk.module.engagement.interaction.view;
 
 import android.app.Activity;
 import android.os.Bundle;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.ActivityContent;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
 /**
@@ -21,6 +21,7 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 	protected T interaction;
 
 	private static final String HAS_LAUNCHED = "has_launched";
+
 	protected boolean hasLaunched;
 
 	public InteractionView(T interaction) {
@@ -42,6 +43,7 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putBoolean(HAS_LAUNCHED, hasLaunched);
+		outState.putString(Interaction.JSON_STRING, interaction.toString());
 	}
 
 	@Override

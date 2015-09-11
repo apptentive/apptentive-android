@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView
+        android:id="@+id/toast_avatar"
+        android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+        android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingLeft="11dp"
+        android:paddingRight="11dp"
+        android:paddingBottom="13dp"
+        android:src="@drawable/avatar" />
+    <TextView
+        android:id="@+id/toast_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="6dp"
+        android:layout_toLeftOf="@+id/toast_timestamp"
+        android:layout_toRightOf="@id/toast_avatar"
+        android:text="Message Title"
+        android:textColor="@color/apptentive_material_toolbar_foreground"
+        android:textSize="@dimen/apptentive_text_medium_small" />
+
+    <TextView
+        android:id="@+id/toast_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/toast_title"
+        android:paddingRight="2dp"
+        android:text="00:00"
+        android:textColor="@color/apptentive_material_toolbar_foreground" />
+
+
+    <TextView
+        android:id="@+id/toast_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toast_title"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_toRightOf="@id/toast_avatar"
+        android:maxLines="2"
+        android:text="Apptentive New Message"
+        android:textColor="@color/apptentive_material_toolbar_foreground"
+        android:textSize="@dimen/apptentive_text_small" />
+
+</RelativeLayout>

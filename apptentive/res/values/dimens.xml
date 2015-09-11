@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <dimen name="apptentive_text_large">22sp</dimen>
+    <dimen name="apptentive_text_medium_large">20sp</dimen>
+    <dimen name="apptentive_text_medium">18sp</dimen>
+    <dimen name="apptentive_text_medium_small">16sp</dimen>
+    <dimen name="apptentive_text_small">14sp</dimen>
+    <dimen name="apptentive_text_small_tiny">12sp</dimen>
+
+    <dimen name="apptentive_activity_side_padding">0dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
+    <dimen name="apptentive_dialog_side_padding">0dp</dimen>
+    <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
+
+    <dimen name="apptentive_text_button_padding_left">12dp</dimen>
+    <dimen name="apptentive_text_button_padding_right">12dp</dimen>
+
+    <dimen name="apptentive_dialog_background_corner_radius">1.5dp</dimen>
+    <dimen name="apptentive_dialog_title_text">21dp</dimen>
+    <dimen name="apptentive_dialog_body_text">16sp</dimen>
+    <dimen name="apptentive_dialog_content_padding_top">24dp</dimen>
+    <dimen name="apptentive_dialog_content_padding_left">24dp</dimen>
+    <dimen name="apptentive_dialog_content_padding_right">24dp</dimen>
+    <dimen name="apptentive_dialog_content_padding_bottom">16dp</dimen>
+    <dimen name="apptentive_dialog_content_spacing">16dp</dimen>
+    <dimen name="apptentive_dialog_edittext">16sp</dimen>
+
+    <dimen name="apptentive_dialog_buttons_padding_bottom">8dp</dimen>
+    <dimen name="apptentive_dialog_buttons_padding_top">8dp</dimen>
+    <dimen name="apptentive_dialog_button_corner_radius">1.5dp</dimen>
+    <dimen name="apptentive_dialog_button_click_area_height">48dp</dimen>
+    <dimen name="apptentive_dialog_button_bar_padding_right">12dp</dimen>
+    <dimen name="apptentive_dialog_button_visible_area_min_width">64dp</dimen>
+    <dimen name="apptentive_dialog_button_visible_area_min_height">36dp</dimen>
+    <dimen name="apptentive_dialog_button_margin_left">4dp</dimen>
+    <dimen name="apptentive_dialog_button_margin_right">4dp</dimen>
+    <dimen name="apptentive_dialog_button_padding_left">8dp</dimen>
+    <dimen name="apptentive_dialog_button_padding_right">8dp</dimen>
+    <dimen name="apptentive_dialog_button_spacing">8dp</dimen>
+    <dimen name="apptentive_dialog_button_text">15sp</dimen>
+
+    <dimen name="apptentive_message_center_header_height">56dp</dimen>
+    <dimen name="apptentive_message_center_icon_dimension">48dp</dimen>
+    <dimen name="apptentive_message_center_message_list_margin">0dp</dimen>
+    <dimen name="apptentive_message_center_message_list_side_border">0dp</dimen>
+    <dimen name="apptentive_message_center_fab_height">20dp</dimen>
+    <dimen name="apptentive_message_center_footer_height">32dp</dimen>
+    <dimen name="apptentive_message_center_card_margin">0dp</dimen>
+    <dimen name="apptentive_message_center_fallback_divider_line_width">2dp</dimen>
+    <dimen name="apptentive_message_center_avatar_image_diameter">48dp</dimen>
+    <dimen name="apptentive_message_center_default_margin_medium">16dp</dimen>
+    <dimen name="apptentive_message_center_default_margin_small">8dp</dimen>
+    <dimen name="apptentive_message_center_card_view_content_margin">16dp</dimen>
+    <dimen name="apptentive_message_center_card_control_margin">8dp</dimen>
+
+    <dimen name="floating_action_button_size_normal">56dp</dimen>
+    <dimen name="floating_action_button_size_mini">40dp</dimen>
+    <dimen name="floating_action_button_elevation">4dp</dimen>
+    <dimen name="floating_action_button_shadow_radius">4dp</dimen>
+    <dimen name="floating_action_button_margin_normal">34dp</dimen>
+    <dimen name="floating_action_button_margin_normal_minus">-34dp</dimen>
+    <dimen name="floating_action_button_margin_mini">26dp</dimen>
+    <dimen name="floating_action_button_margin_mini_minus">-26dp</dimen>
+
+
+    <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_left">16dp</dimen>
+
+    <dimen name="apptentive_message_center_status_side_padding">32dp</dimen>
+
+    <dimen name="apptentive_message_center_badge_normal">14sp</dimen>
+    <dimen name="apptentive_message_center_badge_mini">8sp</dimen>
+
+    <dimen name="apptentive_message_center_error_side_margin">24dp</dimen>
+
+</resources>

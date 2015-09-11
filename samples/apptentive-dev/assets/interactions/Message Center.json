@@ -1,0 +1,54 @@
+{
+  "id": "message_center_interaction_id",
+  "type": "MessageCenter",
+  "version": 2,
+  "configuration": {
+    "title": "Message Center",
+    "branding": "Powered by Apptentive",
+    "composer": {
+      "title": "New Message",
+      "hint_text": "Please leave detailed feedback",
+      "send_button": "Send",
+      "send_start": "Sending...",
+      "send_ok": "Sent",
+      "send_fail": "Failed",
+      "close_text": "Close",
+      "close_confirm_body": "Are you sure you want to discard this message?",
+      "close_discard_button": "Discard",
+      "close_cancel_button": "Cancel"
+    },
+    "greeting": {
+      "title": "Hello!",
+      "body": "We'd love to get feedback from you on our app. The more details you can provide, the better.",
+      "image_url": "https://dfuvhehs12k8c.cloudfront.net/assets/app-icon/good-mark-400889c96ea2b5ec8a8e896ea5d7597b.png"
+    },
+    "status": {
+      "body": "We will respond to your message soon."
+    },
+    "automated_message": {
+      "body": "Please let us know how to make Temp Dev App better for you!"
+    },
+    "error_messages": {
+      "http_error_body": "It looks like we're having trouble sending your message. We've saved it and will try sending it again soon.",
+      "network_error_body": "It looks like you aren't connected to the Internet right now. We've saved your message and will try again when we detect a connection."
+    },
+    "profile": {
+      "request": true,
+      "require": false,
+      "initial": {
+        "title": "Who are we speaking with?",
+        "name_hint": "Name",
+        "email_hint": "Email",
+        "skip_button": "Skip",
+        "save_button": "That's Me!"
+      },
+      "edit": {
+        "title": "Profile",
+        "name_hint": "Name",
+        "email_hint": "Email",
+        "skip_button": "Cancel",
+        "save_button": "Save"
+      }
+    }
+  }
+}

@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -31,14 +33,14 @@ public class InteractionManager {
 
 	public static Interactions getInteractions(Context context) {
 		if (interactions == null) {
-			loadInteractions(context);
+			interactions = loadInteractions(context);
 		}
 		return interactions;
 	}
 
 	public static Targets getTargets(Context context) {
 		if (targets == null) {
-			loadTargets(context);
+			targets = loadTargets(context);
 		}
 		return targets;
 	}
@@ -65,8 +67,10 @@ public class InteractionManager {
 			return;
 		}
 
-		if (hasCacheExpired(context)) {
-			Log.d("Interaction cache has expired. Fetching new interactions.");
+		boolean force = GlobalInfo.isAppDebuggable;
+
+		if (force || hasCacheExpired(context)) {
+			Log.i("Fetching new Interactions.");
 			Thread thread = new Thread() {
 				public void run() {
 					fetchAndStoreInteractions(context);
@@ -83,25 +87,35 @@ public class InteractionManager {
 			thread.setName("Apptentive-FetchInteractions");
 			thread.start();
 		} else {
-			Log.d("Interaction cache has not expired. Using existing interactions.");
+			Log.v("Using cached Interactions.");
 		}
 	}
 
-	private static void fetchAndStoreInteractions(Context context) {
-		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
+	private static void fetchAndStoreInteractions(Context appContext) {
+		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(appContext);
 
-		if (response != null && response.isSuccessful()) {
-			String interactionsPayloadString = response.getContent();
-
-			// Store new integration cache expiration.
-			String cacheControl = response.getHeaders().get("Cache-Control");
-			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if (cacheSeconds == null) {
-				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
-			}
-			updateCacheExpiration(context, cacheSeconds);
-			storeInteractionsPayloadString(context, interactionsPayloadString);
+		// We weren't able to connect to the internet.
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		if (response.isException()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
+			return;
 		}
+		// We got a server error.
+		if (!response.isSuccessful()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
+			return;
+		}
+
+		String interactionsPayloadString = response.getContent();
+
+		// Store new integration cache expiration.
+		String cacheControl = response.getHeaders().get("Cache-Control");
+		Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+		if (cacheSeconds == null) {
+			cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+		}
+		updateCacheExpiration(appContext, cacheSeconds);
+		storeInteractionsPayloadString(appContext, interactionsPayloadString);
 	}
 
 	/**
@@ -175,7 +189,7 @@ public class InteractionManager {
 		return expiration < System.currentTimeMillis();
 	}
 
-	private static void updateCacheExpiration(Context context, long duration) {
+	public static void updateCacheExpiration(Context context, long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();

@@ -8,10 +8,9 @@ package com.apptentive.android.dev;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+
+import com.apptentive.android.dev.push.RegistrationIntentService;
 import com.apptentive.android.sdk.*;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -21,53 +20,51 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
  */
 public class MainActivity extends ApptentiveActivity {
 
-	public static final String LOG_TAG = "Apptentive Dev App";
-
-	private long lastUnreadMessageCount = 0;
+	private UnreadMessagesListener unreadMessagesListener;
+	private OnSurveyFinishedListener surveyFinishedListener;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.main);
 
-		// OPTIONAL: To specify a different user email than what the device was setup with.
-		//Apptentive.setInitialUserEmail(this, "user_email@example.com");
+		// Log from Application when number of unread messages changes.
+		if (unreadMessagesListener == null) {
+			Log.e("Adding UnreadMessagesListener");
+			unreadMessagesListener = new UnreadMessagesListener() {
+				public void onUnreadMessageCountChanged(final int unreadMessages) {
+					Log.e("Unread message count changed. There are %s unread messages.", unreadMessages);
+				}
+			};
+			Apptentive.addUnreadMessagesListener(unreadMessagesListener);
+		}
 
-		// OPTIONAL: To send extra about the device to the server.
-		//Apptentive.addCustomDeviceData(this, "custom_device_key", "custom_device_value");
-		//Apptentive.addCustomPersonData(this, "custom_person_key", "custom_person_value");
+		// Log in Application when a survey is completed.
+		if (surveyFinishedListener == null) {
+			surveyFinishedListener = new OnSurveyFinishedListener() {
+				@Override
+				public void onSurveyFinished(boolean completed) {
+					Log.e(completed ? "Survey was completed." : "Survey was skipped.");
+				}
+			};
+			Apptentive.setOnSurveyFinishedListener(surveyFinishedListener);
+		}
 
-		// OPTIONAL: Specify a different rating provider if your app is not served from Google Play.
-		//Apptentive.setRatingProvider(new AmazonAppstoreRatingProvider());
-
-		// Impersonate an app for ratings.
-		//Apptentive.putRatingProviderArg("package", "your.package.name");
-
-		// If you would like to be notified when there are unread messages available, set a listener like this.
-		Apptentive.setUnreadMessagesListener(new UnreadMessagesListener() {
-			public void onUnreadMessageCountChanged(final int unreadMessages) {
-				Log.e(LOG_TAG, "There are " + unreadMessages + " unread messages.");
-				runOnUiThread(new Runnable() {
-					public void run() {
-						Button messageCenterButton = (Button) findViewById(R.id.button_message_center);
-						if (messageCenterButton != null) {
-							messageCenterButton.setText("Message Center, unread = " + unreadMessages);
-						}
-						if (lastUnreadMessageCount != unreadMessages) {
-							Toast.makeText(MainActivity.this, "You have " + unreadMessages + " unread messages.", Toast.LENGTH_SHORT).show();
-						}
-						lastUnreadMessageCount = unreadMessages;
-					}
-				});
-			}
-		});
-
-		// Ad a listener to notify you when a survey is completed.
-		Apptentive.setOnSurveyFinishedListener(new OnSurveyFinishedListener() {
+		// Catch all Exceptions during development and log exception and causes.
+		Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
-			public void onSurveyFinished(boolean completed) {
-				Toast.makeText(MainActivity.this, completed ? "Survey was completed." : "Survey was skipped.", Toast.LENGTH_SHORT).show();
+			public void uncaughtException(Thread thread, Throwable e) {
+				Log.e("UncaughtException", e);
+				while (e.getCause() != null) {
+					e = e.getCause();
+					Log.e("Caused by:", e);
+				}
 			}
 		});
+
+		// GCM: Start IntentService to register this application.
+		Intent intent = new Intent(this, RegistrationIntentService.class);
+		startService(intent);
 	}
 
 	public void launchInteractionsActivity(@SuppressWarnings("unused") View view) {
@@ -93,11 +90,8 @@ public class MainActivity extends ApptentiveActivity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-/*
 		if (hasFocus) {
-			boolean ret = Apptentive.engage(this, "init");
-			Log.e(LOG_TAG, "Rating flow " + (ret ? "was" : "was not") + " shown.");
+			Apptentive.handleOpenedPushNotification(this);
 		}
-*/
 	}
 }

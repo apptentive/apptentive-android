@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
@@ -8,67 +8,33 @@
     <string name="apptentive_ok">OK</string>
     <string name="apptentive_yes">Tak</string>
     <string name="apptentive_no">Nie</string>
-    <string name="apptentive_skip">Pomiń</string>
-    <string name="apptentive_you">Ty</string>
-    <string name="apptentive_developer">Autor</string>
+
     <string name="apptentive_oops">Ups!</string>
-    <string name="apptentive_send">Wyślij</string>
-    <string name="apptentive_give_feedback">Wystaw opinię</string>
     <string name="apptentive_thanks">Dzięki!</string>
     <string name="apptentive_no_thanks">Nie, dziękuję</string>
-    <string name="apptentive_thank_you">Dziękuję</string>
-    <string name="apptentive_were_sorry">Przepraszamy!</string>
+    <string name="apptentive_thank_you">Dziękujemy</string>
     <string name="apptentive_required">Wymagane</string>
     <string name="apptentive_optional">Opcjonalne</string>
-    <string name="apptentive_sending">Trwa wysyłanie…</string>
-    <string name="apptentive_version">Apptentive, wersja %s</string>
-
-    <string name="apptentive_edittext_hint_email">Twój adres e-mail</string>
-    <string name="apptentive_edittext_hint_email_required">Adres e-mail (wymagany)</string>
-
-    <string name="apptentive_powered_by_apptentive">Przy wsparciu Apptentive</string>
-    <string name="apptentive_about_title">O Apptentive</string>
-    <string name="apptentive_about_description">Apptentive to usługa umożliwiająca komunikację i wymianę opinii, która pozwala twórcom tej aplikacji na sprawne uzyskiwanie opinii użytkowników i wsłuchiwanie się w ich głos.</string>
-    <string name="apptentive_about_description_link">Dowiedz się więcej na apptentive.com</string>
-    <string name="apptentive_about_privacy">Twoja opinia przechowywana jest w ramach usługi Apptentive i objęta jest przepisami polityki prywatności Apptentive oraz polityki prywatności autora tej aplikacji.</string>
-    <string name="apptentive_about_privacy_link">Zapoznaj się z polityką prywatności Apptentive</string>
-
-    <string name="apptentive_do_you_love_this_app">Czy lubisz %s?</string>
-
-    <string name="apptentive_rating_message_fs">Cieszymy się bardzo, że lubisz %s! Twoja ocena będzie dla nas bardzo pomocna. Dziękujemy bardzo ze poświęcenie nam swojego czasu.</string>
+    <string name="apptentive_failed">Nie powiodło się</string>
+    <string name="apptentive_sent">Wysłano</string>
+    <string name="apptentive_version">Apptentive wersja %s</string>
+    <string name="apptentive_powered_by_apptentive">Oparte na technologii</string>
+    <string name="apptentive_about_title">O programie Apptentive</string>
+    <string name="apptentive_about_description">Apptentive to usługa w zakresie komunikacji i zbierania opinii, która umożliwia twórcom tej aplikacji wysłuchanie Twoich uwag.</string>
+    <string name="apptentive_about_description_link">Dowiedz się więcej na stronie apptentive.com</string>
+    <string name="apptentive_about_privacy">Twoja opinia będzie przechowywana przez Apptentive i podlega polityce prywatności Apptentive jak również polityce prywatności autora tej aplikacji.</string>
+    <string name="apptentive_about_privacy_link">Przejrzyj politykę prywatności Apptentive</string>
+    <string name="apptentive_do_you_love_this_app">Czy podoba Ci się %s?</string>
+    <string name="apptentive_rating_message_fs">Bardzo cieszymy się, że podoba Ci się %s! Bylibyśmy bardzo wdzięczni za wystawienie oceny. Dziękujemy za spędzanie z nami czasu.</string>
     <string name="apptentive_rate_this_app">Oceń %s</string>
     <string name="apptentive_rating_remind">Przypomnij mi później</string>
-    <string name="apptentive_rating_error">Nie udało nam się odnaleźć tej aplikacji w sklepie. Prosimy odwiedzić sklep, aby odnaleźć ją i wystawić jej ocenę.</string>
-
-    <string name="apptentive_intro_dialog_title_no_love">@string/apptentive_were_sorry</string>
-    <string name="apptentive_intro_dialog_title_default">Dziękujemy za Twoją opinię!</string>
-    <string name="apptentive_intro_dialog_body">Poinformuj nas, jak możemy poprawić dla Ciebie %s!</string>
-    <string name="apptentive_intro_dialog_edittext_hint">Napisz nam, jak możemy pomóc. (wymagane)</string>
-
-    <string name="apptentive_thank_you_dialog_body">Twoja odpowiedź została zapisana w Centrum wiadomości, gdzie możesz zapoznać się z pozostałymi odpowiedziami i wysyłać nam inne wiadomości.</string>
-    <string name="apptentive_thank_you_dialog_body_message_center_disabled">Dziękujemy za Twoją opinię!</string>
-    <string name="apptentive_thank_you_dialog_body_message_center_disabled_email_required">Skontaktujemy się wkrótce przez e-mail.</string>
-    <string name="apptentive_thank_you_dialog_close">Zamknij</string>
-    <string name="apptentive_thank_you_dialog_view_messages">Wyświetl wiadomości</string>
-
-    <string name="apptentive_dialog_email_validation_failed_title">Nieprawidłowy adres e-mail</string>
-    <string name="apptentive_dialog_email_validation_failed_body">Wprowadź prawidłowy adres e-mail.</string>
-
-    <string name="apptentive_survey_header">Ankieta</string>
-    <string name="apptentive_survey_singleline_hint">Wpisz odpowiedź</string>
+    <string name="apptentive_rating_error">Nie udało się znaleźć tej aplikacji w sklepie. Odwiedź sklep, aby ją znaleźć i ocenić.</string>
+    <string name="apptentive_survey_singleline_hint">Wpisz odpowiedź&#8230;</string>
     <string name="apptentive_survey_send_response">Wyślij odpowiedź</string>
-
     <string name="apptentive_message_center_title">Centrum wiadomości</string>
-    <string name="apptentive_message_center_compose_hint">Wpisz wiadomość…</string>
-    <string name="apptentive_message_center_attachment_title">Wysłać obraz?</string>
-
-    <!-- This is a Java format. -->
-    <string name="apptentive_message_sent_timestamp_format">MMM dd, yyyy h:mma</string>
-
-    <string name="apptentive_message_auto_body_manual">Oto nasze Centrum wiadomości. Jeśli masz jakieś pytania, sugestie, wątpliwości lub po prostu chcesz się z nami skontaktować, napisz do nas. Uwielbiamy być w kontakcie z naszymi Klientami!</string>
-    <string name="apptentive_message_auto_body_no_love">Co możemy zrobić, abyś rozkochać Cię w naszej aplikacji? Doceniamy Twoją konstruktywną opinię.</string>
-
-    <string name="apptentive_rating_provider_no_google_play">Nie znaleziono Google Play. Zanim ocenisz tę aplikację, zainstaluj Google Play.</string>
-    <string name="apptentive_rating_provider_no_amazon_appstore">Nie znaleziono Amazon Appstore. Zanim ocenisz tę aplikację, zainstaluj Amazon Appstore.</string>
-    <string name="apptentive_rating_provider_no_mikandi">Nie znaleziono MiKandi Market. Zanim ocenisz tę aplikację, zainstaluj MiKandi Market.</string>
+    <string name="apptentive_message_center_no_connection">Połącz się z internetem, aby wysłać swoją opinię.</string>
+    <string name="apptentive_message_center_server_error">Wygląda na to, że mamy problem z dostępem do opinii. Prosimy chwilę poczekać i spróbować ponownie.</string>
+    <string name="apptentive_rating_provider_no_google_play">Nie znaleziono Google Play. Przed udzieleniem oceny tej aplikacji, prosimy zainstalować Google Play.</string>
+    <string name="apptentive_rating_provider_no_amazon_appstore">Nie znaleziono Amazon Appstore. Przed udzieleniem oceny tej aplikacji, prosimy zainstalować Amazon Appstore.</string>
+    <string name="apptentive_rating_provider_no_mikandi">Nie znaleziono MiKandi Market. Przed udzieleniem oceny tej aplikacji, prosimy zainstalować MiKandi Market.</string>
 </resources>

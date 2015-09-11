@@ -28,6 +28,7 @@ import com.apptentive.android.sdk.util.Util;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 

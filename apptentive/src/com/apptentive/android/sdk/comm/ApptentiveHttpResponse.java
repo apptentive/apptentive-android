@@ -25,6 +25,10 @@ public class ApptentiveHttpResponse {
 		badPayload = false;
 	}
 
+	public boolean isException() {
+		return code < 0;
+	}
+
 	public boolean isSuccessful() {
 		return code >= 200 && code < 300;
 	}
@@ -34,6 +38,7 @@ public class ApptentiveHttpResponse {
 	}
 
 	public boolean isRejectedTemporarily() {
+		// Not successful and not in the range of [400, 500)
 		return !(isSuccessful() || isRejectedPermanently());
 	}
 

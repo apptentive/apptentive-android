@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <dimen name="apptentive_activity_side_padding">126dp</dimen>
+    <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
+    <dimen name="apptentive_dialog_side_padding">126dp</dimen>
+    <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
+
+    <dimen name="apptentive_header_height">48dp</dimen>
+    <dimen name="apptentive_header_padding_top">0dp</dimen>
+    <dimen name="apptentive_header_padding_bottom">0dp</dimen>
+
+    <dimen name="apptentive_message_center_header_height">48dp</dimen>
+    <dimen name="apptentive_message_center_message_list_margin">24dp</dimen>
+    <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
+    <dimen name="apptentive_message_center_footer_height">32dp</dimen>
+    <dimen name="apptentive_message_center_fab_height">40dp</dimen>
+
+    <dimen name="apptentive_message_center_greeting_side_margin">48dp</dimen>
+
+    <dimen name="apptentive_message_center_status_side_padding">96dp</dimen>
+
+    <dimen name="apptentive_message_center_error_side_margin">48dp</dimen>
+</resources>

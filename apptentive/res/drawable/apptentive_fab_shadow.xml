@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="100"
+        android:startColor="#f000"
+        android:endColor="#0000"
+        />
+    <padding
+        android:left="@dimen/floating_action_button_shadow_radius"
+        android:top="0dp"
+        android:right="@dimen/floating_action_button_shadow_radius"
+        android:bottom="@dimen/floating_action_button_shadow_radius"/>
+</shape>

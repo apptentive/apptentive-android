@@ -1389,40 +1389,29 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
 		}
 
-		//// Test Feedback Dialog
+		// Test Message Center
 
-		// Don't re-prompt, since we've declined to rate.
 		{
 			resetDevice();
 			Log.e("TWELVE");
 			InteractionManager.storeInteractionsPayloadString(targetContext, json);
 			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
 		}
-
-		//// Test Message Center
-
-		// Don't re-prompt, since we've declined to rate.
-		{
-			resetDevice();
-			Log.e("THIRTEEN");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#FeedbackDialog#view_messages"));
-		}
 	}
 
-	public void testWillShowInteraction() {
-		Log.e("Running test: testWillShowInteraction()\n\n");
+	public void testCanShowInteraction() {
+		Log.e("Running test: testCanShowInteraction()\n\n");
 		resetDevice();
 
 		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testWillShowInteraction.json");
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
 		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
-		boolean willShow = Apptentive.willShowInteraction(getTargetContext(), "init");
+		boolean willShow = Apptentive.canShowInteraction(getTargetContext(), "init");
 		assertFalse(willShow);
 
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		willShow = Apptentive.willShowInteraction(getTargetContext(), "init");
+		willShow = Apptentive.canShowInteraction(getTargetContext(), "init");
 		assertTrue(willShow);
 	}
 
