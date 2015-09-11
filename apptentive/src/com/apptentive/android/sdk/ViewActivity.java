@@ -260,7 +260,7 @@ public class ViewActivity extends ApptentiveActivity {
 			case MESSAGE_CENTER_ERROR:
 				break;
 			case INTERACTION:
-				activityContent.onStart();
+				activityContent.onStop();
 				break;
 			default:
 				break;
