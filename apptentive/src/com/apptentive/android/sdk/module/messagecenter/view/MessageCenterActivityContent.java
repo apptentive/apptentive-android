@@ -177,13 +177,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						}
 					}
 					updateMessageSentStates();
-					if (whoCardItem == null && composingItem == null) {
-						MessageCenterStatus newItem = interaction.getRegularStatus();
-						if (newItem != null) {
-							addNewStatusItem(newItem);
-							saveStatusMessageState(true);
-						}
-					}
+					addExpectationStatusIfNeeded();
+
 					// Update the sent message, make sure it stays in view
 					int firstIndex = messageCenterListView.getFirstVisiblePosition();
 					View v = messageCenterListView.getChildAt(0);
@@ -406,13 +401,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					showKeyboard = false;
 				} else {
 					// Finally check if status message need to be restored
-					boolean bStatusShown = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, false);
-					if (bStatusShown) {
-						MessageCenterStatus newItem = interaction.getRegularStatus();
-						if (newItem != null && whoCardItem == null && composingItem == null) {
-							addNewStatusItem(newItem);
-						}
-					}
+					addExpectationStatusIfNeeded();
 				}
 			} else {
 				// Hide keyboard when Who Card is required and the 1st thing to show
@@ -599,6 +588,31 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messages.add(whoCardItem);
 	}
 
+	private boolean addExpectationStatusIfNeeded() {
+		ApptentiveMessage apptentiveMessage = null;
+		MessageCenterListItem message = messages.get(messages.size() - 1);
+
+		if (message != null && message instanceof ApptentiveMessage) {
+			apptentiveMessage = (ApptentiveMessage) message;
+		}
+		// Check if the last message in the view is a sent message
+		if (apptentiveMessage != null &&
+				(apptentiveMessage instanceof OutgoingTextMessage ||
+						apptentiveMessage instanceof OutgoingFileMessage)) {
+			if (apptentiveMessage.getCreatedAt() != null) {
+				MessageCenterStatus newItem = interaction.getRegularStatus();
+				if (newItem != null && whoCardItem == null && composingItem == null) {
+					// Add expectation status message if the last is a sent
+					clearStatus();
+					statusItem = newItem;
+					messages.add(newItem);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public void addNewStatusItem(MessageCenterListItem item) {
 		clearStatus();
 
@@ -664,7 +678,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		if (statusItem != null) {
 			messages.remove(statusItem);
 			statusItem = null;
-			saveStatusMessageState(false);
 		}
 	}
 
@@ -866,6 +879,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 composingItem = null;
 												 messageEditText = null;
 												 messageCenterListAdapter.clearComposing();
+												 addExpectationStatusIfNeeded();
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 showFab();
 												 showProfileButton();
@@ -911,6 +925,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 composingItem = null;
 												 messageEditText = null;
 												 messageCenterListAdapter.clearComposing();
+												 addExpectationStatusIfNeeded();
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 saveOrClearPendingComposingMessage();
 												 // Send out the new message. The delay is added to ensure the CardView showing animation
@@ -982,6 +997,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						pendingWhoCardAvatarFile = null;
 						pendingWhoCardMode = 0;
 						messageCenterListAdapter.clearWhoCard();
+						addExpectationStatusIfNeeded();
 						messageCenterListAdapter.notifyDataSetChanged();
 						saveWhoCardSetState();
 						// If Who card is required, it might be displayed before proceeding to composing, for instance
@@ -1049,13 +1065,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
-		editor.apply();
-	}
-
-	private void saveStatusMessageState(boolean bShown) {
-		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE, bShown);
 		editor.apply();
 	}
 

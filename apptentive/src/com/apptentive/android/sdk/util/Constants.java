@@ -44,17 +44,11 @@ public class Constants {
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
 
-	public static final String PREF_KEY_MESSAGE_CENTER_STATUS_MESSAGE = "messageCenterStatusMessage";
-
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 
 	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET = "messageCenterWhoCardSet";
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_NAME = "messageCenterWhoCardName";
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_EMAIL = "messageCenterWhoCardEmail";
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_AVATAR = "messageCenterWhoCardAvatar";
-
 
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
