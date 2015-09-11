@@ -925,7 +925,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 composingItem = null;
 												 messageEditText = null;
 												 messageCenterListAdapter.clearComposing();
-												 addExpectationStatusIfNeeded();
 												 messageCenterListAdapter.notifyDataSetChanged();
 												 saveOrClearPendingComposingMessage();
 												 // Send out the new message. The delay is added to ensure the CardView showing animation
