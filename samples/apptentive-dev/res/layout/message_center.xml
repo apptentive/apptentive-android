@@ -35,8 +35,8 @@
             android:id="@+id/badge2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            apptentive:badgeSize="mini"
-            apptentive:counterColor="@color/badge_text_color"
+            apptentive:apptentive_badgeSize="mini"
+            apptentive:apptentive_counterColor="@color/badge_text_color"
             />
         <TextView android:layout_width="fill_parent"
                   android:layout_height="32dp"

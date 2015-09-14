@@ -196,8 +196,8 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 
 		try {
 			lockUpdate();
-			setSize(a.getInteger(R.styleable.ApptentiveMessageCenterBadge_badgeSize, SIZE_NORMAL));
-			setTextColor(a.getColor(R.styleable.ApptentiveMessageCenterBadge_counterColor, Color.BLACK));
+			setSize(a.getInteger(R.styleable.ApptentiveMessageCenterBadge_apptentive_badgeSize, SIZE_NORMAL));
+			setTextColor(a.getColor(R.styleable.ApptentiveMessageCenterBadge_apptentive_counterColor, Color.BLACK));
 		} finally {
 			unlockUpdate();
 			a.recycle();
