@@ -32,7 +32,7 @@
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
-        <attr name="text" format="string"/>
+        <attr name="apptentive_buttonText" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">

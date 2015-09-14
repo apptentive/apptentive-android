@@ -35,7 +35,7 @@ public class ApptentiveDialogButton extends FrameLayout {
 
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveDialogButton, defStyle, 0);
 		try {
-			String label = a.getString(R.styleable.ApptentiveDialogButton_text);
+			String label = a.getString(R.styleable.ApptentiveDialogButton_apptentive_buttonText);
 			setText(label);
 		} finally {
 			a.recycle();
