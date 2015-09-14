@@ -51,12 +51,12 @@
                         android:id="@+id/remind"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:text="@string/apptentive_rating_remind"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_rating_remind"/>
                 <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
                         android:id="@+id/decline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:text="@string/apptentive_no_thanks"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_no_thanks"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
