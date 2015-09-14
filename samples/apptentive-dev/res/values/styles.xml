@@ -42,8 +42,8 @@
     </style>
 
     <style name="ApptentiveAvatarView.Message.Override">
-        <item name="borderWidth">2dp</item>
-        <item name="borderSpace">1.5dp</item>
+        <item name="apptentive_borderWidth">2dp</item>
+        <item name="apptentive_borderSpace">1.5dp</item>
     </style>
 
 </resources>
