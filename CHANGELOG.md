@@ -1,3 +1,10 @@
+# 2015-09-15 - 2.0.1
+
+#### Bugs Fixed
+
+* Fixed a [potentially conflicting resource name. [Issue 105](https://github.com/apptentive/apptentive-android/issues/105)
+* Fixed a bug affecting display of Surveys.
+
 # 2015-09-09 - 2.0.0
 
 #### Improvements
