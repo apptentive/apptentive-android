@@ -42,12 +42,12 @@
                         android:id="@+id/no"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:text="@string/apptentive_no"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_no"/>
                 <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
                         android:id="@+id/yes"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:text="@string/apptentive_yes"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_yes"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

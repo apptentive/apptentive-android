@@ -32,13 +32,13 @@
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
-        <attr name="text" format="string"/>
+        <attr name="apptentive_buttonText" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
-        <attr name="backgroundColor" format="color"/>
-        <attr name="progressBarColor" format="color"/>
-        <attr name="progress" format="integer"/>
+        <attr name="apptentive_backgroundColor" format="color"/>
+        <attr name="apptentive_progressBarColor" format="color"/>
+        <attr name="apptentive_progress" format="integer"/>
     </declare-styleable>
 
 
@@ -47,9 +47,9 @@
 
     <declare-styleable name="ApptentiveMessageCenterBadge">
         <!-- counter color -->
-        <attr name="counterColor" format="color|reference"/>
+        <attr name="apptentive_counterColor" format="color|reference"/>
         <!-- Size of action button -->
-        <attr name="badgeSize" format="enum">
+        <attr name="apptentive_badgeSize" format="enum">
             <!-- 56dp -->
             <enum name="normal" value="0"/>
             <!-- 40dp -->
@@ -61,23 +61,23 @@
 
     <declare-styleable name="FloatingActionButton">
         <!-- Background color -->
-        <attr name="floatingActionButtonColor" format="color|reference"/>
+        <attr name="apptentive_floatingActionButtonColor" format="color|reference"/>
         <!-- Size of action button -->
-        <attr name="floatingActionButtonSize" format="enum">
+        <attr name="apptentive_floatingActionButtonSize" format="enum">
             <!-- 56dp -->
             <enum name="normal" value="0"/>
             <!-- 40dp -->
             <enum name="mini" value="1"/>
         </attr>
         <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
-        <attr name="floatingActionButtonImplicitElevation" format="boolean"/>
+        <attr name="apptentive_floatingActionButtonImplicitElevation" format="boolean"/>
         <!-- Show shadow or not, default value is true -->
-        <attr name="floatingActionButtonShadow" format="boolean"/>
+        <attr name="apptentive_floatingActionButtonShadow" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="ApptentiveAvatarView">
-        <attr name="borderWidth" format="dimension"/>
-        <attr name="borderSpace" format="dimension"/>
-        <attr name="borderColor" format="color"/>
+        <attr name="apptentive_borderWidth" format="dimension"/>
+        <attr name="apptentive_borderSpace" format="dimension"/>
+        <attr name="apptentive_borderColor" format="color"/>
     </declare-styleable>
 </resources>

@@ -232,11 +232,11 @@ public class FloatingActionButton extends ImageButton {
 	}
 
 	private void initAttrs(TypedArray a) {
-		setSize(a.getInteger(R.styleable.FloatingActionButton_floatingActionButtonSize, SIZE_NORMAL));
-		setColor(a.getColor(R.styleable.FloatingActionButton_floatingActionButtonColor, Color.GRAY));
-		setColorStateList(a.getColorStateList(R.styleable.FloatingActionButton_floatingActionButtonColor));
-		setShadow(a.getBoolean(R.styleable.FloatingActionButton_floatingActionButtonShadow, true));
-		setImplicitElevation(a.getBoolean(R.styleable.FloatingActionButton_floatingActionButtonImplicitElevation, true));
+		setSize(a.getInteger(R.styleable.FloatingActionButton_apptentive_floatingActionButtonSize, SIZE_NORMAL));
+		setColor(a.getColor(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor, Color.GRAY));
+		setColorStateList(a.getColorStateList(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor));
+		setShadow(a.getBoolean(R.styleable.FloatingActionButton_apptentive_floatingActionButtonShadow, true));
+		setImplicitElevation(a.getBoolean(R.styleable.FloatingActionButton_apptentive_floatingActionButtonImplicitElevation, true));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (mImplicitElevation) {

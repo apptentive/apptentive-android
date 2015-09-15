@@ -45,9 +45,9 @@ public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ApptentiveMaterialDeterminateProgressBar, defStyleAttr, 0);
 		try {
-			progressBarColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_progressBarColor, Color.BLUE);
-			backgroundColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_backgroundColor, desaturate(progressBarColor, 0.5f));
-			progress = attributes.getInt(R.styleable.ApptentiveMaterialDeterminateProgressBar_progress, 50);
+			progressBarColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_apptentive_progressBarColor, Color.BLUE);
+			backgroundColor = attributes.getColor(R.styleable.ApptentiveMaterialDeterminateProgressBar_apptentive_backgroundColor, desaturate(progressBarColor, 0.5f));
+			progress = attributes.getInt(R.styleable.ApptentiveMaterialDeterminateProgressBar_apptentive_progress, 50);
 		} finally {
 			attributes.recycle();
 		}

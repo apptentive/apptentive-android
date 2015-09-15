@@ -344,30 +344,30 @@
     </style>
 
     <style name="ApptentiveAvatarView.Greeting">
-        <item name="borderColor">?attr/apptentive_material_toolbar_foreground</item>
-        <item name="borderWidth">2dp</item>
-        <item name="borderSpace">1.5dp</item>
+        <item name="apptentive_borderColor">?attr/apptentive_material_toolbar_foreground</item>
+        <item name="apptentive_borderWidth">2dp</item>
+        <item name="apptentive_borderSpace">1.5dp</item>
     </style>
 
     <style name="ApptentiveAvatarView.Message">
-        <item name="borderColor">?attr/colorAccent</item>
+        <item name="apptentive_borderColor">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveWidget.NewMessageBadge" parent="android:Widget">
-        <item name="badgeSize">normal</item>
-        <item name="counterColor">@color/apptentive_material_primary_text</item>
+        <item name="apptentive_badgeSize">normal</item>
+        <item name="apptentive_counterColor">@color/apptentive_material_primary_text</item>
     </style>
     <style name="ApptentiveWidget.NewMessageBadge.Mini" parent="ApptentiveWidget.NewMessageBadge">
-        <item name="badgeSize">mini</item>
+        <item name="apptentive_badgeSize">mini</item>
     </style>
 
     <style name="ApptentiveWidget.FloatingActionButton" parent="android:Widget.ImageButton">
-        <item name="floatingActionButtonSize">normal</item>
-        <item name="floatingActionButtonColor">?attr/colorAccent</item>
+        <item name="apptentive_floatingActionButtonSize">normal</item>
+        <item name="apptentive_floatingActionButtonColor">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveWidget.FloatingActionButton.Mini" parent="ApptentiveWidget.FloatingActionButton">
-        <item name="floatingActionButtonSize">mini</item>
+        <item name="apptentive_floatingActionButtonSize">mini</item>
     </style>
 
 
@@ -398,6 +398,6 @@
 
     <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
         <item name="android:layout_marginTop">5dp</item>
-        <item name="progressBarColor">?attr/colorAccent</item>
+        <item name="apptentive_progressBarColor">?attr/colorAccent</item>
     </style>
 </resources>

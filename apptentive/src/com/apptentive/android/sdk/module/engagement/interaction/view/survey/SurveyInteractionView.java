@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -26,6 +27,7 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,9 +42,10 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
 	private static final String KEY_SURVEY_SUBMITTED = "survey_submitted";
+	private static final String KEY_SURVEY_DATA = "survey_data";
 	private boolean surveySubmitted = false;
 
-	private static SurveyState surveyState;
+	private SurveyState surveyState;
 
 	public SurveyInteractionView(SurveyInteraction interaction) {
 		super(interaction);
@@ -56,6 +59,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 		if (savedInstanceState != null) {
 			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
+			surveyState = savedInstanceState.getParcelable(KEY_SURVEY_DATA);
 		}
 
 		if (interaction == null || surveySubmitted) {
@@ -207,6 +211,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(KEY_SURVEY_SUBMITTED, surveySubmitted);
+		outState.putParcelable(KEY_SURVEY_DATA, surveyState);
 	}
 
 	@Override
