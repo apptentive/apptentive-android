@@ -78,7 +78,7 @@ dependencies {
         taskRequest.args.each { taskName ->
             String flavorName = "qa";
             if (taskName.toLowerCase().endsWith(flavorName+"debug") || taskName.toLowerCase().endsWith(flavorName+"release")) {
-                qaCompile 'com.apptentive:apptentive-android:2.0.0-SNAPSHOT@aar'
+                qaCompile 'com.apptentive:apptentive-android:2.0.1-SNAPSHOT@aar'
             }
         }
     }
@@ -88,7 +88,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:7.8.0'
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
     devCompile project(':apptentive')
-    rcCompile 'com.apptentive:apptentive-android:1.7.3@aar'
+    //rcCompile(name:'apptentive-android-2.0.1', ext:'aar')
+    rcCompile 'com.apptentive:apptentive-android:2.0.0@aar'
 }
 
 task run(type: Exec) {
