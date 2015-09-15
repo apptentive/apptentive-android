@@ -995,8 +995,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		long duration = end - start;
 		double average = (double) duration / iterations;
-		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 7d);
+		double limit = 7d;
+		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
+		Log.e(message);
+		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionSelectionPerformance() {
@@ -1026,8 +1028,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		long duration = end - start;
 		double average = (double) duration / iterations;
-		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 7d);
+		double limit = 7d;
+		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
+		Log.e(message);
+		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionStorageAndSelectionPerformance() {
@@ -1059,8 +1063,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		long duration = end - start;
 		double average = (double) duration / iterations;
-		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 50d);
+		double limit = 50d;
+		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
+		Log.e(message);
+		assertTrue(message, average < limit);
 	}
 
 	/* 
@@ -1081,8 +1087,10 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		long duration = end - start;
 		double average = (double) duration / iterations;
-		Log.e("Finished %d iterations in %,dms, average of %.2fms per run.", iterations, duration, average);
-		assertTrue(average < 20d);
+		double limit = 20d;
+		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
+		Log.e(message);
+		assertTrue(message, average < limit);
 	}*/
 
 	public void testSelectionWithInteractionIdUsedInCriteria() {
