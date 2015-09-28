@@ -684,7 +684,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		public LoadAttachedImageTask(int position, OutgoingFileMessageHolder holder) {
 			this.position = position;
-			this.holderRef = new WeakReference<>(holder);
+			this.holderRef = new WeakReference<OutgoingFileMessageHolder>(holder);
 		}
 
 		@Override

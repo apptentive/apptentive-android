@@ -63,7 +63,7 @@ public class MessagePollingWorker {
 		private Configuration conf;
 
 		public MessagePollingThread(Context context) {
-			contextRef = new WeakReference<>(context);
+			contextRef = new WeakReference<Context>(context);
 			conf = Configuration.load(context);
 			backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
 			foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
