@@ -158,7 +158,7 @@ public class MessageManager {
 	}
 
 	public static List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
-		List<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<>();
+		List<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
 		messages.addAll(getMessageStore(context).getAllMessages());
 		return messages;
 	}
@@ -180,7 +180,7 @@ public class MessageManager {
 		Log.d("Fetching messages newer than: " + afterId);
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(appContext, null, afterId, null);
 
-		List<ApptentiveMessage> ret = new ArrayList<>();
+		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		if (!response.isSuccessful()) {
 			return ret;
 		}
@@ -199,7 +199,7 @@ public class MessageManager {
 	}
 
 	public static List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
-		List<ApptentiveMessage> ret = new ArrayList<>();
+		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {
 			JSONArray items = root.getJSONArray("items");
@@ -313,7 +313,7 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			internalNewMessagesListeners.add(new WeakReference<>(newlistener));
+			internalNewMessagesListeners.add(new WeakReference<OnNewIncomingMessagesListener>(newlistener));
 		}
 	}
 
@@ -334,7 +334,7 @@ public class MessageManager {
 	public static void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
 		if (newlistener != null) {
 			clearHostUnreadMessagesListeners();
-			hostUnreadMessagesListeners.add(new WeakReference<>(newlistener));
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
 		}
 	}
 
@@ -349,7 +349,7 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			hostUnreadMessagesListeners.add(new WeakReference<>(newlistener));
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
 		}
 	}
 

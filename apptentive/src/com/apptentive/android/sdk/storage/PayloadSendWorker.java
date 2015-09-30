@@ -70,7 +70,7 @@ public class PayloadSendWorker {
 		private WeakReference<Context> contextRef;
 
 		public PayloadSendThread(Context appContext) {
-			contextRef = new WeakReference<>(appContext);
+			contextRef = new WeakReference<Context>(appContext);
 		}
 
 		public void run() {

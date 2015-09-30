@@ -100,7 +100,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private View profileButton;
 
 	// Data backing of the listview
-	private ArrayList<MessageCenterListItem> messages = new ArrayList<>();
+	private ArrayList<MessageCenterListItem> messages = new ArrayList<MessageCenterListItem>();
 	private MessageAdapter<MessageCenterListItem> messageCenterListAdapter;
 
 	// MesssageCenterView is set to paused when it fails to send message
@@ -409,7 +409,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			}
 
 			updateMessageSentStates(); // Force timestamp recompilation.
-			messageCenterListAdapter = new MessageAdapter<>(viewActivity, messages, this, interaction);
+			messageCenterListAdapter = new MessageAdapter<MessageCenterListItem>(viewActivity, messages, this, interaction);
 			messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
@@ -1094,7 +1094,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		return null;
 	}
 
-	Set<String> dateStampsSeen = new HashSet<>();
+	Set<String> dateStampsSeen = new HashSet<String>();
 
 	public void updateMessageSentStates() {
 		dateStampsSeen.clear();

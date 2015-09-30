@@ -198,7 +198,7 @@ public class ImageUtil {
 		private WeakReference<ApptentiveAvatarView> resultView;
 
 		DownloadImageTask(ApptentiveAvatarView view) {
-			resultView = new WeakReference<>(view);
+			resultView = new WeakReference<ApptentiveAvatarView>(view);
 		}
 
 		protected Bitmap doInBackground(String... urls) {
