@@ -14,6 +14,8 @@ import android.os.Bundle;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
+import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,9 +47,10 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 				default:
 					break;
 			}
-
-			activity.startActivity(intent);
-			success = true;
+			if (Util.canLaunchIntent(activity, intent)) {
+				activity.startActivity(intent);
+				success = true;
+			}
 		} catch (ActivityNotFoundException e) {
 			Log.w("NavigateToLink Error: ", e);
 		} finally {

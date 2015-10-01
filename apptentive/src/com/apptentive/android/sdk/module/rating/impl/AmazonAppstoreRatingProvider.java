@@ -12,6 +12,7 @@ import android.net.Uri;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.Map;
 
@@ -25,7 +26,9 @@ public class AmazonAppstoreRatingProvider implements IRatingProvider {
 		}
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + args.get("package")));
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NEW_TASK);
-		context.startActivity(intent);
+		if (Util.canLaunchIntent(context, intent)) {
+			context.startActivity(intent);
+		}
 	}
 
 	public String activityNotFoundMessage(Context context) {

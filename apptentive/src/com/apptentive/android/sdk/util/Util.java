@@ -9,7 +9,9 @@ package com.apptentive.android.sdk.util;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -511,6 +513,15 @@ public class Util {
 		int green = (int) ((Color.green(color) * (1 - factor) / 255 + factor) * 255);
 		int blue = (int) ((Color.blue(color) * (1 - factor) / 255 + factor) * 255);
 		return Color.argb(Color.alpha(color), red, green, blue);
+	}
+
+	public static boolean canLaunchIntent(Context context, Intent intent) {
+		PackageManager pm = context.getPackageManager();
+		ComponentName cn = intent.resolveActivity(pm);
+		if (cn != null) {
+			return true;
+		}
+		return false;
 	}
 
 }
