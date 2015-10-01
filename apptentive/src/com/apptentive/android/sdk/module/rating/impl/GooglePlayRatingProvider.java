@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
-import com.apptentive.android.sdk.util.Util;
 
 public class GooglePlayRatingProvider implements IRatingProvider {
 	public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
@@ -29,9 +28,7 @@ public class GooglePlayRatingProvider implements IRatingProvider {
 		Log.i("Opening app store for rating with URI: \"%s\"", uri);
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NEW_TASK);
-		if (Util.canLaunchIntent(context, intent)) {
-			context.startActivity(intent);
-		}
+		context.startActivity(intent);
 	}
 
 	public String activityNotFoundMessage(Context ctx) {

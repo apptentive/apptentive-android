@@ -15,7 +15,6 @@ import android.net.Uri;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
-import com.apptentive.android.sdk.util.Util;
 
 /**
  * Implements ratings using the MiKandi market. At the moment this is just a
@@ -32,11 +31,9 @@ public class MiKandiMarketRatingProvider implements IRatingProvider {
 	
 	public void startRating(Context context, Map<String, String> args) throws InsufficientRatingArgumentsException {
 		final Uri launch = Uri.parse("mikandi://link.mikandi.com/app?app_id=" + this.mAppId + "&referrer=apptentive");
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(launch);
-		if (Util.canLaunchIntent(context, intent)) {
-			context.startActivity(intent);
-		}
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(launch);
+		context.startActivity(i);
 	}
 
 	public String activityNotFoundMessage(Context ctx) {
