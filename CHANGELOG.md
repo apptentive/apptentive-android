@@ -1,4 +1,10 @@
-# 2015-08-125skykelsey 1.7.4
+# 2015-10-05 skykelsey 1.7.5
+
+#### Bugs Fixed
+
+* Interactions could be cleared from memory, and not set again until the next time they were fetched.
+
+# 2015-08-12 skykelsey 1.7.4
 
 #### Improvements
 
