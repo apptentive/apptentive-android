@@ -416,7 +416,7 @@ public class MessageManager {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
-				PendingIntent pendingIntent = prepareMessageCenterPendingInent(foreground.getApplicationContext());
+				PendingIntent pendingIntent = prepareMessageCenterPendingIntent(foreground.getApplicationContext());
 				if (pendingIntent != null) {
 					final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
 					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
@@ -438,7 +438,7 @@ public class MessageManager {
 		}
 	}
 
-	private static PendingIntent prepareMessageCenterPendingInent(Context applicationContext) {
+	private static PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
 		Intent intent;
 		if (Apptentive.canShowMessageCenter(applicationContext)) {
 			intent = new Intent();
