@@ -18,6 +18,7 @@ public class Constants {
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
+	public static final String PREF_KEY_API_KEY = "apiKey";
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
 	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
 	public static final String PREF_KEY_PERSON_ID = "personId";
