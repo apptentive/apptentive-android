@@ -26,7 +26,7 @@ public class MessagePollingWorker {
 
   // The following booleans will be accessed by both ui thread and worker thread
 	private static AtomicBoolean appInForeground = new AtomicBoolean(false);
-	private static AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
+	public static AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
 	private static AtomicBoolean threadRunning = new AtomicBoolean(false);
 
 	// A synchronized getter/setter to the static instance of thread object
@@ -83,7 +83,7 @@ public class MessagePollingWorker {
 							return;
 						}
 						long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
-						if (Util.isNetworkConnectionPresent(contextRef.get()) && Apptentive.canShowMessageCenter(contextRef.get())) {
+						if (Apptentive.canShowMessageCenter(contextRef.get())) {
 							Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
 							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 						}
@@ -91,6 +91,7 @@ public class MessagePollingWorker {
 					}
 			} finally {
 				threadRunning.set(false);
+				sPollingThread = null;
 				Log.v("Stopping MessagePollingThread.");
 			}
 		}

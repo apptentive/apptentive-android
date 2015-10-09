@@ -14,6 +14,7 @@ import android.os.Bundle;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -153,6 +154,7 @@ public class ApptentiveInternal {
 			Log.d("Saving Apptentive push notification data.");
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).commit();
+			MessageManager.startMessagePreFetchTask(context);
 			return true;
 		}
 		return false;
