@@ -11,7 +11,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -83,6 +84,7 @@ public class MessageManager {
 							notifyHostUnreadMessagesListeners(msg.arg1);
 							break;
 						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
+							// Notify internal listeners such as Message Center
 							IncomingTextMessage msgToAdd = (IncomingTextMessage) msg.obj;
 							notifyInternalNewMessagesListeners(msgToAdd);
 							break;
@@ -101,13 +103,40 @@ public class MessageManager {
 		return sUIHandler;
 	}
 
+	/*
+	 * Starts an asynctask to pre-fetch messages. This is to be called as part of Push notification action
+	 * when push is received on the device.
+	 */
+	public static void startMessagePreFetchTask(final Context applicationContext) {
+		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
+			@Override
+			protected Void doInBackground(Object... params) {
+				Context context = (Context) params[0];
+				boolean updateMC = (Boolean) params[1];
+				fetchAndStoreMessages(context, updateMC, false);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void v) {
+				sUIHandler = null;
+			}
+		};
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, applicationContext, MessagePollingWorker.messageCenterInForeground.get());
+		} else {
+			task.execute(applicationContext, MessagePollingWorker.messageCenterInForeground.get());
+		}
+	}
+
 	/**
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
 	 * Make sure to run this off the UI Thread, as it blocks on IO.
 	 *
 	 * @return true if messages were returned, else false.
 	 */
-	public static boolean fetchAndStoreMessages(Context appContext, boolean forMessageCenter, boolean showToast) {
+	public static synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
 		if (GlobalInfo.conversationToken == null) {
 			return false;
 		}
@@ -137,6 +166,7 @@ public class MessageManager {
 					}
 					incomingUnreadMessages++;
 					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (IncomingTextMessage) apptentiveMessage);
+					getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
 					msg.sendToTarget();
 				}
 			}
@@ -144,12 +174,14 @@ public class MessageManager {
 			Message msg;
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the forground activity is not alreay message center activity
-				if (!forMessageCenter && showToast) {
+				if (!isMessageCenterForeground && showToast) {
 					msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
+					getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
 					msg.sendToTarget();
 				}
 			}
 			msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
+			getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
 			msg.sendToTarget();
 
 			return incomingUnreadMessages > 0;
@@ -243,9 +275,9 @@ public class MessageManager {
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
-				if (apptentiveMessage instanceof OutgoingFileMessage) {
+				/*if (apptentiveMessage instanceof OutgoingFileMessage) {
 					((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
-				}
+				}*/
 				getMessageStore(context).deleteMessage(apptentiveMessage.getNonce());
 				return;
 			}
@@ -384,37 +416,39 @@ public class MessageManager {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
-				Intent intent;
-
-				if (Apptentive.canShowMessageCenter(foreground.getApplicationContext())) {
-					intent = new Intent();
-					intent.setClass(foreground.getApplicationContext(), ViewActivity.class);
-					intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ENGAGE_INTERNAL_EVENT.name());
-					intent.putExtra(ActivityContent.EVENT_NAME, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
-				} else {
-					intent = MessageCenterInteraction.generateMessageCenterErrorIntent(foreground.getApplicationContext());
-				}
-
-				// TODO: Use a fallback intent if Message Center isn't yet available.
-
-				PendingIntent pendingIntent = PendingIntent.getActivity(foreground.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-				final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
-				final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
-				builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
-						.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-						.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
-						.setContentIntent(pendingIntent)
-						.setFullScreenIntent(pendingIntent, false);
-				foreground.runOnUiThread(new Runnable() {
-																	 public void run() {
-																		 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
-																		 notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
-																		 manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);
+				PendingIntent pendingIntent = prepareMessageCenterPendingIntent(foreground.getApplicationContext());
+				if (pendingIntent != null) {
+					final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
+					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
+					builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
+							.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+							.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
+							.setContentIntent(pendingIntent)
+							.setFullScreenIntent(pendingIntent, false);
+					foreground.runOnUiThread(new Runnable() {
+																		 public void run() {
+																			 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
+																			 notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
+																			 manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);
+																		 }
 																	 }
-																 }
-				);
+					);
+				}
 			}
 		}
 	}
 
+	private static PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
+		Intent intent;
+		if (Apptentive.canShowMessageCenter(applicationContext)) {
+			intent = new Intent();
+			intent.setClass(applicationContext, ViewActivity.class);
+			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ENGAGE_INTERNAL_EVENT.name());
+			intent.putExtra(ActivityContent.EVENT_NAME, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+		} else {
+			intent = MessageCenterInteraction.generateMessageCenterErrorIntent(applicationContext);
+		}
+		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
+				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
+	}
 }
