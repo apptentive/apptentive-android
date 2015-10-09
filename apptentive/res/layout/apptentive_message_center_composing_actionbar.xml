@@ -9,19 +9,19 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:clipToPadding="false"
-             android:paddingLeft="5dp"
-             android:paddingRight="5dp"
+             android:paddingLeft="@dimen/apptentive_message_center_default_margin_small"
+             android:paddingRight="@dimen/apptentive_message_center_default_margin_small"
              android:background="@android:color/transparent">
     <RelativeLayout android:id="@+id/composing_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/apptentive_message_center_outgoing_background"
-                    android:minHeight="@dimen/apptentive_message_center_icon_dimension"
+                    android:minHeight="@dimen/apptentive_message_center_composing_bar_height"
                     android:orientation="horizontal">
 
         <ImageButton android:id="@+id/cancel_composing"
                      android:layout_width="wrap_content"
-                     android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_height="@dimen/apptentive_message_center_composing_bar_height"
                      android:layout_alignParentLeft="true"
                      android:layout_centerVertical="true"
                      android:paddingLeft="@dimen/apptentive_message_center_default_margin_medium"
@@ -43,7 +43,7 @@
                   android:textSize="@dimen/apptentive_text_medium_small"/>
         <ImageButton android:id="@+id/btn_send_message"
                      android:layout_width="wrap_content"
-                     android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_height="@dimen/apptentive_message_center_composing_bar_height"
                      android:layout_alignParentRight="true"
                      android:layout_centerVertical="true"
                      android:paddingLeft="@dimen/apptentive_message_center_default_margin_medium"

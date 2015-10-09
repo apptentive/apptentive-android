@@ -8,17 +8,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
-             android:paddingBottom="1.5dp"
+             android:paddingBottom="2dp"
              android:clipToPadding="false"
              android:background="@android:color/transparent">
 
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginBottom="5dp"
-                      android:layout_marginRight="5dp"
-                      android:layout_marginLeft="5dp"
+                      android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_small"
+                      android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
+                      android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_small"
                       android:orientation="vertical"
-                      android:elevation="1.5dp"
+                      android:elevation="2dp"
                       android:background="@drawable/apptentive_rounded_corner_shape">
             <EditText android:id="@+id/composing_et"
                       android:layout_width="match_parent"

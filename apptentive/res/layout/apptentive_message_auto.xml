@@ -28,7 +28,8 @@
             <TextView android:id="@+id/apptentive_message_auto_body"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      android:paddingTop="8dp"
+                      android:paddingTop="@dimen/apptentive_message_center_default_margin_small"
+                      android:paddingBottom="@dimen/apptentive_message_center_default_margin_small"
                       android:paddingLeft="10dp"
                       android:paddingRight="10dp"
                       android:textColor="?attr/apptentive_material_primary_text"/>

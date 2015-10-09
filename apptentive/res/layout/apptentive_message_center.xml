@@ -21,7 +21,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/apptentive_message_center_header_height"
                         android:background="?attr/colorPrimary"
-                        android:minHeight="@dimen/apptentive_message_center_icon_dimension"
+                        android:minHeight="@dimen/apptentive_message_center_header_height"
                         android:orientation="horizontal">
             <ImageButton android:id="@+id/close"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
@@ -42,7 +42,7 @@
                                                                 android:gravity="center"
                                                                 android:singleLine="true"
                                                                 android:textColor="?attr/apptentive_material_toolbar_foreground"
-                                                                android:textSize="20dp"/>
+                                                                android:textSize="24sp"/>
             <ImageButton android:id="@+id/profile"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
