@@ -13,6 +13,7 @@ build/
 
 # IntelliJ
 *.iws
+*.iml
 .idea/tasks.xml
 .idea/vcs.xml
 .idea/workspace.xml
