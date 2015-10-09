@@ -11,7 +11,7 @@ package com.apptentive.android.sdk.util;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "2.0.1";
+	public static final String APPTENTIVE_SDK_VERSION = "2.1.0";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
