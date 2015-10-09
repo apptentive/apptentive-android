@@ -170,7 +170,7 @@
         <item name="colorPrimary">@color/apptentive_red</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget" />
+    <style name="ApptentiveTheme.Widget"/>
 
     <style name="ApptentiveTheme.Widget.CardView" parent="android:Widget">
         <item name="android:layout_margin">0dp</item>
@@ -219,18 +219,27 @@
         <item name="android:typeface">sans</item>
     </style>
 
+    <style name="ApptentiveTheme.TextViewStyle.Sender">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
+        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
+    </style>
+
     <style name="ApptentiveTheme.TextViewStyle.Status">
         <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">2dp</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
-        <item name="android:textColor">?attr/apptentive_material_disabled_text</item>
+        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.TimeStamp">
+        <item name="android:textStyle">bold</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:gravity">left|bottom</item>
         <item name="android:minHeight">70dp</item>
+        <item name="android:textSize">@dimen/apptentive_text_small</item>
+        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.Toolbar">
@@ -240,11 +249,12 @@
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.Greeting" parent="ApptentiveTheme.TextViewStyle.Toolbar">
-        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingTop">4dp</item>
     </style>
 
     <style name="ApptentiveTheme.TextViewStyle.Greeting.Body">
         <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">5dp</item>
     </style>
 
     <style name="ApptentiveInteractionPositiveButton">
@@ -372,12 +382,11 @@
 
 
     <style name="ApptentiveMessageCenterGreetingContainer">
-        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingTop">36dp</item>
         <item name="android:paddingBottom">0dp</item>
         <item name="android:paddingLeft">@dimen/apptentive_message_center_greeting_side_margin</item>
         <item name="android:paddingRight">0dp</item>
         <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>
     </style>
 

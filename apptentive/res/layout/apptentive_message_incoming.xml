@@ -35,7 +35,7 @@
                     <TextView android:id="@+id/sender_name"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
-                              style="@style/ApptentiveTheme.TextViewStyle"/>
+                              style="@style/ApptentiveTheme.TextViewStyle.Sender"/>
                     <FrameLayout android:id="@+id/body"
                                  android:layout_width="match_parent"
                                  android:layout_height="wrap_content"/>

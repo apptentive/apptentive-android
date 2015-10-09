@@ -10,14 +10,14 @@
              android:layout_height="wrap_content"
              android:clipToPadding="false"
              android:background="@android:color/transparent"
-             android:paddingBottom="5dp">
+             android:paddingBottom="@dimen/apptentive_message_center_default_margin_small">
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/ApptentiveMessageCenterGreetingContainer"
                     android:clipToPadding="false">
         <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
-                                                                                   android:layout_width="88dp"
-                                                                                   android:layout_height="88dp"
+                                                                                   android:layout_width="72dp"
+                                                                                   android:layout_height="72dp"
                                                                                    android:layout_centerVertical="true"
                                                                                    style="?attr/apptentiveAvatarViewGreetingStyle"
                                                                                    android:gravity="center_vertical"

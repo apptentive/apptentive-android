@@ -19,7 +19,7 @@
     <!-- 87% von #000000 -> DE -->
     <color name="primary_text">#DE000000</color>
     <!-- 54% von #000000 -> 8A -->
-    <color name="secondary_text">#8A000000</color>
+    <color name="secondary_text">#AFAFAF</color>
     <!-- 26% von #000000 -> 42 -->
     <color name="hint_text">#42000000</color>
     <!-- 12% von #000000 -> 1F -->
@@ -82,7 +82,7 @@
     <color name="apptentive_red">#DC2636</color>
 
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
-    <color name="apptentive_message_center_incoming_background">#F2F2F2</color>
+    <color name="apptentive_message_center_incoming_background">#F5F5F5</color>
 
 
     <color name="apptentive_message_auto_separator">#BBBBBB</color>
