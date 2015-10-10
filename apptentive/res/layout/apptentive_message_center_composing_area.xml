@@ -36,6 +36,15 @@
                       android:textColorHint="?attr/apptentive_material_hint_text"
                       android:textColor="?attr/apptentive_material_primary_text"
                       android:textSize="@dimen/apptentive_text_medium_small"/>
+            <GridView
+                android:id="@+id/grid"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:horizontalSpacing="@dimen/apptentive_image_grid_space_size"
+                android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
+                android:clipToPadding="false"
+                android:numColumns="@integer/apptentive_image_grid_default_item_number"/>
 
         </LinearLayout>
 </FrameLayout>

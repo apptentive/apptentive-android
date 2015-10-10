@@ -52,6 +52,16 @@
                      android:scaleType="fitCenter"
                      android:src="@drawable/apptentive_ic_action_send"
                      android:tint="?attr/colorAccent"/>
+        <ImageButton android:id="@+id/btn_attach_image"
+                     android:layout_width="wrap_content"
+                     android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_toLeftOf="@+id/btn_send_message"
+                     android:layout_centerVertical="true"
+                     android:background="?android:attr/selectableItemBackground"
+                     android:contentDescription="Attach"
+                     android:scaleType="fitCenter"
+                     android:src="@drawable/apptentive_ic_action_attach"
+                     android:tint="?attr/colorAccent"/>
 
     </RelativeLayout>
 </FrameLayout>
