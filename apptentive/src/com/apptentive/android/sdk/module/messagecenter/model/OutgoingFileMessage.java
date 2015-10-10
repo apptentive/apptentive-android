@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.FileStore;
 import com.apptentive.android.sdk.util.CountingOutputStream;
-import com.apptentive.android.sdk.util.ImageUtil;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 

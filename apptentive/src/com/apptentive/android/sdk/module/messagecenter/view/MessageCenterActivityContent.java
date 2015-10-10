@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,7 +28,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -413,34 +411,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
 		}
-
-		View attachButton = viewActivity.findViewById(R.id.attach);
-		if (attachButton != null && attachButton.getVisibility() == View.VISIBLE) {
-			// Android devices can't take screenshots until Android OS version 4+
-			boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
-			if (canTakeScreenshot) {
-				attachButton.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View view) {
-						EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACH);
-						Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-						Bundle extras = new Bundle();
-						intent.addCategory(Intent.CATEGORY_OPENABLE);
-						if (Build.VERSION.SDK_INT >= 11) {
-							extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
-						}
-						intent.setType("image/*");
-						if (!extras.isEmpty()) {
-							intent.putExtras(extras);
-						}
-						Intent chooserIntent = Intent.createChooser(intent, null);
-						viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
-					}
-				});
-			} else {
-				attachButton.setVisibility(View.GONE);
-			}
-		}
-
 	}
 
 	@Override
@@ -681,20 +651,27 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 	}
 
-	public void sendImage(final Uri uri) {
-		final OutgoingFileMessage message = new OutgoingFileMessage();
-		boolean successful = message.internalCreateStoredImage(viewActivity.getApplicationContext(), uri.toString());
-		if (successful) {
-			message.setRead(true);
-			message.setCustomData(ApptentiveInternal.getAndClearCustomData());
-
-			// Finally, send out the message.
-			MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
-			addNewOutGoingMessageItem(message);
-			messageCenterListAdapter.notifyDataSetChanged();
-		} else {
-			Log.e("Unable to send file.");
-			Toast.makeText(viewActivity, "Unable to send file.", Toast.LENGTH_SHORT).show();
+	public void addImageToComposer(final Uri uri) {
+		// Only update composing view if image is attached successfully
+		if (messageCenterListAdapter.addImagetoComposer(uri)) {
+			messageCenterListAdapter.setForceShowKeyboard(false);
+			messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+			int count = messageCenterListAdapter.getAttachedImageCountInComposingView();
+			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+			if (count >= viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
+				if (barView != null) {
+					barView.attachButton.setEnabled(false);
+					barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+							R.color.apptentive_material_dark_disabled_icon));
+				}
+			} else {
+				if (barView != null && barView.showConfirmation == false) {
+					barView.sendButton.setEnabled(true);
+					barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+							R.color.colorAccent));
+					barView.showConfirmation = true;
+				}
+			}
 		}
 	}
 
@@ -710,7 +687,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
 				@Override
 				public void onAttachmentAccepted() {
-					sendImage(data);
+					addImageToComposer(data);
 				}
 			});
 			dialog.show();
@@ -790,6 +767,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			if (messageText != null) {
 				messageEditText.setText(messageText);
 			}
+		}
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		if (barView != null) {
+			barView.attachButton.setEnabled(true);
+			barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+					R.color.colorAccent));
 		}
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}

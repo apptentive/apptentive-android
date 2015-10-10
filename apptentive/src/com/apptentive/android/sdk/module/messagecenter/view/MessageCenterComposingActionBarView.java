@@ -11,6 +11,8 @@ import android.app.Dialog;
 import android.content.Context;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.DialogFragment;
 
@@ -23,7 +25,10 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
@@ -34,6 +39,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 	public boolean showConfirmation = false;
 	public ImageButton sendButton;
+	public ImageButton attachButton;
 
 	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
 		super(activityContext);
@@ -78,6 +84,30 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		sendButton.setEnabled(false);
 		sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_icon,
 				R.color.apptentive_material_dark_disabled_icon));
+
+		attachButton = (ImageButton) findViewById(R.id.btn_attach_image);
+		// Android devices can't take screenshots until Android OS version 4+
+		boolean canTakeScreenshot = Util.getMajorOsVersion() >= 4;
+		if (canTakeScreenshot) {
+			attachButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View view) {
+					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+					Bundle extras = new Bundle();
+					intent.addCategory(Intent.CATEGORY_OPENABLE);
+					if (Build.VERSION.SDK_INT >= 11) {
+						extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+					}
+					intent.setType("image/*");
+					if (!extras.isEmpty()) {
+						intent.putExtras(extras);
+					}
+					Intent chooserIntent = Intent.createChooser(intent, null);
+					((Activity)activityContext).startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+				}
+			});
+		} else {
+			attachButton.setVisibility(GONE);
+		}
 	}
 
 	public static class CloseConfirmationDialog extends DialogFragment {

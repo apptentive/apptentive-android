@@ -13,6 +13,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.view.MotionEvent;
@@ -47,7 +48,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileM
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.util.AnimationUtil;
-import com.apptentive.android.sdk.util.ImageUtil;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -97,6 +98,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	private int composingViewIndex = INVALID_POSITION;
 	private MessageCenterComposingView composingView;
 	private EditText composingEditText;
+	private boolean updateComposingViewImageBand = true;
 
 	private MessageCenterComposingActionBarView composingActionBarView;
 
@@ -117,6 +119,9 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
+
+	// Array of paths of selected images
+	private ArrayList<Uri> imageToAttchList = new ArrayList<Uri>();
 
 	private OnComposingActionListener composingActionListener;
 
@@ -237,7 +242,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener, imageToAttchList);
 						setupComposingView(position);
 					}
 					view = composingView;
@@ -279,8 +284,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			 */
 			if (type == TYPE_COMPOSING_AREA) {
 				if (composingView == null) {
+					updateComposingViewImageBand = true;
 					composingView = (MessageCenterComposingView) convertView;
 					setupComposingView(position);
+				} else if (updateComposingViewImageBand) {
+					composingView.updateImageBand(imageToAttchList);
+					updateComposingViewImageBand = false;
 				}
 				view = composingView;
 			} else if (type == TYPE_WHOCARD) {
@@ -426,6 +435,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	private void setupComposingView(final int position) {
+		composingView.updateImageBand(imageToAttchList);
 		composingEditText = composingView.getEditText();
 		composingViewIndex = position;
 		composingEditText.setOnTouchListener(new View.OnTouchListener() {
@@ -451,6 +461,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				if (forceShowKeyboard) {
 					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
 				}
+				if (updateComposingViewImageBand) {
+					composingView.updateImageBand(imageToAttchList);
+					updateComposingViewImageBand = false;
+				}
 			}
 
 			@Override
@@ -470,6 +484,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		composingView = null;
 		composingViewIndex = INVALID_POSITION;
 		showComposingBarAnimation = true;
+		updateComposingViewImageBand = true;
+		imageToAttchList.clear();
 	}
 
 	private void setupWhoCardView(final int position) {
@@ -554,6 +570,23 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	public void setForceShowKeyboard(boolean bVal) {
 		forceShowKeyboard = bVal;
+	}
+
+	public boolean addImagetoComposer(Uri newUri) {
+		for (Uri uri : imageToAttchList) {
+			if (uri.equals(newUri)) {
+				updateComposingViewImageBand = false;
+				return false;
+			}
+		}
+		imageToAttchList.add(newUri);
+		updateComposingViewImageBand = true;
+		return true;
+	}
+
+
+	public int getAttachedImageCountInComposingView() {
+		return imageToAttchList.size();
 	}
 
 	protected String createStatus(Double seconds, boolean showSent) {

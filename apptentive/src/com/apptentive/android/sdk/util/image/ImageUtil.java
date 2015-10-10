@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.util;
+package com.apptentive.android.sdk.util.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,6 +16,7 @@ import android.os.Build;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
+import com.apptentive.android.sdk.util.Util;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

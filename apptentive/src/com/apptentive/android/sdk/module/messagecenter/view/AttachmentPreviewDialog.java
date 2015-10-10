@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.rating.view.ApptentiveBaseDialog;
-import com.apptentive.android.sdk.util.ImageUtil;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.FileNotFoundException;
