@@ -42,11 +42,12 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	private ImageGridViewAdapter.Callback imageBandCallback;
 	private ImageGridViewAdapter imageBandAdapter;
 	private int imageBandViewWidth, imageBandViewHeight;
+	List<ImageItem> images = new ArrayList<ImageItem>();
+	private int numberofAttachments;
 
-	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener,
-																		final List<Uri> imagesToAttach) {
+	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
 		super(activityContext);
-		final int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_item_number);
+
 		LayoutInflater inflater = LayoutInflater.from(activityContext);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
@@ -76,6 +77,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 		imageBandView = (GridView) parentView.findViewById(R.id.grid);
 		imageBandView.setAdapter(imageBandAdapter);
+		final int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_item_number);
 		imageBandView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
 			@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -105,34 +107,74 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
 				ImageItem image = (ImageItem) adapterView.getAdapter().getItem(i);
-				//selectImageFromGrid(image, mode);
-
+				listener.onShowImagePreView(i, image.uri);
 			}
 		});
-		updateImageBand(imagesToAttach);
+		// Initialize image attachments band with empty data
+		clearImageAttachmentBand();
 	}
 
 	public EditText getEditText() {
 		return et;
 	}
 
-	public void updateImageBand(final List<Uri> imagesToAttach) {
-		if (imagesToAttach != null && imagesToAttach.size() > 0) {
-			imageBandView.setVisibility(View.VISIBLE);
-		} else {
-			imageBandView.setVisibility(View.GONE);
-		}
-		List<ImageItem> images = new ArrayList<ImageItem>();
+	/**
+	 * Remove all images from attchment band.
+	 */
+	public void clearImageAttachmentBand() {
 		final int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_item_number);
-		int imageAttachmentNum = (imagesToAttach != null) ? imagesToAttach.size() : 0;
+
+		imageBandView.setVisibility(View.GONE);
+		images.clear();
+		numberofAttachments = 0;
 		for (int i = 0; i < desiredNumCount; ++i) {
-			if (i < imageAttachmentNum) {
-				images.add(new ImageItem(imagesToAttach.get(i), "", 0));
-			} else {
-				images.add(new ImageItem(null, "", 0));
-			}
+			images.add(new ImageItem(null, "", 0));
 		}
 		imageBandAdapter.setData(images);
-		imageBandAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * Add new images to attchment band.
+	 * @param position the postion index of the first image to add
+	 * @param imagesToAttach an array of new images to add
+	 */
+	public void addImagesToImageAttachmentBand(final int position, final List<Uri> imagesToAttach) {
+		final int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_item_number);
+
+		if (imagesToAttach == null || imagesToAttach.size() == 0) {
+			return;
+		}
+
+		final int numOfImagesToAdd = Math.min(desiredNumCount - position, imagesToAttach.size());
+
+		if (numOfImagesToAdd > 0 && numberofAttachments == 0) {
+			// About to add image to an empty attachment band
+			imageBandView.setVisibility(View.VISIBLE);
+		}
+
+		for (int i = 0; i < numOfImagesToAdd; ++i) {
+			images.set(position + i, new ImageItem(imagesToAttach.get(i), "", 0));
+			numberofAttachments++;
+		}
+
+		if (numOfImagesToAdd > 0) {
+			imageBandAdapter.setData(images);
+		}
+	}
+
+	/**
+	 * Remove an image from attchment band.
+	 * @param position the postion index of the image to be removed
+	 */
+	public void removeImageFromImageAttachmentBand(final int position) {
+		images.remove(position);
+		images.add(new ImageItem(null, "", 0));
+		numberofAttachments--;
+		if (numberofAttachments == 0) {
+			// Hide attachment band after last attachment is removed
+			imageBandView.setVisibility(View.GONE);
+			return;
+		}
+		imageBandAdapter.setData(images);
 	}
 }

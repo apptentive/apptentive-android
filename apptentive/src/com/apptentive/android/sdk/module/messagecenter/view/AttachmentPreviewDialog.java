@@ -29,7 +29,7 @@ import java.io.InputStream;
  */
 public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 
-	private OnAttachmentAcceptedListener listener;
+	private OnActionButtonListener listener;
 
 	public AttachmentPreviewDialog(Context context) {
 		super(context, R.layout.apptentive_message_center_attachment_preview);
@@ -40,19 +40,18 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 		super.onCreate(savedInstanceState);
 
 		ApptentiveDialogButton no = (ApptentiveDialogButton) findViewById(R.id.no);
-		no.setOnClickListener(new View.OnClickListener() {
+		ApptentiveDialogButton yes = (ApptentiveDialogButton) findViewById(R.id.yes);
+		yes.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				dismiss();
 			}
 		});
-
-		ApptentiveDialogButton yes = (ApptentiveDialogButton) findViewById(R.id.yes);
-		yes.setOnClickListener(new View.OnClickListener() {
+		no.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (AttachmentPreviewDialog.this.listener != null) {
-					listener.onAttachmentAccepted();
+					listener.onTakeAction();
 					dismiss();
 				}
 			}
@@ -76,7 +75,8 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 				cursor.moveToFirst();
 				imageOrientation = cursor.getInt(0);
 			}
-			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 200, 300, null, imageOrientation);
+			//final int dialogWidth =
+			thumbnail = ImageUtil.createLightweightScaledBitmapFromStream(is, 320, 300, null, imageOrientation);
 
 		} catch (FileNotFoundException e) {
 			// TODO: Error toast?
@@ -100,11 +100,11 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 	}
 
 
-	public void setOnAttachmentAcceptedListener(OnAttachmentAcceptedListener listener) {
+	public void setOnAttachmentAcceptedListener(OnActionButtonListener listener) {
 		this.listener = listener;
 	}
 
-	public interface OnAttachmentAcceptedListener {
-		public void onAttachmentAccepted();
+	public interface OnActionButtonListener {
+		void onTakeAction();
 	}
 }

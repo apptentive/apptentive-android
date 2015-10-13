@@ -251,6 +251,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 					// set default indicator
 					if (data.uri == null) {
 						indicator.setVisibility(View.GONE);
+						image.setImageResource(R.drawable.apptentive_empty_image_background);
 					} else {
 						indicator.setImageResource(defaultImageIndicator);
 					}
@@ -260,13 +261,13 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				indicator.setVisibility(View.GONE);
 			}
 
-			if (itemSize > 0) {
+			if (itemSize > 0 && data.uri != null) {
 				// display image
 				Picasso.with(activityContext)
 						.load(data.uri)
-						.placeholder((data.uri == null) ? R.drawable.apptentive_empty_image_background : R.drawable.apptentive_ic_image_default_item)
+						.placeholder(R.drawable.apptentive_ic_image_default_item)
 						.resize(itemSize, itemSize)
-						.centerCrop()
+						.centerInside()
 						.into(image);
 			}
 		}
