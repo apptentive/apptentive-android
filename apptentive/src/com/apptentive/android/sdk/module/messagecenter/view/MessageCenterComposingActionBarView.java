@@ -25,8 +25,6 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -102,7 +100,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 						intent.putExtras(extras);
 					}
 					Intent chooserIntent = Intent.createChooser(intent, null);
-					((Activity)activityContext).startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+					((Activity)activityContext).startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
 				}
 			});
 		} else {

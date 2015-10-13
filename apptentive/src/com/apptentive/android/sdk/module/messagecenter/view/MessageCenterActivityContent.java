@@ -60,6 +60,7 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -112,6 +113,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private MessageCenterComposingItem actionBarItem;
 	private MessageCenterComposingItem whoCardItem;
 	private AutomatedMessage contextualMessage;
+
+	private ArrayList<Uri> imageAttachmentstList = new ArrayList<Uri>();
+
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment,
 	 * , rotate device, attaches a file, etc.
@@ -464,8 +468,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
-				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
-					showAttachmentDialog(viewActivity, data.getData());
+				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
+					addImageToComposer(Arrays.asList(data.getData()));
+					break;
+				case Constants.REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER:
+					ArrayList<Uri> selectedImages = (ArrayList<Uri>) data.getSerializableExtra(Constants.RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER);
+					addImageToComposer(selectedImages);
 					break;
 				default:
 					break;
@@ -651,31 +659,64 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 	}
 
-	public void addImageToComposer(final Uri uri) {
+	public void addImageToComposer(final List<Uri> uris) {
+		int position = imageAttachmentstList.size();
+		if (uris != null && uris.size() > 0) {
+			imageAttachmentstList.addAll(uris);
+		}
 		// Only update composing view if image is attached successfully
-		if (messageCenterListAdapter.addImagetoComposer(uri)) {
-			messageCenterListAdapter.setForceShowKeyboard(false);
-			messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
-			int count = messageCenterListAdapter.getAttachedImageCountInComposingView();
-			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (count >= viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
-				if (barView != null) {
-					barView.attachButton.setEnabled(false);
-					barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
-							R.color.apptentive_material_dark_disabled_icon));
-				}
-			} else {
-				if (barView != null && barView.showConfirmation == false) {
-					barView.sendButton.setEnabled(true);
-					barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-							R.color.colorAccent));
-					barView.showConfirmation = true;
-				}
+		messageCenterListAdapter.addImagestoComposer(position, uris);
+		messageCenterListAdapter.setForceShowKeyboard(false);
+		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+		int count = imageAttachmentstList.size();
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		if (count >= viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
+			if (barView != null) {
+				barView.attachButton.setEnabled(false);
+				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+						R.color.apptentive_material_dark_disabled_icon));
+			}
+		} else {
+			if (barView != null && barView.showConfirmation == false) {
+				barView.sendButton.setEnabled(true);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+						R.color.colorAccent));
+				barView.showConfirmation = true;
 			}
 		}
 	}
 
-	public void showAttachmentDialog(Context context, final Uri data) {
+	public void removeImageFromComposer(final int position) {
+		imageAttachmentstList.remove(position);
+		messageCenterListAdapter.removeImageFromComposer(position);
+		int count = imageAttachmentstList.size();
+		// Show keyboard if all attachments have been removed
+		messageCenterListAdapter.setForceShowKeyboard(count == 0);
+		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		if (count < viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
+			if (barView != null && !barView.sendButton.isEnabled()) {
+				barView.sendButton.setEnabled(true);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+						R.color.colorAccent));
+			}
+		}
+		// No attachment and no pending composing text, do not show close confirmation
+		if (count == 0) {
+			if (barView != null) {
+				barView.attachButton.setEnabled(true);
+				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+						R.color.colorAccent));
+			}
+			Editable content = getPendingComposingContent();
+			final String messageText = (content != null) ? content.toString().trim() : "";
+			barView.showConfirmation = !(messageText.isEmpty());
+		}
+
+	}
+
+	public void showAttachmentDialog(Context context, final Uri data,
+																	 final AttachmentPreviewDialog.OnActionButtonListener listener) {
 		if (data == null) {
 			Log.d("No attachment found.");
 			return;
@@ -684,12 +725,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		try {
 			AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
 			dialog.setImage(data);
-			dialog.setOnAttachmentAcceptedListener(new AttachmentPreviewDialog.OnAttachmentAcceptedListener() {
-				@Override
-				public void onAttachmentAccepted() {
-					addImageToComposer(data);
-				}
-			});
+			if (listener != null) {
+				dialog.setOnAttachmentAcceptedListener(listener);
+			}
 			dialog.show();
 		} catch (Exception e) {
 			Log.e("Error loading attachment preview.", e);
@@ -734,6 +772,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void clearComposingUi(Animator.AnimatorListener al,
 															 ValueAnimator.AnimatorUpdateListener vl, long delay) {
 		if (composingItem != null) {
+			imageAttachmentstList.clear();
 			if (al != null) {
 				deleteItemWithAnimation(messageCenterListAdapter.getComposingActionBarView(), null, null, delay);
 				deleteItemWithAnimation(messageCenterListAdapter.getComposingAreaView(), al, vl, delay);
@@ -833,7 +872,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		JSONObject data = new JSONObject();
 		try {
-			int bodyLength = getPendingComposingContent().toString().trim().length();
+			Editable content = getPendingComposingContent();
+			int bodyLength = (content != null) ? content.toString().trim().length() : 0;
 			data.put("body_length", bodyLength);
 		} catch (JSONException e) {
 			//
@@ -888,7 +928,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			MessageManager.sendMessage(viewActivity.getApplicationContext(), contextualMessage);
 			contextualMessage = null;
 		}
-		final String messageText = getPendingComposingContent().toString().trim();
+		Editable content = getPendingComposingContent();
+		final String messageText = (content != null) ? content.toString().trim() : "";
+
 		// Close all composing UI
 		clearComposingUi(new Animator.AnimatorListener() {
 
@@ -1196,4 +1238,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messages.add(0, interaction.getGreeting());
 	}
 
+	@Override
+	public void onShowImagePreView(final int position, final Uri image) {
+		showAttachmentDialog(viewActivity, image,
+				new AttachmentPreviewDialog.OnActionButtonListener() {
+					@Override
+					public void onTakeAction() {
+						removeImageFromComposer(position);
+					}
+				});
+	}
 }

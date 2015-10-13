@@ -14,7 +14,9 @@ public class Constants {
 	public static final String APPTENTIVE_SDK_VERSION = "2.1.0";
 
 
-	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
+	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 1000;
+	public static final int REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER = 2000;
+	public static final String RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER = "select_result";
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
