@@ -695,19 +695,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
 		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 		if (count < viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
-			if (barView != null && !barView.sendButton.isEnabled()) {
-				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+			if (barView != null && !barView.attachButton.isEnabled()) {
+				barView.attachButton.setEnabled(true);
+				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
 						R.color.colorAccent));
 			}
 		}
 		// No attachment and no pending composing text, do not show close confirmation
 		if (count == 0) {
-			if (barView != null) {
-				barView.attachButton.setEnabled(true);
-				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-						R.color.colorAccent));
-			}
 			Editable content = getPendingComposingContent();
 			final String messageText = (content != null) ? content.toString().trim() : "";
 			barView.showConfirmation = !(messageText.isEmpty());
