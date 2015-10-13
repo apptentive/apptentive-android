@@ -38,24 +38,24 @@ android {
     productFlavors {
         dev {
             applicationId "com.apptentive.android.dev"
-            manifestPlaceholders = [APPTENTIVE_API_KEY            : APPTENTIVE_API_KEY_DEV,
-                                    APPTENTIVE_USE_STAGING_SERVER : "false",
+            manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_DEV,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveSdkOverride",
-                                    APPTENTIVE_APP_NAME           : "Apptentive Dev"];
+                                    APPTENTIVE_APP_NAME: "Apptentive Dev"];
         }
         qa {
             applicationId "com.apptentive.android.qa"
-            manifestPlaceholders = [APPTENTIVE_API_KEY            : APPTENTIVE_API_KEY_QA,
-                                    APPTENTIVE_USE_STAGING_SERVER : "false",
+            manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_QA,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveTheme",
-                                    APPTENTIVE_APP_NAME           : "Apptentive QA"];
+                                    APPTENTIVE_APP_NAME: "Apptentive QA"];
         }
         rc {
             applicationId "com.apptentive.android.rc"
-            manifestPlaceholders = [APPTENTIVE_API_KEY            : APPTENTIVE_API_KEY_RC,
-                                    APPTENTIVE_USE_STAGING_SERVER : "false",
+            manifestPlaceholders = [APPTENTIVE_API_KEY: APPTENTIVE_API_KEY_RC,
+                                    APPTENTIVE_USE_STAGING_SERVER: "false",
                                     APPTENTIVE_VIEW_ACTIVITY_THEME: "@style/ApptentiveSdkOverride",
-                                    APPTENTIVE_APP_NAME           : "Apptentive RC"];
+                                    APPTENTIVE_APP_NAME: "Apptentive RC"];
         }
     }
 
@@ -77,20 +77,19 @@ dependencies {
     gradle.startParameter.taskRequests.each { taskRequest ->
         taskRequest.args.each { taskName ->
             String flavorName = "qa";
-            if (taskName.toLowerCase().endsWith(flavorName + "debug") || taskName.toLowerCase().endsWith(flavorName + "release")) {
+            if (taskName.toLowerCase().endsWith(flavorName+"debug") || taskName.toLowerCase().endsWith(flavorName+"release")) {
                 qaCompile 'com.apptentive:apptentive-android:2.0.1-SNAPSHOT@aar'
             }
         }
     }
-    devCompile project(':apptentive')
-    //rcCompile(name:'apptentive-android-2.0.1', ext:'aar')
-    rcCompile 'com.apptentive:apptentive-android:2.0.0@aar'
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:cardview-v7:23.0.1'
-    compile 'com.google.android.gms:play-services-gcm:8.1.0'
+    compile 'com.google.android.gms:play-services-gcm:7.8.0'
     compile 'net.hockeyapp.android:HockeySDK:3.5.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    devCompile project(':apptentive')
+    //rcCompile(name:'apptentive-android-2.0.1', ext:'aar')
+    rcCompile 'com.apptentive:apptentive-android:2.0.0@aar'
 }
 
 task run(type: Exec) {
