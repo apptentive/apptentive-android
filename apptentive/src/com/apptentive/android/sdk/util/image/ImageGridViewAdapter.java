@@ -243,6 +243,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 			if (showImageIndicator) {
 				indicator.setVisibility(View.VISIBLE);
+				image.setVisibility(View.VISIBLE);
 				if (selectedImages.contains(data)) {
 					// set as selected
 					indicator.setImageResource(R.drawable.apptentive_ic_image_picker_selected);
@@ -251,7 +252,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 					// set default indicator
 					if (data.uri == null) {
 						indicator.setVisibility(View.GONE);
-						image.setImageResource(R.drawable.apptentive_empty_image_background);
+						image.setVisibility(View.GONE);
 					} else {
 						indicator.setImageResource(defaultImageIndicator);
 					}
@@ -259,6 +260,11 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			} else {
 				indicator.setVisibility(View.GONE);
+				if (data.uri == null) {
+					image.setVisibility(View.GONE);
+				} else {
+					image.setVisibility(View.VISIBLE);
+				}
 			}
 
 			if (itemSize > 0 && data.uri != null) {

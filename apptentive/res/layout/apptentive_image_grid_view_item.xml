@@ -6,29 +6,32 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent" android:layout_height="match_parent">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/apptentive_empty_image_background"
+             android:layout_margin="2dp">
 
     <ImageView
         android:id="@+id/image"
-        android:scaleType="centerInside"
-        android:src="@drawable/apptentive_empty_image_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerInside"
+        android:src="@null"/>
 
     <View
-        android:visibility="gone"
         android:id="@+id/mask"
-        android:background="#88000000"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#88000000"/>
 
     <ImageView
         android:id="@+id/indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="top|right"
         android:layout_marginTop="5.5dp"
         android:layout_marginRight="5.5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:src="@drawable/apptentive_ic_image_picker_unselected"/>
 
 </FrameLayout>
