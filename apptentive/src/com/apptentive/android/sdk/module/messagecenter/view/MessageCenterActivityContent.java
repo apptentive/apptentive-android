@@ -661,22 +661,40 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	public void addImageToComposer(final List<Uri> uris) {
 		int position = imageAttachmentstList.size();
+		ArrayList<Uri> uniqueUris = new ArrayList<Uri>();
+		// only add new images, and filter out duplicates
 		if (uris != null && uris.size() > 0) {
-			imageAttachmentstList.addAll(uris);
-		}
-		// Only update composing view if image is attached successfully
-		messageCenterListAdapter.addImagestoComposer(position, uris);
-		messageCenterListAdapter.setForceShowKeyboard(false);
-		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
-		int count = imageAttachmentstList.size();
-		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-		if (count >= viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
-			if (barView != null) {
-				barView.attachButton.setEnabled(false);
-				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
-						R.color.apptentive_material_dark_disabled_icon));
+			for (Uri newUri : uris) {
+				boolean bDupFound = false;
+				for (Uri existingUri : imageAttachmentstList) {
+					if (newUri.equals(existingUri)) {
+						bDupFound = true;
+						break;
+					}
+				}
+				if (bDupFound) {
+					continue;
+				} else {
+					uniqueUris.add(newUri);
+				}
 			}
-		} else {
+		}
+		if (uniqueUris.size() == 0) {
+			return;
+		}
+		imageAttachmentstList.addAll(uniqueUris);
+		View v = messageCenterListView.getChildAt(0);
+		int top = (v == null) ? 0 : v.getTop();
+		// Only update composing view if image is attached successfully
+		messageCenterListAdapter.addImagestoComposer(position, uniqueUris);
+		messageCenterListAdapter.setForceShowKeyboard(false);
+		int firstIndex = messageCenterListView.getFirstVisiblePosition();
+
+		messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+				firstIndex, top));
+
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		{
 			if (barView != null && barView.showConfirmation == false) {
 				barView.sendButton.setEnabled(true);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
@@ -692,15 +710,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		int count = imageAttachmentstList.size();
 		// Show keyboard if all attachments have been removed
 		messageCenterListAdapter.setForceShowKeyboard(count == 0);
-		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-		if (count < viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_item_number)) {
-			if (barView != null && !barView.attachButton.isEnabled()) {
-				barView.attachButton.setEnabled(true);
-				barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-						R.color.colorAccent));
-			}
-		}
+
 		// No attachment and no pending composing text, do not show close confirmation
 		if (count == 0) {
 			Editable content = getPendingComposingContent();
