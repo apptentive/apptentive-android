@@ -1,6 +1,18 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+configurations {
+    deployerJars
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    deployerJars "org.springframework.build:aws-maven:5.0.0.RELEASE"
+}
+
 def isReleaseBuild() {
     return hasProperty("MAVEN_RELEASE_BUILD") && MAVEN_RELEASE_BUILD == "true";
 }
@@ -10,27 +22,34 @@ def getVersionName() {
 }
 
 def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : "s3://apptentive-downloads/maven/"
 }
 
 def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+    if (isReleaseBuild()) {
+        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+    } else {
+        return hasProperty('AWS_ACCESS_KEY_ID') ? AWS_ACCESS_KEY_ID : ""
+    }
 }
 
 def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+    if (isReleaseBuild()) {
+        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+    } else {
+        return hasProperty('AWS_SECRET_ACCESS_KEY') ? AWS_SECRET_ACCESS_KEY : ""
+    }
 }
 
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
+                configuration = configurations.deployerJars
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.groupId = GROUP
