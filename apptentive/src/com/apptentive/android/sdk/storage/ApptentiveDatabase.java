@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
@@ -27,7 +28,7 @@ import java.util.List;
 public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore, FileStore {
 
 	// COMMON
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
@@ -77,7 +78,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + ApptentiveMessage.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
 	private static final String QUERY_MESSAGE_UNREAD = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_READ + " = " + FALSE + " AND " + MESSAGE_KEY_ID + " NOTNULL";
 
-
 	// FileStore
 	private static final String TABLE_FILESTORE = "file_store";
 	private static final String FILESTORE_KEY_ID = "id";                         // 0
@@ -95,6 +95,30 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
 					");";
 
+	/* Compund Message FileStore:
+	 * For compound message stored in TABLE_MESSAGE, each associated file will add a row to this table
+	 * uing the message's "nonce" key
+	 */
+	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table name
+	private static final String COMPOUND_FILESTORE_KEY_MESSAGE_NONCE = "nonce"; // message nonce of the compound message
+	private static final String COMPOUND_FILESTORE_KEY_MIME_TYPE = "mime_type"; // mine type of the file
+	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uri of source file (empty for received file)
+	private static final String COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH = "local_path"; // path to the local cached version
+	private static final String COMPOUND_FILESTORE_KEY_REMOTE_URL = "apptentive_url";  // original server url of received file (empty for sent file)
+	// Create the initial table. Use nonce and local cache path as primary key because both sent/received files will have a local cached copy
+	private static final String TABLE_CREATE_COMPOUND_FILESTORE =
+			"CREATE TABLE " + TABLE_COMPOUND_MESSSAGE_FILESTORE +
+					" (" +
+					COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " TEXT, " +
+					COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + " TEXT, " +
+					COMPOUND_FILESTORE_KEY_MIME_TYPE + " TEXT, " +
+					COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
+					COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
+					"PRIMARY KEY (" + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + ", " + COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + ")" +
+					");";
+
+	// Query all files associated with a given compound message nonce id
+	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_CREATE_COMPOUND_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
 
 	private static ApptentiveDatabase instance;
 
@@ -139,7 +163,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		db.execSQL(TABLE_CREATE_PAYLOAD);
 		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
-
+		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
 	}
 
 	/**
@@ -151,7 +175,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		Log.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
-			case 2:
+				if (newVersion == 2) {
+					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+				}
 		}
 	}
 
@@ -443,6 +469,74 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			Log.d("Deleted %d stored files.", deleted);
 		} finally {
 			ensureClosed(db);
+		}
+	}
+
+	public synchronized void deleteAssociatedFiles(String messageNonce) {
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			int deleted = db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+			Log.d("Deleted %d stored files.", deleted);
+		} finally {
+			ensureClosed(db);
+		}
+	}
+
+	public synchronized List<StoredFile> getAssociatedFiles(String nonce) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery(QUERY_MESSAGE_FILES_GET_BY_NONCE, new String[]{nonce});
+			StoredFile ret = null;
+			if (cursor.moveToFirst()) {
+				do {
+					ret = new StoredFile();
+					ret.setId(nonce);
+					ret.setMimeType(cursor.getString(1));
+					ret.setLocalFilePath(cursor.getString(2));
+					ret.setOriginalUri(cursor.getString(3));
+					ret.setApptentiveUri(cursor.getString(4));
+					associatedFiles.add(ret);
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
+		}
+		return associatedFiles;
+	}
+
+	/*
+	 * Add a list of associated files to compound message file storage
+	 * Caller of this method should ensure all associated files have the same message nonce
+	 * @param associatedFiles list of associated files
+	 * @return true if succeed
+	 */
+	public synchronized boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
+		String messageNonce = associatedFiles.get(0).getId();
+		SQLiteDatabase db = null;
+		long ret = -1;
+		try {
+
+			db = getWritableDatabase();
+			// Always delete existing rows with the same nonce to ensure add/update both work
+			db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+
+      for (StoredFile file: associatedFiles) {
+				ContentValues values = new ContentValues();
+				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());
+				values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, file.getMimeType());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getOriginalUri());
+				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
+				ret = db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
+			}
+		} finally {
+			ensureClosed(db);
+			return ret != -1;
 		}
 	}
 

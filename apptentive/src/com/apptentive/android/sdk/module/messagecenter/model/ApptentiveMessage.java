@@ -244,7 +244,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		TextMessage,
 		FileMessage,
 		AutomatedMessage,
-
+    CompundMessage,
 		// Unknown
 		unknown;
 

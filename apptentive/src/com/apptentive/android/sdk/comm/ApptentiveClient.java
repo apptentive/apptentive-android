@@ -7,15 +7,20 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.ExifInterface;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -31,6 +36,7 @@ import java.util.zip.GZIPInputStream;
 public class ApptentiveClient {
 
 	private static final int API_VERSION = 3;
+	private static final int MAX_SENT_IMAGE_EDGE = 1024;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -85,6 +91,14 @@ public class ApptentiveClient {
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
 				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
+			case CompundMessage:
+				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
+				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
+				// Send as paint text message when there is no associated files
+				if (associatedFiles == null || associatedFiles.size() == 0) {
+					return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
+				}
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
 			case unknown:
 				break;
 		}
@@ -366,6 +380,162 @@ public class ApptentiveClient {
 			ByteArrayOutputStream nbaos = null;
 			try {
 				Log.d("Sending file: " + storedFile.getLocalFilePath());
+				nis = connection.getInputStream();
+				nbaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while (nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
+					nbaos.write(eBuf, 0, eRead);
+				}
+				ret.setContent(nbaos.toString());
+			} finally {
+				Util.ensureClosed(nis);
+				Util.ensureClosed(nbaos);
+			}
+
+			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
+			Log.v(ret.getContent());
+		} catch (FileNotFoundException e) {
+			Log.e("Error getting file to upload.", e);
+		} catch (MalformedURLException e) {
+			Log.e("Error constructing url for file upload.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
+		} catch (IOException e) {
+			Log.e("Error executing file upload.", e);
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
+			}
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(os);
+		}
+		return ret;
+	}
+
+	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
+		uri = getEndpointBase(appContext) + uri;
+		Log.d("Performing multipart request to %s", uri);
+
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+		if (!Util.isNetworkConnectionPresent(appContext)) {
+			Log.d("Network unavailable.");
+			return ret;
+		}
+
+		String lineEnd = "\r\n";
+		String twoHyphens = "--";
+		String boundary = UUID.randomUUID().toString();
+
+		HttpURLConnection connection = null;
+		DataOutputStream os = null;
+		InputStream is = null;
+
+		try {
+
+			// Set up the request.
+			URL url = new URL(uri);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setUseCaches(false);
+			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
+			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setRequestMethod("POST");
+
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			connection.setRequestProperty("Accept", "application/json");
+			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
+			connection.setRequestProperty("User-Agent", getUserAgentString());
+
+			// Open an output stream.
+			os = new DataOutputStream(connection.getOutputStream());
+			os.writeBytes(twoHyphens + boundary + lineEnd);
+
+			// Write text message
+			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			os.writeBytes("Content-Type: text/plain;charset=UTF-8" + lineEnd);
+			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
+			os.writeBytes(lineEnd);
+			os.writeBytes(postBody + lineEnd);
+			os.writeBytes(twoHyphens + boundary + lineEnd);
+
+			// Send associated files
+			for (StoredFile storedFile : associatedFiles) {
+				StringBuilder requestText = new StringBuilder();
+				requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
+				requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+				requestText.append(lineEnd);
+
+				// Write file attributes
+				os.writeBytes(requestText.toString());
+
+				InputStream bis = null;
+				FileInputStream fis = null;
+				ByteArrayInputStream byteInputStream = null;
+				try {
+					String imagePathString = storedFile.getLocalFilePath();
+					File imageFile = new File(imagePathString);
+
+					int imageOrientation = 0;
+					try {
+						ExifInterface exif = new ExifInterface(imagePathString);
+						imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+					} catch (IOException e) {
+
+					}
+
+					fis = new FileInputStream(imageFile);
+					bis = new BufferedInputStream(fis);
+					// Scale the bitmap smaller
+					Bitmap smaller = ImageUtil.createScaledBitmapFromStream(bis, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+					// Compress the size
+					ByteArrayOutputStream bos = new ByteArrayOutputStream();
+					smaller.compress(Bitmap.CompressFormat.JPEG, 95, bos);
+					byte[] bitmapdata = bos.toByteArray();
+
+					byteInputStream = new ByteArrayInputStream(bitmapdata);
+
+					int bytesAvailable = byteInputStream.available();
+					int maxBufferSize = 512 * 512;
+					int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+					byte[] buffer = new byte[bufferSize];
+
+					// read image data 0.5MB at a time and write it into buffer
+					int bytesRead = byteInputStream.read(buffer, 0, bufferSize);
+					while (bytesRead > 0) {
+						os.write(buffer, 0, bufferSize);
+						bytesAvailable = byteInputStream.available();
+						bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						bytesRead = byteInputStream.read(buffer, 0, bufferSize);
+					}
+				} catch (IOException e) {
+					Log.d("Error writing file bytes to HTTP connection.", e);
+					ret.setBadPayload(true);
+					throw e;
+				} finally {
+					Util.ensureClosed(byteInputStream);
+					Util.ensureClosed(bis);
+					Util.ensureClosed(fis);
+				}
+				os.writeBytes(lineEnd);
+				os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+			}
+
+			ret.setCode(connection.getResponseCode());
+			ret.setReason(connection.getResponseMessage());
+      os.flush();
+			os.close();
+
+			// TODO: These streams may not be ready to read now. Put this in a new thread.
+			// Read the normal response.
+			InputStream nis = null;
+			ByteArrayOutputStream nbaos = null;
+			try {
 				nis = connection.getInputStream();
 				nbaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
