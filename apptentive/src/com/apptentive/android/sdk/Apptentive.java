@@ -1144,4 +1144,91 @@ public class Apptentive {
 			Log.d("Person was not updated.");
 		}
 	}
+
+	/**
+	 * This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
+	 * with a string or a long, and there is no limit to the number of parts your semantic version can
+	 * contain. The class allows comparison based on semantic version rules.
+	 * <p></p>
+	 * Valid versions (In sorted order):
+	 * <ul>
+	 *   <li>0</li>
+	 *   <li>0.1</li>
+	 *   <li>1.0.0</li>
+	 *   <li>1.0.9</li>
+	 *   <li>1.0.10</li>
+	 *   <li>1.2.3</li>
+	 *   <li>5</li>
+	 * </ul>
+	 *
+	 * Invalid versions:
+	 * <ul>
+	 *   <li>zero</li>
+	 *   <li>0.1+2015.10.21</li>
+	 *   <li>1.0.0a</li>
+	 *   <li>1.0-rc2</li>
+	 *   <li>1.0.10-SNAPSHOT</li>
+	 *   <li>5a</li>
+	 *   <li>FF01</li>
+	 * </ul>
+	 *
+	 */
+	public static class Version extends JSONObject implements Comparable<Version> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_VERSION = "version";
+
+		public Version(String version) {
+			super();
+			setVersion(version);
+		}
+
+		public Version(long version) {
+			super();
+			setVersion(version);
+		}
+
+		public void setVersion(String version) {
+			try {
+				put(KEY_TYPE, KEY_VERSION);
+				put(KEY_VERSION, version);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.Version.", e);
+			}
+		}
+
+		public void setVersion(long version) {
+			setVersion(Long.toString(version));
+		}
+
+		public String getVersion() {
+			return optString(KEY_VERSION, null);
+		}
+
+		@Override
+		public int compareTo(Version other) {
+			String thisVersion = getVersion();
+			String thatVersion = other.getVersion();
+			String[] thisArray = thisVersion.split("\\.");
+			String[] thatArray = thatVersion.split("\\.");
+
+			int maxParts = Math.max(thisArray.length, thatArray.length);
+			for (int i = 0; i < maxParts; i++) {
+				// If one SemVer has more parts than another, treat pad out the short one with zeros in each slot.
+				long left = 0;
+				if (thisArray.length > i) {
+					left = Long.parseLong(thisArray[i]);
+				}
+				long right = 0;
+				if (thatArray.length > i) {
+					right = Long.parseLong(thatArray[i]);
+				}
+				if (left < right) {
+					return -1;
+				} else if (left > right) {
+					return 1;
+				}
+			}
+			return 0;
+		}
+	}
 }
