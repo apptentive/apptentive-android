@@ -195,18 +195,19 @@ public class Apptentive {
 	 * @param value   The value of the data.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		CustomData customData = DeviceManager.loadCustomDeviceData(context);
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				DeviceManager.storeCustomDeviceData(context, customData);
-			} catch (JSONException e) {
-				Log.w("Unable to add custom device data.", e);
-			}
-		}
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomDeviceData(context, key, version);
 	}
 
 	/**

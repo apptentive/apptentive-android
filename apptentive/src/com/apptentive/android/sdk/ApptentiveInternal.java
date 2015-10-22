@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -18,6 +20,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -187,5 +190,20 @@ public class ApptentiveInternal {
 		Map<String, String> customData = ApptentiveInternal.customData;
 		ApptentiveInternal.customData = null;
 		return customData;
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Object value) {
+		if (key == null || key.trim().length() == 0) {
+			return;
+		}
+		CustomData customData = DeviceManager.loadCustomDeviceData(context);
+		if (customData != null) {
+			try {
+				customData.put(key, value);
+				DeviceManager.storeCustomDeviceData(context, customData);
+			} catch (JSONException e) {
+				Log.w("Unable to add custom device data.", e);
+			}
+		}
 	}
 }
