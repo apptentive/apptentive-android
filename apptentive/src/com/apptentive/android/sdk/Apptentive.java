@@ -210,6 +210,10 @@ public class Apptentive {
 		ApptentiveInternal.addCustomDeviceData(context, key, version);
 	}
 
+	public static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
+	}
+
 	/**
 	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
 	 *
@@ -1230,6 +1234,36 @@ public class Apptentive {
 				}
 			}
 			return 0;
+		}
+	}
+
+	public static class DateTime extends JSONObject implements Comparable<DateTime> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_DATETIME = "datetime";
+
+		public DateTime(double dateTime) {
+			super();
+			setDateTime(dateTime);
+		}
+
+		public void setDateTime(double dateTime) {
+			try {
+				put(KEY_TYPE, KEY_DATETIME);
+				put(KEY_DATETIME, dateTime);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.DateTime.", e);
+			}
+		}
+
+		public double getDateTime() {
+			return optDouble(KEY_DATETIME);
+		}
+
+		@Override
+		public int compareTo(DateTime other) {
+			double thisDateTime = getDateTime();
+			double thatDateTime = other.getDateTime();
+			return Double.compare(thisDateTime, thatDateTime);
 		}
 	}
 }
