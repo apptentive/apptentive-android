@@ -28,7 +28,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 
 	// State and Read are not stored in JSON, only in DB.
-	private State state;
+	private State state = State.unknown;
 	private boolean read = false;
 
 	// datestamp is only stored in memory, due to how we selectively apply date labeling in the view.
@@ -244,7 +244,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		TextMessage,
 		FileMessage,
 		AutomatedMessage,
-    CompundMessage,
+		CompoundMessage,
 		// Unknown
 		unknown;
 

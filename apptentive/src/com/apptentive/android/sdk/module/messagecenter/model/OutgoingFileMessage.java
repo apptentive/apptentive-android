@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingFileMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
+public class OutgoingFileMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 
@@ -256,5 +256,15 @@ public class OutgoingFileMessage extends ApptentiveMessage implements MessageCen
 	@Override
 	public void setLastSent(boolean bVal) {
 		isLast = bVal;
+	}
+
+	@Override
+	public void setBody(String body) {
+
+	}
+
+	@Override
+	public String getBody() {
+		return null;
 	}
 }

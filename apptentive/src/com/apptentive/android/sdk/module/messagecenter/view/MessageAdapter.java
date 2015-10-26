@@ -13,7 +13,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.view.MotionEvent;
@@ -32,22 +31,20 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCen
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.HolderFactory;
-import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingTextMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
-import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingFileMessageHolder;
-import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingTextMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.util.AnimationUtil;
+import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -68,15 +65,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		implements MessageCenterListView.ApptentiveMessageCenterListAdapter {
 
 	private static final int
-			TYPE_TEXT_INCOMING = 0,
-			TYPE_TEXT_OUTGOING = 1,
-			TYPE_FILE_OUTGOING = 2,
-			TYPE_GREETING = 3,
-			TYPE_STATUS = 4,
-			TYPE_AUTO = 5,
-			TYPE_COMPOSING_AREA = 6,
-			TYPE_COMPOSING_BAR = 7,
-			TYPE_WHOCARD = 8;
+			TYPE_COMPOUND_INCOMING = 0,
+			TYPE_COMPOUND_OUTGOING = 1,
+			TYPE_GREETING = 2,
+			TYPE_STATUS = 3,
+			TYPE_AUTO = 4,
+			TYPE_COMPOSING_AREA = 5,
+			TYPE_COMPOSING_BAR = 6,
+			TYPE_WHOCARD = 7;
 
 	private static final int INVALID_POSITION = -1;
 
@@ -120,9 +116,9 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	// maps to prevent redundant asynctasks
 	private ArrayList<Integer> positionsWithPendingUpdateTask = new ArrayList<Integer>();
 
-	private OnComposingActionListener composingActionListener;
+	private OnListviewItemActionListener composingActionListener;
 
-	public interface OnComposingActionListener {
+	public interface OnListviewItemActionListener {
 		void onComposingViewCreated();
 
 		void beforeComposingTextChanged(CharSequence str);
@@ -141,10 +137,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onCloseWhoCard(String buttonLabel);
 
-		void onShowImagePreView(int position, Uri image);
+		void onAttachImage();
+
+		void onShowImagePreView(int position, ImageItem image, boolean withAction);
 	}
 
-	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnComposingActionListener listener, MessageCenterInteraction interaction) {
+	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnListviewItemActionListener listener, MessageCenterInteraction interaction) {
 		super(activityContext, 0, (List<T>) items);
 		this.activityContext = activityContext;
 		this.composingActionListener = listener;
@@ -158,18 +156,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			ApptentiveMessage apptentiveMessage = (ApptentiveMessage) listItem;
 			if (apptentiveMessage.getBaseType() == Payload.BaseType.message) {
 				switch (apptentiveMessage.getType()) {
-					case TextMessage:
-						if (apptentiveMessage instanceof IncomingTextMessage) {
-							return TYPE_TEXT_INCOMING;
-						} else if (apptentiveMessage instanceof OutgoingTextMessage) {
-							return TYPE_TEXT_OUTGOING;
+					case CompoundMessage:
+						if (!apptentiveMessage.isOutgoingMessage()) {
+							return TYPE_COMPOUND_INCOMING;
+						} else{
+							return TYPE_COMPOUND_OUTGOING;
 						}
-						break;
-					case FileMessage:
-						if (apptentiveMessage instanceof OutgoingFileMessage) {
-							return TYPE_FILE_OUTGOING;
-						}
-						break;
 					case AutomatedMessage:
 						return TYPE_AUTO;
 					default:
@@ -196,7 +188,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	@Override
 	public int getViewTypeCount() {
-		return 9;
+		return 8;
 	}
 
 	@Override
@@ -211,20 +203,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		if (null == convertView) {
 			// TODO: Do we need this switch anymore?
 			switch (type) {
-				case TYPE_TEXT_INCOMING:
-					view = new IncomingTextMessageView(parent.getContext(), (IncomingTextMessage) listItem);
+				case TYPE_COMPOUND_INCOMING:
+					view = new CompoundMessageView(parent.getContext(), (CompoundMessage) listItem, composingActionListener);
 					bLoadAvatar = true;
 					break;
-				case TYPE_TEXT_OUTGOING:
-					view = new OutgoingTextMessageView(parent.getContext(), (OutgoingTextMessage) listItem);
-					break;
-/*
-				case TYPE_FILE_INCOMING:
-					convertView = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
-					break;
-*/
-				case TYPE_FILE_OUTGOING:
-					view = new FileMessageView(parent.getContext(), (OutgoingFileMessage) listItem);
+				case TYPE_COMPOUND_OUTGOING:
+					view = new CompoundMessageView(parent.getContext(), (CompoundMessage) listItem, composingActionListener);
 					break;
 				case TYPE_GREETING: {
 					MessageCenterGreeting greeting = (MessageCenterGreeting) listItem;
@@ -310,46 +294,41 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		if (holder != null) {
 			switch (type) {
-				case TYPE_TEXT_INCOMING: {
+				case TYPE_COMPOUND_INCOMING: {
 					showMessageAnimation = true;
 					if (bLoadAvatar) {
-						ImageUtil.startDownloadAvatarTask(((IncomingTextMessageHolder) holder).avatar,
-								((IncomingTextMessage) listItem).getSenderProfilePhoto());
+						ImageUtil.startDownloadAvatarTask(((IncomingCompoundMessageHolder) holder).avatar,
+								((CompoundMessage) listItem).getSenderProfilePhoto());
 					}
-					final IncomingTextMessage textMessage = (IncomingTextMessage) listItem;
-					String datestamp = ((IncomingTextMessage) listItem).getDatestamp();
-					((IncomingTextMessageHolder) holder).updateMessage(textMessage.getSenderUsername(),
-							datestamp, textMessage.getBody());
-					if (!textMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
+					final CompoundMessage compoundMessage = (CompoundMessage) listItem;
+					String datestamp = ((CompoundMessage) listItem).getDatestamp();
+					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
+							datestamp, compoundMessage.getBody(), compoundMessage.getAssociatedFiles(activityContext));
+					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
-						startUpdateUnreadMessageTask(textMessage, position);
+						startUpdateUnreadMessageTask(compoundMessage, position);
 					}
 					break;
 				}
-				case TYPE_TEXT_OUTGOING: {
+				case TYPE_COMPOUND_OUTGOING: {
 					showMessageAnimation = true;
-					OutgoingTextMessage textMessage = (OutgoingTextMessage) listItem;
+
+					CompoundMessage textMessage = (CompoundMessage) listItem;
 					String datestamp = textMessage.getDatestamp();
 					Double createdTime = textMessage.getCreatedAt();
-					String status = createStatus(createdTime, textMessage.isLastSent());
-					int statusTextColor = getStatusColor(createdTime);
-					((OutgoingTextMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							createdTime == null && !isInPauseState, textMessage.getBody());
-					break;
-				}
-				case TYPE_FILE_OUTGOING: {
-					showMessageAnimation = true;
-					OutgoingFileMessage fileMessage = (OutgoingFileMessage) listItem;
-					if (holder.position != position) {
-						holder.position = position;
-						startLoadAttachedImageTask(fileMessage, position, (OutgoingFileMessageHolder) holder);
+					String status;
+					boolean bShowProgress;
+					if (createdTime == null || createdTime > Double.MIN_VALUE) {
+						status = createStatus(createdTime, textMessage.isLastSent());
+						bShowProgress = createdTime == null && !isInPauseState;
 					}
-					String datestamp = fileMessage.getDatestamp();
-					Double createdTime = fileMessage.getCreatedAt();
-					String status = createStatus(createdTime, fileMessage.isLastSent());
+					else {
+						status = activityContext.getResources().getString(R.string.apptentive_failed);
+						bShowProgress = false;
+					}
 					int statusTextColor = getStatusColor(createdTime);
-					((OutgoingFileMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							createdTime == null && !isInPauseState);
+					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
+							bShowProgress, textMessage.getBody(), parent.getWidth(), textMessage.getAssociatedFiles(activityContext));
 					break;
 				}
 				case TYPE_STATUS: {
@@ -382,7 +361,24 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 		}
 		if (showMessageAnimation && position > lastAnimatedMessagePosition) {
-			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(view, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(view, new Animator.AnimatorListener() {
+				@Override
+				public void onAnimationStart(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationRepeat(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					view.invalidate();
+				}
+
+				@Override
+				public void onAnimationCancel(Animator animation) {
+				}
+			}, null);
 			set.start();
 			lastAnimatedMessagePosition = position;
 		}
@@ -570,8 +566,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		forceShowKeyboard = bVal;
 	}
 
-	public void addImagestoComposer(final int position, final List<Uri> uris) {
-		composingView.addImagesToImageAttachmentBand(position, uris);
+	public void addImagestoComposer(final List<ImageItem> images) {
+		composingView.addImagesToImageAttachmentBand(images);
 		notifyDataSetChanged();
 	}
 
@@ -623,7 +619,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		return ret;
 	}
 
-	private void startUpdateUnreadMessageTask(IncomingTextMessage message, int position) {
+	private void startUpdateUnreadMessageTask(CompoundMessage message, int position) {
 		UpdateUnreadMessageTask task = new UpdateUnreadMessageTask(position);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message);
@@ -637,7 +633,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		return (viewType == TYPE_COMPOSING_BAR);
 	}
 
-	private class UpdateUnreadMessageTask extends AsyncTask<IncomingTextMessage, Void, Void> {
+	private class UpdateUnreadMessageTask extends AsyncTask<CompoundMessage, Void, Void> {
 		private int position;
 
 		public UpdateUnreadMessageTask(int position) {
@@ -645,7 +641,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		}
 
 		@Override
-		protected Void doInBackground(IncomingTextMessage... textMessages) {
+		protected Void doInBackground(CompoundMessage... textMessages) {
 			textMessages[0].setRead(true);
 			JSONObject data = new JSONObject();
 			try {
@@ -674,41 +670,43 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	}
 
-	private void startLoadAttachedImageTask(OutgoingFileMessage message, int position, OutgoingFileMessageHolder holder) {
-		StoredFile storedFile = message.getStoredFile(activityContext.getApplicationContext());
-		if (storedFile == null) {
+	private void startLoadAttachedImageTask(CompoundMessage message, int position, OutgoingCompoundMessageHolder holder) {
+		List<StoredFile> storedFiles = message.getAssociatedFiles(activityContext.getApplicationContext());
+		if (storedFiles == null || storedFiles.size() == 0) {
 			return;
 		}
-		String mimeType = storedFile.getMimeType();
-		String imagePath;
+		for (int i = 0; i < storedFiles.size(); i++) {
+			StoredFile storedFile = storedFiles.get(i);
+			String mimeType = storedFile.getMimeType();
+			String imagePath;
 
-		if (mimeType != null) {
-			imagePath = storedFile.getLocalFilePath();
-			if (mimeType.contains("image")) {
-				holder.image.setVisibility(View.INVISIBLE);
+			if (mimeType != null) {
+				imagePath = storedFile.getLocalFilePath();
+				if (mimeType.contains("image")) {
+					//holder.image.setVisibility(View.INVISIBLE);
 
-				Point dimensions = getBitmapDimensions(storedFile);
-				if (dimensions != null) {
-					holder.image.setPadding(dimensions.x, dimensions.y, 0, 0);
+					Point dimensions = getBitmapDimensions(storedFile);
+					if (dimensions != null) {
+						//holder.image.setPadding(dimensions.x, dimensions.y, 0, 0);
+					}
+				}
+				LoadAttachedImageTask task = new LoadAttachedImageTask(position, holder);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagePath);
+				} else {
+					task.execute(imagePath);
 				}
 			}
-			LoadAttachedImageTask task = new LoadAttachedImageTask(position, holder);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagePath);
-			} else {
-				task.execute(imagePath);
-			}
 		}
-
 	}
 
 	private class LoadAttachedImageTask extends AsyncTask<String, Void, Bitmap> {
 		private int position;
-		private WeakReference<OutgoingFileMessageHolder> holderRef;
+		private WeakReference<OutgoingCompoundMessageHolder> holderRef;
 
-		public LoadAttachedImageTask(int position, OutgoingFileMessageHolder holder) {
+		public LoadAttachedImageTask(int position, OutgoingCompoundMessageHolder holder) {
 			this.position = position;
-			this.holderRef = new WeakReference<OutgoingFileMessageHolder>(holder);
+			this.holderRef = new WeakReference<OutgoingCompoundMessageHolder>(holder);
 		}
 
 		@Override
@@ -747,16 +745,11 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			if (null == bitmap) {
 				return;
 			}
-			OutgoingFileMessageHolder holder = holderRef.get();
+			OutgoingCompoundMessageHolder holder = holderRef.get();
 			if (holder != null && holder.position == position) {
-				if (holder.image != null) {
-					holder.image.setPadding(0, 0, 0, 0);
-					holder.image.setImageBitmap(bitmap);
-					holder.image.setVisibility(View.VISIBLE);
-				}
+				//Todo: load image into imageview
 			}
 		}
 	}
-
 
 }

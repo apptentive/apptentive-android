@@ -21,14 +21,9 @@ public class MessageFactory {
 			ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
 			switch (type) {
 				case TextMessage:
-					// This is ugly, but works.
-					ApptentiveMessage apptentiveMessage = new OutgoingTextMessage(json);
-					if (!apptentiveMessage.isOutgoingMessage()) {
-						apptentiveMessage = new IncomingTextMessage(json);
-					}
-					return apptentiveMessage;
+				case CompoundMessage:
 				case FileMessage:
-					return new OutgoingFileMessage(json);
+					return new CompoundMessage(json);
 				case AutomatedMessage:
 					return new AutomatedMessage(json);
 				case unknown:

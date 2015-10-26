@@ -6,33 +6,30 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.webkit.MimeTypeMap;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
-import com.apptentive.android.sdk.storage.FileStore;
-import com.apptentive.android.sdk.util.CountingOutputStream;
-import com.apptentive.android.sdk.util.image.ImageUtil;
-import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.image.ImageItem;
+
 import org.json.JSONException;
 
-import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Barry Li
  */
-public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
+public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 
+	private static final String KEY_TEXT_ONLY = "text_only";
+
 	private boolean isLast;
+
+	private boolean hasNoAttachments = true;
 
 	public CompoundMessage() {
 		super();
@@ -40,14 +37,21 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	public CompoundMessage(String json) throws JSONException {
 		super(json);
+		hasNoAttachments = getTextOnly();
 	}
 
 	@Override
 	protected void initType() {
-		setType(Type.CompundMessage);
+		setType(Type.CompoundMessage);
 	}
 
-  // Get text message body, maybe empty
+	@Override
+	public String marshallForSending() {
+		return toString();
+	}
+
+	// Get text message body, maybe empty
+	@Override
 	public String getBody() {
 		try {
 			if (!isNull(KEY_BODY)) {
@@ -60,6 +64,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	}
 
 	// Set text message body, maybe empty
+	@Override
 	public void setBody(String body) {
 		try {
 			put(KEY_BODY, body);
@@ -68,13 +73,57 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 	}
 
+	public boolean getTextOnly() {
+		try {
+			return getBoolean(KEY_TEXT_ONLY);
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return true;
+	}
 
-	private String getStoredFileId() {
-		return "apptentive-file-" + getNonce();
+	public void setTextOnly(boolean bVal) {
+		try {
+			put(KEY_TEXT_ONLY, bVal);
+		} catch (JSONException e) {
+			Log.e("Unable to set file filePath.");
+		}
+	}
+
+	/**
+	 * This method stores an image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
+	 * it to store an exact copy of the file in question.
+	 */
+	public boolean setAssociatedFiles(Context context, List<ImageItem> attachedImages) {
+
+		if (attachedImages == null || attachedImages.size() == 0) {
+			hasNoAttachments = true;
+			return false;
+		} else {
+			hasNoAttachments = false;
+		}
+		setTextOnly(hasNoAttachments);
+		ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+		for (ImageItem image : attachedImages) {
+			StoredFile storedFile = new StoredFile();
+			storedFile.setId(getNonce());
+			storedFile.setApptentiveUri("");
+			storedFile.setOriginalUri(image.originalPath);
+			// ToDo: look for local cache
+			storedFile.setLocalFilePath(image.localCachePath);
+			storedFile.setMimeType("image/jpeg");
+			attachmentStoredFiles.add(storedFile);
+		}
+		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		return db.addCompoundMessageFiles(attachmentStoredFiles);
 	}
 
 
+
 	public List<StoredFile> getAssociatedFiles(Context context) {
+		if (hasNoAttachments) {
+			return null;
+		}
 		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
 		return db.getAssociatedFiles(getNonce());
 	}
@@ -86,7 +135,8 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	@Override
 	public boolean isLastSent() {
-		return isLast;
+
+		return (isOutgoingMessage()) ? isLast : false;
 	}
 
 	@Override
