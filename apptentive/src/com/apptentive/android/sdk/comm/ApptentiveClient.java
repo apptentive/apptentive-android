@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.CountingOutputStream;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 
@@ -91,7 +92,7 @@ public class ApptentiveClient {
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
 				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
-			case CompundMessage:
+			case CompoundMessage:
 				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
 				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
 				// Send as paint text message when there is no associated files
@@ -349,7 +350,6 @@ public class ApptentiveClient {
 			requestText.append(lineEnd);
 
 			Log.d("Post body: " + requestText);
-
 			// Open an output stream.
 			os = new DataOutputStream(connection.getOutputStream());
 
@@ -431,7 +431,6 @@ public class ApptentiveClient {
 
 		HttpURLConnection connection = null;
 		DataOutputStream os = null;
-		InputStream is = null;
 
 		try {
 
@@ -466,60 +465,80 @@ public class ApptentiveClient {
 
 			// Send associated files
 			for (StoredFile storedFile : associatedFiles) {
-				StringBuilder requestText = new StringBuilder();
-				requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
-				requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
-				requestText.append(lineEnd);
 
-				// Write file attributes
-				os.writeBytes(requestText.toString());
-
-				InputStream bis = null;
 				FileInputStream fis = null;
-				ByteArrayInputStream byteInputStream = null;
 				try {
 					String imagePathString = storedFile.getLocalFilePath();
 					File imageFile = new File(imagePathString);
+					// No local cache found
+          if (!imageFile.exists()) {
+						File imageOriginalFile = new File(storedFile.getOriginalUri());
+						// Original file does not exist any more
+						if (!imageOriginalFile.exists()) {
+							continue;
+						}
+						// Retrieve image orientation
+						int imageOrientation = 0;
 
-					int imageOrientation = 0;
-					try {
-						ExifInterface exif = new ExifInterface(imagePathString);
-						imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-					} catch (IOException e) {
+						try {
+							ExifInterface exif = new ExifInterface(storedFile.getOriginalUri());
+							imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+						} catch (IOException e) {
 
+						}
+
+						// Create local cache from the original file.
+						InputStream tempis = null;
+						CountingOutputStream cos = null;
+						try {
+							tempis = new BufferedInputStream(new FileInputStream(imageOriginalFile));
+							cos = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(imageFile)));
+							System.gc();
+							Bitmap smaller = ImageUtil.createScaledBitmapFromStream(tempis, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+							smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
+							cos.flush();
+							Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+							smaller.recycle();
+							System.gc();
+						} catch (FileNotFoundException e) {
+							Log.e("File not found while storing image.", e);
+
+						} catch (Exception e) {
+							Log.a("Error storing image.", e);
+						} finally {
+							Util.ensureClosed(tempis);
+							Util.ensureClosed(cos);
+						}
 					}
 
+					StringBuilder requestText = new StringBuilder();
+					requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUri())).append(lineEnd);
+					requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+					requestText.append(lineEnd);
+
+					// Write file attributes
+					os.writeBytes(requestText.toString());
+
 					fis = new FileInputStream(imageFile);
-					bis = new BufferedInputStream(fis);
-					// Scale the bitmap smaller
-					Bitmap smaller = ImageUtil.createScaledBitmapFromStream(bis, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
-					// Compress the size
-					ByteArrayOutputStream bos = new ByteArrayOutputStream();
-					smaller.compress(Bitmap.CompressFormat.JPEG, 95, bos);
-					byte[] bitmapdata = bos.toByteArray();
 
-					byteInputStream = new ByteArrayInputStream(bitmapdata);
-
-					int bytesAvailable = byteInputStream.available();
+					int bytesAvailable = fis.available();
 					int maxBufferSize = 512 * 512;
 					int bufferSize = Math.min(bytesAvailable, maxBufferSize);
 					byte[] buffer = new byte[bufferSize];
 
 					// read image data 0.5MB at a time and write it into buffer
-					int bytesRead = byteInputStream.read(buffer, 0, bufferSize);
+					int bytesRead = fis.read(buffer, 0, bufferSize);
 					while (bytesRead > 0) {
 						os.write(buffer, 0, bufferSize);
-						bytesAvailable = byteInputStream.available();
+						bytesAvailable = fis.available();
 						bufferSize = Math.min(bytesAvailable, maxBufferSize);
-						bytesRead = byteInputStream.read(buffer, 0, bufferSize);
+						bytesRead = fis.read(buffer, 0, bufferSize);
 					}
 				} catch (IOException e) {
 					Log.d("Error writing file bytes to HTTP connection.", e);
 					ret.setBadPayload(true);
 					throw e;
 				} finally {
-					Util.ensureClosed(byteInputStream);
-					Util.ensureClosed(bis);
 					Util.ensureClosed(fis);
 				}
 				os.writeBytes(lineEnd);
@@ -565,7 +584,6 @@ public class ApptentiveClient {
 				Log.w("Can't read error stream.", ex);
 			}
 		} finally {
-			Util.ensureClosed(is);
 			Util.ensureClosed(os);
 		}
 		return ret;

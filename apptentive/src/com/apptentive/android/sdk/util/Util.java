@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -21,7 +22,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.CursorLoader;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -278,7 +283,7 @@ public class Util {
 	 * <p>This method will allow you to pass in literal strings. You must wrap the string in single quotes in order to ensure it is not modified
 	 * by Android. Android will try to coerce the string to a float, Integer, etc., if it looks like one.</p>
 	 * <p/>
-	 * <p>Example: <code>&lt;meta-data android:name="sdk_distribution" android:value="'1.00'"/></code></p>
+	 * <p>Example: <code>&lt;meta-data android:filePath="sdk_distribution" android:value="'1.00'"/></code></p>
 	 * <p>This will evaluate to a String "1.00". If you leave off the single quotes, this method will just cast to a String, so the result would be a String "1.0".</p>
 	 */
 	public static String getPackageMetaDataSingleQuotedString(Context context, String key) {
@@ -309,7 +314,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
 			return packageInfo.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.e("Error getting app version name.", e);
+			Log.e("Error getting app version filePath.", e);
 		}
 		return null;
 	}
@@ -524,5 +529,69 @@ public class Util {
 		return false;
 	}
 
+
+	public static String getImagePath(Context context, Uri contentUri){
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		cursor.moveToFirst();
+		String document_id = cursor.getString(0);
+		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		cursor.close();
+
+		cursor = context.getContentResolver().query(
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		cursor.moveToFirst();
+		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		cursor.close();
+
+		return path;
+	}
+
+	public static long getImageCreationTime(Context context, Uri contentUri){
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		cursor.moveToFirst();
+		String document_id = cursor.getString(0);
+		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		cursor.close();
+
+		cursor = context.getContentResolver().query(
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		cursor.moveToFirst();
+		long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+		cursor.close();
+
+		return time;
+	}
+
+	/*
+	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPath(Context context, String imageUri, long createdTime) {
+		String source = imageUri + Long.toString(createdTime);
+		String fileName = String.valueOf(source.hashCode());
+		File cachDir = getDiskCacheDir(context);
+		File cacheFile = new File(cachDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	public static File getDiskCacheDir(Context context) {
+		File appCacheDir = null;
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			appCacheDir = context.getExternalCacheDir();
+		}
+
+		if (appCacheDir == null){
+			appCacheDir = context.getCacheDir();
+		}
+		return appCacheDir;
+	}
+
+	public static boolean hasPermission(Context context, final String permission) {
+		int perm = context.checkCallingOrSelfPermission(permission);
+		return perm == PackageManager.PERMISSION_GRANTED;
+	}
 }
 
