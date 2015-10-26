@@ -79,6 +79,7 @@
                     android:background="@color/apptentive_transparency"
                     android:paddingBottom="60dp"
                     android:clipToPadding="false"
+                    android:descendantFocusability="afterDescendants"
                     android:cacheColorHint="@color/apptentive_transparency"/>
     </LinearLayout>
     <com.apptentive.android.sdk.view.FloatingActionButton
