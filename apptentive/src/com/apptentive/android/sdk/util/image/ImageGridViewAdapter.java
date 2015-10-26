@@ -7,7 +7,7 @@ package com.apptentive.android.sdk.util.image;
  */
 
 import android.content.Context;
-import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,9 +99,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 *
 	 * @param resultList
 	 */
-	public void setDefaultSelected(ArrayList<Uri> resultList) {
-		for (Uri uri : resultList) {
-			ImageItem image = getImageByPath(uri);
+	public void setDefaultSelected(ArrayList<String> resultList) {
+		for (String uri : resultList) {
+			ImageItem image = getImageByUri(uri);
 			if (image != null) {
 				selectedImages.add(image);
 			}
@@ -111,10 +111,10 @@ public class ImageGridViewAdapter extends BaseAdapter {
 		}
 	}
 
-	private ImageItem getImageByPath(Uri uri) {
+	private ImageItem getImageByUri(String uri) {
 		if (images != null && images.size() > 0) {
 			for (ImageItem image : images) {
-				if (image.uri.equals(uri)) {
+				if (image.originalPath.equalsIgnoreCase(uri)) {
 					return image;
 				}
 			}
@@ -250,7 +250,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 					mask.setVisibility(View.VISIBLE);
 				} else {
 					// set default indicator
-					if (data.uri == null) {
+					if (data.originalPath == null) {
 						indicator.setVisibility(View.GONE);
 						image.setVisibility(View.GONE);
 					} else {
@@ -260,17 +260,31 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			} else {
 				indicator.setVisibility(View.GONE);
-				if (data.uri == null) {
+				if (data.originalPath == null) {
 					image.setVisibility(View.GONE);
 				} else {
 					image.setVisibility(View.VISIBLE);
 				}
 			}
 
-			if (itemSize > 0 && data.uri != null) {
-				// display image
+			if (itemSize > 0 && data.originalPath != null) {
+				if (!TextUtils.isEmpty(data.localCachePath)) {
+					File imageFile = new File(data.localCachePath);
+					if (imageFile.exists()) {
+						// display image using cached file
+						Picasso.with(activityContext)
+								.load(imageFile)
+								.placeholder(R.drawable.apptentive_ic_image_default_item)
+								.resize(itemSize, itemSize)
+								.centerInside()
+								.into(image);
+						return;
+					}
+				}
+				// display image using original originalPath
+				File imageFile = new File(data.originalPath);
 				Picasso.with(activityContext)
-						.load(data.uri)
+						.load(imageFile)
 						.placeholder(R.drawable.apptentive_ic_image_default_item)
 						.resize(itemSize, itemSize)
 						.centerInside()
