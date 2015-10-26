@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
@@ -34,7 +36,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
  *
  * @author Sky Kelsey
  */
-public class ViewActivity extends ApptentiveActivity {
+public class ViewActivity extends ApptentiveActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
 
 	private ActivityContent activityContent;
@@ -50,6 +52,10 @@ public class ViewActivity extends ApptentiveActivity {
 			appCompatDelegate = AppCompatDelegate.create(this, null);
 		}
 		return appCompatDelegate;
+	}
+
+	public ActivityContent getActivityContent() {
+		return activityContent;
 	}
 
 	@Override
@@ -352,5 +358,21 @@ public class ViewActivity extends ApptentiveActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		overridePendingTransition(R.anim.slide_up_in, 0);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+																				 @NonNull int[] grantResults) {
+		switch (activeContentType) {
+			case ABOUT:
+				break;
+			case MESSAGE_CENTER_ERROR:
+				break;
+			case INTERACTION:
+				activityContent.onRequestPermissionsResult(requestCode, permissions, grantResults);
+				break;
+			default:
+				break;
+		}
 	}
 }
