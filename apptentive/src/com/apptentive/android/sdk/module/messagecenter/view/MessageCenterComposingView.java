@@ -6,26 +6,19 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.net.Uri;
-import android.os.Build;
 import android.text.Editable;
 
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
-import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
 import java.util.ArrayList;
@@ -40,12 +33,9 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	private EditText et;
 	// Image Band
 	private ApptentiveImageGridView imageBandView;
-	private ImageGridViewAdapter.Callback imageBandCallback;
-	private int imageBandViewWidth, imageBandViewHeight;
 	List<ImageItem> images = new ArrayList<ImageItem>();
-	private int numberofAttachments;
 
-	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
 		super(activityContext);
 
 		LayoutInflater inflater = LayoutInflater.from(activityContext);
@@ -73,15 +63,15 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 
 		imageBandView = (ApptentiveImageGridView) parentView.findViewById(R.id.grid);
-		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_close);
 		imageBandView.setupUi();
-    imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
+		imageBandView.setupLayoutListener();
+		imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
 			@Override
-			public void onClick(int position, Uri uri) {
-				listener.onShowImagePreView(position, uri);
+			public void onClick(int position, ImageItem image) {
+				listener.onShowImagePreView(position, image, true);
 			}
 		});
-
+		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_close);
 		// Initialize image attachments band with empty data
 		clearImageAttachmentBand();
 	}
@@ -102,40 +92,31 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 
 	/**
 	 * Add new images to attchment band.
-	 * @param position the postion index of the first image to add
+	 *
 	 * @param imagesToAttach an array of new images to add
 	 */
-	public void addImagesToImageAttachmentBand(final int position, final List<Uri> imagesToAttach) {
+	public void addImagesToImageAttachmentBand(final List<ImageItem> imagesToAttach) {
 
 		if (imagesToAttach == null || imagesToAttach.size() == 0) {
 			return;
 		}
+		imageBandView.setupLayoutListener();
+		imageBandView.setVisibility(View.VISIBLE);
 
-		final int numOfImagesToAdd = imagesToAttach.size();
+		images.addAll(imagesToAttach);
+		imageBandView.setData(images);
 
-		if (numOfImagesToAdd > 0) {
-			// About to add image to an empty attachment band
-			imageBandView.setVisibility(View.VISIBLE);
-		}
-
-		for (int i = 0; i < numOfImagesToAdd; ++i) {
-			images.add(new ImageItem(imagesToAttach.get(i), "", 0));
-			numberofAttachments++;
-		}
-
-		if (numOfImagesToAdd > 0) {
-			imageBandView.setData(images);
-		}
 	}
 
 	/**
 	 * Remove an image from attchment band.
+	 *
 	 * @param position the postion index of the image to be removed
 	 */
 	public void removeImageFromImageAttachmentBand(final int position) {
 		images.remove(position);
-		numberofAttachments--;
-		if (numberofAttachments == 0) {
+		imageBandView.setupLayoutListener();
+		if (images.size() == 0) {
 			// Hide attachment band after last attachment is removed
 			imageBandView.setVisibility(View.GONE);
 			return;

@@ -18,6 +18,8 @@ public class Constants {
 	public static final int REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER = 2000;
 	public static final String RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER = "select_result";
 
+	public final static int REQUEST_READ_STORAGE_PERMISSION = 1;
+
 	public static final String PREF_NAME = "APPTENTIVE";
 
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
@@ -48,6 +50,7 @@ public class Constants {
 
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 
 	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET = "messageCenterWhoCardSet";
