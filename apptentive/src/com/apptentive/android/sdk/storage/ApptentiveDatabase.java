@@ -18,7 +18,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
@@ -99,10 +98,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * For compound message stored in TABLE_MESSAGE, each associated file will add a row to this table
 	 * uing the message's "nonce" key
 	 */
-	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table name
+	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table filePath
 	private static final String COMPOUND_FILESTORE_KEY_MESSAGE_NONCE = "nonce"; // message nonce of the compound message
 	private static final String COMPOUND_FILESTORE_KEY_MIME_TYPE = "mime_type"; // mine type of the file
-	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uri of source file (empty for received file)
+	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uriString of source file (empty for received file)
 	private static final String COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH = "local_path"; // path to the local cached version
 	private static final String COMPOUND_FILESTORE_KEY_REMOTE_URL = "apptentive_url";  // original server url of received file (empty for sent file)
 	// Create the initial table. Use nonce and local cache path as primary key because both sent/received files will have a local cached copy
@@ -118,7 +117,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					");";
 
 	// Query all files associated with a given compound message nonce id
-	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_CREATE_COMPOUND_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
+	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_COMPOUND_MESSSAGE_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
 
 	private static ApptentiveDatabase instance;
 
@@ -177,6 +176,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			case 1:
 				if (newVersion == 2) {
 					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+					migrateStoredFiles();
 				}
 		}
 	}
@@ -412,6 +412,34 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// File Store
 	//
 
+	public synchronized void migrateStoredFiles() {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		try {
+			db = getWritableDatabase();
+			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
+			if (cursor.moveToFirst()) {
+				do {
+					String file_nonce = cursor.getString(0);
+					// Stored File id was in the format of "apptentive-file-nonce"
+					String patten = "apptentive-file-";
+          String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
+					ContentValues values = new ContentValues();
+					values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, nonce);
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, cursor.getString(3));
+					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, cursor.getString(2));
+					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
+					db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
+
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
+		}
+	}
+
 	public synchronized StoredFile getStoredFile(String id) {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
@@ -495,8 +523,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				do {
 					ret = new StoredFile();
 					ret.setId(nonce);
-					ret.setMimeType(cursor.getString(1));
-					ret.setLocalFilePath(cursor.getString(2));
+					ret.setLocalFilePath(cursor.getString(1));
+					ret.setMimeType(cursor.getString(2));
 					ret.setOriginalUri(cursor.getString(3));
 					ret.setApptentiveUri(cursor.getString(4));
 					associatedFiles.add(ret);
