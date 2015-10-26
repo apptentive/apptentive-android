@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.util.image;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -25,11 +24,12 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	private ImageItemClickedListener listener;
 
+	private Context context;
+
 	public ApptentiveImageGridView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setOnItemClickListener(this);
-		imageBandAdapter = new ImageGridViewAdapter(context, false);
-		setAdapter(imageBandAdapter);
+		this.context = context;
 	}
 
 	@Override
@@ -41,9 +41,8 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 			// The two leftmost bits in the height measure spec have
 			// a special meaning, hence we can't use them to describe height.
 			heightSpec = MeasureSpec.makeMeasureSpec(
-					Integer.MAX_VALUE >>2, MeasureSpec.AT_MOST);
-		}
-		else {
+					Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+		} else {
 			// Any other height should be respected as is.
 			heightSpec = heightMeasureSpec;
 		}
@@ -53,15 +52,20 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	public void onItemClick(AdapterView parent, View v, int position, long id) {
 		if (listener != null) {
-			listener.onClick(position, imageBandAdapter.getItem(position).uri);
+			listener.onClick(position, imageBandAdapter.getItem(position));
 		}
 	}
 
-	public void setListener(ImageItemClickedListener l){
+	public void setListener(ImageItemClickedListener l) {
 		listener = l;
 	}
 
 	public void setupUi() {
+		imageBandAdapter = new ImageGridViewAdapter(context, false);
+		setAdapter(imageBandAdapter);
+	}
+
+	public void setupLayoutListener() {
 		final int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_column_number);
 		getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
@@ -69,14 +73,28 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 			public void onGlobalLayout() {
 
 				final int width = getWidth();
-				final int height = getHeight();
-
 				final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
 
 				int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
 				imageBandAdapter.setItemSize(columnWidth);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+					getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				} else {
+					getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				}
+
+
 			}
 		});
+	}
+
+	public void setAdapterItemSize(int width) {
+		int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_column_number);
+		final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
+
+		int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
+		imageBandAdapter.setItemSize(columnWidth);
 	}
 
 	public void setAdapterIndicator(int rid) {
@@ -90,10 +108,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	public void setData(List<ImageItem> images) {
 		imageBandAdapter.setData(images);
-		setAdapter(imageBandAdapter);
 	}
 
-	public interface ImageItemClickedListener{
-		void onClick(int position, Uri uri);
+	public interface ImageItemClickedListener {
+		void onClick(int position, ImageItem image);
 	}
 }
