@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -36,6 +35,9 @@ import android.widget.ListView;
 import com.apptentive.android.sdk.Log;
 
 import java.io.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -531,6 +533,11 @@ public class Util {
 
 
 	public static String getImagePath(Context context, Uri contentUri){
+
+		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+			return null;
+		}
+
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
@@ -570,8 +577,21 @@ public class Util {
 	public static String generateCacheFileFullPath(Context context, String imageUri, long createdTime) {
 		String source = imageUri + Long.toString(createdTime);
 		String fileName = String.valueOf(source.hashCode());
-		File cachDir = getDiskCacheDir(context);
-		File cacheFile = new File(cachDir, fileName);
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	/*
+	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPathMd5(Context context, String imageUri) {
+		String fileName = calculateMD5(context, Uri.parse(imageUri));
+		if (fileName == null) {
+			return null;
+		}
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
 		return cacheFile.getPath();
 	}
 
@@ -593,5 +613,47 @@ public class Util {
 		int perm = context.checkCallingOrSelfPermission(permission);
 		return perm == PackageManager.PERMISSION_GRANTED;
 	}
+
+	//Calculate MD5 from file's content
+	private static String calculateMD5(Context context, Uri uri) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			Log.e("Exception while getting digest", e);
+			return null;
+		}
+
+		InputStream is;
+		try {
+			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+		} catch (FileNotFoundException e) {
+			Log.e("Exception while getting FileInputStream", e);
+			return null;
+		}
+
+		byte[] buffer = new byte[8192];
+		int read;
+		try {
+			while ((read = is.read(buffer)) > 0) {
+				digest.update(buffer, 0, read);
+			}
+			byte[] md5sum = digest.digest();
+			BigInteger bigInt = new BigInteger(1, md5sum);
+			String output = bigInt.toString(16);
+			// Fill to 32 chars
+			output = String.format("%32s", output).replace(' ', '0');
+			return output;
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to process file for MD5", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				Log.e("Exception on closing MD5 input stream", e);
+			}
+		}
+	}
+
 }
 

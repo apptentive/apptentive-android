@@ -60,7 +60,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.VISIBLE);
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				for (StoredFile file: imagesToAttach) {
-					images.add(new ImageItem(file.getOriginalUri(), file.getLocalFilePath(), 0));
+					images.add(new ImageItem(file.getOriginalUriOrPath(), file.getLocalFilePath(), file.getCreationTime()));
 				}
 				imageBandView.setData(images);
 			}

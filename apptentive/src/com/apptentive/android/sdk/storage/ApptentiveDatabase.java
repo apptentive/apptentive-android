@@ -101,9 +101,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table filePath
 	private static final String COMPOUND_FILESTORE_KEY_MESSAGE_NONCE = "nonce"; // message nonce of the compound message
 	private static final String COMPOUND_FILESTORE_KEY_MIME_TYPE = "mime_type"; // mine type of the file
-	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uriString of source file (empty for received file)
+	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uriString or file path of source file (empty for received file)
 	private static final String COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH = "local_path"; // path to the local cached version
 	private static final String COMPOUND_FILESTORE_KEY_REMOTE_URL = "apptentive_url";  // original server url of received file (empty for sent file)
+	private static final String COMPOUND_FILESTORE_KEY_CREATION_TIME = "creation_time"; // creation time of the original file
 	// Create the initial table. Use nonce and local cache path as primary key because both sent/received files will have a local cached copy
 	private static final String TABLE_CREATE_COMPOUND_FILESTORE =
 			"CREATE TABLE " + TABLE_COMPOUND_MESSSAGE_FILESTORE +
@@ -113,6 +114,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					COMPOUND_FILESTORE_KEY_MIME_TYPE + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
+					COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG, " +
 					"PRIMARY KEY (" + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + ", " + COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + ")" +
 					");";
 
@@ -430,6 +432,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
 					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, cursor.getString(2));
 					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
+					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
 					db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
 
 				} while (cursor.moveToNext());
@@ -451,7 +454,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				ret = new StoredFile();
 				ret.setId(id);
 				ret.setMimeType(cursor.getString(1));
-				ret.setOriginalUri(cursor.getString(2));
+				ret.setOriginalUriOrPath(cursor.getString(2));
 				ret.setLocalFilePath(cursor.getString(3));
 				ret.setApptentiveUri(cursor.getString(4));
 			}
@@ -471,7 +474,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ContentValues values = new ContentValues();
 			values.put(FILESTORE_KEY_ID, storedFile.getId());
 			values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
-			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUri());
+			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUriOrPath());
 			values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
 			values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
@@ -525,8 +528,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					ret.setId(nonce);
 					ret.setLocalFilePath(cursor.getString(1));
 					ret.setMimeType(cursor.getString(2));
-					ret.setOriginalUri(cursor.getString(3));
+					ret.setOriginalUriOrPath(cursor.getString(3));
 					ret.setApptentiveUri(cursor.getString(4));
+					ret.setCreationTime(cursor.getLong(5));
 					associatedFiles.add(ret);
 				} while (cursor.moveToNext());
 			}
@@ -558,8 +562,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
 				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());
 				values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, file.getMimeType());
-				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getOriginalUri());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getOriginalUriOrPath());
 				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
+				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
 				ret = db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
 			}
 		} finally {

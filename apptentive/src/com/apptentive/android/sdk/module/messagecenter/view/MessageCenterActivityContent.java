@@ -61,6 +61,7 @@ import com.apptentive.android.sdk.util.image.ImageItem;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -475,9 +476,21 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
 					Uri uri = data.getData();
-					long creation_time = Util.getImageCreationTime(viewActivity, uri);
 					String originalPath = Util.getImagePath(viewActivity, uri);
-					addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(viewActivity, originalPath, creation_time), creation_time)));
+					if (originalPath != null) {
+						/* If able to retrieve file path and creation time from uri, cache file name will be generated
+						 * from the hash code of file path + creation time
+						 */
+						long creation_time = Util.getImageCreationTime(viewActivity, uri);
+						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(viewActivity, originalPath, creation_time), creation_time)));
+					} else {
+						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
+						 * cache name will be generated from the md5 of the file content
+						 */
+						String cachedFileName = Util.generateCacheFileFullPathMd5(viewActivity, uri.toString());
+						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, 0)));
+					}
+
 					break;
 				case Constants.REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER:
 					ArrayList<ImageItem> selectedImagePaths = (ArrayList<ImageItem>) data.getSerializableExtra(Constants.RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER);

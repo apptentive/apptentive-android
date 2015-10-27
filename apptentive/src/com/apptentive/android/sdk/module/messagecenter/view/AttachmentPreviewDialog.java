@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -78,10 +80,14 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 			}
 			// If no cache, load from the original originalPath
       if (is == null) {
-				File imageFile = new File(imageItem.originalPath);
-				if (imageFile.exists()) {
-					is = new FileInputStream(imageFile);
-					imagePathString = imageItem.originalPath;
+				if (imageItem.time == 0) {
+					is = getContext().getContentResolver().openInputStream(Uri.parse(imageItem.originalPath));
+				} else {
+					File imageFile = new File(imageItem.originalPath);
+					if (imageFile.exists()) {
+						is = new FileInputStream(imageFile);
+						imagePathString = imageItem.originalPath;
+					}
 				}
 			}
 
@@ -92,8 +98,10 @@ public class AttachmentPreviewDialog extends ApptentiveBaseDialog {
 			// Retrieve image orientation
 			int imageOrientation = 0;
 			try {
-				ExifInterface exif = new ExifInterface(imagePathString);
-				imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+				if (imagePathString != null) {
+					ExifInterface exif = new ExifInterface(imagePathString);
+					imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+				}
 			} catch (IOException e) {
 
 			}

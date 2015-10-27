@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 
@@ -59,7 +58,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setAdapterItemSize(viewWidth);
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				for (StoredFile file: imagesToAttach) {
-					images.add(new ImageItem(file.getOriginalUri(), file.getLocalFilePath(), 0));
+					images.add(new ImageItem(file.getOriginalUriOrPath(), file.getLocalFilePath(), file.getCreationTime()));
 				}
 				imageBandView.setData(images);
 			}

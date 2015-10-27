@@ -6,19 +6,14 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.DialogFragment;
 
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +26,6 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.lang.ref.WeakReference;
@@ -105,18 +99,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					if (Build.VERSION.SDK_INT >= 23 && PermissionChecker
-							.checkSelfPermission(activityContext, Manifest.permission.READ_EXTERNAL_STORAGE) !=
-							PermissionChecker.PERMISSION_GRANTED) {
-						ActivityCompat.requestPermissions((Activity) activityContext, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-								Constants.REQUEST_READ_STORAGE_PERMISSION);
-					} else {
-						MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
-						if (locallistener == null) {
-							return;
-						}
-						locallistener.onAttachImage();
+					MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
+					if (locallistener == null) {
+						return;
 					}
+					locallistener.onAttachImage();
 				}
 			});
 		} else {

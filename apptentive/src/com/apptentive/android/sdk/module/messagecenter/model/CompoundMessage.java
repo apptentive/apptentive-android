@@ -108,10 +108,11 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			StoredFile storedFile = new StoredFile();
 			storedFile.setId(getNonce());
 			storedFile.setApptentiveUri("");
-			storedFile.setOriginalUri(image.originalPath);
+			storedFile.setOriginalUriOrPath(image.originalPath);
 			// ToDo: look for local cache
 			storedFile.setLocalFilePath(image.localCachePath);
 			storedFile.setMimeType("image/jpeg");
+			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
 		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);

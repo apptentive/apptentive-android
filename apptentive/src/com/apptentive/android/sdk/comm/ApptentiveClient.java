@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
@@ -467,59 +468,37 @@ public class ApptentiveClient {
 			for (StoredFile storedFile : associatedFiles) {
 
 				FileInputStream fis = null;
+				String originalFilePath;
 				try {
-					String imagePathString = storedFile.getLocalFilePath();
-					File imageFile = new File(imagePathString);
+					String cachedImagePathString = storedFile.getLocalFilePath();
+					File cachedImageFile = new File(cachedImagePathString);
 					// No local cache found
-          if (!imageFile.exists()) {
-						File imageOriginalFile = new File(storedFile.getOriginalUri());
-						// Original file does not exist any more
-						if (!imageOriginalFile.exists()) {
+          if (!cachedImageFile.exists()) {
+						boolean bCachedCreated = false;
+						// Creation time would only be set when we were able to retrieve original file information through uri
+						if (storedFile.getCreationTime() == 0) {
+							originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
+							if (originalFilePath == null) {
+								bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+							}
+						} else {
+							originalFilePath = storedFile.getOriginalUriOrPath();
+							bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
+						}
+						if (!bCachedCreated) {
 							continue;
-						}
-						// Retrieve image orientation
-						int imageOrientation = 0;
-
-						try {
-							ExifInterface exif = new ExifInterface(storedFile.getOriginalUri());
-							imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-						} catch (IOException e) {
-
-						}
-
-						// Create local cache from the original file.
-						InputStream tempis = null;
-						CountingOutputStream cos = null;
-						try {
-							tempis = new BufferedInputStream(new FileInputStream(imageOriginalFile));
-							cos = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(imageFile)));
-							System.gc();
-							Bitmap smaller = ImageUtil.createScaledBitmapFromStream(tempis, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
-							smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
-							cos.flush();
-							Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
-							smaller.recycle();
-							System.gc();
-						} catch (FileNotFoundException e) {
-							Log.e("File not found while storing image.", e);
-
-						} catch (Exception e) {
-							Log.a("Error storing image.", e);
-						} finally {
-							Util.ensureClosed(tempis);
-							Util.ensureClosed(cos);
 						}
 					}
 
 					StringBuilder requestText = new StringBuilder();
-					requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUri())).append(lineEnd);
+					requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
 					requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 					requestText.append(lineEnd);
 
 					// Write file attributes
 					os.writeBytes(requestText.toString());
 
-					fis = new FileInputStream(imageFile);
+					fis = new FileInputStream(cachedImageFile);
 
 					int bytesAvailable = fis.available();
 					int maxBufferSize = 512 * 512;
@@ -547,7 +526,7 @@ public class ApptentiveClient {
 
 			ret.setCode(connection.getResponseCode());
 			ret.setReason(connection.getResponseMessage());
-      os.flush();
+			os.flush();
 			os.close();
 
 			// TODO: These streams may not be ready to read now. Put this in a new thread.

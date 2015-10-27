@@ -7,6 +7,7 @@ package com.apptentive.android.sdk.util.image;
  */
 
 import android.content.Context;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -281,7 +282,16 @@ public class ImageGridViewAdapter extends BaseAdapter {
 						return;
 					}
 				}
-				// display image using original originalPath
+				// display image using originalPath as uri
+				if (data.time == 0) {
+					Picasso.with(activityContext)
+							.load(Uri.parse(data.originalPath))
+							.placeholder(R.drawable.apptentive_ic_image_default_item)
+							.resize(itemSize, itemSize)
+							.centerInside()
+							.into(image);
+					return;
+				}
 				File imageFile = new File(data.originalPath);
 				Picasso.with(activityContext)
 						.load(imageFile)
