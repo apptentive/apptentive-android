@@ -37,7 +37,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
-	private static final int API_VERSION = 3;
+	private static final int API_VERSION = 4;
 	private static final int MAX_SENT_IMAGE_EDGE = 1024;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
@@ -96,10 +96,6 @@ public class ApptentiveClient {
 			case CompoundMessage:
 				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
 				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
-				// Send as paint text message when there is no associated files
-				if (associatedFiles == null || associatedFiles.size() == 0) {
-					return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-				}
 				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
 			case unknown:
 				break;
@@ -465,63 +461,65 @@ public class ApptentiveClient {
 			os.writeBytes(twoHyphens + boundary + lineEnd);
 
 			// Send associated files
-			for (StoredFile storedFile : associatedFiles) {
+			if (associatedFiles != null) {
+				for (StoredFile storedFile : associatedFiles) {
 
-				FileInputStream fis = null;
-				String originalFilePath;
-				try {
-					String cachedImagePathString = storedFile.getLocalFilePath();
-					File cachedImageFile = new File(cachedImagePathString);
-					// No local cache found
-          if (!cachedImageFile.exists()) {
-						boolean bCachedCreated = false;
-						// Creation time would only be set when we were able to retrieve original file information through uri
-						if (storedFile.getCreationTime() == 0) {
-							originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
-							if (originalFilePath == null) {
-								bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+					FileInputStream fis = null;
+					String originalFilePath;
+					try {
+						String cachedImagePathString = storedFile.getLocalFilePath();
+						File cachedImageFile = new File(cachedImagePathString);
+						// No local cache found
+						if (!cachedImageFile.exists()) {
+							boolean bCachedCreated = false;
+							// Creation time would only be set when we were able to retrieve original file information through uri
+							if (storedFile.getCreationTime() == 0) {
+								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
+								if (originalFilePath == null) {
+									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+								}
+							} else {
+								originalFilePath = storedFile.getOriginalUriOrPath();
+								bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
 							}
-						} else {
-							originalFilePath = storedFile.getOriginalUriOrPath();
-							bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
+							if (!bCachedCreated) {
+								continue;
+							}
 						}
-						if (!bCachedCreated) {
-							continue;
+
+						StringBuilder requestText = new StringBuilder();
+						requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+						requestText.append(lineEnd);
+
+						// Write file attributes
+						os.writeBytes(requestText.toString());
+
+						fis = new FileInputStream(cachedImageFile);
+
+						int bytesAvailable = fis.available();
+						int maxBufferSize = 512 * 512;
+						int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						byte[] buffer = new byte[bufferSize];
+
+						// read image data 0.5MB at a time and write it into buffer
+						int bytesRead = fis.read(buffer, 0, bufferSize);
+						while (bytesRead > 0) {
+							os.write(buffer, 0, bufferSize);
+							bytesAvailable = fis.available();
+							bufferSize = Math.min(bytesAvailable, maxBufferSize);
+							bytesRead = fis.read(buffer, 0, bufferSize);
 						}
+					} catch (IOException e) {
+						Log.d("Error writing file bytes to HTTP connection.", e);
+						ret.setBadPayload(true);
+						throw e;
+					} finally {
+						Util.ensureClosed(fis);
 					}
-
-					StringBuilder requestText = new StringBuilder();
-					requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
-					requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
-					requestText.append(lineEnd);
-
-					// Write file attributes
-					os.writeBytes(requestText.toString());
-
-					fis = new FileInputStream(cachedImageFile);
-
-					int bytesAvailable = fis.available();
-					int maxBufferSize = 512 * 512;
-					int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-					byte[] buffer = new byte[bufferSize];
-
-					// read image data 0.5MB at a time and write it into buffer
-					int bytesRead = fis.read(buffer, 0, bufferSize);
-					while (bytesRead > 0) {
-						os.write(buffer, 0, bufferSize);
-						bytesAvailable = fis.available();
-						bufferSize = Math.min(bytesAvailable, maxBufferSize);
-						bytesRead = fis.read(buffer, 0, bufferSize);
-					}
-				} catch (IOException e) {
-					Log.d("Error writing file bytes to HTTP connection.", e);
-					ret.setBadPayload(true);
-					throw e;
-				} finally {
-					Util.ensureClosed(fis);
+					os.writeBytes(lineEnd);
+					os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 				}
-				os.writeBytes(lineEnd);
-				os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 			}
 
 			ret.setCode(connection.getResponseCode());
@@ -581,4 +579,5 @@ public class ApptentiveClient {
 	private static String getEndpointBase() {
 		return useStagingServer ? ENDPOINT_BASE_STAGING : ENDPOINT_BASE_PRODUCTION;
 	}
+
 }
