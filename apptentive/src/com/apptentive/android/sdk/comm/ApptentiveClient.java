@@ -8,8 +8,6 @@ package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -20,7 +18,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.CountingOutputStream;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 
@@ -38,7 +35,6 @@ import java.util.zip.GZIPInputStream;
 public class ApptentiveClient {
 
 	private static final int API_VERSION = 4;
-	private static final int MAX_SENT_IMAGE_EDGE = 1024;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -488,7 +484,7 @@ public class ApptentiveClient {
 						}
 
 						StringBuilder requestText = new StringBuilder();
-						requestText.append(String.format("Content-Disposition: form-data; filePath=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						requestText.append(lineEnd);
 
@@ -522,10 +518,12 @@ public class ApptentiveClient {
 				}
 			}
 
-			ret.setCode(connection.getResponseCode());
-			ret.setReason(connection.getResponseMessage());
 			os.flush();
 			os.close();
+
+			ret.setCode(connection.getResponseCode());
+			ret.setReason(connection.getResponseMessage());
+
 
 			// TODO: These streams may not be ready to read now. Put this in a new thread.
 			// Read the normal response.
