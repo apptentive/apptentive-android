@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -316,11 +317,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					CompoundMessage textMessage = (CompoundMessage) listItem;
 					String datestamp = textMessage.getDatestamp();
 					Double createdTime = textMessage.getCreatedAt();
+					List<StoredFile> files = textMessage.getAssociatedFiles(activityContext);
+					String messageBody = textMessage.getBody();
 					String status;
 					boolean bShowProgress;
 					if (createdTime == null || createdTime > Double.MIN_VALUE) {
 						status = createStatus(createdTime, textMessage.isLastSent());
-						bShowProgress = createdTime == null && !isInPauseState;
+						// show progress bar if: 1. no sent time set, and 2. not paused, and 3. have either text or files to sent
+						bShowProgress = createdTime == null && !isInPauseState && (files != null || !TextUtils.isEmpty(messageBody));
 					}
 					else {
 						status = activityContext.getResources().getString(R.string.apptentive_failed);
@@ -328,7 +332,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					}
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							bShowProgress, textMessage.getBody(), parent.getWidth(), textMessage.getAssociatedFiles(activityContext));
+							bShowProgress, messageBody, parent.getWidth(), files);
 					break;
 				}
 				case TYPE_STATUS: {

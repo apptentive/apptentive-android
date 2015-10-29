@@ -11,11 +11,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +129,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	private static ApptentiveDatabase instance;
 
+	private File fileDir;
+
 	public static ApptentiveDatabase getInstance(Context context) {
 		if (instance == null) {
 			instance = new ApptentiveDatabase(context.getApplicationContext());
@@ -152,6 +160,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	private ApptentiveDatabase(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		fileDir = context.getFilesDir();
 	}
 
 	/**
@@ -178,7 +187,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			case 1:
 				if (newVersion == 2) {
 					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
-					migrateStoredFiles();
+					migrateToCompundMessage(db);
 				}
 		}
 	}
@@ -379,7 +388,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
-			db = getReadableDatabase();
+			db = getWritableDatabase();
 			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
 			return cursor.getCount();
 		} finally {
@@ -414,21 +423,22 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// File Store
 	//
 
-	public synchronized void migrateStoredFiles() {
-		SQLiteDatabase db = null;
+	public synchronized void migrateToCompundMessage(SQLiteDatabase db) {
 		Cursor cursor = null;
+		// Migrate legacy stored files to compound message associated files
 		try {
-			db = getWritableDatabase();
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
 			if (cursor.moveToFirst()) {
 				do {
 					String file_nonce = cursor.getString(0);
 					// Stored File id was in the format of "apptentive-file-nonce"
 					String patten = "apptentive-file-";
-          String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
+					String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
 					ContentValues values = new ContentValues();
 					values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, nonce);
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, cursor.getString(3));
+					// Legacy file was stored in db by name only. Need to get the full path when migrated
+					String localFileName = cursor.getString(3);
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, (new File(fileDir, localFileName).getAbsolutePath()));
 					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
 					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, cursor.getString(2));
 					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
@@ -439,7 +449,47 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
+		}
+		// Migrate legacy message types to CompoundMessage Type
+		try {
+			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
+			if (cursor.moveToFirst()) {
+				do {
+					String json = cursor.getString(6);
+					JSONObject root = null;
+					boolean bUpdateRecord = false;
+					try {
+						root = new JSONObject(json);
+						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+						switch (type) {
+							case TextMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								bUpdateRecord = true;
+								break;
+							case FileMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
+								bUpdateRecord = true;
+								break;
+							case AutomatedMessage:
+								break;
+							default:
+								break;
+						}
+						if (bUpdateRecord) {
+							String databaseId = cursor.getString(0);
+							ContentValues messageValues = new ContentValues();
+							messageValues.put(MESSAGE_KEY_JSON, root.toString());
+							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
+						}
+					} catch (JSONException e) {
+						Log.v("Error parsing json as Message: %s", e, json);
+					}
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
 		}
 	}
 
@@ -538,6 +588,33 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
+		return associatedFiles.size() > 0 ? associatedFiles: null;
+	}
+
+	public synchronized List<StoredFile> getAllStoredFiles() {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
+			StoredFile ret = null;
+			if (cursor.moveToFirst()) {
+				do {
+					ret = new StoredFile();
+					ret.setId(cursor.getString(0));
+					ret.setLocalFilePath(cursor.getString(1));
+					ret.setMimeType(cursor.getString(2));
+					ret.setOriginalUriOrPath(cursor.getString(3));
+					ret.setApptentiveUri(cursor.getString(4));
+					ret.setCreationTime(0);
+					associatedFiles.add(ret);
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
+			ensureClosed(db);
+		}
 		return associatedFiles;
 	}
 
@@ -557,7 +634,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			// Always delete existing rows with the same nonce to ensure add/update both work
 			db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
 
-      for (StoredFile file: associatedFiles) {
+			for (StoredFile file : associatedFiles) {
 				ContentValues values = new ContentValues();
 				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
 				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());

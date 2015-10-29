@@ -20,9 +20,7 @@ public class MessageFactory {
 			JSONObject root = new JSONObject(json);
 			ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
 			switch (type) {
-				case TextMessage:
 				case CompoundMessage:
-				case FileMessage:
 					return new CompoundMessage(json);
 				case AutomatedMessage:
 					return new AutomatedMessage(json);

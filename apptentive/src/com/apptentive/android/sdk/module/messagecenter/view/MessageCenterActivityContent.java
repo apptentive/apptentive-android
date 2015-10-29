@@ -596,9 +596,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 		// Check if the last message in the view is a sent message
 		if (apptentiveMessage != null &&
-				(apptentiveMessage instanceof OutgoingTextMessage ||
-						apptentiveMessage instanceof OutgoingFileMessage ||
-						apptentiveMessage instanceof CompoundMessage)) {
+				(apptentiveMessage.isOutgoingMessage())) {
 			Double createdTime = apptentiveMessage.getCreatedAt();
 			if (createdTime != null && createdTime > Double.MIN_VALUE) {
 				MessageCenterStatus newItem = interaction.getRegularStatus();
@@ -1305,7 +1303,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					}
 				}
 
-				if (next == null || next.getCreatedAt() == null || createdAt == null || next.getCreatedAt() <= createdAt) {
+				if (next == null || next.getCreatedAt() == null || createdAt == null || next.getCreatedAt() <= createdAt ||
+						createdAt <= Double.MIN_VALUE) {
 					listIterator.add(item);
 				} else {
 					// Add in front of the message that has later created_at time

@@ -25,7 +25,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	private static final String KEY_BODY = "body";
 
-	private static final String KEY_TEXT_ONLY = "text_only";
+	public static final String KEY_TEXT_ONLY = "text_only";
 
 	private boolean isLast;
 
@@ -134,9 +134,9 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		db.deleteAssociatedFiles(getNonce());
 	}
 
+
 	@Override
 	public boolean isLastSent() {
-
 		return (isOutgoingMessage()) ? isLast : false;
 	}
 
