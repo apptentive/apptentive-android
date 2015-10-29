@@ -438,7 +438,7 @@ public class ApptentiveClient {
 			connection.setRequestMethod("POST");
 
 			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
@@ -454,7 +454,6 @@ public class ApptentiveClient {
 			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
 			os.writeBytes(lineEnd);
 			os.writeBytes(postBody + lineEnd);
-			os.writeBytes(twoHyphens + boundary + lineEnd);
 
 			// Send associated files
 			if (associatedFiles != null) {
@@ -484,6 +483,7 @@ public class ApptentiveClient {
 						}
 
 						StringBuilder requestText = new StringBuilder();
+						requestText.append(twoHyphens + boundary + lineEnd);
 						requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						requestText.append(lineEnd);
@@ -514,9 +514,9 @@ public class ApptentiveClient {
 						Util.ensureClosed(fis);
 					}
 					os.writeBytes(lineEnd);
-					os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 				}
 			}
+			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
 			os.flush();
 			os.close();
