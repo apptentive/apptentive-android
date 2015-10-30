@@ -457,9 +457,7 @@ public class ApptentiveClient {
 
 			// Send associated files
 			if (associatedFiles != null) {
-				int i = 0;
 				for (StoredFile storedFile : associatedFiles) {
-          i++;
 					FileInputStream fis = null;
 					String originalFilePath;
 					try {
@@ -484,7 +482,7 @@ public class ApptentiveClient {
 						}
 						os.writeBytes(twoHyphens + boundary + lineEnd);
 						StringBuilder requestText = new StringBuilder();
-						requestText.append(String.format("Content-Disposition: form-data; name=\"file%s\"; filename=\"%s\"", i, storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						// Write file attributes
 						os.writeBytes(requestText.toString());
