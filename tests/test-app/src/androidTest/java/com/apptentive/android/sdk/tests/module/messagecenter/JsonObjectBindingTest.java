@@ -54,7 +54,7 @@ public class JsonObjectBindingTest extends ApptentiveInstrumentationTestCase {
 		assertEquals(true, recoveredMessage.contains("\"created_at\":1.376421118499E9"));
 		assertEquals(true, recoveredMessage.contains("\"client_created_at\":1376421112"));
 		assertEquals(true, recoveredMessage.contains("\"client_created_at_utc_offset\":-25200"));
-		assertEquals(true, recoveredMessage.contains("\"type\":\"TextMessage\""));
+		assertEquals(true, recoveredMessage.contains("\"type\":\"CompoundMessage\""));
 		assertEquals(true, recoveredMessage.contains("\"name\":\"Sky Kelsey\""));
 		assertEquals(true, recoveredMessage.contains("\"id\":\"4de48b826688000001000007\""));
 		assertEquals(true, recoveredMessage.contains("\"body\":\"Test reply via email.\""));
