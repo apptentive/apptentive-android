@@ -17,6 +17,7 @@
         android:background="@color/apptentive_material_background"
         android:descendantFocusability="beforeDescendants"
         android:contentDescription="@null"
+        android:src="@drawable/apptentive_ic_image_default_item"
         android:scaleType="matrix"/>
     <RelativeLayout android:id="@+id/header_bar"
                     android:layout_width="match_parent"

@@ -42,6 +42,7 @@
                     android:focusableInTouchMode="false"
                     android:horizontalSpacing="@dimen/apptentive_image_grid_space_size"
                     android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
+                    android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
                     android:clipToPadding="false"
                     android:numColumns="@integer/apptentive_image_grid_default_column_number"/>
                 <TextView android:id="@+id/status"
