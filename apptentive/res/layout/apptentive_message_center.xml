@@ -77,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/apptentive_transparency"
-                    android:paddingBottom="60dp"
+                    android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
                     android:clipToPadding="false"
                     android:descendantFocusability="afterDescendants"
                     android:cacheColorHint="@color/apptentive_transparency"/>
