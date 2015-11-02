@@ -122,6 +122,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	public interface OnListviewItemActionListener {
 		void onComposingViewCreated();
 
+		void onComposingBarCreated();
+
 		void beforeComposingTextChanged(CharSequence str);
 
 		void onComposingTextChanged(CharSequence str);
@@ -401,7 +403,24 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	private void showComposingBarAnimation() {
 		if (showComposingBarAnimation) {
-			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingActionBarView, null, null);
+			AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(composingActionBarView, new Animator.AnimatorListener() {
+				@Override
+				public void onAnimationStart(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationRepeat(Animator animation) {
+				}
+
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					composingActionListener.onComposingBarCreated();
+				}
+
+				@Override
+				public void onAnimationCancel(Animator animation) {
+				}
+			}, null);
 			set.start();
 			showComposingBarAnimation = false;
 		}

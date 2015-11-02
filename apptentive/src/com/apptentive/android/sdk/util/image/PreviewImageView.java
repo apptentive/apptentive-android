@@ -256,6 +256,7 @@ public class PreviewImageView extends ImageView implements OnScaleGestureListene
 			initScale = scale;
 			// Center the image
 			scaleMatrix.postTranslate((viewWidth - dw) / 2, (viewHeight - dh) / 2);
+			scaleMatrix.postScale(scale, scale, getWidth() / 2, getHeight() / 2);
 			checkBorderAndCenterWhenScale();
 			setImageMatrix(scaleMatrix);
 			once = false;

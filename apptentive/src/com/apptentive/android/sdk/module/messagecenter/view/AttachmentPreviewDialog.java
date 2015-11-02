@@ -67,6 +67,11 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		return dialog;
 	}
 
+	@Override
+	public void onCreate(Bundle savedInstance){
+		super.onCreate(savedInstance);
+		setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -116,24 +121,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		height = inflater.getContext().getResources().getDisplayMetrics().heightPixels;
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
 		previewContainer.setLayoutParams(lp);
-		/*this.getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
-			@Override
-			public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent arg2) {
-				if (keyCode == KeyEvent.KEYCODE_BACK) {
-					dismiss();
-					return true;
-				} else if (keyCode == KeyEvent.KEYCODE_CALL) {
-					dismiss();
-					return true;
-				}
-				return false;
-			}
-		});*/
-		getDialog().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-		getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE);
+
 
 		getDialog().setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
@@ -205,7 +193,8 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 			// If no cache, load from the original originalPath
       if (is == null) {
 				if (imageItem.time == 0) {
-					is = getContext().getContentResolver().openInputStream(Uri.parse(imageItem.originalPath));
+					previewImageView.setImageURI(Uri.parse(imageItem.originalPath));
+					return true;
 				} else {
 					File imageFile = new File(imageItem.originalPath);
 					if (imageFile.exists()) {

@@ -89,6 +89,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private final static String LIST_TOP_INDEX = "list_top_index";
 	private final static String LIST_TOP_OFFSET = "list_top_offset";
 	private final static String COMPOSING_EDITTEXT_STATE = "edittext";
+	private final static String COMPOSING_ATTACHMENTS = "attachments";
 	private final static String WHO_CARD_MODE = "whocardmode";
 	private final static String WHO_CARD_NAME = "whocardname";
 	private final static String WHO_CARD_EMAIL = "whocardemail";
@@ -130,6 +131,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	 * , rotate device, attaches a file, etc.
 	 */
 	private Parcelable composingViewSavedState;
+	private ArrayList<ImageItem> savedAttachmentstList;
 
 	/**
 	 * Used to save the state of the who card if the user closes Message Center for a moment,
@@ -139,6 +141,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private Parcelable pendingWhoCardName;
 	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
+
+
 
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
@@ -205,10 +209,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				case MSG_START_SENDING: {
 					Bundle b = msg.getData();
 					CompoundMessage message = new CompoundMessage();
-					message.setBody(b.getString("message"));
+					message.setBody(b.getString(COMPOSING_EDITTEXT_STATE));
 					message.setRead(true);
 					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
-					ArrayList<ImageItem> files = b.getParcelableArrayList("attachments");
+					ArrayList<ImageItem> files = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
 					message.setAssociatedFiles(viewActivity, files);
 					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
 					// Add new outgoing message with animation
@@ -294,6 +298,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				onSavedInstanceState.getInt(LIST_TOP_OFFSET);
 		composingViewSavedState = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
+		savedAttachmentstList = (onSavedInstanceState == null) ? null :
+				onSavedInstanceState.<ImageItem>getParcelableArrayList(COMPOSING_ATTACHMENTS);
 		pendingWhoCardName = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(WHO_CARD_NAME);
 		pendingWhoCardEmail = (onSavedInstanceState == null) ? null :
@@ -444,6 +450,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		outState.putInt(LIST_TOP_INDEX, index);
 		outState.putInt(LIST_TOP_OFFSET, top);
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
+		outState.putParcelableArrayList(COMPOSING_ATTACHMENTS, imageAttachmentstList);
 		outState.putParcelable(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardNameState());
 		outState.putParcelable(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmailState());
 		outState.putString(WHO_CARD_AVATAR_FILE, messageCenterListAdapter.getWhoCardAvatarFileName());
@@ -457,7 +464,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		//messageCenterListView.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_INSTANCE_STATE));
 	}
 
 	@Override
@@ -735,15 +741,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 				firstIndex, top));
 
-		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-		{
-			if (barView != null && barView.showConfirmation == false) {
-				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-						R.color.colorAccent));
-				barView.showConfirmation = true;
-			}
-		}
+		onComposingBarCreated();
 	}
 
 	public void removeImageFromComposer(final int position) {
@@ -753,14 +751,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		// Show keyboard if all attachments have been removed
 		messageCenterListAdapter.setForceShowKeyboard(count == 0);
 		messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
-		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 
-		// No attachment and no pending composing text, do not show close confirmation
-		if (count == 0) {
-			Editable content = getPendingComposingContent();
-			final String messageText = (content != null) ? content.toString().trim() : "";
-			barView.showConfirmation = !(messageText.isEmpty());
-		}
+		onComposingBarCreated();
 
 	}
 
@@ -838,6 +830,29 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
+	public void onComposingBarCreated() {
+		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		if (barView != null) {
+			barView.showConfirmation = true;
+			int attachmentCount = imageAttachmentstList.size();
+			if (attachmentCount == 0) {
+				Editable content = getPendingComposingContent();
+				final String messageText = (content != null) ? content.toString().trim() : "";
+				barView.showConfirmation = !(messageText.isEmpty());
+			}
+			if (barView.showConfirmation == true) {
+				barView.sendButton.setEnabled(true);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
+						R.color.colorAccent));
+			} else {
+				barView.sendButton.setEnabled(false);
+				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
+						R.color.apptentive_material_dark_disabled_icon));
+			}
+		}
+	}
+
+	@Override
 	public void onComposingViewCreated() {
 		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
@@ -865,11 +880,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).commit();
 		}*/
 
-		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-		if (barView != null) {
-			barView.attachButton.setEnabled(true);
-			barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-					R.color.colorAccent));
+		if (savedAttachmentstList != null) {
+			addImageToComposer(savedAttachmentstList);
+			savedAttachmentstList = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
@@ -891,13 +904,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void beforeComposingTextChanged(CharSequence str) {
-		MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
+		/*MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 		if (barView != null) {
 			barView.sendButton.setEnabled(false);
 			barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
 					R.color.apptentive_material_dark_disabled_icon));
 			barView.showConfirmation = false;
-		}
+		}*/
 	}
 
 	@Override
@@ -906,23 +919,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void afterComposingTextChanged(String str) {
-		if (str == null || str.trim().isEmpty()) {
-			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null && barView.showConfirmation == true) {
-				barView.sendButton.setEnabled(false);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
-						R.color.apptentive_material_dark_disabled_icon));
-				barView.showConfirmation = false;
-			}
-		} else {
-			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-			if (barView != null && barView.showConfirmation == false) {
-				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
-						R.color.colorAccent));
-				barView.showConfirmation = true;
-			}
-		}
+		onComposingBarCreated();
 	}
 
 	@Override
@@ -1018,8 +1015,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 // is visible after the keyboard is hidden
 												 if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
 													 Bundle b = new Bundle();
-													 b.putString("message", messageText);
-													 b.putParcelableArrayList("attachments", messageAttachments);
+													 b.putString(COMPOSING_EDITTEXT_STATE, messageText);
+													 b.putParcelableArrayList( COMPOSING_ATTACHMENTS, messageAttachments);
 													 Message msg = messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
 															 messageText);
 													 msg.setData(b);
