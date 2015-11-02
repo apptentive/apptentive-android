@@ -106,6 +106,10 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 		}
 	}
 
+	public void setImageIndicatorCallback(ImageGridViewAdapter.Callback callback) {
+			imageBandAdapter.setIndicatorCallback(callback);
+	}
+
 	public void setData(List<ImageItem> images) {
 		imageBandAdapter.setData(images);
 	}

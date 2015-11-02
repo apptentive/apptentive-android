@@ -6,14 +6,13 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.DialogFragment;
 
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 
+import com.apptentive.android.sdk.ApptentiveInternalActivity;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.ActivityContent;
@@ -62,7 +62,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 					bundle.putString("STR_3", item.str_3);
 					bundle.putString("STR_4", item.str_4);
 					editNameDialog.setArguments(bundle);
-					editNameDialog.show(((Activity) activityContext).getFragmentManager(), "CloseConfirmationDialog");
+					editNameDialog.show(((ApptentiveInternalActivity)activityContext).getSupportFragmentManager(), "CloseConfirmationDialog");
 				} else {
 					locallistener.onCancelComposing();
 				}

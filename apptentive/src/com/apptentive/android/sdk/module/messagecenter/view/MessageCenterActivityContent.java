@@ -10,6 +10,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,6 +35,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveInternalActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -49,13 +52,12 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterCompos
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.WeakReferenceHandler;
+import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
 import org.json.JSONException;
@@ -79,10 +81,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		implements MessageManager.AfterSendMessageListener,
 		MessageAdapter.OnListviewItemActionListener,
 		MessageManager.OnNewIncomingMessagesListener,
-		AbsListView.OnScrollListener {
+		AbsListView.OnScrollListener,
+		MessageCenterListView.OnListviewResizeListener,
+		ImageGridViewAdapter.Callback {
 
 	// keys used to save instance in the event of rotation
-	private final static String LIST_INSTANCE_STATE = "list";
+	private final static String LIST_TOP_INDEX = "list_top_index";
+	private final static String LIST_TOP_OFFSET = "list_top_offset";
 	private final static String COMPOSING_EDITTEXT_STATE = "edittext";
 	private final static String WHO_CARD_MODE = "whocardmode";
 	private final static String WHO_CARD_NAME = "whocardname";
@@ -134,6 +139,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private Parcelable pendingWhoCardName;
 	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
+
+	private int listViewSavedTopIndex = -1;
+	private int listViewSavedTopOffset;
 
 
 	protected static final int MSG_SCROLL_TO_BOTTOM = 1;
@@ -280,8 +288,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		activity.setContentView(R.layout.apptentive_message_center);
 		viewActivity = activity;
 
-		boolean bRestoreListView = onSavedInstanceState != null &&
-				onSavedInstanceState.getParcelable(LIST_INSTANCE_STATE) != null;
+		listViewSavedTopIndex = (onSavedInstanceState == null) ? -1 :
+				onSavedInstanceState.getInt(LIST_TOP_INDEX);
+		listViewSavedTopOffset = (onSavedInstanceState == null) ? 0 :
+				onSavedInstanceState.getInt(LIST_TOP_OFFSET);
 		composingViewSavedState = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
 		pendingWhoCardName = (onSavedInstanceState == null) ? null :
@@ -305,7 +315,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-		if (!bRestoreListView) {
+		if (listViewSavedTopIndex == -1) {
 			messageCenterViewHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 		}
 	}
@@ -336,8 +346,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setOnScrollListener(this);
-
-    messageCenterListView.setItemsCanFocus(true);
+		((MessageCenterListView) messageCenterListView).setOnListViewResizeListener(this);
+		messageCenterListView.setItemsCanFocus(true);
 		final SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		boolean showKeyboard = true;
 
@@ -420,12 +430,19 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			messageCenterListAdapter = new MessageAdapter<MessageCenterListItem>(viewActivity, messages, this, interaction);
 			messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 			messageCenterListView.setAdapter(messageCenterListAdapter);
+			if (listViewSavedTopIndex != -1) {
+				messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
+			}
 		}
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable(LIST_INSTANCE_STATE, messageCenterListView.onSaveInstanceState());
+		int index = messageCenterListView.getFirstVisiblePosition();
+		View v = messageCenterListView.getChildAt(0);
+		int top = (v == null) ? 0 : (v.getTop() - messageCenterListView.getPaddingTop());
+		outState.putInt(LIST_TOP_INDEX, index);
+		outState.putInt(LIST_TOP_OFFSET, top);
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
 		outState.putParcelable(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardNameState());
 		outState.putParcelable(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmailState());
@@ -440,14 +457,19 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		messageCenterListView.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_INSTANCE_STATE));
+		//messageCenterListView.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_INSTANCE_STATE));
 	}
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
+		DialogFragment myFrag = (DialogFragment) (((ApptentiveInternalActivity) viewActivity).getSupportFragmentManager()).findFragmentByTag("preview_dialog");
+		if (myFrag != null) {
+			myFrag.dismiss();
+		}
 		cleanup();
 		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 		return true;
+
 	}
 
 	public boolean cleanup() {
@@ -742,26 +764,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	}
 
-	public void showAttachmentDialog(Context context, final ImageItem image,
-																	 final AttachmentPreviewDialog.OnActionButtonListener listener) {
+	public void showAttachmentDialog(final ImageItem image) {
 		if (image == null) {
 			Log.d("No attachment argument.");
 			return;
 		}
 
 		try {
-			AttachmentPreviewDialog dialog = new AttachmentPreviewDialog(context);
-			boolean bRet = dialog.setImage(image);
-			if (!bRet) {
-				Log.d("No attachment file found.");
-				return;
-			}
-			if (listener != null) {
-				dialog.setOnAttachmentAcceptedListener(listener);
-			} else {
-				dialog.hideActionButton();
-			}
-			dialog.show();
+
+			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
+			dialog.show(((ApptentiveInternalActivity) viewActivity).getSupportFragmentManager(), "preview_dialog");
 		} catch (Exception e) {
 			Log.e("Error loading attachment preview.", e);
 		}
@@ -859,6 +871,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			barView.attachButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
 					R.color.colorAccent));
 		}
+		messageCenterListView.setPadding(0, 0, 0, 0);
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
@@ -872,6 +885,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			emailEditText.onRestoreInstanceState(pendingWhoCardEmail);
 			pendingWhoCardEmail = null;
 		}
+		messageCenterListView.setPadding(0, 0, 0, 0);
 		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
@@ -1141,6 +1155,29 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
+	public void OnListViewResize(int w, int h, int oldw, int oldh) {
+		// detect keyboard launching
+		if (oldh > h) {
+			if (composingItem != null) {
+				// When keyboard is up, adjust the scolling such that the cursor is always visible
+				final int firstIndex = messageCenterListView.getFirstVisiblePosition();
+				int lastIndex = messageCenterListView.getLastVisiblePosition();
+				View v = messageCenterListView.getChildAt(lastIndex - firstIndex);
+				int top = (v == null) ? 0 : v.getTop();
+				if (messageEditText != null) {
+					int pos = messageEditText.getSelectionStart();
+					Layout layout = messageEditText.getLayout();
+					int line = layout.getLineForOffset(pos);
+					int baseline = layout.getLineBaseline(line);
+					int ascent = layout.getLineAscent(line);
+					messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+							lastIndex, Math.max(top - (oldh - h), baseline - ascent)));
+				}
+			}
+		}
+	}
+
+	@Override
 	public void onAttachImage() {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		Bundle extras = new Bundle();
@@ -1253,6 +1290,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	private void showFab() {
+		float scale = viewActivity.getResources().getDisplayMetrics().density;
+		int dpAsPixels = (int) (viewActivity.getResources().getDimension(R.dimen.apptentive_message_center_bottom_padding) * scale + 0.5f);
+		messageCenterListView.setPadding(0, 0, 0, dpAsPixels);
 		AnimationUtil.scaleFadeIn(fab);
 	}
 
@@ -1318,14 +1358,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onShowImagePreView(final int position, final ImageItem image, final boolean withAction) {
-		showAttachmentDialog(viewActivity, image, withAction ?
-				new AttachmentPreviewDialog.OnActionButtonListener() {
-					@Override
-					public void onTakeAction() {
-						removeImageFromComposer(position);
-					}
-				} : null);
+	public void onShowImagePreView(final int position, final ImageItem image) {
+		showAttachmentDialog(image);
 	}
 
 	@Override
@@ -1335,5 +1369,25 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				onAttachImage();
 			}
 		}
+	}
+
+	@Override
+	public void onSingleImageSelected(int index) {
+
+	}
+
+	@Override
+	public void onImageSelected(int index) {
+		removeImageFromComposer(index);
+	}
+
+	@Override
+	public void onImageUnselected(String path) {
+
+	}
+
+	@Override
+	public void onCameraShot(File imageFile) {
+
 	}
 }

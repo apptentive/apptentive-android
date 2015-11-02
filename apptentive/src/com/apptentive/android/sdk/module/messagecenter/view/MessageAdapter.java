@@ -140,7 +140,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onAttachImage();
 
-		void onShowImagePreView(int position, ImageItem image, boolean withAction);
+		void onShowImagePreView(int position, ImageItem image);
 	}
 
 	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnListviewItemActionListener listener, MessageCenterInteraction interaction) {

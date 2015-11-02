@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
+import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
 import java.util.ArrayList;
@@ -68,10 +69,12 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
 			@Override
 			public void onClick(int position, ImageItem image) {
-				listener.onShowImagePreView(position, image, true);
+				listener.onShowImagePreView(position, image);
 			}
 		});
 		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_close);
+
+		imageBandView.setImageIndicatorCallback((ImageGridViewAdapter.Callback) listener);
 		// Initialize image attachments band with empty data
 		clearImageAttachmentBand();
 	}

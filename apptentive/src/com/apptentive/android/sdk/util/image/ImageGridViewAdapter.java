@@ -36,6 +36,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	private boolean showCamera = true;
 	private boolean showImageIndicator = true;
 	private int defaultImageIndicator;
+	private Callback localCallback;
 
 	private List<ImageItem> images = new ArrayList<ImageItem>();
 	private List<ImageItem> selectedImages = new ArrayList<ImageItem>();
@@ -79,6 +80,10 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 	public boolean isShowCamera() {
 		return showCamera;
+	}
+
+	public void setIndicatorCallback(Callback localCallback) {
+		this.localCallback = localCallback;
 	}
 
 	/**
@@ -212,7 +217,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			}
 			if (holder != null) {
-				holder.bindData(getItem(i));
+				holder.bindData(i);
 			}
 		}
 
@@ -237,7 +242,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			view.setTag(this);
 		}
 
-		void bindData(final ImageItem data) {
+		void bindData(final int index) {
+			final ImageItem data = getItem(index);
 			if (data == null) {
 				return;
 			}
@@ -256,6 +262,13 @@ public class ImageGridViewAdapter extends BaseAdapter {
 						image.setVisibility(View.GONE);
 					} else {
 						indicator.setImageResource(defaultImageIndicator);
+						indicator.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								if (localCallback != null) {
+									localCallback.onImageSelected(index);
+								}
+							}
+						});
 					}
 					mask.setVisibility(View.GONE);
 				}
@@ -307,9 +320,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 * Callback Interface
 	 */
 	public interface Callback {
-		void onSingleImageSelected(String path);
+		void onSingleImageSelected(int index);
 
-		void onImageSelected(String path);
+		void onImageSelected(int index);
 
 		void onImageUnselected(String path);
 
