@@ -42,8 +42,6 @@ public class ApptentiveClient {
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
-	private static final String ENDPOINT_BASE_STAGING = "https://api.apptentive-beta.com";
-	private static final String ENDPOINT_BASE_PRODUCTION = "https://api.apptentive.com";
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = "/messages";
@@ -139,7 +137,7 @@ public class ApptentiveClient {
 	 * @return ApptentiveHttpResponse containg content and response returned from the server.
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
-		uri = getEndpointBase() + uri;
+		uri = getEndpointBase(appContext) + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
@@ -280,7 +278,7 @@ public class ApptentiveClient {
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
-		uri = getEndpointBase() + uri;
+		uri = getEndpointBase(appContext) + uri;
 		Log.d("Performing multipart request to %s", uri);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -571,8 +569,14 @@ public class ApptentiveClient {
 		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
 
-	private static String getEndpointBase() {
-		return useStagingServer ? ENDPOINT_BASE_STAGING : ENDPOINT_BASE_PRODUCTION;
+	private static String getEndpointBase(Context appContext) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
+		if (url == null) {
+			url = Constants.CONFIG_DEFAULT_SERVER_URL;
+			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
+		}
+		return url;
 	}
 
 }
