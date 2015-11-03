@@ -173,6 +173,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
 		try {
@@ -212,6 +213,10 @@ public class Apptentive {
 
 	public static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
 		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Duration duration) {
+		ApptentiveInternal.addCustomDeviceData(context, key, duration);
 	}
 
 	/**
@@ -1264,6 +1269,36 @@ public class Apptentive {
 			double thisDateTime = getDateTime();
 			double thatDateTime = other.getDateTime();
 			return Double.compare(thisDateTime, thatDateTime);
+		}
+	}
+
+	public static class Duration extends JSONObject implements Comparable<Duration> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_DURATION = "duration";
+
+		public Duration(double duration) {
+			super();
+			setDuration(duration);
+		}
+
+		public void setDuration(double duration) {
+			try {
+				put(KEY_TYPE, KEY_DURATION);
+				put(KEY_DURATION, duration);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.DateTime.", e);
+			}
+		}
+
+		public double getDuration() {
+			return optDouble(KEY_DURATION);
+		}
+
+		@Override
+		public int compareTo(Duration other) {
+			double thisDuration = getDuration();
+			double thatDuration = other.getDuration();
+			return Double.compare(thisDuration, thatDuration);
 		}
 	}
 }
