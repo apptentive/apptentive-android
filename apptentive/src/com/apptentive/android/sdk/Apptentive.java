@@ -241,6 +241,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
 		Log.w("Setting custom person data: %s", customPersonData.toString());
@@ -255,6 +256,25 @@ public class Apptentive {
 		}
 	}
 
+	public static void addCustomPersonData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomPersonData(context, key, version);
+	}
+
+	public static void addCustomPersonData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Duration duration) {
+		ApptentiveInternal.addCustomPersonData(context, key, duration);
+	}
 
 	/**
 	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are

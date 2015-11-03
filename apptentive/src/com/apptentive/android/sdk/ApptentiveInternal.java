@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -203,6 +204,21 @@ public class ApptentiveInternal {
 				DeviceManager.storeCustomDeviceData(context, customData);
 			} catch (JSONException e) {
 				Log.w("Unable to add custom device data.", e);
+			}
+		}
+	}
+
+	public static void addCustomPersonData(Context context, String key, Object value) {
+		if (key == null || key.trim().length() == 0) {
+			return;
+		}
+		CustomData customData = PersonManager.loadCustomPersonData(context);
+		if (customData != null) {
+			try {
+				customData.put(key, value);
+				PersonManager.storeCustomPersonData(context, customData);
+			} catch (JSONException e) {
+				Log.w("Unable to add custom person data.", e);
 			}
 		}
 	}
