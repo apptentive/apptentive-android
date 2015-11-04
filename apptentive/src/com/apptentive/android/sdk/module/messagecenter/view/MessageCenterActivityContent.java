@@ -46,7 +46,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.Interaction
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -122,7 +121,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private MessageCenterComposingItem composingItem;
 	private MessageCenterComposingItem actionBarItem;
 	private MessageCenterComposingItem whoCardItem;
-	private AutomatedMessage contextualMessage;
+	private CompoundMessage contextualMessage;
 
 	private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
 
@@ -309,7 +308,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		pendingWhoCardMode = (onSavedInstanceState == null) ? 0 :
 				onSavedInstanceState.getInt(WHO_CARD_MODE);
 		String contextualMessageBody = interaction.getContextualMessageBody();
-		contextualMessage = AutomatedMessage.createAutoMessage(null, contextualMessageBody);
+		contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
 
 		setup();
 
