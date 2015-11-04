@@ -31,7 +31,6 @@
                       android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
                       android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
                       android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
-
                       android:inputType="textCapSentences|textMultiLine"
                       android:singleLine="false"
                       android:textColorHint="?attr/apptentive_material_hint_text"

@@ -9,11 +9,20 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.text.Editable;
 
+import android.text.Layout;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.TextWatcher;
+import android.text.method.ArrowKeyMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.R;
@@ -45,6 +54,17 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		if (item.str_2 != null) {
 			et.setHint(item.str_2);
 		}
+		et.setLinksClickable(true);
+		et.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
+		/*
+		 * LinkMovementMethod would enable clickable links in EditView, but disables copy/paste through Long Press.
+		 * Use a custom MovementMethod instead
+		 *
+		 */
+		et.setMovementMethod(ApptentiveMovementMethod.getInstance());
+		//If the edit text contains previous text with potential links
+		Linkify.addLinks(et, Linkify.WEB_URLS);
+
 		et.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -59,6 +79,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			@Override
 			public void afterTextChanged(Editable editable) {
 				listener.afterComposingTextChanged(editable.toString());
+				Linkify.addLinks(editable, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
 			}
 		});
 
@@ -125,5 +146,57 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			return;
 		}
 		imageBandView.setData(images);
+	}
+
+	/*
+	* Extends Android default movement method to enable selecting text and openning the links at the same time
+	 */
+	private static class ApptentiveMovementMethod extends ArrowKeyMovementMethod {
+
+		private static ApptentiveMovementMethod sInstance;
+
+		public static MovementMethod getInstance() {
+			if (sInstance == null) {
+				sInstance = new ApptentiveMovementMethod();
+			}
+			return sInstance;
+		}
+
+		@Override
+		public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+			int action = event.getAction();
+
+			if (action == MotionEvent.ACTION_UP ||
+					action == MotionEvent.ACTION_DOWN) {
+				int x = (int) event.getX();
+				int y = (int) event.getY();
+
+				x -= widget.getTotalPaddingLeft();
+				y -= widget.getTotalPaddingTop();
+
+				x += widget.getScrollX();
+				y += widget.getScrollY();
+
+				Layout layout = widget.getLayout();
+				int line = layout.getLineForVertical(y);
+				int off = layout.getOffsetForHorizontal(line, x);
+
+				ClickableSpan[] link = buffer.getSpans(off, off, ClickableSpan.class);
+
+				if (link.length != 0) {
+					if (action == MotionEvent.ACTION_UP) {
+						link[0].onClick(widget);
+					} else if (action == MotionEvent.ACTION_DOWN) {
+						Selection.setSelection(buffer, buffer.getSpanStart(link[0]), buffer.getSpanEnd(link[0]));
+					}
+
+					return true;
+				}
+
+			}
+
+			return super.onTouchEvent(widget, buffer, event);
+		}
+
 	}
 }
