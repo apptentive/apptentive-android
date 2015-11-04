@@ -59,7 +59,7 @@
     {
       "id": "520a756e4712c7afb7000003",
       "nonce": "9afbeec2-786e-435e-9eb2-d3c431ccd23b",
-      "type": "AutomatedMessage",
+      "type": "CompoundMessage",
       "client_created_at": 1376417122.487,
       "client_created_at_utc_offset": -25200,
       "created_at": 1376417134.838,
@@ -69,6 +69,7 @@
         "profile_photo": "https://secure.gravatar.com/avatar/d515bb535e73afffe3b45c997c145848.png?d=mm&r=PG"
       },
       "body": "What can we do to ensure that you love our app? We appreciate your constructive feedback.",
+      "automated": true,
       "title": "We're Sorry!"
     }
   ],
