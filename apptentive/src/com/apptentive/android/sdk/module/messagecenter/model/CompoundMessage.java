@@ -27,6 +27,8 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	public static final String KEY_TEXT_ONLY = "text_only";
 
+	private static final String KEY_TITLE = "title";
+
 	private boolean isLast;
 
 	private boolean hasNoAttachments = true;
@@ -70,6 +72,23 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			put(KEY_BODY, body);
 		} catch (JSONException e) {
 			Log.e("Unable to set message body.");
+		}
+	}
+
+	public String getTitle() {
+		try {
+			return getString(KEY_TITLE);
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return null;
+	}
+
+	public void setTitle(String title) {
+		try {
+			put(KEY_TITLE, title);
+		} catch (JSONException e) {
+			Log.e("Unable to set title.");
 		}
 	}
 
@@ -144,4 +163,20 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	public void setLastSent(boolean bVal) {
 		isLast = bVal;
 	}
+
+	public static CompoundMessage createAutoMessage(String title, String body) {
+		if (title == null && body == null) {
+			return null;
+		}
+		CompoundMessage message = new CompoundMessage();
+		if (title != null) {
+			message.setTitle(title);
+		}
+		if (body != null) {
+			message.setBody(body);
+		}
+		message.setAutomated(true);
+		return message;
+	}
+
 }

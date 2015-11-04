@@ -95,19 +95,19 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 
 		currentImage = getArguments().getParcelable("image");
 
-		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
+		AsyncTask<Object, Void, Bitmap> task = new AsyncTask<Object, Void, Bitmap>() {
 			@Override
-			protected Void doInBackground(Object... params) {
-				return null;
+			protected Bitmap doInBackground(Object... params) {
+				return prepareBitmap(currentImage);
 			}
 
 			@Override
-			protected void onPostExecute(Void v) {
+			protected void onPostExecute(Bitmap bitmap) {
+				progressBar.setVisibility(View.GONE);
 				if (!isAdded()) {
 					return;
 				}
-				progressBar.setVisibility(View.GONE);
-				displayPreview();
+				displayPreview(bitmap);
 			}
 		};
 
@@ -175,7 +175,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		}
 
 
-	public boolean setImage(ImageItem imageItem) {
+	public Bitmap prepareBitmap(ImageItem imageItem) {
 
 		// Show a preview of the image.
 		InputStream is = null;
@@ -193,8 +193,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 			// If no cache, load from the original originalPath
       if (is == null) {
 				if (imageItem.time == 0) {
-					previewImageView.setImageURI(Uri.parse(imageItem.originalPath));
-					return true;
+					is = getActivity().getContentResolver().openInputStream(Uri.parse(imageItem.originalPath));
 				} else {
 					File imageFile = new File(imageItem.originalPath);
 					if (imageFile.exists()) {
@@ -205,7 +204,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 			}
 
 			if (is == null) {
-				return false;
+				return null;
 			}
 
 			// Retrieve image orientation
@@ -221,31 +220,27 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 
 			//final int dialogWidth
 			if (is != null) {
-				preview = ImageUtil.createLightweightScaledBitmapFromStream(is, width, height, null, imageOrientation);
+				preview = ImageUtil.createScaledBitmapFromStream(is, width, height, null, imageOrientation);
 			} else {
 				preview = null;
 			}
 
 		} catch (FileNotFoundException e) {
 			// TODO: Error toast?
-			return false;
+			return null;
 		} finally {
 			Util.ensureClosed(is);
 		}
 
-		if (preview == null) {
-			return false;
-		}
-
-		previewImageView.setImageBitmap(preview);
-
-		return true;
+		return preview;
 	}
 
-	private void displayPreview() {
+
+	private void displayPreview(Bitmap preview) {
 		previewContainer.setVisibility(View.VISIBLE);
-		setImage(currentImage);
+		if (preview != null) {
+			previewImageView.setImageBitmap(preview);
+		}
 	}
-
 
 }

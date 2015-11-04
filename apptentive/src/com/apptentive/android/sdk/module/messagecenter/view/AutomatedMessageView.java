@@ -8,22 +8,20 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 
 /**
  * @author Sky Kelsey
  */
-public class AutomatedMessageView extends MessageView<AutomatedMessage> {
+public class AutomatedMessageView extends MessageView<CompoundMessage> {
 
-	public AutomatedMessageView(Context context, AutomatedMessage message) {
+	public AutomatedMessageView(Context context, CompoundMessage message) {
 		super(context, message);
 	}
 
-	protected void init(Context context, AutomatedMessage message) {
+	protected void init(Context context, CompoundMessage message) {
 		super.init(context, message);
 		LayoutInflater inflater = LayoutInflater.from(context);
 		inflater.inflate(R.layout.apptentive_message_auto, this);

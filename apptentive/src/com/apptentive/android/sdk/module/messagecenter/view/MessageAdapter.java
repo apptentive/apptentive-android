@@ -31,7 +31,6 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
@@ -160,13 +159,13 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			if (apptentiveMessage.getBaseType() == Payload.BaseType.message) {
 				switch (apptentiveMessage.getType()) {
 					case CompoundMessage:
-						if (!apptentiveMessage.isOutgoingMessage()) {
+						if (apptentiveMessage.isAutomatedMessage()) {
+							return TYPE_AUTO;
+						} else if (!apptentiveMessage.isOutgoingMessage()) {
 							return TYPE_COMPOUND_INCOMING;
-						} else{
+						} else {
 							return TYPE_COMPOUND_OUTGOING;
 						}
-					case AutomatedMessage:
-						return TYPE_AUTO;
 					default:
 						break;
 				}
@@ -253,7 +252,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					break;
 				}
 				case TYPE_AUTO:
-					view = new AutomatedMessageView(parent.getContext(), (AutomatedMessage) listItem);
+					view = new AutomatedMessageView(parent.getContext(), (CompoundMessage) listItem);
 					break;
 				default:
 					view = null;
@@ -327,8 +326,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 						status = createStatus(createdTime, textMessage.isLastSent());
 						// show progress bar if: 1. no sent time set, and 2. not paused, and 3. have either text or files to sent
 						bShowProgress = createdTime == null && !isInPauseState && (files != null || !TextUtils.isEmpty(messageBody));
-					}
-					else {
+					} else {
 						status = activityContext.getResources().getString(R.string.apptentive_failed);
 						bShowProgress = false;
 					}
@@ -343,8 +341,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					break;
 				}
 				case TYPE_AUTO: {
-					AutomatedMessage autoMessage = (AutomatedMessage) listItem;
-					String dateStamp = ((AutomatedMessage) listItem).getDatestamp();
+					CompoundMessage autoMessage = (CompoundMessage) listItem;
+					String dateStamp = autoMessage.getDatestamp();
 					((AutomatedMessageHolder) holder).updateMessage(dateStamp, autoMessage);
 					break;
 				}

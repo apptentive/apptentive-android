@@ -26,6 +26,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public static final String KEY_TYPE = "type";
 	public static final String KEY_HIDDEN = "hidden";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
+	public static final String KEY_AUTOMATED = "automated";
 
 	// State and Read are not stored in JSON, only in DB.
 	private State state = State.unknown;
@@ -96,6 +97,9 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 
 	public Type getType() {
 		try {
+			if (isNull((KEY_TYPE))) {
+				return Type.CompoundMessage;
+			}
 			return Type.parse(getString(KEY_TYPE));
 		} catch (JSONException e) {
 			// Ignore
@@ -223,6 +227,25 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		return null;
 	}
 
+	public boolean getAutomated() {
+		try {
+			if (!isNull((KEY_AUTOMATED))) {
+				return getBoolean(KEY_AUTOMATED);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return false;
+	}
+
+	public void setAutomated(boolean isAutomated) {
+		try {
+			put(KEY_AUTOMATED, isAutomated);
+		} catch (JSONException e) {
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_AUTOMATED);
+		}
+	}
+
 	public String getDatestamp() {
 		return datestamp;
 	}
@@ -239,6 +262,11 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		String senderId = getSenderId();
 		return senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
 	}
+
+	public boolean isAutomatedMessage() {
+		return getAutomated();
+	}
+
 
 	public enum Type {
 		TextMessage,

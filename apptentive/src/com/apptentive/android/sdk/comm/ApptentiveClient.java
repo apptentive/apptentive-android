@@ -79,18 +79,29 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		switch (apptentiveMessage.getType()) {
+			/*
+			 * pending legacy TextMessage, AutomatedMessage and FileMessage may still exist in payload table before sdk upgrade.
+			 * After SDK upgrades to CompoundMessage only, these pending payload will be sent out using new version and multi-part format
+			 */
 			case TextMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case AutomatedMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case FileMessage:
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
+			case AutomatedMessage: {
+				// Make sure "automated" key is set for legacy AutomatedMessage
+				apptentiveMessage.setAutomated(true);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
+			}
+			case FileMessage: {
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
-			case CompoundMessage:
+				List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
+				associatedFiles.add(storedFile);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+			}
+			case CompoundMessage: {
 				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
 				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
 				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+			}
 			case unknown:
 				break;
 		}
@@ -275,135 +286,6 @@ public class ApptentiveClient {
 			Util.ensureClosed(in);
 		}
 		return (errStream != null) ? (errStream.toString()) : null;
-	}
-
-	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
-		uri = getEndpointBase(appContext) + uri;
-		Log.d("Performing multipart request to %s", uri);
-
-		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
-		if (!Util.isNetworkConnectionPresent(appContext)) {
-			Log.d("Network unavailable.");
-			return ret;
-		}
-
-		if (storedFile == null) {
-			Log.e("StoredFile is null. Unable to send.");
-			return ret;
-		}
-
-		int bytesRead;
-		int bufferSize = 4096;
-		byte[] buffer;
-
-		String lineEnd = "\r\n";
-		String twoHyphens = "--";
-		String boundary = UUID.randomUUID().toString();
-
-		HttpURLConnection connection = null;
-		DataOutputStream os = null;
-		InputStream is = null;
-
-		try {
-			is = appContext.openFileInput(storedFile.getLocalFilePath());
-
-			// Set up the request.
-			URL url = new URL(uri);
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setUseCaches(false);
-			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
-			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
-			connection.setRequestMethod("POST");
-
-			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
-			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
-			connection.setRequestProperty("User-Agent", getUserAgentString());
-
-			StringBuilder requestText = new StringBuilder();
-
-			// Write form data
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd);
-			requestText.append("Content-Type: text/plain").append(lineEnd);
-			requestText.append(lineEnd);
-			requestText.append(postBody);
-			requestText.append(lineEnd);
-
-			// Write file attributes.
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
-			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
-			requestText.append(lineEnd);
-
-			Log.d("Post body: " + requestText);
-			// Open an output stream.
-			os = new DataOutputStream(connection.getOutputStream());
-
-			// Write the text so far.
-			os.writeBytes(requestText.toString());
-
-			try {
-				// Write the actual file.
-				buffer = new byte[bufferSize];
-				while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
-					os.write(buffer, 0, bytesRead);
-				}
-			} catch (IOException e) {
-				Log.d("Error writing file bytes to HTTP connection.", e);
-				ret.setBadPayload(true);
-				throw e;
-			}
-
-			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-			os.close();
-
-			ret.setCode(connection.getResponseCode());
-			ret.setReason(connection.getResponseMessage());
-
-			// TODO: These streams may not be ready to read now. Put this in a new thread.
-			// Read the normal response.
-			InputStream nis = null;
-			ByteArrayOutputStream nbaos = null;
-			try {
-				Log.d("Sending file: " + storedFile.getLocalFilePath());
-				nis = connection.getInputStream();
-				nbaos = new ByteArrayOutputStream();
-				byte[] eBuf = new byte[1024];
-				int eRead;
-				while (nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
-					nbaos.write(eBuf, 0, eRead);
-				}
-				ret.setContent(nbaos.toString());
-			} finally {
-				Util.ensureClosed(nis);
-				Util.ensureClosed(nbaos);
-			}
-
-			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
-			Log.v(ret.getContent());
-		} catch (FileNotFoundException e) {
-			Log.e("Error getting file to upload.", e);
-		} catch (MalformedURLException e) {
-			Log.e("Error constructing url for file upload.", e);
-		} catch (SocketTimeoutException e) {
-			Log.w("Timeout communicating with server.");
-		} catch (IOException e) {
-			Log.e("Error executing file upload.", e);
-			try {
-				ret.setContent(getErrorInResponse(connection));
-			} catch (IOException ex) {
-				Log.w("Can't read error stream.", ex);
-			}
-		} finally {
-			Util.ensureClosed(is);
-			Util.ensureClosed(os);
-		}
-		return ret;
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {

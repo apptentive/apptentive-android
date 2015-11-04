@@ -22,8 +22,6 @@ public class MessageFactory {
 			switch (type) {
 				case CompoundMessage:
 					return new CompoundMessage(json);
-				case AutomatedMessage:
-					return new AutomatedMessage(json);
 				case unknown:
 					break;
 				default:

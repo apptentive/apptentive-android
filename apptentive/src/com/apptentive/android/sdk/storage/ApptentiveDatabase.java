@@ -187,7 +187,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			case 1:
 				if (newVersion == 2) {
 					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
-					migrateToCompundMessage(db);
+					migrateToCompoundMessage(db);
 				}
 		}
 	}
@@ -423,7 +423,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// File Store
 	//
 
-	public synchronized void migrateToCompundMessage(SQLiteDatabase db) {
+	public synchronized void migrateToCompoundMessage(SQLiteDatabase db) {
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
 		try {
@@ -473,6 +473,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 								bUpdateRecord = true;
 								break;
 							case AutomatedMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
+								bUpdateRecord = true;
 								break;
 							default:
 								break;
@@ -571,7 +575,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		try {
 			db = getReadableDatabase();
 			cursor = db.rawQuery(QUERY_MESSAGE_FILES_GET_BY_NONCE, new String[]{nonce});
-			StoredFile ret = null;
+			StoredFile ret;
 			if (cursor.moveToFirst()) {
 				do {
 					ret = new StoredFile();
@@ -588,7 +592,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
-		return associatedFiles.size() > 0 ? associatedFiles: null;
+		return associatedFiles.size() > 0 ? associatedFiles : null;
 	}
 
 	public synchronized List<StoredFile> getAllStoredFiles() {
@@ -598,7 +602,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		try {
 			db = getReadableDatabase();
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
-			StoredFile ret = null;
+			StoredFile ret;
 			if (cursor.moveToFirst()) {
 				do {
 					ret = new StoredFile();
@@ -631,6 +635,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		try {
 
 			db = getWritableDatabase();
+			db.beginTransaction();
 			// Always delete existing rows with the same nonce to ensure add/update both work
 			db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
 
@@ -644,6 +649,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
 				ret = db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
 			}
+			db.setTransactionSuccessful();
+			db.endTransaction();
 		} finally {
 			ensureClosed(db);
 			return ret != -1;
