@@ -839,14 +839,20 @@ public class Apptentive {
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
-			String apiKey = null;
+			String apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
 			boolean apptentiveDebug = false;
 			String logLevelOverride = null;
 			try {
 				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
 				if (metaData != null) {
-					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+					if (apiKey == null) {
+						apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+						Log.d("Saving API key for the first time: %s", apiKey);
+						prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
+					} else {
+						Log.d("Using cached API Key: %s", apiKey);
+					}
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 					ApptentiveClient.useStagingServer = metaData.getBoolean(Constants.MANIFEST_KEY_USE_STAGING_SERVER);

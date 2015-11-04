@@ -7,15 +7,19 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -30,7 +34,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
-	private static final int API_VERSION = 3;
+	private static final int API_VERSION = 4;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -38,8 +42,6 @@ public class ApptentiveClient {
 	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
-	private static final String ENDPOINT_BASE_STAGING = "https://api.apptentive-beta.com";
-	private static final String ENDPOINT_BASE_PRODUCTION = "https://api.apptentive.com";
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = "/messages";
@@ -85,6 +87,10 @@ public class ApptentiveClient {
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
 				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
+			case CompoundMessage:
+				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
+				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
 			case unknown:
 				break;
 		}
@@ -131,7 +137,7 @@ public class ApptentiveClient {
 	 * @return ApptentiveHttpResponse containg content and response returned from the server.
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
-		uri = getEndpointBase() + uri;
+		uri = getEndpointBase(appContext) + uri;
 		Log.d("Performing request to %s", uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
@@ -272,7 +278,7 @@ public class ApptentiveClient {
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
-		uri = getEndpointBase() + uri;
+		uri = getEndpointBase(appContext) + uri;
 		Log.d("Performing multipart request to %s", uri);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -335,7 +341,6 @@ public class ApptentiveClient {
 			requestText.append(lineEnd);
 
 			Log.d("Post body: " + requestText);
-
 			// Open an output stream.
 			os = new DataOutputStream(connection.getOutputStream());
 
@@ -401,6 +406,159 @@ public class ApptentiveClient {
 		return ret;
 	}
 
+	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
+		uri = getEndpointBase(appContext) + uri;
+		Log.d("Performing multipart request to %s", uri);
+
+		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
+		if (!Util.isNetworkConnectionPresent(appContext)) {
+			Log.d("Network unavailable.");
+			return ret;
+		}
+
+		String lineEnd = "\r\n";
+		String twoHyphens = "--";
+		String boundary = UUID.randomUUID().toString();
+
+		HttpURLConnection connection = null;
+		DataOutputStream os = null;
+
+		try {
+
+			// Set up the request.
+			URL url = new URL(uri);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setUseCaches(false);
+			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
+			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setRequestMethod("POST");
+
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
+			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			connection.setRequestProperty("Accept", "application/json");
+			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
+			connection.setRequestProperty("User-Agent", getUserAgentString());
+
+			// Open an output stream.
+			os = new DataOutputStream(connection.getOutputStream());
+			os.writeBytes(twoHyphens + boundary + lineEnd);
+
+			// Write text message
+			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			os.writeBytes("Content-Type: text/plain;charset=UTF-8" + lineEnd);
+			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
+			os.writeBytes(lineEnd);
+			os.writeBytes(postBody + lineEnd);
+
+			// Send associated files
+			if (associatedFiles != null) {
+				for (StoredFile storedFile : associatedFiles) {
+					FileInputStream fis = null;
+					String originalFilePath;
+					try {
+						String cachedImagePathString = storedFile.getLocalFilePath();
+						File cachedImageFile = new File(cachedImagePathString);
+						// No local cache found
+						if (!cachedImageFile.exists()) {
+							boolean bCachedCreated = false;
+							// Creation time would only be set when we were able to retrieve original file information through uri
+							if (storedFile.getCreationTime() == 0) {
+								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
+								if (originalFilePath == null) {
+									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+								}
+							} else {
+								originalFilePath = storedFile.getOriginalUriOrPath();
+								bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
+							}
+							if (!bCachedCreated) {
+								continue;
+							}
+						}
+						os.writeBytes(twoHyphens + boundary + lineEnd);
+						StringBuilder requestText = new StringBuilder();
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+						// Write file attributes
+						os.writeBytes(requestText.toString());
+						os.writeBytes(lineEnd);
+
+						fis = new FileInputStream(cachedImageFile);
+
+						int bytesAvailable = fis.available();
+						int maxBufferSize = 512 * 512;
+						int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						byte[] buffer = new byte[bufferSize];
+
+						// read image data 0.5MB at a time and write it into buffer
+						int bytesRead = fis.read(buffer, 0, bufferSize);
+						while (bytesRead > 0) {
+							os.write(buffer, 0, bufferSize);
+							bytesAvailable = fis.available();
+							bufferSize = Math.min(bytesAvailable, maxBufferSize);
+							bytesRead = fis.read(buffer, 0, bufferSize);
+						}
+					} catch (IOException e) {
+						Log.d("Error writing file bytes to HTTP connection.", e);
+						ret.setBadPayload(true);
+						throw e;
+					} finally {
+						Util.ensureClosed(fis);
+					}
+					os.writeBytes(lineEnd);
+				}
+			}
+			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+			os.flush();
+			os.close();
+
+			ret.setCode(connection.getResponseCode());
+			ret.setReason(connection.getResponseMessage());
+
+
+			// TODO: These streams may not be ready to read now. Put this in a new thread.
+			// Read the normal response.
+			InputStream nis = null;
+			ByteArrayOutputStream nbaos = null;
+			try {
+				nis = connection.getInputStream();
+				nbaos = new ByteArrayOutputStream();
+				byte[] eBuf = new byte[1024];
+				int eRead;
+				while (nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
+					nbaos.write(eBuf, 0, eRead);
+				}
+				ret.setContent(nbaos.toString());
+			} finally {
+				Util.ensureClosed(nis);
+				Util.ensureClosed(nbaos);
+			}
+
+			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
+			Log.v(ret.getContent());
+		} catch (FileNotFoundException e) {
+			Log.e("Error getting file to upload.", e);
+		} catch (MalformedURLException e) {
+			Log.e("Error constructing url for file upload.", e);
+		} catch (SocketTimeoutException e) {
+			Log.w("Timeout communicating with server.");
+		} catch (IOException e) {
+			Log.e("Error executing file upload.", e);
+			try {
+				ret.setContent(getErrorInResponse(connection));
+			} catch (IOException ex) {
+				Log.w("Can't read error stream.", ex);
+			}
+		} finally {
+			Util.ensureClosed(os);
+		}
+		return ret;
+	}
+
 	private enum Method {
 		GET,
 		PUT,
@@ -411,7 +569,14 @@ public class ApptentiveClient {
 		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
 
-	private static String getEndpointBase() {
-		return useStagingServer ? ENDPOINT_BASE_STAGING : ENDPOINT_BASE_PRODUCTION;
+	private static String getEndpointBase(Context appContext) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
+		if (url == null) {
+			url = Constants.CONFIG_DEFAULT_SERVER_URL;
+			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
+		}
+		return url;
 	}
+
 }

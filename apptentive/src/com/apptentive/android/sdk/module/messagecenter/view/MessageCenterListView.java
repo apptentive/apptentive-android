@@ -67,7 +67,7 @@ public class MessageCenterListView extends ListView {
 	 */
 	StickyWrapper stickyWrapper;
 
-
+	private OnListviewResizeListener resizeListener;
 	/**
 	 * Scroll listener
 	 */
@@ -132,6 +132,13 @@ public class MessageCenterListView extends ListView {
 		}
 	};
 
+	public interface OnListviewResizeListener {
+		void OnListViewResize(int w, int h, int oldw, int oldh);
+	}
+
+	public void setOnListViewResizeListener(OnListviewResizeListener l) {
+		resizeListener = l;
+	}
 
 	public MessageCenterListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -323,6 +330,14 @@ public class MessageCenterListView extends ListView {
 			if (parentWidth != shadowWidth) {
 				recreateStickyShadow();
 			}
+		}
+	}
+
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		if (resizeListener != null) {
+			resizeListener.OnListViewResize(w, h, oldw, oldh);
 		}
 	}
 

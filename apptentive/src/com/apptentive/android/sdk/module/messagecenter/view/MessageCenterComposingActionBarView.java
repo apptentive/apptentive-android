@@ -6,16 +6,13 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.app.DialogFragment;
 
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +21,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 
+import com.apptentive.android.sdk.ApptentiveInternalActivity;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
+import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
-import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
+import java.lang.ref.WeakReference;
 
 
 /**
@@ -38,9 +39,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 	public boolean showConfirmation = false;
 	public ImageButton sendButton;
 	public ImageButton attachButton;
+	private WeakReference<MessageAdapter.OnListviewItemActionListener> listenerRef;
 
-	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
 		super(activityContext);
+		this.listenerRef = new WeakReference<MessageAdapter.OnListviewItemActionListener>(listener);
 
 		LayoutInflater inflater = LayoutInflater.from(activityContext);
 		inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
@@ -48,17 +51,20 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		View closeButton = findViewById(R.id.cancel_composing);
 		closeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
+				MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
+				if (locallistener == null) {
+					return;
+				}
 				if (showConfirmation) {
 					CloseConfirmationDialog editNameDialog = new CloseConfirmationDialog();
-					editNameDialog.listener = listener;
 					Bundle bundle = new Bundle();
 					bundle.putString("STR_2", item.str_2);
 					bundle.putString("STR_3", item.str_3);
 					bundle.putString("STR_4", item.str_4);
 					editNameDialog.setArguments(bundle);
-					editNameDialog.show(((Activity) activityContext).getFragmentManager(), "CloseConfirmationDialog");
+					editNameDialog.show(((ApptentiveInternalActivity)activityContext).getSupportFragmentManager(), "CloseConfirmationDialog");
 				} else {
-					listener.onCancelComposing();
+					locallistener.onCancelComposing();
 				}
 			}
 		});
@@ -75,7 +81,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		}
 		sendButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				listener.onFinishComposing();
+				MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
+				if (locallistener == null) {
+					return;
+				}
+				locallistener.onFinishComposing();
 			}
 		});
 
@@ -89,18 +99,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		if (canTakeScreenshot) {
 			attachButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-					Bundle extras = new Bundle();
-					intent.addCategory(Intent.CATEGORY_OPENABLE);
-					if (Build.VERSION.SDK_INT >= 11) {
-						extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+					MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
+					if (locallistener == null) {
+						return;
 					}
-					intent.setType("image/*");
-					if (!extras.isEmpty()) {
-						intent.putExtras(extras);
-					}
-					Intent chooserIntent = Intent.createChooser(intent, null);
-					((Activity)activityContext).startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
+					locallistener.onAttachImage();
 				}
 			});
 		} else {
@@ -109,7 +112,6 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 	}
 
 	public static class CloseConfirmationDialog extends DialogFragment {
-		public MessageAdapter.OnComposingActionListener listener;
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -120,7 +122,10 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									listener.onCancelComposing();
+									ActivityContent content = ((ViewActivity) getActivity()).getActivityContent();
+									if (content instanceof MessageAdapter.OnListviewItemActionListener) {
+										((MessageAdapter.OnListviewItemActionListener) content).onCancelComposing();
+									}
 									dialog.dismiss();
 								}
 							})

@@ -10,6 +10,7 @@
              android:layout_height="wrap_content"
              android:clipToPadding="false"
              android:paddingBottom="1.5dp"
+             android:descendantFocusability="afterDescendants"
              android:background="@android:color/transparent">
 
     <LinearLayout android:layout_width="match_parent"

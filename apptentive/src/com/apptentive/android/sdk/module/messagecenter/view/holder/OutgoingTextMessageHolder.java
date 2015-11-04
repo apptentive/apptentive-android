@@ -23,7 +23,7 @@ public class OutgoingTextMessageHolder extends MessageHolder {
 	public OutgoingTextMessageHolder(OutgoingTextMessageView view) {
 		super(view);
 		progressBar = (ApptentiveMaterialIndeterminateProgressBar) view.findViewById(R.id.progressBar);
-		messageContentView = (TextView) view.findViewById(R.id.more_less_container);
+		messageContentView = (TextView) view.findViewById(R.id.message_body);
 	}
 
 	public void updateMessage(String datestamp, String status, int statusColor,

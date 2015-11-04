@@ -71,29 +71,16 @@
         </RelativeLayout>
         <!-- End Header -->
         <!-- Content -->
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:background="@color/apptentive_transparency"
-                      android:orientation="vertical">
-
-            <FrameLayout android:layout_width="match_parent"
-                         android:layout_height="0dp"
-                         android:layout_weight="1"
-                         android:background="@color/apptentive_transparency"
-                         android:orientation="vertical">
                 <!-- Message List -->
                 <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView
                     android:id="@+id/message_list"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@color/apptentive_transparency"
-                    android:paddingBottom="60dp"
-                    android:descendantFocusability="afterDescendants"
-                    android:focusable="false"
+                    android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
                     android:clipToPadding="false"
+                    android:descendantFocusability="afterDescendants"
                     android:cacheColorHint="@color/apptentive_transparency"/>
-            </FrameLayout>
-        </LinearLayout>
     </LinearLayout>
     <com.apptentive.android.sdk.view.FloatingActionButton
         android:id="@+id/composing_fab"

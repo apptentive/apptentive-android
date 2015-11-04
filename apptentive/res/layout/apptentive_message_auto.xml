@@ -10,6 +10,7 @@
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              android:descendantFocusability="blocksDescendants"
               style="@style/MessageCenterMessageFrame">
     <TextView android:id="@+id/datestamp"
               android:layout_width="wrap_content"

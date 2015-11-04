@@ -7,14 +7,14 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 
 /**
  * @author Sky Kelsey
  */
-public abstract class MessageView<T extends ApptentiveMessage> extends FrameLayout implements MessageCenterListItemView {
+public abstract class MessageView<T extends ApptentiveMessage> extends LinearLayout implements MessageCenterListItemView {
 
 	public MessageView(final Context context, final T message) {
 		super(context);

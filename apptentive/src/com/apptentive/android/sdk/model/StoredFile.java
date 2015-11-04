@@ -14,9 +14,11 @@ import android.webkit.MimeTypeMap;
 public class StoredFile {
 	private String id;
 	private String mimeType;
-	private String originalUri;
+	private String originalUriOrPath;
 	private String localFilePath;
 	private String apptentiveUri;
+	//creation time of original file; set to 0 if failed to retrieve creation time from original uri
+	private long creationTime;
 
 	public String getId() {
 		return id;
@@ -34,12 +36,12 @@ public class StoredFile {
 		this.mimeType = mimeType;
 	}
 
-	public String getOriginalUri() {
-		return originalUri;
+	public String getOriginalUriOrPath() {
+		return originalUriOrPath;
 	}
 
-	public void setOriginalUri(String originalUri) {
-		this.originalUri = originalUri;
+	public void setOriginalUriOrPath(String originalUriOrPath) {
+		this.originalUriOrPath = originalUriOrPath;
 	}
 
 	public String getLocalFilePath() {
@@ -60,5 +62,13 @@ public class StoredFile {
 
 	public String getFileName() {
 		return String.format("file.%s", MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType));
+	}
+
+	public long getCreationTime() {
+		return creationTime;
+	}
+
+	public void setCreationTime(long time) {
+		creationTime = time;
 	}
 }

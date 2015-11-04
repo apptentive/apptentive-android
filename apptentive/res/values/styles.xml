@@ -409,4 +409,10 @@
         <item name="android:layout_marginTop">5dp</item>
         <item name="apptentive_progressBarColor">?attr/colorAccent</item>
     </style>
+
+    <!-- For dialog Animation -->
+    <style name="ApptentiveDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_out</item>
+    </style>
 </resources>
