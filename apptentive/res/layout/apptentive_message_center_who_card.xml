@@ -6,21 +6,23 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
+             xmlns:cardView="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:clipToPadding="false"
-             android:paddingBottom="1.5dp"
+             android:paddingBottom="2dp"
+             android:layout_marginRight="10dp"
+             android:layout_marginLeft="10dp"
              android:descendantFocusability="afterDescendants"
              android:background="@android:color/transparent">
-
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ApptentiveTheme.Widget.CardView.Message"
+        cardView:cardElevation="2dp">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginRight="10dp"
-                  android:layout_marginLeft="10dp"
-                  android:layout_marginBottom="5dp"
-                  android:elevation="1.5dp"
-                  android:orientation="vertical"
-                  android:background="@drawable/apptentive_rounded_corner_shape">
+                  style="@style/ApptentiveTheme.Widget.CardContent.WhoCard">
         <TextView android:id="@+id/who_title"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
@@ -90,6 +92,5 @@
                     android:textColor="?attr/colorAccent"/>
         </LinearLayout>
     </LinearLayout>
-
-
+</android.support.v7.widget.CardView>
 </FrameLayout>

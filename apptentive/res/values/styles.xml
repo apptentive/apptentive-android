@@ -205,6 +205,14 @@
         <item name="android:background">@color/apptentive_message_center_incoming_background</item>
     </style>
 
+    <style name="ApptentiveTheme.Widget.CardContent.WhoCard" parent="android:Widget">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/apptentive_white</item>
+    </style>
+
     <style name="ApptentiveTheme.Widget.Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
