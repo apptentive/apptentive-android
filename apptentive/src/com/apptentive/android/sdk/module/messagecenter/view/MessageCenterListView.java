@@ -161,7 +161,7 @@ public class MessageCenterListView extends ListView {
 		if (visible) {
 			if (shadowDrawable == null) {
 				shadowDrawable = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.apptentive_listview_item_shadow);
-				shadowHeight = (int) (8 * getResources().getDisplayMetrics().density);
+				shadowHeight = (int) (4 * getResources().getDisplayMetrics().density);
 			}
 		} else {
 			if (shadowDrawable != null) {
