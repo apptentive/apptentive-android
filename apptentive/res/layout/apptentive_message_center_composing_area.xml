@@ -6,24 +6,25 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
+             android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:paddingBottom="2dp"
+             android:paddingLeft="@dimen/apptentive_message_center_default_margin_small"
+             android:paddingRight="@dimen/apptentive_message_center_default_margin_small"
+             android:layout_marginTop="-1dp"
              android:clipToPadding="false"
+             android:descendantFocusability="afterDescendants"
              android:background="@android:color/transparent">
-
         <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
+                      android:layout_height="match_parent"
+                      android:layout_marginTop="-1dp"
                       android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_small"
-                      android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
-                      android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_small"
                       android:orientation="vertical"
-                      android:elevation="2dp"
-                      android:background="@drawable/apptentive_rounded_corner_shape">
+                      android:background="@drawable/apptentive_rounded_corner_shape_composing">
             <EditText android:id="@+id/composing_et"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:minLines="8"
+                      android:minLines="5"
                       android:gravity="top"
                       android:background="@null"
                       android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
@@ -36,6 +37,15 @@
                       android:textColorHint="?attr/apptentive_material_hint_text"
                       android:textColor="?attr/apptentive_material_primary_text"
                       android:textSize="@dimen/apptentive_text_medium_small"/>
+            <com.apptentive.android.sdk.util.image.ApptentiveImageGridView
+                android:id="@+id/grid"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:horizontalSpacing="@dimen/apptentive_image_grid_space_size"
+                android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
+                android:clipToPadding="false"
+                android:numColumns="@integer/apptentive_image_grid_default_column_number"/>
 
         </LinearLayout>
 </FrameLayout>

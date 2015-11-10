@@ -12,8 +12,11 @@ public class MessageCenterUtil {
 
 	}
 
-	public interface OutgoingItem {
+	// Combine both incoming and outgoing interfaces into one
+	public interface CompoundMessageCommonInterface {
 
+		public void setBody(String body);
+		public String getBody();
 		public void setLastSent(boolean bVal);
 		public boolean isLastSent();
 

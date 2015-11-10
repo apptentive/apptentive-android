@@ -1,24 +1,34 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.util;
+package com.apptentive.android.sdk.util.image;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
+import com.apptentive.android.sdk.util.CountingOutputStream;
+import com.apptentive.android.sdk.util.Util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -29,6 +39,7 @@ import java.net.URL;
  */
 public class ImageUtil {
 
+	private static final int MAX_SENT_IMAGE_EDGE = 1024;
 	/**
 	 * From <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large Bitmaps Efficiently</a>
 	 */
@@ -191,6 +202,105 @@ public class ImageUtil {
 		} else {
 			task.execute(imageUrl);
 		}
+	}
+
+	/**
+	 * This method creates a cached version of the original image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
+	 * it to store an exact copy of the file in question.
+	 * @param context application context
+	 * @param uri original uri of the image source file
+	 * @param cachedFileName file name of the cache to be created (with full path)
+	 * @return  true if cache file is created successfully
+	 */
+	public static boolean createCachedImageFile(Context context, Uri uri, String cachedFileName) {
+		File localFile = new File(cachedFileName);
+
+		int imageOrientation = 0;
+
+		// Retrieve image orientation
+		if (Util.hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+			Cursor cursor = context.getContentResolver().query(uri,
+					new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
+
+			if (cursor.getCount() == 1) {
+				cursor.moveToFirst();
+				imageOrientation = cursor.getInt(0);
+			}
+		}
+
+		// Copy the file contents over.
+		InputStream is = null;
+		CountingOutputStream cos = null;
+		try {
+			is = context.getContentResolver().openInputStream(uri);
+			cos = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
+			System.gc();
+			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+			// TODO: Is JPEG what we want here?
+			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
+			cos.flush();
+			Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			smaller.recycle();
+			System.gc();
+		} catch (FileNotFoundException e) {
+			Log.e("File not found while storing image.", e);
+			return false;
+		} catch (Exception e) {
+			Log.a("Error storing image.", e);
+			return false;
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(cos);
+		}
+
+		return true;
+	}
+
+	/**
+	 * This method creates a cached version of the original image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
+	 * it to store an exact copy of the file in question.
+	 * @param originalFilePath fully qualified path of the image source file
+	 * @param cachedFileName file name of the cache to be created (with full path)
+	 * @return  true if cache file is created successfully
+	 */
+	public static boolean createCachedImageFile(String originalFilePath, String cachedFileName) {
+		File localFile = new File(cachedFileName);
+
+		// Retrieve image orientation
+		int imageOrientation = 0;
+		try {
+			ExifInterface exif = new ExifInterface(originalFilePath);
+			imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+		} catch (IOException e) {
+
+		}
+
+		// Copy the file contents over.
+		InputStream is = null;
+		CountingOutputStream cos = null;
+		try {
+			is = new FileInputStream(new File(originalFilePath));
+			cos = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
+			System.gc();
+			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+			// TODO: Is JPEG what we want here?
+			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
+			cos.flush();
+			Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			smaller.recycle();
+			System.gc();
+		} catch (FileNotFoundException e) {
+			Log.e("File not found while storing image.", e);
+			return false;
+		} catch (Exception e) {
+			Log.a("Error storing image.", e);
+			return false;
+		} finally {
+			Util.ensureClosed(is);
+			Util.ensureClosed(cos);
+		}
+
+		return true;
 	}
 
 	private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

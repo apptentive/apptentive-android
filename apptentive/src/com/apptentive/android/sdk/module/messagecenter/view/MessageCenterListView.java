@@ -67,7 +67,7 @@ public class MessageCenterListView extends ListView {
 	 */
 	StickyWrapper stickyWrapper;
 
-
+	private OnListviewResizeListener resizeListener;
 	/**
 	 * Scroll listener
 	 */
@@ -132,6 +132,13 @@ public class MessageCenterListView extends ListView {
 		}
 	};
 
+	public interface OnListviewResizeListener {
+		void OnListViewResize(int w, int h, int oldw, int oldh);
+	}
+
+	public void setOnListViewResizeListener(OnListviewResizeListener l) {
+		resizeListener = l;
+	}
 
 	public MessageCenterListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -154,7 +161,7 @@ public class MessageCenterListView extends ListView {
 		if (visible) {
 			if (shadowDrawable == null) {
 				shadowDrawable = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.apptentive_listview_item_shadow);
-				shadowHeight = (int) (8 * getResources().getDisplayMetrics().density);
+				shadowHeight = (int) (4 * getResources().getDisplayMetrics().density);
 			}
 		} else {
 			if (shadowDrawable != null) {
@@ -323,6 +330,14 @@ public class MessageCenterListView extends ListView {
 			if (parentWidth != shadowWidth) {
 				recreateStickyShadow();
 			}
+		}
+	}
+
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		if (resizeListener != null) {
+			resizeListener.OnListViewResize(w, h, oldw, oldh);
 		}
 	}
 

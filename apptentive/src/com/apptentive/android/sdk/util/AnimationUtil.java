@@ -146,6 +146,7 @@ public class AnimationUtil {
 		AnimatorSet animatorSet = new AnimatorSet();
 		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", 0, 90);
 		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
+		Animator animScale = ObjectAnimator.ofFloat(view, "scaleY", 1.0F, 0);
 		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
 		if (vl != null) {
 			valueAnimator.addUpdateListener(vl);
@@ -154,7 +155,7 @@ public class AnimationUtil {
 		animX.setDuration(ANIMATION_DURATION);
 		animAlpha.setDuration(ANIMATION_DURATION);
 		valueAnimator.setDuration(ANIMATION_DURATION + ANIMATION_DURATION + 100);
-		animatorSet.playTogether(animX, animAlpha, valueAnimator);
+		animatorSet.playTogether(animX, animAlpha, animScale, valueAnimator);
 		if (al != null) {
 			animatorSet.addListener(al);
 		}
@@ -168,7 +169,8 @@ public class AnimationUtil {
 
 		AnimatorSet animatorSet = new AnimatorSet();
 		Animator animX = ObjectAnimator.ofFloat(view, "rotationX", -90, 0);
-		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
+		Animator animAlpha = ObjectAnimator.ofFloat(view, "alpha", 0, 1.0F);
+		Animator animScale = ObjectAnimator.ofFloat(view, "scaleY", 0, 1.0F);
 		ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
 		if (vl != null) {
 			valueAnimator.addUpdateListener(vl);
@@ -177,7 +179,7 @@ public class AnimationUtil {
 		animX.setDuration(ANIMATION_DURATION);
 		animAlpha.setDuration(ANIMATION_DURATION);
 		valueAnimator.setDuration(ANIMATION_DURATION);
-		animatorSet.playTogether(animX, animAlpha, valueAnimator);
+		animatorSet.playTogether(animX, animAlpha, animScale, valueAnimator);
 		if (al != null) {
 			animatorSet.addListener(al);
 		}

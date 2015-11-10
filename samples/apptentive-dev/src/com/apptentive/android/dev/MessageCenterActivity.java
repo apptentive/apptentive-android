@@ -28,7 +28,6 @@ import com.apptentive.android.sdk.util.Util;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ public class MessageCenterActivity extends ApptentiveActivity {
 	public void sendAttachmentImage(View view) {
 		Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		intent.setType("image/*");
-		this.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER);
+		this.startActivityForResult(intent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
 	}
 
 	public void sendAttachmentFile(View view) {
@@ -116,7 +115,7 @@ public class MessageCenterActivity extends ApptentiveActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
-				case Constants.REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER:
+				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
 					doSendAttachment(data.getData());
 					break;
 				default:

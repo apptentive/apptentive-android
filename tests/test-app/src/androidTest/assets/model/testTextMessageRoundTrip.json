@@ -1,7 +1,7 @@
 {
   "id": "520a84fe4712c71b65000005",
   "nonce": "33b042735704283c0407f22e6d6f8c6fcb0d2f073bf964f76d36ef176ec26472",
-  "type": "TextMessage",
+  "type": "CompoundMessage",
   "client_created_at": 1376421112,
   "client_created_at_utc_offset": -25200,
   "created_at": 1376421118.499,
