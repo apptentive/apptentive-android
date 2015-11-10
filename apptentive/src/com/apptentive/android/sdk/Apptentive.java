@@ -173,6 +173,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
 		try {
@@ -195,18 +196,27 @@ public class Apptentive {
 	 * @param value   The value of the data.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		CustomData customData = DeviceManager.loadCustomDeviceData(context);
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				DeviceManager.storeCustomDeviceData(context, customData);
-			} catch (JSONException e) {
-				Log.w("Unable to add custom device data.", e);
-			}
-		}
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomDeviceData(context, key, version);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
+	}
+
+	public static void addCustomDeviceData(Context context, String key, Duration duration) {
+		ApptentiveInternal.addCustomDeviceData(context, key, duration);
 	}
 
 	/**
@@ -231,6 +241,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
 		Log.w("Setting custom person data: %s", customPersonData.toString());
@@ -245,6 +256,25 @@ public class Apptentive {
 		}
 	}
 
+	public static void addCustomPersonData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomPersonData(context, key, version);
+	}
+
+	public static void addCustomPersonData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
+	}
+
+	public static void addCustomPersonData(Context context, String key, Duration duration) {
+		ApptentiveInternal.addCustomPersonData(context, key, duration);
+	}
 
 	/**
 	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
@@ -1142,6 +1172,153 @@ public class Apptentive {
 			ApptentiveDatabase.getInstance(context).addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
+		}
+	}
+
+	/**
+	 * This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
+	 * with a string or a long, and there is no limit to the number of parts your semantic version can
+	 * contain. The class allows comparison based on semantic version rules.
+	 * <p></p>
+	 * Valid versions (In sorted order):
+	 * <ul>
+	 *   <li>0</li>
+	 *   <li>0.1</li>
+	 *   <li>1.0.0</li>
+	 *   <li>1.0.9</li>
+	 *   <li>1.0.10</li>
+	 *   <li>1.2.3</li>
+	 *   <li>5</li>
+	 * </ul>
+	 *
+	 * Invalid versions:
+	 * <ul>
+	 *   <li>zero</li>
+	 *   <li>0.1+2015.10.21</li>
+	 *   <li>1.0.0a</li>
+	 *   <li>1.0-rc2</li>
+	 *   <li>1.0.10-SNAPSHOT</li>
+	 *   <li>5a</li>
+	 *   <li>FF01</li>
+	 * </ul>
+	 *
+	 */
+	public static class Version extends JSONObject implements Comparable<Version> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_VERSION = "version";
+
+		public Version(String version) {
+			super();
+			setVersion(version);
+		}
+
+		public Version(long version) {
+			super();
+			setVersion(version);
+		}
+
+		public void setVersion(String version) {
+			try {
+				put(KEY_TYPE, KEY_VERSION);
+				put(KEY_VERSION, version);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.Version.", e);
+			}
+		}
+
+		public void setVersion(long version) {
+			setVersion(Long.toString(version));
+		}
+
+		public String getVersion() {
+			return optString(KEY_VERSION, null);
+		}
+
+		@Override
+		public int compareTo(Version other) {
+			String thisVersion = getVersion();
+			String thatVersion = other.getVersion();
+			String[] thisArray = thisVersion.split("\\.");
+			String[] thatArray = thatVersion.split("\\.");
+
+			int maxParts = Math.max(thisArray.length, thatArray.length);
+			for (int i = 0; i < maxParts; i++) {
+				// If one SemVer has more parts than another, treat pad out the short one with zeros in each slot.
+				long left = 0;
+				if (thisArray.length > i) {
+					left = Long.parseLong(thisArray[i]);
+				}
+				long right = 0;
+				if (thatArray.length > i) {
+					right = Long.parseLong(thatArray[i]);
+				}
+				if (left < right) {
+					return -1;
+				} else if (left > right) {
+					return 1;
+				}
+			}
+			return 0;
+		}
+	}
+
+	public static class DateTime extends JSONObject implements Comparable<DateTime> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_DATETIME = "datetime";
+
+		public DateTime(double dateTime) {
+			super();
+			setDateTime(dateTime);
+		}
+
+		public void setDateTime(double dateTime) {
+			try {
+				put(KEY_TYPE, KEY_DATETIME);
+				put(KEY_DATETIME, dateTime);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.DateTime.", e);
+			}
+		}
+
+		public double getDateTime() {
+			return optDouble(KEY_DATETIME);
+		}
+
+		@Override
+		public int compareTo(DateTime other) {
+			double thisDateTime = getDateTime();
+			double thatDateTime = other.getDateTime();
+			return Double.compare(thisDateTime, thatDateTime);
+		}
+	}
+
+	public static class Duration extends JSONObject implements Comparable<Duration> {
+		private final String KEY_TYPE = "_type";
+		private final String KEY_DURATION = "duration";
+
+		public Duration(double duration) {
+			super();
+			setDuration(duration);
+		}
+
+		public void setDuration(double duration) {
+			try {
+				put(KEY_TYPE, KEY_DURATION);
+				put(KEY_DURATION, duration);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.DateTime.", e);
+			}
+		}
+
+		public double getDuration() {
+			return optDouble(KEY_DURATION);
+		}
+
+		@Override
+		public int compareTo(Duration other) {
+			double thisDuration = getDuration();
+			double thatDuration = other.getDuration();
+			return Double.compare(thisDuration, thatDuration);
 		}
 	}
 }
