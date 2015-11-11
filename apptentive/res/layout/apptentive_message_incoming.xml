@@ -29,7 +29,8 @@
                 android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
                 android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
                 style="?attr/apptentiveAvatarViewMessageStyle"/>
-            <LinearLayout android:layout_width="match_parent"
+            <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveMessageCenterMessageContent"
                           android:orientation="vertical">

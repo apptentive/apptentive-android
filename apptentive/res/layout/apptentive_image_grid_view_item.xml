@@ -7,7 +7,7 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
-             android:layout_height="match_parent"
+             android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
              android:background="@drawable/apptentive_empty_image_background"
              android:layout_margin="2dp">
 
@@ -17,6 +17,20 @@
         android:layout_height="match_parent"
         android:scaleType="centerInside"
         android:src="@null"/>
+
+    <TextView
+        android:id="@+id/image_preview_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:gravity="center_horizontal"
+        android:paddingBottom="8dp"
+        android:textSize="26sp"
+        android:lineSpacingMultiplier="0.8"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="@color/apptentive_material_secondary_text"
+        tools:text="File"/>
 
     <View
         android:id="@+id/mask"
@@ -33,5 +47,18 @@
         android:layout_marginTop="5.5dp"
         android:layout_marginRight="5.5dp"
         android:src="@drawable/apptentive_ic_image_picker_unselected"/>
-
+    <ProgressBar
+        android:id="@+id/thumbnail_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        style="@android:style/Widget.ProgressBar.Small"/>
+    <com.apptentive.android.sdk.view.ApptentiveMaterialDeterminateProgressBar
+        android:id="@+id/thumbnail_progress_determinate"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom"
+        style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"
+        android:visibility="gone"/>
 </FrameLayout>
