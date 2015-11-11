@@ -348,12 +348,12 @@ public class ApptentiveClient {
 							boolean bCachedCreated = false;
 							// Creation time would only be set when we were able to retrieve original file information through uri
 							if (storedFile.getCreationTime() == 0) {
-								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
+								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getSourceUriOrPath()));
 								if (originalFilePath == null) {
-									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getSourceUriOrPath()), cachedImagePathString);
 								}
 							} else {
-								originalFilePath = storedFile.getOriginalUriOrPath();
+								originalFilePath = storedFile.getSourceUriOrPath();
 								bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
 							}
 							if (!bCachedCreated) {
@@ -362,7 +362,7 @@ public class ApptentiveClient {
 						}
 						os.writeBytes(twoHyphens + boundary + lineEnd);
 						StringBuilder requestText = new StringBuilder();
-						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getSourceUriOrPath())).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						// Write file attributes
 						os.writeBytes(requestText.toString());

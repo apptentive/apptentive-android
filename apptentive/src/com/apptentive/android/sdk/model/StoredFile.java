@@ -14,8 +14,18 @@ import android.webkit.MimeTypeMap;
 public class StoredFile {
 	private String id;
 	private String mimeType;
-	private String originalUriOrPath;
+	/* For outgoing attachment, this field is the source image uri or source image full path
+	 * if READ_EXTERNAL_STORAGE permission is granted
+	 * For incoming attachment, this field is the full path to the on-device cache file where it is downloaded to
+	 */
+	private String sourceUriOrPath;
+	/* For outgoing attachment, this field is the full path to the on-device cache file where the source image is copied to.
+	 * For incoming attachment, this field is the full path to the on-device cache file where the thumbnail is downloaded to.
+	 */
 	private String localFilePath;
+	/* For outgoing attachment, this field is empty.
+	 * For incoming attachment, this field is the full remote url to the attachment
+	 */
 	private String apptentiveUri;
 	//creation time of original file; set to 0 if failed to retrieve creation time from original uri
 	private long creationTime;
@@ -36,12 +46,12 @@ public class StoredFile {
 		this.mimeType = mimeType;
 	}
 
-	public String getOriginalUriOrPath() {
-		return originalUriOrPath;
+	public String getSourceUriOrPath() {
+		return sourceUriOrPath;
 	}
 
-	public void setOriginalUriOrPath(String originalUriOrPath) {
-		this.originalUriOrPath = originalUriOrPath;
+	public void setSourceUriOrPath(String sourceUriOrPath) {
+		this.sourceUriOrPath = sourceUriOrPath;
 	}
 
 	public String getLocalFilePath() {
