@@ -141,7 +141,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onAttachImage();
 
-		void onShowImagePreView(int position, ImageItem image);
+		void onClickAttachment(int position, ImageItem image);
 	}
 
 	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnListviewItemActionListener listener, MessageCenterInteraction interaction) {
@@ -304,8 +304,13 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					}
 					final CompoundMessage compoundMessage = (CompoundMessage) listItem;
 					String datestamp = ((CompoundMessage) listItem).getDatestamp();
+					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
+					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+					view.measure(widthMeasureSpec, 0);
+					int viewWidth = container.getMeasuredWidth();
 					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
-							datestamp, compoundMessage.getBody(), compoundMessage.getAssociatedFiles(activityContext));
+							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							compoundMessage.getRemoteAttachments());
 					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(compoundMessage, position);

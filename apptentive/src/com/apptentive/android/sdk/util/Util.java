@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.util;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -239,7 +240,7 @@ public class Util {
 		if (cacheControlHeader != null) {
 			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
 			int indexOfLastBracket = cacheControlHeader.lastIndexOf("]");
-			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket+1, indexOfLastBracket);
+			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket + 1, indexOfLastBracket);
 			String[] cacheControlParts = cacheControlHeader.split(",");
 			for (String part : cacheControlParts) {
 				part = part.trim();
@@ -531,8 +532,11 @@ public class Util {
 		return false;
 	}
 
+	public static String getImageMimeType(Context context, Uri contentUri) {
+		return context.getContentResolver().getType(contentUri);
+	}
 
-	public static String getImagePath(Context context, Uri contentUri){
+	public static String getImagePath(Context context, Uri contentUri) {
 
 		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
 			return null;
@@ -541,7 +545,7 @@ public class Util {
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
 		cursor.close();
 
 		cursor = context.getContentResolver().query(
@@ -554,11 +558,11 @@ public class Util {
 		return path;
 	}
 
-	public static long getImageCreationTime(Context context, Uri contentUri){
+	public static long getImageCreationTime(Context context, Uri contentUri) {
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
 		cursor.close();
 
 		cursor = context.getContentResolver().query(
@@ -571,13 +575,41 @@ public class Util {
 		return time;
 	}
 
+	private static String md5(String s) {
+		try {
+			// Create MD5 Hash
+			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+			digest.update(s.getBytes());
+			byte messageDigest[] = digest.digest();
+
+			// Create Hex String
+			StringBuilder hexString = new StringBuilder();
+			for (byte aMessageDigest : messageDigest) {
+				hexString.append(Integer.toHexString(0xFF & aMessageDigest));
+			}
+			return hexString.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/*
-	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 * Generate cached file name use md5 from image originalPath and image created time
 	 */
-	public static String generateCacheFileFullPath(Context context, String imageUri, long createdTime) {
-		String source = imageUri + Long.toString(createdTime);
-		String fileName = String.valueOf(source.hashCode());
-		File cacheDir = getDiskCacheDir(context);
+	public static String generateCacheFileFullPath(String url, File cacheDir) {
+		String fileName = md5(url);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	/*
+	 * Generate cached file name use md5 from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPath(Uri fileOriginalUri, File cacheDir, long createdTime) {
+		String source = fileOriginalUri.toString() + Long.toString(createdTime);
+		String fileName = md5(source);
 		File cacheFile = new File(cacheDir, fileName);
 		return cacheFile.getPath();
 	}
@@ -603,7 +635,7 @@ public class Util {
 			appCacheDir = context.getExternalCacheDir();
 		}
 
-		if (appCacheDir == null){
+		if (appCacheDir == null) {
 			appCacheDir = context.getCacheDir();
 		}
 		return appCacheDir;
@@ -652,6 +684,69 @@ public class Util {
 			} catch (IOException e) {
 				Log.e("Exception on closing MD5 input stream", e);
 			}
+		}
+	}
+
+	/**
+	 * This function launchs the default app to view the selected file, based on mime type
+	 *
+	 * @param selectedFilePath the full path to the local storage
+	 * @param mimeTypeString   the mime type of the file to be opened
+	 * @return true if file can be viewed
+	 */
+	public static boolean openFileAttachment(final Context context, final String selectedFilePath, final String mimeTypeString) {
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			final Intent intent = new Intent();
+			intent.setAction(android.content.Intent.ACTION_VIEW);
+			final File file = new File(selectedFilePath);
+
+			String extStorageDirectory = Environment.getExternalStorageDirectory()
+					.toString();
+			File folder = new File(extStorageDirectory, "apptentivet-tmp");
+			folder.mkdir();
+			File tmpfile = new File(folder, "tmp");
+			String tmpFilePath = tmpfile.getPath();
+			if (tmpfile.exists()) {
+				tmpfile.delete();
+			}
+
+			if (!copyFile(selectedFilePath, tmpFilePath)) {
+				return false;
+			}
+
+			intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
+			try {
+				context.startActivity(intent);
+				return true;
+			} catch (ActivityNotFoundException e) {
+				Log.e("Activity not found: ", e);
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean copyFile(String from, String to) {
+		try {
+			int bytesum = 0;
+			int byteread = 0;
+			File oldfile = new File(from);
+			if (oldfile.exists()) {
+				InputStream inStream = new FileInputStream(from);
+				FileOutputStream fs = new FileOutputStream(to);
+				byte[] buffer = new byte[1444];
+				while ((byteread = inStream.read(buffer)) != -1) {
+					bytesum += byteread;
+					fs.write(buffer, 0, byteread);
+				}
+				inStream.close();
+				fs.close();
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 

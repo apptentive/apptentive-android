@@ -13,7 +13,9 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,17 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	private static final String KEY_TITLE = "title";
 
+	private static final String KEY_ATTACHMENTS = "attachments";
+
 	private boolean isLast;
 
 	private boolean hasNoAttachments = true;
+
+	/* For incoming message, this array stores attachment Urls
+	 * StoredFile::apptentiveUri is set by the "url" of the remote attachment file
+	 * StoredFile:localFilePath is set by the "thumbnail_url" of the remote attachment (maybe empty)
+	 */
+	private ArrayList<StoredFile> remoteAttachmentStoredFiles;
 
 	public CompoundMessage() {
 		super();
@@ -39,6 +49,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	public CompoundMessage(String json) throws JSONException {
 		super(json);
+		parseAttachmentsArray(json);
 		hasNoAttachments = getTextOnly();
 	}
 
@@ -127,7 +138,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			StoredFile storedFile = new StoredFile();
 			storedFile.setId(getNonce());
 			storedFile.setApptentiveUri("");
-			storedFile.setOriginalUriOrPath(image.originalPath);
+			storedFile.setSourceUriOrPath(image.originalPath);
 			// ToDo: look for local cache
 			storedFile.setLocalFilePath(image.localCachePath);
 			storedFile.setMimeType("image/jpeg");
@@ -179,4 +190,36 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		return message;
 	}
 
+	public List<StoredFile> getRemoteAttachments() {
+		return remoteAttachmentStoredFiles;
+	}
+
+	/* Parse attachment array in json. Only incoming compound message would have "attachments" key set
+	 *
+	 */
+	private boolean parseAttachmentsArray(String messageString) throws JSONException {
+		JSONObject root = new JSONObject(messageString);
+		if (!root.isNull(KEY_ATTACHMENTS)) {
+			JSONArray items = root.getJSONArray(KEY_ATTACHMENTS);
+			remoteAttachmentStoredFiles = new ArrayList<StoredFile>();
+			for (int i = 0; i < items.length(); i++) {
+				String json = items.getJSONObject(i).toString();
+				JSONObject attachment = new JSONObject(json);
+				String mimeType = attachment.optString("content_type");
+				StoredFile storedFile = new StoredFile();
+				storedFile.setId(getNonce());
+				storedFile.setApptentiveUri(attachment.optString("url"));
+				storedFile.setSourceUriOrPath(attachment.optString("thumbnail_url"));
+				storedFile.setLocalFilePath(attachment.optString(""));
+				storedFile.setMimeType(mimeType);
+				storedFile.setCreationTime(0);
+				remoteAttachmentStoredFiles.add(storedFile);
+			}
+			if (remoteAttachmentStoredFiles.size() > 0) {
+				setTextOnly(false);
+				return true;
+			}
+		}
+		return false;
+	}
 }

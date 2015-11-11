@@ -509,13 +509,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						 * from the hash code of file path + creation time
 						 */
 						long creation_time = Util.getImageCreationTime(viewActivity, uri);
-						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(viewActivity, originalPath, creation_time), creation_time)));
+						Uri fileUri = Uri.fromFile(new File(originalPath));
+						File cacheDir = Util.getDiskCacheDir(viewActivity);
+						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
+								Util.getImageMimeType(viewActivity, uri), creation_time)));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
 						 * cache name will be generated from the md5 of the file content
 						 */
 						String cachedFileName = Util.generateCacheFileFullPathMd5(viewActivity, uri.toString());
-						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, 0)));
+						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getImageMimeType(viewActivity, uri), 0)));
 					}
 
 					break;
@@ -753,6 +756,19 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		onComposingBarCreated();
 
+	}
+
+	public void openNonImageAttachment(final ImageItem image) {
+		if (image == null) {
+			Log.d("No attachment argument.");
+			return;
+		}
+
+		try {
+			Util.openFileAttachment(viewActivity, image.localCachePath, image.mimeType);
+		} catch (Exception e) {
+			Log.e("Error loading attachment", e);
+		}
 	}
 
 	public void showAttachmentDialog(final ImageItem image) {
@@ -1354,8 +1370,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onShowImagePreView(final int position, final ImageItem image) {
-		showAttachmentDialog(image);
+	public void onClickAttachment(final int position, final ImageItem image) {
+		String fileType = image.mimeType.substring(0, image.mimeType.indexOf("/"));
+		if (fileType.equalsIgnoreCase("Image")) {
+			showAttachmentDialog(image);
+		} else {
+			openNonImageAttachment(image);
+		}
 	}
 
 	@Override

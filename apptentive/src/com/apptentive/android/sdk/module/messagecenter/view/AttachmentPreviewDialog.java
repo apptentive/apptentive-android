@@ -98,7 +98,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		AsyncTask<Object, Void, Bitmap> task = new AsyncTask<Object, Void, Bitmap>() {
 			@Override
 			protected Bitmap doInBackground(Object... params) {
-				return prepareBitmap(currentImage);
+				return prepareAttachmentPreview(currentImage);
 			}
 
 			@Override
@@ -175,7 +175,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		}
 
 
-	public Bitmap prepareBitmap(ImageItem imageItem) {
+	public Bitmap prepareAttachmentPreview(ImageItem imageItem) {
 
 		// Show a preview of the image.
 		InputStream is = null;

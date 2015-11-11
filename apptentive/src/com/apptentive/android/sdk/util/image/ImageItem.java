@@ -12,12 +12,14 @@ import android.os.Parcelable;
 public class ImageItem implements Parcelable{
 	public String originalPath;
 	public String localCachePath;
+	public String mimeType;
 	public long time;
 
-	public ImageItem(String originalPath, String path, long time) {
+	public ImageItem(String originalPath, String path, String type, long time) {
 		this.originalPath = originalPath;
 		this.localCachePath = path;
 		this.time = time;
+		this.mimeType = type;
 	}
 
 	@Override
@@ -33,12 +35,13 @@ public class ImageItem implements Parcelable{
 
 	// Parcelling part
 	private ImageItem(Parcel in){
-		String[] data = new String[3];
+		String[] data = new String[4];
 
 		in.readStringArray(data);
 		this.originalPath = data[0];
 		this.localCachePath = data[1];
-		this.time = Long.valueOf(data[2]);
+		this.mimeType = data[2];
+		this.time = Long.valueOf(data[3]);
 	}
 
 	@Override
@@ -51,6 +54,7 @@ public class ImageItem implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeStringArray(new String[] {this.originalPath,
 				this.localCachePath,
+				this.mimeType,
 				Long.toString(this.time)});
 	}
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

@@ -58,7 +58,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setAdapterItemSize(viewWidth);
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				for (StoredFile file: imagesToAttach) {
-					images.add(new ImageItem(file.getOriginalUriOrPath(), file.getLocalFilePath(), file.getCreationTime()));
+					images.add(new ImageItem(file.getSourceUriOrPath(), file.getLocalFilePath(), file.getMimeType(), file.getCreationTime()));
 				}
 				imageBandView.setData(images);
 			}

@@ -87,6 +87,7 @@ public class ImageUtil {
 
 			final BitmapFactory.Options decodeBoundsOptions = new BitmapFactory.Options();
 			decodeBoundsOptions.inJustDecodeBounds = true;
+			decodeBoundsOptions.inScaled = false;
 			bis.mark(Integer.MAX_VALUE);
 			BitmapFactory.decodeStream(bis, null, decodeBoundsOptions);
 			bis.reset();
@@ -106,6 +107,7 @@ public class ImageUtil {
 			if (sampleRatio >= 2) {
 				options.inSampleSize = sampleRatio;
 			}
+			options.inScaled = false;
 			Log.v("Bitmap sample size = %d", options.inSampleSize);
 
 			Bitmap retImg = BitmapFactory.decodeStream(bis, null, options);

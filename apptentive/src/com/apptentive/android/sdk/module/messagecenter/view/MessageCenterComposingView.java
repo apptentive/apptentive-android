@@ -90,7 +90,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
 			@Override
 			public void onClick(int position, ImageItem image) {
-				listener.onShowImagePreView(position, image);
+				listener.onClickAttachment(position, image);
 			}
 		});
 		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_close);
