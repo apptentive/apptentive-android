@@ -93,7 +93,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 				listener.onClickAttachment(position, image);
 			}
 		});
-		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_close);
+		imageBandView.setAdapterIndicator(R.drawable.apptentive_ic_remove_attachment);
 
 		imageBandView.setImageIndicatorCallback((ImageGridViewAdapter.Callback) listener);
 		// Initialize image attachments band with empty data
@@ -124,12 +124,12 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		if (imagesToAttach == null || imagesToAttach.size() == 0) {
 			return;
 		}
+
 		imageBandView.setupLayoutListener();
 		imageBandView.setVisibility(View.VISIBLE);
 
 		images.addAll(imagesToAttach);
-		imageBandView.setData(images);
-
+		addAdditionalAttchItem();
 	}
 
 	/**
@@ -145,9 +145,16 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 			imageBandView.setVisibility(View.GONE);
 			return;
 		}
-		imageBandView.setData(images);
+		addAdditionalAttchItem();
 	}
 
+	private void addAdditionalAttchItem() {
+		ArrayList<ImageItem> imagesToAdd = new ArrayList<ImageItem>(images);
+		if (imagesToAdd.size() < getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+			imagesToAdd.add(new ImageItem("", "", "", 0));
+		}
+		imageBandView.setData(imagesToAdd);
+	}
 	/*
 	* Extends Android default movement method to enable selecting text and openning the links at the same time
 	 */

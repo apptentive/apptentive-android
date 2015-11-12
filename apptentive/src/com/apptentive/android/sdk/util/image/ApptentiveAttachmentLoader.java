@@ -17,6 +17,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.Log;
@@ -174,6 +175,11 @@ public class ApptentiveAttachmentLoader {
 				if (oldLoaderRequest != null) {
 					oldLoaderRequest.cancel();
 				}
+
+				if (TextUtils.isEmpty(uri)) {
+					return;
+				}
+
 				Bitmap cachedBitmap = (bLoadImage) ? (Bitmap) bitmapMemoryCache.getObjectFromCache(ImageMemoryCache.generateMemoryCacheEntryKey(uri, imageViewWidth, imageViewHeight)) :
 						null;
 				if (cachedBitmap != null) {

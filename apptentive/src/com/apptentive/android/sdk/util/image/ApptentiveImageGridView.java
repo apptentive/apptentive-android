@@ -89,8 +89,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 		});
 	}
 
-	public void setAdapterItemSize(int width) {
-		int desiredNumCount = getResources().getInteger(R.integer.apptentive_image_grid_default_column_number);
+	public void setAdapterItemSize(int width, int desiredNumCount) {
 		final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
 
 		int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;

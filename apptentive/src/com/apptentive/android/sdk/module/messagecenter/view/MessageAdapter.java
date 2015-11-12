@@ -310,6 +310,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					int viewWidth = container.getMeasuredWidth();
 					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
 							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
 							compoundMessage.getRemoteAttachments());
 					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
@@ -335,9 +336,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 						status = activityContext.getResources().getString(R.string.apptentive_failed);
 						bShowProgress = false;
 					}
+					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
+					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+					view.measure(widthMeasureSpec, 0);
+					int viewWidth = container.getMeasuredWidth();
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							bShowProgress, messageBody, parent.getWidth(), files);
+							bShowProgress, messageBody, viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
 					break;
 				}
 				case TYPE_STATUS: {

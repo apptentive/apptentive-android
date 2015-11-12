@@ -41,7 +41,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		imageBandView =(ApptentiveImageGridView) view.findViewById(R.id.grid);
 	}
 
-	public void updateMessage(String name, String datestamp, String text, final int viewWidth, final List<StoredFile> imagesToAttach) {
+	public void updateMessage(String name, String datestamp, String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
 		super.updateMessage(datestamp, 0, null);
 
 		if (messageBodyView != null) {
@@ -61,7 +61,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.GONE);
 			} else {
 				imageBandView.setVisibility(View.VISIBLE);
-				imageBandView.setAdapterItemSize(viewWidth);
+				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				File cacheDir = Util.getDiskCacheDir(imageBandView.getContext());
 				for (StoredFile file: imagesToAttach) {

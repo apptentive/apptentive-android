@@ -855,6 +855,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				final String messageText = (content != null) ? content.toString().trim() : "";
 				barView.showConfirmation = !(messageText.isEmpty());
 			}
+
+			if (attachmentCount == viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+				AnimationUtil.fadeOutGone(barView.attachButton);
+			} else {
+				if (barView.attachButton.getVisibility() != View.VISIBLE) {
+					AnimationUtil.fadeIn(barView.attachButton, null);
+				}
+			}
+
 			if (barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(true);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
@@ -1371,6 +1380,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onClickAttachment(final int position, final ImageItem image) {
+		if (TextUtils.isEmpty(image.originalPath) && TextUtils.isEmpty(image.mimeType)) {
+			onAttachImage();
+			return;
+		}
 		String fileType = image.mimeType.substring(0, image.mimeType.indexOf("/"));
 		if (fileType.equalsIgnoreCase("Image")) {
 			showAttachmentDialog(image);

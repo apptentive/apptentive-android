@@ -35,7 +35,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 	}
 
 	public void updateMessage(String datestamp, String status, int statusColor,
-														boolean progressBarVisible, final String body, final int viewWidth, final List<StoredFile> imagesToAttach) {
+														boolean progressBarVisible, final String body, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
 		super.updateMessage(datestamp, statusColor, status);
 		if (progressBar != null) {
 			if (progressBarVisible) {
@@ -55,7 +55,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.GONE);
 			} else {
 				imageBandView.setVisibility(View.VISIBLE);
-				imageBandView.setAdapterItemSize(viewWidth);
+				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				for (StoredFile file: imagesToAttach) {
 					images.add(new ImageItem(file.getSourceUriOrPath(), file.getLocalFilePath(), file.getMimeType(), file.getCreationTime()));

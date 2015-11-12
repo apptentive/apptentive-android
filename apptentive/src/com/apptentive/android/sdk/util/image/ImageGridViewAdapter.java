@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.util.image;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 */
 	public boolean cilickOn(int index) {
 		ImageItem item = getItem(index);
+		if (TextUtils.isEmpty(item.mimeType)) {
+			return false;
+		}
 		String fileType = item.mimeType.substring(0, item.mimeType.indexOf("/"));
 		if (!fileType.equalsIgnoreCase("Image")) {
 			if (downloadItems.contains(item)) {
@@ -283,6 +287,16 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				return;
 			}
 
+			if (TextUtils.isEmpty(data.originalPath)) {
+				image.setImageResource(R.drawable.apptentive_ic_add);
+				indicator.setVisibility(View.GONE);
+				bLoadThumbnail = false;
+				progressBar.setVisibility(View.GONE);
+				preview_title.setVisibility(View.GONE);
+				progressBar_horizontal.setVisibility(View.GONE);
+				return;
+			}
+
 			int placeholderResId = R.drawable.apptentive_ic_image_default_item;
 
 			if (showImageIndicator) {
@@ -329,12 +343,20 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				progressBar.setVisibility(View.GONE);
 				preview_title.setVisibility(View.VISIBLE);
 				preview_title.setText(MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
-				placeholderResId = R.drawable.apptentive_generic_file_thumbnail;
+
 				if (downloadItems.contains(data)) {
+					placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
 					if (progressBar_horizontal != null) {
 						progressBar_horizontal.setVisibility(View.VISIBLE);
 					}
 				} else {
+					File localFile = new File(data.localCachePath);
+					if (localFile.exists()) {
+						placeholderResId = R.drawable.apptentive_generic_file_thumbnail;
+					} else {
+						placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
+					}
+
 					if (progressBar_horizontal != null) {
 						progressBar_horizontal.setVisibility(View.GONE);
 					}
@@ -353,7 +375,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
-									if (index == pos && image == view && bLoadThumbnail) {
+									if (index == pos && image == view) {
 										image.setImageDrawable(d);
 									}
 								}
@@ -389,6 +411,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								@Override
 								public void onLoaded(ImageView view, int pos, Drawable d) {
 									downloadItems.remove(data);
+									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
 									Util.openFileAttachment(view.getContext(), data.localCachePath, data.mimeType);
 								}
 
@@ -411,6 +434,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 								}
 							});
+				} else {
+					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, true, null);
 				}
 			}
 		}
