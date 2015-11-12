@@ -10,8 +10,8 @@
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:descendantFocusability="blocksDescendants"
-              style="@style/MessageCenterMessageFrame">
+              style="@style/MessageCenterMessageFrame"
+              android:descendantFocusability="blocksDescendants">
     <TextView android:id="@+id/datestamp"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -26,7 +26,8 @@
                       android:layout_height="wrap_content"
                       android:background="@color/apptentive_message_center_outgoing_background"
                       android:orientation="vertical">
-            <LinearLayout android:layout_width="match_parent"
+            <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
+                          android:layout_width="match_parent"
                           android:layout_height="match_parent"
                           style="@style/ApptentiveTheme.Widget.CardContent.Outgoing">
                 <TextView android:id="@+id/apptentive_compound_message_body"
@@ -38,12 +39,12 @@
                     android:id="@+id/grid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
                     android:visibility="gone"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
                     android:horizontalSpacing="@dimen/apptentive_image_grid_space_size"
                     android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
-                    android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
                     android:clipToPadding="false"
                     android:numColumns="@integer/apptentive_image_grid_default_column_number"/>
                 <TextView android:id="@+id/status"
