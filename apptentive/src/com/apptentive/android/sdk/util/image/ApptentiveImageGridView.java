@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.util.image;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.List;
 
@@ -76,7 +78,8 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 				final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
 
 				int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
-				imageBandAdapter.setItemSize(columnWidth);
+				Point point = Util.getScreenSize(getContext().getApplicationContext());
+				imageBandAdapter.setItemSize(columnWidth, (int) (((float) point.y / (float) point.x) * columnWidth));
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 					getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -93,7 +96,8 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 		final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
 
 		int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
-		imageBandAdapter.setItemSize(columnWidth);
+		Point point = Util.getScreenSize(getContext().getApplicationContext());
+		imageBandAdapter.setItemSize(columnWidth, (int) (((float) point.y / (float) point.x) * columnWidth));
 	}
 
 	public void setAdapterIndicator(int rid) {

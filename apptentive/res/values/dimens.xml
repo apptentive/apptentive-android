@@ -83,6 +83,6 @@
     <dimen name="apptentive_message_center_error_side_margin">24dp</dimen>
 
     <dimen name="apptentive_image_thumbnail_default_size">160dp</dimen>
-    <dimen name="apptentive_image_grid_space_size">4dp</dimen>
+    <dimen name="apptentive_image_grid_space_size">3dp</dimen>
 
 </resources>

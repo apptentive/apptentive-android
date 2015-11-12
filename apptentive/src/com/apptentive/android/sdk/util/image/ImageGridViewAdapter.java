@@ -7,6 +7,7 @@ package com.apptentive.android.sdk.util.image;
  */
 
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -46,7 +47,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 	private List<ImageItem> downloadItems = new ArrayList<ImageItem>();
 
-	private int itemSize;
+	private int itemWidth;
+	private int itemHeight;
+
 	private GridView.LayoutParams itemLayoutParams;
 
 	public ImageGridViewAdapter(Context context, boolean showCamera) {
@@ -181,15 +184,16 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 *
 	 * @param columnWidth
 	 */
-	public void setItemSize(int columnWidth) {
+	public void setItemSize(int columnWidth, int columnHeight) {
 
-		if (itemSize == columnWidth) {
+		if (itemWidth == columnWidth) {
 			return;
 		}
 
-		itemSize = columnWidth;
+		itemWidth = columnWidth;
+		itemHeight = columnHeight;
 
-		itemLayoutParams = new GridView.LayoutParams(itemSize, itemSize);
+		itemLayoutParams = new GridView.LayoutParams(itemWidth, itemHeight);
 
 		notifyDataSetChanged();
 	}
@@ -255,7 +259,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 		/** Fixed View Size */
 		GridView.LayoutParams lp = (GridView.LayoutParams) view.getLayoutParams();
-		if (lp.height != itemSize) {
+		if (lp.height != itemHeight) {
 			view.setLayoutParams(itemLayoutParams);
 		}
 
@@ -366,9 +370,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			image.setImageDrawable(null);
 			image.setImageResource(placeholderResId);
 
-			if (itemSize > 0 && data.originalPath != null) {
+			if (itemWidth > 0 && data.originalPath != null) {
 				if (bLoadThumbnail) {
-					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, itemSize, itemSize, true,
+					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, itemWidth, itemHeight, true,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
 								public void onLoaded(ImageView view, int pos, Drawable d) {
