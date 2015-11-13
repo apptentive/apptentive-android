@@ -102,47 +102,6 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 	}
 
-	public void testQueriesAgainstAppRelease() {
-		Log.e("Running test: testQueriesAgainstAppRelease()\n\n");
-		resetDevice();
-
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstAppRelease.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-
-		Interaction interaction;
-
-		AppReleaseManager.storeAppReleaseAndReturnDiff(getTargetContext());
-
-		// 0
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
-
-		// 1
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
-
-		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
-
-		// 3
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
-
-		// 4
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
-
-		// 5
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
-	}
-
 	public void testQueriesAgainstSdk() {
 		Log.e("Running test: testQueriesAgainstSdk()\n\n");
 		resetDevice();
@@ -166,6 +125,6 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		// 2
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNotNull(interaction);
+		assertNull(interaction);
 	}
 }

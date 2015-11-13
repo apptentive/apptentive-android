@@ -14,20 +14,20 @@
           "$or": [
             {
               "code_point/switch.code.point/invokes/total": 0,
-              "application_version": {
-                "$ends_with": ".1"
+              "person/email": {
+                "$ends_with": ".com"
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 1,
-              "application_version": {
-                "$ends_with": ".0"
+              "person/email": {
+                "$ends_with": ".COM"
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 2,
               "person/email": {
-                "$ends_with": "example"
+                "$ends_with": "test@example.com"
               }
             },
             {
@@ -39,13 +39,29 @@
             {
               "code_point/switch.code.point/invokes/total": 4,
               "device/os_name": {
-                "$ends_with": "roid "
+                "$ends_with": "roid"
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 5,
+              "$not": {
+                "device/os_name": {
+                  "$ends_with": "roid "
+                }
+              }
+            },
+            {
+              "code_point/switch.code.point/invokes/total": 6,
               "device/os_name": {
                 "$ends_with": "Roid"
+              }
+            },
+            {
+              "code_point/switch.code.point/invokes/total": 7,
+              "$not": {
+                "device/os_name": {
+                  "$ends_with": "iOS"
+                }
               }
             }
           ]

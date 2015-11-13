@@ -14,13 +14,13 @@
           "$or": [
             {
               "code_point/switch.code.point/invokes/total": 0,
-              "application_version": {
+              "application/version": {
                 "$exists": false
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 1,
-              "application_version": {
+              "application/version": {
                 "$exists": true
               }
             }

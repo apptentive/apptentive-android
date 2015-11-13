@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -33,9 +33,11 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
+		Log.e("0");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNull(interaction);
 
+		Log.e("1");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
@@ -50,26 +52,26 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
-		// 0
+		Log.e("0");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 1
+		Log.e("1");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 2
+		Log.e("2");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 3
+		Log.e("3");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 4
+		Log.e("4");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
@@ -84,42 +86,42 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
-		PersonManager.storePersonEmail(getTargetContext(), "example@example.com");
+		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
 		PersonManager.storePersonAndReturnIt(getTargetContext());
 		DeviceManager.storeDeviceAndReturnIt(getTargetContext());
 
-		// 0
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
-
-		// 1
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		Log.e("0");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
 		assertNotNull(interaction);
 
-		// 2
+		Log.e("1");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
 		assertNotNull(interaction);
 
-		// 3
+		Log.e("2");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
 		assertNotNull(interaction);
 
-		// 4
+		Log.e("3");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
-
-		// 5
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
 		assertNotNull(interaction);
 
-		// 6
+		Log.e("4");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
+		assertNotNull(interaction);
+
+		Log.e("5");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
+		assertNotNull(interaction);
+
+		Log.e("6");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
 		assertNotNull(interaction);
 	}
 
@@ -132,35 +134,35 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
-		PersonManager.storePersonEmail(getTargetContext(), "example@example.com");
+		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
 		PersonManager.storePersonAndReturnIt(getTargetContext());
 		DeviceManager.storeDeviceAndReturnIt(getTargetContext());
 
-		// 0
+		Log.e("0");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 1
+		Log.e("1");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
-
-		// 3
+		Log.e("2");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 4
+		Log.e("3");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 5
+		Log.e("4");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		assertNotNull(interaction);
+
+		Log.e("5");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
@@ -175,35 +177,45 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
-		PersonManager.storePersonEmail(getTargetContext(), "example@example.com");
+		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
 		PersonManager.storePersonAndReturnIt(getTargetContext());
 		DeviceManager.storeDeviceAndReturnIt(getTargetContext());
 
-		// 0
+		Log.e("0");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 1
+		Log.e("1");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
-
-		// 3
+		Log.e("2");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
-		// 4
+		Log.e("3");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
-		assertNull(interaction);
+		assertNotNull(interaction);
 
-		// 5
+		Log.e("4");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		assertNotNull(interaction);
+
+		Log.e("5");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		assertNotNull(interaction);
+
+		Log.e("6");
+		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
+		assertNotNull(interaction);
+
+		Log.e("7");
 		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);

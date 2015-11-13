@@ -14,26 +14,28 @@
           "$or": [
             {
               "code_point/switch.code.point/invokes/total": 0,
-              "application_version": {
-                "$starts_with": "1."
+              "person/email": {
+                "$starts_with": "test"
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 1,
-              "application_version": {
-                "$starts_with": "2."
+              "$not": {
+                "person/email": {
+                  "$starts_with": " test"
+                }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 2,
               "person/email": {
-                "$starts_with": "examplE.com"
+                "$starts_with": "test@example.com"
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 3,
               "person/email": {
-                "$starts_with": "example"
+                "$starts_with": "tEsT@eXaMpLe.CoM"
               }
             },
             {

@@ -49,7 +49,6 @@ public class InteractionManager {
 
 		Targets targets = getTargets(context);
 
-		// TODO: Check with Interaction to see if it can run. Otherwise, put that check in the criteria?
 		if (targets != null) {
 			String interactionId = targets.getApplicableInteraction(context, eventLabel);
 			if (interactionId != null) {

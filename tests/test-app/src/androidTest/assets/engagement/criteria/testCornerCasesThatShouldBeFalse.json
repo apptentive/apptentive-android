@@ -1,0 +1,12 @@
+{
+  "$not": {
+    "$or": [
+      {
+        "code_point/switch.code.point/invokes/total": 0,
+        "person/custom_data/foo": {
+          "$exists": null
+        }
+      }
+    ]
+  }
+}

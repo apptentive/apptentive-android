@@ -15,40 +15,51 @@
             {
               "code_point/switch.code.point/invokes/total": 0,
               "$not": {
-                "application_version": {
-                  "$contains": "1.0"
+                "application/version": {
+                  "_type": "version",
+                  "version": "3.0"
                 }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 1,
               "$not": {
-                "application_version": {
-                  "$contains": "2.0"
+                "application/version": {
+                  "_type": "version",
+                  "version": "4.0.1"
                 }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 2,
               "$not": {
-                "application_version": {
-                  "$contains": "2."
+                "application/version": {
+                  "$gt": {
+                    "_type": "version",
+                    "version": "4.0.0"
+                  }
                 }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 3,
               "$not": {
-                "application_version": {
-                  "$contains": ".0"
+                "application/version": {
+                  "$lt": {
+                    "_type": "version",
+                    "version": "4.0.0"
+                  }
                 }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 4,
               "$not": {
-                "application_version": {
-                  "$contains": "2.0.0"
+                "application/version": {
+                  "$ne": {
+                    "_type": "version",
+                    "version": "4.0.0"
+                  }
                 }
               }
             }
