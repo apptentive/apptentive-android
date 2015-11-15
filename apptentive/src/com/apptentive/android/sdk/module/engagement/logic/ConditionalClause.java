@@ -107,11 +107,11 @@ public class ConditionalClause implements Clause {
 	public boolean evaluate(Context context) {
 		Log.v("    - %s", query);
 		Comparable field = FieldManager.getValue(context, query);
-		Log.v("      - => %s(%s)", field == null ? "null" : field.getClass().getSimpleName(), field);
+		Log.v("      - => %s", classToString(field));
 		for (ConditionalTest test : conditionalTests) {
 			switch (test.operator) {
 				case $exists: {
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (test.parameter == null) {
 						return false;
 					}
@@ -127,7 +127,7 @@ public class ConditionalClause implements Clause {
 					}
 				}
 				case $eq:
-					Log.v("      - %s %s(%s)?", test.operator, test.parameter.getClass().getSimpleName(), test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null && test.parameter == null) {
 						continue;
 					}
@@ -143,7 +143,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $ne:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -156,7 +156,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $lt:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -169,7 +169,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $lte:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -182,7 +182,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $gte:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -195,7 +195,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $gt:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -208,7 +208,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $starts_with:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (!(field instanceof String) || !(test.parameter instanceof String)) {
 						return false;
 					}
@@ -218,7 +218,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $ends_with:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (!(field instanceof String) || !(test.parameter instanceof String)) {
 						return false;
 					}
@@ -228,7 +228,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 				case $contains:
-					Log.v("      - %s %s?", test.operator, test.parameter);
+					Log.v("      - %s %s?", test.operator, classToString(test.parameter));
 					if (field == null || test.parameter == null) {
 						return false;
 					}
@@ -251,7 +251,7 @@ public class ConditionalClause implements Clause {
 					Double offset = ((BigDecimal) test.parameter).doubleValue();
 					Double currentTime = Util.currentTimeSeconds();
 					Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-					Log.v("      - %s %s(%s)?", test.operator, offsetDateTime.getClass().getSimpleName(), offsetDateTime);
+					Log.v("      - %s %s?", test.operator, classToString(offsetDateTime));
 					if (((Apptentive.DateTime) field).compareTo(offsetDateTime) < 0) {
 						continue;
 					} else {
@@ -269,9 +269,9 @@ public class ConditionalClause implements Clause {
 					Double offset = ((BigDecimal) test.parameter).doubleValue();
 					Double currentTime = Util.currentTimeSeconds();
 					Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-					Log.v("      - %s %s(%s)?", test.operator, offsetDateTime.getClass().getSimpleName(), offsetDateTime);
+					Log.v("      - %s %s?", test.operator, classToString(offsetDateTime));
 					if (((Apptentive.DateTime) field).compareTo(offsetDateTime) > 0) {
-						continue;
+						continue; // The compiler says this is unnecessary. But you just know that if you remove it, you won't remember to add it again when you add support for another operator.
 					} else {
 						return false;
 					}
@@ -279,5 +279,13 @@ public class ConditionalClause implements Clause {
 			}
 		}
 		return true;
+	}
+
+	private String classToString(Object object) {
+		if (object == null) {
+			return "null";
+		} else {
+			return String.format("%s(%s)", object.getClass().getSimpleName(), object);
+		}
 	}
 }
