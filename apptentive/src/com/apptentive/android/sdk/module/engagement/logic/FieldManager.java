@@ -143,7 +143,9 @@ public class FieldManager {
 			case device: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				Device device = DeviceManager.getStoredDevice(context);
-
+				if (device == null) {
+					return null;
+				}
 				switch (subQuery) {
 					case custom_data:
 						String customDataKey = tokens[2];
