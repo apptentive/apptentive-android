@@ -20,7 +20,6 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
-import java.util.TimeZone;
 
 /**
  * @author Sky Kelsey
@@ -63,7 +62,7 @@ public class FieldManager {
 			case current_time:
 				return new Apptentive.DateTime(Util.currentTimeSeconds());
 			case local_time:
-				return new Apptentive.DateTime(Util.currentTimeSeconds() + TimeZone.getDefault().getRawOffset());
+				return new Apptentive.DateTime(Util.currentTimeSeconds() + Util.getUtcOffset());
 			case is_update: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
