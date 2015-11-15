@@ -43,7 +43,11 @@ public class LogicalClause implements Clause {
 			Iterator<String> it = jsonObject.keys();
 			while (it.hasNext()) {
 				String currentKey = it.next();
-				children.add(ClauseParser.parse(currentKey, jsonObject.get(currentKey)));
+				if (!jsonObject.isNull(currentKey)) {
+					children.add(ClauseParser.parse(currentKey, jsonObject.get(currentKey)));
+				} else {
+					children.add(ClauseParser.parse(currentKey, null));
+				}
 			}
 		} else {
 			Log.w("Unrecognized LogicalClause: %s", value.toString());
