@@ -910,38 +910,6 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 	}
 
-	public void testBadCriteria() {
-		Log.e("Running test: testBadCriteria()");
-		resetDevice();
-
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testBadCriteria.json");
-
-		Interaction interaction;
-		try {
-			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
-			assertNull(interaction);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
-			assertNull(interaction);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.3");
-			assertNull(interaction);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.4");
-			assertNull(interaction);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.5");
-			assertNull(interaction);
-
-			interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.6");
-			assertNull(interaction);
-		} catch (Exception e) {
-			assertNull("An exception was thrown from bad criteria.", e);
-		}
-	}
-
 	public void testCorruptedJson() {
 		Log.e("Running test: testCorruptedJson()");
 		resetDevice();
