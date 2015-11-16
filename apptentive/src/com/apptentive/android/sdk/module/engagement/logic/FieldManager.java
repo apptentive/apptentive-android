@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.logic;
 import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
@@ -238,7 +239,7 @@ public class FieldManager {
 				try {
 					return QueryPart.valueOf(name);
 				} catch (IllegalArgumentException e) {
-					throw new RuntimeException(String.format("Error parsing QueryPart: %s", name), e);
+					Log.d(String.format("Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name), e);
 				}
 			}
 			return other;
