@@ -44,7 +44,10 @@ public class ConditionalClause implements Clause {
 		Iterator<String> operators = conditionObject.keys();
 		while (operators.hasNext()) {
 			String operator = operators.next();
-			Object value = parseValue(conditionObject.opt(operator));
+			Object value = null;
+			if (!conditionObject.isNull(operator)) {
+				value = parseValue(conditionObject.opt(operator));
+			}
 			conditionalTests.add(new ConditionalTest(ConditionalOperator.parse(operator), value));
 		}
 		return conditionalTests;
