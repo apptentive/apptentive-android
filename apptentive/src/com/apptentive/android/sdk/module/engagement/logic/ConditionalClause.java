@@ -24,6 +24,9 @@ import java.util.List;
  * @author Sky Kelsey
  */
 public class ConditionalClause implements Clause {
+
+	private static final String KEY_COMPLEX_TYPE = "_type";
+
 	String query;
 	List<ConditionalTest> conditionalTests;
 
@@ -75,7 +78,7 @@ public class ConditionalClause implements Clause {
 			return new BigDecimal((Short) value);
 		} else if (value instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject) value;
-			String typeName = jsonObject.optString("_type");
+			String typeName = jsonObject.optString(KEY_COMPLEX_TYPE);
 			if (typeName != null) {
 				try {
 					if (Apptentive.Version.TYPE.equals(typeName)) {
@@ -89,7 +92,7 @@ public class ConditionalClause implements Clause {
 					throw new RuntimeException(String.format("Error parsing complex parameter with name: \"%s\", and value: \"%s\"" + typeName, value), e);
 				}
 			} else {
-				throw new RuntimeException("Error: Complex type parameter missing \"_type\".");
+				throw new RuntimeException(String.format("Error: Complex type parameter missing \"%s\".", KEY_COMPLEX_TYPE));
 			}
 		}
 		// All other values, such as Boolean and String should be returned unaltered.
@@ -97,7 +100,7 @@ public class ConditionalClause implements Clause {
 	}
 
 	private boolean isComplexType(JSONObject jsonObject) {
-		return jsonObject != null && !jsonObject.isNull("_type");
+		return jsonObject != null && !jsonObject.isNull(KEY_COMPLEX_TYPE);
 	}
 
 	/**
