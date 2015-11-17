@@ -57,7 +57,7 @@
         android:id="@+id/thumbnail_progress_determinate"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_gravity="bottom"
+        android:layout_gravity="center"
         style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"
         android:visibility="gone"/>
 </FrameLayout>

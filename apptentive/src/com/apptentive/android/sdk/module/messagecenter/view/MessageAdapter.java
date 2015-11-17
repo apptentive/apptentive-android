@@ -743,17 +743,15 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		@Override
 		protected Bitmap doInBackground(String... paths) {
-			FileInputStream fis = null;
 			Bitmap imageBitmap = null;
 			try {
-				fis = activityContext.openFileInput(paths[0]);
 				Point point = Util.getScreenSize(activityContext.getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
-				imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
+				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(activityContext, paths[0], maxImageWidth, maxImageHeight, null, 0);
 				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
 				Log.e("Error opening stored image.", e);
@@ -762,8 +760,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				// had to result from allocating a bitmap, so the system should be in a good state.
 				// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
 				Log.e("Ran out of memory opening image.", e);
-			} finally {
-				Util.ensureClosed(fis);
 			}
 			return imageBitmap;
 		}

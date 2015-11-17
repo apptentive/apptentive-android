@@ -56,6 +56,7 @@ import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.WeakReferenceHandler;
+import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
@@ -327,7 +328,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	protected void setup() {
 
-		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close);
+		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close_mc);
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -486,6 +487,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
 		ApptentiveInternal.getAndClearCustomData();
+		ApptentiveAttachmentLoader.getInstance().clearMemoryCache();
 		return true;
 	}
 
@@ -503,7 +505,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
 					Uri uri = data.getData();
-					String originalPath = Util.getImagePath(viewActivity, uri);
+					String originalPath = Util.getImageRealFilePathFromUri(viewActivity, uri);
 					if (originalPath != null) {
 						/* If able to retrieve file path and creation time from uri, cache file name will be generated
 						 * from the hash code of file path + creation time
@@ -765,7 +767,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 
 		try {
-			Util.openFileAttachment(viewActivity, image.localCachePath, image.mimeType);
+			Util.openFileAttachment(viewActivity, image.originalPath, image.localCachePath, image.mimeType);
 		} catch (Exception e) {
 			Log.e("Error loading attachment", e);
 		}

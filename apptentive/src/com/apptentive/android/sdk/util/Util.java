@@ -536,10 +536,11 @@ public class Util {
 		return context.getContentResolver().getType(contentUri);
 	}
 
-	public static String getImagePath(Context context, Uri contentUri) {
+	public static String getImageRealFilePathFromUri(Context context, Uri contentUri) {
 
+		String path = null;
 		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
-			return null;
+			return path;
 		}
 
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
@@ -552,13 +553,16 @@ public class Util {
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 		cursor.moveToFirst();
-		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 		cursor.close();
 
 		return path;
 	}
 
 	public static long getImageCreationTime(Context context, Uri contentUri) {
+		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+			return 0;
+		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
@@ -689,30 +693,33 @@ public class Util {
 
 	/**
 	 * This function launchs the default app to view the selected file, based on mime type
-	 *
+	 * @param sourcePath
 	 * @param selectedFilePath the full path to the local storage
 	 * @param mimeTypeString   the mime type of the file to be opened
 	 * @return true if file can be viewed
 	 */
-	public static boolean openFileAttachment(final Context context, final String selectedFilePath, final String mimeTypeString) {
+	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
 				|| !Environment.isExternalStorageRemovable())
 				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
 			final Intent intent = new Intent();
 			intent.setAction(android.content.Intent.ACTION_VIEW);
-			final File file = new File(selectedFilePath);
 
+      /* Attachments were downloaded into app private data dir. In order for external app to open
+       * the attchments, the file need to be copied to a download folder that is accessible to public
+      */
 			String extStorageDirectory = Environment.getExternalStorageDirectory()
 					.toString();
-			File folder = new File(extStorageDirectory, "apptentivet-tmp");
-			folder.mkdir();
-			File tmpfile = new File(folder, "tmp");
+			File folder = new File(extStorageDirectory, "Downloads");
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			File tmpfile = new File(folder, "apptentive-tmp");
 			String tmpFilePath = tmpfile.getPath();
 			if (tmpfile.exists()) {
 				tmpfile.delete();
 			}
-
-			if (!copyFile(selectedFilePath, tmpFilePath)) {
+			if (copyFile(selectedFilePath, tmpFilePath) == 0) {
 				return false;
 			}
 
@@ -721,34 +728,49 @@ public class Util {
 				context.startActivity(intent);
 				return true;
 			} catch (ActivityNotFoundException e) {
-				Log.e("Activity not found: ", e);
+				Log.e("Activity not found to open attachment: ", e);
+			}
+		} else {
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourcePath));
+			if (Util.canLaunchIntent(context, browserIntent)) {
+				context.startActivity(browserIntent);
 			}
 		}
-
 		return false;
 	}
 
-	public static boolean copyFile(String from, String to) {
+	/**
+	 * This function copies file from one location to another
+	 *
+	 * @param from the full path to the source file
+	 * @param to the full path to the destination file
+	 * @return total bytes copied. 0 indicates
+	 */
+	public static int copyFile(String from, String to) {
+		InputStream inStream = null;
+		FileOutputStream fs = null;
 		try {
 			int bytesum = 0;
-			int byteread = 0;
+			int byteread;
 			File oldfile = new File(from);
 			if (oldfile.exists()) {
-				InputStream inStream = new FileInputStream(from);
-				FileOutputStream fs = new FileOutputStream(to);
+				inStream = new FileInputStream(from);
+				fs = new FileOutputStream(to);
 				byte[] buffer = new byte[1444];
 				while ((byteread = inStream.read(buffer)) != -1) {
 					bytesum += byteread;
 					fs.write(buffer, 0, byteread);
 				}
-				inStream.close();
-				fs.close();
 			}
-			return true;
+			return bytesum;
 		} catch (Exception e) {
-			return false;
+			return 0;
+		} finally {
+			Util.ensureClosed(inStream);
+			Util.ensureClosed(fs);
 		}
 	}
+
 
 }
 

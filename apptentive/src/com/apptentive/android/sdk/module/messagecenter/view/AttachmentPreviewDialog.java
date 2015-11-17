@@ -30,17 +30,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Barry Li
@@ -68,7 +64,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstance){
+	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
 		setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
 	}
@@ -160,76 +156,53 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	}
 
 
-		@Override
-		public void onSingleTapDetected() {
-			if (closeButton.getVisibility() == View.GONE) {
-				closeButton.setVisibility(View.VISIBLE);
-			} else {
-				closeButton.setVisibility(View.GONE);
-			}
+	@Override
+	public void onSingleTapDetected() {
+		if (closeButton.getVisibility() == View.GONE) {
+			closeButton.setVisibility(View.VISIBLE);
+		} else {
+			closeButton.setVisibility(View.GONE);
 		}
+	}
 
-		@Override
-		public void onFlingDetected() {
-				dismiss();
-		}
+	@Override
+	public void onFlingDetected() {
+		dismiss();
+	}
 
 
 	public Bitmap prepareAttachmentPreview(ImageItem imageItem) {
 
 		// Show a preview of the image.
-		InputStream is = null;
-		final Bitmap preview;
-		try {
-			String imagePathString = null;
-			// Always try to load preview from cached file
-			if (!TextUtils.isEmpty(imageItem.localCachePath)) {
-				File imageFile = new File(imageItem.localCachePath);
-        if (imageFile.exists()) {
-					is = new FileInputStream(imageFile);
-					imagePathString = imageItem.localCachePath;
-				}
+		Bitmap preview = null;
+		String imagePathString = imageItem.originalPath;
+		// Always try to load preview from cached file
+		if (!TextUtils.isEmpty(imageItem.localCachePath)) {
+			File imageFile = new File(imageItem.localCachePath);
+			if (imageFile.exists()) {
+				imagePathString = imageItem.localCachePath;
 			}
-			// If no cache, load from the original originalPath
-      if (is == null) {
-				if (imageItem.time == 0) {
-					is = getActivity().getContentResolver().openInputStream(Uri.parse(imageItem.originalPath));
-				} else {
-					File imageFile = new File(imageItem.originalPath);
-					if (imageFile.exists()) {
-						is = new FileInputStream(imageFile);
-						imagePathString = imageItem.originalPath;
-					}
-				}
-			}
+		}
 
-			if (is == null) {
-				return null;
-			}
-
-			// Retrieve image orientation
-			int imageOrientation = 0;
-			try {
-				if (imagePathString != null) {
-					ExifInterface exif = new ExifInterface(imagePathString);
-					imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-				}
-			} catch (IOException e) {
-
-			}
-
-			//final int dialogWidth
-			if (is != null) {
-				preview = ImageUtil.createScaledBitmapFromStream(is, width, height, null, imageOrientation);
-			} else {
-				preview = null;
-			}
-
-		} catch (FileNotFoundException e) {
-			// TODO: Error toast?
+		if (imagePathString == null) {
 			return null;
-		} finally {
-			Util.ensureClosed(is);
+		}
+
+		// Retrieve image orientation
+		int imageOrientation = 0;
+		try {
+			if (imagePathString != null) {
+				ExifInterface exif = new ExifInterface(imagePathString);
+				imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+			}
+		} catch (IOException e) {
+
+		}
+		try {
+			//final int dialogWidth
+			preview = ImageUtil.createScaledBitmapFromLocalImageSource(getContext(), imagePathString, width, height, null, imageOrientation);
+		} catch (Throwable e) {
+			//ignore
 		}
 
 		return preview;
