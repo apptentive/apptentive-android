@@ -97,7 +97,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 *
 	 * @param index
 	 */
-	public boolean cilickOn(int index) {
+	public boolean clickOn(int index) {
 		ImageItem item = getItem(index);
 		if (TextUtils.isEmpty(item.mimeType)) {
 			return false;
@@ -268,11 +268,11 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	class ViewHolder {
 		ImageView image;
 		ImageView indicator;
-		TextView attachment_extension;
+		TextView attachmentExtension;
 		// a circular indeterminate progress bar showing local file loading progress
 		ProgressBar progressBar;
 		// a horizontal determinate progress bar showing download progress
-		ApptentiveMaterialDeterminateProgressBar progressBar_download;
+		ApptentiveMaterialDeterminateProgressBar progressBarDownload;
 		View mask;
 		boolean bLoadThumbnail;
 
@@ -280,9 +280,9 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			image = (ImageView) view.findViewById(R.id.image);
 			indicator = (ImageView) view.findViewById(R.id.indicator);
 			mask = view.findViewById(R.id.mask);
-			attachment_extension = (TextView) view.findViewById(R.id.image_preview_title);
+			attachmentExtension = (TextView) view.findViewById(R.id.image_preview_title);
 			progressBar = (ProgressBar) view.findViewById(R.id.thumbnail_progress);
-			progressBar_download = (ApptentiveMaterialDeterminateProgressBar) view.findViewById(R.id.thumbnail_progress_determinate);
+			progressBarDownload = (ApptentiveMaterialDeterminateProgressBar) view.findViewById(R.id.thumbnail_progress_determinate);
 			view.setTag(this);
 		}
 
@@ -298,8 +298,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				indicator.setVisibility(View.GONE);
 				bLoadThumbnail = false;
 				progressBar.setVisibility(View.GONE);
-				attachment_extension.setVisibility(View.GONE);
-				progressBar_download.setVisibility(View.GONE);
+				attachmentExtension.setVisibility(View.GONE);
+				progressBarDownload.setVisibility(View.GONE);
 				return;
 			} else {
 				image.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -342,20 +342,20 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 			String fileType = data.mimeType.substring(0, data.mimeType.indexOf("/"));
 			if (fileType.equalsIgnoreCase("Image")) {
-				attachment_extension.setVisibility(View.GONE);
+				attachmentExtension.setVisibility(View.GONE);
 				bLoadThumbnail = true;
 				// show the progress bar while we load content...
 				progressBar.setVisibility(View.VISIBLE);
 			} else {
 				bLoadThumbnail = false;
 				progressBar.setVisibility(View.GONE);
-				attachment_extension.setVisibility(View.VISIBLE);
-				attachment_extension.setText(MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
+				attachmentExtension.setVisibility(View.VISIBLE);
+				attachmentExtension.setText(MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
 
 				if (downloadItems.contains(data)) {
 					placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
-					if (progressBar_download != null) {
-						progressBar_download.setVisibility(View.VISIBLE);
+					if (progressBarDownload != null) {
+						progressBarDownload.setVisibility(View.VISIBLE);
 					}
 				} else {
 					File localFile = new File(data.localCachePath);
@@ -365,8 +365,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 						placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
 					}
 
-					if (progressBar_download != null) {
-						progressBar_download.setVisibility(View.GONE);
+					if (progressBarDownload != null) {
+						progressBarDownload.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -383,8 +383,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.GONE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
 									}
 									if (index == pos && image == view) {
 										image.setImageDrawable(d);
@@ -396,8 +396,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.GONE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
 									}
 								}
 
@@ -406,17 +406,17 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.VISIBLE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.VISIBLE);
 									}
 								}
 
 								@Override
 								public void onDownloadProgress(int progress) {
-									if (progressBar_download != null) {
+									if (progressBarDownload != null) {
 										// progress is -1 when download fails
 										if (progress == 100 || progress == -1) {
-											progressBar_download.setVisibility(View.GONE);
+											progressBarDownload.setVisibility(View.GONE);
 											if (progressBar != null) {
 												if (progress == 100) {
 													progressBar.setVisibility(View.VISIBLE);
@@ -426,7 +426,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 											}
 										}
 										if (progress >= 0) {
-											progressBar_download.setProgress(progress);
+											progressBarDownload.setProgress(progress);
 										}
 									}
 								}
@@ -437,8 +437,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								@Override
 								public void onLoaded(ImageView view, int pos, Drawable d) {
 									downloadItems.remove(data);
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.GONE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
 									}
 									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
 									Util.openFileAttachment(view.getContext(), data.originalPath, data.localCachePath, data.mimeType);
@@ -450,27 +450,27 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.GONE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
 									}
 								}
 
 								@Override
 								public void onDownloadStart() {
-									if (progressBar_download != null) {
-										progressBar_download.setVisibility(View.VISIBLE);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.VISIBLE);
 									}
 								}
 
 								@Override
 								public void onDownloadProgress(int progress) {
-									if (progressBar_download != null) {
+									if (progressBarDownload != null) {
 										if (progress == 100 || progress == -1) {
 											downloadItems.remove(data);
-											progressBar_download.setVisibility(View.GONE);
+											progressBarDownload.setVisibility(View.GONE);
 										}
 										if (progress >= 0) {
-											progressBar_download.setProgress(progress);
+											progressBarDownload.setProgress(progress);
 										}
 									}
 								}

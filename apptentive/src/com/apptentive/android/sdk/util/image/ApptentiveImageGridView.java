@@ -53,7 +53,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void onItemClick(AdapterView parent, View v, int position, long id) {
-		if (!imageBandAdapter.cilickOn(position) && listener != null) {
+		if (!imageBandAdapter.clickOn(position) && listener != null) {
 			listener.onClick(position, imageBandAdapter.getItem(position));
 		}
 	}
