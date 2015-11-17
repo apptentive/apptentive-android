@@ -35,7 +35,7 @@ public class DefaultValues extends ApptentiveInstrumentationTestCase {
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
-			assertNotNull(e);
+			assertNull(e);
 		}
 		Log.e("Finished test.");
 	}

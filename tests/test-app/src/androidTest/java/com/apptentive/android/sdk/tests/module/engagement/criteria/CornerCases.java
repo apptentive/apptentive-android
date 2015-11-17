@@ -35,7 +35,7 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
-			assertNotNull(e);
+			assertNull(e);
 		}
 		Log.e("Finished test.");
 	}
@@ -53,7 +53,7 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
-			assertNotNull(e);
+			assertNull(e);
 		}
 		Log.e("Finished test.");
 	}
