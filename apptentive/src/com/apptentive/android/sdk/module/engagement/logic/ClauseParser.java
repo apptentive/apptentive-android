@@ -18,6 +18,10 @@ public class ClauseParser {
 
 	public static Clause parse(String json) throws JSONException {
 		Log.v("+ Parsing Interaction Criteria.");
+		if (json == null) {
+			Log.e("+ Interaction Criteria is null.");
+			return null;
+		}
 		JSONObject root = new JSONObject(json);
 		Clause ret = ClauseParser.parse(null, root);
 		Log.v("+ Finished parsing Interaction Criteria.");
