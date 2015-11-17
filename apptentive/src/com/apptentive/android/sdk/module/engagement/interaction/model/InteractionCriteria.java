@@ -7,26 +7,27 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import android.content.Context;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-
 
 /**
  * @author Sky Kelsey
  */
-public class InteractionCriteria extends JSONObject {
+public class InteractionCriteria {
+
+	private String json;
 
 	public InteractionCriteria(String json) throws JSONException {
-		super(json);
+		this.json = json;
 	}
 
 	public boolean isMet(Context context) {
 		try {
-			Clause criteria = ClauseParser.parse(null, this);
+			Clause criteria = ClauseParser.parse(json);
 			Log.i("Evaluating Criteria");
 			boolean ret = criteria.evaluate(context);
 			Log.i("- => %b", ret);
