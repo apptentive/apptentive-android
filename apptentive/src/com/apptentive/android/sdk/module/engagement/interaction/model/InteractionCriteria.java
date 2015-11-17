@@ -27,9 +27,12 @@ public class InteractionCriteria {
 
 	public boolean isMet(Context context) {
 		try {
-			Clause criteria = ClauseParser.parse(json);
+			Clause rootClause = ClauseParser.parse(json);
 			Log.i("Evaluating Criteria");
-			boolean ret = criteria.evaluate(context);
+			boolean ret = false;
+			if (rootClause != null) {
+				ret = rootClause.evaluate(context);
+			}
 			Log.i("- => %b", ret);
 			return ret;
 		} catch (JSONException e) {
