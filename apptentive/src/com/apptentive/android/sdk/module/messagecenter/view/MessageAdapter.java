@@ -141,7 +141,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onAttachImage();
 
-		void onShowImagePreView(int position, ImageItem image);
+		void onClickAttachment(int position, ImageItem image);
 	}
 
 	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnListviewItemActionListener listener, MessageCenterInteraction interaction) {
@@ -304,8 +304,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					}
 					final CompoundMessage compoundMessage = (CompoundMessage) listItem;
 					String datestamp = ((CompoundMessage) listItem).getDatestamp();
+					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
+					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+					view.measure(widthMeasureSpec, 0);
+					int viewWidth = container.getMeasuredWidth();
 					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
-							datestamp, compoundMessage.getBody(), compoundMessage.getAssociatedFiles(activityContext));
+							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
+							compoundMessage.getRemoteAttachments());
 					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(compoundMessage, position);
@@ -330,9 +336,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 						status = activityContext.getResources().getString(R.string.apptentive_failed);
 						bShowProgress = false;
 					}
+					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
+					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+					view.measure(widthMeasureSpec, 0);
+					int viewWidth = container.getMeasuredWidth();
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							bShowProgress, messageBody, parent.getWidth(), files);
+							bShowProgress, messageBody, viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
 					break;
 				}
 				case TYPE_STATUS: {
@@ -732,17 +743,15 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		@Override
 		protected Bitmap doInBackground(String... paths) {
-			FileInputStream fis = null;
 			Bitmap imageBitmap = null;
 			try {
-				fis = activityContext.openFileInput(paths[0]);
 				Point point = Util.getScreenSize(activityContext.getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
-				imageBitmap = ImageUtil.createScaledBitmapFromStream(fis, maxImageWidth, maxImageHeight, null, 0);
+				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(activityContext, paths[0], maxImageWidth, maxImageHeight, null, 0);
 				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
 				Log.e("Error opening stored image.", e);
@@ -751,8 +760,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				// had to result from allocating a bitmap, so the system should be in a good state.
 				// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
 				Log.e("Ran out of memory opening image.", e);
-			} finally {
-				Util.ensureClosed(fis);
 			}
 			return imageBitmap;
 		}

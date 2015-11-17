@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.util;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -239,7 +240,7 @@ public class Util {
 		if (cacheControlHeader != null) {
 			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
 			int indexOfLastBracket = cacheControlHeader.lastIndexOf("]");
-			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket+1, indexOfLastBracket);
+			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket + 1, indexOfLastBracket);
 			String[] cacheControlParts = cacheControlHeader.split(",");
 			for (String part : cacheControlParts) {
 				part = part.trim();
@@ -531,34 +532,41 @@ public class Util {
 		return false;
 	}
 
+	public static String getImageMimeType(Context context, Uri contentUri) {
+		return context.getContentResolver().getType(contentUri);
+	}
 
-	public static String getImagePath(Context context, Uri contentUri){
+	public static String getImageRealFilePathFromUri(Context context, Uri contentUri) {
 
+		String path = null;
 		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
-			return null;
+			return path;
 		}
 
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
 		cursor.close();
 
 		cursor = context.getContentResolver().query(
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 		cursor.moveToFirst();
-		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 		cursor.close();
 
 		return path;
 	}
 
-	public static long getImageCreationTime(Context context, Uri contentUri){
+	public static long getImageCreationTime(Context context, Uri contentUri) {
+		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+			return 0;
+		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
 		cursor.close();
 
 		cursor = context.getContentResolver().query(
@@ -571,13 +579,41 @@ public class Util {
 		return time;
 	}
 
+	private static String md5(String s) {
+		try {
+			// Create MD5 Hash
+			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+			digest.update(s.getBytes());
+			byte messageDigest[] = digest.digest();
+
+			// Create Hex String
+			StringBuilder hexString = new StringBuilder();
+			for (byte aMessageDigest : messageDigest) {
+				hexString.append(Integer.toHexString(0xFF & aMessageDigest));
+			}
+			return hexString.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/*
-	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 * Generate cached file name use md5 from image originalPath and image created time
 	 */
-	public static String generateCacheFileFullPath(Context context, String imageUri, long createdTime) {
-		String source = imageUri + Long.toString(createdTime);
-		String fileName = String.valueOf(source.hashCode());
-		File cacheDir = getDiskCacheDir(context);
+	public static String generateCacheFileFullPath(String url, File cacheDir) {
+		String fileName = md5(url);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	/*
+	 * Generate cached file name use md5 from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPath(Uri fileOriginalUri, File cacheDir, long createdTime) {
+		String source = fileOriginalUri.toString() + Long.toString(createdTime);
+		String fileName = md5(source);
 		File cacheFile = new File(cacheDir, fileName);
 		return cacheFile.getPath();
 	}
@@ -603,7 +639,7 @@ public class Util {
 			appCacheDir = context.getExternalCacheDir();
 		}
 
-		if (appCacheDir == null){
+		if (appCacheDir == null) {
 			appCacheDir = context.getCacheDir();
 		}
 		return appCacheDir;
@@ -654,6 +690,87 @@ public class Util {
 			}
 		}
 	}
+
+	/**
+	 * This function launchs the default app to view the selected file, based on mime type
+	 * @param sourcePath
+	 * @param selectedFilePath the full path to the local storage
+	 * @param mimeTypeString   the mime type of the file to be opened
+	 * @return true if file can be viewed
+	 */
+	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			final Intent intent = new Intent();
+			intent.setAction(android.content.Intent.ACTION_VIEW);
+
+      /* Attachments were downloaded into app private data dir. In order for external app to open
+       * the attchments, the file need to be copied to a download folder that is accessible to public
+      */
+			String extStorageDirectory = Environment.getExternalStorageDirectory()
+					.toString();
+			File folder = new File(extStorageDirectory, "Downloads");
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			File tmpfile = new File(folder, "apptentive-tmp");
+			String tmpFilePath = tmpfile.getPath();
+			if (tmpfile.exists()) {
+				tmpfile.delete();
+			}
+			if (copyFile(selectedFilePath, tmpFilePath) == 0) {
+				return false;
+			}
+
+			intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
+			try {
+				context.startActivity(intent);
+				return true;
+			} catch (ActivityNotFoundException e) {
+				Log.e("Activity not found to open attachment: ", e);
+			}
+		} else {
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourcePath));
+			if (Util.canLaunchIntent(context, browserIntent)) {
+				context.startActivity(browserIntent);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function copies file from one location to another
+	 *
+	 * @param from the full path to the source file
+	 * @param to the full path to the destination file
+	 * @return total bytes copied. 0 indicates
+	 */
+	public static int copyFile(String from, String to) {
+		InputStream inStream = null;
+		FileOutputStream fs = null;
+		try {
+			int bytesum = 0;
+			int byteread;
+			File oldfile = new File(from);
+			if (oldfile.exists()) {
+				inStream = new FileInputStream(from);
+				fs = new FileOutputStream(to);
+				byte[] buffer = new byte[1444];
+				while ((byteread = inStream.read(buffer)) != -1) {
+					bytesum += byteread;
+					fs.write(buffer, 0, byteread);
+				}
+			}
+			return bytesum;
+		} catch (Exception e) {
+			return 0;
+		} finally {
+			Util.ensureClosed(inStream);
+			Util.ensureClosed(fs);
+		}
+	}
+
 
 }
 

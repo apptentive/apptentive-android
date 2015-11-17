@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
+import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,7 +122,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG, " +
-					"PRIMARY KEY (" + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + ", " + COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + ")" +
+					"PRIMARY KEY (" + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + ", " + COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + ")" +
 					");";
 
 	// Query all files associated with a given compound message nonce id
@@ -129,7 +130,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	private static ApptentiveDatabase instance;
 
-	private File fileDir;
+	private File fileDir; // data dir of the application
 
 	public static ApptentiveDatabase getInstance(Context context) {
 		if (instance == null) {
@@ -508,7 +509,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				ret = new StoredFile();
 				ret.setId(id);
 				ret.setMimeType(cursor.getString(1));
-				ret.setOriginalUriOrPath(cursor.getString(2));
+				ret.setSourceUriOrPath(cursor.getString(2));
 				ret.setLocalFilePath(cursor.getString(3));
 				ret.setApptentiveUri(cursor.getString(4));
 			}
@@ -528,7 +529,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ContentValues values = new ContentValues();
 			values.put(FILESTORE_KEY_ID, storedFile.getId());
 			values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
-			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getOriginalUriOrPath());
+			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getSourceUriOrPath());
 			values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
 			values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
@@ -582,7 +583,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					ret.setId(nonce);
 					ret.setLocalFilePath(cursor.getString(1));
 					ret.setMimeType(cursor.getString(2));
-					ret.setOriginalUriOrPath(cursor.getString(3));
+					ret.setSourceUriOrPath(cursor.getString(3));
 					ret.setApptentiveUri(cursor.getString(4));
 					ret.setCreationTime(cursor.getLong(5));
 					associatedFiles.add(ret);
@@ -609,7 +610,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					ret.setId(cursor.getString(0));
 					ret.setLocalFilePath(cursor.getString(1));
 					ret.setMimeType(cursor.getString(2));
-					ret.setOriginalUriOrPath(cursor.getString(3));
+					ret.setSourceUriOrPath(cursor.getString(3));
 					ret.setApptentiveUri(cursor.getString(4));
 					ret.setCreationTime(0);
 					associatedFiles.add(ret);
@@ -644,7 +645,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
 				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());
 				values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, file.getMimeType());
-				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getOriginalUriOrPath());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getSourceUriOrPath());
 				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
 				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
 				ret = db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);

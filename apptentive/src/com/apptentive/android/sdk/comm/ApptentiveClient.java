@@ -34,12 +34,12 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
-	private static final int API_VERSION = 4;
+	public static final int API_VERSION = 4;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
-	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
+	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
+	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
@@ -269,7 +269,7 @@ public class ApptentiveClient {
 	 * @return String with error message contents.
 	 * @throws IOException
 	 */
-	private static String getErrorInResponse(HttpURLConnection con) throws IOException {
+	public static String getErrorInResponse(HttpURLConnection con) throws IOException {
 		assert (con != null);
 		BufferedReader in = null;
 		StringBuffer errStream = null;
@@ -347,22 +347,16 @@ public class ApptentiveClient {
 						if (!cachedImageFile.exists()) {
 							boolean bCachedCreated = false;
 							// Creation time would only be set when we were able to retrieve original file information through uri
-							if (storedFile.getCreationTime() == 0) {
-								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
-								if (originalFilePath == null) {
-									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
-								}
-							} else {
-								originalFilePath = storedFile.getOriginalUriOrPath();
-								bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
-							}
+							originalFilePath = storedFile.getSourceUriOrPath();
+							bCachedCreated = ImageUtil.createCachedImageFile(appContext, originalFilePath, cachedImagePathString);
+
 							if (!bCachedCreated) {
 								continue;
 							}
 						}
 						os.writeBytes(twoHyphens + boundary + lineEnd);
 						StringBuilder requestText = new StringBuilder();
-						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getSourceUriOrPath())).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						// Write file attributes
 						os.writeBytes(requestText.toString());
@@ -447,7 +441,7 @@ public class ApptentiveClient {
 		POST
 	}
 
-	private static String getUserAgentString() {
+	public static String getUserAgentString() {
 		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
 

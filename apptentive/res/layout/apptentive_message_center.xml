@@ -23,7 +23,7 @@
                         android:background="?attr/colorPrimary"
                         android:minHeight="@dimen/apptentive_message_center_header_height"
                         android:orientation="horizontal">
-            <ImageButton android:id="@+id/close"
+            <ImageButton android:id="@+id/close_mc"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_alignParentLeft="true"
@@ -36,7 +36,7 @@
             <com.apptentive.android.sdk.view.AutoResizeTextView android:id="@id/title"
                                                                 android:layout_width="wrap_content"
                                                                 android:layout_height="@dimen/apptentive_message_center_header_height"
-                                                                android:layout_toRightOf="@id/close"
+                                                                android:layout_toRightOf="@id/close_mc"
                                                                 android:layout_marginLeft="2dp"
                                                                 android:layout_centerVertical="true"
                                                                 android:gravity="center"

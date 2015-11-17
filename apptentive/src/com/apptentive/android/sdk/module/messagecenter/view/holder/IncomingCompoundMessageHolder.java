@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,9 +15,11 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.CompoundMessageView;
+import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +41,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		imageBandView =(ApptentiveImageGridView) view.findViewById(R.id.grid);
 	}
 
-	public void updateMessage(String name, String datestamp, String text, final List<StoredFile> imagesToAttach) {
+	public void updateMessage(String name, String datestamp, String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
 		super.updateMessage(datestamp, 0, null);
 
 		if (messageBodyView != null) {
@@ -58,9 +61,20 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.GONE);
 			} else {
 				imageBandView.setVisibility(View.VISIBLE);
+				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
 				List<ImageItem> images = new ArrayList<ImageItem>();
+				File cacheDir = Util.getDiskCacheDir(imageBandView.getContext());
 				for (StoredFile file: imagesToAttach) {
-					images.add(new ImageItem(file.getOriginalUriOrPath(), file.getLocalFilePath(), file.getCreationTime()));
+					String thumbnailUrl = file.getSourceUriOrPath();
+					String remoteUrl = file.getApptentiveUri();
+					String thumbnailStorageFilePath;
+					if (!TextUtils.isEmpty(thumbnailUrl)) {
+						thumbnailStorageFilePath = Util.generateCacheFileFullPath(thumbnailUrl, cacheDir);
+						images.add(new ImageItem(thumbnailUrl, thumbnailStorageFilePath, file.getMimeType(), file.getCreationTime()));
+					} else {
+						thumbnailStorageFilePath = Util.generateCacheFileFullPath(remoteUrl, cacheDir);
+						images.add(new ImageItem(remoteUrl, thumbnailStorageFilePath, file.getMimeType(), file.getCreationTime()));
+					}
 				}
 				imageBandView.setData(images);
 			}

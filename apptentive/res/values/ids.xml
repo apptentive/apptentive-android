@@ -7,4 +7,5 @@
 
 <resources>
     <item name="apptentive_message_center_view" type="id"/>
+    <item name="drawable_downloader" type="id" />
 </resources>

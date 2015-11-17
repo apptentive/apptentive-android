@@ -40,7 +40,7 @@ public class CompoundMessageView extends PersonalMessageView<CompoundMessage> {
 			public void onClick(int position, ImageItem image) {
 				MessageAdapter.OnListviewItemActionListener listener = listenerRef.get();
 				if (listener != null) {
-					listener.onShowImagePreView(position, image);
+					listener.onClickAttachment(position, image);
 				}
 			}
 		});
