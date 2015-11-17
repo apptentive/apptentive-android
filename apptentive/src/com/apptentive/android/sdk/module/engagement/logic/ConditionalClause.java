@@ -119,7 +119,7 @@ public class ConditionalClause implements Clause {
 						return false;
 					}
 					if (!(test.parameter instanceof Boolean)) {
-						throw new IllegalArgumentException(String.format("%s operator passed parameter of type %s", test.operator.name(), test.parameter.getClass().getSimpleName()));
+						return false;
 					}
 					boolean exists = FieldManager.exists(context, query);
 					boolean parameter = (Boolean) test.parameter;
