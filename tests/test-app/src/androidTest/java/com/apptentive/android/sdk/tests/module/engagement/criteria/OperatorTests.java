@@ -6,10 +6,11 @@
 
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.storage.PersonManager;
 
 import org.json.JSONException;
 
@@ -24,41 +25,54 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 
 	public void testOperatorExists() {
 		Log.e("Running test: testOperatorExists()\n\n");
-		resetDevice();
 		doTest("testOperatorExists.json");
 		Log.e("Finished test.");
 	}
 
 	public void testOperatorNot() {
 		Log.e("Running test: testOperatorNot()\n\n");
-		resetDevice();
 		doTest("testOperatorNot.json");
+		Log.e("Finished test.");
+	}
+
+	public void testOperatorLessThan() {
+		Log.e("Running test: testOperatorLessThan()\n\n");
+		doTest("testOperatorLessThan.json");
+		Log.e("Finished test.");
+	}
+
+	public void testOperatorLessThanOrEqual() {
+		Log.e("Running test: testOperatorLessThanOrEqual()\n\n");
+		doTest("testOperatorLessThanOrEqual.json");
+		Log.e("Finished test.");
+	}
+
+	public void testOperatorGreaterThanOrEqual() {
+		Log.e("Running test: testOperatorGreaterThanOrEqual()\n\n");
+		doTest("testOperatorGreaterThanOrEqual.json");
+		Log.e("Finished test.");
+	}
+
+	public void testOperatorGreaterThan() {
+		Log.e("Running test: testOperatorGreaterThan()\n\n");
+		doTest("testOperatorGreaterThan.json");
 		Log.e("Finished test.");
 	}
 
 	public void testOperatorContains() {
 		Log.e("Running test: testOperatorContains()\n\n");
-		resetDevice();
-		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
-		PersonManager.storePersonAndReturnIt(getTargetContext());
 		doTest("testOperatorContains.json");
 		Log.e("Finished test.");
 	}
 
 	public void testOperatorStartsWith() {
 		Log.e("Running test: testOperatorStartsWith()\n\n");
-		resetDevice();
-		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
-		PersonManager.storePersonAndReturnIt(getTargetContext());
 		doTest("testOperatorStartsWith.json");
 		Log.e("Finished test.");
 	}
 
 	public void testOperatorEndsWith() {
 		Log.e("Running test: testOperatorEndsWith()\n\n");
-		resetDevice();
-		PersonManager.storePersonEmail(getTargetContext(), "test@example.com");
-		PersonManager.storePersonAndReturnIt(getTargetContext());
 		doTest("testOperatorEndsWith.json");
 		Log.e("Finished test.");
 	}
@@ -66,6 +80,10 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 	private void doTest(String testFile) {
 		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
 		try {
+			Apptentive.addCustomDeviceData(getTargetContext(), "number_5", 5);
+			Apptentive.addCustomDeviceData(getTargetContext(), "string_qwerty", "qwerty");
+			Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
+			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet(getTargetContext()));
 		} catch (JSONException e) {
