@@ -243,12 +243,12 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			ViewHolder holder;
 			if (view == null) {
 				view = inflater.inflate(R.layout.apptentive_image_grid_view_item, viewGroup, false);
-				holder = new ViewHolder(view);
+				holder = new ViewHolder(view, i);
 			} else {
 				holder = (ViewHolder) view.getTag();
 				if (holder == null) {
 					view = inflater.inflate(R.layout.apptentive_image_grid_view_item, viewGroup, false);
-					holder = new ViewHolder(view);
+					holder = new ViewHolder(view, i);
 				}
 			}
 			if (holder != null) {
@@ -273,16 +273,19 @@ public class ImageGridViewAdapter extends BaseAdapter {
 		ProgressBar progressBar;
 		// a horizontal determinate progress bar showing download progress
 		ApptentiveMaterialDeterminateProgressBar progressBarDownload;
+		int pos;
+
 		View mask;
 		boolean bLoadThumbnail;
 
-		ViewHolder(View view) {
+		ViewHolder(View view, int index) {
 			image = (ImageView) view.findViewById(R.id.image);
 			indicator = (ImageView) view.findViewById(R.id.indicator);
 			mask = view.findViewById(R.id.mask);
 			attachmentExtension = (TextView) view.findViewById(R.id.image_preview_title);
 			progressBar = (ProgressBar) view.findViewById(R.id.thumbnail_progress);
 			progressBarDownload = (ApptentiveMaterialDeterminateProgressBar) view.findViewById(R.id.thumbnail_progress_determinate);
+			pos = index;
 			view.setTag(this);
 		}
 
@@ -376,17 +379,17 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 			if (itemWidth > 0 && data.originalPath != null) {
 				if (bLoadThumbnail) {
-					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, itemWidth, itemHeight, true,
+					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, pos, image, itemWidth, itemHeight, true,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
-								public void onLoaded(ImageView view, int pos, Drawable d) {
+								public void onLoaded(ImageView view, int i, Drawable d) {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
 									if (progressBarDownload != null) {
 										progressBarDownload.setVisibility(View.GONE);
 									}
-									if (index == pos && image == view) {
+									if (i == pos && image == view) {
 										image.setImageDrawable(d);
 									}
 								}

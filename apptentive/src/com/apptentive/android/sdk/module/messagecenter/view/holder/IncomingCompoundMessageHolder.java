@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.CompoundMessageView;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -32,6 +33,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 	private TextView messageBodyView;
 	private TextView nameView;
 	private ApptentiveImageGridView imageBandView;
+	private MessageAdapter.OnListviewItemActionListener listener;
 
 	public IncomingCompoundMessageHolder(CompoundMessageView view) {
 		super(view);
@@ -39,6 +41,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		nameView = (TextView) view.findViewById(R.id.sender_name);
 		messageBodyView = (TextView) view.findViewById(R.id.apptentive_compound_message_body);
 		imageBandView =(ApptentiveImageGridView) view.findViewById(R.id.grid);
+		listener = view.getListener();
 	}
 
 	public void updateMessage(String name, String datestamp, String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
@@ -63,7 +66,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.VISIBLE);
 				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
 				List<ImageItem> images = new ArrayList<ImageItem>();
-				File cacheDir = Util.getDiskCacheDir(imageBandView.getContext());
+				final File cacheDir = Util.getDiskCacheDir(imageBandView.getContext());
 				for (StoredFile file: imagesToAttach) {
 					String thumbnailUrl = file.getSourceUriOrPath();
 					String remoteUrl = file.getApptentiveUri();
@@ -77,6 +80,18 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 					}
 				}
 				imageBandView.setData(images);
+				imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
+					@Override
+					public void onClick(int position, ImageItem image) {
+						StoredFile file = imagesToAttach.get(position);
+						String remoteUrl = file.getApptentiveUri();
+						String localFilePath = Util.generateCacheFileFullPath(remoteUrl, cacheDir);
+						if (listener != null) {
+							listener.onClickAttachment(position, new ImageItem(remoteUrl, localFilePath, file.getMimeType(), file.getCreationTime()));
+						}
+					}
+				});
+
 			}
 		}
 	}

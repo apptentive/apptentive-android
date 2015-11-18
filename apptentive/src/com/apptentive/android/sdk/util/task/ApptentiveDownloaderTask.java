@@ -100,7 +100,6 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		if (response.isSuccessful()) {
 			listener.onDownloadComplete();
 		} else {
-			listener.onProgress(-1);
 			listener.onDownloadError();
 		}
 	}
@@ -185,42 +184,44 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 
 			ret.setHeaders(headers);
 
-			// Read the normal content response
-			InputStream input = null;
-			FileOutputStream output = null;
-			try {
-				int lenghtOfFile = connection.getContentLength();
+			if (ret.isSuccessful()) {
+				// Read the normal content response
+				InputStream input = null;
+				FileOutputStream output = null;
+				try {
+					int lenghtOfFile = connection.getContentLength();
 
-				// input stream to read file - with 8k buffer
-				input = new BufferedInputStream(httpUrl.openStream(),
-						8192);
-				output = new FileOutputStream(destFilePath);
+					// input stream to read file - with 8k buffer
+					input = new BufferedInputStream(httpUrl.openStream(),
+							8192);
+					output = new FileOutputStream(destFilePath);
 
-				byte data[] = new byte[1024];
+					byte data[] = new byte[1024];
 
-				long total = 0;
+					long total = 0;
 
-				while ((count = input.read(data)) != -1) {
-					if (this.download) {
-						total += count;
-						// publishing the progress....
-						publishProgress((int) ((total * 100) / lenghtOfFile));
-						output.write(data, 0, count);
+					while ((count = input.read(data)) != -1) {
+						if (this.download) {
+							total += count;
+							// publishing the progress....
+							publishProgress((int) ((total * 100) / lenghtOfFile));
+							output.write(data, 0, count);
+						}
 					}
+					// flushing output
+					output.flush();
+					if (!this.download) {
+						File fileTodelete = new File(destFilePath);
+						fileTodelete.delete();
+						publishProgress(-1);
+					} else {
+						publishProgress(100);
+					}
+				} finally {
+					// closing streams
+					Util.ensureClosed(output);
+					Util.ensureClosed(input);
 				}
-				// flushing output
-				output.flush();
-				if (!this.download) {
-					File fileTodelete = new File(destFilePath);
-					fileTodelete.delete();
-					publishProgress(-1);
-				} else {
-					publishProgress(100);
-				}
-			} finally {
-				// closing streams
-				Util.ensureClosed(output);
-				Util.ensureClosed(input);
 			}
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);

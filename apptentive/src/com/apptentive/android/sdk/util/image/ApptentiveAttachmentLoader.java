@@ -35,8 +35,8 @@ public class ApptentiveAttachmentLoader {
 	public static final int DRAWABLE_DOWNLOAD_TAG = R.id.drawable_downloader;
 
 	private ImageMemoryCache bitmapMemoryCache;
-	private ArrayList<LoaderRequest> queuedLoaderRequests;
-	private ArrayList<LoaderRequest> runningLoaderRequests;
+	private ArrayList<LoaderRequest> queuedDownLoaderRequests;
+	private ArrayList<LoaderRequest> runningDownLoaderRequests;
 	private HashMap<String, ArrayList<LoaderRequest>> duplicateDownloads;
 	private int maxDownloads;
 	private Drawable mErrorDrawable;
@@ -80,8 +80,8 @@ public class ApptentiveAttachmentLoader {
 	}
 
 	private void setup(int maxDownloads) {
-		queuedLoaderRequests = new ArrayList<LoaderRequest>();
-		runningLoaderRequests = new ArrayList<LoaderRequest>();
+		queuedDownLoaderRequests = new ArrayList<LoaderRequest>();
+		runningDownLoaderRequests = new ArrayList<LoaderRequest>();
 		this.maxDownloads = maxDownloads;
 		duplicateDownloads = new HashMap<String, ArrayList<LoaderRequest>>();
 		bitmapMemoryCache = new ImageMemoryCache(5);
@@ -113,14 +113,14 @@ public class ApptentiveAttachmentLoader {
 	}
 
 	public void cancelAllDownloads() {
-		queuedLoaderRequests.clear();
-		for (LoaderRequest loaderRequest : runningLoaderRequests) {
+		queuedDownLoaderRequests.clear();
+		for (LoaderRequest loaderRequest : runningDownLoaderRequests) {
 			ApptentiveDownloaderTask task = loaderRequest.getDrawableDownloaderTask();
 			if (task != null) {
 				task.cancel(true);
 			}
 		}
-		runningLoaderRequests.clear();
+		runningDownLoaderRequests.clear();
 	}
 
 	public class LoaderRequest implements ApptentiveDownloaderTask.FileDownloadListener, ApptentiveDrawableLoaderTask.BitmapLoadListener {
@@ -155,6 +155,10 @@ public class ApptentiveAttachmentLoader {
 
 		public ImageView getImageView() {
 			return mImageViewRef.get();
+		}
+
+		public int getPosition() {
+			return pos;
 		}
 
 		public String getUrl() {
@@ -207,8 +211,8 @@ public class ApptentiveAttachmentLoader {
 			if (mIsCancelled) {
 				// if the download has been cancelled, do not download
 				// this image, but start the next one
-				if (!queuedLoaderRequests.isEmpty() && runningLoaderRequests.size() < maxDownloads) {
-					LoaderRequest d = queuedLoaderRequests.remove(0);
+				if (!queuedDownLoaderRequests.isEmpty() && runningDownLoaderRequests.size() < maxDownloads) {
+					LoaderRequest d = queuedDownLoaderRequests.remove(0);
 					d.doDownload();
 				}
 				return;
@@ -225,12 +229,12 @@ public class ApptentiveAttachmentLoader {
 				} catch (RejectedExecutionException e) {
 				}
 				Log.d("ApptentiveAttachmentLoader doDownload: " + uri);
-				runningLoaderRequests.add(this);
+				runningDownLoaderRequests.add(this);
 			}
 		}
 
 		private boolean isBeingDownloaded() {
-			for (LoaderRequest loaderRequest : runningLoaderRequests) {
+			for (LoaderRequest loaderRequest : runningDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -239,7 +243,8 @@ public class ApptentiveAttachmentLoader {
 				if (thisImageView == null || otherImageView == null) {
 					continue;
 				}
-				if (otherImageView.equals(thisImageView) && loaderRequest.getUrl().equals(uri)) {
+				if ((otherImageView.equals(thisImageView) || loaderRequest.getPosition() == getPosition())
+						&& loaderRequest.getUrl().equals(uri)) {
 					return true;
 				}
 			}
@@ -272,8 +277,8 @@ public class ApptentiveAttachmentLoader {
 		private void cancel() {
 			Log.d("cancel requested for: " + uri);
 			mIsCancelled = true;
-			if (queuedLoaderRequests.contains(this)) {
-				queuedLoaderRequests.remove(this);
+			if (queuedDownLoaderRequests.contains(this)) {
+				queuedDownLoaderRequests.remove(this);
 			}
 			if (mDrawableDownloaderTask != null) {
 				mDrawableDownloaderTask.cancel(true);
@@ -284,7 +289,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private int indexOfDownloadWithDifferentURL() {
-			for (LoaderRequest loaderRequest : runningLoaderRequests) {
+			for (LoaderRequest loaderRequest : runningDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -294,14 +299,14 @@ public class ApptentiveAttachmentLoader {
 					continue;
 				}
 				if (otherImageView.equals(thisImageView) && !loaderRequest.getUrl().equals(uri)) {
-					return runningLoaderRequests.indexOf(loaderRequest);
+					return runningDownLoaderRequests.indexOf(loaderRequest);
 				}
 			}
 			return -1;
 		}
 
 		private boolean isQueuedForDownload() {
-			for (LoaderRequest loaderRequest : queuedLoaderRequests) {
+			for (LoaderRequest loaderRequest : queuedDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -318,7 +323,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private int indexOfQueuedDownloadWithDifferentURL() {
-			for (LoaderRequest loaderRequest : queuedLoaderRequests) {
+			for (LoaderRequest loaderRequest : queuedDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -328,14 +333,14 @@ public class ApptentiveAttachmentLoader {
 					continue;
 				}
 				if (otherImageView.equals(thisImageView) && !loaderRequest.getUrl().equals(uri)) {
-					return queuedLoaderRequests.indexOf(loaderRequest);
+					return queuedDownLoaderRequests.indexOf(loaderRequest);
 				}
 			}
 			return -1;
 		}
 
 		private LoaderRequest isAnotherQueuedOrRunningWithSameUrl() {
-			for (LoaderRequest loaderRequest : queuedLoaderRequests) {
+			for (LoaderRequest loaderRequest : queuedDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -343,7 +348,7 @@ public class ApptentiveAttachmentLoader {
 					return loaderRequest;
 				}
 			}
-			for (LoaderRequest loaderRequest : runningLoaderRequests) {
+			for (LoaderRequest loaderRequest : runningDownLoaderRequests) {
 				if (loaderRequest == null) {
 					continue;
 				}
@@ -389,7 +394,7 @@ public class ApptentiveAttachmentLoader {
 		public void onDownloadComplete() {
 			Log.d("ApptentiveAttachmentLoader onDownloadComplete: " + uri);
 
-			runningLoaderRequests.remove(this);
+			runningDownLoaderRequests.remove(this);
 			mWasDownloaded = true;
 
 			ImageView imageView = mImageViewRef.get();
@@ -422,8 +427,8 @@ public class ApptentiveAttachmentLoader {
 				duplicateDownloads.remove(uri);
 			}
 
-			if (!queuedLoaderRequests.isEmpty()) {
-				LoaderRequest d = queuedLoaderRequests.remove(0);
+			if (!queuedDownLoaderRequests.isEmpty()) {
+				LoaderRequest d = queuedDownLoaderRequests.remove(0);
 				d.doDownload();
 			}
 		}
@@ -432,7 +437,7 @@ public class ApptentiveAttachmentLoader {
 		@Override
 		public void onDownloadError() {
 			Log.d("ApptentiveAttachmentLoader onDownloadError: " + uri);
-			runningLoaderRequests.remove(this);
+			runningDownLoaderRequests.remove(this);
 			ImageView imageView = mImageViewRef.get();
 			mWasDownloaded = true;
 			if (imageView != null) {
@@ -444,8 +449,24 @@ public class ApptentiveAttachmentLoader {
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
 				imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 			}
-			if (!queuedLoaderRequests.isEmpty()) {
-				LoaderRequest d = queuedLoaderRequests.remove(0);
+
+			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
+			if (duplicates != null) {
+				for (LoaderRequest dup : duplicates) {
+					Log.d("ApptentiveAttachmentLoader onDownloadError (dup): " + dup.uri);
+					// load the image.
+					if (dup != null && dup.getImageView() != null &&
+							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
+						if (dup.getLoaderCallback() != null) {
+							dup.getLoaderCallback().onLoadTerminated();
+						}
+					}
+				}
+				duplicateDownloads.remove(uri);
+			}
+
+			if (!queuedDownLoaderRequests.isEmpty()) {
+				LoaderRequest d = queuedDownLoaderRequests.remove(0);
 				d.doDownload();
 			}
 		}
@@ -463,14 +484,30 @@ public class ApptentiveAttachmentLoader {
 		public void onDownloadCancel() {
 			mIsCancelled = true;
 			Log.d("ApptentiveAttachmentLoader onDownloadCancel: " + uri);
-			runningLoaderRequests.remove(this);
+			runningDownLoaderRequests.remove(this);
 
 			ImageView imageView = mImageViewRef.get();
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
 				imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 			}
-			if (!queuedLoaderRequests.isEmpty()) {
-				LoaderRequest d = queuedLoaderRequests.remove(0);
+
+			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
+			if (duplicates != null) {
+				for (LoaderRequest dup : duplicates) {
+					Log.d("ApptentiveAttachmentLoader onDownloadCancel (dup): " + dup.uri);
+					// load the image.
+					if (dup != null && dup.getImageView() != null &&
+							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
+						if (dup.getLoaderCallback() != null) {
+							dup.getLoaderCallback().onLoadTerminated();
+						}
+					}
+				}
+				duplicateDownloads.remove(uri);
+			}
+
+			if (!queuedDownLoaderRequests.isEmpty()) {
+				LoaderRequest d = queuedDownLoaderRequests.remove(0);
 				Log.d("ApptentiveAttachmentLoader starting DL of: " + d.getUrl());
 				d.doDownload();
 			}
@@ -506,12 +543,12 @@ public class ApptentiveAttachmentLoader {
 				int queuedIndex = indexOfQueuedDownloadWithDifferentURL();
 				int downloadIndex = indexOfDownloadWithDifferentURL();
 				while (queuedIndex != -1) {
-					queuedLoaderRequests.remove(queuedIndex);
+					queuedDownLoaderRequests.remove(queuedIndex);
 					Log.d("ApptentiveAttachmentLoader notFound(Removing): " + uri);
 					queuedIndex = indexOfQueuedDownloadWithDifferentURL();
 				}
 				if (downloadIndex != -1) {
-					LoaderRequest runningLoaderRequest = runningLoaderRequests.get(downloadIndex);
+					LoaderRequest runningLoaderRequest = runningDownLoaderRequests.get(downloadIndex);
 					ApptentiveDownloaderTask downloadTask = runningLoaderRequest.getDrawableDownloaderTask();
 					if (downloadTask != null) {
 						downloadTask.cancel(true);
@@ -520,9 +557,9 @@ public class ApptentiveAttachmentLoader {
 				}
 
 				if (!(isBeingDownloaded() || isQueuedForDownload())) {
-					if (runningLoaderRequests.size() >= maxDownloads) {
+					if (runningDownLoaderRequests.size() >= maxDownloads) {
 						Log.d("ApptentiveAttachmentLoader notFound(Queuing): " + uri);
-						queuedLoaderRequests.add(this);
+						queuedDownLoaderRequests.add(this);
 					} else {
 						Log.d("ApptentiveAttachmentLoader notFound(Downloading): " + uri);
 						doDownload();
