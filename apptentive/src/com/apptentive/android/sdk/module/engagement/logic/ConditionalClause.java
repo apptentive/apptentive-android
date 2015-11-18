@@ -12,7 +12,6 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Util;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
@@ -38,7 +37,7 @@ public class ConditionalClause implements Clause {
 		if (inputValue instanceof JSONObject && !isComplexType((JSONObject) inputValue)) {
 			conditionalTests = getConditions((JSONObject) inputValue);
 		} else {
-			conditionalTests.add(new ConditionalTest(ConditionalOperator.$eq, parseValue(inputValue)));
+			conditionalTests.add(new ConditionalTest(ConditionalOperator.$eq, ClauseParser.parseValue(inputValue)));
 		}
 	}
 
@@ -49,54 +48,11 @@ public class ConditionalClause implements Clause {
 			String operator = operators.next();
 			Object value = null;
 			if (!conditionObject.isNull(operator)) {
-				value = parseValue(conditionObject.opt(operator));
+				value = ClauseParser.parseValue(conditionObject.opt(operator));
 			}
 			conditionalTests.add(new ConditionalTest(ConditionalOperator.parse(operator), value));
 		}
 		return conditionalTests;
-	}
-
-	/**
-	 * Constructs complex types values from the JSONObjects that represent them. Turns all Numbers into BigDecimal for easier comparison.
-	 *
-	 * @param value
-	 * @return null if value is a JSONObject, but not a complex type.
-	 */
-	private static Object parseValue(Object value) {
-		if (value == null) {
-			return null;
-		}
-		if (value instanceof Double) {
-			return new BigDecimal((Double) value);
-		} else if (value instanceof Long) {
-			return new BigDecimal((Long) value);
-		} else if (value instanceof Integer) {
-			return new BigDecimal((Integer) value);
-		} else if (value instanceof Float) {
-			return new BigDecimal((Float) value);
-		} else if (value instanceof Short) {
-			return new BigDecimal((Short) value);
-		} else if (value instanceof JSONObject) {
-			JSONObject jsonObject = (JSONObject) value;
-			String typeName = jsonObject.optString(KEY_COMPLEX_TYPE);
-			if (typeName != null) {
-				try {
-					if (Apptentive.Version.TYPE.equals(typeName)) {
-						return new Apptentive.Version(jsonObject.toString());
-					} else if (Apptentive.DateTime.TYPE.equals(typeName)) {
-						return new Apptentive.DateTime(jsonObject.toString());
-					} else {
-						throw new RuntimeException(String.format("Error parsing complex parameter with unrecognized name: \"%s\"", typeName));
-					}
-				} catch (JSONException e) {
-					throw new RuntimeException(String.format("Error parsing complex parameter with name: \"%s\", and value: \"%s\"" + typeName, value), e);
-				}
-			} else {
-				throw new RuntimeException(String.format("Error: Complex type parameter missing \"%s\".", KEY_COMPLEX_TYPE));
-			}
-		}
-		// All other values, such as Boolean and String should be returned unaltered.
-		return value;
 	}
 
 	private boolean isComplexType(JSONObject jsonObject) {

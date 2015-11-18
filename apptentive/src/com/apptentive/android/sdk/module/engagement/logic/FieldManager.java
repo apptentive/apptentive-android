@@ -28,14 +28,15 @@ import java.math.BigDecimal;
 public class FieldManager {
 
 	public static boolean exists(Context context, String query) {
-		return getValue(context, query, false) != null;
+		return getValue(context, query) != null;
 	}
 
 	public static Comparable getValue(Context context, String query) {
-		return getValue(context, query, true);
+		Object rawValue = doGetValue(context, query);
+		return (Comparable) ClauseParser.parseValue(rawValue);
 	}
 
-	public static Comparable getValue(Context context, String query, boolean useDefault) {
+	public static Object doGetValue(Context context, String query) {
 		String[] tokens = query.split("/");
 		QueryPart topLevelQuery = QueryPart.parse(tokens[0]);
 
@@ -129,7 +130,7 @@ public class FieldManager {
 						String customDataKey = tokens[2];
 						CustomData customData = person.getCustomData();
 						if (customData != null) {
-							return (Comparable) customData.opt(customDataKey);
+							return customData.opt(customDataKey);
 						}
 						break;
 					case name:
@@ -138,7 +139,7 @@ public class FieldManager {
 						return person.getEmail();
 					case other:
 						String key = tokens[1];
-						return (Comparable) person.opt(key);
+						return person.opt(key);
 				}
 			}
 			case device: {
@@ -152,7 +153,7 @@ public class FieldManager {
 						String customDataKey = tokens[2];
 						CustomData customData = device.getCustomData();
 						if (customData != null) {
-							return (Comparable) customData.opt(customDataKey);
+							return customData.opt(customDataKey);
 						}
 						break;
 					case board:
@@ -178,7 +179,7 @@ public class FieldManager {
 					case radio_version:
 					case uuid:
 					case other:
-						return (Comparable) device.opt(subQuery.name());
+						return device.opt(subQuery.name());
 				}
 			}
 			default:
