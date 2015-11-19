@@ -8,15 +8,18 @@ package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -31,7 +34,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
-	private static final int API_VERSION = 3;
+	private static final int API_VERSION = 4;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -76,14 +79,29 @@ public class ApptentiveClient {
 
 	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		switch (apptentiveMessage.getType()) {
+			/*
+			 * pending legacy TextMessage, AutomatedMessage and FileMessage may still exist in payload table before sdk upgrade.
+			 * After SDK upgrades to CompoundMessage only, these pending payload will be sent out using new version and multi-part format
+			 */
 			case TextMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case AutomatedMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case FileMessage:
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
+			case AutomatedMessage: {
+				// Make sure "automated" key is set for legacy AutomatedMessage
+				apptentiveMessage.setAutomated(true);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
+			}
+			case FileMessage: {
 				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
 				StoredFile storedFile = fileMessage.getStoredFile(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
+				List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
+				associatedFiles.add(storedFile);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+			}
+			case CompoundMessage: {
+				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
+				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
+				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+			}
 			case unknown:
 				break;
 		}
@@ -270,7 +288,7 @@ public class ApptentiveClient {
 		return (errStream != null) ? (errStream.toString()) : null;
 	}
 
-	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
+	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
 		uri = getEndpointBase(appContext) + uri;
 		Log.d("Performing multipart request to %s", uri);
 
@@ -280,25 +298,14 @@ public class ApptentiveClient {
 			return ret;
 		}
 
-		if (storedFile == null) {
-			Log.e("StoredFile is null. Unable to send.");
-			return ret;
-		}
-
-		int bytesRead;
-		int bufferSize = 4096;
-		byte[] buffer;
-
 		String lineEnd = "\r\n";
 		String twoHyphens = "--";
 		String boundary = UUID.randomUUID().toString();
 
 		HttpURLConnection connection = null;
 		DataOutputStream os = null;
-		InputStream is = null;
 
 		try {
-			is = appContext.openFileInput(storedFile.getLocalFilePath());
 
 			// Set up the request.
 			URL url = new URL(uri);
@@ -311,60 +318,95 @@ public class ApptentiveClient {
 			connection.setRequestMethod("POST");
 
 			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
 			connection.setRequestProperty("User-Agent", getUserAgentString());
 
-			StringBuilder requestText = new StringBuilder();
-
-			// Write form data
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd);
-			requestText.append("Content-Type: text/plain").append(lineEnd);
-			requestText.append(lineEnd);
-			requestText.append(postBody);
-			requestText.append(lineEnd);
-
-			// Write file attributes.
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
-			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
-			requestText.append(lineEnd);
-
-			Log.d("Post body: " + requestText);
-
 			// Open an output stream.
 			os = new DataOutputStream(connection.getOutputStream());
+			os.writeBytes(twoHyphens + boundary + lineEnd);
 
-			// Write the text so far.
-			os.writeBytes(requestText.toString());
+			// Write text message
+			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			os.writeBytes("Content-Type: text/plain;charset=UTF-8" + lineEnd);
+			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
+			os.writeBytes(lineEnd);
+			os.writeBytes(postBody + lineEnd);
 
-			try {
-				// Write the actual file.
-				buffer = new byte[bufferSize];
-				while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
-					os.write(buffer, 0, bytesRead);
+			// Send associated files
+			if (associatedFiles != null) {
+				for (StoredFile storedFile : associatedFiles) {
+					FileInputStream fis = null;
+					String originalFilePath;
+					try {
+						String cachedImagePathString = storedFile.getLocalFilePath();
+						File cachedImageFile = new File(cachedImagePathString);
+						// No local cache found
+						if (!cachedImageFile.exists()) {
+							boolean bCachedCreated = false;
+							// Creation time would only be set when we were able to retrieve original file information through uri
+							if (storedFile.getCreationTime() == 0) {
+								originalFilePath = Util.getImagePath(appContext, Uri.parse(storedFile.getOriginalUriOrPath()));
+								if (originalFilePath == null) {
+									bCachedCreated = ImageUtil.createCachedImageFile(appContext, Uri.parse(storedFile.getOriginalUriOrPath()), cachedImagePathString);
+								}
+							} else {
+								originalFilePath = storedFile.getOriginalUriOrPath();
+								bCachedCreated = ImageUtil.createCachedImageFile(originalFilePath, cachedImagePathString);
+							}
+							if (!bCachedCreated) {
+								continue;
+							}
+						}
+						os.writeBytes(twoHyphens + boundary + lineEnd);
+						StringBuilder requestText = new StringBuilder();
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getOriginalUriOrPath())).append(lineEnd);
+						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+						// Write file attributes
+						os.writeBytes(requestText.toString());
+						os.writeBytes(lineEnd);
+
+						fis = new FileInputStream(cachedImageFile);
+
+						int bytesAvailable = fis.available();
+						int maxBufferSize = 512 * 512;
+						int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						byte[] buffer = new byte[bufferSize];
+
+						// read image data 0.5MB at a time and write it into buffer
+						int bytesRead = fis.read(buffer, 0, bufferSize);
+						while (bytesRead > 0) {
+							os.write(buffer, 0, bufferSize);
+							bytesAvailable = fis.available();
+							bufferSize = Math.min(bytesAvailable, maxBufferSize);
+							bytesRead = fis.read(buffer, 0, bufferSize);
+						}
+					} catch (IOException e) {
+						Log.d("Error writing file bytes to HTTP connection.", e);
+						ret.setBadPayload(true);
+						throw e;
+					} finally {
+						Util.ensureClosed(fis);
+					}
+					os.writeBytes(lineEnd);
 				}
-			} catch (IOException e) {
-				Log.d("Error writing file bytes to HTTP connection.", e);
-				ret.setBadPayload(true);
-				throw e;
 			}
-
 			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+			os.flush();
 			os.close();
 
 			ret.setCode(connection.getResponseCode());
 			ret.setReason(connection.getResponseMessage());
+
 
 			// TODO: These streams may not be ready to read now. Put this in a new thread.
 			// Read the normal response.
 			InputStream nis = null;
 			ByteArrayOutputStream nbaos = null;
 			try {
-				Log.d("Sending file: " + storedFile.getLocalFilePath());
 				nis = connection.getInputStream();
 				nbaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
@@ -394,7 +436,6 @@ public class ApptentiveClient {
 				Log.w("Can't read error stream.", ex);
 			}
 		} finally {
-			Util.ensureClosed(is);
 			Util.ensureClosed(os);
 		}
 		return ret;
@@ -419,4 +460,5 @@ public class ApptentiveClient {
 		}
 		return url;
 	}
+
 }

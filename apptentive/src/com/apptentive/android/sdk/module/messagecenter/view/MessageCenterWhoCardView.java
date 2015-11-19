@@ -30,7 +30,7 @@ import com.apptentive.android.sdk.util.Util;
  */
 public class MessageCenterWhoCardView extends FrameLayout implements MessageCenterListItemView {
 
-	private MessageAdapter.OnComposingActionListener listener;
+	private MessageAdapter.OnListviewItemActionListener listener;
 	private EditText emailEditText;
 	private EditText nameEditText;
 	private TextView title;
@@ -42,7 +42,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private TextWatcher emailTextWatcher;
 	private boolean emailIsValid;
 
-	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnComposingActionListener listener) {
+	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnListviewItemActionListener listener) {
 		super(activityContext);
 		this.listener = listener;
 		LayoutInflater inflater = LayoutInflater.from(activityContext);

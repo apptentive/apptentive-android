@@ -13,7 +13,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingTextMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
+public class OutgoingTextMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 

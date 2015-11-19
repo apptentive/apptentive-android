@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveToastNotificationManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
-import com.apptentive.android.sdk.util.ImageUtil;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

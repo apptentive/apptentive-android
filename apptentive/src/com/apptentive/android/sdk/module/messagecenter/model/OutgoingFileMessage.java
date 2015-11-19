@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.FileStore;
 import com.apptentive.android.sdk.util.CountingOutputStream;
-import com.apptentive.android.sdk.util.ImageUtil;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -27,7 +27,7 @@ import java.io.*;
 /**
  * @author Sky Kelsey
  */
-public class OutgoingFileMessage extends ApptentiveMessage implements MessageCenterUtil.OutgoingItem {
+public class OutgoingFileMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final int MAX_STORED_IMAGE_EDGE = 1024;
 
@@ -95,69 +95,6 @@ public class OutgoingFileMessage extends ApptentiveMessage implements MessageCen
 
 	private String getStoredFileId() {
 		return "apptentive-file-" + getNonce();
-	}
-
-	/**
-	 * This method stores an image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
-	 * it to store an exact copy of the file in question.
-	 */
-	public boolean internalCreateStoredImage(Context context, String uriString) {
-		Uri uri = Uri.parse(uriString);
-
-		ContentResolver resolver = context.getContentResolver();
-		String mimeType = resolver.getType(uri);
-		MimeTypeMap mime = MimeTypeMap.getSingleton();
-		String extension = mime.getExtensionFromMimeType(mimeType);
-		setFileName(uri.getLastPathSegment() + "." + extension);
-		setMimeType(mimeType);
-
-		// Create a file to save locally.
-		String localFileName = getStoredFileId();
-		File localFile = new File(localFileName);
-
-		// Retrieve image orientation
-		Cursor cursor = context.getContentResolver().query(uri,
-				new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
-
-		int imageOrientation = 0;
-		if (cursor.getCount() == 1) {
-			cursor.moveToFirst();
-			imageOrientation = cursor.getInt(0);
-		}
-
-		// Copy the file contents over.
-		InputStream is = null;
-		CountingOutputStream cos = null;
-		try {
-			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
-			cos = new CountingOutputStream(new BufferedOutputStream(context.openFileOutput(localFile.getPath(), Context.MODE_PRIVATE)));
-			System.gc();
-			Bitmap smaller = ImageUtil.createScaledBitmapFromStream(is, MAX_STORED_IMAGE_EDGE, MAX_STORED_IMAGE_EDGE, null, imageOrientation);
-			// TODO: Is JPEG what we want here?
-			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
-			cos.flush();
-			Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
-			smaller.recycle();
-			System.gc();
-		} catch (FileNotFoundException e) {
-			Log.e("File not found while storing image.", e);
-			return false;
-		} catch (Exception e) {
-			Log.a("Error storing image.", e);
-			return false;
-		} finally {
-			Util.ensureClosed(is);
-			Util.ensureClosed(cos);
-		}
-
-		// Create a StoredFile database entry for this locally saved file.
-		StoredFile storedFile = new StoredFile();
-		storedFile.setId(getStoredFileId());
-		storedFile.setOriginalUri(uri.toString());
-		storedFile.setLocalFilePath(localFile.getPath());
-		storedFile.setMimeType("image/jpeg");
-		FileStore db = ApptentiveDatabase.getInstance(context);
-		return db.putStoredFile(storedFile);
 	}
 
 	public boolean createStoredFile(Context context, String uriString) {
@@ -256,5 +193,15 @@ public class OutgoingFileMessage extends ApptentiveMessage implements MessageCen
 	@Override
 	public void setLastSent(boolean bVal) {
 		isLast = bVal;
+	}
+
+	@Override
+	public void setBody(String body) {
+
+	}
+
+	@Override
+	public String getBody() {
+		return null;
 	}
 }

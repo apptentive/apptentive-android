@@ -44,16 +44,23 @@
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveDialogBottomArea"
                           android:orientation="horizontal">
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
+                <ImageButton
                         android:id="@+id/no"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_no"/>
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
+                        android:background="?android:attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/apptentive_ic_close"
+                        android:paddingRight="@dimen/apptentive_message_center_default_margin_medium"
+                        android:tint="@color/apptentive_red"/>
+                <ImageButton
                         android:id="@+id/yes"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_yes"/>
+                        android:background="?android:attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/apptentive_ic_btn_check_on"
+                        android:paddingLeft="@dimen/apptentive_message_center_default_margin_medium"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

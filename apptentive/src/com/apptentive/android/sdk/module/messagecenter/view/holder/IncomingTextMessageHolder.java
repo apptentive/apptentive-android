@@ -26,7 +26,7 @@ public class IncomingTextMessageHolder extends MessageHolder {
 	public IncomingTextMessageHolder(IncomingTextMessageView view) {
 		super(view);
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
-		messageBody = (TextView) view.findViewById(R.id.more_less_container);
+		messageBody = (TextView) view.findViewById(R.id.message_body);
 		nameView = (TextView) view.findViewById(R.id.sender_name);
 	}
 

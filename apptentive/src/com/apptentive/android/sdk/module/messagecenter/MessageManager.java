@@ -28,6 +28,7 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
@@ -85,12 +86,12 @@ public class MessageManager {
 							break;
 						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
 							// Notify internal listeners such as Message Center
-							IncomingTextMessage msgToAdd = (IncomingTextMessage) msg.obj;
+							CompoundMessage msgToAdd = (CompoundMessage) msg.obj;
 							notifyInternalNewMessagesListeners(msgToAdd);
 							break;
 						}
 						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
-							IncomingTextMessage msgToShow = (IncomingTextMessage) msg.obj;
+							CompoundMessage msgToShow = (CompoundMessage) msg.obj;
 							showUnreadMessageToastNotification(msgToShow);
 							break;
 						}
@@ -149,7 +150,7 @@ public class MessageManager {
 		Log.d("Fetching messages after last id: " + lastId);
 		List<ApptentiveMessage> messagesToSave = fetchMessages(appContext, lastId);
 
-		IncomingTextMessage messageOnToast = null;
+		CompoundMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
 			Log.d("Messages retrieved.");
 			// Also get the count of incoming unread messages.
@@ -160,12 +161,12 @@ public class MessageManager {
 					apptentiveMessage.setRead(true);
 				} else {
 					if (messageOnToast == null) {
-						if (apptentiveMessage.getType() == ApptentiveMessage.Type.TextMessage) {
-							messageOnToast = (IncomingTextMessage) apptentiveMessage;
+						if (apptentiveMessage.getType() == ApptentiveMessage.Type.CompoundMessage) {
+							messageOnToast = (CompoundMessage) apptentiveMessage;
 						}
 					}
 					incomingUnreadMessages++;
-					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (IncomingTextMessage) apptentiveMessage);
+					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
 					getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
 					msg.sendToTarget();
 				}
@@ -263,6 +264,14 @@ public class MessageManager {
 		if (response.isRejectedPermanently() || response.isBadPayload()) {
 			if (apptentiveMessage instanceof OutgoingFileMessage) {
 				((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
+			} else if (apptentiveMessage instanceof CompoundMessage) {
+
+					apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
+					getMessageStore(context).updateMessage(apptentiveMessage);
+					if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
+						afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+					}
+
 			}
 			return;
 		}
@@ -283,9 +292,9 @@ public class MessageManager {
 			}
 			try {
 				JSONObject responseJson = new JSONObject(response.getContent());
-				if (apptentiveMessage.getState() == ApptentiveMessage.State.sending) {
-					apptentiveMessage.setState(ApptentiveMessage.State.sent);
-				}
+
+				apptentiveMessage.setState(ApptentiveMessage.State.sent);
+
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
@@ -331,7 +340,7 @@ public class MessageManager {
 	}
 
 	public interface OnNewIncomingMessagesListener {
-		public void onMessagesUpdated(final IncomingTextMessage apptentiveMsg);
+		public void onMessagesUpdated(final CompoundMessage apptentiveMsg);
 	}
 
 	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
@@ -353,7 +362,7 @@ public class MessageManager {
 		internalNewMessagesListeners.clear();
 	}
 
-	public static void notifyInternalNewMessagesListeners(final IncomingTextMessage apptentiveMsg) {
+	public static void notifyInternalNewMessagesListeners(final CompoundMessage apptentiveMsg) {
 		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
@@ -412,7 +421,7 @@ public class MessageManager {
 		}
 	}
 
-	private static void showUnreadMessageToastNotification(final IncomingTextMessage apptentiveMsg) {
+	private static void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {

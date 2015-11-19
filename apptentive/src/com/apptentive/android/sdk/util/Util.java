@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -21,7 +22,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -31,6 +35,9 @@ import android.widget.ListView;
 import com.apptentive.android.sdk.Log;
 
 import java.io.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -529,6 +536,129 @@ public class Util {
 			return "null";
 		} else {
 			return String.format("%s(%s)", object.getClass().getSimpleName(), object);
+		}
+	}
+
+	public static String getImagePath(Context context, Uri contentUri){
+
+		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+			return null;
+		}
+
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		cursor.moveToFirst();
+		String document_id = cursor.getString(0);
+		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		cursor.close();
+
+		cursor = context.getContentResolver().query(
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		cursor.moveToFirst();
+		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		cursor.close();
+
+		return path;
+	}
+
+	public static long getImageCreationTime(Context context, Uri contentUri){
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		cursor.moveToFirst();
+		String document_id = cursor.getString(0);
+		document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+		cursor.close();
+
+		cursor = context.getContentResolver().query(
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		cursor.moveToFirst();
+		long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+		cursor.close();
+
+		return time;
+	}
+
+	/*
+	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPath(Context context, String imageUri, long createdTime) {
+		String source = imageUri + Long.toString(createdTime);
+		String fileName = String.valueOf(source.hashCode());
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	/*
+	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPathMd5(Context context, String imageUri) {
+		String fileName = calculateMD5(context, Uri.parse(imageUri));
+		if (fileName == null) {
+			return null;
+		}
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	public static File getDiskCacheDir(Context context) {
+		File appCacheDir = null;
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			appCacheDir = context.getExternalCacheDir();
+		}
+
+		if (appCacheDir == null){
+			appCacheDir = context.getCacheDir();
+		}
+		return appCacheDir;
+	}
+
+	public static boolean hasPermission(Context context, final String permission) {
+		int perm = context.checkCallingOrSelfPermission(permission);
+		return perm == PackageManager.PERMISSION_GRANTED;
+	}
+
+	//Calculate MD5 from file's content
+	private static String calculateMD5(Context context, Uri uri) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			Log.e("Exception while getting digest", e);
+			return null;
+		}
+
+		InputStream is;
+		try {
+			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+		} catch (FileNotFoundException e) {
+			Log.e("Exception while getting FileInputStream", e);
+			return null;
+		}
+
+		byte[] buffer = new byte[8192];
+		int read;
+		try {
+			while ((read = is.read(buffer)) > 0) {
+				digest.update(buffer, 0, read);
+			}
+			byte[] md5sum = digest.digest();
+			BigInteger bigInt = new BigInteger(1, md5sum);
+			String output = bigInt.toString(16);
+			// Fill to 32 chars
+			output = String.format("%32s", output).replace(' ', '0');
+			return output;
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to process file for MD5", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				Log.e("Exception on closing MD5 input stream", e);
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:clipToPadding="false"
+             android:descendantFocusability="blocksDescendants"
              android:background="@android:color/transparent"
              android:paddingBottom="@dimen/apptentive_message_center_default_margin_small">
     <RelativeLayout android:layout_width="match_parent"
