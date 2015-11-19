@@ -15,6 +15,7 @@ build/
 *.iws
 *.iml
 .idea/tasks.xml
+.idea/gradle.xml
 .idea/vcs.xml
 .idea/workspace.xml
 .idea/libraries
