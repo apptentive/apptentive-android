@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -60,40 +62,23 @@ public class VersionHistoryStore {
 	 * always stored in order, the first matching entry happened first.
 	 *
 	 * @param selector - The type of version entry we are looking for: total, version, or build.
-	 * @return A Double representing the number of seconds since we first saw the desired app release entry. Null if never seen.
+	 * @return A DateTime representing the number of seconds since we first saw the desired app release entry. A DateTime with current time if never seen.
 	 */
-	public static Double getTimeSinceVersionFirstSeen(Context context, Selector selector) {
+	public static Apptentive.DateTime getTimeAtInstall(Context context, Selector selector) {
 		List<VersionHistoryEntry> entries = getVersionHistory(context);
-		VersionHistoryEntry matchingEntry = null;
 		if (entries != null) {
-			outer_loop:
 			for (VersionHistoryEntry entry : entries) {
 				switch (selector) {
 					case total:
-						// Grab the first entry.
-						matchingEntry = entry;
-						break outer_loop;
-					case version:
-						if (entry.versionName.equals(Util.getAppVersionName(context))) {
-							matchingEntry = entry;
-							break outer_loop;
-						}
-						continue;
+						return new Apptentive.DateTime(entry.seconds);
 					case build:
 						if (entry.versionCode.equals(Util.getAppVersionCode(context))) {
-							matchingEntry = entry;
-							break outer_loop;
+							return new Apptentive.DateTime(entry.seconds);
 						}
-						continue;
-					default:
-						return null;
 				}
 			}
 		}
-		if (matchingEntry != null) {
-			return Util.currentTimeSeconds() - matchingEntry.seconds;
-		}
-		return null;
+		return new Apptentive.DateTime(Util.currentTimeSeconds());
 	}
 
 	/**
@@ -156,7 +141,7 @@ public class VersionHistoryStore {
 		for (VersionHistoryEntry entry : versionHistory) {
 			versionHistoryString.append(entry.toString()).append(ENTRY_SEP);
 		}
-		prefs.edit().putString(Constants.PREF_KEY_VERSION_HISTORY, versionHistoryString.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_VERSION_HISTORY, versionHistoryString.toString()).apply();
 	}
 
 	public static class VersionHistoryEntry {

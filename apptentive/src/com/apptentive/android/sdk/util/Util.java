@@ -524,5 +524,12 @@ public class Util {
 		return false;
 	}
 
+	public static String classToString(Object object) {
+		if (object == null) {
+			return "null";
+		} else {
+			return String.format("%s(%s)", object.getClass().getSimpleName(), object);
+		}
+	}
 }
 

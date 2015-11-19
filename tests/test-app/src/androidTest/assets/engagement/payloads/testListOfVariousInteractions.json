@@ -24,21 +24,6 @@
     {
       "id": "526fe2836dd8bf546a00000e",
       "priority": 1,
-      "criteria": {
-        "$or": [
-          {
-            "time_since_install/total": {
-              "$lt": 259200
-            }
-          },
-          {
-            "code_point/app.launch/invokes/total": 2
-          },
-          {
-            "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
-          }
-        ]
-      },
       "type": "RatingDialog",
       "version": null,
       "active": true,
@@ -50,35 +35,6 @@
     {
       "id": "526fe2836dd8bf546a00000f",
       "priority": 1,
-      "criteria": {
-        "$or": [
-          {
-            "time_since_install/version": {
-              "$lt": 259200
-            }
-          },
-          {
-            "$and": [
-              {
-                "code_point/app.launch/invokes/total": 2
-              },
-              {
-                "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
-              },
-              {
-                "$or": [
-                  {
-                    "code_point/small.win/invokes/total": 2
-                  },
-                  {
-                    "code_point/big.win/invokes/total": 2
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
       "type": "RatingDialog",
       "version": null,
       "active": true,
@@ -93,8 +49,8 @@
       {
         "interaction_id": "526fe2836dd8bf546a00000c",
         "criteria": {
-          "time_since_install/total": {
-            "$lt": 259200
+          "time_at_install/total": {
+            "$after": -259200
           },
           "code_point/app.launch/invokes/total": 2,
           "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
@@ -113,8 +69,8 @@
         "criteria": {
           "$or": [
             {
-              "time_since_install/total": {
-                "$lt": 259200
+              "time_at_install/total": {
+                "$after": -259200
               }
             },
             {
@@ -133,8 +89,8 @@
         "criteria": {
           "$or": [
             {
-              "time_since_install/version": {
-                "$lt": 259200
+              "time_at_install/version": {
+                "$after": -259200
               }
             },
             {

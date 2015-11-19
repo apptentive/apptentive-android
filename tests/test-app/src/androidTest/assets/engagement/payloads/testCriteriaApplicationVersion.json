@@ -23,19 +23,31 @@
           "$or": [
             {
               "code_point/switch/invokes/total": 0,
-              "application_version": "2.0"
+              "application/version": {
+                "_type": "version",
+                "version": "3"
+              }
             },
             {
               "code_point/switch/invokes/total": 1,
-              "application_version": "2.1"
+              "application/version": {
+                "_type": "version",
+                "version": "4.0"
+              }
             },
             {
               "code_point/switch/invokes/total": 2,
-              "application_build": 4
+              "application/version": {
+                "_type": "version",
+                "version": "4"
+              }
             },
             {
               "code_point/switch/invokes/total": 3,
-              "application_build": 5
+              "application/version": {
+                "_type": "version",
+                "version": "5"
+              }
             }
           ]
         }
