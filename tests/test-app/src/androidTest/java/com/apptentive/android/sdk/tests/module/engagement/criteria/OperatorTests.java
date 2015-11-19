@@ -77,6 +77,18 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 		Log.e("Finished test.");
 	}
 
+	public void testOperatorBefore() {
+		Log.e("Running test: testOperatorBefore()\n\n");
+		doTest("testOperatorBefore.json");
+		Log.e("Finished test.");
+	}
+
+	public void testOperatorAfter() {
+		Log.e("Running test: testOperatorAfter()\n\n");
+		doTest("testOperatorAfter.json");
+		Log.e("Finished test.");
+	}
+
 	private void doTest(String testFile) {
 		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
 		try {
