@@ -84,10 +84,10 @@ public class LogicalClause implements Clause {
 				throw new IllegalArgumentException("$not condition must have exactly one child, has ." + children.size());
 			}
 			Clause clause = children.get(0);
-			boolean ret = !clause.evaluate(context);
+			boolean ret = clause.evaluate(context);
 			Log.v("        - => %b", ret);
 			Log.v("  - </%s>", operator.name());
-			return ret;
+			return !ret;
 		} else {
 			// Unsupported
 			Log.v("Unsupported operation: \"%s\" => false", operatorName);
