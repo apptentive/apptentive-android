@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -23,6 +25,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
@@ -53,6 +56,13 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
+				/* ViewActivity must have a theme inherit from Apptentive Base themes.
+				*  If hosting app fails to specify one in AndroidManifest, apply a default ApptentiveTheme.
+				*  The check is done through checking if one of the apptentive attributes have value defined
+				*/
+				if (Util.getThemeColor(this, R.attr.apptentive_material_toolbar_foreground) == 0) {
+					setTheme(R.style.ApptentiveTheme);
+				}
 				if (activeContentType == ActivityContent.Type.ABOUT) {
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (activeContentType == ActivityContent.Type.INTERACTION) {
