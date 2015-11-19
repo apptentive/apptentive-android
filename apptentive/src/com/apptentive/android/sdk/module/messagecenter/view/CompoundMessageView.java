@@ -53,4 +53,8 @@ public class CompoundMessageView extends PersonalMessageView<CompoundMessage> {
 		return isOutGoingView;
 	}
 
+	public MessageAdapter.OnListviewItemActionListener getListener() {
+		return listenerRef.get();
+	}
+
 }

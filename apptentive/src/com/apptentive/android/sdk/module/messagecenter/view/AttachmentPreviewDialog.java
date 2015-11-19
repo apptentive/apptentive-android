@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -26,10 +27,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
@@ -91,27 +94,6 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 
 		currentImage = getArguments().getParcelable("image");
 
-		AsyncTask<Object, Void, Bitmap> task = new AsyncTask<Object, Void, Bitmap>() {
-			@Override
-			protected Bitmap doInBackground(Object... params) {
-				return prepareAttachmentPreview(currentImage);
-			}
-
-			@Override
-			protected void onPostExecute(Bitmap bitmap) {
-				progressBar.setVisibility(View.GONE);
-				if (!isAdded()) {
-					return;
-				}
-				displayPreview(bitmap);
-			}
-		};
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		} else {
-			task.execute();
-		}
 
 		width = inflater.getContext().getResources().getDisplayMetrics().widthPixels;
 		height = inflater.getContext().getResources().getDisplayMetrics().heightPixels;
@@ -135,6 +117,40 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 				wm.updateViewLayout(getDialog().getWindow().getDecorView(), lp);
 			}
 		});
+
+		ApptentiveAttachmentLoader.getInstance().load(currentImage.originalPath, currentImage.localCachePath, 0, previewImageView, width, height, true,
+				new ApptentiveAttachmentLoader.LoaderCallback() {
+					@Override
+					public void onLoaded(ImageView view, int pos, Drawable d) {
+						if (progressBar != null) {
+							progressBar.setVisibility(View.GONE);
+						}
+
+						if (previewImageView == view) {
+							previewContainer.setVisibility(View.VISIBLE);
+							previewImageView.setImageDrawable(d);
+						}
+					}
+
+					@Override
+					public void onLoadTerminated() {
+						if (progressBar != null) {
+							progressBar.setVisibility(View.GONE);
+						}
+					}
+
+					@Override
+					public void onDownloadStart() {
+						if (progressBar != null) {
+							progressBar.setVisibility(View.VISIBLE);
+						}
+					}
+
+					@Override
+					public void onDownloadProgress(int progress) {
+					}
+				});
+
 
 		return rootView;
 	}
@@ -170,50 +186,5 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		dismiss();
 	}
 
-
-	public Bitmap prepareAttachmentPreview(ImageItem imageItem) {
-
-		// Show a preview of the image.
-		Bitmap preview = null;
-		String imagePathString = imageItem.originalPath;
-		// Always try to load preview from cached file
-		if (!TextUtils.isEmpty(imageItem.localCachePath)) {
-			File imageFile = new File(imageItem.localCachePath);
-			if (imageFile.exists()) {
-				imagePathString = imageItem.localCachePath;
-			}
-		}
-
-		if (imagePathString == null) {
-			return null;
-		}
-
-		// Retrieve image orientation
-		int imageOrientation = 0;
-		try {
-			if (imagePathString != null) {
-				ExifInterface exif = new ExifInterface(imagePathString);
-				imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-			}
-		} catch (IOException e) {
-
-		}
-		try {
-			//final int dialogWidth
-			preview = ImageUtil.createScaledBitmapFromLocalImageSource(getContext(), imagePathString, width, height, null, imageOrientation);
-		} catch (Throwable e) {
-			//ignore
-		}
-
-		return preview;
-	}
-
-
-	private void displayPreview(Bitmap preview) {
-		previewContainer.setVisibility(View.VISIBLE);
-		if (preview != null) {
-			previewImageView.setImageBitmap(preview);
-		}
-	}
 
 }

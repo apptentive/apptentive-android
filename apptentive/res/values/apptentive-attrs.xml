@@ -58,6 +58,7 @@
     </declare-styleable>
 
     <attr name="apptentiveFabStyle" format="reference"/>
+    <attr name="apptentiveAvatarStyle" format="reference"/>
 
     <declare-styleable name="FloatingActionButton">
         <!-- Background color -->

@@ -28,7 +28,7 @@
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_alignParentLeft="true"
                          android:layout_centerVertical="true"
-                         android:layout_marginRight="10dp"
+                         android:layout_marginRight="8dp"
                          android:contentDescription="Close"
                          android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
                          android:background="?android:attr/selectableItemBackground"
@@ -37,12 +37,11 @@
                                                                 android:layout_width="wrap_content"
                                                                 android:layout_height="@dimen/apptentive_message_center_header_height"
                                                                 android:layout_toRightOf="@id/close_mc"
-                                                                android:layout_marginLeft="2dp"
                                                                 android:layout_centerVertical="true"
                                                                 android:gravity="center"
                                                                 android:singleLine="true"
                                                                 android:textColor="?attr/apptentive_material_toolbar_foreground"
-                                                                android:textSize="24sp"/>
+                                                                android:textSize="20sp"/>
             <ImageButton android:id="@+id/profile"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"

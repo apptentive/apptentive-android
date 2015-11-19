@@ -53,12 +53,24 @@ public class ApptentiveAvatarView extends ImageView {
 	}
 
 	public ApptentiveAvatarView(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, R.attr.apptentiveAvatarStyle);
 	}
 
 	public ApptentiveAvatarView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+
+		if (isInEditMode()) {
+			return;
+		}
+
+		if (attrs == null) {
+			return;
+		}
+
 		Resources.Theme theme = context.getTheme();
+		if (theme == null) {
+			return;
+		}
 
 		TypedArray attributes = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, R.style.ApptentiveAvatarView);
 		try {
@@ -149,7 +161,7 @@ public class ApptentiveAvatarView extends ImageView {
 			return;
 		}
 
-		paddingLeft  = getPaddingLeft();
+		paddingLeft = getPaddingLeft();
 		paddingRight = getPaddingRight();
 		paddingTop = getPaddingTop();
 		paddingBottom = getPaddingBottom();
