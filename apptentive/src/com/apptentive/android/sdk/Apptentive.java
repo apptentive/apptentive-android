@@ -215,10 +215,6 @@ public class Apptentive {
 		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
 	}
 
-	public static void addCustomDeviceData(Context context, String key, Duration duration) {
-		ApptentiveInternal.addCustomDeviceData(context, key, duration);
-	}
-
 	/**
 	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
 	 *
@@ -270,10 +266,6 @@ public class Apptentive {
 
 	public static void addCustomPersonData(Context context, String key, DateTime dateTime) {
 		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
-	}
-
-	public static void addCustomPersonData(Context context, String key, Duration duration) {
-		ApptentiveInternal.addCustomPersonData(context, key, duration);
 	}
 
 	/**
@@ -1204,12 +1196,14 @@ public class Apptentive {
 	 *
 	 */
 	public static class Version extends JSONObject implements Comparable<Version> {
-		private final String KEY_TYPE = "_type";
-		private final String KEY_VERSION = "version";
+		public static final String KEY_TYPE = "_type";
+		public static final String TYPE = "version";
 
-		public Version(String version) {
-			super();
-			setVersion(version);
+		public Version() {
+		}
+
+		public Version(String json) throws JSONException {
+			super(json);
 		}
 
 		public Version(long version) {
@@ -1219,8 +1213,8 @@ public class Apptentive {
 
 		public void setVersion(String version) {
 			try {
-				put(KEY_TYPE, KEY_VERSION);
-				put(KEY_VERSION, version);
+				put(KEY_TYPE, TYPE);
+				put(TYPE, version);
 			} catch (JSONException e) {
 				Log.e("Error creating Apptentive.Version.", e);
 			}
@@ -1231,7 +1225,7 @@ public class Apptentive {
 		}
 
 		public String getVersion() {
-			return optString(KEY_VERSION, null);
+			return optString(TYPE, null);
 		}
 
 		@Override
@@ -1260,11 +1254,21 @@ public class Apptentive {
 			}
 			return 0;
 		}
+
+		@Override
+		public String toString() {
+			return getVersion();
+		}
 	}
 
 	public static class DateTime extends JSONObject implements Comparable<DateTime> {
-		private final String KEY_TYPE = "_type";
-		private final String KEY_DATETIME = "datetime";
+		public static final String KEY_TYPE = "_type";
+		public static final String TYPE = "datetime";
+		public static final String SEC = "sec";
+
+		public DateTime(String json) throws JSONException {
+			super(json);
+		}
 
 		public DateTime(double dateTime) {
 			super();
@@ -1273,15 +1277,20 @@ public class Apptentive {
 
 		public void setDateTime(double dateTime) {
 			try {
-				put(KEY_TYPE, KEY_DATETIME);
-				put(KEY_DATETIME, dateTime);
+				put(KEY_TYPE, TYPE);
+				put(SEC, dateTime);
 			} catch (JSONException e) {
 				Log.e("Error creating Apptentive.DateTime.", e);
 			}
 		}
 
 		public double getDateTime() {
-			return optDouble(KEY_DATETIME);
+			return optDouble(SEC);
+		}
+
+		@Override
+		public String toString() {
+			return Double.toString(getDateTime());
 		}
 
 		@Override
@@ -1289,36 +1298,6 @@ public class Apptentive {
 			double thisDateTime = getDateTime();
 			double thatDateTime = other.getDateTime();
 			return Double.compare(thisDateTime, thatDateTime);
-		}
-	}
-
-	public static class Duration extends JSONObject implements Comparable<Duration> {
-		private final String KEY_TYPE = "_type";
-		private final String KEY_DURATION = "duration";
-
-		public Duration(double duration) {
-			super();
-			setDuration(duration);
-		}
-
-		public void setDuration(double duration) {
-			try {
-				put(KEY_TYPE, KEY_DURATION);
-				put(KEY_DURATION, duration);
-			} catch (JSONException e) {
-				Log.e("Error creating Apptentive.DateTime.", e);
-			}
-		}
-
-		public double getDuration() {
-			return optDouble(KEY_DURATION);
-		}
-
-		@Override
-		public int compareTo(Duration other) {
-			double thisDuration = getDuration();
-			double thatDuration = other.getDuration();
-			return Double.compare(thisDuration, thatDuration);
 		}
 	}
 }

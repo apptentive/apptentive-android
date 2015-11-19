@@ -19,48 +19,47 @@
           "$or": [
             {
               "code_point/switch/invokes/total": 0,
-              "$or": [
+              "$and": [
                 {
-                  "time_since_install/total": {
-                    "$lt": 2.2
+                  "time_at_install/total": {
+                    "$before": -2
                   }
                 },
                 {
-                  "time_since_install/total": {
-                    "$gt": 3.4
+                  "time_at_install/total": {
+                    "$after": -4
                   }
                 }
               ]
             },
             {
               "code_point/switch/invokes/total": 1,
-              "$or": [
+              "$and": [
                 {
-                  "time_since_install/version": {
-                    "$lt": 2.2
+                  "time_at_install/version": {
+                    "$before": -2.0
                   }
                 },
                 {
-                  "time_since_install/version": {
-                    "$gt": 3.4
+                  "time_at_install/version": {
+                    "$after": -4.0
                   }
                 }
               ]
             },
             {
               "code_point/switch/invokes/total": 2,
-              "$or": [
-                {
-                  "time_since_install/build": {
-                    "$lt": 2.2
-                  }
-                },
-                {
-                  "time_since_install/build": {
-                    "$gt": 3.4
-                  }
-                }
-              ]
+              "time_at_install/version": {
+                "$before": -2.0,
+                "$after": -4
+              }
+            },
+            {
+              "code_point/switch/invokes/total": 3,
+              "time_at_install/version": {
+                "$before": 1.0,
+                "$after": -1
+              }
             }
           ]
         }

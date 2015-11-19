@@ -31,8 +31,8 @@
         "criteria": {
           "$and": [
             {
-              "time_since_install/total": {
-                "$gte": 432000
+              "time_at_install/total": {
+                "$before": -432000
               }
             },
             {
@@ -53,8 +53,8 @@
           },
           "code_point/com.apptentive#RatingDialog#rate/invokes/total": 0,
           "code_point/com.apptentive#RatingDialog#decline/invokes/total": 0,
-          "code_point/com.apptentive#RatingDialog#remind/invokes/time_ago": {
-            "$gte": 432000
+          "code_point/com.apptentive#RatingDialog#remind/last_invoked_at/total": {
+            "$before": -432000
           }
         }
       }

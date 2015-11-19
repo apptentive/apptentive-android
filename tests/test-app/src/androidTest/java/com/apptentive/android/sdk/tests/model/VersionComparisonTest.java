@@ -56,13 +56,15 @@ public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
 
 				Apptentive.Version leftVersion;
 				if (left instanceof String) {
-					leftVersion = new Apptentive.Version((String) left);
+					leftVersion = new Apptentive.Version();
+					leftVersion.setVersion((String) left);
 				} else {
 					leftVersion = new Apptentive.Version((Long) left);
 				}
 				Apptentive.Version rightVersion;
 				if (right instanceof String) {
-					rightVersion = new Apptentive.Version((String) right);
+					rightVersion = new Apptentive.Version();
+					rightVersion.setVersion((String) right);
 				} else {
 					rightVersion = new Apptentive.Version((Long) right);
 				}
