@@ -20,6 +20,9 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 23
+
+        versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0
+        versionName "2.1.0"
     }
 
     lintOptions {
