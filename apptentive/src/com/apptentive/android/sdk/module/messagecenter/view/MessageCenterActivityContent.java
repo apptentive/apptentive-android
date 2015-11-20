@@ -212,8 +212,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 					message.setBody(b.getString(COMPOSING_EDITTEXT_STATE));
 					message.setRead(true);
 					message.setCustomData(ApptentiveInternal.getAndClearCustomData());
-					ArrayList<ImageItem> files = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
-					message.setAssociatedFiles(viewActivity, files);
+					ArrayList<ImageItem> imagesToAttach = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
+					message.setAssociatedImages(viewActivity, imagesToAttach);
 					MessageManager.sendMessage(viewActivity.getApplicationContext(), message);
 					// Add new outgoing message with animation
 					addNewOutGoingMessageItem(message);
@@ -505,22 +505,22 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
 					Uri uri = data.getData();
-					String originalPath = Util.getImageRealFilePathFromUri(viewActivity, uri);
+					String originalPath = Util.getRealFilePathFromUri(viewActivity, uri);
 					if (originalPath != null) {
 						/* If able to retrieve file path and creation time from uri, cache file name will be generated
 						 * from the hash code of file path + creation time
 						 */
-						long creation_time = Util.getImageCreationTime(viewActivity, uri);
+						long creation_time = Util.getContentCreationTime(viewActivity, uri);
 						Uri fileUri = Uri.fromFile(new File(originalPath));
 						File cacheDir = Util.getDiskCacheDir(viewActivity);
 						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
-								Util.getImageMimeType(viewActivity, uri), creation_time)));
+								Util.getMimeTypeFromUri(viewActivity, uri), creation_time)));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
 						 * cache name will be generated from the md5 of the file content
 						 */
 						String cachedFileName = Util.generateCacheFileFullPathMd5(viewActivity, uri.toString());
-						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getImageMimeType(viewActivity, uri), 0)));
+						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(viewActivity, uri), 0)));
 					}
 
 					break;
@@ -1386,8 +1386,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			onAttachImage();
 			return;
 		}
-		String fileType = image.mimeType.substring(0, image.mimeType.indexOf("/"));
-		if (fileType.equalsIgnoreCase("Image")) {
+
+		if (Util.isMimeTypeImage(image.mimeType)) {
 			showAttachmentDialog(image);
 		} else {
 			openNonImageAttachment(image);

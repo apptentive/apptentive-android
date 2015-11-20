@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
@@ -346,9 +345,14 @@ public class ApptentiveClient {
 						// No local cache found
 						if (!cachedImageFile.exists()) {
 							boolean bCachedCreated = false;
-							// Creation time would only be set when we were able to retrieve original file information through uri
 							originalFilePath = storedFile.getSourceUriOrPath();
-							bCachedCreated = ImageUtil.createCachedImageFile(appContext, originalFilePath, cachedImagePathString);
+							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+								bCachedCreated = ImageUtil.createScaledDownImageCacheFile(appContext, originalFilePath, cachedImagePathString);
+							} else {
+								if (Util.createLocalStoredFile(appContext, originalFilePath, cachedImagePathString, null) != null) {
+									bCachedCreated = true;
+								}
+							}
 
 							if (!bCachedCreated) {
 								continue;

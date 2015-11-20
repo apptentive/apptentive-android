@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,11 +121,8 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 	}
 
-	/**
-	 * This method stores an image, and compresses it in the process so it doesn't fill up the disk. Therefore, do not use
-	 * it to store an exact copy of the file in question.
-	 */
-	public boolean setAssociatedFiles(Context context, List<ImageItem> attachedImages) {
+
+	public boolean setAssociatedImages(Context context, List<ImageItem> attachedImages) {
 
 		if (attachedImages == null || attachedImages.size() == 0) {
 			hasNoAttachments = true;
@@ -149,6 +147,19 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		return db.addCompoundMessageFiles(attachmentStoredFiles);
 	}
 
+	public boolean setAssociatedFiles(Context context, List<StoredFile> attachedFiles) {
+
+		if (attachedFiles == null || attachedFiles.size() == 0) {
+			hasNoAttachments = true;
+			return false;
+		} else {
+			hasNoAttachments = false;
+		}
+		setTextOnly(hasNoAttachments);
+
+		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		return db.addCompoundMessageFiles(attachedFiles);
+	}
 
 
 	public List<StoredFile> getAssociatedFiles(Context context) {
@@ -161,6 +172,12 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	public void deleteAssociatedFiles(Context context) {
 		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		List<StoredFile> associatedFiles = db.getAssociatedFiles(getNonce());
+		// Delete local cached files
+		for (StoredFile file : associatedFiles) {
+			File localFile = new File(file.getLocalFilePath());
+			localFile.delete();
+		}
 		db.deleteAssociatedFiles(getNonce());
 	}
 
