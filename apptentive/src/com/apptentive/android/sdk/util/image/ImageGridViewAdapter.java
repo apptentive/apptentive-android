@@ -102,8 +102,8 @@ public class ImageGridViewAdapter extends BaseAdapter {
 		if (TextUtils.isEmpty(item.mimeType)) {
 			return false;
 		}
-		String fileType = item.mimeType.substring(0, item.mimeType.indexOf("/"));
-		if (!fileType.equalsIgnoreCase("Image")) {
+
+		if (!Util.isMimeTypeImage(item.mimeType)) {
 			if (downloadItems.contains(item)) {
 				return true;
 			} else {
@@ -343,8 +343,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			}
 
-			String fileType = data.mimeType.substring(0, data.mimeType.indexOf("/"));
-			if (fileType.equalsIgnoreCase("Image")) {
+			if (Util.isMimeTypeImage(data.mimeType)) {
 				attachmentExtension.setVisibility(View.GONE);
 				bLoadThumbnail = true;
 				// show the progress bar while we load content...
