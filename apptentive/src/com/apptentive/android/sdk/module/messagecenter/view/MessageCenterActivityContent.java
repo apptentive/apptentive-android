@@ -56,6 +56,7 @@ import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.WeakReferenceHandler;
+import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
@@ -327,7 +328,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	protected void setup() {
 
-		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close);
+		ImageButton closeButton = (ImageButton) viewActivity.findViewById(R.id.close_mc);
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -486,6 +487,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		MessageManager.clearInternalOnMessagesUpdatedListeners();
 		MessageManager.setAfterSendMessageListener(null);
 		ApptentiveInternal.getAndClearCustomData();
+		ApptentiveAttachmentLoader.getInstance().clearMemoryCache();
 		return true;
 	}
 
@@ -503,19 +505,22 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
 					Uri uri = data.getData();
-					String originalPath = Util.getImagePath(viewActivity, uri);
+					String originalPath = Util.getImageRealFilePathFromUri(viewActivity, uri);
 					if (originalPath != null) {
 						/* If able to retrieve file path and creation time from uri, cache file name will be generated
 						 * from the hash code of file path + creation time
 						 */
 						long creation_time = Util.getImageCreationTime(viewActivity, uri);
-						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(viewActivity, originalPath, creation_time), creation_time)));
+						Uri fileUri = Uri.fromFile(new File(originalPath));
+						File cacheDir = Util.getDiskCacheDir(viewActivity);
+						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
+								Util.getImageMimeType(viewActivity, uri), creation_time)));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
 						 * cache name will be generated from the md5 of the file content
 						 */
 						String cachedFileName = Util.generateCacheFileFullPathMd5(viewActivity, uri.toString());
-						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, 0)));
+						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getImageMimeType(viewActivity, uri), 0)));
 					}
 
 					break;
@@ -755,6 +760,19 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	}
 
+	public void openNonImageAttachment(final ImageItem image) {
+		if (image == null) {
+			Log.d("No attachment argument.");
+			return;
+		}
+
+		try {
+			Util.openFileAttachment(viewActivity, image.originalPath, image.localCachePath, image.mimeType);
+		} catch (Exception e) {
+			Log.e("Error loading attachment", e);
+		}
+	}
+
 	public void showAttachmentDialog(final ImageItem image) {
 		if (image == null) {
 			Log.d("No attachment argument.");
@@ -839,6 +857,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				final String messageText = (content != null) ? content.toString().trim() : "";
 				barView.showConfirmation = !(messageText.isEmpty());
 			}
+
+			if (attachmentCount == viewActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+				AnimationUtil.fadeOutGone(barView.attachButton);
+			} else {
+				if (barView.attachButton.getVisibility() != View.VISIBLE) {
+					AnimationUtil.fadeIn(barView.attachButton, null);
+				}
+			}
+
 			if (barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(true);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.colorAccent,
@@ -1354,8 +1381,17 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onShowImagePreView(final int position, final ImageItem image) {
-		showAttachmentDialog(image);
+	public void onClickAttachment(final int position, final ImageItem image) {
+		if (TextUtils.isEmpty(image.originalPath) && TextUtils.isEmpty(image.mimeType)) {
+			onAttachImage();
+			return;
+		}
+		String fileType = image.mimeType.substring(0, image.mimeType.indexOf("/"));
+		if (fileType.equalsIgnoreCase("Image")) {
+			showAttachmentDialog(image);
+		} else {
+			openNonImageAttachment(image);
+		}
 	}
 
 	@Override

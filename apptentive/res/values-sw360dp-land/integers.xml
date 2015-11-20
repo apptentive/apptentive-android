@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <integer name="apptentive_image_grid_default_column_number">5</integer>
+    <integer name="apptentive_image_grid_default_column_number_incoming">4</integer>
+</resources>

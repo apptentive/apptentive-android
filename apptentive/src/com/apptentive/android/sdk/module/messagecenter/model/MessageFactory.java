@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
+import android.text.TextUtils;
+
 import com.apptentive.android.sdk.Log;
 
 import org.json.JSONException;
@@ -17,8 +19,14 @@ import org.json.JSONObject;
 public class MessageFactory {
 	public static ApptentiveMessage fromJson(String json) {
 		try {
+			ApptentiveMessage.Type type = ApptentiveMessage.Type.CompoundMessage;
 			JSONObject root = new JSONObject(json);
-			ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+			if (!root.isNull(ApptentiveMessage.KEY_TYPE)) {
+				String typeStr = root.getString(ApptentiveMessage.KEY_TYPE);
+				if (!TextUtils.isEmpty(typeStr)) {
+					type = ApptentiveMessage.Type.valueOf(typeStr);
+				}
+			}
 			switch (type) {
 				case CompoundMessage:
 					return new CompoundMessage(json);

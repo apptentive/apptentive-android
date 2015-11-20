@@ -71,7 +71,8 @@
 
 
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
-    <dimen name="apptentive_message_center_greeting_text_padding_left">22dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_left">26dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_bottom">40dp</dimen>
 
     <dimen name="apptentive_message_center_bottom_padding">60dp</dimen>
 
@@ -83,6 +84,6 @@
     <dimen name="apptentive_message_center_error_side_margin">24dp</dimen>
 
     <dimen name="apptentive_image_thumbnail_default_size">160dp</dimen>
-    <dimen name="apptentive_image_grid_space_size">4dp</dimen>
+    <dimen name="apptentive_image_grid_space_size">3dp</dimen>
 
 </resources>

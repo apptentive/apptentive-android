@@ -7,14 +7,17 @@ package com.apptentive.android.sdk.util.image;
  */
 
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 
@@ -22,15 +25,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.squareup.picasso.Picasso;
+import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.view.ApptentiveMaterialDeterminateProgressBar;
+
 
 public class ImageGridViewAdapter extends BaseAdapter {
 
 	private static final int TYPE_CAMERA = 0;
 	private static final int TYPE_IMAGE = 1;
 	public static final int GONE = 0x00000008;
-
-	private Context activityContext;
 
 	private LayoutInflater inflater;
 	private boolean showCamera = true;
@@ -41,11 +44,14 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	private List<ImageItem> images = new ArrayList<ImageItem>();
 	private List<ImageItem> selectedImages = new ArrayList<ImageItem>();
 
-	private int itemSize;
+	private List<ImageItem> downloadItems = new ArrayList<ImageItem>();
+
+	private int itemWidth;
+	private int itemHeight;
+
 	private GridView.LayoutParams itemLayoutParams;
 
 	public ImageGridViewAdapter(Context context, boolean showCamera) {
-		activityContext = context;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.showCamera = showCamera;
 		itemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
@@ -84,6 +90,34 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 	public void setIndicatorCallback(Callback localCallback) {
 		this.localCallback = localCallback;
+	}
+
+	/**
+	 * Click an image
+	 *
+	 * @param index
+	 */
+	public boolean clickOn(int index) {
+		ImageItem item = getItem(index);
+		if (TextUtils.isEmpty(item.mimeType)) {
+			return false;
+		}
+		String fileType = item.mimeType.substring(0, item.mimeType.indexOf("/"));
+		if (!fileType.equalsIgnoreCase("Image")) {
+			if (downloadItems.contains(item)) {
+				return true;
+			} else {
+				File localFile = new File(item.localCachePath);
+				if (localFile.exists()) {
+					return false;
+				} else {
+					downloadItems.add(item);
+					notifyDataSetChanged();
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -149,15 +183,16 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 *
 	 * @param columnWidth
 	 */
-	public void setItemSize(int columnWidth) {
+	public void setItemSize(int columnWidth, int columnHeight) {
 
-		if (itemSize == columnWidth) {
+		if (itemWidth == columnWidth) {
 			return;
 		}
 
-		itemSize = columnWidth;
+		itemWidth = columnWidth;
+		itemHeight = columnHeight;
 
-		itemLayoutParams = new GridView.LayoutParams(itemSize, itemSize);
+		itemLayoutParams = new GridView.LayoutParams(itemWidth, itemHeight);
 
 		notifyDataSetChanged();
 	}
@@ -208,12 +243,12 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			ViewHolder holder;
 			if (view == null) {
 				view = inflater.inflate(R.layout.apptentive_image_grid_view_item, viewGroup, false);
-				holder = new ViewHolder(view);
+				holder = new ViewHolder(view, i);
 			} else {
 				holder = (ViewHolder) view.getTag();
 				if (holder == null) {
 					view = inflater.inflate(R.layout.apptentive_image_grid_view_item, viewGroup, false);
-					holder = new ViewHolder(view);
+					holder = new ViewHolder(view, i);
 				}
 			}
 			if (holder != null) {
@@ -223,7 +258,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 		/** Fixed View Size */
 		GridView.LayoutParams lp = (GridView.LayoutParams) view.getLayoutParams();
-		if (lp.height != itemSize) {
+		if (lp.height != itemHeight) {
 			view.setLayoutParams(itemLayoutParams);
 		}
 
@@ -233,12 +268,24 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	class ViewHolder {
 		ImageView image;
 		ImageView indicator;
-		View mask;
+		TextView attachmentExtension;
+		// a circular indeterminate progress bar showing local file loading progress
+		ProgressBar progressBar;
+		// a horizontal determinate progress bar showing download progress
+		ApptentiveMaterialDeterminateProgressBar progressBarDownload;
+		int pos;
 
-		ViewHolder(View view) {
+		View mask;
+		boolean bLoadThumbnail;
+
+		ViewHolder(View view, int index) {
 			image = (ImageView) view.findViewById(R.id.image);
 			indicator = (ImageView) view.findViewById(R.id.indicator);
 			mask = view.findViewById(R.id.mask);
+			attachmentExtension = (TextView) view.findViewById(R.id.image_preview_title);
+			progressBar = (ProgressBar) view.findViewById(R.id.thumbnail_progress);
+			progressBarDownload = (ApptentiveMaterialDeterminateProgressBar) view.findViewById(R.id.thumbnail_progress_determinate);
+			pos = index;
 			view.setTag(this);
 		}
 
@@ -247,6 +294,21 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			if (data == null) {
 				return;
 			}
+
+			if (TextUtils.isEmpty(data.originalPath)) {
+				image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+				image.setImageResource(R.drawable.apptentive_ic_add);
+				indicator.setVisibility(View.GONE);
+				bLoadThumbnail = false;
+				progressBar.setVisibility(View.GONE);
+				attachmentExtension.setVisibility(View.GONE);
+				progressBarDownload.setVisibility(View.GONE);
+				return;
+			} else {
+				image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			}
+
+			int placeholderResId = R.drawable.apptentive_ic_image_default_item;
 
 			if (showImageIndicator) {
 				indicator.setVisibility(View.VISIBLE);
@@ -281,37 +343,144 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			}
 
-			if (itemSize > 0 && data.originalPath != null) {
-				if (!TextUtils.isEmpty(data.localCachePath)) {
-					File imageFile = new File(data.localCachePath);
-					if (imageFile.exists()) {
-						// display image using cached file
-						Picasso.with(activityContext)
-								.load(imageFile)
-								.placeholder(R.drawable.apptentive_ic_image_default_item)
-								.resize(itemSize, itemSize)
-								.centerInside()
-								.into(image);
-						return;
+			String fileType = data.mimeType.substring(0, data.mimeType.indexOf("/"));
+			if (fileType.equalsIgnoreCase("Image")) {
+				attachmentExtension.setVisibility(View.GONE);
+				bLoadThumbnail = true;
+				// show the progress bar while we load content...
+				progressBar.setVisibility(View.VISIBLE);
+			} else {
+				bLoadThumbnail = false;
+				progressBar.setVisibility(View.GONE);
+				attachmentExtension.setVisibility(View.VISIBLE);
+				attachmentExtension.setText(MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
+
+				if (downloadItems.contains(data)) {
+					placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
+					if (progressBarDownload != null) {
+						progressBarDownload.setVisibility(View.VISIBLE);
+					}
+				} else {
+					File localFile = new File(data.localCachePath);
+					if (localFile.exists()) {
+						placeholderResId = R.drawable.apptentive_generic_file_thumbnail;
+					} else {
+						placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;
+					}
+
+					if (progressBarDownload != null) {
+						progressBarDownload.setVisibility(View.GONE);
 					}
 				}
-				// display image using originalPath as uri
-				if (data.time == 0) {
-					Picasso.with(activityContext)
-							.load(Uri.parse(data.originalPath))
-							.placeholder(R.drawable.apptentive_ic_image_default_item)
-							.resize(itemSize, itemSize)
-							.centerInside()
-							.into(image);
-					return;
+			}
+
+			image.setImageDrawable(null);
+			image.setImageResource(placeholderResId);
+
+			if (itemWidth > 0 && data.originalPath != null) {
+				if (bLoadThumbnail) {
+					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, pos, image, itemWidth, itemHeight, true,
+							new ApptentiveAttachmentLoader.LoaderCallback() {
+								@Override
+								public void onLoaded(ImageView view, int i, Drawable d) {
+									if (progressBar != null) {
+										progressBar.setVisibility(View.GONE);
+									}
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
+									}
+									if (i == pos && image == view) {
+										image.setImageDrawable(d);
+									}
+								}
+
+								@Override
+								public void onLoadTerminated() {
+									if (progressBar != null) {
+										progressBar.setVisibility(View.GONE);
+									}
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
+									}
+								}
+
+								@Override
+								public void onDownloadStart() {
+									if (progressBar != null) {
+										progressBar.setVisibility(View.GONE);
+									}
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.VISIBLE);
+									}
+								}
+
+								@Override
+								public void onDownloadProgress(int progress) {
+									if (progressBarDownload != null) {
+										// progress is -1 when download fails
+										if (progress == 100 || progress == -1) {
+											progressBarDownload.setVisibility(View.GONE);
+											if (progressBar != null) {
+												if (progress == 100) {
+													progressBar.setVisibility(View.VISIBLE);
+												} else {
+													progressBar.setVisibility(View.GONE);
+												}
+											}
+										}
+										if (progress >= 0) {
+											progressBarDownload.setProgress(progress);
+										}
+									}
+								}
+							});
+				} else if (downloadItems.contains(data)){
+					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, 0, 0, false,
+							new ApptentiveAttachmentLoader.LoaderCallback() {
+								@Override
+								public void onLoaded(ImageView view, int pos, Drawable d) {
+									downloadItems.remove(data);
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
+									}
+									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
+									Util.openFileAttachment(view.getContext(), data.originalPath, data.localCachePath, data.mimeType);
+								}
+
+								@Override
+								public void onLoadTerminated() {
+									downloadItems.remove(data);
+									if (progressBar != null) {
+										progressBar.setVisibility(View.GONE);
+									}
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.GONE);
+									}
+								}
+
+								@Override
+								public void onDownloadStart() {
+									if (progressBarDownload != null) {
+										progressBarDownload.setVisibility(View.VISIBLE);
+									}
+								}
+
+								@Override
+								public void onDownloadProgress(int progress) {
+									if (progressBarDownload != null) {
+										if (progress == 100 || progress == -1) {
+											downloadItems.remove(data);
+											progressBarDownload.setVisibility(View.GONE);
+										}
+										if (progress >= 0) {
+											progressBarDownload.setProgress(progress);
+										}
+									}
+								}
+							});
+				} else {
+					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, true, null);
 				}
-				File imageFile = new File(data.originalPath);
-				Picasso.with(activityContext)
-						.load(imageFile)
-						.placeholder(R.drawable.apptentive_ic_image_default_item)
-						.resize(itemSize, itemSize)
-						.centerInside()
-						.into(image);
 			}
 		}
 	}

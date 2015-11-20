@@ -31,7 +31,6 @@
                      android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                      android:layout_alignParentLeft="true"
                      android:layout_centerVertical="true"
-                     android:layout_marginLeft="24dp"
                      android:contentDescription="Close"
                      android:visibility="gone"
                      android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
@@ -42,6 +41,6 @@
         android:id="@+id/preview_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-
+        android:layout_gravity="center"
+        style="@android:style/Widget.ProgressBar.Large"/>
 </FrameLayout>

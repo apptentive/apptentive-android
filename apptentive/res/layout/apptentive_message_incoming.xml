@@ -29,7 +29,8 @@
                 android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
                 android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
                 style="?attr/apptentiveAvatarViewMessageStyle"/>
-            <LinearLayout android:layout_width="match_parent"
+            <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveMessageCenterMessageContent"
                           android:orientation="vertical">
@@ -40,6 +41,7 @@
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
+                          android:autoLink="web|email|phone|map"
                           android:textColor="?attr/apptentive_material_primary_text"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView
                     android:id="@+id/grid"
@@ -50,7 +52,7 @@
                     android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
                     android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
                     android:clipToPadding="false"
-                    android:numColumns="@integer/apptentive_image_grid_default_column_number"/>
+                    android:numColumns="@integer/apptentive_image_grid_default_column_number_incoming"/>
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
