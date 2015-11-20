@@ -1,18 +1,6 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-configurations {
-    deployerJars
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    deployerJars "org.springframework.build:aws-maven:5.0.0.RELEASE"
-}
-
 def isReleaseBuild() {
     return hasProperty("MAVEN_RELEASE_BUILD") && MAVEN_RELEASE_BUILD == "true";
 }
@@ -26,14 +14,14 @@ def getReleaseRepositoryUrl() {
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : "s3://apptentive-downloads/maven/"
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : "http://54.183.158.246:8081/artifactory/apptentive-snapshots"
 }
 
 def getRepositoryUsername() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
     } else {
-        return hasProperty('AWS_ACCESS_KEY_ID') ? AWS_ACCESS_KEY_ID : ""
+        return "jenkins"
     }
 }
 
@@ -41,7 +29,7 @@ def getRepositoryPassword() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
     } else {
-        return hasProperty('AWS_SECRET_ACCESS_KEY') ? AWS_SECRET_ACCESS_KEY : ""
+        return "nFempzNsvhuxPuB[rrw7rLFLVKtWNysX&BZdCpfbMNXFu9rwdZ"
     }
 }
 
@@ -49,7 +37,6 @@ afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
-                configuration = configurations.deployerJars
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.groupId = GROUP
