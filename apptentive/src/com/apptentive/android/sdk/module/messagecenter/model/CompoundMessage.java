@@ -174,6 +174,10 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
 		List<StoredFile> associatedFiles = db.getAssociatedFiles(getNonce());
 		// Delete local cached files
+		if (associatedFiles == null || associatedFiles.size() == 0) {
+			return;
+		}
+
 		for (StoredFile file : associatedFiles) {
 			File localFile = new File(file.getLocalFilePath());
 			localFile.delete();
