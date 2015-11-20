@@ -90,6 +90,6 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="@dimen/apptentive_message_center_fab_height"
-        android:src="@drawable/apptentive_ic_composing"
+        android:src="@drawable/ic_edit"
         />
 </RelativeLayout>

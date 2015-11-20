@@ -264,7 +264,7 @@ public class ImageUtil {
 	 * @param cachedFileName file name of the cache to be created (with full path)
 	 * @return true if cache file is created successfully
 	 */
-	public static boolean createCachedImageFile(Context context, String sourcePath, String cachedFileName) {
+	public static boolean createScaledDownImageCacheFile(Context context, String sourcePath, String cachedFileName) {
 		File localFile = new File(cachedFileName);
 
 		// Retrieve image orientation

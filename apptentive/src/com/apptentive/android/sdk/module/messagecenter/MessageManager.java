@@ -266,11 +266,11 @@ public class MessageManager {
 				((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
 			} else if (apptentiveMessage instanceof CompoundMessage) {
 
-					apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
-					getMessageStore(context).updateMessage(apptentiveMessage);
-					if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-						afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
-					}
+				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
+				getMessageStore(context).updateMessage(apptentiveMessage);
+				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
+					afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+				}
 
 			}
 			return;
@@ -284,9 +284,7 @@ public class MessageManager {
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
-				/*if (apptentiveMessage instanceof OutgoingFileMessage) {
-					((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
-				}*/
+				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles(context);
 				getMessageStore(context).deleteMessage(apptentiveMessage.getNonce());
 				return;
 			}

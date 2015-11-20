@@ -14,8 +14,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -26,6 +29,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -38,7 +42,8 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+
 import java.io.InputStream;
 import java.util.*;
 
@@ -656,10 +661,12 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentText(Context context, String text) {
 		try {
-			OutgoingTextMessage message = new OutgoingTextMessage();
+			CompoundMessage message = new CompoundMessage();
 			message.setBody(text);
+			message.setRead(true);
 			message.setHidden(true);
-			MessageManager.sendMessage(context, message);
+			message.setAssociatedFiles(context, null);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
 		} catch (Exception e) {
 			Log.w("Error sending attachment text.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -676,15 +683,42 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, String uri) {
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
+			if (TextUtils.isEmpty(uri)) {
+				return;
+			}
+
+			CompoundMessage message = new CompoundMessage();
+			// No body, just attachment
+			message.setBody(null);
+			message.setRead(true);
 			message.setHidden(true);
 
-			boolean successful = message.createStoredFile(context, uri);
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
+			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+      // make a local copy in the cache dir, and file name is "apptentive-hidden-file + nonce"
+			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
+
+			String mimeType = Util.getMimeTypeFromUri(context, Uri.parse(uri));
+			MimeTypeMap mime = MimeTypeMap.getSingleton();
+			String extension = mime.getExtensionFromMimeType(mimeType);
+
+			// If we can't get the mime type from the uri, try getting it from the extension.
+			if (extension == null) {
+				extension = MimeTypeMap.getFileExtensionFromUrl(uri);
 			}
+			if (mimeType == null && extension != null) {
+				mimeType = mime.getMimeTypeFromExtension(extension);
+			}
+			StoredFile storedFile = Util.createLocalStoredFile(context, uri, localFilePath, mimeType);
+			if (storedFile == null) {
+				return;
+			}
+
+			storedFile.setId(message.getNonce());
+			attachmentStoredFiles.add(storedFile);
+
+			message.setAssociatedFiles(context, attachmentStoredFiles);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
+
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -701,19 +735,12 @@ public class Apptentive {
 	 * @param mimeType The mime type of the file.
 	 */
 	public static void sendAttachmentFile(Context context, byte[] content, String mimeType) {
+		ByteArrayInputStream is = null;
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
-			message.setHidden(true);
-
-			boolean successful = message.createStoredFile(context, content, mimeType);
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
-			}
-		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
-			MetricModule.sendError(context, e, null, null);
+			is = new ByteArrayInputStream(content);
+			sendAttachmentFile(context, is, mimeType);
+		} finally {
+			Util.ensureClosed(is);
 		}
 	}
 
@@ -728,20 +755,30 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, InputStream is, String mimeType) {
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
+			if (is == null) {
+				return;
+			}
+
+			CompoundMessage message = new CompoundMessage();
+			// No body, just attachment
+			message.setBody(null);
+			message.setRead(true);
 			message.setHidden(true);
 
-			boolean successful = false;
-			try {
-				successful = message.createStoredFile(context, is, mimeType);
-			} catch (IOException e) {
-				Log.e("Error creating local copy of file attachment.");
+			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
+      // When created from InputStream, there is no source file uri or path, thus just use the cache file path
+			StoredFile storedFile = Util.createLocalStoredFile(is, localFilePath, localFilePath, mimeType);
+			if (storedFile == null) {
+				return;
 			}
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
-			}
+
+			storedFile.setId(message.getNonce());
+			attachmentStoredFiles.add(storedFile);
+
+			message.setAssociatedFiles(context, attachmentStoredFiles);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
+
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);

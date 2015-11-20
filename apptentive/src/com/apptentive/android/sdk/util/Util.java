@@ -27,13 +27,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.StoredFile;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -540,11 +543,11 @@ public class Util {
 		}
 	}
 
-	public static String getImageMimeType(Context context, Uri contentUri) {
+	public static String getMimeTypeFromUri(Context context, Uri contentUri) {
 		return context.getContentResolver().getType(contentUri);
 	}
 
-	public static String getImageRealFilePathFromUri(Context context, Uri contentUri) {
+	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
 
 		String path = null;
 		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
@@ -567,7 +570,7 @@ public class Util {
 		return path;
 	}
 
-	public static long getImageCreationTime(Context context, Uri contentUri) {
+	public static long getContentCreationTime(Context context, Uri contentUri) {
 		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
 			return 0;
 		}
@@ -617,7 +620,7 @@ public class Util {
 	}
 
 	/*
-	 * Generate cached file name use md5 from image originalPath and image created time
+	 * Generate cached file name use md5 from file originalPath and created time
 	 */
 	public static String generateCacheFileFullPath(Uri fileOriginalUri, File cacheDir, long createdTime) {
 		String source = fileOriginalUri.toString() + Long.toString(createdTime);
@@ -627,7 +630,7 @@ public class Util {
 	}
 
 	/*
-	 * Generate cached file name use {@linkplain String#hashCode() hashcode} from image originalPath and image created time
+	 * Generate cached file name use content md5
 	 */
 	public static String generateCacheFileFullPathMd5(Context context, String imageUri) {
 		String fileName = calculateMD5(context, Uri.parse(imageUri));
@@ -651,6 +654,13 @@ public class Util {
 			appCacheDir = context.getCacheDir();
 		}
 		return appCacheDir;
+	}
+
+	public static String generateUniqueCacheFilePathFromNonce(Context context, String nonce) {
+		String fileName = "apptentive-hidden-file-" + nonce;
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
 	}
 
 	public static boolean hasPermission(Context context, final String permission) {
@@ -714,7 +724,7 @@ public class Util {
 			intent.setAction(android.content.Intent.ACTION_VIEW);
 
       /* Attachments were downloaded into app private data dir. In order for external app to open
-       * the attchments, the file need to be copied to a download folder that is accessible to public
+			 * the attchments, the file need to be copied to a download folder that is accessible to public
       */
 			String extStorageDirectory = Environment.getExternalStorageDirectory()
 					.toString();
@@ -751,7 +761,7 @@ public class Util {
 	 * This function copies file from one location to another
 	 *
 	 * @param from the full path to the source file
-	 * @param to the full path to the destination file
+	 * @param to   the full path to the destination file
 	 * @return total bytes copied. 0 indicates
 	 */
 	public static int copyFile(String from, String to) {
@@ -778,5 +788,83 @@ public class Util {
 			Util.ensureClosed(fs);
 		}
 	}
+
+	public static boolean isMimeTypeImage(String mimeType) {
+		if (TextUtils.isEmpty(mimeType)) {
+			return false;
+		}
+
+		String fileType = mimeType.substring(0, mimeType.indexOf("/"));
+		return (fileType.equalsIgnoreCase("Image"));
+	}
+
+	/**
+	 * This method creates a cached file exactly copying from the input stream.
+	 *
+	 * @param context       context for resolving uri
+	 * @param sourceUrl     the source file path or uri string
+	 * @param localFilePath the cache file path string
+	 * @param mimeType      the mimeType of the source inputstream
+	 * @return null if failed, otherwise a StoredFile object
+	 */
+	public static StoredFile createLocalStoredFile(Context context, String sourceUrl, String localFilePath, String mimeType) {
+		InputStream is = null;
+		try {
+			if (URLUtil.isContentUrl(sourceUrl) && context != null) {
+				Uri uri = Uri.parse(sourceUrl);
+				is = context.getContentResolver().openInputStream(uri);
+			} else {
+				File file = new File(sourceUrl);
+				is = new FileInputStream(file);
+			}
+			return createLocalStoredFile(is, sourceUrl, localFilePath, mimeType);
+
+		} catch (FileNotFoundException e) {
+			return null;
+		} finally {
+			ensureClosed(is);
+		}
+	}
+
+	/**
+	 * This method creates a cached file exactly copying from the input stream.
+	 *
+	 * @param is            the source input stream
+	 * @param sourceUrl     the source file path or uri string
+	 * @param localFilePath the cache file path string
+	 * @param mimeType      the mimeType of the source inputstream
+	 * @return null if failed, otherwise a StoredFile object
+	 */
+	public static StoredFile createLocalStoredFile(InputStream is, String sourceUrl, String localFilePath, String mimeType) {
+
+		if (is == null) {
+			return null;
+		}
+		// Copy the file contents over.
+		CountingOutputStream os = null;
+		try {
+			File localFile = new File(localFilePath);
+			os = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
+			byte[] buf = new byte[2048];
+			int count;
+			while ((count = is.read(buf, 0, 2048)) != -1) {
+				os.write(buf, 0, count);
+			}
+			Log.d("File saved, size = " + (os.getBytesWritten() / 1024) + "k");
+		} catch (IOException e) {
+			Log.e("Error creating local copy of file attachment.");
+			return null;
+		} finally {
+			Util.ensureClosed(os);
+		}
+
+		// Create a StoredFile database entry for this locally saved file.
+		StoredFile storedFile = new StoredFile();
+		storedFile.setSourceUriOrPath(sourceUrl);
+		storedFile.setLocalFilePath(localFilePath);
+		storedFile.setMimeType(mimeType);
+		return storedFile;
+	}
+
 }
 
