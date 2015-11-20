@@ -708,6 +708,9 @@ public class Apptentive {
 			if (mimeType == null && extension != null) {
 				mimeType = mime.getMimeTypeFromExtension(extension);
 			}
+			if (!TextUtils.isEmpty(extension)) {
+				localFilePath += "." + extension;
+			}
 			StoredFile storedFile = Util.createLocalStoredFile(context, uri, localFilePath, mimeType);
 			if (storedFile == null) {
 				return;
@@ -767,12 +770,16 @@ public class Apptentive {
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
-      // When created from InputStream, there is no source file uri or path, thus just use the cache file path
+
+			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
+			if (!TextUtils.isEmpty(extension)) {
+				localFilePath += "." + extension;
+			}
+			// When created from InputStream, there is no source file uri or path, thus just use the cache file path
 			StoredFile storedFile = Util.createLocalStoredFile(is, localFilePath, localFilePath, mimeType);
 			if (storedFile == null) {
 				return;
 			}
-
 			storedFile.setId(message.getNonce());
 			attachmentStoredFiles.add(storedFile);
 
