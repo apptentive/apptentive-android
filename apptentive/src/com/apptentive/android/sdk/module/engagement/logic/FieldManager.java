@@ -63,8 +63,6 @@ public class FieldManager {
 			}
 			case current_time:
 				return new Apptentive.DateTime(Util.currentTimeSeconds());
-			case local_time:
-				return new Apptentive.DateTime(Util.currentTimeSeconds() + Util.getUtcOffset());
 			case is_update: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
@@ -191,7 +189,6 @@ public class FieldManager {
 	private enum QueryPart {
 		application,
 		current_time,
-		local_time,
 		is_update,
 		time_at_install,
 		code_point,
