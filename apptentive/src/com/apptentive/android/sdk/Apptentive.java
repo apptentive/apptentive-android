@@ -462,12 +462,11 @@ public class Apptentive {
 	}
 
 	/**
-	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
+	 * <p>Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
 	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
 	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
-	 * notification did not come from Apptentive, this method has no effect.
-	 * <p/>
-	 * Use this method when using Parse and Amazon SNS as push providers.
+	 * notification did not come from Apptentive, this method has no effect.</p>
+	 * <p>Use this method when using Parse and Amazon SNS as push providers.</p>
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
@@ -1207,32 +1206,29 @@ public class Apptentive {
 	}
 
 	/**
-	 * This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
+	 * <p>This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
 	 * with a string or a long, and there is no limit to the number of parts your semantic version can
 	 * contain. The class allows comparison based on semantic version rules.
-	 * <p></p>
-	 * Valid versions (In sorted order):
+	 * Valid versions (In sorted order):</p>
 	 * <ul>
-	 *   <li>0</li>
-	 *   <li>0.1</li>
-	 *   <li>1.0.0</li>
-	 *   <li>1.0.9</li>
-	 *   <li>1.0.10</li>
-	 *   <li>1.2.3</li>
-	 *   <li>5</li>
+	 * <li>0</li>
+	 * <li>0.1</li>
+	 * <li>1.0.0</li>
+	 * <li>1.0.9</li>
+	 * <li>1.0.10</li>
+	 * <li>1.2.3</li>
+	 * <li>5</li>
 	 * </ul>
-	 *
 	 * Invalid versions:
 	 * <ul>
-	 *   <li>zero</li>
-	 *   <li>0.1+2015.10.21</li>
-	 *   <li>1.0.0a</li>
-	 *   <li>1.0-rc2</li>
-	 *   <li>1.0.10-SNAPSHOT</li>
-	 *   <li>5a</li>
-	 *   <li>FF01</li>
+	 * <li>zero</li>
+	 * <li>0.1+2015.10.21</li>
+	 * <li>1.0.0a</li>
+	 * <li>1.0-rc2</li>
+	 * <li>1.0.10-SNAPSHOT</li>
+	 * <li>5a</li>
+	 * <li>FF01</li>
 	 * </ul>
-	 *
 	 */
 	public static class Version extends JSONObject implements Comparable<Version> {
 		public static final String KEY_TYPE = "_type";
