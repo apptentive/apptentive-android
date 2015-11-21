@@ -272,16 +272,16 @@ public class ApptentiveClient {
 		if (con != null) {
 			BufferedReader in = null;
 			try {
-				StringBuilder error = new StringBuilder();
 				InputStream errorStream = con.getErrorStream();
 				if (errorStream != null) {
+					StringBuilder error = new StringBuilder();
 					in = new BufferedReader(new InputStreamReader(errorStream));
 					String errStr;
 					while ((errStr = in.readLine()) != null) {
 						error.append(errStr);
 					}
+					return error.toString();
 				}
-				return error.toString();
 			} finally {
 				Util.ensureClosed(in);
 			}

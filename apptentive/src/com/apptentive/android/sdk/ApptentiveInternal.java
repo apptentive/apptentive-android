@@ -197,6 +197,7 @@ public class ApptentiveInternal {
 		if (key == null || key.trim().length() == 0) {
 			return;
 		}
+		key = key.trim();
 		CustomData customData = DeviceManager.loadCustomDeviceData(context);
 		if (customData != null) {
 			try {

@@ -28,10 +28,10 @@ public class LogicalClause implements Clause {
 	protected List<Clause> children;
 
 	protected LogicalClause(String key, Object value) throws JSONException {
-		operatorName = key;
+		operatorName = key.trim();
 		operator = LogicalOperator.parse(operatorName);
 		children = new ArrayList<Clause>();
-		Log.v("  + LogicalClause of type \"%s\"", key);
+		Log.v("  + LogicalClause of type \"%s\"", operatorName);
 		if (value instanceof JSONArray) {
 			JSONArray jsonArray = (JSONArray) value;
 			for (int i = 0; i < jsonArray.length(); i++) {

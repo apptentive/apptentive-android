@@ -18,6 +18,7 @@ public enum LogicalOperator {
 
 	public static LogicalOperator parse(String name) {
 		if (name != null) {
+			name = name.trim();
 			try {
 				return LogicalOperator.valueOf(name);
 			} catch (IllegalArgumentException e) {
