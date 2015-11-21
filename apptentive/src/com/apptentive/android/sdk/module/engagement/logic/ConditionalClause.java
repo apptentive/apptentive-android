@@ -24,14 +24,14 @@ public class ConditionalClause implements Clause {
 
 	private static final String KEY_COMPLEX_TYPE = "_type";
 
-	String query;
+	String fieldName;
 	List<ConditionalTest> conditionalTests;
 
-	public ConditionalClause(String query, Object inputValue) {
-		this.query = query;
+	public ConditionalClause(String field, Object inputValue) {
+		this.fieldName = field.trim();
 		conditionalTests = new ArrayList<ConditionalTest>();
 
-		Log.v("    + ConditionalClause for query: \"%s\"", query);
+		Log.v("    + ConditionalClause for query: \"%s\"", fieldName);
 		if (inputValue instanceof JSONObject && !isComplexType((JSONObject) inputValue)) {
 			conditionalTests = getConditions((JSONObject) inputValue);
 		} else {
@@ -65,11 +65,11 @@ public class ConditionalClause implements Clause {
 	 */
 	@Override
 	public boolean evaluate(Context context) {
-		Log.v("    - %s", query);
-		Comparable field = FieldManager.getValue(context, query);
+		Log.v("    - %s", fieldName);
+		Comparable fieldValue = FieldManager.getValue(context, fieldName);
 		for (ConditionalTest test : conditionalTests) {
-			Log.v("      - %s %s %s?", Util.classToString(field), test.operator, Util.classToString(test.parameter));
-			if (!test.operator.apply(field, test.parameter)) {
+			Log.v("      - %s %s %s?", Util.classToString(fieldValue), test.operator, Util.classToString(test.parameter));
+			if (!test.operator.apply(fieldValue, test.parameter)) {
 				return false;
 			}
 		}

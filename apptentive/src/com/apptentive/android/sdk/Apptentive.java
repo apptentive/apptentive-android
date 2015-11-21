@@ -201,6 +201,9 @@ public class Apptentive {
 	 * @param value   The value of the data.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
+		if (value != null) {
+			value = value.trim();
+		}
 		ApptentiveInternal.addCustomDeviceData(context, key, value);
 	}
 
@@ -257,6 +260,21 @@ public class Apptentive {
 		}
 	}
 
+	/**
+	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   The value of the data.
+	 */
+	public static void addCustomPersonData(Context context, String key, String value) {
+		if (value != null) {
+			value = value.trim();
+		}
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
 	public static void addCustomPersonData(Context context, String key, Number value) {
 		ApptentiveInternal.addCustomPersonData(context, key, value);
 	}
@@ -271,29 +289,6 @@ public class Apptentive {
 
 	public static void addCustomPersonData(Context context, String key, DateTime dateTime) {
 		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
-	}
-
-	/**
-	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
-	 * idempotent.
-	 *
-	 * @param context The context from which this method is called.
-	 * @param key     The key to store the data under.
-	 * @param value   The value of the data.
-	 */
-	public static void addCustomPersonData(Context context, String key, String value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		CustomData customData = PersonManager.loadCustomPersonData(context);
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				PersonManager.storeCustomPersonData(context, customData);
-			} catch (JSONException e) {
-				Log.w("Unable to add custom person data.", e);
-			}
-		}
 	}
 
 	/**

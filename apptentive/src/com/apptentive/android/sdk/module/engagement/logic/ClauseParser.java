@@ -38,6 +38,7 @@ public class ClauseParser {
 			// The Root object, and objects inside arrays should be treated as $and.
 			key = LogicalOperator.$and.name();
 		}
+		key = key.trim();
 		LogicalOperator operator = LogicalOperator.parse(key);
 		switch (operator) {
 			case $or:
@@ -74,6 +75,8 @@ public class ClauseParser {
 			return new BigDecimal((Float) value);
 		} else if (value instanceof Short) {
 			return new BigDecimal((Short) value);
+		} else if (value instanceof String) {
+			return ((String) value).trim();
 		} else if (value instanceof Apptentive.Version) {
 			return value;
 		} else if (value instanceof Apptentive.DateTime) {

@@ -37,6 +37,7 @@ public class FieldManager {
 	}
 
 	public static Object doGetValue(Context context, String query) {
+		query = query.trim();
 		String[] tokens = query.split("/");
 		QueryPart topLevelQuery = QueryPart.parse(tokens[0]);
 
@@ -125,7 +126,7 @@ public class FieldManager {
 				}
 				switch (subQuery) {
 					case custom_data:
-						String customDataKey = tokens[2];
+						String customDataKey = tokens[2].trim();
 						CustomData customData = person.getCustomData();
 						if (customData != null) {
 							return customData.opt(customDataKey);
@@ -148,7 +149,7 @@ public class FieldManager {
 				}
 				switch (subQuery) {
 					case custom_data:
-						String customDataKey = tokens[2];
+						String customDataKey = tokens[2].trim();
 						CustomData customData = device.getCustomData();
 						if (customData != null) {
 							return customData.opt(customDataKey);
@@ -234,6 +235,7 @@ public class FieldManager {
 
 		public static QueryPart parse(String name) {
 			if (name != null) {
+				name = name.trim();
 				try {
 					return QueryPart.valueOf(name);
 				} catch (IllegalArgumentException e) {
