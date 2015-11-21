@@ -269,22 +269,24 @@ public class ApptentiveClient {
 	 * @throws IOException
 	 */
 	public static String getErrorInResponse(HttpURLConnection con) throws IOException {
-		assert (con != null);
-		BufferedReader in = null;
-		StringBuffer errStream = null;
-		try {
-			errStream = new StringBuffer();
-			InputStream errorStream = con.getErrorStream();
-			assert (errorStream != null);
-			in = new BufferedReader(new InputStreamReader(errorStream));
-			String errStr;
-			while ((errStr = in.readLine()) != null) {
-				errStream.append(errStr);
+		if (con != null) {
+			BufferedReader in = null;
+			try {
+				StringBuilder error = new StringBuilder();
+				InputStream errorStream = con.getErrorStream();
+				if (errorStream != null) {
+					in = new BufferedReader(new InputStreamReader(errorStream));
+					String errStr;
+					while ((errStr = in.readLine()) != null) {
+						error.append(errStr);
+					}
+				}
+				return error.toString();
+			} finally {
+				Util.ensureClosed(in);
 			}
-		} finally {
-			Util.ensureClosed(in);
 		}
-		return (errStream != null) ? (errStream.toString()) : null;
+		return null;
 	}
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
@@ -399,8 +401,6 @@ public class ApptentiveClient {
 			ret.setCode(connection.getResponseCode());
 			ret.setReason(connection.getResponseMessage());
 
-
-			// TODO: These streams may not be ready to read now. Put this in a new thread.
 			// Read the normal response.
 			InputStream nis = null;
 			ByteArrayOutputStream nbaos = null;
