@@ -138,7 +138,7 @@ public class Apptentive {
 	 * or by the user through Message Center.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @return
+	 * @return The person's email if set, else null.
 	 */
 	public static String getPersonEmail(Context context) {
 		return PersonManager.loadPersonEmail(context);
@@ -163,7 +163,7 @@ public class Apptentive {
 	 * or by the user through Message Center.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @return
+	 * @return The person's name if set, else null.
 	 */
 	public static String getPersonName(Context context) {
 		return PersonManager.loadPersonName(context);
@@ -374,6 +374,7 @@ public class Apptentive {
 	 * <a href="http://www.apptentive.com/docs/android/integration/#push-notifications">integration guide</a> for
 	 * instructions.
 	 *
+	 * @param context      The Context from which this method is called.
 	 * @param pushProvider One of the following:
 	 *                     <ul>
 	 *                     <li>{@link #PUSH_PROVIDER_APPTENTIVE}</li>
@@ -429,10 +430,12 @@ public class Apptentive {
 
 	private static CustomData getIntegrationConfigurationWithoutPushProviders(Context context) {
 		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
-		integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
-		integrationConfig.remove(INTEGRATION_PARSE);
-		integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
-		integrationConfig.remove(INTEGRATION_AWS_SNS);
+		if (integrationConfig != null) {
+			integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
+			integrationConfig.remove(INTEGRATION_PARSE);
+			integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
+			integrationConfig.remove(INTEGRATION_AWS_SNS);
+		}
 		return integrationConfig;
 	}
 
@@ -470,6 +473,7 @@ public class Apptentive {
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
+	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
@@ -488,7 +492,7 @@ public class Apptentive {
 	 *
 	 * @param context The context from which this method was called.
 	 * @param data    A Bundle containing the GCM data object from the push notification.
-	 * @return true if data came from Apptentive.
+	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Bundle data) {
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
@@ -843,9 +847,10 @@ public class Apptentive {
 	}
 
 	/**
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param context The Context from which this method is called.
+	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
+	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 * @deprecated Use {@link #canShowInteraction(Context, String)}() instead. The behavior is identical. Only the name has changed.
 	 */
@@ -859,9 +864,10 @@ public class Apptentive {
 	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
 	 * displayed before you create a UI Button, etc.
 	 *
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param context The Context from which this method is called.
+	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
+	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 */
 	public static synchronized boolean canShowInteraction(Context context, String event) {
