@@ -176,7 +176,8 @@ public class ApptentiveAttachmentLoader {
 		public void load() {
 			ImageView imageView = mImageViewRef.get();
 			if (imageView != null) {
-				Log.d("ApptentiveAttachmentLoader load requested:" + uri);
+				Log.d("ApptentiveAttachmentLoader load requested:" + uri );
+				Log.d("ApptentiveAttachmentLoader load requested on:" + imageView.toString() );
 				// find the old download, cancel it and set this download as the current
 				// download for the imageview
 				LoaderRequest oldLoaderRequest = (LoaderRequest) imageView.getTag(DRAWABLE_DOWNLOAD_TAG);
@@ -185,6 +186,8 @@ public class ApptentiveAttachmentLoader {
 				}
 
 				if (TextUtils.isEmpty(uri)) {
+					loadDrawable(null);
+					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 					return;
 				}
 
@@ -275,8 +278,20 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private void cancel() {
-			Log.d("cancel requested for: " + uri);
+			Log.d("ApptentiveAttachmentLoader cancel requested for: " + uri);
 			mIsCancelled = true;
+
+			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
+			if (duplicates != null) {
+				duplicates.remove(this);
+				if (duplicates.size() > 0) {
+					duplicateDownloads.put(uri, duplicates);
+				} else {
+					duplicateDownloads.remove(uri);
+				}
+			}
+
+
 			if (queuedDownLoaderRequests.contains(this)) {
 				queuedDownLoaderRequests.remove(this);
 			}
@@ -364,7 +379,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private void loadDrawable(Drawable d, boolean animate) {
-			Log.d("ApptentiveAttachmentLoader loadDrawable: " + d);
+			Log.d("ApptentiveAttachmentLoader loadDrawable: ");
 			ImageView imageView = getImageView();
 			if (imageView != null) {
 				if (loadingTaskCallback != null) {
@@ -384,6 +399,7 @@ public class ApptentiveAttachmentLoader {
 		// called when the download is in progress
 		@Override
 		public void onProgress(int progress) {
+			Log.d("ApptentiveAttachmentLoader onProgress: " + progress);
 			if (loadingTaskCallback != null) {
 				loadingTaskCallback.onDownloadProgress(progress);
 			}
@@ -400,6 +416,7 @@ public class ApptentiveAttachmentLoader {
 			ImageView imageView = mImageViewRef.get();
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
 				if (!bLoadImage) {
+					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 					if (loadingTaskCallback != null) {
 						loadingTaskCallback.onLoaded(imageView, pos, null);
 					}
@@ -416,6 +433,7 @@ public class ApptentiveAttachmentLoader {
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
 						if (!dup.isLoadingImage()) {
+							dup.getImageView().setTag(DRAWABLE_DOWNLOAD_TAG, null);
 							if (dup.getLoaderCallback() != null) {
 								dup.getLoaderCallback().onLoaded(dup.getImageView(), dup.pos, null);
 							}
@@ -452,17 +470,27 @@ public class ApptentiveAttachmentLoader {
 
 			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
 			if (duplicates != null) {
+				duplicates.remove(this);
+				if (duplicates.size() > 0) {
+					duplicateDownloads.put(uri, duplicates);
+				} else {
+					duplicateDownloads.remove(uri);
+				}
 				for (LoaderRequest dup : duplicates) {
 					Log.d("ApptentiveAttachmentLoader onDownloadError (dup): " + dup.uri);
 					// load the image.
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
-						if (dup.getLoaderCallback() != null) {
-							dup.getLoaderCallback().onLoadTerminated();
+						duplicates.remove(0);
+						if (duplicates.size() > 0) {
+							duplicateDownloads.put(uri, duplicates);
+						} else {
+							duplicateDownloads.remove(uri);
 						}
+						dup.doDownload();
+						return;
 					}
 				}
-				duplicateDownloads.remove(uri);
 			}
 
 			if (!queuedDownLoaderRequests.isEmpty()) {
@@ -493,17 +521,26 @@ public class ApptentiveAttachmentLoader {
 
 			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
 			if (duplicates != null) {
+				duplicates.remove(this);
+				if (duplicates.size() > 0) {
+					duplicateDownloads.put(uri, duplicates);
+				} else {
+					duplicateDownloads.remove(uri);
+				}
 				for (LoaderRequest dup : duplicates) {
-					Log.d("ApptentiveAttachmentLoader onDownloadCancel (dup): " + dup.uri);
-					// load the image.
+					// start next download task in the duplicate queue
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
-						if (dup.getLoaderCallback() != null) {
-							dup.getLoaderCallback().onLoadTerminated();
+						duplicates.remove(0);
+						if (duplicates.size() > 0) {
+							duplicateDownloads.put(uri, duplicates);
+						} else {
+							duplicateDownloads.remove(uri);
 						}
+						dup.doDownload();
+						return;
 					}
 				}
-				duplicateDownloads.remove(uri);
 			}
 
 			if (!queuedDownLoaderRequests.isEmpty()) {
