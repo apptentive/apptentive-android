@@ -410,6 +410,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 									if (progressBarDownload != null) {
 										progressBarDownload.setVisibility(View.VISIBLE);
+										progressBarDownload.setProgress(0);
 									}
 								}
 
@@ -478,7 +479,26 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								}
 							});
 				} else {
-					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, true, null);
+					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, true, new ApptentiveAttachmentLoader.LoaderCallback() {
+						@Override
+						public void onLoaded(ImageView view, int pos, Drawable d) {
+							if (progressBarDownload != null) {
+								progressBarDownload.setVisibility(View.GONE);
+							}
+						}
+
+						@Override
+						public void onLoadTerminated() {
+						}
+
+						@Override
+						public void onDownloadStart() {
+						}
+
+						@Override
+						public void onDownloadProgress(int progress) {
+						}
+					});
 				}
 			}
 		}

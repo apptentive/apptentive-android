@@ -84,7 +84,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 
 	@Override
 	protected void onCancelled(ApptentiveHttpResponse response) {
-		Log.d("ApptentiveDownloaderTask onCancelled(Boolean):  " + response.getCode());
+		Log.d("ApptentiveDownloaderTask onCancelled(Boolean):  " + ((response != null) ? response.getCode() : ""));
 		download = false;
 		listener.onDownloadCancel();
 	}
