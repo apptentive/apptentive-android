@@ -463,6 +463,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									if (progressBarDownload != null) {
 										progressBarDownload.setVisibility(View.VISIBLE);
 									}
+									progressBarDownload.setProgress(0);
 								}
 
 								@Override
