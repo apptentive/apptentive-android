@@ -720,33 +720,46 @@ public class Util {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
 				|| !Environment.isExternalStorageRemovable())
 				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
-			final Intent intent = new Intent();
-			intent.setAction(android.content.Intent.ACTION_VIEW);
+
+			File selectedFile = new File(selectedFilePath);
+			String selectedFileName = null;
+			if (selectedFile.exists()) {
+				selectedFileName = selectedFile.getName();
+				final Intent intent = new Intent();
+				intent.setAction(android.content.Intent.ACTION_VIEW);
 
       /* Attachments were downloaded into app private data dir. In order for external app to open
-			 * the attchments, the file need to be copied to a download folder that is accessible to public
+			 * the attachments, the file need to be copied to a download folder that is accessible to public
+			 * THe folder will be sdcard/Downloads/apptentive-received/<file name>
       */
-			String extStorageDirectory = Environment.getExternalStorageDirectory()
-					.toString();
-			File folder = new File(extStorageDirectory, "Downloads");
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-			File tmpfile = new File(folder, "apptentive-tmp");
-			String tmpFilePath = tmpfile.getPath();
-			if (tmpfile.exists()) {
-				tmpfile.delete();
-			}
-			if (copyFile(selectedFilePath, tmpFilePath) == 0) {
-				return false;
-			}
+				String extStorageDirectory = Environment.getExternalStorageDirectory()
+						.toString();
+				File folder = new File(extStorageDirectory, "Downloads" + File.separator + "apptentive-received");
+				if (!folder.exists()) {
+					folder.mkdir();
+				}
 
-			intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
-			try {
-				context.startActivity(intent);
-				return true;
-			} catch (ActivityNotFoundException e) {
-				Log.e("Activity not found to open attachment: ", e);
+				File tmpfile = new File(folder, selectedFileName);
+				String tmpFilePath = tmpfile.getPath();
+				// If destination file already exists, overwrite it; otherwise, delete all existing files in the same folder first.
+				if (!tmpfile.exists()) {
+					String[] children = folder.list();
+					for (int i = 0; i < children.length; i++)
+					{
+						new File(folder, children[i]).delete();
+					}
+				}
+				if (copyFile(selectedFilePath, tmpFilePath) == 0) {
+					return false;
+				}
+
+				intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
+				try {
+					context.startActivity(intent);
+					return true;
+				} catch (ActivityNotFoundException e) {
+					Log.e("Activity not found to open attachment: ", e);
+				}
 			}
 		} else {
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourcePath));

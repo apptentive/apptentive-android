@@ -9,17 +9,11 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +28,9 @@ import android.widget.ProgressBar;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageItem;
-import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
 
 
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Barry Li
@@ -159,7 +150,6 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		//dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		dialog.getWindow().getAttributes().windowAnimations = R.style.ApptentiveDialogAnimation;
 
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

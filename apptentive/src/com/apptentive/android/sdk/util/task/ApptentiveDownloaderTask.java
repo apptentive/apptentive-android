@@ -109,7 +109,6 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 	 */
 	@Override
 	protected void onProgressUpdate(Integer... progress) {
-
 		super.onProgressUpdate(progress);
 		listener.onProgress(progress[0]);
 	}
@@ -196,15 +195,21 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 							8192);
 					output = new FileOutputStream(destFilePath);
 
-					byte data[] = new byte[1024];
+					byte data[] = new byte[8192];
 
 					long total = 0;
 
 					while ((count = input.read(data)) != -1) {
-						if (this.download) {
+						// allow canceling
+						if (isCancelled()) {
+							this.download = false;
+							break;
+						} else if (this.download) {
 							total += count;
-							// publishing the progress....
-							publishProgress((int) ((total * 100) / lenghtOfFile));
+							// publishing the progress only if fileLength is known
+							if (lenghtOfFile > 0) {
+								publishProgress((int) ((total * 100) / lenghtOfFile));
+							}
 							output.write(data, 0, count);
 						}
 					}
