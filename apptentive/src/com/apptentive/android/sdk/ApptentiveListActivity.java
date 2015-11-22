@@ -10,15 +10,14 @@ import android.annotation.SuppressLint;
 import android.app.ListActivity;
 
 /**
- * Extend this class instead of ListActivity to easily integrate Apptentive into your application.
- * <p/>
- * If you are unable to inherit from our Activity, you can delegate the calls to Apptentive static methods into your
- * own Activity manually, as specified below.
- * <p/>
- * All Activities in your Application MUST integrate Apptentive by extending of of the Apptentive Activities, or by
- * delegation.
- * @see ApptentiveActivity
+ * <p>Extend this class instead of ListActivity to easily integrate Apptentive into your application.</p>
+ * <p>If you are unable to inherit from our Activity, you can delegate the calls to Apptentive static methods into your
+ * own Activity manually, as specified below.</p>
+ * <p>All Activities in your Application MUST integrate Apptentive by extending of of the Apptentive Activities, or by
+ * delegation.</p>
+ *
  * @author Sky Kelsey
+ * @see ApptentiveActivity
  */
 @SuppressLint("Registered")
 public class ApptentiveListActivity extends ListActivity {

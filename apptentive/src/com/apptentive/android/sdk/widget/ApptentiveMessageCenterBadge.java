@@ -59,9 +59,8 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	}
 
 	/**
-	 * Sets abstract size for this badge.
-	 * <p/>
-	 * Xml attribute: {@code apptentive:badgeSize}
+	 * <p>Sets abstract size for this badge.</p>
+	 * <p>Xml attribute: {@code apptentive:badgeSize}</p>
 	 *
 	 * @param size {@link #SIZE_NORMAL} or {@link #SIZE_MINI}
 	 */
@@ -85,10 +84,8 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 	}
 
 	/**
-	 * Sets counter text color of the badge .
-	 * <p/>
-	 * Xml attribute: {@code apptentive:counterColor}
-	 * <p/>
+	 * <p>Sets counter text color of the badge.</p>
+	 * <p>Xml attribute: {@code apptentive:counterColor}</p>
 	 * NOTE: this method sets the <code>mColorStateList</code> field to <code>null</code>
 	 *
 	 * @param color color

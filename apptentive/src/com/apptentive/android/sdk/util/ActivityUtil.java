@@ -24,18 +24,17 @@ import java.util.List;
 public class ActivityUtil {
 
 	/**
-	 * <strong>NOTE: This method is for debugging purposes only. Google may reject your app if you ship it with the
-	 * GET_TASKS permission enabled.</strong>
-	 * <p/>
-	 * This method will return true if the Application is going into the background because an Activity that is not defined
+	 * <p><strong>NOTE: This method is for debugging purposes only. Google may reject your app if you ship it with the
+	 * GET_TASKS permission enabled.</strong></p>
+	 * <p>This method will return true if the Application is going into the background because an Activity that is not defined
 	 * in the current Application's manifest is going into the foreground. It will return false if another Activity defined
-	 * in the current Application's manifest is going into the foreground, or if the Application is exiting.
-	 * <p/> Call this from Activity.onPause(), and it will tell you if the Application is being backgrounded so another
-	 * Application can run.
-	 * <p/>Requires permission: android.permission.GET_TASKS
+	 * in the current Application's manifest is going into the foreground, or if the Application is exiting.</p>
+	 * <p>Call this from Activity.onPause(), and it will tell you if the Application is being backgrounded so another
+	 * Application can run.</p>
+	 * <p>Requires permission: android.permission.GET_TASKS</p>
 	 *
 	 * @param activity The activity you are calling from.
-	 * @return true: if another Application is coming to the foreground.<p/>
+	 * @return true: if another Application is coming to the foreground.<br/>
 	 *         false: if the Activity is merely giving way to another Activity defined in the same Application.
 	 * @deprecated Marking this deprecated simply so you read this whole javadoc before trying to use this method.
 	 */
