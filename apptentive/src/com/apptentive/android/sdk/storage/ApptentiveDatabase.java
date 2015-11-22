@@ -106,6 +106,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * uing the message's "nonce" key
 	 */
 	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table filePath
+	private static final String COMPOUND_FILESTORE_KEY_DB_ID = "_id";                         // 0
 	private static final String COMPOUND_FILESTORE_KEY_MESSAGE_NONCE = "nonce"; // message nonce of the compound message
 	private static final String COMPOUND_FILESTORE_KEY_MIME_TYPE = "mime_type"; // mine type of the file
 	private static final String COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI = "local_uri"; // original uriString or file path of source file (empty for received file)
@@ -116,13 +117,13 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	private static final String TABLE_CREATE_COMPOUND_FILESTORE =
 			"CREATE TABLE " + TABLE_COMPOUND_MESSSAGE_FILESTORE +
 					" (" +
+					COMPOUND_FILESTORE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
 					COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_MIME_TYPE + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
 					COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG, " +
-					"PRIMARY KEY (" + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + ", " + COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + ")" +
+					COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG" +
 					");";
 
 	// Query all files associated with a given compound message nonce id
@@ -581,11 +582,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				do {
 					ret = new StoredFile();
 					ret.setId(nonce);
-					ret.setLocalFilePath(cursor.getString(1));
-					ret.setMimeType(cursor.getString(2));
-					ret.setSourceUriOrPath(cursor.getString(3));
-					ret.setApptentiveUri(cursor.getString(4));
-					ret.setCreationTime(cursor.getLong(5));
+					ret.setLocalFilePath(cursor.getString(2));
+					ret.setMimeType(cursor.getString(3));
+					ret.setSourceUriOrPath(cursor.getString(4));
+					ret.setApptentiveUri(cursor.getString(5));
+					ret.setCreationTime(cursor.getLong(6));
 					associatedFiles.add(ret);
 				} while (cursor.moveToNext());
 			}
