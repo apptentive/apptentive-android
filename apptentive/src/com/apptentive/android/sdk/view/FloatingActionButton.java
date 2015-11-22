@@ -53,9 +53,8 @@ public class FloatingActionButton extends ImageButton {
 	}
 
 	/**
-	 * Sets abstract size for this button.
-	 * <p/>
-	 * Xml attribute: {@code app:floatingActionButtonSize}
+	 * <p>Sets abstract size for this button.</p>
+	 * <p>Xml attribute: {@code app:floatingActionButtonSize}</p>
 	 *
 	 * @param size {@link #SIZE_NORMAL} or {@link #SIZE_MINI}
 	 */
@@ -79,11 +78,9 @@ public class FloatingActionButton extends ImageButton {
 	}
 
 	/**
-	 * Sets background color for this button.
-	 * <p/>
-	 * Xml attribute: {@code app:floatingActionButtonColor}
-	 * <p/>
-	 * NOTE: this method sets the <code>mColorStateList</code> field to <code>null</code>
+	 * <p>Sets background color for this button.</p>
+	 * <p>Xml attribute: {@code app:floatingActionButtonColor}</p>
+	 * <p>NOTE: this method sets the <code>mColorStateList</code> field to <code>null</code></p>
 	 *
 	 * @param color color
 	 */
@@ -133,9 +130,8 @@ public class FloatingActionButton extends ImageButton {
 	}
 
 	/**
-	 * Sets color state list as background for this button.
-	 * <p/>
-	 * Xml attribute: {@code app:floatingActionButtonColor}
+	 * <p>Sets color state list as background for this button.</p>
+	 * <p>Xml attribute: {@code app:floatingActionButtonColor}</p>
 	 *
 	 * @param colorStateList color
 	 */
@@ -248,8 +244,6 @@ public class FloatingActionButton extends ImageButton {
 	/**
 	 * Inflate and initialize background drawable for this view with arguments
 	 * inflated from xml or specified using {@link #setSize(int)} or {@link #setColor(int)}
-	 * <p/>
-	 *
 	 */
 	public void initBackground() {
 		final int backgroundId;

@@ -19,47 +19,41 @@ import com.apptentive.android.sdk.storage.SharedPreferencesPersistentSessionQueu
 import java.util.*;
 
 /**
- * This class provides two methods: activityStarted(), and activityStopped(). Both of these methods should only
+ * <p>This class provides two methods: activityStarted(), and activityStopped(). Both of these methods should only
  * be called internally, and need to be called during the onStart() and onStop() of each Activity that constitute the
- * Application we are integrated into.
- * <p/><p/>
- * The way this works:
- * <p/>
- * Each time an Activity is started or stopped, we generate an event and stick it into a queue. The event keeps track
+ * Application we are integrated into.</p>
+ * <p>The way this works:</p>
+ * <p>Each time an Activity is started or stopped, we generate an event and stick it into a queue. The event keeps track
  * of the Activity's object instance, whether it was started or stopped, and a timestamp of when the start or stop
  * occurred. Each time we start an Activity, we look back into this queue and remove events that no longer provide
  * information to us. For instance, we need to keep track of any events that have started, but don't have a
  * corresponding stop event, but we also need to keep the pair of events that contains the last stop event. This is
  * because when the Activity starts, we look at the last stop event, and if it has been longer than a certain amount of
- * time since that stop, we decide the new start constitutes a new app use.
- * <p/>
- * The logic is further complicated because the order that Activities call their onStart() and onStop() can not be
+ * time since that stop, we decide the new start constitutes a new app use.</p>
+ * <p>The logic is further complicated because the order that Activities call their onStart() and onStop() can not be
  * relied on. Sometimes it may be A.onStart(), A.onStop(), B.onStart(), B.onStop(), and sometimes it mey be A.onStart(),
- * B.onStart(), A.onStop(), B.onStop().
- * <p/>
- * Additionally, we have to provide a way to detect when the app has crashed, and reset the queue. But because of our
+ * B.onStart(), A.onStop(), B.onStop().</p>
+ * <p>Additionally, we have to provide a way to detect when the app has crashed, and reset the queue. But because of our
  * inability to be sure what the actual ordering of the events is, we can't tell an app has crashed until the second
  * time an Activity.onStart() is called after the crash. We need to see that there are two onStart() calls
  * that are missing their corresponding onStop() calls (one from before the crash, one from after). Caveat: If a push
  * notification for this app is opened while the app is running, a crash will be detected. This is due to the fact that
  * certain Activity start/stop behavior is ambiguous. Erring on the side of this case being a crash is necessary so that
- * when the app is operating normally without crashes and push notifications, we can trust the data.
- * <p/>
- * There are two implementations for queue storage. One is backed by SQLite, but it was too slow. The one we use is
- * backed by SharedPreferences, and is much faster.
+ * when the app is operating normally without crashes and push notifications, we can trust the data.</p>
+ * <p>There are two implementations for queue storage. One is backed by SQLite, but it was too slow. The one we use is
+ * backed by SharedPreferences, and is much faster.</p>
  *
  * @author Sky Kelsey
  */
 public class ActivityLifecycleManager {
 
 	/**
-	 * A timeout in seconds for determining if the previous app session has stopped, and a new one has started. Timeout
+	 * <p>A timeout in seconds for determining if the previous app session has stopped, and a new one has started. Timeout
 	 * will occur if the number of seconds between one Activity defined in the Application calling onStop(), and another
-	 * calling onStart() exceeds this value.
-	 * <p/>
-	 * Ten seconds was chosen because it is unlikely that it would take an Activity more than that amount of time to
+	 * calling onStart() exceeds this value.</p>
+	 * <p>Ten seconds was chosen because it is unlikely that it would take an Activity more than that amount of time to
 	 * be created and started, but it is also unlikely that we would incorrectly decide an Application session was still
-	 * in affect after ten seconds had passed.
+	 * in affect after ten seconds had passed.</p>
 	 */
 	private static final int SESSION_TIMEOUT_SECONDS = 10;
 

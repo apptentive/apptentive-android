@@ -1,16 +1,12 @@
 /**
  * DO WHAT YOU WANT TO PUBLIC LICENSE
  * Version 2, December 2004
- * <p/>
  * Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
- * <p/>
  * Everyone is permitted to copy and distribute verbatim or modified
  * copies of this license document, and changing it is allowed as long
  * as the name is changed.
- * <p/>
  * DO WHAT YOU WANT TO PUBLIC LICENSE
  * TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
- * <p/>
  * 0. You just DO WHAT YOU WANT TO.
  */
 

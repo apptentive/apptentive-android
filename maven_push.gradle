@@ -96,6 +96,7 @@ afterEvaluate { project ->
         include 'com/apptentive/android/sdk/ApptentiveListActivity.java'
         include 'com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.java'
         include 'com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.java'
+        include 'com/apptentive/android/sdk/module/rating/InsufficientRatingArgumentsException.java'
         include 'com/apptentive/android/sdk/module/rating/IRatingProvider.java'
         include 'com/apptentive/android/sdk/module/messagecenter/UnreadMessagesListener.java'
         include 'com/apptentive/android/sdk/module/survey/OnSurveyFinishedListener.java'
