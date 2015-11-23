@@ -30,8 +30,6 @@ import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -663,6 +661,7 @@ public class Apptentive {
 			message.setBody(text);
 			message.setRead(true);
 			message.setHidden(true);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
 			message.setAssociatedFiles(context, null);
 			MessageManager.sendMessage(context.getApplicationContext(), message);
 		} catch (Exception e) {
@@ -690,6 +689,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
       // make a local copy in the cache dir, and file name is "apptentive-hidden-file + nonce"
@@ -765,6 +765,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
@@ -990,12 +991,6 @@ public class Apptentive {
 				onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 			}
 
-			// Grab the conversation token from shared preferences.
-			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
-				GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-				GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
-			}
-
 			GlobalInfo.initialized = true;
 			Log.v("Done initializing...");
 		} else {
@@ -1003,11 +998,11 @@ public class Apptentive {
 		}
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
-			asyncFetchConversationToken(appContext.getApplicationContext());
+		if (GlobalInfo.getConversationToken(appContext)  == null || GlobalInfo.getPersonId(appContext) == null) {
+			asyncFetchConversationToken(appContext);
 		} else {
-			asyncFetchAppConfiguration(appContext.getApplicationContext());
-			InteractionManager.asyncFetchAndStoreInteractions(appContext.getApplicationContext());
+			asyncFetchAppConfiguration(appContext);
+			InteractionManager.asyncFetchAndStoreInteractions(appContext);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
@@ -1093,17 +1088,15 @@ public class Apptentive {
 				Log.d("ConversationToken: " + conversationToken);
 				String conversationId = root.getString("id");
 				Log.d("New Conversation id: %s", conversationId);
-				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
 				if (conversationToken != null && !conversationToken.equals("")) {
-					GlobalInfo.conversationToken = conversationToken;
-					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
-					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_ID, conversationId).commit();
+					GlobalInfo.setConversationToken(context, conversationToken);
+					GlobalInfo.setConversationId(context, conversationId);
 				}
 				String personId = root.getString("person_id");
 				Log.d("PersonId: " + personId);
 				if (personId != null && !personId.equals("")) {
-					GlobalInfo.personId = personId;
-					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
+					GlobalInfo.setPersonId(context, personId);
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);

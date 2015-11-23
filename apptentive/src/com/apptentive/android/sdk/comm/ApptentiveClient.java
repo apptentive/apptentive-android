@@ -15,7 +15,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageUtil;
@@ -63,7 +62,7 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse getAppConfiguration(Context appContext) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -73,33 +72,15 @@ public class ApptentiveClient {
 	 */
 	public static ApptentiveHttpResponse getMessages(Context appContext, Integer count, String afterId, String beforeId) {
 		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, uri, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
+	public static ApptentiveHttpResponse postMessage(Context appContext, ApptentiveMessage apptentiveMessage) {
 		switch (apptentiveMessage.getType()) {
-			/*
-			 * pending legacy TextMessage, AutomatedMessage and FileMessage may still exist in payload table before sdk upgrade.
-			 * After SDK upgrades to CompoundMessage only, these pending payload will be sent out using new version and multi-part format
-			 */
-			case TextMessage:
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
-			case AutomatedMessage: {
-				// Make sure "automated" key is set for legacy AutomatedMessage
-				apptentiveMessage.setAutomated(true);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), null);
-			}
-			case FileMessage: {
-				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
-				StoredFile storedFile = fileMessage.getStoredFile(context);
-				List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
-				associatedFiles.add(storedFile);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
-			}
 			case CompoundMessage: {
 				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
-				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(appContext);
+				return performMultipartFilePost(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
 			}
 			case unknown:
 				break;
@@ -108,32 +89,32 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse postEvent(Context appContext, Event event) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putDevice(Context appContext, Device device) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putSdk(Context appContext, Sdk sdk) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putAppRelease(Context appContext, AppRelease appRelease) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putPerson(Context appContext, Person person) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(Context appContext, SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse getInteractions(Context appContext) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
 	/**

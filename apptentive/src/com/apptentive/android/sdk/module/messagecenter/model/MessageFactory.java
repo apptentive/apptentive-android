@@ -6,8 +6,10 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
+import android.content.Context;
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 
 import org.json.JSONException;
@@ -17,8 +19,9 @@ import org.json.JSONObject;
  * @author Sky Kelsey
  */
 public class MessageFactory {
-	public static ApptentiveMessage fromJson(String json) {
+	public static ApptentiveMessage fromJson(Context appContext, String json) {
 		try {
+			// If KEY_TYPE is set to CompoundMessage or not set, treat them as CompoundMessage
 			ApptentiveMessage.Type type = ApptentiveMessage.Type.CompoundMessage;
 			JSONObject root = new JSONObject(json);
 			if (!root.isNull(ApptentiveMessage.KEY_TYPE)) {
@@ -29,7 +32,20 @@ public class MessageFactory {
 			}
 			switch (type) {
 				case CompoundMessage:
-					return new CompoundMessage(json);
+					String senderId = null;
+					try {
+						if (!root.isNull(ApptentiveMessage.KEY_SENDER)) {
+							JSONObject sender = root.getJSONObject(ApptentiveMessage.KEY_SENDER);
+							if (!sender.isNull((ApptentiveMessage.KEY_SENDER_ID))) {
+								senderId = sender.getString(ApptentiveMessage.KEY_SENDER_ID);
+							}
+						}
+					} catch (JSONException e) {
+						// Ignore, snederId would be null
+					}
+					String storedId = GlobalInfo.getPersonId(appContext);
+					// If senderId is null or same as the locally stored id, construct message as outgoing
+					return new CompoundMessage(json, (senderId == null || senderId.equals(storedId)));
 				case unknown:
 					break;
 				default:
@@ -38,7 +54,7 @@ public class MessageFactory {
 		} catch (JSONException e) {
 			Log.v("Error parsing json as Message: %s", e, json);
 		} catch (IllegalArgumentException e) {
-			// Unknown unknown #rumsfeld
+			// Exception treated as unknown type
 		}
 		return null;
 	}

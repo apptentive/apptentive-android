@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.storage;
 
+import android.content.Context;
+
 import com.apptentive.android.sdk.model.Payload;
 
 /**
@@ -13,6 +15,6 @@ public interface PayloadStore {
 
 	public void deleteAllPayloads();
 
-	public Payload getOldestUnsentPayload();
+	public Payload getOldestUnsentPayload(Context appContext);
 
 }

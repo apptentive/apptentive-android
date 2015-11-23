@@ -38,21 +38,32 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	private boolean hasNoAttachments = true;
 
+	private boolean isOutgoing = true;
+
 	/* For incoming message, this array stores attachment Urls
 	 * StoredFile::apptentiveUri is set by the "url" of the remote attachment file
 	 * StoredFile:localFilePath is set by the "thumbnail_url" of the remote attachment (maybe empty)
 	 */
 	private ArrayList<StoredFile> remoteAttachmentStoredFiles;
 
+	// Default constructor will only be called when the message is created from local, a.k.a outgoing
 	public CompoundMessage() {
 		super();
+		isOutgoing = true;
 	}
 
-	public CompoundMessage(String json) throws JSONException {
+	/* Constructing compound message when JSON is received from incoming, or repopulated from database
+	*
+	* @param json The JSON string of the message
+	* @param bOutgoing true if the message is originated from local
+	 */
+	public CompoundMessage(String json, boolean bOutgoing) throws JSONException {
 		super(json);
 		parseAttachmentsArray(json);
 		hasNoAttachments = getTextOnly();
+		isOutgoing = bOutgoing;
 	}
+
 
 	@Override
 	protected void initType() {
@@ -196,6 +207,11 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		isLast = bVal;
 	}
 
+	@Override
+	public boolean isOutgoingMessage() {
+		return isOutgoing;
+	}
+
 	public static CompoundMessage createAutoMessage(String title, String body) {
 		if (title == null && body == null) {
 			return null;
@@ -216,7 +232,8 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	}
 
 	/* Parse attachment array in json. Only incoming compound message would have "attachments" key set
-	 *
+	 * @param messageString JSON string of the message
+	 * @return true if attachment array is found in JSON
 	 */
 	private boolean parseAttachmentsArray(String messageString) throws JSONException {
 		JSONObject root = new JSONObject(messageString);

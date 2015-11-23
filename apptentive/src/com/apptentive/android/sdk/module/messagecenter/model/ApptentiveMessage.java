@@ -27,6 +27,8 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public static final String KEY_HIDDEN = "hidden";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 	public static final String KEY_AUTOMATED = "automated";
+	public static final String KEY_SENDER = "sender";
+	public static final String KEY_SENDER_ID = "id";
 
 	// State and Read are not stored in JSON, only in DB.
 	private State state = State.unknown;
@@ -35,14 +37,12 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	// datestamp is only stored in memory, due to how we selectively apply date labeling in the view.
 	private String datestamp;
 
-	private static final String KEY_SENDER = "sender";
-	private static final String KEY_SENDER_ID = "id";
 	private static final String KEY_SENDER_NAME = "name";
 	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
 
+
 	protected ApptentiveMessage() {
 		super();
-		setSenderId(GlobalInfo.personId);
 		state = State.sending;
 		read = true; // This message originated here.
 		setBaseType(BaseType.message);
@@ -258,10 +258,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		this.datestamp = null;
 	}
 
-	public boolean isOutgoingMessage() {
-		String senderId = getSenderId();
-		return senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
-	}
+	public abstract boolean isOutgoingMessage();
 
 	public boolean isAutomatedMessage() {
 		return getAutomated();

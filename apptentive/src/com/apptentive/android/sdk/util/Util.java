@@ -202,8 +202,8 @@ public class Util {
 		return null;
 	}
 
-	public static boolean isNetworkConnectionPresent(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	public static boolean isNetworkConnectionPresent(Context appContext) {
+		ConnectivityManager cm = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
 

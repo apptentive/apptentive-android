@@ -155,7 +155,7 @@ public class InteractionsActivity extends ApptentiveActivity {
 		getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
 		CodePointStore.clear(this);
 		InteractionManager.clear(this);
-		GlobalInfo.reset();
+		GlobalInfo.reset(this);
 		ApptentiveDatabase.reset(this);
 		Apptentive.onStart(this);
 	}

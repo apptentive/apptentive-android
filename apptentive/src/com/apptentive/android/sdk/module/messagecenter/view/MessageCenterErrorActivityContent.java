@@ -7,14 +7,13 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -26,7 +25,6 @@ public class MessageCenterErrorActivityContent extends ActivityContent {
 	private static final String EVENT_NAME_NO_INTERACTION_ATTEMPTING = "no_interaction_attempting";
 	public static final String EVENT_NAME_NO_INTERACTION_CLOSE = "no_interaction_close";
 
-	private Context context;
 	private MessageCenterErrorView messageCenterErrorView;
 
 	protected boolean hasLaunched;
@@ -38,14 +36,14 @@ public class MessageCenterErrorActivityContent extends ActivityContent {
 		}
 		if (!hasLaunched) {
 			hasLaunched = true;
-			if (MessageCenterErrorView.wasLastAttemptServerError(activity.getApplicationContext())) {
+			if (MessageCenterErrorView.wasLastAttemptServerError(activity.getApplicationContext()) ||
+					Util.isNetworkConnectionPresent(activity.getApplicationContext())) {
 				EngagementModule.engage(activity, "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
 			} else {
 				EngagementModule.engage(activity, "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
 			}
 		}
 
-		context = activity.getApplicationContext();
 		messageCenterErrorView = new MessageCenterErrorView(activity);
 
 		// TODO: Send metric?

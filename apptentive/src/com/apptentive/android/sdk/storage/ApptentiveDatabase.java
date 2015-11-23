@@ -55,6 +55,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	private static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
 
+	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
+
 
 	// MESSAGE
 	private static final String TABLE_MESSAGE = "message";
@@ -196,15 +198,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	// PAYLOAD: This table is used to store all the Payloads we want to send to the server.
 
-	// Try not to hit the database unless we need to. This value is polled every few seconds.
-	private boolean payloadsDirty = true;
-
 	/**
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
 	public synchronized void addPayload(Payload... payloads) {
-		payloadsDirty = true;
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -223,7 +221,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized void deletePayload(Payload payload) {
-		payloadsDirty = true;
 		if (payload != null) {
 			SQLiteDatabase db = null;
 			try {
@@ -236,7 +233,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	}
 
 	public synchronized void deleteAllPayloads() {
-		payloadsDirty = true;
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -246,7 +242,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized Payload getOldestUnsentPayload() {
+	public synchronized Payload getOldestUnsentPayload(Context appContext) {
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -258,10 +254,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				long databaseId = Long.parseLong(cursor.getString(0));
 				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
-				payload = PayloadFactory.fromJson(json, baseType);
-				payload.setDatabaseId(databaseId);
+				payload = PayloadFactory.fromJson(appContext, json, baseType);
+				if (payload != null) {
+					payload.setDatabaseId(databaseId);
+				}
 			}
-			payloadsDirty = false;
 			return payload;
 		} finally {
 			ensureClosed(cursor);
@@ -341,7 +338,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized List<ApptentiveMessage> getAllMessages() {
+	public synchronized List<ApptentiveMessage> getAllMessages(Context appContext) {
 		List<ApptentiveMessage> apptentiveMessages = new ArrayList<ApptentiveMessage>();
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -351,7 +348,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(6);
-					ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
+					ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(appContext, json);
 					if (apptentiveMessage == null) {
 						Log.e("Error parsing Record json from database: %s", json);
 						continue;
@@ -488,6 +485,53 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 							ContentValues messageValues = new ContentValues();
 							messageValues.put(MESSAGE_KEY_JSON, root.toString());
 							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
+						}
+					} catch (JSONException e) {
+						Log.v("Error parsing json as Message: %s", e, json);
+					}
+				} while (cursor.moveToNext());
+			}
+		} finally {
+			ensureClosed(cursor);
+		}
+
+		// Migrate all pending payload messages
+		// Migrate legacy message types to CompoundMessage Type
+		try {
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.BaseType.message.name()});
+			if (cursor.moveToFirst()) {
+				do {
+					String json = cursor.getString(2);
+					JSONObject root;
+					boolean bUpdateRecord = false;
+					try {
+						root = new JSONObject(json);
+						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+						switch (type) {
+							case TextMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								bUpdateRecord = true;
+								break;
+							case FileMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
+								bUpdateRecord = true;
+								break;
+							case AutomatedMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
+								bUpdateRecord = true;
+								break;
+							default:
+								break;
+						}
+						if (bUpdateRecord) {
+							String databaseId = cursor.getString(0);
+							ContentValues messageValues = new ContentValues();
+							messageValues.put(PAYLOAD_KEY_JSON, root.toString());
+							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
 						Log.v("Error parsing json as Message: %s", e, json);

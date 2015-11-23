@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -41,7 +42,8 @@ public class MessageCenterErrorView extends FrameLayout {
 			}
 		});
 
-		if (wasLastAttemptServerError(getContext())) {
+		if (wasLastAttemptServerError(getContext()) ||
+				Util.isNetworkConnectionPresent(activity.getApplicationContext())) {
 			((ImageView) findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_icon_server_error);
 			((TextView) findViewById(R.id.message)).setText(R.string.apptentive_message_center_server_error);
 		} else {
