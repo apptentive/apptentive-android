@@ -9,9 +9,9 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.Gravity;
@@ -112,14 +112,16 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		ApptentiveAttachmentLoader.getInstance().load(currentImage.originalPath, currentImage.localCachePath, 0, previewImageView, width, height, true,
 				new ApptentiveAttachmentLoader.LoaderCallback() {
 					@Override
-					public void onLoaded(ImageView view, int pos, Drawable d) {
+					public void onLoaded(ImageView view, int pos, Bitmap d) {
 						if (progressBar != null) {
 							progressBar.setVisibility(View.GONE);
 						}
 
 						if (previewImageView == view) {
 							previewContainer.setVisibility(View.VISIBLE);
-							previewImageView.setImageDrawable(d);
+							if (!d.isRecycled()) {
+								previewImageView.setImageBitmap(d);
+							}
 						}
 					}
 

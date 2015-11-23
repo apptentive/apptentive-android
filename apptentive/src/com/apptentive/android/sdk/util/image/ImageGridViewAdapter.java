@@ -7,7 +7,7 @@ package com.apptentive.android.sdk.util.image;
  */
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -313,6 +313,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 			if (TextUtils.isEmpty(data.originalPath)) {
 				image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+				image.setImageBitmap(null);
 				image.setImageResource(R.drawable.apptentive_ic_add);
 				indicator.setVisibility(View.GONE);
 				bLoadThumbnail = false;
@@ -387,15 +388,15 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				progressBarDownload.setVisibility(View.GONE);
 			}
 
-			image.setImageDrawable(null);
+			image.setImageBitmap(null);
 			image.setImageResource(placeholderResId);
 
-			if (itemWidth > 0 && data.originalPath != null) {
+			if (itemWidth > 0 && !TextUtils.isEmpty(data.originalPath)) {
 				if (bLoadThumbnail) {
 					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, pos, image, itemWidth, itemHeight, true,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
-								public void onLoaded(ImageView view, int i, Drawable d) {
+								public void onLoaded(ImageView view, int i, Bitmap d) {
 									if (progressBar != null) {
 										progressBar.setVisibility(View.GONE);
 									}
@@ -403,7 +404,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 										progressBarDownload.setVisibility(View.GONE);
 									}
 									if (i == pos && image == view) {
-										image.setImageDrawable(d);
+										image.setImageBitmap(d);
 									}
 								}
 
@@ -453,7 +454,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, 0, 0, false,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
-								public void onLoaded(ImageView view, int pos, Drawable d) {
+								public void onLoaded(ImageView view, int pos, Bitmap d) {
 									if (progressBarDownload != null) {
 										progressBarDownload.setVisibility(View.GONE);
 									}
@@ -502,7 +503,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				} else {
 					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, false, new ApptentiveAttachmentLoader.LoaderCallback() {
 						@Override
-						public void onLoaded(ImageView view, int pos, Drawable d) {
+						public void onLoaded(ImageView view, int pos, Bitmap d) {
 							if (progressBarDownload != null) {
 								progressBarDownload.setVisibility(View.GONE);
 							}

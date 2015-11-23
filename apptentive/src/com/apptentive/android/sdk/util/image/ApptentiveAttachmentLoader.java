@@ -14,14 +14,13 @@ import java.util.concurrent.RejectedExecutionException;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.cache.ImageMemoryCache;
@@ -44,7 +43,7 @@ public class ApptentiveAttachmentLoader {
 
 
 	public static interface LoaderCallback {
-		void onLoaded(ImageView view, int pos, Drawable d);
+		void onLoaded(ImageView view, int pos, Bitmap d);
 
 		void onLoadTerminated();
 
@@ -84,7 +83,7 @@ public class ApptentiveAttachmentLoader {
 		filesBeingDownloaded = new HashSet<String>();
 		this.maxDownloads = maxDownloads;
 		duplicateDownloads = new HashMap<String, ArrayList<LoaderRequest>>();
-		bitmapMemoryCache = new ImageMemoryCache(5);
+		bitmapMemoryCache = new ImageMemoryCache(30);
 	}
 
 	/* Check if a file is being downloaded. If true, the file is not completely written by download task yet.
@@ -189,9 +188,9 @@ public class ApptentiveAttachmentLoader {
 						null;
 				if (cachedBitmap != null) {
 					mWasDownloaded = false;
-					BitmapDrawable bm = new BitmapDrawable(imageView.getResources(), cachedBitmap);
+
 					Log.d("ApptentiveAttachmentLoader loadDrawable(found in cache)");
-					loadDrawable(bm);
+					loadDrawable(cachedBitmap);
 					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 				} else {
 					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, this);
@@ -219,10 +218,12 @@ public class ApptentiveAttachmentLoader {
 				mDrawableDownloaderTask = new ApptentiveDownloaderTask(imageView, this);
 				try {
 					Log.d("ApptentiveAttachmentLoader doDownload: " + uri);
+					// Conversation token is needed if the download url is an redrect link from an Apptentive endpoint
+					String conversationToken = GlobalInfo.getConversationToken(imageView.getContext().getApplicationContext());
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath);
+						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, conversationToken);
 					} else {
-						mDrawableDownloaderTask.execute(uri, diskCacheFilePath);
+						mDrawableDownloaderTask.execute(uri, diskCacheFilePath, conversationToken);
 					}
 				} catch (RejectedExecutionException e) {
 				}
@@ -369,11 +370,11 @@ public class ApptentiveAttachmentLoader {
 			return null;
 		}
 
-		private void loadDrawable(Drawable d) {
+		private void loadDrawable(Bitmap d) {
 			loadDrawable(d, true);
 		}
 
-		private void loadDrawable(Drawable d, boolean animate) {
+		private void loadDrawable(Bitmap d, boolean animate) {
 			Log.d("ApptentiveAttachmentLoader loadDrawable");
 			ImageView imageView = getImageView();
 			if (imageView != null) {
@@ -619,9 +620,8 @@ public class ApptentiveAttachmentLoader {
 			bitmapMemoryCache.addObjectToCache(ImageMemoryCache.generateMemoryCacheEntryKey(uri, imageViewWidth, imageViewHeight), b);
 			ImageView imageView = getImageView();
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
-				BitmapDrawable bm = new BitmapDrawable(imageView.getResources(), b);
 				Log.d("ApptentiveAttachmentLoader loadDrawable(add to cache)");
-				loadDrawable(bm);
+				loadDrawable(b);
 				imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 			}
 			mWasDownloaded = false;
