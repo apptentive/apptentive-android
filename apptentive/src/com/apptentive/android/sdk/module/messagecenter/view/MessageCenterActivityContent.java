@@ -503,12 +503,26 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
-				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER:
-					Uri uri = data.getData();
+				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER: {
+					if (data == null) {
+						Log.d("no image is picked");
+						return;
+					}
+					Uri uri;
+					//Android SDK less than 19
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+						uri = data.getData();
+					} else {
+						//for Android 4.4
+						uri = data.getData();
+						int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+						viewActivity.getContentResolver().takePersistableUriPermission(uri, takeFlags);
+					}
+
 					String originalPath = Util.getRealFilePathFromUri(viewActivity, uri);
 					if (originalPath != null) {
 						/* If able to retrieve file path and creation time from uri, cache file name will be generated
-						 * from the hash code of file path + creation time
+						 * from the md5 of file path + creation time
 						 */
 						long creation_time = Util.getContentCreationTime(viewActivity, uri);
 						Uri fileUri = Uri.fromFile(new File(originalPath));
@@ -517,17 +531,15 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 								Util.getMimeTypeFromUri(viewActivity, uri), creation_time)));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
-						 * cache name will be generated from the md5 of the file content
+						 * cache name will be generated from md5 of uri string
 						 */
-						String cachedFileName = Util.generateCacheFileFullPathMd5(viewActivity, uri.toString());
+						File cacheDir = Util.getDiskCacheDir(viewActivity);
+						String cachedFileName = Util.generateCacheFileFullPath(uri, cacheDir, 0);
 						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(viewActivity, uri), 0)));
 					}
 
 					break;
-				case Constants.REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER:
-					ArrayList<ImageItem> selectedImagePaths = (ArrayList<ImageItem>) data.getSerializableExtra(Constants.RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER);
-					addImageToComposer(selectedImagePaths);
-					break;
+				}
 				default:
 					break;
 			}
@@ -1202,18 +1214,24 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onAttachImage() {
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		Bundle extras = new Bundle();
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		if (Build.VERSION.SDK_INT >= 11) {
-			extras.putBoolean(Intent.EXTRA_LOCAL_ONLY, true);
+		try {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {//Api level 19
+				Intent intent = new Intent();
+				intent.setType("image/*");
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				Intent chooserIntent = Intent.createChooser(intent, null);
+				viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
+			} else {
+				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+				intent.setType("image/*");
+				Intent chooserIntent = Intent.createChooser(intent, null);
+				viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d("can't launch image picker");
 		}
-		intent.setType("image/*");
-		if (!extras.isEmpty()) {
-			intent.putExtras(extras);
-		}
-		Intent chooserIntent = Intent.createChooser(intent, null);
-		viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
 	}
 
 	private void saveWhoCardSetState() {
