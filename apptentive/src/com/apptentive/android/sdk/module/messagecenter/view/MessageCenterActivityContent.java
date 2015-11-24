@@ -60,6 +60,7 @@ import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -141,7 +142,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private Parcelable pendingWhoCardName;
 	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
-
 
 
 	private int listViewSavedTopIndex = -1;
@@ -479,7 +479,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public boolean cleanup() {
-		clearPendingComposingMessage();
+		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		clearComposingUi(null, null, 0);
 		clearWhoCardUi(null, null, 0);
@@ -908,15 +908,39 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			if (messageText != null) {
 				messageEditText.setText(messageText);
 			}
+			// Stored pending composing text has been restored, remove it from the persistent storage
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).commit();
 		}
+
+
 		// Restore composing attachments
-		/*if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)) {
-			imageAttachmentstList = (ArrayList<ImageItem>) Util.deserialize(prefs.getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, null));
+		if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)) {
+			JSONArray jArray = null;
+			try {
+				jArray = new JSONArray(prefs.getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, ""));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			if (jArray != null && jArray.length() > 0) {
+				if (savedAttachmentstList == null) {
+					savedAttachmentstList = new ArrayList<ImageItem>();
+				}
+				for (int i = 0; i < jArray.length(); i++) {
+					try {
+						JSONObject json = jArray.getJSONObject(i);
+						if (json != null) {
+							savedAttachmentstList.add(new ImageItem(json));
+						}
+					} catch (JSONException e) {
+						continue;
+					}
+				}
+			}
+			// Stored pending attachemnts have been restored, remove it from the persistent storage
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).commit();
-		}*/
+		}
 
 		if (savedAttachmentstList != null) {
 			addImageToComposer(savedAttachmentstList);
@@ -1054,7 +1078,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 												 if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
 													 Bundle b = new Bundle();
 													 b.putString(COMPOSING_EDITTEXT_STATE, messageText);
-													 b.putParcelableArrayList( COMPOSING_ATTACHMENTS, messageAttachments);
+													 b.putParcelableArrayList(COMPOSING_ATTACHMENTS, messageAttachments);
 													 Message msg = messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
 															 messageText);
 													 msg.setData(b);
@@ -1251,8 +1275,26 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, (content != null) ? content.toString().trim() : null);
-		//editor.pu(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, Util.serialize(imageAttachmentstList));
+		if (content != null) {
+			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, content.toString().trim());
+		} else {
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE);
+		}
+
+		JSONArray jArray = new JSONArray();
+		// Save pending attachment
+		for (ImageItem pendingAttachment : imageAttachmentstList) {
+			JSONObject jobject = pendingAttachment.toJSON();
+			if (jobject != null) {
+				jArray.put(jobject);
+			}
+		}
+
+		if (jArray.length() > 0) {
+			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, jArray.toString());
+		} else {
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
+		}
 		editor.apply();
 	}
 
@@ -1262,8 +1304,9 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void clearPendingComposingMessage() {
 		SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).commit();
-		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).commit();
+		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE);
+		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
+		editor.apply();
 	}
 
 	private Parcelable saveEditTextInstanceState() {
