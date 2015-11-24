@@ -29,9 +29,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCen
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.IncomingTextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -138,7 +136,7 @@ public class MessageManager {
 	 * @return true if messages were returned, else false.
 	 */
 	public static synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
-		if (GlobalInfo.conversationToken == null) {
+		if (GlobalInfo.getConversationToken(appContext) == null) {
 			return false;
 		}
 		if (!Util.isNetworkConnectionPresent(appContext)) {
@@ -192,7 +190,7 @@ public class MessageManager {
 
 	public static List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
 		List<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
-		messages.addAll(getMessageStore(context).getAllMessages());
+		messages.addAll(getMessageStore(context).getAllMessages(context.getApplicationContext()));
 		return messages;
 	}
 
@@ -218,7 +216,7 @@ public class MessageManager {
 			return ret;
 		}
 		try {
-			ret = parseMessagesString(response.getContent());
+			ret = parseMessagesString(appContext, response.getContent());
 		} catch (JSONException e) {
 			Log.e("Error parsing messages JSON.", e);
 		} catch (Exception e) {
@@ -231,17 +229,19 @@ public class MessageManager {
 		getMessageStore(context).updateMessage(apptentiveMessage);
 	}
 
-	public static List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
+	public static List<ApptentiveMessage> parseMessagesString(Context appContext, String messageString) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {
 			JSONArray items = root.getJSONArray("items");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
-				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
+				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(appContext, json);
 				// Since these came back from the server, mark them saved before updating them in the DB.
-				apptentiveMessage.setState(ApptentiveMessage.State.saved);
-				ret.add(apptentiveMessage);
+				if (apptentiveMessage != null) {
+					apptentiveMessage.setState(ApptentiveMessage.State.saved);
+					ret.add(apptentiveMessage);
+				}
 			}
 		}
 		return ret;
@@ -262,10 +262,7 @@ public class MessageManager {
 	public static void onSentMessage(Context context, ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
 
 		if (response.isRejectedPermanently() || response.isBadPayload()) {
-			if (apptentiveMessage instanceof OutgoingFileMessage) {
-				((OutgoingFileMessage) apptentiveMessage).deleteStoredFile(context);
-			} else if (apptentiveMessage instanceof CompoundMessage) {
-
+			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
 				getMessageStore(context).updateMessage(apptentiveMessage);
 				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {

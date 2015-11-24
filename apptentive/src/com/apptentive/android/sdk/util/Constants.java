@@ -15,8 +15,6 @@ public class Constants {
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 1000;
-	public static final int REQUEST_CODE_PHOTO_FROM_APPTENTIVE_PICKER = 2000;
-	public static final String RESULT_CODE_PHOTO_FROM_APPTENTIVE_PICKER = "select_result";
 
 	public final static int REQUEST_READ_STORAGE_PERMISSION = 1;
 

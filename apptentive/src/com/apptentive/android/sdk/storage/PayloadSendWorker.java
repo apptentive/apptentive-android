@@ -90,7 +90,7 @@ public class PayloadSendWorker {
 					}
 
 					PayloadStore db = getPayloadStore(contextRef.get());
-					if (Util.isEmpty(GlobalInfo.conversationToken)) {
+					if (Util.isEmpty(GlobalInfo.getConversationToken(contextRef.get()))) {
 						Log.i("No conversation token yet.");
 						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						goToSleep(NO_TOKEN_SLEEP);
@@ -104,7 +104,7 @@ public class PayloadSendWorker {
 					}
 					Log.v("Checking for payloads to send.");
 					Payload payload;
-					payload = db.getOldestUnsentPayload();
+					payload = db.getOldestUnsentPayload(contextRef.get());
 					if (payload == null) {
 						// There is no payload in the db.
 						goToSleep(EMPTY_QUEUE_SLEEP_TIME);

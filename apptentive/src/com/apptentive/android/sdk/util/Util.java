@@ -202,8 +202,8 @@ public class Util {
 		return null;
 	}
 
-	public static boolean isNetworkConnectionPresent(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	public static boolean isNetworkConnectionPresent(Context appContext) {
+		ConnectivityManager cm = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
 
@@ -628,18 +628,6 @@ public class Util {
 		return cacheFile.getPath();
 	}
 
-	/*
-	 * Generate cached file name use content md5
-	 */
-	public static String generateCacheFileFullPathMd5(Context context, String imageUri) {
-		String fileName = calculateMD5(context, Uri.parse(imageUri));
-		if (fileName == null) {
-			return null;
-		}
-		File cacheDir = getDiskCacheDir(context);
-		File cacheFile = new File(cacheDir, fileName);
-		return cacheFile.getPath();
-	}
 
 	public static File getDiskCacheDir(Context context) {
 		File appCacheDir = null;
@@ -667,47 +655,6 @@ public class Util {
 		return perm == PackageManager.PERMISSION_GRANTED;
 	}
 
-	//Calculate MD5 from file's content
-	private static String calculateMD5(Context context, Uri uri) {
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			Log.e("Exception while getting digest", e);
-			return null;
-		}
-
-		InputStream is;
-		try {
-			is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
-		} catch (FileNotFoundException e) {
-			Log.e("Exception while getting FileInputStream", e);
-			return null;
-		}
-
-		byte[] buffer = new byte[8192];
-		int read;
-		try {
-			while ((read = is.read(buffer)) > 0) {
-				digest.update(buffer, 0, read);
-			}
-			byte[] md5sum = digest.digest();
-			BigInteger bigInt = new BigInteger(1, md5sum);
-			String output = bigInt.toString(16);
-			// Fill to 32 chars
-			output = String.format("%32s", output).replace(' ', '0');
-			return output;
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to process file for MD5", e);
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				Log.e("Exception on closing MD5 input stream", e);
-			}
-		}
-	}
-
 	/**
 	 * This function launchs the default app to view the selected file, based on mime type
 	 * @param sourcePath
@@ -719,33 +666,46 @@ public class Util {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
 				|| !Environment.isExternalStorageRemovable())
 				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
-			final Intent intent = new Intent();
-			intent.setAction(android.content.Intent.ACTION_VIEW);
+
+			File selectedFile = new File(selectedFilePath);
+			String selectedFileName = null;
+			if (selectedFile.exists()) {
+				selectedFileName = selectedFile.getName();
+				final Intent intent = new Intent();
+				intent.setAction(android.content.Intent.ACTION_VIEW);
 
       /* Attachments were downloaded into app private data dir. In order for external app to open
-			 * the attchments, the file need to be copied to a download folder that is accessible to public
+			 * the attachments, the file need to be copied to a download folder that is accessible to public
+			 * THe folder will be sdcard/Downloads/apptentive-received/<file name>
       */
-			String extStorageDirectory = Environment.getExternalStorageDirectory()
-					.toString();
-			File folder = new File(extStorageDirectory, "Downloads");
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-			File tmpfile = new File(folder, "apptentive-tmp");
-			String tmpFilePath = tmpfile.getPath();
-			if (tmpfile.exists()) {
-				tmpfile.delete();
-			}
-			if (copyFile(selectedFilePath, tmpFilePath) == 0) {
-				return false;
-			}
+				String extStorageDirectory = Environment.getExternalStorageDirectory()
+						.toString();
+				File folder = new File(extStorageDirectory, "Downloads" + File.separator + "apptentive-received");
+				if (!folder.exists()) {
+					folder.mkdir();
+				}
 
-			intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
-			try {
-				context.startActivity(intent);
-				return true;
-			} catch (ActivityNotFoundException e) {
-				Log.e("Activity not found to open attachment: ", e);
+				File tmpfile = new File(folder, selectedFileName);
+				String tmpFilePath = tmpfile.getPath();
+				// If destination file already exists, overwrite it; otherwise, delete all existing files in the same folder first.
+				if (!tmpfile.exists()) {
+					String[] children = folder.list();
+					for (int i = 0; i < children.length; i++)
+					{
+						new File(folder, children[i]).delete();
+					}
+				}
+				if (copyFile(selectedFilePath, tmpFilePath) == 0) {
+					return false;
+				}
+
+				intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
+				try {
+					context.startActivity(intent);
+					return true;
+				} catch (ActivityNotFoundException e) {
+					Log.e("Activity not found to open attachment: ", e);
+				}
 			}
 		} else {
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourcePath));

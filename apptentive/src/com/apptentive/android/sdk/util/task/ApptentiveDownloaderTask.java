@@ -23,7 +23,6 @@ import java.util.Map;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -40,17 +39,16 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 
 	boolean download = false;
 
-
 	public interface FileDownloadListener {
-		public void onDownloadStart();
+		void onDownloadStart();
 
-		public void onProgress(int progress);
+		void onProgress(int progress);
 
-		public void onDownloadComplete();
+		void onDownloadComplete();
 
-		public void onDownloadError();
+		void onDownloadError();
 
-		public void onDownloadCancel();
+		void onDownloadCancel();
 	}
 
 	public ApptentiveDownloaderTask(ImageView imageView, FileDownloadListener listener) {
@@ -68,7 +66,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 	protected ApptentiveHttpResponse doInBackground(Object... params) {
 		ApptentiveHttpResponse finished = new ApptentiveHttpResponse();
 		try {
-			finished = downloadBitmap((String) params[0], (String) params[1]);
+			finished = downloadBitmap((String) params[0], (String) params[1], (String) params[2]);
 		} catch (Exception e) {
 			Log.d("Error downloading bitmap", e);
 		}
@@ -109,7 +107,6 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 	 */
 	@Override
 	protected void onProgressUpdate(Integer... progress) {
-
 		super.onProgressUpdate(progress);
 		listener.onProgress(progress[0]);
 	}
@@ -117,7 +114,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 	/**
 	 * This function download the large file from the server
 	 */
-	private ApptentiveHttpResponse downloadBitmap(String urlstr, String destFilePath) {
+	private ApptentiveHttpResponse downloadBitmap(String urlstr, String destFilePath, String conversationToken) {
 		if (isCancelled()) {
 			return null;
 		}
@@ -136,7 +133,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				connection = (HttpURLConnection) httpUrl.openConnection();
 				if (bRequestRedirectThroughApptentive) {
 					connection.setRequestProperty("User-Agent", ApptentiveClient.getUserAgentString());
-					connection.setRequestProperty("Authorization", "OAuth " + GlobalInfo.conversationToken);
+					connection.setRequestProperty("Authorization", "OAuth " + conversationToken);
 					connection.setRequestProperty("X-API-Version", String.valueOf(ApptentiveClient.API_VERSION));
 				} else if (cookies != null) {
 					connection.setRequestProperty("Cookie", cookies);
@@ -196,15 +193,21 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 							8192);
 					output = new FileOutputStream(destFilePath);
 
-					byte data[] = new byte[1024];
+					byte data[] = new byte[8192];
 
 					long total = 0;
 
 					while ((count = input.read(data)) != -1) {
-						if (this.download) {
+						// allow canceling
+						if (isCancelled()) {
+							this.download = false;
+							break;
+						} else if (this.download) {
 							total += count;
-							// publishing the progress....
-							publishProgress((int) ((total * 100) / lenghtOfFile));
+							// publishing the progress only if fileLength is known
+							if (lenghtOfFile > 0) {
+								publishProgress((int) ((total * 100) / lenghtOfFile));
+							}
 							output.write(data, 0, count);
 						}
 					}

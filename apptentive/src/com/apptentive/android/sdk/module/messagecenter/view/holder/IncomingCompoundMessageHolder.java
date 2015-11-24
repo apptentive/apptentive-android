@@ -51,11 +51,13 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 			messageBodyView.setText(text);
 		}
 
-		if (name != null && !name.isEmpty()) {
-			nameView.setVisibility(View.VISIBLE);
-			nameView.setText(name);
-		} else {
-			nameView.setVisibility(View.GONE);
+		if (nameView != null) {
+			if (name != null && !name.isEmpty()) {
+				nameView.setVisibility(View.VISIBLE);
+				nameView.setText(name);
+			} else {
+				nameView.setVisibility(View.GONE);
+			}
 		}
 
 		// Set up attahments view
