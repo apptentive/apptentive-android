@@ -9,17 +9,47 @@ package com.apptentive.android.sdk.util.image;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ImageItem implements Parcelable{
 	public String originalPath;
 	public String localCachePath;
 	public String mimeType;
 	public long time;
 
+	private static final String KEY_ORIGINAL = "original";
+	private static final String KEY_LOCAL = "local_path";
+	private static final String KEY_MIME = "mimeType";
+	private static final String KEY_TIME = "time";
+
+
 	public ImageItem(String originalPath, String path, String type, long time) {
 		this.originalPath = originalPath;
 		this.localCachePath = path;
 		this.time = time;
 		this.mimeType = type;
+	}
+
+	public ImageItem(JSONObject json) throws JSONException {
+		this.originalPath = json.optString(KEY_ORIGINAL);
+		this.localCachePath = json.optString(KEY_LOCAL);
+		this.mimeType = json.optString(KEY_MIME);
+		this.time = json.optLong(KEY_TIME, 0);
+	}
+
+	public JSONObject toJSON() {
+		JSONObject json = null;
+		try {
+			json = new JSONObject();
+			json.put(KEY_ORIGINAL, this.originalPath);
+			json.put(KEY_LOCAL, this.localCachePath);
+			json.put(KEY_MIME, this.mimeType);
+			json.put(KEY_TIME, this.time);
+		} catch (JSONException e) {
+			// Ignored
+		}
+		return  json;
 	}
 
 	@Override
