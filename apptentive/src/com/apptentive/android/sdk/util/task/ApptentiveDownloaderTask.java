@@ -186,7 +186,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				InputStream input = null;
 				FileOutputStream output = null;
 				try {
-					int lenghtOfFile = connection.getContentLength();
+					int fileLength = connection.getContentLength();
 
 					// input stream to read file - with 8k buffer
 					input = new BufferedInputStream(httpUrl.openStream(), 8192);
@@ -204,8 +204,8 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 						} else if (this.download) {
 							total += count;
 							// publishing the progress only if fileLength is known
-							if (lenghtOfFile > 0) {
-								publishProgress((int) ((total * 100) / lenghtOfFile));
+							if (fileLength > 0) {
+								publishProgress((int) ((total * 100) / fileLength));
 							}
 							output.write(data, 0, count);
 						}
