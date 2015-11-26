@@ -129,7 +129,7 @@ public class ApptentiveClient {
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase(appContext) + uri;
-		Log.d("Performing request to %s", uri);
+		Log.d("Performing %s request to %s", method.name(), uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -180,37 +180,27 @@ public class ApptentiveClient {
 			}
 			ret.setHeaders(headers);
 
-			// Read the normal content response
-			InputStream nis = null;
-			try {
-				nis = connection.getInputStream();
-				if (nis != null) {
-					String contentEncoding = ret.getHeaders().get("Content-Encoding");
-					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("[gzip]")) {
-						nis = new GZIPInputStream(nis);
-					}
-					ret.setContent(Util.readStringFromInputStream(nis, "UTF-8"));
-					if (responseCode >= 200 && responseCode < 300) {
-						Log.v("Response: " + ret.getContent());
-					} else {
-						Log.w("Response: " + ret.getContent());
-					}
-				}
-			} finally {
-				Util.ensureClosed(nis);
+			// Read the response, if available
+			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			if (responseCode >= 200 && responseCode < 300) {
+				ret.setContent(getResponse(connection, ret.isZipped()));
+				Log.v("Response: %s", ret.getContent());
+			} else {
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
+				Log.w("Response: %s", ret.getContent());
 			}
-
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
 			Log.w("Timeout communicating with server.", e);
 		} catch (final MalformedURLException e) {
-			Log.w("ClientProtocolException", e);
+			Log.w("MalformedUrlException", e);
 		} catch (final IOException e) {
-			Log.w("ClientProtocolException", e);
+			Log.w("IOException", e);
 			// Read the error response.
 			try {
-				ret.setContent(getErrorInResponse(connection));
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
+				Log.w("Response: " + ret.getContent());
 			} catch (IOException ex) {
 				Log.w("Can't read error stream.", ex);
 			}
@@ -242,37 +232,10 @@ public class ApptentiveClient {
 		}
 	}
 
-	/**
-	 * Reads error message from response and returns it as a string.
-	 *
-	 * @param con current connection
-	 * @return String with error message contents.
-	 * @throws IOException
-	 */
-	public static String getErrorInResponse(HttpURLConnection con) throws IOException {
-		if (con != null) {
-			BufferedReader in = null;
-			try {
-				InputStream errorStream = con.getErrorStream();
-				if (errorStream != null) {
-					StringBuilder error = new StringBuilder();
-					in = new BufferedReader(new InputStreamReader(errorStream));
-					String errStr;
-					while ((errStr = in.readLine()) != null) {
-						error.append(errStr);
-					}
-					return error.toString();
-				}
-			} finally {
-				Util.ensureClosed(in);
-			}
-		}
-		return null;
-	}
-
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
 		uri = getEndpointBase(appContext) + uri;
-		Log.d("Performing multipart request to %s", uri);
+		Log.d("Performing multipart POST to %s", uri);
+		Log.d("Multipart POST body: %s", postBody);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		if (!Util.isNetworkConnectionPresent(appContext)) {
@@ -399,8 +362,8 @@ public class ApptentiveClient {
 				Util.ensureClosed(nbaos);
 			}
 
-			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
-			Log.v(ret.getContent());
+			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			Log.v("Response: %s", ret.getContent());
 		} catch (FileNotFoundException e) {
 			Log.e("Error getting file to upload.", e);
 		} catch (MalformedURLException e) {
@@ -410,7 +373,7 @@ public class ApptentiveClient {
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
 			try {
-				ret.setContent(getErrorInResponse(connection));
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
 				Log.w("Can't read error stream.", ex);
 			}
@@ -440,4 +403,53 @@ public class ApptentiveClient {
 		return url;
 	}
 
+	/**
+	 * Reads response and returns it as a string. Handles gzipped streams.
+	 *
+	 * @param connection Current connection
+	 * @return Response as String
+	 * @throws IOException
+	 */
+	public static String getResponse(HttpURLConnection connection, boolean isZipped) throws IOException {
+		if (connection != null) {
+			InputStream is = null;
+			try {
+				is = connection.getInputStream();
+				if (is != null) {
+					if (isZipped) {
+						is = new GZIPInputStream(is);
+					}
+					return Util.readStringFromInputStream(is, "UTF-8");
+				}
+			} finally {
+				Util.ensureClosed(is);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Reads error response and returns it as a string. Handles gzipped streams.
+	 *
+	 * @param connection Current connection
+	 * @return Error response as String
+	 * @throws IOException
+	 */
+	public static String getErrorResponse(HttpURLConnection connection, boolean isZipped) throws IOException {
+		if (connection != null) {
+			InputStream is = null;
+			try {
+				is = connection.getErrorStream();
+				if (is != null) {
+					if (isZipped) {
+						is = new GZIPInputStream(is);
+					}
+				}
+				return Util.readStringFromInputStream(is, "UTF-8");
+			} finally {
+				Util.ensureClosed(is);
+			}
+		}
+		return null;
+	}
 }

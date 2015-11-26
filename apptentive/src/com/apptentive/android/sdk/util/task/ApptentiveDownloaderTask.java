@@ -189,8 +189,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 					int lenghtOfFile = connection.getContentLength();
 
 					// input stream to read file - with 8k buffer
-					input = new BufferedInputStream(httpUrl.openStream(),
-							8192);
+					input = new BufferedInputStream(httpUrl.openStream(), 8192);
 					output = new FileOutputStream(destFilePath);
 
 					byte data[] = new byte[8192];
@@ -236,7 +235,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 			Log.w("ClientProtocolException", e);
 			// Read the error response.
 			try {
-				ret.setContent(ApptentiveClient.getErrorInResponse(connection));
+				ret.setContent(ApptentiveClient.getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
 				Log.w("Can't read error stream.", ex);
 			}
