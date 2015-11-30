@@ -298,7 +298,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			image = (ImageView) view.findViewById(R.id.image);
 			indicator = (ImageView) view.findViewById(R.id.indicator);
 			mask = view.findViewById(R.id.mask);
-			attachmentExtension = (TextView) view.findViewById(R.id.image_preview_title);
+			attachmentExtension = (TextView) view.findViewById(R.id.image_file_extension);
 			progressBar = (ProgressBar) view.findViewById(R.id.thumbnail_progress);
 			progressBarDownload = (ApptentiveMaterialDeterminateProgressBar) view.findViewById(R.id.thumbnail_progress_determinate);
 			pos = index;
@@ -322,11 +322,15 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				progressBarDownload.setVisibility(View.GONE);
 				return;
 			} else {
-				image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+				if (Util.isMimeTypeImage(data.mimeType)) {
+					image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+				} else {
+					image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+				}
 			}
 
 			int placeholderResId = R.drawable.apptentive_ic_image_default_item;
-      // Image indicators are overlay controls, such as close button, check box
+            // Image indicators are overlay controls, such as close button, check box
 			if (showImageIndicator) {
 				indicator.setVisibility(View.VISIBLE);
 				image.setVisibility(View.VISIBLE);
@@ -370,7 +374,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				bLoadThumbnail = false;
 				progressBar.setVisibility(View.GONE);
 				attachmentExtension.setVisibility(View.VISIBLE);
-				attachmentExtension.setText(MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
+				attachmentExtension.setText("." + MimeTypeMap.getSingleton().getExtensionFromMimeType(data.mimeType));
 
 				if (downloadItems.contains(data.originalPath)) {
 					placeholderResId = R.drawable.apptentive_generic_file_thumbnail_download;

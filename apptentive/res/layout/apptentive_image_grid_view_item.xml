@@ -18,17 +18,17 @@
         android:src="@null"/>
 
     <TextView
-        android:id="@+id/image_preview_title"
+        android:id="@+id/image_file_extension"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_gravity="center|center_horizontal"
         android:gravity="center_horizontal"
-        android:paddingBottom="8dp"
-        android:textSize="26sp"
+        android:layout_marginTop="@dimen/apptentive_image_file_extension_layout_top"
+        android:textSize="@dimen/apptentive_image_file_extension_default_text_size"
         android:lineSpacingMultiplier="0.8"
         android:maxLines="2"
         android:ellipsize="end"
-        android:textColor="@color/apptentive_material_secondary_text"
+        android:textColor="#617D8A"
         tools:text="File"/>
 
     <View
@@ -57,7 +57,7 @@
         android:id="@+id/thumbnail_progress_determinate"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_gravity="center"
-        style="@style/ApptentiveMessageCenterMessageOutgoingProgressBar"
+        android:layout_gravity="bottom"
+        style="@style/ApptentiveMessageCenterAttachmentDownloadProgressBar"
         android:visibility="gone"/>
 </FrameLayout>

@@ -13,4 +13,7 @@
     <dimen name="apptentive_header_padding_right">12dp</dimen>
 
     <dimen name="apptentive_message_center_avatar_image_diameter">56dp</dimen>
+
+    <dimen name="apptentive_image_file_extension_default_text_size">24sp</dimen>
+    <dimen name="apptentive_image_file_extension_layout_top">40dp</dimen>
 </resources>

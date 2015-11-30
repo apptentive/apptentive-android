@@ -86,4 +86,8 @@
     <dimen name="apptentive_image_thumbnail_default_size">160dp</dimen>
     <dimen name="apptentive_image_grid_space_size">3dp</dimen>
 
+    <dimen name="apptentive_image_file_extension_default_text_size">12sp</dimen>
+    <dimen name="apptentive_image_file_extension_layout_top">24dp</dimen>
+
+
 </resources>
