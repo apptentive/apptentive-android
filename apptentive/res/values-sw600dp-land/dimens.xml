@@ -23,4 +23,6 @@
     <dimen name="apptentive_message_center_status_side_padding">32dp</dimen>
 
     <dimen name="apptentive_message_center_error_side_margin">128dp</dimen>
+    <dimen name="apptentive_image_file_extension_layout_top">0dp</dimen>
+    <dimen name="apptentive_image_download_progresbar_layout_top">8dp</dimen>
 </resources>

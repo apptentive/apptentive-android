@@ -298,8 +298,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				onSavedInstanceState.getInt(LIST_TOP_OFFSET);
 		composingViewSavedState = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
-		savedAttachmentstList = (onSavedInstanceState == null) ? null :
-				onSavedInstanceState.<ImageItem>getParcelableArrayList(COMPOSING_ATTACHMENTS);
 		pendingWhoCardName = (onSavedInstanceState == null) ? null :
 				onSavedInstanceState.getParcelable(WHO_CARD_NAME);
 		pendingWhoCardEmail = (onSavedInstanceState == null) ? null :
@@ -450,7 +448,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		outState.putInt(LIST_TOP_INDEX, index);
 		outState.putInt(LIST_TOP_OFFSET, top);
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
-		outState.putParcelableArrayList(COMPOSING_ATTACHMENTS, imageAttachmentstList);
 		outState.putParcelable(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardNameState());
 		outState.putParcelable(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmailState());
 		outState.putString(WHO_CARD_AVATAR_FILE, messageCenterListAdapter.getWhoCardAvatarFileName());
@@ -947,7 +944,6 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			savedAttachmentstList = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
-		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
 	@Override
@@ -961,18 +957,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			pendingWhoCardEmail = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
-		//Util.showSoftKeyboard(viewActivity, viewActivity.findViewById(android.R.id.content));
 	}
 
 	@Override
 	public void beforeComposingTextChanged(CharSequence str) {
-		/*MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
-		if (barView != null) {
-			barView.sendButton.setEnabled(false);
-			barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(viewActivity, R.attr.apptentive_material_disabled_icon,
-					R.color.apptentive_material_dark_disabled_icon));
-			barView.showConfirmation = false;
-		}*/
+
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -674,9 +675,9 @@ public class Util {
 				final Intent intent = new Intent();
 				intent.setAction(android.content.Intent.ACTION_VIEW);
 				/* Attachments were downloaded into app private data dir. In order for external app to open
-			     * the attachments, the file need to be copied to a download folder that is accessible to public
-			     * THe folder will be sdcard/Downloads/apptentive-received/<file name>
-                 */
+			   * the attachments, the file need to be copied to a download folder that is accessible to public
+			   * THe folder will be sdcard/Downloads/apptentive-received/<file name>
+         */
 				File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 				File apptentiveSubFolder = new File(downloadFolder, "apptentive-received");
 				if (!apptentiveSubFolder.exists()) {
@@ -824,5 +825,35 @@ public class Util {
 		return storedFile;
 	}
 
+	// A utility to obtain screen info for debug logging
+	public static String getDeviceScreenInfo(Activity activity) {
+		StringBuilder inforString = new StringBuilder("Screen(density bucket:");
+		DisplayMetrics metrics = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		float density = metrics.density;
+		if (density >= 4.0) {
+			inforString.append("xxxhdpi ");
+		}
+		else if (density >= 3.0) {
+			inforString.append("xxhdpi ");
+		}
+		else if (density >= 2.0) {
+			inforString.append("xhdpi ");
+		}
+		else if (density >= 1.5) {
+			inforString.append("hdpi ");
+		}
+		else if (density >= 1.0) {
+			inforString.append("mdpi ");
+		}
+		else {
+			inforString.append("ldpi ");
+		}
+		inforString.append("sw" + (int) (metrics.widthPixels / density) + "dp");
+		inforString.append(" width pix:" + metrics.widthPixels);
+		inforString.append(" height pix:" + metrics.heightPixels);
+		inforString.append(")");
+		return inforString.toString();
+	}
 }
 

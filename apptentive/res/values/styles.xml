@@ -419,6 +419,13 @@
         <item name="apptentive_progressBarColor">?attr/colorAccent</item>
     </style>
 
+    <style name="ApptentiveMessageCenterAttachmentDownloadProgressBar">
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="apptentive_progressBarColor">?attr/colorAccent</item>
+    </style>
+
     <!-- For dialog Animation -->
     <style name="ApptentiveDialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
