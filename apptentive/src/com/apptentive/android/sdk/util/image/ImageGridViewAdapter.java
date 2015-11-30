@@ -534,7 +534,6 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 * Callback Interface
 	 */
 	public interface Callback {
-		void onSingleImageSelected(int index);
 
 		void onImageSelected(int index);
 

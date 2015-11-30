@@ -134,6 +134,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	private Parcelable composingViewSavedState;
 	private ArrayList<ImageItem> savedAttachmentstList;
 
+	/*
+	 * Set to true when user launches image picker, and set to false once an image is picked
+	 * This is used to track if the user tried to attach an image but abandoned the image picker
+	 * without picking anything
+	 */
+	private boolean imagePickerLaunched = false;
+
 	/**
 	 * Used to save the state of the who card if the user closes Message Center for a moment,
 	 * , rotate device, attaches a file, etc.
@@ -505,6 +512,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						Log.d("no image is picked");
 						return;
 					}
+					imagePickerLaunched = false;
 					Uri uri;
 					//Android SDK less than 19
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -524,7 +532,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						long creation_time = Util.getContentCreationTime(viewActivity, uri);
 						Uri fileUri = Uri.fromFile(new File(originalPath));
 						File cacheDir = Util.getDiskCacheDir(viewActivity);
-						addImageToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
+						addAttachmentsToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
 								Util.getMimeTypeFromUri(viewActivity, uri), creation_time)));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
@@ -532,7 +540,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 						 */
 						File cacheDir = Util.getDiskCacheDir(viewActivity);
 						String cachedFileName = Util.generateCacheFileFullPath(uri, cacheDir, 0);
-						addImageToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(viewActivity, uri), 0)));
+						addAttachmentsToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(viewActivity, uri), 0)));
 					}
 
 					break;
@@ -551,6 +559,14 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	@Override
 	public void onResume() {
 		MessageManager.onResumeSending();
+		/* imagePickerLaunched was set true when the picker intent was launched. If user had picked an image,
+		 * it woud have been set to false. Otherwise, it indicates the user tried to attach an image but
+		 * abandoned the image picker without picking anything
+		 */
+		if (imagePickerLaunched) {
+			EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
+			imagePickerLaunched = false;
+		}
 	}
 
 	private void clearPendingMessageCenterPushNotification() {
@@ -721,7 +737,8 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 	}
 
-	public void addImageToComposer(final List<ImageItem> images) {
+	public void addAttachmentsToComposer(final List<ImageItem> images) {
+		int numberOfExistingAttachments = imageAttachmentstList.size();
 		ArrayList<ImageItem> uniqueImages = new ArrayList<ImageItem>();
 		// only add new images, and filter out duplicates
 		if (images != null && images.size() > 0) {
@@ -744,6 +761,12 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 			return;
 		}
 		imageAttachmentstList.addAll(uniqueImages);
+		// New attachments are added to a composer with no prior attachment
+		if (imageAttachmentstList.size() > 0 && numberOfExistingAttachments == 0) {
+			EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_LIST_SHOWN);
+		}
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_ADD);
+
 		View v = messageCenterListView.getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
 		// Only update composing view if image is attached successfully
@@ -757,7 +780,24 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		onComposingBarCreated();
 	}
 
+	public void restoreSavedAttachmentsToComposer(final List<ImageItem> images) {
+		imageAttachmentstList.clear();
+		imageAttachmentstList.addAll(images);
+		View v = messageCenterListView.getChildAt(0);
+		int top = (v == null) ? 0 : v.getTop();
+		// Only update composing view if image is attached successfully
+		messageCenterListAdapter.addImagestoComposer(images);
+		messageCenterListAdapter.setForceShowKeyboard(false);
+		int firstIndex = messageCenterListView.getFirstVisiblePosition();
+
+		messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+				firstIndex, top));
+
+		onComposingBarCreated();
+	}
+
 	public void removeImageFromComposer(final int position) {
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
 		imageAttachmentstList.remove(position);
 		messageCenterListAdapter.removeImageFromComposer(position);
 		int count = imageAttachmentstList.size();
@@ -817,7 +857,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public void clearWhoCardUi(Animator.AnimatorListener al,
-														 ValueAnimator.AnimatorUpdateListener vl, long delay) {
+							   ValueAnimator.AnimatorUpdateListener vl, long delay) {
 		if (whoCardItem != null) {
 			if (al != null) {
 				deleteItemWithAnimation(messageCenterListAdapter.getWhoCardView(), al, vl, delay);
@@ -833,7 +873,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	public void clearComposingUi(Animator.AnimatorListener al,
-															 ValueAnimator.AnimatorUpdateListener vl, long delay) {
+								 ValueAnimator.AnimatorUpdateListener vl, long delay) {
 		if (composingItem != null) {
 			if (al != null) {
 				deleteItemWithAnimation(messageCenterListAdapter.getComposingActionBarView(), null, null, delay);
@@ -940,7 +980,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 
 		if (savedAttachmentstList != null) {
-			addImageToComposer(savedAttachmentstList);
+			restoreSavedAttachmentsToComposer(savedAttachmentstList);
 			savedAttachmentstList = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
@@ -990,39 +1030,39 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 		clearComposingUi(new Animator.AnimatorListener() {
 
-											 @Override
-											 public void onAnimationStart(Animator animation) {
-											 }
+							 @Override
+							 public void onAnimationStart(Animator animation) {
+							 }
 
-											 @Override
-											 public void onAnimationRepeat(Animator animation) {
-											 }
+							 @Override
+							 public void onAnimationRepeat(Animator animation) {
+							 }
 
-											 @Override
-											 public void onAnimationEnd(Animator animation) {
-												 if (contextualMessage != null) {
-													 messages.remove(contextualMessage);
-													 contextualMessage = null;
-												 }
-												 messages.remove(actionBarItem);
-												 messages.remove(composingItem);
-												 actionBarItem = null;
-												 composingItem = null;
-												 messageEditText = null;
-												 messageCenterListAdapter.clearComposing();
-												 addExpectationStatusIfNeeded();
-												 messageCenterListAdapter.notifyDataSetChanged();
-												 imageAttachmentstList.clear();
-												 showFab();
-												 showProfileButton();
-												 // messageEditText has been set to null, pending composing message will reset
-												 clearPendingComposingMessage();
-											 }
+							 @Override
+							 public void onAnimationEnd(Animator animation) {
+								 if (contextualMessage != null) {
+									 messages.remove(contextualMessage);
+									 contextualMessage = null;
+								 }
+								 messages.remove(actionBarItem);
+								 messages.remove(composingItem);
+								 actionBarItem = null;
+								 composingItem = null;
+								 messageEditText = null;
+								 messageCenterListAdapter.clearComposing();
+								 addExpectationStatusIfNeeded();
+								 messageCenterListAdapter.notifyDataSetChanged();
+								 imageAttachmentstList.clear();
+								 showFab();
+								 showProfileButton();
+								 // messageEditText has been set to null, pending composing message will reset
+								 clearPendingComposingMessage();
+							 }
 
-											 @Override
-											 public void onAnimationCancel(Animator animation) {
-											 }
-										 },
+							 @Override
+							 public void onAnimationCancel(Animator animation) {
+							 }
+						 },
 				null,
 				DEFAULT_DELAYMILLIS);
 		//clearComposingUi(null, null, 0);
@@ -1044,45 +1084,45 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		// Close all composing UI
 		clearComposingUi(new Animator.AnimatorListener() {
 
-											 @Override
-											 public void onAnimationStart(Animator animation) {
-											 }
+							 @Override
+							 public void onAnimationStart(Animator animation) {
+							 }
 
-											 @Override
-											 public void onAnimationRepeat(Animator animation) {
-											 }
+							 @Override
+							 public void onAnimationRepeat(Animator animation) {
+							 }
 
-											 @Override
-											 public void onAnimationEnd(Animator animation) {
-												 messages.remove(actionBarItem);
-												 messages.remove(composingItem);
-												 actionBarItem = null;
-												 composingItem = null;
-												 messageEditText = null;
-												 messageCenterListAdapter.clearComposing();
-												 messageCenterListAdapter.notifyDataSetChanged();
-												 clearPendingComposingMessage();
-												 // Send out the new message. The delay is added to ensure the CardView showing animation
-												 // is visible after the keyboard is hidden
-												 if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
-													 Bundle b = new Bundle();
-													 b.putString(COMPOSING_EDITTEXT_STATE, messageText);
-													 b.putParcelableArrayList(COMPOSING_ATTACHMENTS, messageAttachments);
-													 Message msg = messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
-															 messageText);
-													 msg.setData(b);
-													 messageCenterViewHandler.sendMessageDelayed(msg, DEFAULT_DELAYMILLIS);
-												 }
+							 @Override
+							 public void onAnimationEnd(Animator animation) {
+								 messages.remove(actionBarItem);
+								 messages.remove(composingItem);
+								 actionBarItem = null;
+								 composingItem = null;
+								 messageEditText = null;
+								 messageCenterListAdapter.clearComposing();
+								 messageCenterListAdapter.notifyDataSetChanged();
+								 clearPendingComposingMessage();
+								 // Send out the new message. The delay is added to ensure the CardView showing animation
+								 // is visible after the keyboard is hidden
+								 if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
+									 Bundle b = new Bundle();
+									 b.putString(COMPOSING_EDITTEXT_STATE, messageText);
+									 b.putParcelableArrayList(COMPOSING_ATTACHMENTS, messageAttachments);
+									 Message msg = messageCenterViewHandler.obtainMessage(MSG_START_SENDING,
+											 messageText);
+									 msg.setData(b);
+									 messageCenterViewHandler.sendMessageDelayed(msg, DEFAULT_DELAYMILLIS);
+								 }
 
-												 imageAttachmentstList.clear();
-												 showFab();
-												 showProfileButton();
-											 }
+								 imageAttachmentstList.clear();
+								 showFab();
+								 showProfileButton();
+							 }
 
-											 @Override
-											 public void onAnimationCancel(Animator animation) {
-											 }
-										 },
+							 @Override
+							 public void onAnimationCancel(Animator animation) {
+							 }
+						 },
 				null,
 				DEFAULT_DELAYMILLIS);
 	}
@@ -1225,10 +1265,13 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 	}
 
+	/* Callback when the attach button is clicked
+	 *
+	 */
 	@Override
 	public void onAttachImage() {
 		try {
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {//Api level 19
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {//prior Api level 19
 				Intent intent = new Intent();
 				intent.setType("image/*");
 				intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -1241,8 +1284,10 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				Intent chooserIntent = Intent.createChooser(intent, null);
 				viewActivity.startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
 			}
+			imagePickerLaunched = true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			imagePickerLaunched = false;
 			Log.d("can't launch image picker");
 		}
 	}
@@ -1353,7 +1398,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 
 	private void deleteItemWithAnimation(final View v, final Animator.AnimatorListener al,
-																			 final ValueAnimator.AnimatorUpdateListener vl, long delay) {
+										 final ValueAnimator.AnimatorUpdateListener vl, long delay) {
 		if (v == null) {
 			return;
 		}
@@ -1453,11 +1498,11 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		}
 	}
 
-	@Override
-	public void onSingleImageSelected(int index) {
 
-	}
-
+	/*
+	 * Called when attachment overlayed "selection" ui is tapped. The "selection" ui could be selection checkbox
+	 * or close button
+	 */
 	@Override
 	public void onImageSelected(int index) {
 		removeImageFromComposer(index);
