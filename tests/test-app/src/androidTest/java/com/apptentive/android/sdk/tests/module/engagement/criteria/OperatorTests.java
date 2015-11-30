@@ -94,7 +94,14 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 		try {
 			Apptentive.addCustomDeviceData(getTargetContext(), "number_5", 5);
 			Apptentive.addCustomDeviceData(getTargetContext(), "string_qwerty", "qwerty");
+			Apptentive.addCustomDeviceData(getTargetContext(), "boolean_true", true);
+			Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
+			Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
+			Apptentive.Version version = new Apptentive.Version();
+			version.setVersion("1.2.3");
+			Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
 			Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
+
 			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet(getTargetContext()));
