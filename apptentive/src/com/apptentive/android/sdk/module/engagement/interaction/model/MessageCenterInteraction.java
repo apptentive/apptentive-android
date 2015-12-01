@@ -84,6 +84,10 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String EVENT_NAME_PROFILE_NAME = "profile_name";
 	public static final String EVENT_NAME_PROFILE_EMAIL = "profile_email";
 	public static final String EVENT_NAME_PROFILE_SUBMIT = "profile_submit";
+	public static final String EVENT_NAME_ATTACHMENT_LIST_SHOWN = "attachment_list_open";
+	public static final String EVENT_NAME_ATTACHMENT_ADD = "attachment_add";
+	public static final String EVENT_NAME_ATTACHMENT_DELETE = "attachment_delete";
+	public static final String EVENT_NAME_ATTACHMENT_CANCEL = "attachment_cancel";
 
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
