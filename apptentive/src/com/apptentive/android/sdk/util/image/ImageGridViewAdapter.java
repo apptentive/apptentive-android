@@ -330,7 +330,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 			}
 
 			int placeholderResId = R.drawable.apptentive_ic_image_default_item;
-            // Image indicators are overlay controls, such as close button, check box
+			// Image indicators are overlay controls, such as close button, check box
 			if (showImageIndicator) {
 				indicator.setVisibility(View.VISIBLE);
 				image.setVisibility(View.VISIBLE);
@@ -387,7 +387,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 					}
 				}
 			}
-      // Hide the progress bar till download starts
+			// Hide the progress bar till download starts
 			if (progressBarDownload != null) {
 				progressBarDownload.setVisibility(View.GONE);
 			}
@@ -454,7 +454,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 								}
 							});
-				} else if (downloadItems.contains(data.originalPath)){
+				} else if (downloadItems.contains(data.originalPath)) {
 					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, 0, 0, false,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
@@ -495,8 +495,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 										if (progress == -1) {
 											downloadItems.remove(data.originalPath);
 											progressBarDownload.setVisibility(View.GONE);
-										}
-										else if (progress >= 0) {
+										} else if (progress >= 0) {
 											progressBarDownload.setVisibility(View.VISIBLE);
 											progressBarDownload.setProgress(progress);
 											Log.d("ApptentiveAttachmentLoader progress callback: " + progress);
@@ -505,7 +504,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								}
 							});
 				} else {
-					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0 , 0, false, new ApptentiveAttachmentLoader.LoaderCallback() {
+					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0, 0, false, new ApptentiveAttachmentLoader.LoaderCallback() {
 						@Override
 						public void onLoaded(ImageView view, int pos, Bitmap d) {
 							if (progressBarDownload != null) {
