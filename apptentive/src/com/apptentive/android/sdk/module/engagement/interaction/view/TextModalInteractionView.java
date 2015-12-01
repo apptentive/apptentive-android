@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
@@ -63,8 +64,12 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 		}
 
 		LinearLayout bottomArea = (LinearLayout) activity.findViewById(R.id.bottom_area);
-		List<Action> actions = interaction.getActions().getAsList();
+		Actions actionsObject = interaction.getActions();
 		boolean vertical;
+		List<Action> actions = null;
+		if (actionsObject != null) {
+			actions = actionsObject.getAsList();
+		}
 		if (actions != null && !actions.isEmpty()) {
 			int totalChars = 0;
 			for (Action button : actions) {
