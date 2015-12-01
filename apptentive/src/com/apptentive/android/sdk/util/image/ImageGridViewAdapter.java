@@ -108,7 +108,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	 */
 	public boolean clickOn(int index) {
 		ImageItem item = getItem(index);
-		if (TextUtils.isEmpty(item.mimeType)) {
+		if (item == null || TextUtils.isEmpty(item.mimeType)) {
 			return false;
 		}
 		// For non-image item, fisrt time tap will start download
