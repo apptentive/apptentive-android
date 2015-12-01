@@ -14,14 +14,14 @@ def getReleaseRepositoryUrl() {
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : "http://54.183.158.246:8081/artifactory/apptentive-snapshots"
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : ""
 }
 
 def getRepositoryUsername() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
     } else {
-        return "jenkins"
+        return hasProperty('SNAPSHOT_REPOSITORY_USERNAME') ? SNAPSHOT_REPOSITORY_USERNAME : ""
     }
 }
 
@@ -29,7 +29,7 @@ def getRepositoryPassword() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
     } else {
-        return "nFempzNsvhuxPuB[rrw7rLFLVKtWNysX&BZdCpfbMNXFu9rwdZ"
+        return hasProperty('SNAPSHOT_REPOSITORY_PASSWORD') ? SNAPSHOT_REPOSITORY_PASSWORD : ""
     }
 }
 
