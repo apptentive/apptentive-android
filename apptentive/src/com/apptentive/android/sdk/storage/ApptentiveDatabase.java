@@ -545,7 +545,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	public synchronized StoredFile getStoredFile(String id) {
 		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
+		Cursor cursor = null;
 		try {
 			db = getReadableDatabase();
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
