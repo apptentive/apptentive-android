@@ -770,21 +770,27 @@ public class Util {
 			return null;
 		}
 		// Copy the file contents over.
-		CountingOutputStream os = null;
+		CountingOutputStream cos = null;
+		BufferedOutputStream bos = null;
+		FileOutputStream fos = null;
 		try {
 			File localFile = new File(localFilePath);
-			os = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
+			fos = new FileOutputStream(localFile);
+			bos = new BufferedOutputStream(fos);
+			cos = new CountingOutputStream(bos);
 			byte[] buf = new byte[2048];
 			int count;
 			while ((count = is.read(buf, 0, 2048)) != -1) {
-				os.write(buf, 0, count);
+				cos.write(buf, 0, count);
 			}
-			Log.d("File saved, size = " + (os.getBytesWritten() / 1024) + "k");
+			Log.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
 			Log.e("Error creating local copy of file attachment.");
 			return null;
 		} finally {
-			Util.ensureClosed(os);
+			Util.ensureClosed(cos);
+			Util.ensureClosed(bos);
+			Util.ensureClosed(fos);
 		}
 
 		// Create a StoredFile database entry for this locally saved file.
