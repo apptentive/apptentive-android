@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.util;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -548,13 +549,13 @@ public class Util {
 	}
 
 	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
-
-		String path = null;
-		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
-			return path;
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+			return null;
 		}
-
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor == null) {
+			return null;
+		}
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
 		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
@@ -563,18 +564,23 @@ public class Util {
 		cursor = context.getContentResolver().query(
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		if (cursor == null) {
+			return null;
+		}
 		cursor.moveToFirst();
-		path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 		cursor.close();
-
 		return path;
 	}
 
 	public static long getContentCreationTime(Context context, Uri contentUri) {
-		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 			return 0;
 		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor == null) {
+			return 0;
+		}
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
 		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
@@ -583,6 +589,9 @@ public class Util {
 		cursor = context.getContentResolver().query(
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		if (cursor == null) {
+			return 0;
+		}
 		cursor.moveToFirst();
 		long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
 		cursor.close();
