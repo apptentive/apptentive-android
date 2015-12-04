@@ -34,7 +34,7 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:autoLink="web|email|phone|map"
-                          android:textColor="?attr/apptentive_material_primary_text"/>
+                          style="@style/ApptentiveTheme.TextAppearence.TextView"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView
                     android:id="@+id/grid"
                     android:layout_width="match_parent"

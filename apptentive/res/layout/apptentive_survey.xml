@@ -31,7 +31,8 @@
                           android:paddingRight="16dp"
                           android:textColor="@color/apptentive_survey_title_text"
                           android:textStyle="bold"
-                          android:textSize="@dimen/apptentive_text_large"/>
+                          android:textSize="@dimen/apptentive_text_large"
+                          style="@style/ApptentiveTheme.TextAppearence"/>
                 <FrameLayout android:layout_width="match_parent"
                              android:layout_height="4dp"
                              android:background="@color/apptentive_survey_separator"/>
@@ -50,7 +51,8 @@
                               android:paddingTop="16dp"
                               android:visibility="gone"
                               android:textSize="@dimen/apptentive_text_medium"
-                              android:textColor="@color/apptentive_survey_question_instruction_text"/>
+                              android:textColor="@color/apptentive_survey_question_instruction_text"
+                              style="@style/ApptentiveTheme.TextAppearence"/>
                     <LinearLayout android:id="@+id/questions"
                                   android:layout_width="match_parent"
                                   android:layout_height="match_parent"
