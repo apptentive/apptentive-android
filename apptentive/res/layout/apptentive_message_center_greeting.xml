@@ -37,12 +37,12 @@
             <TextView android:id="@+id/title"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextViewStyle.Greeting"
+                      style="@style/ApptentiveTheme.TextAppearence.Greeting"
                       android:text="Hello"/>
             <TextView android:id="@+id/body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextViewStyle.Greeting.Body"/>
+                      style="@style/ApptentiveTheme.TextAppearence.Greeting.Body"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"
                      android:layout_width="@dimen/apptentive_message_center_icon_dimension"

@@ -39,10 +39,7 @@
                   android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
                   android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
                   android:inputType="textCapSentences"
-                  android:singleLine="true"
-                  android:textColorHint="?attr/apptentive_material_hint_text"
-                  android:textColor="?attr/apptentive_material_primary_text"
-                  android:textSize="@dimen/apptentive_text_medium_small"/>
+                  style="@style/ApptentiveTheme.TextAppearence.EditText.WhoCard"/>
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
@@ -54,12 +51,8 @@
             <EditText android:id="@+id/who_email"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:singleLine="true"
-                      android:textColorHint="?attr/apptentive_material_hint_text"
-                      android:textColor="?attr/apptentive_material_primary_text"
-                      android:textSize="@dimen/apptentive_text_medium_small"
-                      android:inputType="textEmailAddress"/>
-
+                      android:inputType="textEmailAddress"
+                      style="@style/ApptentiveTheme.TextAppearence.EditText.WhoCard"/>
             <TextView android:id="@+id/email_explanation"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -82,7 +75,6 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:contentDescription="Skip"
                     android:textColor="?attr/colorAccent"/>
-
             <Button android:id="@+id/btn_send"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
