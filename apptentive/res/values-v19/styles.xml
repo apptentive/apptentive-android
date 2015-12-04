@@ -36,7 +36,7 @@
     </style>
 
     <style name="ApptentiveTheme.TextAppearence" parent="@android:style/TextAppearance">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.TextView">

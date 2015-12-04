@@ -41,7 +41,8 @@
                                                                 android:gravity="center"
                                                                 android:singleLine="true"
                                                                 android:textColor="?attr/apptentive_material_toolbar_foreground"
-                                                                android:textSize="20sp"/>
+                                                                android:textSize="20sp"
+                                                                style="@style/ApptentiveTheme.TextAppearence"/>
             <ImageButton android:id="@+id/profile"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
