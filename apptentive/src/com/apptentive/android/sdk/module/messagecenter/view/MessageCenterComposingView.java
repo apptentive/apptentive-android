@@ -151,7 +151,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	private void addAdditionalAttchItem() {
 		ArrayList<ImageItem> imagesToAdd = new ArrayList<ImageItem>(images);
 		if (imagesToAdd.size() < getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
-			imagesToAdd.add(new ImageItem("", "", "", 0));
+			imagesToAdd.add(new ImageItem("", "", "Image/*", 0));
 		}
 		imageBandView.setData(imagesToAdd);
 	}

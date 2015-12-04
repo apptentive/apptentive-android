@@ -166,6 +166,10 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+    <style name="ApptentiveTheme.Transparent.FullScreen">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="ApptentiveTheme.About" parent="ApptentiveTheme">
         <item name="colorPrimary">@color/apptentive_red</item>
     </style>

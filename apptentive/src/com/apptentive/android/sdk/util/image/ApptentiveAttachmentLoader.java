@@ -179,6 +179,7 @@ public class ApptentiveAttachmentLoader {
 				}
 
 				if (TextUtils.isEmpty(uri)) {
+					Log.d("ApptentiveAttachmentLoader loadDrawable(clear)");
 					loadDrawable(null);
 					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 					return;

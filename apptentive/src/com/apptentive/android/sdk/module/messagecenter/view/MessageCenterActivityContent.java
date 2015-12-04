@@ -1477,14 +1477,16 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public void onClickAttachment(final int position, final ImageItem image) {
-		if (TextUtils.isEmpty(image.originalPath) && TextUtils.isEmpty(image.mimeType)) {
-			onAttachImage();
-			return;
-		}
-
 		if (Util.isMimeTypeImage(image.mimeType)) {
-			showAttachmentDialog(image);
+			// "+" placeholder is clicked
+			if (TextUtils.isEmpty(image.originalPath)) {
+				onAttachImage();
+			} else {
+				// an image thumbnail is clicked
+				showAttachmentDialog(image);
+			}
 		} else {
+			// a generic attachment icon is clicked
 			openNonImageAttachment(image);
 		}
 	}
