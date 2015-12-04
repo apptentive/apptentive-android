@@ -59,7 +59,8 @@
                               android:paddingRight="16dp"
                               android:paddingTop="16dp"
                               android:paddingBottom="16dp"
-                              android:orientation="vertical">
+                              android:orientation="vertical"
+                              style="@style/ApptentiveTheme.TextAppearence">
                     <TextView android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:paddingBottom="16dp"

@@ -13,8 +13,8 @@
               android:gravity="center">
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/apptentive_activity_side_padding"
-                android:paddingRight="@dimen/apptentive_activity_side_padding"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_enjoyment"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_enjoyment"
                 android:fadingEdge="none">
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                       android:layout_width="fill_parent"
@@ -31,7 +31,7 @@
                 <TextView android:id="@+id/title"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveDialogTitle"/>
+                          style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogTitle"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/bottom_area"
                           android:layout_width="fill_parent"
@@ -42,12 +42,14 @@
                         android:id="@+id/no"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_no"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_no"
+                        style="@style/ApptentiveTheme.TextAppearence"/>
                 <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
                         android:id="@+id/yes"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_yes"/>
+                        apptentive:apptentive_buttonText="@string/apptentive_yes"
+                        style="@style/ApptentiveTheme.TextAppearence"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

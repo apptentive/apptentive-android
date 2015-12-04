@@ -15,7 +15,7 @@
     <TextView android:id="@+id/datestamp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveTheme.TextViewStyle.TimeStamp"/>
+              style="@style/ApptentiveTheme.TextAppearence.TextView.TimeStamp"/>
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,12 +37,12 @@
                 <TextView android:id="@+id/sender_name"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextViewStyle.Sender"/>
+                          style="@style/ApptentiveTheme.TextAppearence.TextView.Sender"/>
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:autoLink="web|email|phone|map"
-                          android:textColor="?attr/apptentive_material_primary_text"/>
+                          style="@style/ApptentiveTheme.TextAppearence.TextView"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView
                     android:id="@+id/grid"
                     android:layout_width="match_parent"

@@ -24,18 +24,11 @@
             <EditText android:id="@+id/composing_et"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:minLines="5"
-                      android:gravity="top"
-                      android:background="@null"
                       android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
                       android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
                       android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
                       android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
-                      android:inputType="textCapSentences|textMultiLine"
-                      android:singleLine="false"
-                      android:textColorHint="?attr/apptentive_material_hint_text"
-                      android:textColor="?attr/apptentive_material_primary_text"
-                      android:textSize="@dimen/apptentive_text_medium_small"/>
+                      style="@style/ApptentiveTheme.TextAppearence.EditText.Composer"/>
             <com.apptentive.android.sdk.util.image.ApptentiveImageGridView
                 android:id="@+id/grid"
                 android:visibility="gone"

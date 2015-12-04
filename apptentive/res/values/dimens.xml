@@ -14,6 +14,13 @@
     <dimen name="apptentive_text_small_tiny">12sp</dimen>
 
     <dimen name="apptentive_activity_side_padding">0dp</dimen>
+    <dimen name="apptentive_activity_side_padding_survey">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_rating">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_enjoyment">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_upgrade">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_note">@dimen/apptentive_activity_side_padding</dimen>
+
+
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">0dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>

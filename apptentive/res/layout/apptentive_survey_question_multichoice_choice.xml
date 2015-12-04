@@ -17,7 +17,8 @@
               android:layout_height="wrap_content"
               android:layout_weight="1"
               android:textColor="@color/apptentive_survey_question_answer_text"
-              android:textSize="@dimen/apptentive_text_small"/>
+              android:textSize="@dimen/apptentive_text_small"
+              style="@style/ApptentiveTheme.TextAppearence"/>
     <!-- It is important to use saveEnabled=false here so that Android doesn't mess with our manual state saving. -->
     <CheckBox android:id="@+id/checkbox"
               android:layout_width="wrap_content"

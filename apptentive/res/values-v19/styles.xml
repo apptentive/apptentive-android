@@ -35,12 +35,15 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveTheme.TextViewStyle" parent="@android:style/TextAppearance">
+    <style name="ApptentiveTheme.TextAppearence" parent="@android:style/TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="ApptentiveTheme.TextAppearence.TextView">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">left</item>
-        <item name="android:fontFamily">sans-serif</item>
     </style>
 
 </resources>

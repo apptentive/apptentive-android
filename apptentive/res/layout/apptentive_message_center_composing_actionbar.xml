@@ -40,7 +40,8 @@
                   android:singleLine="true"
                   android:textStyle="bold"
                   android:textColor="?attr/apptentive_material_secondary_text"
-                  android:textSize="@dimen/apptentive_text_medium_small"/>
+                  android:textSize="@dimen/apptentive_text_medium_small"
+                  style="@style/ApptentiveTheme.TextAppearence.TextView"/>
         <ImageButton android:id="@+id/btn_send_message"
                      android:layout_width="wrap_content"
                      android:layout_height="@dimen/apptentive_message_center_composing_bar_height"

@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -83,7 +84,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		title.setText(interaction.getName());
 
 		String descriptionText = interaction.getDescription();
-		if (descriptionText != null) {
+		if (!TextUtils.isEmpty(descriptionText)) {
 			TextView description = (TextView) activity.findViewById(R.id.description);
 			description.setText(descriptionText);
 			description.setVisibility(View.VISIBLE);

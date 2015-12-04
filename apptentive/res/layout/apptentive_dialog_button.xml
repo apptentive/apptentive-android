@@ -18,6 +18,6 @@
                   android:layout_marginRight="@dimen/apptentive_dialog_button_margin_right"
                   android:layout_gravity="center"
                   android:duplicateParentState="true"
-                  style="@style/ApptentiveDialogButtonText"/>
+                  style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogButtonText"/>
     </FrameLayout>
 </merge>
