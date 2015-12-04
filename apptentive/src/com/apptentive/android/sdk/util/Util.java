@@ -6,8 +6,7 @@
 
 package com.apptentive.android.sdk.util;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -40,7 +39,6 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -164,43 +162,6 @@ public class Util {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(target, 0);
 		}
-	}
-
-
-	public static String[] getAllUserAccountEmailAddresses(Context context) {
-		List<String> emails = new ArrayList<String>();
-		AccountManager accountManager = AccountManager.get(context);
-		Account[] accounts = null;
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
-			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-				accounts = accountManager.getAccountsByType("com.google");
-			}
-		}
-		if (accounts != null) {
-			for (Account account : accounts) {
-				emails.add(account.name);
-			}
-		}
-		return emails.toArray(new String[emails.size()]);
-	}
-
-	private static String getUserEmail(Context context) {
-		AccountManager accountManager = AccountManager.get(context);
-		Account[] accounts = null;
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
-			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-				accounts = accountManager.getAccountsByType("com.google");
-			}
-		}
-
-		if (accounts != null && accounts.length > 0) {
-			// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
-			Account account = accounts[accounts.length - 1];
-			if (account != null) {
-				return account.name;
-			}
-		}
-		return null;
 	}
 
 	public static boolean isNetworkConnectionPresent(Context appContext) {
@@ -548,13 +509,13 @@ public class Util {
 	}
 
 	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
-
-		String path = null;
-		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
-			return path;
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+			return null;
 		}
-
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor == null) {
+			return null;
+		}
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
 		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
@@ -563,18 +524,23 @@ public class Util {
 		cursor = context.getContentResolver().query(
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		if (cursor == null) {
+			return null;
+		}
 		cursor.moveToFirst();
-		path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 		cursor.close();
-
 		return path;
 	}
 
 	public static long getContentCreationTime(Context context, Uri contentUri) {
-		if (!hasPermission(context, "android.permission.READ_EXTERNAL_STORAGE")) {
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 			return 0;
 		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor == null) {
+			return 0;
+		}
 		cursor.moveToFirst();
 		String document_id = cursor.getString(0);
 		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
@@ -583,6 +549,9 @@ public class Util {
 		cursor = context.getContentResolver().query(
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+		if (cursor == null) {
+			return 0;
+		}
 		cursor.moveToFirst();
 		long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
 		cursor.close();
@@ -658,6 +627,7 @@ public class Util {
 
 	/**
 	 * This function launchs the default app to view the selected file, based on mime type
+	 *
 	 * @param sourcePath
 	 * @param selectedFilePath the full path to the local storage
 	 * @param mimeTypeString   the mime type of the file to be opened
@@ -666,7 +636,7 @@ public class Util {
 	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
 				|| !Environment.isExternalStorageRemovable())
-				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+				&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
 			File selectedFile = new File(selectedFilePath);
 			String selectedFileName = null;
@@ -675,8 +645,8 @@ public class Util {
 				final Intent intent = new Intent();
 				intent.setAction(android.content.Intent.ACTION_VIEW);
 				/* Attachments were downloaded into app private data dir. In order for external app to open
-			   * the attachments, the file need to be copied to a download folder that is accessible to public
-			   * THe folder will be sdcard/Downloads/apptentive-received/<file name>
+				 * the attachments, the file need to be copied to a download folder that is accessible to public
+			   * The folder will be sdcard/Downloads/apptentive-received/<file name>
          */
 				File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 				File apptentiveSubFolder = new File(downloadFolder, "apptentive-received");
@@ -800,21 +770,27 @@ public class Util {
 			return null;
 		}
 		// Copy the file contents over.
-		CountingOutputStream os = null;
+		CountingOutputStream cos = null;
+		BufferedOutputStream bos = null;
+		FileOutputStream fos = null;
 		try {
 			File localFile = new File(localFilePath);
-			os = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
+			fos = new FileOutputStream(localFile);
+			bos = new BufferedOutputStream(fos);
+			cos = new CountingOutputStream(bos);
 			byte[] buf = new byte[2048];
 			int count;
 			while ((count = is.read(buf, 0, 2048)) != -1) {
-				os.write(buf, 0, count);
+				cos.write(buf, 0, count);
 			}
-			Log.d("File saved, size = " + (os.getBytesWritten() / 1024) + "k");
+			Log.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
 			Log.e("Error creating local copy of file attachment.");
 			return null;
 		} finally {
-			Util.ensureClosed(os);
+			Util.ensureClosed(cos);
+			Util.ensureClosed(bos);
+			Util.ensureClosed(fos);
 		}
 
 		// Create a StoredFile database entry for this locally saved file.
@@ -827,33 +803,28 @@ public class Util {
 
 	// A utility to obtain screen info for debug logging
 	public static String getDeviceScreenInfo(Activity activity) {
-		StringBuilder inforString = new StringBuilder("Screen(density bucket:");
+		StringBuilder infoString = new StringBuilder("Screen(density bucket:");
 		DisplayMetrics metrics = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		float density = metrics.density;
 		if (density >= 4.0) {
-			inforString.append("xxxhdpi ");
+			infoString.append("xxxhdpi ");
+		} else if (density >= 3.0) {
+			infoString.append("xxhdpi ");
+		} else if (density >= 2.0) {
+			infoString.append("xhdpi ");
+		} else if (density >= 1.5) {
+			infoString.append("hdpi ");
+		} else if (density >= 1.0) {
+			infoString.append("mdpi ");
+		} else {
+			infoString.append("ldpi ");
 		}
-		else if (density >= 3.0) {
-			inforString.append("xxhdpi ");
-		}
-		else if (density >= 2.0) {
-			inforString.append("xhdpi ");
-		}
-		else if (density >= 1.5) {
-			inforString.append("hdpi ");
-		}
-		else if (density >= 1.0) {
-			inforString.append("mdpi ");
-		}
-		else {
-			inforString.append("ldpi ");
-		}
-		inforString.append("sw" + (int) (metrics.widthPixels / density) + "dp");
-		inforString.append(" width pix:" + metrics.widthPixels);
-		inforString.append(" height pix:" + metrics.heightPixels);
-		inforString.append(")");
-		return inforString.toString();
+		infoString.append("sw" + (int) (metrics.widthPixels / density) + "dp");
+		infoString.append(" width pix:" + metrics.widthPixels);
+		infoString.append(" height pix:" + metrics.heightPixels);
+		infoString.append(")");
+		return infoString.toString();
 	}
 }
 
