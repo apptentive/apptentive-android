@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
@@ -439,7 +440,12 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					String localFileName = cursor.getString(3);
 					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, (new File(fileDir, localFileName).getAbsolutePath()));
 					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, cursor.getString(2));
+					// Original file name might not be stored, i.e. sent by API, in which case, local stored file name will be used.
+					String originalFileName = cursor.getString(2);
+					if (TextUtils.isEmpty(originalFileName)) {
+						originalFileName = localFileName;
+					}
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, originalFileName);
 					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
 					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
 					db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);

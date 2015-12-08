@@ -284,7 +284,7 @@ public class ApptentiveClient {
 			if (associatedFiles != null) {
 				for (StoredFile storedFile : associatedFiles) {
 					FileInputStream fis = null;
-					String originalFilePath;
+					String originalFilePath = null;
 					try {
 						String cachedImagePathString = storedFile.getLocalFilePath();
 						File cachedImageFile = new File(cachedImagePathString);
@@ -293,8 +293,10 @@ public class ApptentiveClient {
 							boolean bCachedCreated = false;
 							originalFilePath = storedFile.getSourceUriOrPath();
 							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+								// Create a scaled down version of original image
 								bCachedCreated = ImageUtil.createScaledDownImageCacheFile(appContext, originalFilePath, cachedImagePathString);
 							} else {
+								// For non-image file, just copy to a cache file
 								if (Util.createLocalStoredFile(appContext, originalFilePath, cachedImagePathString, null) != null) {
 									bCachedCreated = true;
 								}
@@ -306,7 +308,11 @@ public class ApptentiveClient {
 						}
 						os.writeBytes(twoHyphens + boundary + lineEnd);
 						StringBuilder requestText = new StringBuilder();
-						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getSourceUriOrPath())).append(lineEnd);
+						String fileFullPathName = originalFilePath;
+						if (TextUtils.isEmpty(fileFullPathName)) {
+							fileFullPathName = storedFile.getLocalFilePath();
+						}
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", fileFullPathName)).append(lineEnd);
 						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
 						// Write file attributes
 						os.writeBytes(requestText.toString());

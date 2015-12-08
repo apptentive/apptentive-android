@@ -189,9 +189,16 @@ public class MessageManager {
 	}
 
 	public static List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
-		List<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
-		messages.addAll(getMessageStore(context).getAllMessages(context.getApplicationContext()));
-		return messages;
+		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
+		List<ApptentiveMessage> messagesAll = getMessageStore(context).getAllMessages(context.getApplicationContext());
+		// Do not display hidden messages on Message Center
+		for (ApptentiveMessage message : messagesAll) {
+			if (!message.isHidden()) {
+				messagesToShow.add(message);
+			}
+		}
+
+		return messagesToShow;
 	}
 
 	public static void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
@@ -301,11 +308,6 @@ public class MessageManager {
 				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
 			}
 		}
-/*
-		if(response.isBadPayload()) {
-			// TODO: Tell the user that this apptentiveMessage failed to send. It will be deleted by the record send worker.
-		}
-*/
 	}
 
 	private static MessageStore getMessageStore(Context context) {
