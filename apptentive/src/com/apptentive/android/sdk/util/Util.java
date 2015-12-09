@@ -513,24 +513,21 @@ public class Util {
 			return null;
 		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
-		if (cursor == null) {
-			return null;
-		}
-		cursor.moveToFirst();
-		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-		cursor.close();
+		if (cursor != null && cursor.moveToFirst()) {
+			String document_id = cursor.getString(0);
+			document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+			cursor.close();
 
-		cursor = context.getContentResolver().query(
-				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-		if (cursor == null) {
-			return null;
+			cursor = context.getContentResolver().query(
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+				cursor.close();
+				return path;
+			}
 		}
-		cursor.moveToFirst();
-		String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-		cursor.close();
-		return path;
+		return null;
 	}
 
 	public static long getContentCreationTime(Context context, Uri contentUri) {
@@ -538,25 +535,22 @@ public class Util {
 			return 0;
 		}
 		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
-		if (cursor == null) {
-			return 0;
-		}
-		cursor.moveToFirst();
-		String document_id = cursor.getString(0);
-		document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-		cursor.close();
+		if (cursor != null && cursor.moveToFirst()) {
+			String document_id = cursor.getString(0);
+			document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+			cursor.close();
 
-		cursor = context.getContentResolver().query(
-				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-		if (cursor == null) {
-			return 0;
+			cursor = context.getContentResolver().query(
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+				cursor.close();
+				return time;
+			}
 		}
-		cursor.moveToFirst();
-		long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
-		cursor.close();
 
-		return time;
+		return 0;
 	}
 
 	private static String md5(String s) {
@@ -775,7 +769,7 @@ public class Util {
 		FileOutputStream fos = null;
 		try {
 			File localFile = new File(localFilePath);
-      /* Local cache file name may not be unique, and can be reused, in which case, the previously created
+	  /* Local cache file name may not be unique, and can be reused, in which case, the previously created
        * cache file need to be deleted before it is being copied over.
        */
 			if (localFile.exists()) {
