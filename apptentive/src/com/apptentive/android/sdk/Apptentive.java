@@ -692,8 +692,10 @@ public class Apptentive {
 			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
-      // make a local copy in the cache dir, and file name is "apptentive-hidden-file + nonce"
-			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
+			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
+			 * If original uri is known, the name will be taken from the original uri
+			 */
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), Uri.parse(uri).getLastPathSegment());
 
 			String mimeType = Util.getMimeTypeFromUri(context, Uri.parse(uri));
 			MimeTypeMap mime = MimeTypeMap.getSingleton();
@@ -768,7 +770,7 @@ public class Apptentive {
 			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
-			String localFilePath = Util.generateUniqueCacheFilePathFromNonce(context, message.getNonce());
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), null);
 
 			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
 			if (!TextUtils.isEmpty(extension)) {

@@ -613,8 +613,8 @@ public class Util {
 		return appCacheDir;
 	}
 
-	public static String generateUniqueCacheFilePathFromNonce(Context context, String nonce) {
-		String fileName = "apptentive-hidden-file-" + nonce;
+	public static String generateCacheFilePathFromNonceOrPrefix(Context context, String nonce, String prefix) {
+		String fileName = (prefix == null) ? "apptentive-api-file-" + nonce : prefix;
 		File cacheDir = getDiskCacheDir(context);
 		File cacheFile = new File(cacheDir, fileName);
 		return cacheFile.getPath();
@@ -756,7 +756,7 @@ public class Util {
 	}
 
 	/**
-	 * This method creates a cached file exactly copying from the input stream.
+	 * This method creates a cached file copy from the source input stream.
 	 *
 	 * @param is            the source input stream
 	 * @param sourceUrl     the source file path or uri string
@@ -775,6 +775,12 @@ public class Util {
 		FileOutputStream fos = null;
 		try {
 			File localFile = new File(localFilePath);
+      /* Local cache file name may not be unique, and can be reused, in which case, the previously created
+       * cache file need to be deleted before it is being copied over.
+       */
+			if (localFile.exists()) {
+				localFile.delete();
+			}
 			fos = new FileOutputStream(localFile);
 			bos = new BufferedOutputStream(fos);
 			cos = new CountingOutputStream(bos);
