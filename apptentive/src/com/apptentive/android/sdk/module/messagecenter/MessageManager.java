@@ -337,7 +337,7 @@ public class MessageManager {
 	}
 
 	public interface OnNewIncomingMessagesListener {
-		public void onMessagesUpdated(final CompoundMessage apptentiveMsg);
+		void onNewMessageReceived(final CompoundMessage apptentiveMsg);
 	}
 
 	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
@@ -363,7 +363,7 @@ public class MessageManager {
 		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
-				listener.onMessagesUpdated(apptentiveMsg);
+				listener.onNewMessageReceived(apptentiveMsg);
 			}
 		}
 	}

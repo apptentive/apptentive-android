@@ -1204,7 +1204,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void onMessagesUpdated(final CompoundMessage apptentiveMsg) {
+	public void onNewMessageReceived(final CompoundMessage apptentiveMsg) {
 		messageCenterViewHandler.sendMessage(messageCenterViewHandler.obtainMessage(MSG_MESSAGE_ADD_INCOMING,
 				apptentiveMsg));
 	}
