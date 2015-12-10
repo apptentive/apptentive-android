@@ -801,26 +801,42 @@ public class Util {
 		return storedFile;
 	}
 
-	// A utility to obtain screen info for debug logging
+	/* A utility to obtain screen info for debug logging
+	 * See https://design.google.com/devices/ for example devices
+	 */
 	public static String getDeviceScreenInfo(Activity activity) {
 		StringBuilder infoString = new StringBuilder("Screen(density bucket:");
 		DisplayMetrics metrics = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		float density = metrics.density;
-		if (density >= 4.0) {
-			infoString.append("xxxhdpi ");
-		} else if (density >= 3.0) {
-			infoString.append("xxhdpi ");
-		} else if (density >= 2.0) {
-			infoString.append("xhdpi ");
-		} else if (density >= 1.5) {
-			infoString.append("hdpi ");
-		} else if (density >= 1.0) {
-			infoString.append("mdpi ");
-		} else {
-			infoString.append("ldpi ");
+
+		switch (metrics.densityDpi) {
+			case DisplayMetrics.DENSITY_LOW:
+				infoString.append("ldpi ");
+				break;
+			case DisplayMetrics.DENSITY_MEDIUM:
+				infoString.append("mdpi ");
+				break;
+			case DisplayMetrics.DENSITY_HIGH:
+				infoString.append("hdpi ");
+				break;
+			case DisplayMetrics.DENSITY_XHIGH:
+				infoString.append("xhdpi ");
+				break;
+			case DisplayMetrics.DENSITY_XXHIGH:
+				infoString.append("xxhdpi ");
+				break;
+			case DisplayMetrics.DENSITY_XXXHIGH:
+				infoString.append("xxxhdpi ");
+				break;
+			case DisplayMetrics.DENSITY_TV:
+				infoString.append("tvdpi ");
+				break;
+			default:
+				infoString.append("unknown ");
+				break;
 		}
-		infoString.append("sw" + (int) (metrics.widthPixels / density) + "dp");
+
+		infoString.append("sw" + (int) (metrics.widthPixels / metrics.density) + "dp");
 		infoString.append(" width pix:" + metrics.widthPixels);
 		infoString.append(" height pix:" + metrics.heightPixels);
 		infoString.append(")");
