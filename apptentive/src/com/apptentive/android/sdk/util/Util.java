@@ -801,30 +801,5 @@ public class Util {
 		return storedFile;
 	}
 
-	// A utility to obtain screen info for debug logging
-	public static String getDeviceScreenInfo(Activity activity) {
-		StringBuilder infoString = new StringBuilder("Screen(density bucket:");
-		DisplayMetrics metrics = new DisplayMetrics();
-		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		float density = metrics.density;
-		if (density >= 4.0) {
-			infoString.append("xxxhdpi ");
-		} else if (density >= 3.0) {
-			infoString.append("xxhdpi ");
-		} else if (density >= 2.0) {
-			infoString.append("xhdpi ");
-		} else if (density >= 1.5) {
-			infoString.append("hdpi ");
-		} else if (density >= 1.0) {
-			infoString.append("mdpi ");
-		} else {
-			infoString.append("ldpi ");
-		}
-		infoString.append("sw" + (int) (metrics.widthPixels / density) + "dp");
-		infoString.append(" width pix:" + metrics.widthPixels);
-		infoString.append(" height pix:" + metrics.heightPixels);
-		infoString.append(")");
-		return infoString.toString();
-	}
 }
 
