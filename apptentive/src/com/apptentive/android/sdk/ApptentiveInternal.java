@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -42,7 +43,7 @@ public class ApptentiveInternal {
 	private static WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
-	private static Map<String, String> customData;
+	private static Map<String, Object> customData;
 
 	public static final String PUSH_ACTION = "action";
 
@@ -164,9 +165,28 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	public static boolean showMessageCenterInternal(Activity activity, Map<String, String> customData) {
+	public static boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {
 		boolean interactionShown = false;
 		if (EngagementModule.canShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
+			if (customData != null) {
+				Iterator<String> keysIterator = customData.keySet().iterator();
+				while (keysIterator.hasNext()) {
+					String key = keysIterator.next();
+					Object value = customData.get(key);
+					if (value != null) {
+						if (!(value instanceof String ||
+								value instanceof Boolean ||
+								value instanceof Long ||
+								value instanceof Double ||
+								value instanceof Float ||
+								value instanceof Integer ||
+								value instanceof Short)) {
+							Log.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
+							keysIterator.remove();
+						}
+					}
+				}
+			}
 			ApptentiveInternal.customData = customData;
 			interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
@@ -187,8 +207,8 @@ public class ApptentiveInternal {
 		return EngagementModule.canShowInteraction(context, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 	}
 
-	public static Map<String, String> getAndClearCustomData() {
-		Map<String, String> customData = ApptentiveInternal.customData;
+	public static Map<String, Object> getAndClearCustomData() {
+		Map<String, Object> customData = ApptentiveInternal.customData;
 		ApptentiveInternal.customData = null;
 		return customData;
 	}

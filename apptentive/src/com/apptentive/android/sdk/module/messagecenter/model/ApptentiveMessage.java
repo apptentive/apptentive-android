@@ -6,10 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ConversationItem;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,7 +130,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		}
 	}
 
-	public void setCustomData(Map<String, String> customData) {
+	public void setCustomData(Map<String, Object> customData) {
 		if (customData == null || customData.size() == 0) {
 			if (!isNull(KEY_CUSTOM_DATA)) {
 				remove(KEY_CUSTOM_DATA);
