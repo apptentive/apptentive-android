@@ -191,12 +191,13 @@ public class Apptentive {
 	}
 
 	/**
-	 * Add a piece of custom data to the device's info. This info will be sent to the server.  Calls to this method are
+	 * Add a custom data String to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to store the data under.
-	 * @param value   The value of the data.
+	 * @param value   A String value.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
 		if (value != null) {
@@ -205,24 +206,42 @@ public class Apptentive {
 		ApptentiveInternal.addCustomDeviceData(context, key, value);
 	}
 
+	/**
+	 * Add a custom data Number to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Number value.
+	 */
 	public static void addCustomDeviceData(Context context, String key, Number value) {
 		ApptentiveInternal.addCustomDeviceData(context, key, value);
 	}
 
+	/**
+	 * Add a custom data Boolean to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Boolean value.
+	 */
 	public static void addCustomDeviceData(Context context, String key, Boolean value) {
 		ApptentiveInternal.addCustomDeviceData(context, key, value);
 	}
 
-	public static void addCustomDeviceData(Context context, String key, Version version) {
+	private static void addCustomDeviceData(Context context, String key, Version version) {
 		ApptentiveInternal.addCustomDeviceData(context, key, version);
 	}
 
-	public static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
+	private static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
 		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
 	}
 
 	/**
-	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
+	 * Remove a piece of custom data from the device. Calls to this method are idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to remove.
@@ -259,12 +278,13 @@ public class Apptentive {
 	}
 
 	/**
-	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
+	 * Add a custom data String to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to store the data under.
-	 * @param value   The value of the data.
+	 * @param value   A String value.
 	 */
 	public static void addCustomPersonData(Context context, String key, String value) {
 		if (value != null) {
@@ -273,24 +293,42 @@ public class Apptentive {
 		ApptentiveInternal.addCustomPersonData(context, key, value);
 	}
 
+	/**
+	 * Add a custom data Number to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Number value.
+	 */
 	public static void addCustomPersonData(Context context, String key, Number value) {
 		ApptentiveInternal.addCustomPersonData(context, key, value);
 	}
 
+	/**
+	 * Add a custom data Boolean to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Boolean value.
+	 */
 	public static void addCustomPersonData(Context context, String key, Boolean value) {
 		ApptentiveInternal.addCustomPersonData(context, key, value);
 	}
 
-	public static void addCustomPersonData(Context context, String key, Version version) {
+	private static void addCustomPersonData(Context context, String key, Version version) {
 		ApptentiveInternal.addCustomPersonData(context, key, version);
 	}
 
-	public static void addCustomPersonData(Context context, String key, DateTime dateTime) {
+	private static void addCustomPersonData(Context context, String key, DateTime dateTime) {
 		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
 	}
 
 	/**
-	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
+	 * Remove a piece of custom data from the Person. Calls to this method are idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to remove.
