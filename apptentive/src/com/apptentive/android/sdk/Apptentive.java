@@ -587,10 +587,12 @@ public class Apptentive {
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
 	 * @param activity   The Activity from which to launch the Message Center
-	 * @param customData A Map of key/value Strings that will be sent with the next message.
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
+	 *                   If any message is sent by the Person, this data is sent with it, and then
+	 *                   cleared. If no message is sent, this data is discarded.
 	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Activity activity, Map<String, String> customData) {
+	public static boolean showMessageCenter(Activity activity, Map<String, Object> customData) {
 		try {
 			return ApptentiveInternal.showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
