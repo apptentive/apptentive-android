@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -168,17 +169,21 @@ public class ApptentiveInternal {
 		boolean interactionShown = false;
 		if (EngagementModule.canShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
 			if (customData != null) {
-				for (String key : customData.keySet()) {
+				Iterator<String> keysIterator = customData.keySet().iterator();
+				while (keysIterator.hasNext()) {
+					String key = keysIterator.next();
 					Object value = customData.get(key);
-					if (!(value instanceof String ||
-							value instanceof Boolean ||
-							value instanceof Long ||
-							value instanceof Double ||
-							value instanceof Float ||
-							value instanceof Integer ||
-							value instanceof Short)) {
-						Log.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
-						customData.remove(key);
+					if (value != null) {
+						if (!(value instanceof String ||
+								value instanceof Boolean ||
+								value instanceof Long ||
+								value instanceof Double ||
+								value instanceof Float ||
+								value instanceof Integer ||
+								value instanceof Short)) {
+							Log.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
+							keysIterator.remove();
+						}
 					}
 				}
 			}
