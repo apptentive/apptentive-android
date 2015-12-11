@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view.holder;
 import com.apptentive.android.sdk.module.messagecenter.view.AutomatedMessageView;
 import com.apptentive.android.sdk.module.messagecenter.view.CompoundMessageView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListItemView;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterStatusView;
 
 /**
  * @author Sky Kelsey
@@ -24,6 +25,9 @@ public class HolderFactory {
 		} else if (messageCenterListItemView instanceof AutomatedMessageView) {
 			AutomatedMessageView automatedView = (AutomatedMessageView) messageCenterListItemView;
 			holder = new AutomatedMessageHolder(automatedView);
+		} else if (messageCenterListItemView instanceof MessageCenterStatusView) {
+			MessageCenterStatusView messageCenterStatusView = (MessageCenterStatusView) messageCenterListItemView;
+			holder = new StatusHolder(messageCenterStatusView);
 		}
 		return holder;
 	}
