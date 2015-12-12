@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -96,10 +97,12 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 			Apptentive.addCustomDeviceData(getTargetContext(), "string_qwerty", "qwerty");
 			Apptentive.addCustomDeviceData(getTargetContext(), "boolean_true", true);
 			Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
-			Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
+			//Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
+			ApptentiveInternal.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
 			Apptentive.Version version = new Apptentive.Version();
 			version.setVersion("1.2.3");
-			Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
+			//Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
+			ApptentiveInternal.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
 			Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
 
 			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
