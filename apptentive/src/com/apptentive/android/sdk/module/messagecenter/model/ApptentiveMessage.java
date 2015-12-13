@@ -6,10 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.ConversationItem;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,22 +24,23 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public static final String KEY_TYPE = "type";
 	public static final String KEY_HIDDEN = "hidden";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
+	public static final String KEY_AUTOMATED = "automated";
+	public static final String KEY_SENDER = "sender";
+	public static final String KEY_SENDER_ID = "id";
 
 	// State and Read are not stored in JSON, only in DB.
-	private State state;
+	private State state = State.unknown;
 	private boolean read = false;
 
 	// datestamp is only stored in memory, due to how we selectively apply date labeling in the view.
 	private String datestamp;
 
-	private static final String KEY_SENDER = "sender";
-	private static final String KEY_SENDER_ID = "id";
 	private static final String KEY_SENDER_NAME = "name";
 	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
 
+
 	protected ApptentiveMessage() {
 		super();
-		setSenderId(GlobalInfo.personId);
 		state = State.sending;
 		read = true; // This message originated here.
 		setBaseType(BaseType.message);
@@ -96,6 +95,9 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 
 	public Type getType() {
 		try {
+			if (isNull((KEY_TYPE))) {
+				return Type.CompoundMessage;
+			}
 			return Type.parse(getString(KEY_TYPE));
 		} catch (JSONException e) {
 			// Ignore
@@ -128,7 +130,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		}
 	}
 
-	public void setCustomData(Map<String, String> customData) {
+	public void setCustomData(Map<String, Object> customData) {
 		if (customData == null || customData.size() == 0) {
 			if (!isNull(KEY_CUSTOM_DATA)) {
 				remove(KEY_CUSTOM_DATA);
@@ -223,6 +225,25 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		return null;
 	}
 
+	public boolean getAutomated() {
+		try {
+			if (!isNull((KEY_AUTOMATED))) {
+				return getBoolean(KEY_AUTOMATED);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return false;
+	}
+
+	public void setAutomated(boolean isAutomated) {
+		try {
+			put(KEY_AUTOMATED, isAutomated);
+		} catch (JSONException e) {
+			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_AUTOMATED);
+		}
+	}
+
 	public String getDatestamp() {
 		return datestamp;
 	}
@@ -235,16 +256,18 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		this.datestamp = null;
 	}
 
-	public boolean isOutgoingMessage() {
-		String senderId = getSenderId();
-		return senderId == null || senderId.equals(GlobalInfo.personId) || getState().equals(State.sending);
+	public abstract boolean isOutgoingMessage();
+
+	public boolean isAutomatedMessage() {
+		return getAutomated();
 	}
+
 
 	public enum Type {
 		TextMessage,
 		FileMessage,
 		AutomatedMessage,
-
+		CompoundMessage,
 		// Unknown
 		unknown;
 

@@ -7,15 +7,17 @@
 package com.apptentive.android.sdk.comm;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -30,16 +32,14 @@ import java.util.zip.GZIPInputStream;
  */
 public class ApptentiveClient {
 
-	private static final int API_VERSION = 3;
+	public static final int API_VERSION = 4;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
-	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
+	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
+	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
 
 	// Active API
-	private static final String ENDPOINT_BASE_STAGING = "https://api.apptentive-beta.com";
-	private static final String ENDPOINT_BASE_PRODUCTION = "https://api.apptentive.com";
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_MESSAGES = "/messages";
@@ -62,7 +62,7 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse getAppConfiguration(Context appContext) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONFIGURATION, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -72,19 +72,16 @@ public class ApptentiveClient {
 	 */
 	public static ApptentiveHttpResponse getMessages(Context appContext, Integer count, String afterId, String beforeId) {
 		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, uri, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse postMessage(Context context, ApptentiveMessage apptentiveMessage) {
+	public static ApptentiveHttpResponse postMessage(Context appContext, ApptentiveMessage apptentiveMessage) {
 		switch (apptentiveMessage.getType()) {
-			case TextMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case AutomatedMessage:
-				return performHttpRequest(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, Method.POST, apptentiveMessage.marshallForSending());
-			case FileMessage:
-				OutgoingFileMessage fileMessage = (OutgoingFileMessage) apptentiveMessage;
-				StoredFile storedFile = fileMessage.getStoredFile(context);
-				return performMultipartFilePost(context, GlobalInfo.conversationToken, ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), storedFile);
+			case CompoundMessage: {
+				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
+				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles(appContext);
+				return performMultipartFilePost(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+			}
 			case unknown:
 				break;
 		}
@@ -92,32 +89,32 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse postEvent(Context appContext, Event event) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putDevice(Context appContext, Device device) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putSdk(Context appContext, Sdk sdk) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putAppRelease(Context appContext, AppRelease appRelease) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putPerson(Context appContext, Person person) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(Context appContext, SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, endpoint, Method.POST, survey.marshallForSending());
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse getInteractions(Context appContext) {
-		return performHttpRequest(appContext, GlobalInfo.conversationToken, ENDPOINT_INTERACTIONS, Method.GET, null);
+		return performHttpRequest(appContext, GlobalInfo.getConversationToken(appContext), ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
 	/**
@@ -131,8 +128,8 @@ public class ApptentiveClient {
 	 * @return ApptentiveHttpResponse containg content and response returned from the server.
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
-		uri = getEndpointBase() + uri;
-		Log.d("Performing request to %s", uri);
+		uri = getEndpointBase(appContext) + uri;
+		Log.d("Performing %s request to %s", method.name(), uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
@@ -183,37 +180,27 @@ public class ApptentiveClient {
 			}
 			ret.setHeaders(headers);
 
-			// Read the normal content response
-			InputStream nis = null;
-			try {
-				nis = connection.getInputStream();
-				if (nis != null) {
-					String contentEncoding = ret.getHeaders().get("Content-Encoding");
-					if (contentEncoding != null && contentEncoding.equalsIgnoreCase("[gzip]")) {
-						nis = new GZIPInputStream(nis);
-					}
-					ret.setContent(Util.readStringFromInputStream(nis, "UTF-8"));
-					if (responseCode >= 200 && responseCode < 300) {
-						Log.v("Response: " + ret.getContent());
-					} else {
-						Log.w("Response: " + ret.getContent());
-					}
-				}
-			} finally {
-				Util.ensureClosed(nis);
+			// Read the response, if available
+			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			if (responseCode >= 200 && responseCode < 300) {
+				ret.setContent(getResponse(connection, ret.isZipped()));
+				Log.v("Response: %s", ret.getContent());
+			} else {
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
+				Log.w("Response: %s", ret.getContent());
 			}
-
 		} catch (IllegalArgumentException e) {
 			Log.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
 			Log.w("Timeout communicating with server.", e);
 		} catch (final MalformedURLException e) {
-			Log.w("ClientProtocolException", e);
+			Log.w("MalformedUrlException", e);
 		} catch (final IOException e) {
-			Log.w("ClientProtocolException", e);
+			Log.w("IOException", e);
 			// Read the error response.
 			try {
-				ret.setContent(getErrorInResponse(connection));
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
+				Log.w("Response: " + ret.getContent());
 			} catch (IOException ex) {
 				Log.w("Can't read error stream.", ex);
 			}
@@ -245,35 +232,10 @@ public class ApptentiveClient {
 		}
 	}
 
-	/**
-	 * Reads error message from response and returns it as a string.
-	 *
-	 * @param con current connection
-	 * @return String with error message contents.
-	 * @throws IOException
-	 */
-	private static String getErrorInResponse(HttpURLConnection con) throws IOException {
-		assert (con != null);
-		BufferedReader in = null;
-		StringBuffer errStream = null;
-		try {
-			errStream = new StringBuffer();
-			InputStream errorStream = con.getErrorStream();
-			assert (errorStream != null);
-			in = new BufferedReader(new InputStreamReader(errorStream));
-			String errStr;
-			while ((errStr = in.readLine()) != null) {
-				errStream.append(errStr);
-			}
-		} finally {
-			Util.ensureClosed(in);
-		}
-		return (errStream != null) ? (errStream.toString()) : null;
-	}
-
-	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, StoredFile storedFile) {
-		uri = getEndpointBase() + uri;
-		Log.d("Performing multipart request to %s", uri);
+	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
+		uri = getEndpointBase(appContext) + uri;
+		Log.d("Performing multipart POST to %s", uri);
+		Log.d("Multipart POST body: %s", postBody);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		if (!Util.isNetworkConnectionPresent(appContext)) {
@@ -281,25 +243,14 @@ public class ApptentiveClient {
 			return ret;
 		}
 
-		if (storedFile == null) {
-			Log.e("StoredFile is null. Unable to send.");
-			return ret;
-		}
-
-		int bytesRead;
-		int bufferSize = 4096;
-		byte[] buffer;
-
 		String lineEnd = "\r\n";
 		String twoHyphens = "--";
 		String boundary = UUID.randomUUID().toString();
 
 		HttpURLConnection connection = null;
 		DataOutputStream os = null;
-		InputStream is = null;
 
 		try {
-			is = appContext.openFileInput(storedFile.getLocalFilePath());
 
 			// Set up the request.
 			URL url = new URL(uri);
@@ -312,60 +263,97 @@ public class ApptentiveClient {
 			connection.setRequestMethod("POST");
 
 			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
 			connection.setRequestProperty("User-Agent", getUserAgentString());
 
-			StringBuilder requestText = new StringBuilder();
-
-			// Write form data
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd);
-			requestText.append("Content-Type: text/plain").append(lineEnd);
-			requestText.append(lineEnd);
-			requestText.append(postBody);
-			requestText.append(lineEnd);
-
-			// Write file attributes.
-			requestText.append(twoHyphens).append(boundary).append(lineEnd);
-			requestText.append(String.format("Content-Disposition: form-data; name=\"file\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd);
-			requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
-			requestText.append(lineEnd);
-
-			Log.d("Post body: " + requestText);
-
 			// Open an output stream.
 			os = new DataOutputStream(connection.getOutputStream());
+			os.writeBytes(twoHyphens + boundary + lineEnd);
 
-			// Write the text so far.
-			os.writeBytes(requestText.toString());
+			// Write text message
+			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			os.writeBytes("Content-Type: text/plain;charset=UTF-8" + lineEnd);
+			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
+			os.writeBytes(lineEnd);
+			os.writeBytes(postBody + lineEnd);
 
-			try {
-				// Write the actual file.
-				buffer = new byte[bufferSize];
-				while ((bytesRead = is.read(buffer, 0, bufferSize)) > 0) {
-					os.write(buffer, 0, bytesRead);
+			// Send associated files
+			if (associatedFiles != null) {
+				for (StoredFile storedFile : associatedFiles) {
+					FileInputStream fis = null;
+					try {
+						String cachedImagePathString = storedFile.getLocalFilePath();
+						String originalFilePath = storedFile.getSourceUriOrPath();
+						File cachedImageFile = new File(cachedImagePathString);
+						// No local cache found
+						if (!cachedImageFile.exists()) {
+							boolean bCachedCreated = false;
+							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+								// Create a scaled down version of original image
+								bCachedCreated = ImageUtil.createScaledDownImageCacheFile(appContext, originalFilePath, cachedImagePathString);
+							} else {
+								// For non-image file, just copy to a cache file
+								if (Util.createLocalStoredFile(appContext, originalFilePath, cachedImagePathString, null) != null) {
+									bCachedCreated = true;
+								}
+							}
+
+							if (!bCachedCreated) {
+								continue;
+							}
+						}
+						os.writeBytes(twoHyphens + boundary + lineEnd);
+						StringBuilder requestText = new StringBuilder();
+						String fileFullPathName = originalFilePath;
+						if (TextUtils.isEmpty(fileFullPathName)) {
+							fileFullPathName = cachedImagePathString;
+						}
+						requestText.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", fileFullPathName)).append(lineEnd);
+						requestText.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd);
+						// Write file attributes
+						os.writeBytes(requestText.toString());
+						os.writeBytes(lineEnd);
+
+						fis = new FileInputStream(cachedImageFile);
+
+						int bytesAvailable = fis.available();
+						int maxBufferSize = 512 * 512;
+						int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						byte[] buffer = new byte[bufferSize];
+
+						// read image data 0.5MB at a time and write it into buffer
+						int bytesRead = fis.read(buffer, 0, bufferSize);
+						while (bytesRead > 0) {
+							os.write(buffer, 0, bufferSize);
+							bytesAvailable = fis.available();
+							bufferSize = Math.min(bytesAvailable, maxBufferSize);
+							bytesRead = fis.read(buffer, 0, bufferSize);
+						}
+					} catch (IOException e) {
+						Log.d("Error writing file bytes to HTTP connection.", e);
+						ret.setBadPayload(true);
+						throw e;
+					} finally {
+						Util.ensureClosed(fis);
+					}
+					os.writeBytes(lineEnd);
 				}
-			} catch (IOException e) {
-				Log.d("Error writing file bytes to HTTP connection.", e);
-				ret.setBadPayload(true);
-				throw e;
 			}
-
 			os.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+			os.flush();
 			os.close();
 
 			ret.setCode(connection.getResponseCode());
 			ret.setReason(connection.getResponseMessage());
 
-			// TODO: These streams may not be ready to read now. Put this in a new thread.
 			// Read the normal response.
 			InputStream nis = null;
 			ByteArrayOutputStream nbaos = null;
 			try {
-				Log.d("Sending file: " + storedFile.getLocalFilePath());
 				nis = connection.getInputStream();
 				nbaos = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
@@ -379,8 +367,8 @@ public class ApptentiveClient {
 				Util.ensureClosed(nbaos);
 			}
 
-			Log.d("HTTP " + connection.getResponseCode() + ": " + connection.getResponseMessage() + "");
-			Log.v(ret.getContent());
+			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			Log.v("Response: %s", ret.getContent());
 		} catch (FileNotFoundException e) {
 			Log.e("Error getting file to upload.", e);
 		} catch (MalformedURLException e) {
@@ -390,12 +378,11 @@ public class ApptentiveClient {
 		} catch (IOException e) {
 			Log.e("Error executing file upload.", e);
 			try {
-				ret.setContent(getErrorInResponse(connection));
+				ret.setContent(getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
 				Log.w("Can't read error stream.", ex);
 			}
 		} finally {
-			Util.ensureClosed(is);
 			Util.ensureClosed(os);
 		}
 		return ret;
@@ -407,11 +394,67 @@ public class ApptentiveClient {
 		POST
 	}
 
-	private static String getUserAgentString() {
+	public static String getUserAgentString() {
 		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
 
-	private static String getEndpointBase() {
-		return useStagingServer ? ENDPOINT_BASE_STAGING : ENDPOINT_BASE_PRODUCTION;
+	private static String getEndpointBase(Context appContext) {
+		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
+		if (url == null) {
+			url = Constants.CONFIG_DEFAULT_SERVER_URL;
+			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
+		}
+		return url;
+	}
+
+	/**
+	 * Reads response and returns it as a string. Handles gzipped streams.
+	 *
+	 * @param connection Current connection
+	 * @return Response as String
+	 * @throws IOException
+	 */
+	public static String getResponse(HttpURLConnection connection, boolean isZipped) throws IOException {
+		if (connection != null) {
+			InputStream is = null;
+			try {
+				is = connection.getInputStream();
+				if (is != null) {
+					if (isZipped) {
+						is = new GZIPInputStream(is);
+					}
+					return Util.readStringFromInputStream(is, "UTF-8");
+				}
+			} finally {
+				Util.ensureClosed(is);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Reads error response and returns it as a string. Handles gzipped streams.
+	 *
+	 * @param connection Current connection
+	 * @return Error response as String
+	 * @throws IOException
+	 */
+	public static String getErrorResponse(HttpURLConnection connection, boolean isZipped) throws IOException {
+		if (connection != null) {
+			InputStream is = null;
+			try {
+				is = connection.getErrorStream();
+				if (is != null) {
+					if (isZipped) {
+						is = new GZIPInputStream(is);
+					}
+				}
+				return Util.readStringFromInputStream(is, "UTF-8");
+			} finally {
+				Util.ensureClosed(is);
+			}
+		}
+		return null;
 	}
 }

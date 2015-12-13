@@ -14,6 +14,13 @@
     <dimen name="apptentive_text_small_tiny">12sp</dimen>
 
     <dimen name="apptentive_activity_side_padding">0dp</dimen>
+    <dimen name="apptentive_activity_side_padding_survey">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_rating">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_enjoyment">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_upgrade">@dimen/apptentive_activity_side_padding</dimen>
+    <dimen name="apptentive_activity_side_padding_note">@dimen/apptentive_activity_side_padding</dimen>
+
+
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">0dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
@@ -49,6 +56,7 @@
     <dimen name="apptentive_message_center_icon_dimension">48dp</dimen>
     <dimen name="apptentive_message_center_message_list_margin">0dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">0dp</dimen>
+    <dimen name="apptentive_message_center_composing_bar_height">40dp</dimen>
     <dimen name="apptentive_message_center_fab_height">20dp</dimen>
     <dimen name="apptentive_message_center_footer_height">32dp</dimen>
     <dimen name="apptentive_message_center_card_margin">0dp</dimen>
@@ -70,7 +78,10 @@
 
 
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
-    <dimen name="apptentive_message_center_greeting_text_padding_left">16dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_left">26dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_bottom">40dp</dimen>
+
+    <dimen name="apptentive_message_center_bottom_padding">60dp</dimen>
 
     <dimen name="apptentive_message_center_status_side_padding">32dp</dimen>
 
@@ -78,5 +89,12 @@
     <dimen name="apptentive_message_center_badge_mini">8sp</dimen>
 
     <dimen name="apptentive_message_center_error_side_margin">24dp</dimen>
+
+    <dimen name="apptentive_image_thumbnail_default_size">160dp</dimen>
+    <dimen name="apptentive_image_grid_space_size">3dp</dimen>
+
+    <dimen name="apptentive_image_file_extension_default_text_size">12sp</dimen>
+    <dimen name="apptentive_image_file_extension_layout_top">24dp</dimen>
+
 
 </resources>

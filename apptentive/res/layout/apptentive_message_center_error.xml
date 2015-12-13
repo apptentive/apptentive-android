@@ -54,6 +54,7 @@
                   android:layout_height="wrap_content"
                   android:textColor="#9E9E9E"
                   android:textSize="14sp"
-                  android:gravity="center"/>
+                  android:gravity="center"
+                  style="@style/ApptentiveTheme.TextAppearence.TextView"/>
     </LinearLayout>
 </LinearLayout>

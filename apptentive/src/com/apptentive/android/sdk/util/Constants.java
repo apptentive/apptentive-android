@@ -11,13 +11,17 @@ package com.apptentive.android.sdk.util;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "2.0.1";
+	public static final String APPTENTIVE_SDK_VERSION = "2.1.0";
 
 
-	public static final int REQUEST_CODE_PHOTO_FROM_MESSAGE_CENTER = 1000;
+	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 1000;
+
+	public final static int REQUEST_READ_STORAGE_PERMISSION = 1;
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
+	public static final String PREF_KEY_SERVER_URL = "serverUrl";
+	public static final String PREF_KEY_API_KEY = "apiKey";
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
 	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
 	public static final String PREF_KEY_PERSON_ID = "personId";
@@ -46,6 +50,7 @@ public class Constants {
 
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 
 	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET = "messageCenterWhoCardSet";
@@ -66,6 +71,8 @@ public class Constants {
 	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 	// Config Defaults
+	public static final String CONFIG_DEFAULT_SERVER_URL = "https://api.apptentive.com";
+
 	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours

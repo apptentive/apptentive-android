@@ -54,8 +54,8 @@ public class ApptentiveToastNotificationManager {
 
 	private ApptentiveToastNotificationManager(Context context) {
 		this.context = context;
-		codeToNotificationMap = new HashMap<>();
-		pendingNotificationQueue = new LinkedList<>();
+		codeToNotificationMap = new HashMap<Integer, ApptentiveToastNotification>();
+		pendingNotificationQueue = new LinkedList<ApptentiveToastNotification>();
 		wManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
 		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

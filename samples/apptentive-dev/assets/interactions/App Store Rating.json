@@ -1,9 +1,0 @@
-{
-  "id": "app_store_rating_interaction",
-  "type": "AppStoreRating",
-  "configuration": {
-    "store_id": "12345678",
-    "method": "magic",
-    "url": "itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=12345678&pageNumber=0&sortOrdering=1"
-  }
-}

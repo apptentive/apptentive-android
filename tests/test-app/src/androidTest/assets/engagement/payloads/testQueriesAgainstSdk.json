@@ -16,17 +16,28 @@
             {
               "code_point/switch.code.point/invokes/total": 0,
               "sdk/version": {
-                "$contains": "2.0."
+                "$gte": {
+                  "_type": "version",
+                  "version": "0"
+                }
               }
             },
             {
               "code_point/switch.code.point/invokes/total": 1,
-              "sdk/platform": "Android"
+              "sdk/version": {
+                "$gt": {
+                  "_type": "version",
+                  "version": "1.0.0"
+                }
+              }
             },
             {
               "code_point/switch.code.point/invokes/total": 2,
-              "sdk/distribution": {
-                "$exists": false
+              "sdk/version": {
+                "$gte": {
+                  "_type": "version",
+                  "version": "100.100.100"
+                }
               }
             }
           ]

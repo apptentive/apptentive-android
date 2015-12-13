@@ -7,18 +7,15 @@
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuInflater;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -28,13 +25,14 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * For internal use only. Used to launch Apptentive Message Center, Survey, and About views.
  *
  * @author Sky Kelsey
  */
-public class ViewActivity extends ApptentiveActivity {
+public class ViewActivity extends ApptentiveInternalActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
 
 	private ActivityContent activityContent;
@@ -42,82 +40,11 @@ public class ViewActivity extends ApptentiveActivity {
 
 	private boolean activityExtraBoolean;
 
-	// Use AppCompatDelegate istead of extending AppCompatActivity
-	private AppCompatDelegate appCompatDelegate;
 
-	private AppCompatDelegate getDelegate() {
-		if (appCompatDelegate == null) {
-			appCompatDelegate = AppCompatDelegate.create(this, null);
-		}
-		return appCompatDelegate;
+	public ActivityContent getActivityContent() {
+		return activityContent;
 	}
 
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		getDelegate().onPostCreate(savedInstanceState);
-	}
-
-	public ActionBar getSupportActionBar() {
-		return getDelegate().getSupportActionBar();
-	}
-
-	public void setSupportActionBar(@Nullable Toolbar toolbar) {
-		getDelegate().setSupportActionBar(toolbar);
-	}
-
-	@Override
-	public MenuInflater getMenuInflater() {
-		return getDelegate().getMenuInflater();
-	}
-
-	@Override
-	public void setContentView(int layoutResID) {
-		getDelegate().setContentView(layoutResID);
-	}
-
-	@Override
-	public void setContentView(View view) {
-		getDelegate().setContentView(view);
-	}
-
-	@Override
-	public void setContentView(View view, ViewGroup.LayoutParams params) {
-		getDelegate().setContentView(view, params);
-	}
-
-	@Override
-	public void addContentView(View view, ViewGroup.LayoutParams params) {
-		getDelegate().addContentView(view, params);
-	}
-
-	@Override
-	protected void onPostResume() {
-		super.onPostResume();
-		getDelegate().onPostResume();
-	}
-
-	@Override
-	protected void onTitleChanged(CharSequence title, int color) {
-		super.onTitleChanged(title, color);
-		getDelegate().setTitle(title);
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		getDelegate().onConfigurationChanged(newConfig);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		getDelegate().onDestroy();
-	}
-
-	public void invalidateOptionsMenu() {
-		getDelegate().invalidateOptionsMenu();
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +56,13 @@ public class ViewActivity extends ApptentiveActivity {
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
+				/* ViewActivity must have a theme inherit from Apptentive Base themes.
+				*  If hosting app fails to specify one in AndroidManifest, apply a default ApptentiveTheme.
+				*  The check is done through checking if one of the apptentive attributes have value defined
+				*/
+				if (Util.getThemeColor(this, R.attr.apptentive_material_toolbar_foreground) == 0) {
+					setTheme(R.style.ApptentiveTheme);
+				}
 				if (activeContentType == ActivityContent.Type.ABOUT) {
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (activeContentType == ActivityContent.Type.INTERACTION) {
@@ -179,8 +113,6 @@ public class ViewActivity extends ApptentiveActivity {
 				}
 
 				boolean activityContentRequired = true;
-				getDelegate().installViewFactory();
-				getDelegate().onCreate(savedInstanceState);
 
 				super.onCreate(savedInstanceState);
 
@@ -253,7 +185,6 @@ public class ViewActivity extends ApptentiveActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		getDelegate().onStop();
 		switch (activeContentType) {
 			case ABOUT:
 				break;
@@ -352,5 +283,21 @@ public class ViewActivity extends ApptentiveActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		overridePendingTransition(R.anim.slide_up_in, 0);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+																				 @NonNull int[] grantResults) {
+		switch (activeContentType) {
+			case ABOUT:
+				break;
+			case MESSAGE_CENTER_ERROR:
+				break;
+			case INTERACTION:
+				activityContent.onRequestPermissionsResult(requestCode, permissions, grantResults);
+				break;
+			default:
+				break;
+		}
 	}
 }

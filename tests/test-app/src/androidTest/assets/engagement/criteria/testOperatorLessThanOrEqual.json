@@ -1,0 +1,144 @@
+{
+  "$and": [
+    {
+      "device/custom_data/number_5": {
+        "$lte": 10
+      }
+    },
+    {
+      "device/custom_data/number_5": {
+        "$lte": 5
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": 4
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": 0
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": -5
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": null
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": "string"
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": true
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/number_5": {
+          "$lte": {
+            "_type": "datetime",
+            "sec": 100000
+          }
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/key_with_null_value": {
+          "$lte": 0
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/non_existent_key": {
+          "$lte": 0
+        }
+      }
+    },
+    {
+      "device/custom_data/boolean_true": {
+        "$lte": true
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/boolean_true": {
+          "$lte": false
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/datetime_1000": {
+          "$lte": {
+            "_type": "datetime",
+            "sec": "999"
+          }
+        }
+      }
+    },
+    {
+      "device/custom_data/datetime_1000": {
+        "$lte": {
+          "_type": "datetime",
+          "sec": "1000"
+        }
+      }
+    },
+    {
+      "device/custom_data/datetime_1000": {
+        "$lte": {
+          "_type": "datetime",
+          "sec": "1001"
+        }
+      }
+    },
+    {
+      "$not": {
+        "device/custom_data/version_1.2.3": {
+          "$lte": {
+            "_type": "version",
+            "version": "1.2.2"
+          }
+        }
+      }
+    },
+    {
+      "device/custom_data/version_1.2.3": {
+        "$lte": {
+          "_type": "version",
+          "version": "1.2.3"
+        }
+      }
+    },
+    {
+      "device/custom_data/version_1.2.3": {
+        "$lte": {
+          "_type": "version",
+          "version": "1.2.4"
+        }
+      }
+    }
+  ]
+}

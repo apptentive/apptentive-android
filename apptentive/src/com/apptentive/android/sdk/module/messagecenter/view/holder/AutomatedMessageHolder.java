@@ -6,11 +6,10 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
-import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.AutomatedMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.AutomatedMessageView;
 
 /**
@@ -24,7 +23,7 @@ public class AutomatedMessageHolder extends MessageHolder {
 		body = (TextView) view.findViewById(R.id.apptentive_message_auto_body);
 	}
 
-	public void updateMessage(String dateStamp, final AutomatedMessage newMessage) {
+	public void updateMessage(String dateStamp, final CompoundMessage newMessage) {
 		super.updateMessage(dateStamp, 0, null);
 		body.setText(newMessage.getBody());
 	}

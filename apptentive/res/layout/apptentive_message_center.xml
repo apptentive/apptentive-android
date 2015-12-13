@@ -21,14 +21,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/apptentive_message_center_header_height"
                         android:background="?attr/colorPrimary"
-                        android:minHeight="@dimen/apptentive_message_center_icon_dimension"
+                        android:minHeight="@dimen/apptentive_message_center_header_height"
                         android:orientation="horizontal">
-            <ImageButton android:id="@+id/close"
+            <ImageButton android:id="@+id/close_mc"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_alignParentLeft="true"
                          android:layout_centerVertical="true"
-                         android:layout_marginRight="10dp"
+                         android:layout_marginRight="8dp"
                          android:contentDescription="Close"
                          android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
                          android:background="?android:attr/selectableItemBackground"
@@ -36,13 +36,13 @@
             <com.apptentive.android.sdk.view.AutoResizeTextView android:id="@id/title"
                                                                 android:layout_width="wrap_content"
                                                                 android:layout_height="@dimen/apptentive_message_center_header_height"
-                                                                android:layout_toRightOf="@id/close"
-                                                                android:layout_marginLeft="2dp"
+                                                                android:layout_toRightOf="@id/close_mc"
                                                                 android:layout_centerVertical="true"
                                                                 android:gravity="center"
                                                                 android:singleLine="true"
                                                                 android:textColor="?attr/apptentive_material_toolbar_foreground"
-                                                                android:textSize="20dp"/>
+                                                                android:textSize="20sp"
+                                                                style="@style/ApptentiveTheme.TextAppearence"/>
             <ImageButton android:id="@+id/profile"
                          android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -71,29 +71,16 @@
         </RelativeLayout>
         <!-- End Header -->
         <!-- Content -->
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:background="@color/apptentive_transparency"
-                      android:orientation="vertical">
-
-            <FrameLayout android:layout_width="match_parent"
-                         android:layout_height="0dp"
-                         android:layout_weight="1"
-                         android:background="@color/apptentive_transparency"
-                         android:orientation="vertical">
                 <!-- Message List -->
                 <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView
                     android:id="@+id/message_list"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@color/apptentive_transparency"
-                    android:paddingBottom="60dp"
-                    android:descendantFocusability="afterDescendants"
-                    android:focusable="false"
+                    android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
                     android:clipToPadding="false"
+                    android:descendantFocusability="afterDescendants"
                     android:cacheColorHint="@color/apptentive_transparency"/>
-            </FrameLayout>
-        </LinearLayout>
     </LinearLayout>
     <com.apptentive.android.sdk.view.FloatingActionButton
         android:id="@+id/composing_fab"
@@ -104,6 +91,6 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="@dimen/apptentive_message_center_fab_height"
-        android:src="@drawable/apptentive_ic_composing"
+        android:src="@drawable/ic_edit"
         />
 </RelativeLayout>

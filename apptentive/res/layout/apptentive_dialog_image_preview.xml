@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/preview_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.apptentive.android.sdk.util.image.PreviewImageView
+        android:id="@+id/preview_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/apptentive_material_background"
+        android:descendantFocusability="beforeDescendants"
+        android:contentDescription="@null"
+        android:src="@drawable/apptentive_ic_image_default_item"
+        android:scaleType="matrix"/>
+    <RelativeLayout android:id="@+id/header_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/apptentive_preview_gradient"
+                    android:animateLayoutChanges="true"
+                    android:layout_gravity="top"
+                    android:orientation="horizontal">
+        <ImageButton android:id="@+id/close_dialog"
+                     android:layout_width="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                     android:layout_alignParentLeft="true"
+                     android:layout_centerVertical="true"
+                     android:contentDescription="Close"
+                     android:visibility="gone"
+                     android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
+                     android:background="?android:attr/selectableItemBackground"
+                     android:tint="@color/apptentive_material_toolbar_foreground"/>
+    </RelativeLayout>
+    <ProgressBar
+        android:id="@+id/preview_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@android:style/Widget.ProgressBar.Large"/>
+</FrameLayout>

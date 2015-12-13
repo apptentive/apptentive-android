@@ -6,12 +6,15 @@
 
 package com.apptentive.android.sdk.util;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -19,16 +22,25 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.model.StoredFile;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -152,45 +164,8 @@ public class Util {
 		}
 	}
 
-
-	public static String[] getAllUserAccountEmailAddresses(Context context) {
-		List<String> emails = new ArrayList<String>();
-		AccountManager accountManager = AccountManager.get(context);
-		Account[] accounts = null;
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
-			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-				accounts = accountManager.getAccountsByType("com.google");
-			}
-		}
-		if (accounts != null) {
-			for (Account account : accounts) {
-				emails.add(account.name);
-			}
-		}
-		return emails.toArray(new String[emails.size()]);
-	}
-
-	private static String getUserEmail(Context context) {
-		AccountManager accountManager = AccountManager.get(context);
-		Account[] accounts = null;
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.CUPCAKE) {
-			if (Util.packageHasPermission(context, "android.permission.GET_ACCOUNTS")) {
-				accounts = accountManager.getAccountsByType("com.google");
-			}
-		}
-
-		if (accounts != null && accounts.length > 0) {
-			// It seems that the first google account added will always be at the end of this list. That SHOULD be the main account.
-			Account account = accounts[accounts.length - 1];
-			if (account != null) {
-				return account.name;
-			}
-		}
-		return null;
-	}
-
-	public static boolean isNetworkConnectionPresent(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	public static boolean isNetworkConnectionPresent(Context appContext) {
+		ConnectivityManager cm = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
 
@@ -230,7 +205,7 @@ public class Util {
 		if (cacheControlHeader != null) {
 			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
 			int indexOfLastBracket = cacheControlHeader.lastIndexOf("]");
-			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket+1, indexOfLastBracket);
+			cacheControlHeader = cacheControlHeader.substring(indexOfOpenBracket + 1, indexOfLastBracket);
 			String[] cacheControlParts = cacheControlHeader.split(",");
 			for (String part : cacheControlParts) {
 				part = part.trim();
@@ -275,7 +250,6 @@ public class Util {
 	/**
 	 * <p>This method will allow you to pass in literal strings. You must wrap the string in single quotes in order to ensure it is not modified
 	 * by Android. Android will try to coerce the string to a float, Integer, etc., if it looks like one.</p>
-	 * <p/>
 	 * <p>Example: <code>&lt;meta-data android:name="sdk_distribution" android:value="'1.00'"/></code></p>
 	 * <p>This will evaluate to a String "1.00". If you leave off the single quotes, this method will just cast to a String, so the result would be a String "1.0".</p>
 	 */
@@ -511,6 +485,320 @@ public class Util {
 		int green = (int) ((Color.green(color) * (1 - factor) / 255 + factor) * 255);
 		int blue = (int) ((Color.blue(color) * (1 - factor) / 255 + factor) * 255);
 		return Color.argb(Color.alpha(color), red, green, blue);
+	}
+
+	public static boolean canLaunchIntent(Context context, Intent intent) {
+		PackageManager pm = context.getPackageManager();
+		ComponentName cn = intent.resolveActivity(pm);
+		if (cn != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static String classToString(Object object) {
+		if (object == null) {
+			return "null";
+		} else {
+			return String.format("%s(%s)", object.getClass().getSimpleName(), object);
+		}
+	}
+
+	public static String getMimeTypeFromUri(Context context, Uri contentUri) {
+		return context.getContentResolver().getType(contentUri);
+	}
+
+	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+			return null;
+		}
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor != null && cursor.moveToFirst()) {
+			String document_id = cursor.getString(0);
+			document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+			cursor.close();
+
+			cursor = context.getContentResolver().query(
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+				cursor.close();
+				return path;
+			}
+		}
+		return null;
+	}
+
+	public static long getContentCreationTime(Context context, Uri contentUri) {
+		if (!hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+			return 0;
+		}
+		Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+		if (cursor != null && cursor.moveToFirst()) {
+			String document_id = cursor.getString(0);
+			document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+			cursor.close();
+
+			cursor = context.getContentResolver().query(
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+				cursor.close();
+				return time;
+			}
+		}
+
+		return 0;
+	}
+
+	private static String md5(String s) {
+		try {
+			// Create MD5 Hash
+			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+			digest.update(s.getBytes());
+			byte messageDigest[] = digest.digest();
+
+			// Create Hex String
+			StringBuilder hexString = new StringBuilder();
+			for (byte aMessageDigest : messageDigest) {
+				hexString.append(Integer.toHexString(0xFF & aMessageDigest));
+			}
+			return hexString.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/*
+	 * Generate cached file name use md5 from image originalPath and image created time
+	 */
+	public static String generateCacheFileFullPath(String url, File cacheDir) {
+		String fileName = md5(url);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	/*
+	 * Generate cached file name use md5 from file originalPath and created time
+	 */
+	public static String generateCacheFileFullPath(Uri fileOriginalUri, File cacheDir, long createdTime) {
+		String source = fileOriginalUri.toString() + Long.toString(createdTime);
+		String fileName = md5(source);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+
+	public static File getDiskCacheDir(Context context) {
+		File appCacheDir = null;
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			appCacheDir = context.getExternalCacheDir();
+		}
+
+		if (appCacheDir == null) {
+			appCacheDir = context.getCacheDir();
+		}
+		return appCacheDir;
+	}
+
+	public static String generateCacheFilePathFromNonceOrPrefix(Context context, String nonce, String prefix) {
+		String fileName = (prefix == null) ? "apptentive-api-file-" + nonce : prefix;
+		File cacheDir = getDiskCacheDir(context);
+		File cacheFile = new File(cacheDir, fileName);
+		return cacheFile.getPath();
+	}
+
+	public static boolean hasPermission(Context context, final String permission) {
+		int perm = context.checkCallingOrSelfPermission(permission);
+		return perm == PackageManager.PERMISSION_GRANTED;
+	}
+
+	/**
+	 * This function launchs the default app to view the selected file, based on mime type
+	 *
+	 * @param sourcePath
+	 * @param selectedFilePath the full path to the local storage
+	 * @param mimeTypeString   the mime type of the file to be opened
+	 * @return true if file can be viewed
+	 */
+	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
+		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+			File selectedFile = new File(selectedFilePath);
+			String selectedFileName = null;
+			if (selectedFile.exists()) {
+				selectedFileName = selectedFile.getName();
+				final Intent intent = new Intent();
+				intent.setAction(android.content.Intent.ACTION_VIEW);
+				/* Attachments were downloaded into app private data dir. In order for external app to open
+				 * the attachments, the file need to be copied to a download folder that is accessible to public
+			   * The folder will be sdcard/Downloads/apptentive-received/<file name>
+         */
+				File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+				File apptentiveSubFolder = new File(downloadFolder, "apptentive-received");
+				if (!apptentiveSubFolder.exists()) {
+					apptentiveSubFolder.mkdir();
+				}
+
+				File tmpfile = new File(apptentiveSubFolder, selectedFileName);
+				String tmpFilePath = tmpfile.getPath();
+				// If destination file already exists, overwrite it; otherwise, delete all existing files in the same folder first.
+				if (!tmpfile.exists()) {
+					String[] children = apptentiveSubFolder.list();
+					if (children != null) {
+						for (int i = 0; i < children.length; i++) {
+							new File(apptentiveSubFolder, children[i]).delete();
+						}
+					}
+				}
+				if (copyFile(selectedFilePath, tmpFilePath) == 0) {
+					return false;
+				}
+
+				intent.setDataAndType(Uri.fromFile(tmpfile), mimeTypeString);
+				try {
+					context.startActivity(intent);
+					return true;
+				} catch (ActivityNotFoundException e) {
+					Log.e("Activity not found to open attachment: ", e);
+				}
+			}
+		} else {
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourcePath));
+			if (Util.canLaunchIntent(context, browserIntent)) {
+				context.startActivity(browserIntent);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function copies file from one location to another
+	 *
+	 * @param from the full path to the source file
+	 * @param to   the full path to the destination file
+	 * @return total bytes copied. 0 indicates
+	 */
+	public static int copyFile(String from, String to) {
+		InputStream inStream = null;
+		FileOutputStream fs = null;
+		try {
+			int bytesum = 0;
+			int byteread;
+			File oldfile = new File(from);
+			if (oldfile.exists()) {
+				inStream = new FileInputStream(from);
+				fs = new FileOutputStream(to);
+				byte[] buffer = new byte[1444];
+				while ((byteread = inStream.read(buffer)) != -1) {
+					bytesum += byteread;
+					fs.write(buffer, 0, byteread);
+				}
+			}
+			return bytesum;
+		} catch (Exception e) {
+			return 0;
+		} finally {
+			Util.ensureClosed(inStream);
+			Util.ensureClosed(fs);
+		}
+	}
+
+	public static boolean isMimeTypeImage(String mimeType) {
+		if (TextUtils.isEmpty(mimeType)) {
+			return false;
+		}
+
+		String fileType = mimeType.substring(0, mimeType.indexOf("/"));
+		return (fileType.equalsIgnoreCase("Image"));
+	}
+
+	/**
+	 * This method creates a cached file exactly copying from the input stream.
+	 *
+	 * @param context       context for resolving uri
+	 * @param sourceUrl     the source file path or uri string
+	 * @param localFilePath the cache file path string
+	 * @param mimeType      the mimeType of the source inputstream
+	 * @return null if failed, otherwise a StoredFile object
+	 */
+	public static StoredFile createLocalStoredFile(Context context, String sourceUrl, String localFilePath, String mimeType) {
+		InputStream is = null;
+		try {
+			if (URLUtil.isContentUrl(sourceUrl) && context != null) {
+				Uri uri = Uri.parse(sourceUrl);
+				is = context.getContentResolver().openInputStream(uri);
+			} else {
+				File file = new File(sourceUrl);
+				is = new FileInputStream(file);
+			}
+			return createLocalStoredFile(is, sourceUrl, localFilePath, mimeType);
+
+		} catch (FileNotFoundException e) {
+			return null;
+		} finally {
+			ensureClosed(is);
+		}
+	}
+
+	/**
+	 * This method creates a cached file copy from the source input stream.
+	 *
+	 * @param is            the source input stream
+	 * @param sourceUrl     the source file path or uri string
+	 * @param localFilePath the cache file path string
+	 * @param mimeType      the mimeType of the source inputstream
+	 * @return null if failed, otherwise a StoredFile object
+	 */
+	public static StoredFile createLocalStoredFile(InputStream is, String sourceUrl, String localFilePath, String mimeType) {
+
+		if (is == null) {
+			return null;
+		}
+		// Copy the file contents over.
+		CountingOutputStream cos = null;
+		BufferedOutputStream bos = null;
+		FileOutputStream fos = null;
+		try {
+			File localFile = new File(localFilePath);
+	  /* Local cache file name may not be unique, and can be reused, in which case, the previously created
+       * cache file need to be deleted before it is being copied over.
+       */
+			if (localFile.exists()) {
+				localFile.delete();
+			}
+			fos = new FileOutputStream(localFile);
+			bos = new BufferedOutputStream(fos);
+			cos = new CountingOutputStream(bos);
+			byte[] buf = new byte[2048];
+			int count;
+			while ((count = is.read(buf, 0, 2048)) != -1) {
+				cos.write(buf, 0, count);
+			}
+			Log.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+		} catch (IOException e) {
+			Log.e("Error creating local copy of file attachment.");
+			return null;
+		} finally {
+			Util.ensureClosed(cos);
+			Util.ensureClosed(bos);
+			Util.ensureClosed(fos);
+		}
+
+		// Create a StoredFile database entry for this locally saved file.
+		StoredFile storedFile = new StoredFile();
+		storedFile.setSourceUriOrPath(sourceUrl);
+		storedFile.setLocalFilePath(localFilePath);
+		storedFile.setMimeType(mimeType);
+		return storedFile;
 	}
 
 }

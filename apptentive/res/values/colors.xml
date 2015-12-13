@@ -15,11 +15,15 @@
     <color name="window_background">#ECECEC</color>
 
     <!-- Material DEFAULT text / items colors -->
-    <color name="icons">#FFF</color>
+    <color name="icons">#FFFFFF</color>
+
+    <!-- 70% von #FFFFFF -> B3 -->
+    <color name="icons_secondary">#B3FFFFFF</color>
+
     <!-- 87% von #000000 -> DE -->
     <color name="primary_text">#DE000000</color>
     <!-- 54% von #000000 -> 8A -->
-    <color name="secondary_text">#8A000000</color>
+    <color name="secondary_text">#AFAFAF</color>
     <!-- 26% von #000000 -> 42 -->
     <color name="hint_text">#42000000</color>
     <!-- 12% von #000000 -> 1F -->
@@ -45,6 +49,8 @@
     <color name="apptentive_material_background">@color/window_background</color>
     <!-- Apptentive Material DEFAULT text / items colors -->
     <color name="apptentive_material_toolbar_foreground">@color/icons</color>
+    <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
+
     <color name="apptentive_material_primary_text">@color/primary_text</color>
     <color name="apptentive_material_primary_icon">@color/secondary_text</color>
     <color name="apptentive_material_secondary_text">@color/secondary_text</color>
@@ -82,7 +88,7 @@
     <color name="apptentive_red">#DC2636</color>
 
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
-    <color name="apptentive_message_center_incoming_background">#F2F2F2</color>
+    <color name="apptentive_message_center_incoming_background">#F5F5F5</color>
 
 
     <color name="apptentive_message_auto_separator">#BBBBBB</color>

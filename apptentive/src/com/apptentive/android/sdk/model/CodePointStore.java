@@ -15,8 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * All public methods altering code point values should be synchronized.<p/>
- * Example:
+ * <p>All public methods altering code point values should be synchronized.</p>
+ * <p>Example:</p>
  * <pre>
  * {
  *   "code_point": {
@@ -229,7 +229,7 @@ public class CodePointStore extends JSONObject {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return 0d;
+		return null;
 	}
 
 	public static Long getVersionInvokes(Context context, boolean interaction, String name, String version) {

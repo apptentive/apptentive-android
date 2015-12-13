@@ -12,8 +12,8 @@
               android:gravity="center">
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/apptentive_activity_side_padding"
-                android:paddingRight="@dimen/apptentive_activity_side_padding"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_note"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_note"
                 android:fadingEdge="none">
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                       android:layout_width="fill_parent"
@@ -30,11 +30,11 @@
                 <TextView android:id="@+id/title"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveDialogTitle"/>
+                          style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogTitle"/>
                 <TextView android:id="@+id/body"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveDialogBody"/>
+                          style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogBody"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/bottom_area"
                           android:layout_width="fill_parent"

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -80,7 +80,9 @@ public class AboutModule {
 			@Override
 			public void onClick(View view) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://www.apptentive.com/?source=%s", packageName)));
-				activity.startActivity(browserIntent);
+				if (Util.canLaunchIntent(activity, browserIntent)) {
+					activity.startActivity(browserIntent);
+				}
 			}
 		});
 
@@ -89,7 +91,9 @@ public class AboutModule {
 			@Override
 			public void onClick(View view) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://www.apptentive.com/privacy/?source=%s", packageName)));
-				activity.startActivity(browserIntent);
+				if (Util.canLaunchIntent(activity, browserIntent)) {
+					activity.startActivity(browserIntent);
+				}
 			}
 		});
 

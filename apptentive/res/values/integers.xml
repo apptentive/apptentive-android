@@ -16,4 +16,8 @@
 
     <integer name="apptentive_message_center_status_orientation">@integer/apptentive_orientation_vertical</integer>
     <integer name="apptentive_message_center_status_text_gravity">@integer/apptentive_gravity_center</integer>
+
+    <integer name="apptentive_image_grid_default_column_number">4</integer>
+    <integer name="apptentive_image_grid_default_column_number_incoming">3</integer>
+    <integer name="apptentive_image_grid_default_attachments_total">4</integer>
 </resources>

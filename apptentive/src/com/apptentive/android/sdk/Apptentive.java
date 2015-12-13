@@ -14,8 +14,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -26,8 +29,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingFileMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.OutgoingTextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -38,7 +40,8 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+
 import java.io.InputStream;
 import java.util.*;
 
@@ -133,7 +136,7 @@ public class Apptentive {
 	 * or by the user through Message Center.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @return
+	 * @return The person's email if set, else null.
 	 */
 	public static String getPersonEmail(Context context) {
 		return PersonManager.loadPersonEmail(context);
@@ -158,7 +161,7 @@ public class Apptentive {
 	 * or by the user through Message Center.
 	 *
 	 * @param context The Context from which this method is called.
-	 * @return
+	 * @return The person's name if set, else null.
 	 */
 	public static String getPersonName(Context context) {
 		return PersonManager.loadPersonName(context);
@@ -173,6 +176,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customDeviceData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomDeviceData(Context context, Map<String, String> customDeviceData) {
 		try {
@@ -187,30 +191,57 @@ public class Apptentive {
 	}
 
 	/**
-	 * Add a piece of custom data to the device's info. This info will be sent to the server.  Calls to this method are
+	 * Add a custom data String to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to store the data under.
-	 * @param value   The value of the data.
+	 * @param value   A String value.
 	 */
 	public static void addCustomDeviceData(Context context, String key, String value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
+		if (value != null) {
+			value = value.trim();
 		}
-		CustomData customData = DeviceManager.loadCustomDeviceData(context);
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				DeviceManager.storeCustomDeviceData(context, customData);
-			} catch (JSONException e) {
-				Log.w("Unable to add custom device data.", e);
-			}
-		}
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
 	}
 
 	/**
-	 * Remove a piece of custom data from the device's info. Calls to this method are idempotent.
+	 * Add a custom data Number to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Number value.
+	 */
+	public static void addCustomDeviceData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	/**
+	 * Add a custom data Boolean to the Device. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Boolean value.
+	 */
+	public static void addCustomDeviceData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomDeviceData(context, key, value);
+	}
+
+	private static void addCustomDeviceData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomDeviceData(context, key, version);
+	}
+
+	private static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
+	}
+
+	/**
+	 * Remove a piece of custom data from the device. Calls to this method are idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to remove.
@@ -231,6 +262,7 @@ public class Apptentive {
 	 *
 	 * @param context          The context from which this method is called.
 	 * @param customPersonData A Map of key/value pairs to send to the server.
+	 * @deprecated
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
 		Log.w("Setting custom person data: %s", customPersonData.toString());
@@ -245,32 +277,58 @@ public class Apptentive {
 		}
 	}
 
-
 	/**
-	 * Add a piece of custom data to the person's info. This info will be sent to the server. Calls to this method are
+	 * Add a custom data String to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to store the data under.
-	 * @param value   The value of the data.
+	 * @param value   A String value.
 	 */
 	public static void addCustomPersonData(Context context, String key, String value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
+		if (value != null) {
+			value = value.trim();
 		}
-		CustomData customData = PersonManager.loadCustomPersonData(context);
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				PersonManager.storeCustomPersonData(context, customData);
-			} catch (JSONException e) {
-				Log.w("Unable to add custom person data.", e);
-			}
-		}
+		ApptentiveInternal.addCustomPersonData(context, key, value);
 	}
 
 	/**
-	 * Remove a piece of custom data from the person's info. Calls to this method are idempotent.
+	 * Add a custom data Number to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Number value.
+	 */
+	public static void addCustomPersonData(Context context, String key, Number value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	/**
+	 * Add a custom data Boolean to the Person. Custom data will be sent to the server, is displayed
+	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
+	 * idempotent.
+	 *
+	 * @param context The context from which this method is called.
+	 * @param key     The key to store the data under.
+	 * @param value   A Boolean value.
+	 */
+	public static void addCustomPersonData(Context context, String key, Boolean value) {
+		ApptentiveInternal.addCustomPersonData(context, key, value);
+	}
+
+	private static void addCustomPersonData(Context context, String key, Version version) {
+		ApptentiveInternal.addCustomPersonData(context, key, version);
+	}
+
+	private static void addCustomPersonData(Context context, String key, DateTime dateTime) {
+		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
+	}
+
+	/**
+	 * Remove a piece of custom data from the Person. Calls to this method are idempotent.
 	 *
 	 * @param context The context from which this method is called.
 	 * @param key     The key to remove.
@@ -352,6 +410,7 @@ public class Apptentive {
 	 * <a href="http://www.apptentive.com/docs/android/integration/#push-notifications">integration guide</a> for
 	 * instructions.
 	 *
+	 * @param context      The Context from which this method is called.
 	 * @param pushProvider One of the following:
 	 *                     <ul>
 	 *                     <li>{@link #PUSH_PROVIDER_APPTENTIVE}</li>
@@ -407,10 +466,12 @@ public class Apptentive {
 
 	private static CustomData getIntegrationConfigurationWithoutPushProviders(Context context) {
 		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
-		integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
-		integrationConfig.remove(INTEGRATION_PARSE);
-		integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
-		integrationConfig.remove(INTEGRATION_AWS_SNS);
+		if (integrationConfig != null) {
+			integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
+			integrationConfig.remove(INTEGRATION_PARSE);
+			integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
+			integrationConfig.remove(INTEGRATION_AWS_SNS);
+		}
 		return integrationConfig;
 	}
 
@@ -440,15 +501,15 @@ public class Apptentive {
 	}
 
 	/**
-	 * Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
+	 * <p>Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
 	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
 	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
-	 * notification did not come from Apptentive, this method has no effect.
-	 * <p/>
-	 * Use this method when using Parse and Amazon SNS as push providers.
+	 * notification did not come from Apptentive, this method has no effect.</p>
+	 * <p>Use this method when using Parse and Amazon SNS as push providers.</p>
 	 *
 	 * @param context The Context from which this method is called.
 	 * @param intent  The Intent that you received when the user opened a push notification.
+	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
@@ -467,7 +528,7 @@ public class Apptentive {
 	 *
 	 * @param context The context from which this method was called.
 	 * @param data    A Bundle containing the GCM data object from the push notification.
-	 * @return true if data came from Apptentive.
+	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Bundle data) {
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
@@ -564,10 +625,12 @@ public class Apptentive {
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
 	 * @param activity   The Activity from which to launch the Message Center
-	 * @param customData A Map of key/value Strings that will be sent with the next message.
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
+	 *                   If any message is sent by the Person, this data is sent with it, and then
+	 *                   cleared. If no message is sent, this data is discarded.
 	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Activity activity, Map<String, String> customData) {
+	public static boolean showMessageCenter(Activity activity, Map<String, Object> customData) {
 		try {
 			return ApptentiveInternal.showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
@@ -634,10 +697,13 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentText(Context context, String text) {
 		try {
-			OutgoingTextMessage message = new OutgoingTextMessage();
+			CompoundMessage message = new CompoundMessage();
 			message.setBody(text);
+			message.setRead(true);
 			message.setHidden(true);
-			MessageManager.sendMessage(context, message);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+			message.setAssociatedFiles(context, null);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
 		} catch (Exception e) {
 			Log.w("Error sending attachment text.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -654,15 +720,48 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, String uri) {
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
-			message.setHidden(true);
-
-			boolean successful = message.createStoredFile(context, uri);
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
+			if (TextUtils.isEmpty(uri)) {
+				return;
 			}
+
+			CompoundMessage message = new CompoundMessage();
+			// No body, just attachment
+			message.setBody(null);
+			message.setRead(true);
+			message.setHidden(true);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+
+			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
+			 * If original uri is known, the name will be taken from the original uri
+			 */
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), Uri.parse(uri).getLastPathSegment());
+
+			String mimeType = Util.getMimeTypeFromUri(context, Uri.parse(uri));
+			MimeTypeMap mime = MimeTypeMap.getSingleton();
+			String extension = mime.getExtensionFromMimeType(mimeType);
+
+			// If we can't get the mime type from the uri, try getting it from the extension.
+			if (extension == null) {
+				extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+			}
+			if (mimeType == null && extension != null) {
+				mimeType = mime.getMimeTypeFromExtension(extension);
+			}
+			if (!TextUtils.isEmpty(extension)) {
+				localFilePath += "." + extension;
+			}
+			StoredFile storedFile = Util.createLocalStoredFile(context, uri, localFilePath, mimeType);
+			if (storedFile == null) {
+				return;
+			}
+
+			storedFile.setId(message.getNonce());
+			attachmentStoredFiles.add(storedFile);
+
+			message.setAssociatedFiles(context, attachmentStoredFiles);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
+
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -679,19 +778,12 @@ public class Apptentive {
 	 * @param mimeType The mime type of the file.
 	 */
 	public static void sendAttachmentFile(Context context, byte[] content, String mimeType) {
+		ByteArrayInputStream is = null;
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
-			message.setHidden(true);
-
-			boolean successful = message.createStoredFile(context, content, mimeType);
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
-			}
-		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
-			MetricModule.sendError(context, e, null, null);
+			is = new ByteArrayInputStream(content);
+			sendAttachmentFile(context, is, mimeType);
+		} finally {
+			Util.ensureClosed(is);
 		}
 	}
 
@@ -706,20 +798,35 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(Context context, InputStream is, String mimeType) {
 		try {
-			OutgoingFileMessage message = new OutgoingFileMessage();
-			message.setHidden(true);
+			if (is == null) {
+				return;
+			}
 
-			boolean successful = false;
-			try {
-				successful = message.createStoredFile(context, is, mimeType);
-			} catch (IOException e) {
-				Log.e("Error creating local copy of file attachment.");
+			CompoundMessage message = new CompoundMessage();
+			// No body, just attachment
+			message.setBody(null);
+			message.setRead(true);
+			message.setHidden(true);
+			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+
+			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), null);
+
+			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
+			if (!TextUtils.isEmpty(extension)) {
+				localFilePath += "." + extension;
 			}
-			if (successful) {
-				message.setRead(true);
-				// Finally, send out the message.
-				MessageManager.sendMessage(context, message);
+			// When created from InputStream, there is no source file uri or path, thus just use the cache file path
+			StoredFile storedFile = Util.createLocalStoredFile(is, localFilePath, localFilePath, mimeType);
+			if (storedFile == null) {
+				return;
 			}
+			storedFile.setId(message.getNonce());
+			attachmentStoredFiles.add(storedFile);
+
+			message.setAssociatedFiles(context, attachmentStoredFiles);
+			MessageManager.sendMessage(context.getApplicationContext(), message);
+
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -783,9 +890,10 @@ public class Apptentive {
 	}
 
 	/**
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param context The Context from which this method is called.
+	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
+	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 * @deprecated Use {@link #canShowInteraction(Context, String)}() instead. The behavior is identical. Only the name has changed.
 	 */
@@ -799,9 +907,10 @@ public class Apptentive {
 	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
 	 * displayed before you create a UI Button, etc.
 	 *
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param context The Context from which this method is called.
+	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
+	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 */
 	public static synchronized boolean canShowInteraction(Context context, String event) {
@@ -839,14 +948,20 @@ public class Apptentive {
 
 			// First, Get the api key, and figure out if app is debuggable.
 			GlobalInfo.isAppDebuggable = false;
-			String apiKey = null;
+			String apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
 			boolean apptentiveDebug = false;
 			String logLevelOverride = null;
 			try {
 				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
 				Bundle metaData = ai.metaData;
 				if (metaData != null) {
-					apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+					if (apiKey == null) {
+						apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
+						Log.d("Saving API key for the first time: %s", apiKey);
+						prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
+					} else {
+						Log.d("Using cached API Key: %s", apiKey);
+					}
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 					ApptentiveClient.useStagingServer = metaData.getBoolean(Constants.MANIFEST_KEY_USE_STAGING_SERVER);
@@ -918,12 +1033,6 @@ public class Apptentive {
 				onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 			}
 
-			// Grab the conversation token from shared preferences.
-			if (prefs.contains(Constants.PREF_KEY_CONVERSATION_TOKEN) && prefs.contains(Constants.PREF_KEY_PERSON_ID)) {
-				GlobalInfo.conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-				GlobalInfo.personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
-			}
-
 			GlobalInfo.initialized = true;
 			Log.v("Done initializing...");
 		} else {
@@ -931,11 +1040,11 @@ public class Apptentive {
 		}
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (GlobalInfo.conversationToken == null || GlobalInfo.personId == null) {
-			asyncFetchConversationToken(appContext.getApplicationContext());
+		if (GlobalInfo.getConversationToken(appContext)  == null || GlobalInfo.getPersonId(appContext) == null) {
+			asyncFetchConversationToken(appContext);
 		} else {
-			asyncFetchAppConfiguration(appContext.getApplicationContext());
-			InteractionManager.asyncFetchAndStoreInteractions(appContext.getApplicationContext());
+			asyncFetchAppConfiguration(appContext);
+			InteractionManager.asyncFetchAndStoreInteractions(appContext);
 		}
 
 		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
@@ -1021,17 +1130,15 @@ public class Apptentive {
 				Log.d("ConversationToken: " + conversationToken);
 				String conversationId = root.getString("id");
 				Log.d("New Conversation id: %s", conversationId);
-				SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
 				if (conversationToken != null && !conversationToken.equals("")) {
-					GlobalInfo.conversationToken = conversationToken;
-					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).commit();
-					prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_ID, conversationId).commit();
+					GlobalInfo.setConversationToken(context, conversationToken);
+					GlobalInfo.setConversationId(context, conversationId);
 				}
 				String personId = root.getString("person_id");
 				Log.d("PersonId: " + personId);
 				if (personId != null && !personId.equals("")) {
-					GlobalInfo.personId = personId;
-					prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).commit();
+					GlobalInfo.setPersonId(context, personId);
 				}
 				// Try to fetch app configuration, since it depends on the conversation token.
 				asyncFetchAppConfiguration(context);
@@ -1136,6 +1243,137 @@ public class Apptentive {
 			ApptentiveDatabase.getInstance(context).addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
+		}
+	}
+
+	/**
+	 * <p>This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
+	 * with a string or a long, and there is no limit to the number of parts your semantic version can
+	 * contain. The class allows comparison based on semantic version rules.
+	 * Valid versions (In sorted order):</p>
+	 * <ul>
+	 * <li>0</li>
+	 * <li>0.1</li>
+	 * <li>1.0.0</li>
+	 * <li>1.0.9</li>
+	 * <li>1.0.10</li>
+	 * <li>1.2.3</li>
+	 * <li>5</li>
+	 * </ul>
+	 * Invalid versions:
+	 * <ul>
+	 * <li>zero</li>
+	 * <li>0.1+2015.10.21</li>
+	 * <li>1.0.0a</li>
+	 * <li>1.0-rc2</li>
+	 * <li>1.0.10-SNAPSHOT</li>
+	 * <li>5a</li>
+	 * <li>FF01</li>
+	 * </ul>
+	 */
+	public static class Version extends JSONObject implements Comparable<Version> {
+		public static final String KEY_TYPE = "_type";
+		public static final String TYPE = "version";
+
+		public Version() {
+		}
+
+		public Version(String json) throws JSONException {
+			super(json);
+		}
+
+		public Version(long version) {
+			super();
+			setVersion(version);
+		}
+
+		public void setVersion(String version) {
+			try {
+				put(KEY_TYPE, TYPE);
+				put(TYPE, version);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.Version.", e);
+			}
+		}
+
+		public void setVersion(long version) {
+			setVersion(Long.toString(version));
+		}
+
+		public String getVersion() {
+			return optString(TYPE, null);
+		}
+
+		@Override
+		public int compareTo(Version other) {
+			String thisVersion = getVersion();
+			String thatVersion = other.getVersion();
+			String[] thisArray = thisVersion.split("\\.");
+			String[] thatArray = thatVersion.split("\\.");
+
+			int maxParts = Math.max(thisArray.length, thatArray.length);
+			for (int i = 0; i < maxParts; i++) {
+				// If one SemVer has more parts than another, treat pad out the short one with zeros in each slot.
+				long left = 0;
+				if (thisArray.length > i) {
+					left = Long.parseLong(thisArray[i]);
+				}
+				long right = 0;
+				if (thatArray.length > i) {
+					right = Long.parseLong(thatArray[i]);
+				}
+				if (left < right) {
+					return -1;
+				} else if (left > right) {
+					return 1;
+				}
+			}
+			return 0;
+		}
+
+		@Override
+		public String toString() {
+			return getVersion();
+		}
+	}
+
+	public static class DateTime extends JSONObject implements Comparable<DateTime> {
+		public static final String KEY_TYPE = "_type";
+		public static final String TYPE = "datetime";
+		public static final String SEC = "sec";
+
+		public DateTime(String json) throws JSONException {
+			super(json);
+		}
+
+		public DateTime(double dateTime) {
+			super();
+			setDateTime(dateTime);
+		}
+
+		public void setDateTime(double dateTime) {
+			try {
+				put(KEY_TYPE, TYPE);
+				put(SEC, dateTime);
+			} catch (JSONException e) {
+				Log.e("Error creating Apptentive.DateTime.", e);
+			}
+		}
+
+		public double getDateTime() {
+			return optDouble(SEC);
+		}
+
+		@Override
+		public String toString() {
+			return Double.toString(getDateTime());
+		}
+
+		@Override
+		public int compareTo(DateTime other) {
+			double thisDateTime = getDateTime();
+			double thatDateTime = other.getDateTime();
+			return Double.compare(thisDateTime, thatDateTime);
 		}
 	}
 }

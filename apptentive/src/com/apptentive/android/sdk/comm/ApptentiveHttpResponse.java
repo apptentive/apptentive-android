@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -80,5 +80,13 @@ public class ApptentiveHttpResponse {
 
 	public void setBadPayload(boolean badPayload) {
 		this.badPayload = badPayload;
+	}
+
+	public boolean isZipped() {
+		if (headers != null) {
+			String contentEncoding = headers.get("Content-Encoding");
+			return contentEncoding != null && contentEncoding.equalsIgnoreCase("[gzip]");
+		}
+		return false;
 	}
 }

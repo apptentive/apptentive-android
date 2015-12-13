@@ -10,21 +10,27 @@ def getVersionName() {
 }
 
 def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : ""
 }
 
 def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+    if (isReleaseBuild()) {
+        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+    } else {
+        return hasProperty('SNAPSHOT_REPOSITORY_USERNAME') ? SNAPSHOT_REPOSITORY_USERNAME : ""
+    }
 }
 
 def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+    if (isReleaseBuild()) {
+        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+    } else {
+        return hasProperty('SNAPSHOT_REPOSITORY_PASSWORD') ? SNAPSHOT_REPOSITORY_PASSWORD : ""
+    }
 }
 
 afterEvaluate { project ->
@@ -90,6 +96,7 @@ afterEvaluate { project ->
         include 'com/apptentive/android/sdk/ApptentiveListActivity.java'
         include 'com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.java'
         include 'com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.java'
+        include 'com/apptentive/android/sdk/module/rating/InsufficientRatingArgumentsException.java'
         include 'com/apptentive/android/sdk/module/rating/IRatingProvider.java'
         include 'com/apptentive/android/sdk/module/messagecenter/UnreadMessagesListener.java'
         include 'com/apptentive/android/sdk/module/survey/OnSurveyFinishedListener.java'

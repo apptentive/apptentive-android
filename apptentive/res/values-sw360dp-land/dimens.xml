@@ -7,6 +7,7 @@
 
 <resources>
     <dimen name="apptentive_activity_side_padding">126dp</dimen>
+
     <dimen name="apptentive_activity_vertical_padding">0dp</dimen>
     <dimen name="apptentive_dialog_side_padding">126dp</dimen>
     <dimen name="apptentive_dialog_vertical_padding">0dp</dimen>
@@ -26,4 +27,6 @@
     <dimen name="apptentive_message_center_status_side_padding">96dp</dimen>
 
     <dimen name="apptentive_message_center_error_side_margin">48dp</dimen>
+    <dimen name="apptentive_image_file_extension_layout_top">0dp</dimen>
+    <dimen name="apptentive_image_download_progresbar_layout_top">8dp</dimen>
 </resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/apptentive_empty_image_background">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:src="@null"/>
+
+    <TextView
+        android:id="@+id/image_file_extension"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/apptentive_image_file_extension_layout_top"
+        android:textSize="@dimen/apptentive_image_file_extension_default_text_size"
+        android:lineSpacingMultiplier="0.8"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="#617D8A"
+        tools:text="File"/>
+
+    <View
+        android:id="@+id/mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#88000000"/>
+
+    <ImageView
+        android:id="@+id/indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="-2dp"
+        android:layout_marginRight="-2dp"
+        android:src="@drawable/apptentive_ic_image_picker_unselected"/>
+    <ProgressBar
+        android:id="@+id/thumbnail_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        style="@android:style/Widget.ProgressBar.Small"/>
+    <com.apptentive.android.sdk.view.ApptentiveMaterialDeterminateProgressBar
+        android:id="@+id/thumbnail_progress_determinate"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom"
+        style="@style/ApptentiveMessageCenterAttachmentDownloadProgressBar"
+        android:visibility="gone"/>
+</FrameLayout>

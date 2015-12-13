@@ -12,8 +12,8 @@
               android:gravity="center_vertical">
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/apptentive_activity_side_padding"
-                android:paddingRight="@dimen/apptentive_activity_side_padding"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_upgrade"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_upgrade"
                 android:fadingEdge="none">
         <FrameLayout android:layout_width="fill_parent"
                      android:layout_height="wrap_content"

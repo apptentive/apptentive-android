@@ -20,5 +20,6 @@
               android:textSize="@dimen/apptentive_text_small"
               android:hint="@string/apptentive_survey_singleline_hint"
               android:background="@drawable/android_textfield_activated_holo_light"
-              android:saveEnabled="false"/>
+              android:saveEnabled="false"
+              style="@style/ApptentiveTheme.TextAppearence.EditText"/>
 </LinearLayout>

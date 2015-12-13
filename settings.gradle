@@ -6,7 +6,5 @@ include 'test-app'
 project(':test-app').projectDir = new File('tests/test-app')
 
 // Samples
-include 'apptentive-dev'
-project(':apptentive-dev').projectDir = new File('samples/apptentive-dev')
 include 'apptentive-example'
 project(':apptentive-example').projectDir = new File('samples/apptentive-example')

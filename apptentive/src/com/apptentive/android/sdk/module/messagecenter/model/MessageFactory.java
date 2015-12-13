@@ -6,6 +6,10 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
+import android.content.Context;
+import android.text.TextUtils;
+
+import com.apptentive.android.sdk.GlobalInfo;
 import com.apptentive.android.sdk.Log;
 
 import org.json.JSONException;
@@ -15,22 +19,33 @@ import org.json.JSONObject;
  * @author Sky Kelsey
  */
 public class MessageFactory {
-	public static ApptentiveMessage fromJson(String json) {
+	public static ApptentiveMessage fromJson(Context appContext, String json) {
 		try {
+			// If KEY_TYPE is set to CompoundMessage or not set, treat them as CompoundMessage
+			ApptentiveMessage.Type type = ApptentiveMessage.Type.CompoundMessage;
 			JSONObject root = new JSONObject(json);
-			ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+			if (!root.isNull(ApptentiveMessage.KEY_TYPE)) {
+				String typeStr = root.getString(ApptentiveMessage.KEY_TYPE);
+				if (!TextUtils.isEmpty(typeStr)) {
+					type = ApptentiveMessage.Type.valueOf(typeStr);
+				}
+			}
 			switch (type) {
-				case TextMessage:
-					// This is ugly, but works.
-					ApptentiveMessage apptentiveMessage = new OutgoingTextMessage(json);
-					if (!apptentiveMessage.isOutgoingMessage()) {
-						apptentiveMessage = new IncomingTextMessage(json);
+				case CompoundMessage:
+					String senderId = null;
+					try {
+						if (!root.isNull(ApptentiveMessage.KEY_SENDER)) {
+							JSONObject sender = root.getJSONObject(ApptentiveMessage.KEY_SENDER);
+							if (!sender.isNull((ApptentiveMessage.KEY_SENDER_ID))) {
+								senderId = sender.getString(ApptentiveMessage.KEY_SENDER_ID);
+							}
+						}
+					} catch (JSONException e) {
+						// Ignore, snederId would be null
 					}
-					return apptentiveMessage;
-				case FileMessage:
-					return new OutgoingFileMessage(json);
-				case AutomatedMessage:
-					return new AutomatedMessage(json);
+					String storedId = GlobalInfo.getPersonId(appContext);
+					// If senderId is null or same as the locally stored id, construct message as outgoing
+					return new CompoundMessage(json, (senderId == null || senderId.equals(storedId)));
 				case unknown:
 					break;
 				default:
@@ -39,7 +54,7 @@ public class MessageFactory {
 		} catch (JSONException e) {
 			Log.v("Error parsing json as Message: %s", e, json);
 		} catch (IllegalArgumentException e) {
-			// Unknown unknown #rumsfeld
+			// Exception treated as unknown type
 		}
 		return null;
 	}
