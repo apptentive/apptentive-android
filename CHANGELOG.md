@@ -1,3 +1,10 @@
+# 2015-12-12 - 2.1.0
+
+#### Improvements
+
+* Message Center now allows consumers to attach up to four images to each outgoing message. You can also attach files to your replies, and they will be downloaded and displayed to consumers when they open Message Center.
+* You've always had the ability to send custom data in the Person, Deveice, Message, and Event objects. However, you can now send custom data that is a Number or Boolean, and use that custom data in your Interaction targeting logic.
+
 # 2015-09-15 - 2.0.1
 
 #### Bugs Fixed

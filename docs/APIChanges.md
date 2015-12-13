@@ -1,5 +1,29 @@
 This document tracks changes to the API between versions.
 
+# 2.1.0
+
+* Added a methods for setting custom data of type String, Number, and Boolean on the Device and Person objects.
+* Deprecated `setCustomDeviceData()` and `setCustomDeviceData()`.
+* Modified `showMessageCenter()` to allow custom data of type Number and Boolean, in addition to the existing String.
+
+| Added Methods |
+| ------------- |
+| [public static void addCustomDeviceData(Context context, String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-android.content.Context-java.lang.String-java.lang.String) |
+| [public static void addCustomDeviceData(Context context, String key, Number value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-android.content.Context-java.lang.String-java.lang.Number) |
+| [public static void addCustomDeviceData(Context context, String key, Boolean value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-android.content.Context-java.lang.String-java.lang.Boolean) |
+| [public static void addCustomPersonData(Context context, String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-android.content.Context-java.lang.String-java.lang.String) |
+| [public static void addCustomPersonData(Context context, String key, Number value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-android.content.Context-java.lang.String-java.lang.Number) |
+| [public static void addCustomPersonData(Context context, String key, Boolean value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-android.content.Context-java.lang.String-java.lang.Boolean) |
+
+| Modified Methods |
+| ------------------ |
+| [public static void showMessageCenter(Context context, Map<String, Object>)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-android.content.Context-java.util.Map) |
+
+| Deprecated Methods |
+| ------------------ |
+| [public static void setCustomDeviceData(Context context, Map<String, String>)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomDeviceData-android.content.Context-java.util.Map) |
+| [public static void setCustomPersonData(Context context, Map<String, String>)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setCustomPersonData-android.content.Context-java.util.Map) |
+
 # 2.0.0
 
 * Modified `showMessageCenter()` to return a boolean. Returns true if Message Center was shown, else false.
