@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Sky Kelsey
  */
-public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore, FileStore {
+public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore {
 
 	// COMMON
 	private static final int DATABASE_VERSION = 2;
@@ -579,74 +579,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized StoredFile getStoredFile(String id) {
-		SQLiteDatabase db = getReadableDatabase();
-		Cursor cursor = null;
-		StoredFile ret = null;
-		try {
-			db = getReadableDatabase();
-			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
-			
-			if (cursor.moveToFirst()) {
-				ret = new StoredFile();
-				ret.setId(id);
-				ret.setMimeType(cursor.getString(1));
-				ret.setSourceUriOrPath(cursor.getString(2));
-				ret.setLocalFilePath(cursor.getString(3));
-				ret.setApptentiveUri(cursor.getString(4));
-			}
-		} catch (SQLException sqe) {
-			Log.e("getStoredFile EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-			ensureClosed(db);
-		}
-		return ret;
-	}
-
-	public synchronized boolean putStoredFile(StoredFile storedFile) {
-		SQLiteDatabase db = null;
-		Cursor cursor = null;
-		long ret = -1;
-		try {
-			db = getWritableDatabase();
-
-			ContentValues values = new ContentValues();
-			values.put(FILESTORE_KEY_ID, storedFile.getId());
-			values.put(FILESTORE_KEY_MIME_TYPE, storedFile.getMimeType());
-			values.put(FILESTORE_KEY_ORIGINAL_URL, storedFile.getSourceUriOrPath());
-			values.put(FILESTORE_KEY_LOCAL_URL, storedFile.getLocalFilePath());
-			values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
-			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
-			boolean doUpdate = cursor.moveToFirst();
-			
-			if (doUpdate) {
-				ret = db.update(TABLE_FILESTORE, values, FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
-			} else {
-				ret = db.insert(TABLE_FILESTORE, null, values);
-			}
-		} catch (SQLException sqe) {
-			Log.e("putStoredFile EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-			ensureClosed(db);
-		}
-		return ret != -1;
-	}
-
-	public synchronized void deleteStoredFile(String id) {
-		SQLiteDatabase db = null;
-		try {
-			db = getWritableDatabase();
-			int deleted = db.delete(TABLE_FILESTORE, MESSAGE_KEY_ID + " = ?", new String[]{id});
-			Log.d("Deleted %d stored files.", deleted);
-		} catch (SQLException sqe) {
-			Log.e("deleteStoredFile EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
-		}
-	}
-
 	public synchronized void deleteAssociatedFiles(String messageNonce) {
 		SQLiteDatabase db = null;
 		try {
@@ -687,33 +619,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ensureClosed(db);
 		}
 		return associatedFiles.size() > 0 ? associatedFiles : null;
-	}
-
-	public synchronized List<StoredFile> getAllStoredFiles() {
-		SQLiteDatabase db = null;
-		Cursor cursor = null;
-		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
-		try {
-			db = getReadableDatabase();
-			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
-			StoredFile ret;
-			if (cursor.moveToFirst()) {
-				do {
-					ret = new StoredFile();
-					ret.setId(cursor.getString(0));
-					ret.setLocalFilePath(cursor.getString(1));
-					ret.setMimeType(cursor.getString(2));
-					ret.setSourceUriOrPath(cursor.getString(3));
-					ret.setApptentiveUri(cursor.getString(4));
-					ret.setCreationTime(0);
-					associatedFiles.add(ret);
-				} while (cursor.moveToNext());
-			}
-		} finally {
-			ensureClosed(cursor);
-			ensureClosed(db);
-		}
-		return associatedFiles;
 	}
 
 	/*
