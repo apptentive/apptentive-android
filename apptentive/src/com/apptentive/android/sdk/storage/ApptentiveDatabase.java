@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.storage;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
@@ -18,7 +19,6 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
-import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -136,7 +136,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 	private File fileDir; // data dir of the application
 
-	public static ApptentiveDatabase getInstance(Context context) {
+	public static synchronized ApptentiveDatabase getInstance(Context context) {
 		if (instance == null) {
 			instance = new ApptentiveDatabase(context.getApplicationContext());
 		}
@@ -216,6 +216,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
+		} catch (SQLException sqe) {
+			Log.e("addPayload EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -227,6 +229,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			try {
 				db = getWritableDatabase();
 				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
+			} catch (SQLException sqe) {
+				Log.e("deletePayload EXCEPTION: " + sqe.getMessage());
 			} finally {
 				ensureClosed(db);
 			}
@@ -238,6 +242,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		try {
 			db = getWritableDatabase();
 			db.delete(TABLE_PAYLOAD, "", null);
+		} catch (SQLException sqe) {
+			Log.e("deleteAllPayloads EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -261,6 +267,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				}
 			}
 			return payload;
+		} catch (SQLException sqe) {
+			Log.e("getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
+			return null;
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
@@ -310,6 +319,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					ensureClosed(cursor);
 				}
 			}
+		} catch (SQLException sqe) {
+			Log.e("addOrUpdateMessages EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -318,7 +329,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	public synchronized void updateMessage(ApptentiveMessage apptentiveMessage) {
 		SQLiteDatabase db = null;
 		try {
-			db = this.getWritableDatabase();
+			db = getWritableDatabase();
 			db.beginTransaction();
 			ContentValues values = new ContentValues();
 			values.put(MESSAGE_KEY_ID, apptentiveMessage.getId());
@@ -331,6 +342,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			values.put(MESSAGE_KEY_JSON, apptentiveMessage.toString());
 			db.update(TABLE_MESSAGE, values, MESSAGE_KEY_NONCE + " = ?", new String[]{apptentiveMessage.getNonce()});
 			db.setTransactionSuccessful();
+		} catch (SQLException sqe) {
+			Log.e("updateMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			if (db != null) {
 				db.endTransaction();
@@ -344,7 +357,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
-			db = this.getReadableDatabase();
+			db = getReadableDatabase();
 			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
 			if (cursor.moveToFirst()) {
 				do {
@@ -360,6 +373,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					apptentiveMessages.add(apptentiveMessage);
 				} while (cursor.moveToNext());
 			}
+		} catch (SQLException sqe) {
+			Log.e("getAllMessages EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
@@ -370,18 +385,20 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	public synchronized String getLastReceivedMessageId() {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
+		String ret = null;
 		try {
 			db = getReadableDatabase();
 			cursor = db.rawQuery(QUERY_MESSAGE_GET_LAST_ID, null);
-			String ret = null;
 			if (cursor.moveToFirst()) {
 				ret = cursor.getString(0);
 			}
-			return ret;
+		} catch (SQLException sqe) {
+			Log.e("getLastReceivedMessageId EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
+		return ret;
 	}
 
 	public synchronized int getUnreadMessageCount() {
@@ -391,6 +408,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db = getWritableDatabase();
 			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
 			return cursor.getCount();
+		} catch (SQLException sqe) {
+			Log.e("getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
+			return 0;
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
@@ -402,6 +422,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		try {
 			db = getWritableDatabase();
 			db.delete(TABLE_MESSAGE, "", null);
+		} catch (SQLException sqe) {
+			Log.e("deleteAllMessages EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -413,6 +435,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_MESSAGE, MESSAGE_KEY_NONCE + " = ?", new String[]{nonce});
 			Log.d("Deleted %d messages.", deleted);
+		} catch (SQLException sqe) {
+			Log.e("deleteMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -452,6 +476,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 
 				} while (cursor.moveToNext());
 			}
+		} catch (SQLException sqe) {
+			Log.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -497,6 +523,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					}
 				} while (cursor.moveToNext());
 			}
+		} catch (SQLException sqe) {
+			Log.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -544,6 +572,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					}
 				} while (cursor.moveToNext());
 			}
+		} catch (SQLException sqe) {
+			Log.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -552,10 +582,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	public synchronized StoredFile getStoredFile(String id) {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor cursor = null;
+		StoredFile ret = null;
 		try {
 			db = getReadableDatabase();
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{id});
-			StoredFile ret = null;
+			
 			if (cursor.moveToFirst()) {
 				ret = new StoredFile();
 				ret.setId(id);
@@ -564,16 +595,19 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				ret.setLocalFilePath(cursor.getString(3));
 				ret.setApptentiveUri(cursor.getString(4));
 			}
-			return ret;
+		} catch (SQLException sqe) {
+			Log.e("getStoredFile EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
+		return ret;
 	}
 
 	public synchronized boolean putStoredFile(StoredFile storedFile) {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
+		long ret = -1;
 		try {
 			db = getWritableDatabase();
 
@@ -585,17 +619,19 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			values.put(FILESTORE_KEY_APPTENTIVE_URL, storedFile.getApptentiveUri());
 			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE + " WHERE " + FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
 			boolean doUpdate = cursor.moveToFirst();
-			long ret;
+			
 			if (doUpdate) {
 				ret = db.update(TABLE_FILESTORE, values, FILESTORE_KEY_ID + " = ?", new String[]{storedFile.getId()});
 			} else {
 				ret = db.insert(TABLE_FILESTORE, null, values);
 			}
-			return ret != -1;
+		} catch (SQLException sqe) {
+			Log.e("putStoredFile EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
 		}
+		return ret != -1;
 	}
 
 	public synchronized void deleteStoredFile(String id) {
@@ -604,6 +640,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_FILESTORE, MESSAGE_KEY_ID + " = ?", new String[]{id});
 			Log.d("Deleted %d stored files.", deleted);
+		} catch (SQLException sqe) {
+			Log.e("deleteStoredFile EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -615,6 +653,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
 			Log.d("Deleted %d stored files.", deleted);
+		} catch (SQLException sqe) {
+			Log.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 		}
@@ -640,6 +680,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					associatedFiles.add(ret);
 				} while (cursor.moveToNext());
 			}
+		} catch (SQLException sqe) {
+			Log.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 			ensureClosed(db);
@@ -703,6 +745,8 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
+		} catch (SQLException sqe) {
+			Log.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(db);
 			return ret != -1;
