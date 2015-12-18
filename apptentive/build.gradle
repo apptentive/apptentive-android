@@ -18,7 +18,7 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 23
 
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0

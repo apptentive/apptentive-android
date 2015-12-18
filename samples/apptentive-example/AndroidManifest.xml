@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.apptentive.android.example"
-          android:versionCode="1"
-          android:versionName="1.0">
+          package="com.apptentive.android.example">
 
     <!-- Required for Apptentive -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -20,8 +18,6 @@
     <uses-permission android:name="com.apptentive.android.example.gcm.permission.C2D_MESSAGE"/>
     <!-- -->
 
-    <uses-sdk android:minSdkVersion="11"
-              android:targetSdkVersion="23"/>
     <supports-screens android:xlargeScreens="true"
                       android:largeScreens="true"
                       android:normalScreens="true"
