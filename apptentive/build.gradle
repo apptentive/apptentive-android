@@ -20,21 +20,12 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
-
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0
         versionName "2.1.0"
     }
 
     lintOptions {
         abortOnError false
-    }
-
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            res.srcDirs = ['res']
-        }
     }
 
     compileOptions {
