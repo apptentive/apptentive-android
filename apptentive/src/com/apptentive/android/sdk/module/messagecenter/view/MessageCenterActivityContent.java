@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -1358,8 +1359,18 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	public void updateMessageSentStates() {
 		dateStampsSeen.clear();
 		MessageCenterUtil.CompoundMessageCommonInterface lastSent = null;
-		for (MessageCenterListItem message : messages) {
+		Set<String> uniqueNonce = new HashSet<String>();
+		Iterator<MessageCenterListItem> messageIterator = messages.iterator();
+		while (messageIterator.hasNext()) {
+			MessageCenterListItem message = messageIterator.next();
 			if (message instanceof ApptentiveMessage) {
+				/* Check if there is any duplicate messages and remove if found.
+				* add() of a Set returns false if the element already exists.
+				 */
+				if (!uniqueNonce.add(((ApptentiveMessage) message).getNonce())) {
+					messageIterator.remove();
+					continue;
+				}
 				// Update timestamps
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
 				Double sentOrReceivedAt = apptentiveMessage.getCreatedAt();
@@ -1382,6 +1393,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 				}
 			}
 		}
+
 		if (lastSent != null) {
 			lastSent.setLastSent(true);
 		}
