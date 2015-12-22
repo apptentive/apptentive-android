@@ -17,6 +17,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
@@ -33,7 +34,7 @@ public class UpgradeMessageInteractionView extends InteractionView<UpgradeMessag
 	}
 
 	@Override
-	public void doOnCreate(Activity activity, Bundle savedInstanceState) {
+	public void doOnCreate(ViewActivity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_upgrade_message_interaction);
 
 		ImageView iconView = (ImageView) activity.findViewById(R.id.icon);

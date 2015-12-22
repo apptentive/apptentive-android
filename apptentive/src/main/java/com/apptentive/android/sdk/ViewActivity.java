@@ -7,15 +7,14 @@
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.URLUtil;
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -32,7 +31,7 @@ import com.apptentive.android.sdk.util.Util;
  *
  * @author Sky Kelsey
  */
-public class ViewActivity extends ApptentiveInternalActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class ViewActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
 
 	private ActivityContent activityContent;
@@ -44,7 +43,6 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 	public ActivityContent getActivityContent() {
 		return activityContent;
 	}
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

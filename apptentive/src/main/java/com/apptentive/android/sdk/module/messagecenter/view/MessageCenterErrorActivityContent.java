@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -30,7 +31,7 @@ public class MessageCenterErrorActivityContent extends ActivityContent {
 	protected boolean hasLaunched;
 
 	@Override
-	public void onCreate(Activity activity, Bundle savedInstanceState) {
+	public void onCreate(ViewActivity activity, Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
 		}

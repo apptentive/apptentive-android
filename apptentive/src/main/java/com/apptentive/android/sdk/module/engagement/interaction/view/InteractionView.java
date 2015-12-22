@@ -6,10 +6,10 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
@@ -28,7 +28,7 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 		this.interaction = interaction;
 	}
 
-	public void onCreate(final Activity activity, Bundle savedInstanceState) {
+	public void onCreate(final ViewActivity activity, Bundle savedInstanceState) {
 		Log.d("Showing interaction.");
 		if (savedInstanceState != null) {
 			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
@@ -51,5 +51,5 @@ public abstract class InteractionView<T extends Interaction> extends ActivityCon
 		hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED, false);
 	}
 
-	protected abstract void doOnCreate(Activity activity, Bundle savedInstanceState);
+	protected abstract void doOnCreate(ViewActivity viewActivity, Bundle savedInstanceState);
 }

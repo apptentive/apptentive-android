@@ -14,6 +14,7 @@ import android.os.Bundle;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -35,7 +36,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 	}
 
 	@Override
-	public void doOnCreate(Activity activity, Bundle savedInstanceState) {
+	public void doOnCreate(ViewActivity activity, Bundle savedInstanceState) {
 		// TODO: See if we can determine which app store the app was downloaded and go directly there.
 		String errorMessage = activity.getString(R.string.apptentive_rating_error);
 		boolean showingDialog = false;

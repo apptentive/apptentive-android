@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 import com.apptentive.android.sdk.util.Util;
@@ -31,7 +32,7 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 	}
 
 	@Override
-	public void doOnCreate(Activity activity, Bundle savedInteraction) {
+	public void doOnCreate(ViewActivity activity, Bundle savedInteraction) {
 		boolean success = false;
 		try {
 			String url = interaction.getUrl();

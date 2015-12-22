@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ViewActivity;
 
 /**
  * @author Sky Kelsey
@@ -24,7 +25,7 @@ public abstract class ActivityContent {
 
 	protected Type type;
 
-	public abstract void onCreate(Activity activity, Bundle savedInstanceState);
+	public abstract void onCreate(ViewActivity activity, Bundle savedInstanceState);
 
 	public abstract void onSaveInstanceState(Bundle outState);
 

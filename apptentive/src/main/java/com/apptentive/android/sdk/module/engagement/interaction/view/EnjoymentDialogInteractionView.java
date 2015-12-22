@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
@@ -29,7 +30,7 @@ public class EnjoymentDialogInteractionView extends InteractionView<EnjoymentDia
 	}
 
 	@Override
-	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
+	public void doOnCreate(final ViewActivity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_enjoyment_dialog_interaction);
 
 		TextView bodyView = (TextView) activity.findViewById(R.id.title);

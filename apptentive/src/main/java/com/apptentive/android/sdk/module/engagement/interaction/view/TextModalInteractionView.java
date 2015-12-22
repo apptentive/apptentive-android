@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -46,7 +47,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 	}
 
 	@Override
-	public void doOnCreate(final Activity activity, Bundle onSavedInstanceState) {
+	public void doOnCreate(final ViewActivity activity, Bundle onSavedInstanceState) {
 		activity.setContentView(R.layout.apptentive_textmodal_interaction_center);
 
 

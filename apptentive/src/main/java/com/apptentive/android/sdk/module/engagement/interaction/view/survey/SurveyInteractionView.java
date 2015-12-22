@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
@@ -56,7 +57,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 	}
 
 	@Override
-	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
+	public void doOnCreate(final ViewActivity activity, Bundle savedInstanceState) {
 
 		if (savedInstanceState != null) {
 			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);

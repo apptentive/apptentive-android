@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
@@ -30,7 +31,7 @@ public class RatingDialogInteractionView extends InteractionView<RatingDialogInt
 	}
 
 	@Override
-	public void doOnCreate(final Activity activity, Bundle savedInstanceState) {
+	public void doOnCreate(final ViewActivity activity, Bundle savedInstanceState) {
 		activity.setContentView(R.layout.apptentive_rating_dialog_interaction);
 
 		String title = interaction.getTitle();

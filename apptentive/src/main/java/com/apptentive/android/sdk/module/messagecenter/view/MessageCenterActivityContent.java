@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -35,9 +36,9 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveInternalActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -101,7 +102,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	private final static long DEFAULT_DELAYMILLIS = 200;
 
-	private Activity viewActivity;
+	private ViewActivity viewActivity;
 	private View messageCenterHeader;
 	private View headerDivider;
 	private ListView messageCenterListView; // List of apptentive messages
@@ -295,7 +296,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 	}
 
 	@Override
-	public void doOnCreate(Activity activity, Bundle onSavedInstanceState) {
+	public void doOnCreate(ViewActivity activity, Bundle onSavedInstanceState) {
 		activity.setContentView(R.layout.apptentive_message_center);
 		viewActivity = activity;
 
@@ -472,7 +473,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 
 	@Override
 	public boolean onBackPressed(Activity activity) {
-		DialogFragment myFrag = (DialogFragment) (((ApptentiveInternalActivity) viewActivity).getSupportFragmentManager()).findFragmentByTag("preview_dialog");
+		DialogFragment myFrag = (DialogFragment) (viewActivity.getSupportFragmentManager()).findFragmentByTag("preview_dialog");
 		if (myFrag != null) {
 			myFrag.dismiss();
 		}
@@ -831,7 +832,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		try {
 
 			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
-			dialog.show(((ApptentiveInternalActivity) viewActivity).getSupportFragmentManager(), "preview_dialog");
+			dialog.show(((AppCompatActivity) viewActivity).getSupportFragmentManager(), "preview_dialog");
 		} catch (Exception e) {
 			Log.e("Error loading attachment preview.", e);
 		}
