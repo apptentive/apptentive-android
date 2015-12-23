@@ -1,3 +1,11 @@
+# 2015-12-23 - 2.1.1
+
+#### Bug Fixed
+
+* Fixed a bug where multiple SqlLite Connections were made when Parse push is integrated
+
+
+
 # 2015-12-12 - 2.1.0
 
 #### Improvements
