@@ -16,6 +16,8 @@ build/
 *.iml
 .idea/tasks.xml
 .idea/gradle.xml
+.idea/modules.xml
+.idea/encodings.xml
 .idea/vcs.xml
 .idea/workspace.xml
 .idea/libraries
