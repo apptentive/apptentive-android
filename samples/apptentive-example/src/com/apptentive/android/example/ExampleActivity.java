@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,12 +16,8 @@ import com.apptentive.android.sdk.Apptentive;
 
 /**
  * This is an example integration of Apptentive.
- *
- * @author Sky Kelsey
  */
 public class ExampleActivity extends Activity {
-
-	private static String LOG_TAG = "Apptentive Example";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -34,24 +30,12 @@ public class ExampleActivity extends Activity {
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		Apptentive.onStart(this);
-	}
-
-	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		// Only engage if this window is gaining focus.
 		if (hasFocus) {
 			Apptentive.handleOpenedPushNotification(this);
 		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		Apptentive.onStop(this);
 	}
 
 	/**

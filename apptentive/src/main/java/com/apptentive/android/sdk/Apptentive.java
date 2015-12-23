@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -53,6 +55,15 @@ import java.util.*;
 public class Apptentive {
 
 	private Apptentive() {
+	}
+
+	/**
+	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
+	 * @param application The {@link Application} object for this app.
+	 */
+	public static void register(Application application) {
+		Log.i("Registering Apptentive.");
+		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks());
 	}
 
 	// ****************************************************************************************
