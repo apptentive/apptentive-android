@@ -38,6 +38,8 @@ import java.util.Map;
  */
 public class ApptentiveInternal {
 
+	public static boolean appIsInForeground;
+
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
 	private static WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
@@ -63,6 +65,10 @@ public class ApptentiveInternal {
 
 	public static void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	}
+
+	public static void onAppExit(final Activity activity) {
+		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
 	public static IRatingProvider getRatingProvider() {

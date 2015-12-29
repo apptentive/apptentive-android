@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -28,9 +27,7 @@ import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.lifecycle.ActivityLifecycleManager;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -63,66 +60,9 @@ public class Apptentive {
 	 */
 	public static void register(Application application) {
 		Log.i("Registering Apptentive.");
-		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks());
+		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(application));
+		init(application);
 	}
-
-	// ****************************************************************************************
-	// DELEGATE METHODS
-	// ****************************************************************************************
-
-	/**
-	 * A reference count of the number of Activities that are started. If the count drops to zero, then no Activities are currently running.
-	 * Any threads or receivers that are spawned by Apptentive should exit or stop listening when runningActivities == 0.
-	 */
-	private static int runningActivities;
-
-	/**
-	 * Call this method from each of your Activities' onStart() methods. Must be called before using other Apptentive APIs
-	 * methods
-	 *
-	 * @param activity The Activity from which this method is called.
-	 */
-	public static void onStart(Activity activity) {
-		try {
-			init(activity);
-			ActivityLifecycleManager.activityStarted(activity);
-			if (runningActivities == 0) {
-				PayloadSendWorker.appWentToForeground(activity.getApplicationContext());
-				MessagePollingWorker.appWentToForeground(activity.getApplicationContext());
-			}
-			runningActivities++;
-			MessageManager.setCurrentForgroundActivity(activity);
-		} catch (Exception e) {
-			Log.w("Error starting Apptentive Activity.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-	}
-
-	/**
-	 * Call this method from each of your Activities' onStop() methods.
-	 *
-	 * @param activity The Activity from which this method is called.
-	 */
-	public static void onStop(Activity activity) {
-		try {
-			ActivityLifecycleManager.activityStopped(activity);
-			runningActivities--;
-			if (runningActivities < 0) {
-				Log.e("Incorrect number of running Activities encountered. Resetting to 0. Did you make sure to call Apptentive.onStart() and Apptentive.onStop() in all your Activities?");
-				runningActivities = 0;
-			}
-			// If there are no running activities, wake the thread so it can stop immediately and gracefully.
-			if (runningActivities == 0) {
-				PayloadSendWorker.appWentToBackground();
-				MessagePollingWorker.appWentToBackground();
-			}
-			MessageManager.setCurrentForgroundActivity(null);
-		} catch (Exception e) {
-			Log.w("Error stopping Apptentive Activity.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
-		}
-	}
-
 
 	// ****************************************************************************************
 	// GLOBAL DATA METHODS
@@ -946,13 +886,11 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
-	private static void init(Activity activity) {
+	private static void init(final Context appContext) {
 
 		//
 		// First, initialize data relies on synchronous reads from local resources.
 		//
-
-		final Context appContext = activity.getApplicationContext();
 
 		if (!GlobalInfo.initialized) {
 			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -995,6 +933,7 @@ public class Apptentive {
 
 			Log.i("Debug mode enabled? %b", GlobalInfo.isAppDebuggable);
 
+/*
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
 			if ((Util.isEmpty(apiKey))) {
@@ -1009,6 +948,7 @@ public class Apptentive {
 				}
 				Log.e(errorString);
 			}
+*/
 			GlobalInfo.apiKey = apiKey;
 
 			Log.i("API Key: %s", GlobalInfo.apiKey);

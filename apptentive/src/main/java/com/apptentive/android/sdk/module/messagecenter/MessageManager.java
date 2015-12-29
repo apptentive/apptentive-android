@@ -409,7 +409,7 @@ public class MessageManager {
 	}
 
 
-	// Set when an ApptentiveActivity onStart() is called
+	// Set when Activity.onResume() is called
 	public static void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {
 			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
