@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -149,7 +148,6 @@ public class MessageManager {
 		// Fetch the messages.
 		String lastId = getMessageStore(appContext).getLastReceivedMessageId();
 		List<ApptentiveMessage> messagesToSave = fetchMessages(appContext, lastId);
-		Log.d("Fetching messages after last id: " + lastId);
 
 		CompoundMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
