@@ -261,7 +261,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				long databaseId = Long.parseLong(cursor.getString(0));
 				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
-				payload = PayloadFactory.fromJson(appContext, json, baseType);
+				payload = PayloadFactory.fromJson(json, baseType);
 				if (payload != null) {
 					payload.setDatabaseId(databaseId);
 				}
@@ -362,7 +362,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(6);
-					ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(appContext, json);
+					ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
 					if (apptentiveMessage == null) {
 						Log.e("Error parsing Record json from database: %s", json);
 						continue;

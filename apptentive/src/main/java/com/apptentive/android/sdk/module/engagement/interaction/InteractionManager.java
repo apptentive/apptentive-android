@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -66,7 +66,7 @@ public class InteractionManager {
 			return;
 		}
 
-		boolean force = GlobalInfo.isAppDebuggable;
+		boolean force = ApptentiveInternal.isAppDebuggable;
 
 		if (force || hasCacheExpired(context)) {
 			Log.i("Fetching new Interactions.");

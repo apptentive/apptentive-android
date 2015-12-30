@@ -7,7 +7,8 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import com.apptentive.android.sdk.GlobalInfo;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -90,7 +91,7 @@ public class PayloadSendWorker {
 					}
 
 					PayloadStore db = getPayloadStore(contextRef.get());
-					if (Util.isEmpty(GlobalInfo.getConversationToken(contextRef.get()))) {
+					if (Util.isEmpty(ApptentiveInternal.conversationToken)){
 						Log.i("No conversation token yet.");
 						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						goToSleep(NO_TOKEN_SLEEP);

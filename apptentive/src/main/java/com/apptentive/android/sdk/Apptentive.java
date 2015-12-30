@@ -11,21 +11,14 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
@@ -60,8 +53,8 @@ public class Apptentive {
 	 */
 	public static void register(Application application) {
 		Log.i("Registering Apptentive.");
+		ApptentiveInternal.init(application);
 		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(application));
-		init(application);
 	}
 
 	// ****************************************************************************************
@@ -322,7 +315,7 @@ public class Apptentive {
 			}
 			Log.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
-			syncDevice(context);
+			ApptentiveInternal.syncDevice(context);
 		} catch (JSONException e) {
 			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
@@ -408,7 +401,7 @@ public class Apptentive {
 					return;
 			}
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
-			syncDevice(context);
+			ApptentiveInternal.syncDevice(context);
 		} catch (JSONException e) {
 			Log.e("Error setting push integration.", e);
 			return;
@@ -652,7 +645,7 @@ public class Apptentive {
 			message.setBody(text);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+			message.setSenderId(ApptentiveInternal.personId);
 			message.setAssociatedFiles(context, null);
 			MessageManager.sendMessage(context.getApplicationContext(), message);
 		} catch (Exception e) {
@@ -680,7 +673,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+			message.setSenderId(ApptentiveInternal.personId);
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
@@ -758,7 +751,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(GlobalInfo.getPersonId(context.getApplicationContext()));
+			message.setSenderId(ApptentiveInternal.personId);
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), null);
@@ -880,321 +873,6 @@ public class Apptentive {
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
 		ApptentiveInternal.setOnSurveyFinishedListener(listener);
-	}
-
-	// ****************************************************************************************
-	// INTERNAL METHODS
-	// ****************************************************************************************
-
-	private static void init(final Context appContext) {
-
-		//
-		// First, initialize data relies on synchronous reads from local resources.
-		//
-
-		if (!GlobalInfo.initialized) {
-			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-			// First, Get the api key, and figure out if app is debuggable.
-			GlobalInfo.isAppDebuggable = false;
-			String apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
-			boolean apptentiveDebug = false;
-			String logLevelOverride = null;
-			try {
-				ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
-				Bundle metaData = ai.metaData;
-				if (metaData != null) {
-					if (apiKey == null) {
-						apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-						Log.d("Saving API key for the first time: %s", apiKey);
-						prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
-					} else {
-						Log.d("Using cached API Key: %s", apiKey);
-					}
-					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
-					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-					ApptentiveClient.useStagingServer = metaData.getBoolean(Constants.MANIFEST_KEY_USE_STAGING_SERVER);
-				}
-				if (apptentiveDebug) {
-					Log.i("Apptentive debug logging set to VERBOSE.");
-					ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
-				} else if (logLevelOverride != null) {
-					Log.i("Overriding log level: %s", logLevelOverride);
-					ApptentiveInternal.setMinimumLogLevel(Log.Level.parse(logLevelOverride));
-				} else {
-					GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-					if (GlobalInfo.isAppDebuggable) {
-						ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
-					}
-				}
-			} catch (Exception e) {
-				Log.e("Unexpected error while reading application info.", e);
-			}
-
-			Log.i("Debug mode enabled? %b", GlobalInfo.isAppDebuggable);
-
-/*
-			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
-			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
-			if ((Util.isEmpty(apiKey))) {
-				if (GlobalInfo.isAppDebuggable) {
-					AlertDialog alertDialog = new AlertDialog.Builder(activity)
-							.setTitle("Error")
-							.setMessage(errorString)
-							.setPositiveButton("OK", null)
-							.create();
-					alertDialog.setCanceledOnTouchOutside(false);
-					alertDialog.show();
-				}
-				Log.e(errorString);
-			}
-*/
-			GlobalInfo.apiKey = apiKey;
-
-			Log.i("API Key: %s", GlobalInfo.apiKey);
-
-			// Grab app info we need to access later on.
-			GlobalInfo.appPackage = appContext.getPackageName();
-			GlobalInfo.androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-			// Check the host app version, and notify modules if it's changed.
-			try {
-				PackageManager packageManager = appContext.getPackageManager();
-				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
-
-				Integer currentVersionCode = packageInfo.versionCode;
-				String currentVersionName = packageInfo.versionName;
-				VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
-				if (lastVersionEntrySeen == null) {
-					onVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
-				} else {
-					if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-						onVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
-					}
-				}
-
-				GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
-			} catch (PackageManager.NameNotFoundException e) {
-				// Nothing we can do then.
-				GlobalInfo.appDisplayName = "this app";
-			}
-
-			String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
-			if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
-				onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
-			}
-
-			GlobalInfo.initialized = true;
-			Log.v("Done initializing...");
-		} else {
-			Log.v("Already initialized...");
-		}
-
-		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (GlobalInfo.getConversationToken(appContext)  == null || GlobalInfo.getPersonId(appContext) == null) {
-			asyncFetchConversationToken(appContext);
-		} else {
-			asyncFetchAppConfiguration(appContext);
-			InteractionManager.asyncFetchAndStoreInteractions(appContext);
-		}
-
-		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
-		syncDevice(appContext);
-		syncSdk(appContext);
-		syncPerson(appContext);
-
-		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		Log.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
-	}
-
-	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
-		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
-		if (appRelease != null) {
-			Log.d("App release was updated.");
-			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
-		}
-		invalidateCaches(context);
-	}
-
-	private static void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
-		Log.i("Sdk version changed: %s => %s", previousSdkVersion, currentSdkVersion);
-		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
-		invalidateCaches(context);
-	}
-
-	/**
-	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
-	 *
-	 * @param context
-	 */
-	private static void invalidateCaches(Context context) {
-		InteractionManager.updateCacheExpiration(context, 0);
-		Configuration config = Configuration.load(context);
-		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
-		config.save(context);
-	}
-
-	private synchronized static void asyncFetchConversationToken(final Context context) {
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				fetchConversationToken(context);
-			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
-				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-FetchConversationToken");
-		thread.start();
-	}
-
-	/**
-	 * First looks to see if we've saved the ConversationToken in memory, then in SharedPreferences, and finally tries to get one
-	 * from the server.
-	 */
-	private static void fetchConversationToken(Context context) {
-		// Try to fetch a new one from the server.
-		ConversationTokenRequest request = new ConversationTokenRequest();
-
-		// Send the Device and Sdk now, so they are available on the server from the start.
-		request.setDevice(DeviceManager.storeDeviceAndReturnIt(context));
-		request.setSdk(SdkManager.storeSdkAndReturnIt(context));
-		request.setPerson(PersonManager.storePersonAndReturnIt(context));
-
-		// TODO: Allow host app to send a user id, if available.
-		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(context, request);
-		if (response == null) {
-			Log.w("Got null response fetching ConversationToken.");
-			return;
-		}
-		if (response.isSuccessful()) {
-			try {
-				JSONObject root = new JSONObject(response.getContent());
-				String conversationToken = root.getString("token");
-				Log.d("ConversationToken: " + conversationToken);
-				String conversationId = root.getString("id");
-				Log.d("New Conversation id: %s", conversationId);
-
-				if (conversationToken != null && !conversationToken.equals("")) {
-					GlobalInfo.setConversationToken(context, conversationToken);
-					GlobalInfo.setConversationId(context, conversationId);
-				}
-				String personId = root.getString("person_id");
-				Log.d("PersonId: " + personId);
-				if (personId != null && !personId.equals("")) {
-					GlobalInfo.setPersonId(context, personId);
-				}
-				// Try to fetch app configuration, since it depends on the conversation token.
-				asyncFetchAppConfiguration(context);
-				InteractionManager.asyncFetchAndStoreInteractions(context);
-			} catch (JSONException e) {
-				Log.e("Error parsing ConversationToken response json.", e);
-			}
-		}
-	}
-
-	/**
-	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
-	 */
-	private static void fetchAppConfiguration(Context context) {
-		boolean force = GlobalInfo.isAppDebuggable;
-
-		// Don't get the app configuration unless forced, or the cache has expired.
-		if (force || Configuration.load(context).hasConfigurationCacheExpired()) {
-			Log.i("Fetching new Configuration.");
-			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(context);
-			try {
-				Map<String, String> headers = response.getHeaders();
-				if (headers != null) {
-					String cacheControl = headers.get("Cache-Control");
-					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-					if (cacheSeconds == null) {
-						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-					}
-					Log.d("Caching configuration for %d seconds.", cacheSeconds);
-					Configuration config = new Configuration(response.getContent());
-					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-					config.save(context);
-				}
-			} catch (JSONException e) {
-				Log.e("Error parsing app configuration from server.", e);
-			}
-		} else {
-			Log.v("Using cached Configuration.");
-		}
-	}
-
-	private static void asyncFetchAppConfiguration(final Context context) {
-		Thread thread = new Thread() {
-			public void run() {
-				fetchAppConfiguration(context);
-			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
-				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-FetchAppConfiguration");
-		thread.start();
-	}
-
-	/**
-	 * Sends current Device to the server if it differs from the last time it was sent.
-	 *
-	 * @param context
-	 */
-	private static void syncDevice(Context context) {
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
-		if (deviceInfo != null) {
-			Log.d("Device info was updated.");
-			Log.v(deviceInfo.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
-		} else {
-			Log.d("Device info was not updated.");
-		}
-	}
-
-	/**
-	 * Sends current Sdk to the server if it differs from the last time it was sent.
-	 *
-	 * @param context
-	 */
-	private static void syncSdk(Context context) {
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
-		if (sdk != null) {
-			Log.d("Sdk was updated.");
-			Log.v(sdk.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(sdk);
-		} else {
-			Log.d("Sdk was not updated.");
-		}
-	}
-
-	/**
-	 * Sends current Person to the server if it differs from the last time it was sent.
-	 *
-	 * @param context
-	 */
-	private static void syncPerson(Context context) {
-		Person person = PersonManager.storePersonAndReturnDiff(context);
-		if (person != null) {
-			Log.d("Person was updated.");
-			Log.v(person.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(person);
-		} else {
-			Log.d("Person was not updated.");
-		}
 	}
 
 	/**

@@ -19,7 +19,7 @@ import android.os.Message;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
@@ -137,10 +137,12 @@ public class MessageManager {
 	 * @return true if messages were returned, else false.
 	 */
 	public static synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
-		if (GlobalInfo.getConversationToken(appContext) == null) {
+		if (ApptentiveInternal.conversationToken == null) {
+			Log.d("Can't fetch messages because the conversation has not yet been initialized.");
 			return false;
 		}
 		if (!Util.isNetworkConnectionPresent(appContext)) {
+			Log.d("Can't fetch messages because a network connection is not present.");
 			return false;
 		}
 
@@ -247,7 +249,7 @@ public class MessageManager {
 			JSONArray items = root.getJSONArray("items");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
-				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(appContext, json);
+				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
 				// Since these came back from the server, mark them saved before updating them in the DB.
 				if (apptentiveMessage != null) {
 					apptentiveMessage.setState(ApptentiveMessage.State.saved);

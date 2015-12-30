@@ -6,10 +6,9 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import android.content.Context;
 import android.text.TextUtils;
 
-import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 
 import org.json.JSONException;
@@ -19,7 +18,7 @@ import org.json.JSONObject;
  * @author Sky Kelsey
  */
 public class MessageFactory {
-	public static ApptentiveMessage fromJson(Context appContext, String json) {
+	public static ApptentiveMessage fromJson(String json) {
 		try {
 			// If KEY_TYPE is set to CompoundMessage or not set, treat them as CompoundMessage
 			ApptentiveMessage.Type type = ApptentiveMessage.Type.CompoundMessage;
@@ -41,11 +40,11 @@ public class MessageFactory {
 							}
 						}
 					} catch (JSONException e) {
-						// Ignore, snederId would be null
+						// Ignore, senderId would be null
 					}
-					String storedId = GlobalInfo.getPersonId(appContext);
+					String personId = ApptentiveInternal.personId;
 					// If senderId is null or same as the locally stored id, construct message as outgoing
-					return new CompoundMessage(json, (senderId == null || senderId.equals(storedId)));
+					return new CompoundMessage(json, (senderId == null || senderId.equals(personId)));
 				case unknown:
 					break;
 				default:

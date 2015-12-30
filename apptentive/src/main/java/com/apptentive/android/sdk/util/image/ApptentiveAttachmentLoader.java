@@ -20,7 +20,7 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 
-import com.apptentive.android.sdk.GlobalInfo;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.cache.ImageMemoryCache;
@@ -220,7 +220,7 @@ public class ApptentiveAttachmentLoader {
 				try {
 					Log.d("ApptentiveAttachmentLoader doDownload: " + uri);
 					// Conversation token is needed if the download url is an redrect link from an Apptentive endpoint
-					String conversationToken = GlobalInfo.getConversationToken(imageView.getContext().getApplicationContext());
+					String conversationToken = ApptentiveInternal.conversationToken;
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, conversationToken);
 					} else {

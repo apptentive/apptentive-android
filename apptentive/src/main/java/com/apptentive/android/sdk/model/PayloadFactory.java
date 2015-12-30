@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
-
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
@@ -18,10 +16,10 @@ import org.json.JSONException;
  */
 public class PayloadFactory {
 
-	public static Payload fromJson(Context appContext, String json, Payload.BaseType baseType) {
+	public static Payload fromJson(String json, Payload.BaseType baseType) {
 		switch (baseType) {
 			case message:
-				return MessageFactory.fromJson(appContext, json);
+				return MessageFactory.fromJson(json);
 			case event:
 				return EventFactory.fromJson(json);
 			case device:

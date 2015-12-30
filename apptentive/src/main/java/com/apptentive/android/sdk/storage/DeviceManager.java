@@ -10,7 +10,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import com.apptentive.android.sdk.GlobalInfo;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
@@ -130,7 +131,7 @@ public class DeviceManager {
 		device.setBrand(Build.BRAND);
 		device.setCpu(Build.CPU_ABI);
 		device.setDevice(Build.DEVICE);
-		device.setUuid(GlobalInfo.androidId);
+		device.setUuid(ApptentiveInternal.androidId);
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
 
