@@ -21,7 +21,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0
-        versionName "2.1.0"
+        versionName VERSION_NAME
     }
 
     lintOptions {
