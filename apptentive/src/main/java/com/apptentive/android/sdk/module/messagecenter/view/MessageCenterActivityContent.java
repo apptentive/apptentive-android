@@ -833,7 +833,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		try {
 
 			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
-			dialog.show(((AppCompatActivity) viewActivity).getSupportFragmentManager(), "preview_dialog");
+			dialog.show(viewActivity.getSupportFragmentManager(), "preview_dialog");
 		} catch (Exception e) {
 			Log.e("Error loading attachment preview.", e);
 		}
