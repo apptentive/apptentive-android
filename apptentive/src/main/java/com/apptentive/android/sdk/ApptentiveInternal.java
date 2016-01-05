@@ -97,6 +97,14 @@ public class ApptentiveInternal {
 
 	public static void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+
+		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
+		if (conversationToken == null || personId == null) {
+			asyncFetchConversationToken(appContext);
+		} else {
+			fetchSdkState();
+		}
+
 		syncDevice(appContext);
 		syncSdk(appContext);
 		syncPerson(appContext);
@@ -185,17 +193,6 @@ public class ApptentiveInternal {
 
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
 		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
-
-
-////
-		// TODO: If app registration fails, the app won't get a valid conversation until the application is reset. We should do this when the first Activity starts, or simply if the conversation hasn't been created.
-		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (conversationToken == null || personId == null) {
-			asyncFetchConversationToken(appContext);
-		} else {
-			asyncFetchAppConfiguration(appContext);
-			InteractionManager.asyncFetchAndStoreInteractions(appContext);
-		}
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
@@ -275,9 +272,7 @@ public class ApptentiveInternal {
 				if (personId != null && !personId.equals("")) {
 					setPersonId(personId);
 				}
-				// Try to fetch app configuration, since it depends on the conversation token.
-				asyncFetchAppConfiguration(context);
-				InteractionManager.asyncFetchAndStoreInteractions(context);
+				fetchSdkState();
 			} catch (JSONException e) {
 				Log.e("Error parsing ConversationToken response json.", e);
 			}
@@ -569,5 +564,8 @@ public class ApptentiveInternal {
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).apply();
 	}
 
-
+	private static void fetchSdkState() {
+		asyncFetchAppConfiguration(appContext);
+		InteractionManager.asyncFetchAndStoreInteractions(appContext);
+	}
 }
