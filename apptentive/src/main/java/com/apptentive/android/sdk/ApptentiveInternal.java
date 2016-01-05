@@ -69,6 +69,8 @@ public class ApptentiveInternal {
 	public static String conversationId;
 	public static String personId;
 	public static String androidId;
+	public static String appPackageName;
+	public static String defaultAppDisplayName = "this app";
 
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
@@ -112,7 +114,10 @@ public class ApptentiveInternal {
 		String logLevelOverride = null;
 		String manifestApiKey = null;
 		try {
-			ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA);
+			appPackageName = appContext.getPackageName();
+			PackageManager packageManager = appContext.getPackageManager();
+			ApplicationInfo ai = packageManager.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA);
+
 			Bundle metaData = ai.metaData;
 			if (metaData != null) {
 				manifestApiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
@@ -120,23 +125,22 @@ public class ApptentiveInternal {
 				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
-		} catch (Exception e) {
-			Log.e("Unexpected error while reading application info.", e);
-		}
 
-		// The API Key is stored in SharedPreferences after the first time it is provided to the SDK. This allows us to override the one provided in the manifest during debug sessions.
-		apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
-		if (apiKey == null) {
-			if (manifestApiKey == null) {
-				Log.a("UNRECOVERABLE ERROR: No Apptentive API Key found. Please make sure you have specified your Apptentive API Key in your AndroidManifest.xml");
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, 0);
+			Integer currentVersionCode = packageInfo.versionCode;
+			String currentVersionName = packageInfo.versionName;
+			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
+			if (lastVersionEntrySeen == null) {
+				onVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
 			} else {
-				Log.d("Saving API key for the first time: %s", manifestApiKey);
-				prefs.edit().putString(Constants.PREF_KEY_API_KEY, manifestApiKey).apply();
+				if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
+					onVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
+				}
 			}
-		} else {
-			Log.d("Using cached Apptentive API Key");
+			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
+		} catch (Exception e) {
+			Log.e("Unexpected error while reading application or package info.", e);
 		}
-		Log.d("Apptentive API Key: %s", apiKey);
 
 		// Set debuggable and appropriate log level.
 		if (apptentiveDebug) {
@@ -150,40 +154,38 @@ public class ApptentiveInternal {
 				ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
 			}
 		}
-
 		Log.i("Debug mode enabled? %b", isAppDebuggable);
-
-		// Grab app info we need to access later on.
-		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		Log.d("Android ID: ", androidId);
-
-		// Check the host app version, and notify modules if it's changed.
-		try {
-			PackageManager packageManager = appContext.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
-
-			Integer currentVersionCode = packageInfo.versionCode;
-			String currentVersionName = packageInfo.versionName;
-			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
-			if (lastVersionEntrySeen == null) {
-				onVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
-			} else {
-				if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-					onVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
-				}
-			}
-
-			GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
-		} catch (PackageManager.NameNotFoundException e) {
-			// Nothing we can do then.
-			GlobalInfo.appDisplayName = "this app";
-		}
 
 		String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
 		if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
 			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 		}
+
+		// The API Key is stored in SharedPreferences after the first time it is provided to the SDK. This allows us to override the one provided in the manifest during debug sessions.
+		apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
+		if (apiKey == null) {
+			if (manifestApiKey == null) {
+				Log.a("UNRECOVERABLE ERROR: No Apptentive API Key found. Please make sure you have specified your Apptentive API Key in your AndroidManifest.xml");
+			} else {
+				apiKey = manifestApiKey;
+				Log.d("Saving API key for the first time: %s", apiKey);
+				prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
+			}
+		} else {
+			Log.d("Using cached Apptentive API Key");
+		}
+		Log.d("Apptentive API Key: %s", apiKey);
+
+		// Grab app info we need to access later on.
+		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+		Log.d("Android ID: ", androidId);
+
+		Log.d("Default Locale: %s", Locale.getDefault().toString());
+		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+
+
 ////
+		// TODO: If app registration fails, the app won't get a valid conversation until the application is reset. We should do this when the first Activity starts, or simply if the conversation hasn't been created.
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
 		if (conversationToken == null || personId == null) {
 			asyncFetchConversationToken(appContext);
@@ -192,13 +194,11 @@ public class ApptentiveInternal {
 			InteractionManager.asyncFetchAndStoreInteractions(appContext);
 		}
 
-		// TODO: Do this on a dedicated thread if it takes too long. Some devices are slow to read device data.
+		// TODO: Do this when the app starts instead of here.
 		syncDevice(appContext);
 		syncSdk(appContext);
 		syncPerson(appContext);
 
-		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		Log.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
@@ -247,10 +247,6 @@ public class ApptentiveInternal {
 		thread.start();
 	}
 
-	/**
-	 * First looks to see if we've saved the ConversationToken in memory, then in SharedPreferences, and finally tries to get one
-	 * from the server.
-	 */
 	private static void fetchConversationToken(Context context) {
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();

@@ -11,7 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import com.apptentive.android.sdk.GlobalInfo;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
@@ -85,7 +86,7 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return GlobalInfo.appDisplayName;
+		return ApptentiveInternal.defaultAppDisplayName;
 	}
 
 	private JSONObject getMessageCenter() {
