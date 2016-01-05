@@ -97,6 +97,9 @@ public class ApptentiveInternal {
 
 	public static void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+		syncDevice(appContext);
+		syncSdk(appContext);
+		syncPerson(appContext);
 	}
 
 	public static void onAppExit(final Activity activity) {
@@ -193,12 +196,6 @@ public class ApptentiveInternal {
 			asyncFetchAppConfiguration(appContext);
 			InteractionManager.asyncFetchAndStoreInteractions(appContext);
 		}
-
-		// TODO: Do this when the app starts instead of here.
-		syncDevice(appContext);
-		syncSdk(appContext);
-		syncPerson(appContext);
-
 	}
 
 	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
