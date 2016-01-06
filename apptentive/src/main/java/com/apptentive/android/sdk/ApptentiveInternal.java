@@ -127,7 +127,8 @@ public class ApptentiveInternal {
 		try {
 			appPackageName = appContext.getPackageName();
 			PackageManager packageManager = appContext.getPackageManager();
-			ApplicationInfo ai = packageManager.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA);
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA);
+			ApplicationInfo ai = packageInfo.applicationInfo;
 
 			Bundle metaData = ai.metaData;
 			if (metaData != null) {
@@ -137,7 +138,6 @@ public class ApptentiveInternal {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
-			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, 0);
 			Integer currentVersionCode = packageInfo.versionCode;
 			String currentVersionName = packageInfo.versionName;
 			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
