@@ -17,7 +17,6 @@ import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
-import com.apptentive.android.sdk.util.Reflection;
 import org.json.JSONException;
 
 import java.util.Locale;
@@ -141,9 +140,14 @@ public class DeviceManager {
 		device.setCurrentCarrier(tm.getNetworkOperatorName());
 		device.setNetworkType(Constants.networkTypeAsString(tm.getNetworkType()));
 
-		// Finally, use reflection to try loading from APIs that are not available on all Android versions.
-		device.setBootloaderVersion(Reflection.getBootloaderVersion());
-		device.setRadioVersion(Reflection.getRadioVersion());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+			try {
+				device.setBootloaderVersion((String) Build.class.getField("BOOTLOADER").get(null));
+			} catch (Exception e) {
+				//
+			}
+			device.setRadioVersion(Build.getRadioVersion());
+		}
 
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
