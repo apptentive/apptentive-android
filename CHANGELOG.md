@@ -1,10 +1,14 @@
+# 2016-01-08 - 2.1.2
+
+#### Bug Fixed
+
+* Fixed Message Center bug where non-english messages were either garbled or failed to send to server
+
 # 2015-12-23 - 2.1.1
 
 #### Bug Fixed
 
 * Fixed a bug where multiple SqlLite Connections were made when Parse push is integrated
-
-
 
 # 2015-12-12 - 2.1.0
 
