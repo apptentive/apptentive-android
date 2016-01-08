@@ -2,6 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.apptentive.android.sdk"
           android:versionCode="32"
-          android:versionName="2.1.1">
+          android:versionName="2.1.2">
     <uses-sdk android:minSdkVersion="11"/>
 </manifest>
