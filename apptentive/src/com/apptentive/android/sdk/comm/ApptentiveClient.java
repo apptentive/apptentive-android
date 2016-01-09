@@ -262,7 +262,6 @@ public class ApptentiveClient {
 			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
 			connection.setRequestMethod("POST");
 
-			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
 			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
 			connection.setRequestProperty("Accept", "application/json");
@@ -275,10 +274,14 @@ public class ApptentiveClient {
 
 			// Write text message
 			os.writeBytes("Content-Disposition: form-data; name=\"message\"" + lineEnd);
+			// Indicate the character encoding is UTF-8
 			os.writeBytes("Content-Type: text/plain;charset=UTF-8" + lineEnd);
-			os.writeBytes("Content-Length: " + postBody.length() + lineEnd);
+
 			os.writeBytes(lineEnd);
-			os.writeBytes(postBody + lineEnd);
+			// Explicitly encode message json in utf-8
+			os.write(postBody.getBytes("UTF-8"));
+			os.writeBytes(lineEnd);
+
 
 			// Send associated files
 			if (associatedFiles != null) {
