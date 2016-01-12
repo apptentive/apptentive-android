@@ -19,6 +19,7 @@ android {
     defaultConfig {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName project.version
         multiDexEnabled true
