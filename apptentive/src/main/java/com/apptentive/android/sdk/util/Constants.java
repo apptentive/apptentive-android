@@ -21,7 +21,8 @@ public class Constants {
 	public static final String PREF_NAME = "APPTENTIVE";
 
 	public static final String PREF_KEY_SERVER_URL = "serverUrl";
-	public static final String PREF_KEY_API_KEY = "apiKey";
+	// Just in case a customer copies the example text verbatim.
+	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
 	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
 	public static final String PREF_KEY_PERSON_ID = "personId";
@@ -42,13 +43,6 @@ public class Constants {
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
-	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
-
-	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE = "autoMessageShownAutoMessage";
-	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
-	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
-
-	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
@@ -85,13 +79,12 @@ public class Constants {
 	// Manifest keys
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
 	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
-	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
+	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 
 	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
-	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
 	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
@@ -108,6 +101,16 @@ public class Constants {
 	public static final String PREF_KEY_RATING_USES = "uses";
 	public static final String PREF_KEY_PERSON_INITIAL_EMAIL = "personInitialEmail";
 	public static final String PREF_KEY_PERSON_INITIAL_USER_NAME = "personInitialUserName";
+	public static final String PREF_KEY_API_KEY = "apiKey";
+	public static final String PREF_KEY_APP_MAIN_ACTIVITY_NAME = "mainActivityName";
+	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_AUTO_MESSAGE = "autoMessageShownAutoMessage";
+	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_NO_LOVE = "autoMessageShownNoLove";
+	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
+	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
+	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
+
+
+
 
 	/**
 	 * A list of mobile carrier network types as Strings.

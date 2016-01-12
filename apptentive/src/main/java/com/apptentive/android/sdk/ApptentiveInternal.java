@@ -114,7 +114,7 @@ public class ApptentiveInternal {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
-	static void init(final Context applicationContext) {
+	static void init(final Context applicationContext, String apptentiveApiKey) {
 		appContext = applicationContext;
 		prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
@@ -132,8 +132,8 @@ public class ApptentiveInternal {
 
 			Bundle metaData = ai.metaData;
 			if (metaData != null) {
-				manifestApiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-				logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
+				manifestApiKey = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY));
+				logLevelOverride = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL));
 				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
@@ -172,15 +172,21 @@ public class ApptentiveInternal {
 			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 		}
 
-		// The API Key is stored in SharedPreferences after the first time it is provided to the SDK. This allows us to override the one provided in the manifest during debug sessions.
-		apiKey = prefs.getString(Constants.PREF_KEY_API_KEY, null);
-		if (apiKey == null) {
-			if (manifestApiKey == null) {
-				Log.a("UNRECOVERABLE ERROR: No Apptentive API Key found. Please make sure you have specified your Apptentive API Key in your AndroidManifest.xml");
+		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
+		apptentiveApiKey = Util.trim(apptentiveApiKey);
+		if (!Util.isEmpty(apptentiveApiKey)) {
+			apiKey = apptentiveApiKey;
+		} else if (!Util.isEmpty(manifestApiKey)) {
+			apiKey = manifestApiKey;
+		}
+		if (Util.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
+			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
+					"<meta-data android:name=\"apptentive_api_key\"\n" +
+					"           android:value=\"@string/your_apptentive_api_key\"/>";
+			if (isAppDebuggable) {
+				throw new RuntimeException(errorMessage);
 			} else {
-				apiKey = manifestApiKey;
-				Log.d("Saving API key for the first time: %s", apiKey);
-				prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
+				Log.a(errorMessage);
 			}
 		} else {
 			Log.d("Using cached Apptentive API Key");
@@ -567,5 +573,11 @@ public class ApptentiveInternal {
 	private static void fetchSdkState() {
 		asyncFetchAppConfiguration(appContext);
 		InteractionManager.asyncFetchAndStoreInteractions(appContext);
+	}
+
+	public static void resetSdkState() {
+		// Use commit() instead of apply(), otherwise it doesn't finish before the app is killed.
+		prefs.edit().clear().commit();
+		ApptentiveDatabase.reset(appContext);
 	}
 }

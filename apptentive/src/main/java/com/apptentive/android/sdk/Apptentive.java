@@ -52,8 +52,12 @@ public class Apptentive {
 	 * @param application The {@link Application} object for this app.
 	 */
 	public static void register(Application application) {
+		Apptentive.register(application, null);
+	}
+
+	public static void register(Application application, String apptentiveApiKey) {
 		Log.i("Registering Apptentive.");
-		ApptentiveInternal.init(application);
+		ApptentiveInternal.init(application, apptentiveApiKey);
 		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(application));
 	}
 

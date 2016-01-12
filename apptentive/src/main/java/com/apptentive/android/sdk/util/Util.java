@@ -201,6 +201,13 @@ public class Util {
 		return charSequence == null || charSequence.length() == 0;
 	}
 
+	public static String trim(String string) {
+		if (string != null) {
+			return string.trim();
+		}
+		return null;
+	}
+
 	public static Integer parseCacheControlHeader(String cacheControlHeader) {
 		if (cacheControlHeader != null) {
 			int indexOfOpenBracket = cacheControlHeader.indexOf("[");
