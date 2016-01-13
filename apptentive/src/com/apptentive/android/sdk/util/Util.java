@@ -26,8 +26,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -460,7 +460,7 @@ public class Util {
 		int color = getThemeColor(ctx, attr);
 		// If this color is not styled, use the default from the resource
 		if (color == 0) {
-			color = ctx.getResources().getColor(res);
+			color = ContextCompat.getColor(ctx, res);
 		}
 		return color;
 	}
@@ -480,12 +480,46 @@ public class Util {
 		return states;
 	}
 
-	public static int lighter(int color, float factor) {
+	public static int brighter(int color, float factor) {
 		int red = (int) ((Color.red(color) * (1 - factor) / 255 + factor) * 255);
 		int green = (int) ((Color.green(color) * (1 - factor) / 255 + factor) * 255);
 		int blue = (int) ((Color.blue(color) * (1 - factor) / 255 + factor) * 255);
 		return Color.argb(Color.alpha(color), red, green, blue);
 	}
+
+	public static int dimmer(int color, float factor) {
+		int alpha = (int) (Color.alpha(color) * factor);
+		return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
+	}
+
+	/* Use alpha channel to compute percentage RGB share in blending.
+*    * Background color may be visible only if foreground alpha is smaller than 100%
+*    */
+	public static int alphaMixColors(int backgroundColor, int foregroundColor) {
+		final byte ALPHA_CHANNEL = 24;
+		final byte RED_CHANNEL = 16;
+		final byte GREEN_CHANNEL = 8;
+		final byte BLUE_CHANNEL = 0;
+
+		final double ap1 = (double) (backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+		final double ap2 = (double) (foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+		final double ap = ap2 + (ap1 * (1 - ap2));
+
+		final double amount1 = (ap1 * (1 - ap2)) / ap;
+		final double amount2 = amount1 / ap;
+
+		int a = ((int) (ap * 255d)) & 0xff;
+
+		int r = ((int) (((float) (backgroundColor >> RED_CHANNEL & 0xff) * amount1) +
+				((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
+		int g = ((int) (((float) (backgroundColor >> GREEN_CHANNEL & 0xff) * amount1) +
+				((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
+		int b = ((int) (((float) (backgroundColor & 0xff) * amount1) +
+				((float) (foregroundColor & 0xff) * amount2))) & 0xff;
+
+		return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
+	}
+
 
 	public static boolean canLaunchIntent(Context context, Intent intent) {
 		PackageManager pm = context.getPackageManager();
@@ -770,7 +804,7 @@ public class Util {
 		try {
 			File localFile = new File(localFilePath);
 	  /* Local cache file name may not be unique, and can be reused, in which case, the previously created
-       * cache file need to be deleted before it is being copied over.
+	   * cache file need to be deleted before it is being copied over.
        */
 			if (localFile.exists()) {
 				localFile.delete();

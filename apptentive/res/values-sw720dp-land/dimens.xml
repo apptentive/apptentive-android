@@ -14,15 +14,15 @@
 
 
     <dimen name="apptentive_message_center_header_height">64dp</dimen>
-    <dimen name="apptentive_message_center_message_list_left_margin">124dp</dimen>
-    <dimen name="apptentive_message_center_message_list_right_margin">124dp</dimen>
-    <dimen name="apptentive_message_center_card_view_composing_margin">124dp</dimen>
+    <dimen name="apptentive_message_center_message_list_left_margin">212dp</dimen>
+    <dimen name="apptentive_message_center_message_list_right_margin">212dp</dimen>
+    <dimen name="apptentive_message_center_card_view_composing_margin">212dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
     <dimen name="apptentive_message_center_fab_height">40dp</dimen>
-    <dimen name="apptentive_message_center_fab_right">96dp</dimen>
+    <dimen name="apptentive_message_center_fab_right">184dp</dimen>
     <dimen name="apptentive_message_center_footer_height">64dp</dimen>
 
-    <dimen name="apptentive_message_center_greeting_side_margin">188dp</dimen>
+    <dimen name="apptentive_message_center_greeting_side_margin">276dp</dimen>
 
     <dimen name="apptentive_message_center_status_side_padding">32dp</dimen>
 

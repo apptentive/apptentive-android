@@ -30,8 +30,7 @@
                       android:layout_toRightOf="@id/avatar"
                       android:layout_centerVertical="true"
                       android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
-                      android:layout_marginRight="@dimen/apptentive_message_center_icon_dimension"
-                      android:layout_marginBottom="@dimen/apptentive_message_center_greeting_text_padding_bottom"
+                      android:layout_marginBottom="@dimen/apptentive_message_center_icon_dimension"
                       android:gravity="left"
                       android:orientation="vertical">
             <TextView android:id="@+id/title"
@@ -49,7 +48,6 @@
                      android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                      android:layout_alignParentRight="true"
                      android:layout_alignParentBottom="true"
-                     android:layout_marginRight="10dp"
                      android:contentDescription="About"
                      android:background="?android:attr/selectableItemBackground"
                      android:src="@drawable/apptentive_ic_info"/>

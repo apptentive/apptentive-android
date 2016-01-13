@@ -9,13 +9,14 @@ package com.apptentive.android.sdk;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.URLUtil;
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -56,9 +57,15 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 			if (activityContentTypeString != null) {
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
+
+				/* The default status bar color fallback order are,
+				 * the colorPrimaryDark specified in Apptentive Base Theme override; or app default; or transparency
+				 */
+				int statusBarDefaultColor = Util.getThemeColorFromAttrOrRes(this, R.attr.colorPrimaryDark, R.color.apptentive_transparency);
+
 				/* ViewActivity must have a theme inherit from Apptentive Base themes.
-				*  If hosting app fails to specify one in AndroidManifest, apply a default ApptentiveTheme.
-				*  The check is done through checking if one of the apptentive attributes have value defined
+				*  If hosting app fails to specify one in AndroidManifest, apply the default ApptentiveTheme.
+				*  The check is done through checking if one of the apptentive theme attributes has value defined
 				*/
 				if (Util.getThemeColor(this, R.attr.apptentive_material_toolbar_foreground) == 0) {
 					setTheme(R.style.ApptentiveTheme);
@@ -77,34 +84,34 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 						switch (interaction.getType()) {
 							case UpgradeMessage:
 								activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case EnjoymentDialog:
 								activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case RatingDialog:
 								activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case AppStoreRating:
 								activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case Survey:
 								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case MessageCenter:
 								activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
 								break;
 							case TextModal:
 								activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case NavigateToLink:
 								activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
-								setTheme(R.style.ApptentiveTheme_Transparent);
+								setStatusBarColor(statusBarDefaultColor);
 								break;
 							default:
 								break;
@@ -287,7 +294,7 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-																				 @NonNull int[] grantResults) {
+										   @NonNull int[] grantResults) {
 		switch (activeContentType) {
 			case ABOUT:
 				break;
@@ -298,6 +305,17 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 				break;
 			default:
 				break;
+		}
+	}
+
+	/* Set status bar color when model interaction, such as Rating prompt, Niote .. is shown.
+	 * It is the default status color alpha blended with the Apptentive translucent
+	* color apptentive_activity_frame
+	*/
+	private void setStatusBarColor(int statusBarDefaultColor) {
+		if (Build.VERSION.SDK_INT >= 21) {
+			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame);
+			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}
 	}
 }
