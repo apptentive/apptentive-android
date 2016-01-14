@@ -43,20 +43,17 @@
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveDialogBottomArea"
                           android:orientation="vertical">
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
-                        android:id="@+id/rate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
-                        android:id="@+id/remind"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_rating_remind"/>
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton
-                        android:id="@+id/decline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        apptentive:apptentive_buttonText="@string/apptentive_no_thanks"/>
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/rate"
+                                                                                                             android:layout_width="wrap_content"
+                                                                                                             android:layout_height="wrap_content"/>
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/remind"
+                                                                                                             android:layout_width="wrap_content"
+                                                                                                             android:layout_height="wrap_content"
+                                                                                                             apptentive:apptentive_buttonText="@string/apptentive_rating_remind"/>
+                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/decline"
+                                                                                                             android:layout_width="wrap_content"
+                                                                                                             android:layout_height="wrap_content"
+                                                                                                             apptentive:apptentive_buttonText="@string/apptentive_no_thanks"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

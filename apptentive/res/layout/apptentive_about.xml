@@ -55,12 +55,12 @@
                 </RelativeLayout>
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
+                              style="@style/ApptentiveTheme.TextAppearence"
                               android:paddingLeft="16dp"
                               android:paddingRight="16dp"
                               android:paddingTop="16dp"
                               android:paddingBottom="16dp"
-                              android:orientation="vertical"
-                              style="@style/ApptentiveTheme.TextAppearence">
+                              android:orientation="vertical">
                     <TextView android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:paddingBottom="16dp"

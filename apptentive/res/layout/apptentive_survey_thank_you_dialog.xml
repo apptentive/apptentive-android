@@ -42,8 +42,8 @@
                     <Button android:id="@+id/ok"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:minEms="6"
                             style="@style/ApptentiveTheme.TextAppearence.ApptentiveInteractionPositiveButton"
+                            android:minEms="6"
                             android:text="@string/apptentive_ok"/>
                 </LinearLayout>
             </LinearLayout>

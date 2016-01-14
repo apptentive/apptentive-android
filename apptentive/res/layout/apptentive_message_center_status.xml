@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content">
@@ -27,7 +29,7 @@
                        android:paddingBottom="12dp"
                        android:paddingRight="16dp"
                        android:paddingLeft="16dp"
-                android:scaleType="center"/>
+                       android:scaleType="center"/>
             <TextView android:id="@+id/body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"

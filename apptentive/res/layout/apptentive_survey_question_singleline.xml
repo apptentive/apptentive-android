@@ -14,12 +14,12 @@
     <EditText android:id="@+id/answer_text"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              style="@style/ApptentiveTheme.TextAppearence.EditText"
               android:paddingTop="16dp"
               android:paddingBottom="16dp"
               android:textColor="@color/apptentive_survey_answer_text"
               android:textSize="@dimen/apptentive_text_small"
               android:hint="@string/apptentive_survey_singleline_hint"
               android:background="@drawable/android_textfield_activated_holo_light"
-              android:saveEnabled="false"
-              style="@style/ApptentiveTheme.TextAppearence.EditText"/>
+              android:saveEnabled="false"/>
 </LinearLayout>

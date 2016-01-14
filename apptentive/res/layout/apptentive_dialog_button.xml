@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
@@ -9,15 +10,15 @@
     <FrameLayout android:id="@+id/background"
                  android:layout_width="wrap_content"
                  android:layout_height="@dimen/apptentive_dialog_button_click_area_height"
-                 android:duplicateParentState="true"
-                 style="@style/ApptentiveButtonClickArea">
+                 style="@style/ApptentiveButtonClickArea"
+                 android:duplicateParentState="true">
         <TextView android:id="@+id/label"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_marginLeft="@dimen/apptentive_dialog_button_margin_left"
                   android:layout_marginRight="@dimen/apptentive_dialog_button_margin_right"
                   android:layout_gravity="center"
-                  android:duplicateParentState="true"
-                  style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogButtonText"/>
+                  style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogButtonText"
+                  android:duplicateParentState="true"/>
     </FrameLayout>
 </merge>
