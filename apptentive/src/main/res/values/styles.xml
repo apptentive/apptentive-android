@@ -259,19 +259,18 @@
 
     <style name="ApptentiveTheme.TextAppearence.Toolbar">
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/apptentive_material_toolbar_foreground</item>
+        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="android:textSize">24sp</item>
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.Greeting">
-        <item name="android:textColor">@color/apptentive_material_toolbar_foreground</item>
+        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="android:textSize">24sp</item>
         <item name="android:paddingTop">4dp</item>
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.Greeting.Body">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/apptentive_material_toolbar_foreground_secondary</item>
         <item name="android:lineSpacingExtra">5dp</item>
     </style>
 
@@ -421,7 +420,7 @@
         <item name="android:paddingTop">32dp</item>
         <item name="android:paddingBottom">0dp</item>
         <item name="android:paddingLeft">@dimen/apptentive_message_center_greeting_side_margin</item>
-        <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_greeting_side_margin</item>
         <item name="android:background">?attr/colorPrimary</item>
         <item name="android:orientation">horizontal</item>
     </style>
@@ -429,6 +428,8 @@
     <style name="MessageCenterMessageFrame">
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_left_margin</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_message_list_right_margin</item>
         <item name="android:clipToPadding">false</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:orientation">vertical</item>

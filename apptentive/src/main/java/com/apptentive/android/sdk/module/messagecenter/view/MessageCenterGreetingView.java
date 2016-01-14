@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
+import com.apptentive.android.sdk.util.Util;
 
 /**
  * @author Sky Kelsey
@@ -52,6 +53,9 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 		}
 		if (body != null) {
 			body.setText(messageCenterGreeting.body);
+			int defaultColor = Util.getThemeColor(context, R.attr.apptentive_material_toolbar_foreground);
+			int dimmerColor = Util.dimmer(defaultColor, 0.7f);
+			body.setTextColor(dimmerColor);
 		}
 
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
@@ -62,7 +66,7 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 				view.setClickable(false);
 				mClickHandler.sendEmptyMessageDelayed(view.getId(), DELAY_TIME);
 				if (context instanceof ViewActivity)
-				AboutModule.getInstance().show((Activity) context, false);
+					AboutModule.getInstance().show((Activity) context, false);
 			}
 		});
 	}

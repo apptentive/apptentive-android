@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
@@ -23,15 +24,13 @@
                                                                                    style="?attr/apptentiveAvatarViewGreetingStyle"
                                                                                    android:gravity="center_vertical"
                                                                                    android:src="@drawable/avatar"/>
-
         <LinearLayout android:id="@+id/greeting_content"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_toRightOf="@id/avatar"
                       android:layout_centerVertical="true"
+                      android:layout_marginBottom="@dimen/apptentive_message_center_icon_dimension"
                       android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
-                      android:layout_marginRight="@dimen/apptentive_message_center_icon_dimension"
-                      android:layout_marginBottom="@dimen/apptentive_message_center_greeting_text_padding_bottom"
                       android:gravity="left"
                       android:orientation="vertical">
             <TextView android:id="@+id/title"
@@ -49,7 +48,6 @@
                      android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                      android:layout_alignParentRight="true"
                      android:layout_alignParentBottom="true"
-                     android:layout_marginRight="10dp"
                      android:contentDescription="About"
                      android:background="?android:attr/selectableItemBackground"
                      android:src="@drawable/apptentive_ic_info"/>

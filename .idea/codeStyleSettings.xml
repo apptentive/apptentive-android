@@ -44,34 +44,6 @@
           </value>
         </option>
         <option name="RIGHT_MARGIN" value="100" />
-        <AndroidXmlCodeStyleSettings>
-          <option name="USE_CUSTOM_SETTINGS" value="true" />
-          <option name="LAYOUT_SETTINGS">
-            <value>
-              <option name="INSERT_BLANK_LINE_BEFORE_TAG" value="false" />
-              <option name="WRAP_ATTRIBUTES" value="0" />
-              <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
-            </value>
-          </option>
-          <option name="MANIFEST_SETTINGS">
-            <value>
-              <option name="GROUP_TAGS_WITH_SAME_NAME" value="false" />
-              <option name="WRAP_ATTRIBUTES" value="0" />
-              <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
-            </value>
-          </option>
-          <option name="VALUE_RESOURCE_FILE_SETTINGS">
-            <value>
-              <option name="INSERT_LINE_BREAKS_AROUND_STYLE" value="false" />
-            </value>
-          </option>
-          <option name="OTHER_SETTINGS">
-            <value>
-              <option name="WRAP_ATTRIBUTES" value="0" />
-              <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
-            </value>
-          </option>
-        </AndroidXmlCodeStyleSettings>
         <Objective-C-extensions>
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
           <option name="RELEASE_STYLE" value="IVAR" />
@@ -101,7 +73,7 @@
           </extensions>
         </Objective-C-extensions>
         <XML>
-          <option name="XML_ATTRIBUTE_WRAP" value="0" />
+          <option name="XML_ATTRIBUTE_WRAP" value="2" />
           <option name="XML_TEXT_WRAP" value="0" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>

@@ -354,7 +354,7 @@ public class MessageCenterActivityContent extends InteractionView<MessageCenterI
 		messageCenterHeader = viewActivity.findViewById(R.id.header_bar);
 		headerDivider = viewActivity.findViewById(R.id.header_divider);
 		int defaultColor = Util.getThemeColor(viewActivity, R.attr.colorPrimary);
-		int brightColor = Util.lighter(defaultColor, 0.5f);
+		int brightColor = Util.brighter(defaultColor, 0.5f);
 		headerDivider.setBackgroundColor(brightColor);
 		messageCenterListView = (ListView) viewActivity.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
