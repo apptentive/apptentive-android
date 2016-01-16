@@ -62,13 +62,6 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 				 */
 				int statusBarDefaultColor = Util.getThemeColorFromAttrOrRes(this, R.attr.colorPrimaryDark, R.color.apptentive_transparency);
 
-				/* ViewActivity must have a theme inherit from Apptentive Base themes.
-				*  If hosting app fails to specify one in AndroidManifest, apply the default ApptentiveTheme.
-				*  The check is done through checking if one of the apptentive theme attributes has value defined
-				*/
-				if (Util.getThemeColor(this, R.attr.apptentive_material_toolbar_foreground) == 0) {
-					setTheme(R.style.ApptentiveTheme);
-				}
 				if (activeContentType == ActivityContent.Type.ABOUT) {
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (activeContentType == ActivityContent.Type.INTERACTION) {

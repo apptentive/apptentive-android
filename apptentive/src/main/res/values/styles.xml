@@ -7,6 +7,18 @@
 
 <resources>
 
+    <!-- ApptentiveTheme is the theme used by all Apptentive UIs. It is default to Light Base Theme, if not provided by the app-->
+    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"></style>
+
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme"></style>
+
+    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
+
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar"></style>
+
     <!-- LIGHT Base Theme-->
     <style name="ApptentiveBaseVersionBaseTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Setting appcompat’s color theming attrs -->
@@ -110,68 +122,44 @@
         <item name="apptentive_material_pressed_highlight">@color/apptentive_material_dark_background</item>
     </style>
 
-    <!-- Apptentive Default Themes (based on Light Base Theme)-->
     <style name="ApptentiveBaseTheme" parent="ApptentiveBaseVersionBaseTheme.Light"></style>
-
-    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"></style>
-
-    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme"></style>
-
-    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
-
-    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar"></style>
 
     <!-- Apptentive Default Themes (based on Dark Base Theme)-->
     <style name="ApptentiveBaseTheme.Dark" parent="ApptentiveBaseVersionBaseTheme.Dark"></style>
 
-    <style name="ApptentiveTheme.Dark" parent="ApptentiveBaseTheme.Dark"></style>
 
-    <style name="ApptentiveTheme.Dark.TranslucentStatus" parent="ApptentiveTheme.Dark"></style>
+    <style name="ApptentiveBaseTheme.Dark.TranslucentStatus"></style>
 
-    <style name="ApptentiveTheme.Dark.ActionBar" parent="ApptentiveTheme.Dark">
+    <style name="ApptentiveBaseTheme.Dark.ActionBar">
         <item name="windowActionBar">true</item>
         <item name="android:windowNoTitle">false</item>
     </style>
 
-    <style name="ApptentiveTheme.Dark.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Dark.ActionBar"></style>
+    <style name="ApptentiveBaseTheme.Dark.ActionBar.TranslucentStatus"></style>
 
     <!-- Apptentive Default Themes (based on Dark ToolBar With Light Base Theme)-->
     <style name="ApptentiveBaseTheme.Light.DarkToolbar" parent="ApptentiveBaseVersionBaseTheme.Light.DarkToolbar"></style>
 
-    <style name="ApptentiveTheme.Light.DarkToolbar" parent="ApptentiveBaseTheme.Light.DarkToolbar"></style>
 
-    <style name="ApptentiveTheme.Light.DarkToolbar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
+    <style name="ApptentiveBaseTheme.Light.DarkToolbar.TranslucentStatus"></style>
 
-    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar" parent="ApptentiveTheme.Light.DarkToolbar">
+    <style name="ApptentiveBaseTheme.Light.DarkToolbar.ActionBar">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>
         <!-- only set this if we use an ActionBar -->
         <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark</item>
     </style>
 
-    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar"></style>
+    <style name="ApptentiveBaseTheme.Light.DarkToolbar.ActionBar.TranslucentStatus"></style>
 
-
-    <!-- Apptentive Specific Widget Themes-->
-    <style name="ApptentiveTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="windowNoTitle">true</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/apptentive_activity_frame</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:backgroundDimEnabled">false</item>
-    </style>
-
-    <style name="ApptentiveTheme.Transparent.FullScreen">
-        <item name="android:windowFullscreen">true</item>
-    </style>
-
+    <!-- Default theme used by Apptentive about -->
     <style name="ApptentiveTheme.About" parent="ApptentiveTheme">
         <item name="colorPrimary">@color/apptentive_red</item>
+    </style>
+
+    <!-- Default theme used by image preview -->
+    <style name="ApptentiveTheme.FullScreen">
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="ApptentiveTheme.Widget"/>
