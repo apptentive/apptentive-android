@@ -15,6 +15,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -174,12 +175,12 @@ public class ApptentiveInternal {
 
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
 		apptentiveApiKey = Util.trim(apptentiveApiKey);
-		if (!Util.isEmpty(apptentiveApiKey)) {
+		if (!TextUtils.isEmpty(apptentiveApiKey)) {
 			apiKey = apptentiveApiKey;
-		} else if (!Util.isEmpty(manifestApiKey)) {
+		} else if (!TextUtils.isEmpty(manifestApiKey)) {
 			apiKey = manifestApiKey;
 		}
-		if (Util.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
+		if (!TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 					"<meta-data android:name=\"apptentive_api_key\"\n" +
 					"           android:value=\"@string/your_apptentive_api_key\"/>";
