@@ -180,7 +180,7 @@ public class ApptentiveInternal {
 		} else if (!TextUtils.isEmpty(manifestApiKey)) {
 			apiKey = manifestApiKey;
 		}
-		if (!TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
+		if (TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 					"<meta-data android:name=\"apptentive_api_key\"\n" +
 					"           android:value=\"@string/your_apptentive_api_key\"/>";
