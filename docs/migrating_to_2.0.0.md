@@ -19,3 +19,7 @@ We have also changed the way that you set your customer's name and email. The ne
 ## Unread Messages Listener
 
 We've modified how you pass in an `UnreadMessagesListener` when you want to be notified that the number of messages waiting to be read by your customer has changed. You should replace your calls to the deprecated `setUnreadMessagesListener()` with the new `addUnreadMessagesListener()`.
+
+## Manifest file
+
+We have removed Apptentive's NetworkStateReceiver from sdk. Please make sure remove `<receiver android:name="com.apptentive.android.sdk.comm.NetworkStateReceiver"> ... </receiver>` from your manifest. 
