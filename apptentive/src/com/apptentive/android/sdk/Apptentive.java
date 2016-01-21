@@ -8,9 +8,11 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -81,7 +83,10 @@ public class Apptentive {
 			}
 			runningActivities++;
 			MessageManager.setCurrentForgroundActivity(activity);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
+			throw e;
+		}
+		catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
@@ -1009,20 +1014,32 @@ public class Apptentive {
 			// Check the host app version, and notify modules if it's changed.
 			try {
 				PackageManager packageManager = appContext.getPackageManager();
-				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
+				PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), PackageManager.GET_RECEIVERS);
 
 				Integer currentVersionCode = packageInfo.versionCode;
 				String currentVersionName = packageInfo.versionName;
 				VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen(appContext);
 				if (lastVersionEntrySeen == null) {
-					onVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
+					onAppVersionChanged(appContext, null, currentVersionCode, null, currentVersionName);
 				} else {
 					if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-						onVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
+						onAppVersionChanged(appContext, lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
 					}
 				}
 
 				GlobalInfo.appDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
+
+				// Prevent delayed run-time exception if the app upgrades from pre-2.0 and doesn't remove NetworkStateReceiver from manifest
+				ActivityInfo[] registered = packageInfo.receivers;
+				if (registered != null) {
+					for (ActivityInfo activityInfo : registered) {
+						// Throw immediate runtime exception when relict class found in manifest.
+						if (activityInfo.name.equals("com.apptentive.android.sdk.comm.NetworkStateReceiver")) {
+							throw new RuntimeException("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file");
+						}
+					}
+				}
+
 			} catch (PackageManager.NameNotFoundException e) {
 				// Nothing we can do then.
 				GlobalInfo.appDisplayName = "this app";
@@ -1056,8 +1073,8 @@ public class Apptentive {
 		Log.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
-	private static void onVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
-		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+	private static void onAppVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
+		Log.i("App version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
@@ -1375,5 +1392,6 @@ public class Apptentive {
 			double thatDateTime = other.getDateTime();
 			return Double.compare(thisDateTime, thatDateTime);
 		}
+
 	}
 }
