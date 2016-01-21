@@ -1,9 +1,8 @@
-# 2016-01-20 - 2.1.3
+# 2016-01-22 - 2.1.3
 
 #### Bug Fixed and Improvements
 
-*  If apps upgrading from pre-2.0.0 still has now obsolete NetworkStateReceiver defined in their manifest, an immediate run-time exception will help them detect early. 
-*  Message Center now has different layout on tablet
+*  If apps upgrading from pre-2.0.0 still has now obsolete NetworkStateReceiver defined in their manifest, an immediate run-time assertion error will help app developers detect early. 
 
 # 2016-01-08 - 2.1.2
 

@@ -83,10 +83,7 @@ public class Apptentive {
 			}
 			runningActivities++;
 			MessageManager.setCurrentForgroundActivity(activity);
-		} catch (RuntimeException e) {
-			throw e;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
@@ -1033,9 +1030,9 @@ public class Apptentive {
 				ActivityInfo[] registered = packageInfo.receivers;
 				if (registered != null) {
 					for (ActivityInfo activityInfo : registered) {
-						// Throw immediate runtime exception when relict class found in manifest.
+						// Throw assertion error when relict class found in manifest.
 						if (activityInfo.name.equals("com.apptentive.android.sdk.comm.NetworkStateReceiver")) {
-							throw new RuntimeException("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file");
+							throw new AssertionError("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file");
 						}
 					}
 				}
