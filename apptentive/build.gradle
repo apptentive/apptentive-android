@@ -22,7 +22,7 @@ android {
         targetSdkVersion 23
 
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0
-        versionName "2.1.2"
+        versionName "2.1.3"
     }
 
     lintOptions {
