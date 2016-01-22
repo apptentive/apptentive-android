@@ -27,6 +27,9 @@
       <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
     </Native>
     <Java />
+    <Profilers>
+      <option name="GAPID_DISABLE_PCS" value="false" />
+    </Profilers>
     <method />
   </configuration>
 </component>
