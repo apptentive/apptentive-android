@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -128,7 +129,7 @@ public class ApptentiveInternal {
 		try {
 			appPackageName = appContext.getPackageName();
 			PackageManager packageManager = appContext.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA);
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
 			ApplicationInfo ai = packageInfo.applicationInfo;
 
 			Bundle metaData = ai.metaData;
@@ -150,6 +151,18 @@ public class ApptentiveInternal {
 				}
 			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
+
+			// Prevent delayed run-time exception if the app upgrades from pre-2.0 and doesn't remove NetworkStateReceiver from manifest
+			ActivityInfo[] registered = packageInfo.receivers;
+			if (registered != null) {
+				for (ActivityInfo activityInfo : registered) {
+					// Throw assertion error when relict class found in manifest.
+					if (activityInfo.name.equals("com.apptentive.android.sdk.comm.NetworkStateReceiver")) {
+						throw new AssertionError("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file");
+					}
+				}
+			}
+
 		} catch (Exception e) {
 			Log.e("Unexpected error while reading application or package info.", e);
 		}
@@ -180,7 +193,7 @@ public class ApptentiveInternal {
 		} else if (!TextUtils.isEmpty(manifestApiKey)) {
 			apiKey = manifestApiKey;
 		}
-		if (!TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
+		if (TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 					"<meta-data android:name=\"apptentive_api_key\"\n" +
 					"           android:value=\"@string/your_apptentive_api_key\"/>";
