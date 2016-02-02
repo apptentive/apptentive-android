@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,12 +59,9 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 				Log.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
 
-				/* The default status bar color fallback order are,
-				 * the colorPrimaryDark specified in Apptentive Base Theme override; or app default; or transparency
-				 */
-				int statusBarDefaultColor = Util.getThemeColorFromAttrOrRes(this, R.attr.colorPrimaryDark, R.color.apptentive_transparency);
 
 				if (activeContentType == ActivityContent.Type.ABOUT) {
+					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (activeContentType == ActivityContent.Type.INTERACTION) {
 					String interactionString;
@@ -75,35 +74,36 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 					if (interaction != null) {
 						switch (interaction.getType()) {
 							case UpgradeMessage:
+								applyApptentiveTheme(false);
 								activityContent = new UpgradeMessageInteractionView((UpgradeMessageInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case EnjoymentDialog:
+								applyApptentiveTheme(false);
 								activityContent = new EnjoymentDialogInteractionView((EnjoymentDialogInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case RatingDialog:
+								applyApptentiveTheme(false);
 								activityContent = new RatingDialogInteractionView((RatingDialogInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case AppStoreRating:
+								applyApptentiveTheme(false);
 								activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case Survey:
 								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
+								applyApptentiveTheme(false);
 								break;
 							case MessageCenter:
+								applyApptentiveTheme(true);
 								activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
 								break;
 							case TextModal:
+								applyApptentiveTheme(false);
 								activityContent = new TextModalInteractionView((TextModalInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							case NavigateToLink:
+								applyApptentiveTheme(false);
 								activityContent = new NavigateToLinkInteractionView((NavigateToLinkInteraction) interaction);
-								setStatusBarColor(statusBarDefaultColor);
 								break;
 							default:
 								break;
@@ -300,14 +300,49 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 		}
 	}
 
-	/* Set status bar color when model interaction, such as Rating prompt, Niote .. is shown.
+	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
+		// A straightforward way to check if the app has default Theme.AppCompat theme specified for activities
+		int appcolorPrimaryDark = Util.getThemeColor(this, R.attr.colorPrimaryDark);
+		int statusBarDefaultColor = Util.getThemeColor(this, android.R.attr.statusBarColor);
+
+		Resources.Theme appDefaultTheme = getTheme();
+				/* When no colorPrimaryDark is defined, it indicates ViewActivity has no default Theme.AppCompat attributes
+				 * specified by the app, just apply the default ApptentiveTheme (2nd parameter is true);
+				 * If app has a default material theme, the ApptentiveTheme attributes will only be used if not already
+				 * defined in the app default theme (2nd parameter is false).
+				*/
+		appDefaultTheme.applyStyle(R.style.ApptentiveTheme, (appcolorPrimaryDark == 0));
+		// Next, force to apply Apptentive non-frame window style
+		appDefaultTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
+		// Finally, force to apply possible Apptentive attributes override defined by the app
+		appDefaultTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
+
+		if (!isFullScreenInteraction) {
+				setStatusBarColor(statusBarDefaultColor);
+		}
+	}
+
+	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
 	 * It is the default status color alpha blended with the Apptentive translucent
 	* color apptentive_activity_frame
+	* @param statusBarDefaultColor the default activity status bar color specified by the app
 	*/
 	private void setStatusBarColor(int statusBarDefaultColor) {
-		if (Build.VERSION.SDK_INT >= 21) {
+		// Changing status bar color is a post-21 feature
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Resources.Theme newTheme = getResources().newTheme();
+			newTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
+			TypedArray a = newTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+			int statusBarColorOveride;
+			try {
+				// Use android:statusBarColor specified in ApptentiveThemeOverride
+				statusBarColorOveride = a.getColor(0, statusBarDefaultColor);
+			} finally {
+				a.recycle();
+			}
+
 			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame);
-			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
+			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarColorOveride, overlayColor));
 		}
 	}
 }

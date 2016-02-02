@@ -7,7 +7,7 @@
 
 <resources>
 
-    <declare-styleable name="ApptentiveMaterial">
+    <declare-styleable name="ApptentiveThemeTemplate">
         <attr name="apptentive_material_background" format="color|reference" />
 
         <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
@@ -30,6 +30,7 @@
 
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
+    <attr name="apptentiveToolbarStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="apptentive_buttonText" format="string"/>

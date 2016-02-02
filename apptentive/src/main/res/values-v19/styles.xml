@@ -7,31 +7,11 @@
 
 <resources>
     <!-- DEFAULT (LIGHT) -->
-    <style name="ApptentiveBaseTheme.TranslucentStatus">
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveBaseTheme.ActionBar.TranslucentStatus">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-
-    <!-- DARK -->
-    <style name="ApptentiveBaseTheme.Dark.TranslucentStatus">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Dark.ActionBar.TranslucentStatus">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-
-    <!-- LIGHT DARK TOOLBAR -->
-    <style name="ApptentiveBaseTheme.Light.DarkToolbar.TranslucentStatus">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Light.DarkToolbar.ActionBar.TranslucentStatus">
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 

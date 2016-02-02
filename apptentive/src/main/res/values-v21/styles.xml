@@ -7,58 +7,21 @@
 
 <resources>
     <!-- Default (Light) -->
-    <style name="ApptentiveBaseTheme.TranslucentStatus">
+    <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveBaseTheme.ActionBar">
+    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>
     </style>
 
-    <style name="ApptentiveBaseTheme.ActionBar.TranslucentStatus">
+    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-
-    <!-- Dark -->
-    <style name="ApptentiveBaseTheme.Dark.TranslucentStatus">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Dark.ActionBar">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Dark.ActionBar.TranslucentStatus">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-
-    <!-- Light DARK ACTIONBAR -->
-    <style name="ApptentiveBaseTheme.Light.DarkToolbar.TranslucentStatus">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Light.DarkToolbar.ActionBar">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
-
-    <style name="ApptentiveBaseTheme.Light.DarkToolbar.ActionBar.TranslucentStatus">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
 </resources>

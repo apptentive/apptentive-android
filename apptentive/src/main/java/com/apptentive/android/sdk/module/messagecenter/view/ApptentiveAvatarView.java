@@ -72,7 +72,7 @@ public class ApptentiveAvatarView extends ImageView {
 			return;
 		}
 
-		TypedArray attributes = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, R.style.ApptentiveAvatarView);
+		TypedArray attributes = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveAvatarView, defStyleAttr, 0);
 		try {
 			borderWidth = attributes.getDimension(R.styleable.ApptentiveAvatarView_apptentive_borderWidth, 0.0f);
 			borderSpace = attributes.getDimensionPixelSize(R.styleable.ApptentiveAvatarView_apptentive_borderSpace, 0);

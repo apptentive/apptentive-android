@@ -115,7 +115,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			return new AlertDialog.Builder(getActivity())
+			final AlertDialog d = new AlertDialog.Builder(getActivity())
 					.setMessage(getArguments().getString("STR_2"))
 					.setPositiveButton(getArguments().getString("STR_3"),
 							new DialogInterface.OnClickListener() {
@@ -137,6 +137,14 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 									dialog.dismiss();
 								}
 							}).create();
+			/*d.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Button b = d.getButton(DialogInterface.BUTTON_POSITIVE);
+					b.setTextColor(Util.getThemeColorFromAttrOrRes(getActivity(), R.attr.colorAccent, R.color.apptentive_material_accent));
+				}
+			});*/
+			return d;
 		}
 
 	}

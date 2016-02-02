@@ -179,7 +179,7 @@ public class FloatingActionButton extends ImageButton {
 
 	public FloatingActionButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init(context, attrs, R.attr.apptentiveFabStyle);
+		init(context, attrs, 0);
 	}
 
 	public FloatingActionButton(Context context, AttributeSet attrs, int defStyle) {
@@ -204,7 +204,7 @@ public class FloatingActionButton extends ImageButton {
 				return;
 			}
 
-			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, R.style.ApptentiveWidget_FloatingActionButton);
+			a = theme.obtainStyledAttributes(attrs, R.styleable.FloatingActionButton, defStyle, 0);
 			if (a == null) {
 				return;
 			}
@@ -218,7 +218,7 @@ public class FloatingActionButton extends ImageButton {
 
 		try {
 			lockUpdate();
-			initAttrs(a);
+			initAttrs(context, a);
 		} finally {
 			unlockUpdate();
 			a.recycle();
@@ -227,10 +227,22 @@ public class FloatingActionButton extends ImageButton {
 		initBackground();
 	}
 
-	private void initAttrs(TypedArray a) {
+	private void initAttrs(Context context, TypedArray a) {
 		setSize(a.getInteger(R.styleable.FloatingActionButton_apptentive_floatingActionButtonSize, SIZE_NORMAL));
 		setColor(a.getColor(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor, Color.GRAY));
-		setColorStateList(a.getColorStateList(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor));
+		ColorStateList colorStateList = a.getColorStateList(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor);
+		if (colorStateList == null) {
+			int colorAccent = Util.getThemeColorFromAttrOrRes(context, R.attr.colorAccent, R.color.colorAccent);
+			colorStateList = new ColorStateList(
+					new int[][]{
+							new int[]{} // Null state list sets default colors
+					},
+					new int[]{
+							colorAccent
+					}
+			);
+		}
+		setColorStateList(colorStateList);
 		setShadow(a.getBoolean(R.styleable.FloatingActionButton_apptentive_floatingActionButtonShadow, true));
 		setImplicitElevation(a.getBoolean(R.styleable.FloatingActionButton_apptentive_floatingActionButtonImplicitElevation, true));
 
