@@ -15,5 +15,6 @@
 
     <application>
         <activity android:name="com.apptentive.android.sdk.ViewActivity"/>
+        <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity"/>
     </application>
 </manifest>
