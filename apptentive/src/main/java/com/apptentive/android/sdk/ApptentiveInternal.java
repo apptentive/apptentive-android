@@ -61,6 +61,8 @@ import java.util.Map;
  */
 public class ApptentiveInternal {
 
+	private static final Object lock = new Object();
+
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	public static Context appContext;
 	public static boolean appIsInForeground;
@@ -94,6 +96,21 @@ public class ApptentiveInternal {
 				Log.d("Error parsing unknown PushAction: " + name);
 			}
 			return unknown;
+		}
+	}
+
+	public static Context getApplicationContext() {
+		return appContext;
+	}
+
+	public static void setApplicationContext(Context c) {
+		Object object = ApptentiveInternal.lock;
+
+		synchronized (ApptentiveInternal.lock) {
+			if (ApptentiveInternal.appContext == null) {
+				ApptentiveInternal.appContext = c;
+			}
+
 		}
 	}
 

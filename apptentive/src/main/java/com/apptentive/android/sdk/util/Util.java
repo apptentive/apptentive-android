@@ -136,9 +136,8 @@ public class Util {
 		return Math.round(px / scale);
 	}
 
-	public static int dipsToPixels(Context context, int dp) {
-		final float scale = context.getResources().getDisplayMetrics().density;
-		return Math.round(dp * scale);
+	public static float dipsToPixels(Context context, float dp) {
+		return context.getResources().getDisplayMetrics().density * dp;
 	}
 
 	public static float dipsToPixelsFloat(Context context, int dp) {
