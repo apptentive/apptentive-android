@@ -116,7 +116,7 @@ public class ApptentiveInternal {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
-	static void init(final Context applicationContext, String apptentiveApiKey) {
+	public static void init(final Context applicationContext, String apptentiveApiKey) {
 		appContext = applicationContext;
 		prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);

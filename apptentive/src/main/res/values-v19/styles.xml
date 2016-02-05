@@ -15,26 +15,6 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-
-    <!-- DARK -->
-    <style name="ApptentiveTheme.Dark.TranslucentStatus" parent="ApptentiveTheme.Dark">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveTheme.Dark.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Dark.ActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-
-    <!-- LIGHT DARK TOOLBAR -->
-    <style name="ApptentiveTheme.Light.DarkToolbar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveTheme.Light.DarkToolbar.ActionBar.TranslucentStatus" parent="ApptentiveTheme.Light.DarkToolbar.ActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
     <style name="ApptentiveTheme.TextAppearence" parent="@android:style/TextAppearance">
         <item name="android:fontFamily">sans-serif</item>
     </style>

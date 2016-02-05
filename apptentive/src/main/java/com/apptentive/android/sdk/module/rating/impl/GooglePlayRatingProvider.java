@@ -11,6 +11,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -27,7 +28,8 @@ public class GooglePlayRatingProvider implements IRatingProvider {
 		Uri uri = Uri.parse("market://details?id=" + args.get("package"));
 		Log.i("Opening app store for rating with URI: \"%s\"", uri);
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NEW_TASK);
+		int flag = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? Intent.FLAG_ACTIVITY_NEW_DOCUMENT : Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
+		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | flag | Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 	}
 

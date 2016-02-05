@@ -53,6 +53,8 @@
 
     <color name="apptentive_material_primary_text">@color/primary_text</color>
     <color name="apptentive_material_primary_icon">@color/secondary_text</color>
+    <color name="apptentive_material_primary_text_inverse">@color/icons</color>
+
     <color name="apptentive_material_secondary_text">@color/secondary_text</color>
     <color name="apptentive_material_hint_text">@color/hint_text</color>
     <color name="apptentive_material_disabled_text">@color/disabled_text</color>
