@@ -25,7 +25,6 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
@@ -95,7 +94,6 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 								break;
 							case MessageCenter:
 								applyApptentiveTheme(true);
-								activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
 								break;
 							case TextModal:
 								applyApptentiveTheme(false);
