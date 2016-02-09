@@ -53,15 +53,14 @@
 
     <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
                                                 android:layout_height="match_parent"
+                                                android:background="#FFFFFF"
                                                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <TextView android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:textSize="20sp"
-                  android:lineSpacingExtra="8dp"
-                  android:padding="32dp"
-                  android:background="#FFFFFF"
-                  android:textColor="?android:attr/textColorPrimaryInverse"
-                  android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. "/>
+        <LinearLayout android:id="@+id/questions"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="vertical">
+            <!-- Questions are added here -->
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.v7.widget.Toolbar android:id="@+id/title"
@@ -75,65 +74,14 @@
                                        app:layout_anchor="@id/appbar"
                                        app:layout_anchorGravity="top"/>
 
-    <!--<ScrollView android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingLeft="@dimen/apptentive_activity_side_padding_survey"-->
-    <!--android:paddingRight="@dimen/apptentive_activity_side_padding_survey"-->
-    <!--android:fadingEdge="none">-->
-    <!--<FrameLayout android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingTop="@dimen/apptentive_activity_vertical_padding"-->
-    <!--android:paddingBottom="@dimen/apptentive_activity_vertical_padding">-->
-    <!--<LinearLayout android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical"-->
-    <!--android:background="@drawable/apptentive_activity_background">-->
-    <!--<TextView android:id="@+id/title"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="64dp"-->
-    <!--style="@style/ApptentiveTheme.TextAppearence"-->
-    <!--android:gravity="center"-->
-    <!--android:paddingLeft="16dp"-->
-    <!--android:paddingRight="16dp"-->
-    <!--android:textColor="@color/apptentive_survey_title_text"-->
-    <!--android:textStyle="bold"-->
-    <!--android:textSize="@dimen/apptentive_text_large"/>-->
-    <!--<FrameLayout android:layout_width="match_parent"-->
-    <!--android:layout_height="4dp"-->
-    <!--android:background="@color/apptentive_survey_separator"/>-->
-    <!--<LinearLayout android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical"-->
-    <!--android:gravity="center_vertical"-->
-    <!--android:paddingLeft="16dp"-->
-    <!--android:paddingRight="16dp"-->
-    <!--android:paddingBottom="16dp"-->
-    <!--android:background="@color/apptentive_survey_content_background">-->
-    <!--<TextView android:id="@+id/description"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--style="@style/ApptentiveTheme.TextAppearence"-->
-    <!--android:gravity="center_vertical|left"-->
-    <!--android:paddingTop="16dp"-->
-    <!--android:visibility="gone"-->
-    <!--android:textSize="@dimen/apptentive_text_medium"-->
-    <!--android:textColor="@color/apptentive_survey_question_instruction_text"/>-->
-    <!--<LinearLayout android:id="@+id/questions"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:orientation="vertical">-->
-    <!--&lt;!&ndash; Filled programmatically &ndash;&gt;-->
-    <!--</LinearLayout>-->
-    <!--<Button android:id="@+id/send"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="48dp"-->
-    <!--android:layout_marginTop="16dp"-->
-    <!--style="@style/ApptentiveTheme.TextAppearence.ApptentiveInteractionPositiveButton"-->
-    <!--android:text="@string/apptentive_survey_send_response"/>-->
-    <!--</LinearLayout>-->
-    <!--<include layout="@layout/apptentive_branding"/>-->
-    <!--</LinearLayout>-->
-    <!--</FrameLayout>-->
-    <!--</ScrollView>-->
+
+    <!--
+        <Button android:id="@+id/send"
+                style="@style/ApptentiveTheme.TextAppearence.ApptentiveInteractionPositiveButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/apptentive_survey_send_response"/>
+    -->
 
 </android.support.design.widget.CoordinatorLayout>

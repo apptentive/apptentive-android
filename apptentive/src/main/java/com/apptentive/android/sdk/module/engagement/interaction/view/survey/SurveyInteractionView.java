@@ -110,7 +110,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		});
 */
 
-/*
 		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
 		questions.removeAllViews();
 
@@ -121,7 +120,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(textQuestionView);
@@ -130,7 +129,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multichoiceQuestionView);
@@ -139,13 +138,13 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multiselectQuestionView);
 			}
 		}
-
+/*
 		send.setEnabled(isSurveyValid());
 
 		// Force the top of the survey to be shown first.
