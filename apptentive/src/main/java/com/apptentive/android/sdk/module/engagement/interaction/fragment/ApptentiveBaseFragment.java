@@ -5,6 +5,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
@@ -149,7 +152,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(this.getMenuResourceId(), menu);
-		this.attachMenuListeners(menu);
+		attachMenuListeners(menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -191,7 +194,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 
 	public void showToolbarElevation(boolean visible) {
 		if (Build.VERSION.SDK_INT >= 21) {
-			this.showToolbarElevationLollipop(visible);
+			showToolbarElevationLollipop(visible);
 		} else {
 			showToolbarElevationPreLollipop(visible);
 		}
@@ -244,17 +247,17 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 	}
 
 	private void showToolbarElevationPreLollipop(boolean visible) {
-		/*FrameLayout flowFragmentContainer = (FrameLayout) getActivity(this).findViewById(R.id.fragment_container);
+		FrameLayout pager = (FrameLayout) getActivity().findViewById(R.id.apptentive_vp_container);
 
-		if (flowFragmentContainer != null) {
+		if (pager != null) {
 			if (visible) {
-				Drawable shadow = this.getResources().getDrawable(R.drawable.apptentive_actionbar_compat_shadow);
+				Drawable shadow = getResources().getDrawable(R.drawable.apptentive_actionbar_compat_shadow);
 
-				flowFragmentContainer.setForeground(shadow);
+				pager.setForeground(shadow);
 			} else {
-				flowFragmentContainer.setForeground(new ColorDrawable(0));
+				pager.setForeground(new ColorDrawable(0));
 			}
-		}*/
+		}
 
 	}
 

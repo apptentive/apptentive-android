@@ -102,7 +102,7 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 
 		setContentView(R.layout.apptentive_viewactivity);
 
-		toolbar = (Toolbar) this.findViewById(R.id.apptentive_toolbar);
+		toolbar = (Toolbar) findViewById(R.id.apptentive_toolbar);
 		setSupportActionBar(toolbar);
 		ActionBar actionBar = getSupportActionBar();
 
@@ -159,14 +159,12 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 
 	@Override
 	protected void onStart() {
+		super.onStart();
 		switch (fragmentType) {
 			case ABOUT:
-				super.onStart();
 				AboutModule.getInstance().setupView(this, activityExtraBoolean);
 				break;
 			default:
-				Log.w("No Activity specified. Finishing...");
-				finish();
 				break;
 		}
 	}

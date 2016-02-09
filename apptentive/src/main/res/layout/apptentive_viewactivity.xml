@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.apptentive.android.sdk.FullScreenActivity">
+    tools:context="com.apptentive.android.sdk.ApptentiveViewActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/apptentive_toolbar"
@@ -15,10 +15,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-
+    <FrameLayout
+        android:id="@+id/apptentive_vp_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/apptentive_toolbar">
     <android.support.v4.view.ViewPager
         android:id="@+id/apptentive_vp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/apptentive_toolbar" />
+        android:layout_height="wrap_content"/>
+    </FrameLayout>
 </RelativeLayout>

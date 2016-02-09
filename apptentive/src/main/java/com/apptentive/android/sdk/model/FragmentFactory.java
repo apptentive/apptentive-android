@@ -2,30 +2,10 @@ package com.apptentive.android.sdk.model;
 
 import android.os.Bundle;
 
-import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
-import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.UpgradeMessageInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.view.AppStoreRatingInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.EnjoymentDialogInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.NavigateToLinkInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.RatingDialogInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.TextModalInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.UpgradeMessageInteractionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
-
-import org.json.JSONException;
 
 /**
  * @author Sky Kelsey

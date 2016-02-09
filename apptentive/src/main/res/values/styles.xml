@@ -8,9 +8,9 @@
 <resources>
 
     <!-- ApptentiveTheme is the theme used by all Apptentive UIs. It is default to Light Base Theme, if not provided by the app-->
-    <style name="ApptentiveThemeOverride" />
+    <style name="ApptentiveThemeOverride"/>
 
-    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme" />
+    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"/>
 
     <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
         <item name="windowActionBar">true</item>
@@ -93,7 +93,9 @@
     <style name="ApptentiveTheme.Widget"/>
 
     <style name="Apptentive"/>
+
     <style name="Apptentive.Style"/>
+
     <style name="Apptentive.Style.BorderlessButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?colorAccent</item>
     </style>
@@ -112,10 +114,13 @@
         <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
     </style>
 
-    <style name="Apptentive.Style.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+
+    <style name="Apptentive.Style.Toolbar" parent="Base.Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
+
 
     <style name="ApptentiveTheme.Widget.CardView" parent="android:Widget">
         <item name="android:layout_margin">0dp</item>

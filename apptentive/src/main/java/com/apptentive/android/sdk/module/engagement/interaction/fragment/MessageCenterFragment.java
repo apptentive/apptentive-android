@@ -348,6 +348,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		messageCenterListView = (ListView) rootView.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setOnScrollListener(this);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			messageCenterListView.setNestedScrollingEnabled(true);
+		}
 		((MessageCenterListView) messageCenterListView).setOnListViewResizeListener(this);
 		messageCenterListView.setItemsCanFocus(true);
 		final SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -1114,19 +1117,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		} else {
 			bCanScrollUp = ViewCompat.canScrollVertically(view, -1);
 		}
-		if (bCanScrollUp) {
-			/*if (android.os.Build.VERSION.SDK_INT > 20) {
-				messageCenterHeader.setElevation(8);
-			} else {
-				headerDivider.setVisibility(View.VISIBLE);
-			}*/
-		} else {
-			/*if (android.os.Build.VERSION.SDK_INT > 20) {
-				messageCenterHeader.setElevation(0);
-			} else {
-				headerDivider.setVisibility(View.GONE);
-			}*/
-		}
+		showToolbarElevation(bCanScrollUp);
 	}
 
 	@Override
