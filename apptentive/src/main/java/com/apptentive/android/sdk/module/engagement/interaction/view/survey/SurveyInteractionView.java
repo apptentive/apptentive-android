@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -144,6 +145,14 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				questions.addView(multiselectQuestionView);
 			}
 		}
+
+		View infoButton = activity.findViewById(R.id.info);
+		infoButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AboutModule.getInstance().show(activity, false);
+			}
+		});
 /*
 		send.setEnabled(isSurveyValid());
 
