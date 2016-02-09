@@ -30,7 +30,8 @@
                             android:paddingBottom="16dp">
                 <Space android:layout_width="match_parent"
                        android:layout_height="?attr/actionBarSize"/>
-                <TextView android:layout_width="match_parent"
+                <TextView android:id="@+id/description"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_alignParentTop="true"
                           android:textColor="#FFFFFF"
@@ -63,7 +64,8 @@
                   android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at hendrerit felis. Cras mattis aliquam justo egestas facilisis. Praesent iaculis mattis rutrum. Cras neque nisl, consectetur et lorem et, rutrum aliquam sem. Pellentesque egestas ligula nec velit finibus, quis feugiat est fermentum. "/>
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.v7.widget.Toolbar android:layout_width="match_parent"
+    <android.support.v7.widget.Toolbar android:id="@+id/title"
+                                       android:layout_width="match_parent"
                                        android:layout_height="?attr/actionBarSize"
                                        android:background="?attr/colorPrimary"
                                        android:navigationIcon="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
