@@ -128,7 +128,7 @@
     <color name="apptentive_survey_question_instruction_text">@color/apptentive_black</color>
     <color name="apptentive_survey_question_instruction_text_valid">#56B8D8</color>
     <color name="apptentive_survey_question_instruction_background_valid">#D6E9F0</color>
-    <color name="apptentive_survey_question_instruction_text_invalid">#BB6F6F</color>
+    <color name="apptentive_survey_question_instruction_text_invalid">#D93849</color>
     <color name="apptentive_survey_question_instruction_background_invalid">#EEDDDD</color>
     <color name="apptentive_survey_question_text">@color/apptentive_black</color>
     <color name="apptentive_survey_question_answer_text">@color/apptentive_black</color>
