@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -68,18 +69,8 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 		activity.setContentView(R.layout.apptentive_survey);
 
-/*		// Hide branding if needed.
-		final View branding = activity.findViewById(R.id.apptentive_branding_view);
-		if (branding != null) {
-			if (Configuration.load(activity).isHideBranding(activity)) {
-				branding.setVisibility(View.GONE);
-			}
-		}
-
-		TextView title = (TextView) activity.findViewById(R.id.title);
-		title.setFocusable(true);
-		title.setFocusableInTouchMode(true);
-		title.setText(interaction.getName());
+		Toolbar title = (Toolbar) activity.findViewById(R.id.title);
+		title.setTitle(interaction.getName());
 
 		String descriptionText = interaction.getDescription();
 		if (!TextUtils.isEmpty(descriptionText)) {
@@ -88,6 +79,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			description.setVisibility(View.VISIBLE);
 		}
 
+/*
 		final Button send = (Button) activity.findViewById(R.id.send);
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -116,7 +108,9 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				cleanup();
 			}
 		});
+*/
 
+/*
 		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
 		questions.removeAllViews();
 
