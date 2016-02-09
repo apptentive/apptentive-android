@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -19,7 +19,7 @@
               android:paddingBottom="16dp"
               android:textColor="@color/apptentive_survey_answer_text"
               android:textSize="@dimen/apptentive_text_small"
-              android:hint="@string/apptentive_survey_singleline_hint"
+              android:hint="Please leave detailed feedback…"
               android:background="@drawable/android_textfield_activated_holo_light"
               android:saveEnabled="false"/>
 </LinearLayout>
