@@ -37,7 +37,7 @@
                           android:textColor="#FFFFFF"
                           android:textSize="18sp"
                           android:text="Please answer a couple of questions to help us make this app better for you!"/>
-                <ImageButton android:id="@+id/btn_info"
+                <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_alignParentRight="true"
