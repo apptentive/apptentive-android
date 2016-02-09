@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -34,9 +34,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-/**
- * @author Sky Kelsey
- */
 public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 	private static final String EVENT_CANCEL = "cancel";
@@ -71,7 +68,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 		activity.setContentView(R.layout.apptentive_survey);
 
-		// Hide branding if needed.
+/*		// Hide branding if needed.
 		final View branding = activity.findViewById(R.id.apptentive_branding_view);
 		if (branding != null) {
 			if (Configuration.load(activity).isHideBranding(activity)) {
@@ -158,7 +155,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		send.setEnabled(isSurveyValid());
 
 		// Force the top of the survey to be shown first.
-		title.requestFocus();
+		title.requestFocus();*/
 	}
 
 	public boolean isSurveyValid() {
