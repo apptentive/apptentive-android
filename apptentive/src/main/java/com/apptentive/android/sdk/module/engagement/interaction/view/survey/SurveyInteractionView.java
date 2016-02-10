@@ -21,7 +21,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.*;
@@ -70,8 +69,8 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 		activity.setContentView(R.layout.apptentive_survey);
 
-		Toolbar title = (Toolbar) activity.findViewById(R.id.title);
-		title.setTitle(interaction.getName());
+		Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+		toolbar.setTitle(interaction.getName());
 
 		String descriptionText = interaction.getDescription();
 		if (!TextUtils.isEmpty(descriptionText)) {
@@ -80,7 +79,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			description.setVisibility(View.VISIBLE);
 		}
 
-/*
 		final Button send = (Button) activity.findViewById(R.id.send);
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -109,7 +107,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				cleanup();
 			}
 		});
-*/
 
 		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
 		questions.removeAllViews();
@@ -155,9 +152,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		});
 /*
 		send.setEnabled(isSurveyValid());
-
-		// Force the top of the survey to be shown first.
-		title.requestFocus();*/
+*/
 	}
 
 	public boolean isSurveyValid() {
