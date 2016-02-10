@@ -10,8 +10,5 @@
     <style name="ApptentiveBaseTheme" parent="ApptentiveBaseVersionBaseTheme">
         <item name="android:dialogTheme">@style/Apptentive.Style.Dialog</item>
         <item name="alertDialogTheme">@style/Apptentive.Style.AlertDialog</item>
-        <item name="android:buttonStyle">@style/ApptentiveButtonStyle</item>
     </style>
-
-
 </resources>
