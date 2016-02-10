@@ -73,6 +73,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
+        <item name="apptentiveBorderedButtonSurveyStyle">?apptentiveBorderedButtonStyle</item>
     </style>
 
 
@@ -104,6 +106,11 @@
 
     <style name="Apptentive.Style.BorderlessButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?colorAccent</item>
+    </style>
+
+    <style name="Apptentive.Style.BorderedButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="backgroundTint">?colorPrimary</item>
+        <item name="android:textColor">@color/apptentive_material_primary_text_inverse</item>
     </style>
 
     <!-- General Theme override to change the Dialog design -->
@@ -420,10 +427,5 @@
     <style name="ApptentiveDialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
         <item name="android:windowExitAnimation">@anim/slide_down_out</item>
-    </style>
-
-    <style name="ApptentiveButtonStyle" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">?colorPrimary</item>
-        <item name="android:textColor">@color/apptentive_material_primary_text_inverse</item>
     </style>
 </resources>

@@ -23,9 +23,4 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
-
-    <style name="ApptentiveButtonStyle" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:colorButtonNormal">?colorPrimary</item>
-        <item name="android:textColor">@color/apptentive_material_primary_text_inverse</item>
-    </style>
 </resources>
