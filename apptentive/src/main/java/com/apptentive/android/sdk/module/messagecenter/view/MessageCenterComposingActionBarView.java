@@ -7,14 +7,13 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Dialog;
-import android.content.Context;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -23,8 +22,6 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.Util;
 
@@ -41,11 +38,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 	public ImageButton attachButton;
 	private WeakReference<MessageAdapter.OnListviewItemActionListener> listenerRef;
 
-	public MessageCenterComposingActionBarView(final Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
-		super(activityContext);
+	public MessageCenterComposingActionBarView(final Fragment fragment, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
+		super(fragment.getContext());
 		this.listenerRef = new WeakReference<MessageAdapter.OnListviewItemActionListener>(listener);
 
-		LayoutInflater inflater = LayoutInflater.from(activityContext);
+		LayoutInflater inflater = LayoutInflater.from(fragment.getContext());
 		inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
 
 		View closeButton = findViewById(R.id.cancel_composing);
@@ -56,13 +53,14 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 					return;
 				}
 				if (showConfirmation) {
-					CloseConfirmationDialog editNameDialog = new CloseConfirmationDialog();
+					CloseConfirmationDialog closeComposingDialog = new CloseConfirmationDialog();
+					closeComposingDialog.setTargetFragment(fragment, 0);
 					Bundle bundle = new Bundle();
 					bundle.putString("STR_2", item.str_2);
 					bundle.putString("STR_3", item.str_3);
 					bundle.putString("STR_4", item.str_4);
-					editNameDialog.setArguments(bundle);
-					editNameDialog.show(((AppCompatActivity) activityContext).getSupportFragmentManager(), "CloseConfirmationDialog");
+					closeComposingDialog.setArguments(bundle);
+					closeComposingDialog.show(fragment.getFragmentManager(), "CloseConfirmationDialog");
 				} else {
 					locallistener.onCancelComposing();
 				}
@@ -90,7 +88,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		});
 
 		sendButton.setEnabled(false);
-		sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_icon,
+		sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(fragment.getContext(), R.attr.apptentive_material_disabled_icon,
 				R.color.apptentive_material_dark_disabled_icon));
 
 		attachButton = (ImageButton) findViewById(R.id.btn_attach_image);
@@ -122,9 +120,9 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									ActivityContent content = ((ViewActivity) getActivity()).getActivityContent();
-									if (content instanceof MessageAdapter.OnListviewItemActionListener) {
-										((MessageAdapter.OnListviewItemActionListener) content).onCancelComposing();
+									Fragment fragment = getTargetFragment();
+									if (fragment instanceof MessageAdapter.OnListviewItemActionListener) {
+										((MessageAdapter.OnListviewItemActionListener) fragment).onCancelComposing();
 									}
 									dialog.dismiss();
 								}

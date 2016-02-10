@@ -52,14 +52,6 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (fragmentType == ActivityContent.Type.INTERACTION) {
-
-					String interactionString;
-					if (savedInstanceState != null) {
-						bundle.putString(Interaction.KEY_NAME, savedInstanceState.getString(Interaction.JSON_STRING));
-						interactionString = savedInstanceState.getString(Interaction.JSON_STRING);
-					} else {
-						interactionString = getIntent().getExtras().getCharSequence(Interaction.KEY_NAME).toString();
-					}
 					applyApptentiveTheme(true);
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);

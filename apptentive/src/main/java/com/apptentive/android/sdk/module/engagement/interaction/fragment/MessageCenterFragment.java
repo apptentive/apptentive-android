@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewCompat;
 import android.text.Editable;
 import android.text.Layout;
@@ -32,6 +33,7 @@ import android.widget.ListView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -53,7 +55,6 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.WeakReferenceHandler;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -82,7 +83,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		ImageGridViewAdapter.Callback {
 
 	private MessageCenterInteraction interaction;
-	private boolean menuItemsPrepared;
 	private MenuItem profileMenuItem;
 
 	// keys used to save instance in the event of rotation
@@ -174,23 +174,26 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	}
 
 
-
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		if (contextualMessage != null || composingItem != null) {
+			hideFab();
+			hideProfileButton();
+		} else if (whoCardItem != null) {
+			hideFab();
+		}
 	}
 
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Bundle bundle = this.getArguments();
+		Bundle bundle = getArguments();
 
 		if (bundle != null) {
 			String interactionString = bundle.getString("interaction");
-			interaction = (MessageCenterInteraction)Interaction.Factory.parseInteraction(interactionString);
+			interaction = (MessageCenterInteraction) Interaction.Factory.parseInteraction(interactionString);
 			sectionTitle = interaction.getTitle();
-
 		}
 
 	}
@@ -198,9 +201,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.apptentive_message_center, container, false);
-
-		return v;
+		return inflater.inflate(R.layout.apptentive_message_center, container, false);
 	}
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
@@ -329,22 +330,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		return R.menu.apptentive_message_center;
 	}
 
-	protected void attachMenuListeners(Menu menu) {
+	@Override
+	protected void attachFragmentMenuListeners(Menu menu) {
 		profileMenuItem = menu.findItem(R.id.profile);
-
 		profileMenuItem.setOnMenuItemClickListener(this);
-		/*MenuItemCompat.getActionView(profileMenuItem).setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				onMenuItemClick(profileMenuItem);
-			}
-		});*/
-
-		menuItemsPrepared = true;
-
-		//refreshMenu();
 	}
 
-	protected void setup(View rootView) {
+	private void setup(View rootView) {
 		messageCenterListView = (ListView) rootView.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setOnScrollListener(this);
@@ -353,62 +345,69 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		}
 		((MessageCenterListView) messageCenterListView).setOnListViewResizeListener(this);
 		messageCenterListView.setItemsCanFocus(true);
-		final SharedPreferences prefs = viewActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		boolean showKeyboard = true;
+
 
 		fab = rootView.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				addComposingArea();
+				addComposerItems();
+				hideFab();
+				hideProfileButton();
 				messageCenterListAdapter.setForceShowKeyboard(true);
 				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
 		});
 
-
+		boolean showKeyboard = false;
 		if (messageCenterListAdapter == null) {
 			List<MessageCenterUtil.MessageCenterListItem> items = MessageManager.getMessageCenterListItems(viewActivity);
+			// populate message list from db
 			prepareMessages(items);
 
+
 			if (contextualMessage != null) {
-				addContextualMessage();
-				showKeyboard = false;
+				addContextualMessageItem();
 			}
 			/* Add composing
 			** if the user was in composing mode before roatation
 			 */
 			else if (composingViewSavedState != null) {
-				addComposingArea();
+				addComposerItems();
 			}
 			/* Add who card
 			** if the user was in composing Who card mode before roatation
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
-				addWhoCard(pendingWhoCardMode);
+				addWhoCardItem(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
 				if (messages.size() == 1) {
-					addComposingArea();
-					showKeyboard = false;
+					addComposerItems();
 				} else {
 					// Finally check if status message need to be restored
 					addExpectationStatusIfNeeded();
 				}
-			} else {
-				// Hide keyboard when Who Card is required and the 1st thing to show
-				showKeyboard = false;
 			}
 
 			updateMessageSentStates(); // Force timestamp recompilation.
-			messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(viewActivity, messages, this, interaction);
-			messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
-			messageCenterListView.setAdapter(messageCenterListAdapter);
-			if (listViewSavedTopIndex != -1) {
-				messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
+		}
+
+		if (composingItem != null) {
+			showKeyboard = true;
+			if (messages.size() == 3 || contextualMessage != null)
+			{
+				showKeyboard = false;
 			}
+		}
+
+		messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
+		messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
+		messageCenterListView.setAdapter(messageCenterListAdapter);
+		if (listViewSavedTopIndex != -1) {
+			messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
 		}
 	}
 
@@ -432,10 +431,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 				EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 
 				if (!bWhoCardSet) {
-					addWhoCard(WHO_CARD_MODE_INIT);
+					addWhoCardItem(WHO_CARD_MODE_INIT);
 				} else {
-					addWhoCard(WHO_CARD_MODE_EDIT);
+					addWhoCardItem(WHO_CARD_MODE_EDIT);
 				}
+				hideFab();
 				messageCenterListAdapter.setForceShowKeyboard(true);
 				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
@@ -443,6 +443,35 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		int index = messageCenterListView.getFirstVisiblePosition();
+		View v = messageCenterListView.getChildAt(0);
+		int top = (v == null) ? 0 : (v.getTop() - messageCenterListView.getPaddingTop());
+		outState.putInt(LIST_TOP_INDEX, index);
+		outState.putInt(LIST_TOP_OFFSET, top);
+		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
+		outState.putParcelable(WHO_CARD_NAME, messageCenterListAdapter.getWhoCardNameState());
+		outState.putParcelable(WHO_CARD_EMAIL, messageCenterListAdapter.getWhoCardEmailState());
+		outState.putString(WHO_CARD_AVATAR_FILE, messageCenterListAdapter.getWhoCardAvatarFileName());
+		outState.putInt(WHO_CARD_MODE, pendingWhoCardMode);
+		if (contextualMessage == null) {
+			interaction.clearContextualMessage();
+		}
+		super.onSaveInstanceState(outState);
+	}
+
+	public boolean onBackPressed() {
+		DialogFragment myFrag = (DialogFragment) (((ApptentiveViewActivity) viewActivity).getSupportFragmentManager()).findFragmentByTag("preview_dialog");
+		if (myFrag != null) {
+			myFrag.dismiss();
+		}
+		cleanup();
+		EngagementModule.engageInternal(viewActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+		return false;
+
 	}
 
 	public boolean cleanup() {
@@ -482,21 +511,19 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		}
 	}
 
-	public void addContextualMessage() {
+	public void addContextualMessageItem() {
 		// Clear any pending composing message to present an empty composing area
 		clearPendingComposingMessage();
-		clearStatus();
+		clearStatusItem();
 		messages.add(contextualMessage);
 		// If checkAddWhoCardIfRequired returns true, it will add WhoCard
 		if (!checkAddWhoCardIfRequired()) {
-			addComposingArea();
+			addComposerItems();
 		}
 	}
 
-	public void addComposingArea() {
-		hideFab();
-		hideProfileButton();
-		clearStatus();
+	public void addComposerItems() {
+		clearStatusItem();
 		actionBarItem = interaction.getComposerBar();
 		messages.add(actionBarItem);
 		composingItem = interaction.getComposerArea();
@@ -508,12 +535,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
 			if (!bWhoCardSet) {
-				addWhoCard(WHO_CARD_MODE_INIT);
+				addWhoCardItem(WHO_CARD_MODE_INIT);
 				return true;
 			} else {
 				String savedEmail = Apptentive.getPersonEmail(viewActivity);
 				if (TextUtils.isEmpty(savedEmail)) {
-					addWhoCard(WHO_CARD_MODE_EDIT);
+					addWhoCardItem(WHO_CARD_MODE_EDIT);
 					return true;
 				}
 			}
@@ -521,14 +548,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		return false;
 	}
 
-	public void addWhoCard(int mode) {
-		hideProfileButton();
+	public void addWhoCardItem(int mode) {
 		if (!interaction.getWhoCardRequestEnabled()) {
 			return;
 		}
 		pendingWhoCardMode = mode;
-		hideFab();
-		clearStatus();
+		clearStatusItem();
 		whoCardItem = (mode == WHO_CARD_MODE_INIT) ? interaction.getWhoCardInit()
 				: interaction.getWhoCardEdit();
 		messages.add(whoCardItem);
@@ -549,7 +574,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 				MessageCenterStatus newItem = interaction.getRegularStatus();
 				if (newItem != null && whoCardItem == null && composingItem == null) {
 					// Add expectation status message if the last is a sent
-					clearStatus();
+					clearStatusItem();
 					statusItem = newItem;
 					messages.add(newItem);
 					return true;
@@ -560,7 +585,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	}
 
 	public void addNewStatusItem(MessageCenterUtil.MessageCenterListItem item) {
-		clearStatus();
+		clearStatusItem();
 
 		if (composingItem != null) {
 			return;
@@ -573,7 +598,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	}
 
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
-		clearStatus();
+		clearStatusItem();
 
 		messages.add(message);
 		unsendMessagesCount++;
@@ -583,7 +608,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	}
 
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
-		clearStatus();
+		clearStatusItem();
 
 		// Determine where to insert the new incoming message. It will be in front of any eidting
 		// area, i.e. composing, Who Card ...
@@ -619,7 +644,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 
 	}
 
-	private void clearStatus() {
+	private void clearStatusItem() {
 		// Remove the status message whenever a new incoming message is added
 		if (statusItem != null) {
 			messages.remove(statusItem);
@@ -1075,7 +1100,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 						// when there was a contextual message or it was the first message. We need to resume composing
 						// after dismissing Who Card
 						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
-							addComposingArea();
+							addComposerItems();
 							messageCenterListAdapter.setForceShowKeyboard(true);
 							messagingActionHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
 						} else {
@@ -1309,10 +1334,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 
 	private void showProfileButton() {
 		//AnimationUtil.fadeIn(profileButton, null);
+		profileMenuItem.setVisible(true);
 	}
 
 	private void hideProfileButton() {
-		//AnimationUtil.fadeOutGone(profileButton);
+		profileMenuItem.setVisible(false);
 	}
 
 	/*
@@ -1477,7 +1503,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 						fragment.addExpectationStatusIfNeeded();
 					} else {
 						fragment.clearPendingComposingMessage();
-						fragment.clearStatus();
+						fragment.clearStatusItem();
 						fragment.messages.add(fragment.contextualMessage);
 						fragment.contextualMessage = null;
 					}
@@ -1514,7 +1540,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 							//
 						}
 						EngagementModule.engageInternal(fragment.viewActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-						fragment.addWhoCard(WHO_CARD_MODE_INIT);
+						fragment.addWhoCardItem(WHO_CARD_MODE_INIT);
 						fragment.messageCenterListAdapter.setForceShowKeyboard(true);
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
@@ -1545,7 +1571,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 					if (fragment.isPaused) {
 						fragment.isPaused = false;
 						if (fragment.unsendMessagesCount > 0) {
-							fragment.clearStatus();
+							fragment.clearStatusItem();
 						}
 
 						fragment.messageCenterListAdapter.setPaused(fragment.isPaused);

@@ -110,7 +110,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 				}
 
 				toolbar.inflateMenu(getMenuResourceId());
-				attachMenuListeners(toolbar.getMenu());
+				attachFragmentMenuListeners(toolbar.getMenu());
 				Menu menu = toolbar.getMenu();
 
 				fragmentMenuItems = new ArrayList();
@@ -152,7 +152,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(this.getMenuResourceId(), menu);
-		attachMenuListeners(menu);
+		attachFragmentMenuListeners(menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -170,7 +170,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 		return 0;
 	}
 
-	protected void attachMenuListeners(Menu menu) {}
+	protected void attachFragmentMenuListeners(Menu menu) {}
 
 	public Activity getActivity(Fragment fragment) {
 		if (fragment == null) {
