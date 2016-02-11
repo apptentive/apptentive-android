@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.EnjoymentDialogFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
@@ -30,7 +31,7 @@ public class FragmentFactory {
 						case UpgradeMessage:
 							break;
 						case EnjoymentDialog:
-							break;
+							return EnjoymentDialogFragment.newInstance(bundle);
 						case RatingDialog:
 							break;
 						case AppStoreRating:

@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class ApptentiveBaseFragment extends Fragment {
+public abstract class ApptentiveBaseFragment extends DialogFragment {
 
 
 	private final String fragmentName = getClass().getSimpleName();
@@ -52,6 +53,7 @@ public abstract class ApptentiveBaseFragment extends Fragment {
 	}
 
 	public boolean isChangingConfigurations() {
+		// When true, it indicates the fragment was destroyed then re-created again (as result of change in orientation )
 		return isChangingConfigurations;
 	}
 

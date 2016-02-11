@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -121,7 +122,10 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 				if (currentFragment.canShowToolBar()) {
 					toolbar.setVisibility(View.VISIBLE);
-					toolbar.setTitle(currentFragment.getTitle());
+					String title = currentFragment.getTitle();
+					if (!TextUtils.isEmpty(title)) {
+						toolbar.setTitle(title);
+					}
 				} else {
 					toolbar.setVisibility(View.GONE);
 				}
@@ -205,25 +209,11 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 	}
 
 	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
-		// A straightforward way to check if the app has default Theme.AppCompat theme specified for activities
-		int appcolorPrimaryDark = Util.getThemeColor(this, R.attr.colorPrimaryDark);
-		int statusBarDefaultColor = Util.getThemeColor(this, android.R.attr.statusBarColor);
-
-		Resources.Theme appDefaultTheme = getTheme();
-		// Force to apply Apptentive non-frame window style
-		appDefaultTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
-		/* When no colorPrimaryDark is defined, it indicates ViewActivity has no default Theme.AppCompat attributes
-		 * specified by the app, just apply the default ApptentiveTheme (2nd parameter is true);
-		 * If app has a default material theme, the ApptentiveTheme attributes will only be used if not already
-		 * defined in the app default theme (2nd parameter is false).
-		*/
-		appDefaultTheme.applyStyle(R.style.ApptentiveTheme, (appcolorPrimaryDark == 0));
-
-		// Finally, force to apply possible Apptentive attributes override defined by the app
-		appDefaultTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
-
-		if (!isFullScreenInteraction) {
-			setStatusBarColor(statusBarDefaultColor);
+		if (ApptentiveInternal.apptentiveTheme != null) {
+			getTheme().setTo(ApptentiveInternal.apptentiveTheme);
+			if (!isFullScreenInteraction) {
+				setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
+			}
 		}
 
 	}
