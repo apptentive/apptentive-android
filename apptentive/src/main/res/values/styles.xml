@@ -67,6 +67,12 @@
         <item name="apptentiveFabStyle">@style/ApptentiveWidget.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
 
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
     </style>
 
 
@@ -78,11 +84,11 @@
         <item name="android:windowBackground">@color/apptentive_activity_frame</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:backgroundDimEnabled">false</item>
         <item name="windowActionBarOverlay">false</item>
         <item name="windowActionModeOverlay">false</item>
         <item name="actionBarPopupTheme">@null</item>
         <item name="actionBarTheme">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
     </style>
 
     <!-- Default theme used by image preview -->
