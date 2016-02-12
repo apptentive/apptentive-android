@@ -5,18 +5,19 @@
  */
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
@@ -36,7 +37,11 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.apptentive_enjoyment_dialog_interaction, container, false);
+		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
+		// clone the inflater using the ContextThemeWrapper
+		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
+		View v = themedInflater.inflate(R.layout.apptentive_enjoyment_dialog_interaction, container, false);
 		TextView bodyView = (TextView) v.findViewById(R.id.title);
 		String body = interaction.getTitle(getContext());
 		bodyView.setText(body);
