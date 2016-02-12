@@ -3,6 +3,7 @@
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
+
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.content.Context;
@@ -33,6 +34,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
 		enjoymentFragment.setArguments(bundle);
 		return enjoymentFragment;
 	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

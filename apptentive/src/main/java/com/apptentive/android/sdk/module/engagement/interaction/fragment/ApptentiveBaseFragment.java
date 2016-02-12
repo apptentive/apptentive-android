@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 
@@ -5,6 +11,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -13,6 +21,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +34,7 @@ import android.widget.FrameLayout;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.lang.reflect.Field;
@@ -41,8 +51,9 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 	private Toolbar toolbar = null;
 	private List fragmentMenuItems = null;
 	private boolean isChangingConfigurations;
-	private boolean bShowToolBar;
+	private boolean bShownAsModel;
 	protected String sectionTitle;
+
 
 	public FragmentManager getRetainedChildFragmentManager() {
 		if (retainedChildFragmentManager == null) {
@@ -87,22 +98,19 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		Bundle bundle = getArguments();
 
 		if (bundle != null) {
-			toolbarLayoutId = bundle.getInt("toolbarLayoutId");
+			toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
+			bShownAsModel = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
 		}
 
 		if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {
 			setHasOptionsMenu(true);
-			bShowToolBar = true;
-		} else {
-			bShowToolBar = false;
 		}
-
 	}
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		if (toolbarLayoutId != 0) {
-			toolbar = (Toolbar) this.getActivity().findViewById(this.toolbarLayoutId);
+			toolbar = (Toolbar) this.getActivity().findViewById(toolbarLayoutId);
 			if (getMenuResourceId() != 0) {
 				Menu parentMenu = toolbar.getMenu();
 				ArrayList parentMenuItems = new ArrayList();
@@ -127,6 +135,9 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 			}
 		}
 
+		if (bShownAsModel) {
+				setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
+		}
 	}
 
 	public void onStop() {
@@ -162,7 +173,7 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		Bundle bundle = new Bundle();
 
 		if (toolbarLayoutId != 0) {
-			bundle.putInt("toolbarLayoutId", toolbarLayoutId);
+			bundle.putInt(Constants.FragmentConfigKeys.TOOLBAR_ID, toolbarLayoutId);
 		}
 
 		return bundle;
@@ -186,8 +197,8 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		}
 	}
 
-	public boolean canShowToolBar() {
-		return bShowToolBar;
+	public boolean isShownAsModelDialog() {
+		return bShownAsModel;
 	}
 
 	public String getTitle() {
@@ -294,4 +305,27 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		fragmentManager.beginTransaction().remove(fragment).commit();
 	}
 
+	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
+	 * It is the default status color alpha blended with the Apptentive translucent
+	* color apptentive_activity_frame
+	* @param statusBarDefaultColor the default activity status bar color specified by the app
+	*/
+	private void setStatusBarColor(int statusBarDefaultColor) {
+		// Changing status bar color is a post-21 feature
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Resources.Theme newTheme = getResources().newTheme();
+			newTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
+			TypedArray a = newTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+			int statusBarColorOveride;
+			try {
+				// Use android:statusBarColor specified in ApptentiveThemeOverride
+				statusBarColorOveride = a.getColor(0, statusBarDefaultColor);
+			} finally {
+				a.recycle();
+			}
+
+			int overlayColor = ContextCompat.getColor(getContext(), R.color.apptentive_activity_frame);
+			getActivity().getWindow().setStatusBarColor(Util.alphaMixColors(statusBarColorOveride, overlayColor));
+		}
+	}
 }

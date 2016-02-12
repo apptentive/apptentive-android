@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -110,6 +110,11 @@ public class Constants {
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
 
 
+	public interface FragmentConfigKeys {
+
+		String TOOLBAR_ID = "toolbarLayoutId";
+		String MODAL = "showAsModal";
+	}
 
 
 	/**

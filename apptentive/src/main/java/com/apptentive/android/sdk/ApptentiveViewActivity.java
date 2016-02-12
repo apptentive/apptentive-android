@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.model.FragmentFactory;
@@ -46,16 +49,16 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 		try {
 			Bundle bundle = getIntent().getExtras();
 			String fragmentTypeString = bundle.getString(ActivityContent.KEY);
-			Interaction interaction;
+
 			if (fragmentTypeString != null) {
 				fragmentType = ActivityContent.Type.parse(fragmentTypeString);
 				if (fragmentType == ActivityContent.Type.ABOUT) {
 					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
 					setTheme(R.style.ApptentiveTheme_About);
 				} else if (fragmentType == ActivityContent.Type.INTERACTION) {
-					applyApptentiveTheme(true);
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
+					applyApptentiveTheme(!newFragment.isShownAsModelDialog());
 				}
 
 				super.onCreate(savedInstanceState);
@@ -120,7 +123,7 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 			@Override
 			public void onPageSelected(int position) {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
-				if (currentFragment.canShowToolBar()) {
+				if (!currentFragment.isShownAsModelDialog()) {
 					toolbar.setVisibility(View.VISIBLE);
 					String title = currentFragment.getTitle();
 					if (!TextUtils.isEmpty(title)) {
@@ -147,10 +150,6 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 		};
 
 		viewPager.addOnPageChangeListener(pageChangeListener);
-
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
-		window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
 	}
 
 	@Override
@@ -211,34 +210,6 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
 		if (ApptentiveInternal.apptentiveTheme != null) {
 			getTheme().setTo(ApptentiveInternal.apptentiveTheme);
-			if (!isFullScreenInteraction) {
-				setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
-			}
-		}
-
-	}
-
-	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
-	 * It is the default status color alpha blended with the Apptentive translucent
-	* color apptentive_activity_frame
-	* @param statusBarDefaultColor the default activity status bar color specified by the app
-	*/
-	private void setStatusBarColor(int statusBarDefaultColor) {
-		// Changing status bar color is a post-21 feature
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Resources.Theme newTheme = getResources().newTheme();
-			newTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
-			TypedArray a = newTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
-			int statusBarColorOveride;
-			try {
-				// Use android:statusBarColor specified in ApptentiveThemeOverride
-				statusBarColorOveride = a.getColor(0, statusBarDefaultColor);
-			} finally {
-				a.recycle();
-			}
-
-			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame);
-			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarColorOveride, overlayColor));
 		}
 	}
 
