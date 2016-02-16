@@ -82,14 +82,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-public class MessageCenterFragment extends ApptentiveBaseFragment implements OnMenuItemClickListener, MessageManager.AfterSendMessageListener,
+public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements OnMenuItemClickListener, MessageManager.AfterSendMessageListener,
 		MessageAdapter.OnListviewItemActionListener,
 		MessageManager.OnNewIncomingMessagesListener,
 		AbsListView.OnScrollListener,
 		MessageCenterListView.OnListviewResizeListener,
 		ImageGridViewAdapter.Callback {
 
-	private MessageCenterInteraction interaction;
 	private MenuItem profileMenuItem;
 
 	// keys used to save instance in the event of rotation
@@ -208,12 +207,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 		pendingWhoCardMode = (savedInstanceState == null) ? 0 :
 				savedInstanceState.getInt(WHO_CARD_MODE);
 
-
-		Bundle bundle = getArguments();
-
-		if (bundle != null) {
-			String interactionString = bundle.getString("interaction");
-			interaction = (MessageCenterInteraction) Interaction.Factory.parseInteraction(interactionString);
+		if (interaction != null) {
 			sectionTitle = interaction.getTitle();
 			String contextualMessageBody = interaction.getContextualMessageBody();
 			contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
@@ -253,7 +247,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment implements OnM
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-		setRetainInstance(true);
+
 		hostingActivity = (Activity) context;
 		messagingActionHandler = new MessageCenterFragment.MessagingActionHandler(this);
 	}

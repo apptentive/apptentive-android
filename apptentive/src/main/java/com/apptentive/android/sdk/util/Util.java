@@ -432,11 +432,7 @@ public class Util {
 	public static Drawable getCompatDrawable(Context c, int drawableRes) {
 		Drawable d = null;
 		try {
-			if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-				d = c.getResources().getDrawable(drawableRes);
-			} else {
-				d = c.getResources().getDrawable(drawableRes, c.getTheme());
-			}
+			d = ContextCompat.getDrawable(c, drawableRes);
 		} catch (Exception ex) {
 		}
 		return d;

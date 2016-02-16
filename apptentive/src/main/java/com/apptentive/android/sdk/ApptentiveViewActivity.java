@@ -6,13 +6,11 @@
 
 package com.apptentive.android.sdk;
 
+
 import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
+
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -26,12 +24,11 @@ import com.apptentive.android.sdk.model.FragmentFactory;
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.util.Util;
 
 
-public class ApptentiveViewActivity extends AppCompatActivity {
+
+public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 
 	private ActivityContent.Type fragmentType;
 
@@ -58,7 +55,10 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 				} else if (fragmentType == ActivityContent.Type.INTERACTION) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
-					applyApptentiveTheme(!newFragment.isShownAsModelDialog());
+					if (newFragment != null) {
+						newFragment.setOnTransitionListener(this);
+						applyApptentiveTheme(!newFragment.isShownAsModelDialog());
+					}
 				}
 
 				super.onCreate(savedInstanceState);
@@ -194,6 +194,26 @@ public class ApptentiveViewActivity extends AppCompatActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		overridePendingTransition(R.anim.slide_up_in, 0);
+	}
+
+	@Override
+	public void onFragmentTransition(ApptentiveBaseFragment currentFragment) {
+		if (currentFragment != null) {
+			int numberOfPages = viewPager_Adapter.getCount();
+			for (int i = 0; i< numberOfPages; ++i) {
+				ApptentiveBaseFragment fragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(i);
+				if (currentFragment == fragment) {
+					if (numberOfPages == 1) {
+						finish();
+					} else {
+						currentFragment.dismiss();
+						viewPager_Adapter.removeItem(i);
+						viewPager_Adapter.notifyDataSetChanged();
+					}
+					return;
+				}
+			}
+		}
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {

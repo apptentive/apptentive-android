@@ -34,6 +34,7 @@ import android.widget.FrameLayout;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -42,8 +43,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class ApptentiveBaseFragment extends DialogFragment {
+public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment {
 
+
+	private static final String HAS_LAUNCHED = "has_launched";
 
 	private final String fragmentName = getClass().getSimpleName();
 	private FragmentManager retainedChildFragmentManager;
@@ -52,8 +55,17 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 	private List fragmentMenuItems = null;
 	private boolean isChangingConfigurations;
 	private boolean bShownAsModel;
+
+	protected T interaction;
+	protected boolean hasLaunched;
 	protected String sectionTitle;
 
+	private OnFragmentTransitionListener onTransitionListener;
+
+
+	public interface OnFragmentTransitionListener {
+		void onFragmentTransition(ApptentiveBaseFragment currentFragment);
+	}
 
 	public FragmentManager getRetainedChildFragmentManager() {
 		if (retainedChildFragmentManager == null) {
@@ -61,6 +73,10 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		}
 
 		return retainedChildFragmentManager;
+	}
+
+	public String getFragmentName() {
+		return fragmentName;
 	}
 
 	public boolean isChangingConfigurations() {
@@ -73,6 +89,17 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		return context != null ? context : ApptentiveInternal.getApplicationContext();
 	}
 
+	public void setOnTransitionListener(OnFragmentTransitionListener onTransitionListener) {
+		this.onTransitionListener = onTransitionListener;
+	}
+
+	public void transit() {
+		if (onTransitionListener != null) {
+			onTransitionListener.onFragmentTransition(this);
+		}
+	}
+
+	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
 		if (ApptentiveInternal.getApplicationContext() == null) {
@@ -91,19 +118,37 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 			}
 		}
 
+		// not create new fragment (onCreate() won't be called) when configuration changes, i.e. rotation
+		setRetainInstance(true);
+
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		Bundle bundle = getArguments();
 
 		if (bundle != null) {
 			toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
 			bShownAsModel = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
+			String interactionString = bundle.getString("interaction");
+			interaction = (T) Interaction.Factory.parseInteraction(interactionString);
+		}
+
+		if (bShownAsModel) {
+			sectionTitle = null;
 		}
 
 		if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {
 			setHasOptionsMenu(true);
+		}
+
+		if (savedInstanceState != null) {
+			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
+		}
+		if (!hasLaunched) {
+			hasLaunched = true;
+			interaction.sendLaunchEvent(getActivity());
 		}
 	}
 
@@ -136,7 +181,7 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 		}
 
 		if (bShownAsModel) {
-				setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
+			setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
 		}
 	}
 
@@ -264,8 +309,7 @@ public abstract class ApptentiveBaseFragment extends DialogFragment {
 
 		if (pager != null) {
 			if (visible) {
-				Drawable shadow = getResources().getDrawable(R.drawable.apptentive_actionbar_compat_shadow);
-
+				Drawable shadow = ContextCompat.getDrawable(getContext(), R.drawable.apptentive_actionbar_compat_shadow);
 				pager.setForeground(shadow);
 			} else {
 				pager.setForeground(new ColorDrawable(0));

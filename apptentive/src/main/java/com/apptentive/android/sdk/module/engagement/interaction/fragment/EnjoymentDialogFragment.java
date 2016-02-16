@@ -21,13 +21,11 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentD
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
-public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
+public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> {
 
 	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_YES = "yes";
 	private static final String CODE_POINT_NO = "no";
-
-	private EnjoymentDialogInteraction interaction;
 
 	public static EnjoymentDialogFragment newInstance(Bundle bundle) {
 		EnjoymentDialogFragment enjoymentFragment = new EnjoymentDialogFragment();
@@ -58,6 +56,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
 			@Override
 			public void onClick(View view) {
 				EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_NO);
+				transit();
 			}
 		});
 
@@ -71,20 +70,10 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment {
 			@Override
 			public void onClick(View view) {
 				EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_YES);
+				transit();
 			}
 		});
 		return v;
-	}
-
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Bundle bundle = getArguments();
-
-		if (bundle != null) {
-			String interactionString = bundle.getString("interaction");
-			interaction = (EnjoymentDialogInteraction) Interaction.Factory.parseInteraction(interactionString);
-			sectionTitle = null;
-		}
 	}
 
 	@Override

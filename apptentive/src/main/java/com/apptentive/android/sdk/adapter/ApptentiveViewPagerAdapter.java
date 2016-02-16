@@ -11,6 +11,7 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.view.ViewGroup;
 
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
@@ -29,7 +30,8 @@ public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {
 	public Object instantiateItem(ViewGroup container, int position) {
 		ApptentiveBaseFragment fragment = (ApptentiveBaseFragment) super.instantiateItem(container, position);
 		fragments.set(position, fragment);
-		return fragment;
+		tabTitles.set(position, fragment.getTitle());
+		return getItem(position);
 	}
 
 	@Override
@@ -48,9 +50,17 @@ public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {
 	}
 
 
+	public void removeItem(int position) {
+		if (position <= getCount()) {
+			fragments.remove(position);
+			tabTitles.remove(position);
+		}
+	}
+
 	public void add(ApptentiveBaseFragment f, String title) {
 		fragments.add(f);
 		tabTitles.add(title);
 	}
+
 
 }

@@ -10,9 +10,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.module.ActivityContent;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.AppStoreRatingFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.EnjoymentDialogFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.NavigateToLinkFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.NoteFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.RatingDialogFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.UpgradeMessageFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants.FragmentConfigKeys;
 
@@ -38,7 +43,7 @@ public class FragmentFactory {
 							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
 								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							}
-							break;
+							return UpgradeMessageFragment.newInstance(bundle);
 						case EnjoymentDialog:
 							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
 								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
@@ -48,12 +53,10 @@ public class FragmentFactory {
 							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
 								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							}
-							break;
+							return RatingDialogFragment.newInstance(bundle);
 						case AppStoreRating:
-							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
-								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
-							}
-							break;
+							bundle.putBoolean(FragmentConfigKeys.MODAL, true);
+							return AppStoreRatingFragment.newInstance(bundle);
 						case Survey:
 							break;
 						case MessageCenter:
@@ -62,9 +65,10 @@ public class FragmentFactory {
 							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
 								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							}
-							break;
+							return NoteFragment.newInstance(bundle);
 						case NavigateToLink:
-							break;
+							bundle.putBoolean(FragmentConfigKeys.MODAL, true);
+							return NavigateToLinkFragment.newInstance(bundle);
 						default:
 							break;
 					}
