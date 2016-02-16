@@ -14,6 +14,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -61,6 +63,8 @@ import java.util.Map;
  */
 public class ApptentiveInternal {
 
+	private static final Object lock = new Object();
+
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	public static Context appContext;
 	public static boolean appIsInForeground;
@@ -72,6 +76,8 @@ public class ApptentiveInternal {
 	public static String personId;
 	public static String androidId;
 	public static String appPackageName;
+	public static Resources.Theme apptentiveTheme;
+	public static int statusBarColorDefault;
 	public static String defaultAppDisplayName = "this app";
 
 	private static IRatingProvider ratingProvider;
@@ -94,6 +100,21 @@ public class ApptentiveInternal {
 				Log.d("Error parsing unknown PushAction: " + name);
 			}
 			return unknown;
+		}
+	}
+
+	public static Context getApplicationContext() {
+		return appContext;
+	}
+
+	public static void setApplicationContext(Context c) {
+		Object object = ApptentiveInternal.lock;
+
+		synchronized (ApptentiveInternal.lock) {
+			if (ApptentiveInternal.appContext == null) {
+				ApptentiveInternal.appContext = c;
+			}
+
 		}
 	}
 
@@ -162,6 +183,25 @@ public class ApptentiveInternal {
 					}
 				}
 			}
+
+			// Set up apptentive theme by applying default from Apptentive, app, and custom override
+			int appDefaultThemeId = ai.theme;
+			apptentiveTheme = appContext.getResources().newTheme();
+			apptentiveTheme.applyStyle(R.style.ApptentiveTheme, true);
+			if (appDefaultThemeId != 0) {
+					Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
+					appDefaultTheme.applyStyle(appDefaultThemeId, true);
+					TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+
+					try {
+						statusBarColorDefault = a.getColor(0, 0);
+					} finally {
+						a.recycle();
+					}
+				apptentiveTheme.applyStyle(appDefaultThemeId, true);
+			}
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
+			apptentiveTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
 
 		} catch (Exception e) {
 			Log.e("Unexpected error while reading application or package info.", e);

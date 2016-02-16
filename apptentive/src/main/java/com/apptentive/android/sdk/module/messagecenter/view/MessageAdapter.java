@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -86,7 +87,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	// If message sending is paused or not
 	private boolean isInPauseState = false;
 
-	private Context activityContext;
+	private Fragment fragment;
 
 	private MessageCenterInteraction interaction;
 
@@ -144,10 +145,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		void onClickAttachment(int position, ImageItem image);
 	}
 
-	public MessageAdapter(Context activityContext, List<MessageCenterListItem> items, OnListviewItemActionListener listener, MessageCenterInteraction interaction) {
-		super(activityContext, 0, (List<T>) items);
-		this.activityContext = activityContext;
-		this.composingActionListener = listener;
+	public MessageAdapter(Fragment fragment, List<MessageCenterListItem> items, MessageCenterInteraction interaction) {
+		super(fragment.getContext(), 0, (List<T>) items);
+		this.fragment = fragment;
+		this.composingActionListener = (OnListviewItemActionListener) fragment;
 		this.interaction = interaction;
 	}
 
@@ -227,7 +228,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(fragment.getContext(), (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					view = composingView;
@@ -235,7 +236,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_COMPOSING_BAR: {
 					if (composingActionBarView == null) {
-						composingActionBarView = new MessageCenterComposingActionBarView(activityContext, (MessageCenterComposingItem) listItem, composingActionListener);
+						composingActionBarView = new MessageCenterComposingActionBarView(fragment, (MessageCenterComposingItem) listItem, composingActionListener);
 					}
 					showComposingBarAnimation();
 					view = composingActionBarView;
@@ -243,9 +244,9 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
-						whoCardView = new MessageCenterWhoCardView(activityContext, composingActionListener);
-						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(activityContext),
-								Apptentive.getPersonEmail(activityContext));
+						whoCardView = new MessageCenterWhoCardView(fragment.getContext(), composingActionListener);
+						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(fragment.getContext()),
+								Apptentive.getPersonEmail(fragment.getContext()));
 						setupWhoCardView(position);
 					}
 					view = whoCardView;
@@ -279,8 +280,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			} else if (type == TYPE_WHOCARD) {
 				if (whoCardView == null) {
 					whoCardView = (MessageCenterWhoCardView) convertView;
-					whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(activityContext),
-							Apptentive.getPersonEmail(activityContext));
+					whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(fragment.getContext()),
+							Apptentive.getPersonEmail(fragment.getContext()));
 					setupWhoCardView(position);
 				}
 				view = whoCardView;
@@ -310,7 +311,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					int viewWidth = container.getMeasuredWidth();
 					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
 							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
-							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
+							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
 							compoundMessage.getRemoteAttachments());
 					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
@@ -324,7 +325,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					CompoundMessage textMessage = (CompoundMessage) listItem;
 					String datestamp = textMessage.getDatestamp();
 					Double createdTime = textMessage.getCreatedAt();
-					List<StoredFile> files = textMessage.getAssociatedFiles(activityContext);
+					List<StoredFile> files = textMessage.getAssociatedFiles(fragment.getContext());
 					String messageBody = textMessage.getBody();
 					String status;
 					boolean bShowProgress;
@@ -333,7 +334,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 						// show progress bar if: 1. no sent time set, and 2. not paused, and 3. have either text or files to sent
 						bShowProgress = createdTime == null && !isInPauseState && (files != null || !TextUtils.isEmpty(messageBody));
 					} else {
-						status = activityContext.getResources().getString(R.string.apptentive_failed);
+						status = fragment.getResources().getString(R.string.apptentive_failed);
 						bShowProgress = false;
 					}
 					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
@@ -343,7 +344,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
 							bShowProgress, messageBody, viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
-							activityContext.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
+							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
 					break;
 				}
 				case TYPE_STATUS: {
@@ -484,7 +485,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			@Override
 			public void onAnimationEnd(Animator animation) {
 				if (forceShowKeyboard) {
-					Util.showSoftKeyboard((Activity) activityContext, composingEditText);
+					Util.showSoftKeyboard(fragment.getActivity(), composingEditText);
 				}
 				if (updateComposingViewImageBand) {
 					updateComposingViewImageBand = false;
@@ -556,9 +557,9 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			public void onAnimationEnd(Animator animation) {
 				if (forceShowKeyboard) {
 					if (focusOnNameField) {
-						Util.showSoftKeyboard((Activity) activityContext, nameEditText);
+						Util.showSoftKeyboard(fragment.getActivity(), nameEditText);
 					} else {
-						Util.showSoftKeyboard((Activity) activityContext, emailEditText);
+						Util.showSoftKeyboard(fragment.getActivity(), emailEditText);
 					}
 				}
 			}
@@ -610,19 +611,19 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 	protected String createStatus(Double seconds, boolean showSent) {
 		if (seconds == null) {
-			return isInPauseState ? activityContext.getResources().getString(R.string.apptentive_failed) : null;
+			return isInPauseState ? fragment.getResources().getString(R.string.apptentive_failed) : null;
 		}
-		return (showSent) ? activityContext.getResources().getString(R.string.apptentive_sent) : null;
+		return (showSent) ? fragment.getResources().getString(R.string.apptentive_sent) : null;
 	}
 
 	protected int getStatusColor(Double seconds) {
 		if (seconds == null) {
 			// failed color (red)
-			return isInPauseState ? Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_selected_text,
+			return isInPauseState ? Util.getThemeColorFromAttrOrRes(fragment.getContext(), R.attr.apptentive_material_selected_text,
 					R.color.apptentive_material_selected_text) : 0;
 		}
 		// other status color
-		return Util.getThemeColorFromAttrOrRes(activityContext, R.attr.apptentive_material_disabled_text,
+		return Util.getThemeColorFromAttrOrRes(fragment.getContext(), R.attr.apptentive_material_disabled_text,
 				R.color.apptentive_material_disabled_text);
 	}
 
@@ -630,13 +631,13 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		Point ret = null;
 		FileInputStream fis = null;
 		try {
-			fis = activityContext.openFileInput(storedFile.getLocalFilePath());
+			fis = fragment.getContext().openFileInput(storedFile.getLocalFilePath());
 
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
 			BitmapFactory.decodeStream(fis, null, options);
 
-			Point point = Util.getScreenSize(activityContext.getApplicationContext());
+			Point point = Util.getScreenSize(fragment.getContext());
 			int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 			int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 			maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
@@ -682,11 +683,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			} catch (JSONException e) {
 				//
 			}
-			if (activityContext instanceof Activity) {
-				EngagementModule.engageInternal((Activity) activityContext, interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
-			}
-			MessageManager.updateMessage(activityContext.getApplicationContext(), textMessages[0]);
-			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(activityContext.getApplicationContext()));
+			EngagementModule.engageInternal(fragment.getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+
+			MessageManager.updateMessage(fragment.getActivity().getApplicationContext(), textMessages[0]);
+			MessageManager.notifyHostUnreadMessagesListeners(MessageManager.getUnreadMessageCount(fragment.getActivity().getApplicationContext()));
 			return null;
 		}
 
@@ -703,7 +703,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	private void startLoadAttachedImageTask(CompoundMessage message, int position, OutgoingCompoundMessageHolder holder) {
-		List<StoredFile> storedFiles = message.getAssociatedFiles(activityContext.getApplicationContext());
+		List<StoredFile> storedFiles = message.getAssociatedFiles(fragment.getActivity().getApplicationContext());
 		if (storedFiles == null || storedFiles.size() == 0) {
 			return;
 		}
@@ -745,13 +745,13 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		protected Bitmap doInBackground(String... paths) {
 			Bitmap imageBitmap = null;
 			try {
-				Point point = Util.getScreenSize(activityContext.getApplicationContext());
+				Point point = Util.getScreenSize(fragment.getActivity().getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
-				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(activityContext, paths[0], maxImageWidth, maxImageHeight, null, 0);
+				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(fragment.getContext(), paths[0], maxImageWidth, maxImageHeight, null, 0);
 				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
 				Log.e("Error opening stored image.", e);

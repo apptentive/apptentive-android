@@ -25,7 +25,6 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
@@ -90,12 +89,11 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 								activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
 								break;
 							case Survey:
-								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 								applyApptentiveTheme(false);
+								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 								break;
 							case MessageCenter:
 								applyApptentiveTheme(true);
-								activityContent = new MessageCenterActivityContent((MessageCenterInteraction) interaction);
 								break;
 							case TextModal:
 								applyApptentiveTheme(false);
@@ -155,9 +153,6 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 		if (activeContentType == null) {
 			finish();
 		}
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
-		window.addFlags(WindowManager.LayoutParams.FLAG_DITHER);
 	}
 
 	@Override
@@ -301,24 +296,11 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 	}
 
 	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
-		// A straightforward way to check if the app has default Theme.AppCompat theme specified for activities
-		int appcolorPrimaryDark = Util.getThemeColor(this, R.attr.colorPrimaryDark);
-		int statusBarDefaultColor = Util.getThemeColor(this, android.R.attr.statusBarColor);
-
-		Resources.Theme appDefaultTheme = getTheme();
-				/* When no colorPrimaryDark is defined, it indicates ViewActivity has no default Theme.AppCompat attributes
-				 * specified by the app, just apply the default ApptentiveTheme (2nd parameter is true);
-				 * If app has a default material theme, the ApptentiveTheme attributes will only be used if not already
-				 * defined in the app default theme (2nd parameter is false).
-				*/
-		appDefaultTheme.applyStyle(R.style.ApptentiveTheme, (appcolorPrimaryDark == 0));
-		// Next, force to apply Apptentive non-frame window style
-		appDefaultTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
-		// Finally, force to apply possible Apptentive attributes override defined by the app
-		appDefaultTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
-
-		if (!isFullScreenInteraction) {
-				setStatusBarColor(statusBarDefaultColor);
+		if (ApptentiveInternal.apptentiveTheme != null) {
+			getTheme().setTo(ApptentiveInternal.apptentiveTheme);
+			if (!isFullScreenInteraction) {
+				setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
+			}
 		}
 	}
 
