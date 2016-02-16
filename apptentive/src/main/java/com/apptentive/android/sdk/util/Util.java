@@ -136,9 +136,8 @@ public class Util {
 		return Math.round(px / scale);
 	}
 
-	public static int dipsToPixels(Context context, int dp) {
-		final float scale = context.getResources().getDisplayMetrics().density;
-		return Math.round(dp * scale);
+	public static float dipsToPixels(Context context, float dp) {
+		return context.getResources().getDisplayMetrics().density * dp;
 	}
 
 	public static float dipsToPixelsFloat(Context context, int dp) {
@@ -433,11 +432,7 @@ public class Util {
 	public static Drawable getCompatDrawable(Context c, int drawableRes) {
 		Drawable d = null;
 		try {
-			if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-				d = c.getResources().getDrawable(drawableRes);
-			} else {
-				d = c.getResources().getDrawable(drawableRes, c.getTheme());
-			}
+			d = ContextCompat.getDrawable(c, drawableRes);
 		} catch (Exception ex) {
 		}
 		return d;
