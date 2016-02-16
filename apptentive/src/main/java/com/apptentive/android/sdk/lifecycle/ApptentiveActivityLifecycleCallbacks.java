@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
@@ -26,8 +27,12 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	private int runningActivities;
 	private int foregroundActivities;
 
+	private Runnable checkFgBgRoutine;
+	private boolean isAppForeground = false, paused = true;
+	private Handler handler = new Handler();
+
 	public ApptentiveActivityLifecycleCallbacks(Application application) {
-		this.appContext = application;
+		appContext = application;
 	}
 
 	@Override
@@ -48,9 +53,19 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityResumed(Activity activity) {
 		Log.e("onActivityResumed(%s)", activity.toString());
-		if (foregroundActivities == 0) {
-			appWentToForeground();
+		paused = false;
+		boolean wasAppBackground = !isAppForeground;
+		isAppForeground = true;
+
+		if (checkFgBgRoutine != null)
+			handler.removeCallbacks(checkFgBgRoutine);
+
+		if (wasAppBackground && foregroundActivities == 0) {
+			appBecomeForeground();
+		} else {
+			Log.d("application is still in foreground");
 		}
+
 		foregroundActivities++;
 		Log.e("==> Foreground Activities: %d", foregroundActivities);
 		MessageManager.setCurrentForgroundActivity(activity);
@@ -59,17 +74,37 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityPaused(Activity activity) {
 		Log.e("onActivityPaused(%s)", activity.toString());
-		MessageManager.setCurrentForgroundActivity(null);
+
+		paused = true;
 
 		foregroundActivities--;
 		if (foregroundActivities < 0) {
 			Log.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities = 0;
 		}
-		if (foregroundActivities == 0) {
-			appWentToBackground();
-		}
 		Log.e("==> Foreground Activities: %d", foregroundActivities);
+
+		if (checkFgBgRoutine != null) {
+			handler.removeCallbacks(checkFgBgRoutine);
+		}
+      /* When one activity transits to another one, there is a brief period durong which the former
+      * is paused but the latter has not yet resumed. To prevent flase negative, check rountine is
+      * conducted delayed
+      */
+		handler.postDelayed(checkFgBgRoutine = new Runnable() {
+			@Override
+			public void run() {
+				if (isAppForeground && paused && foregroundActivities == 0) {
+					isAppForeground = false;
+					appBecomeBackground();
+				} else {
+					Log.d("application is still in foreground");
+				}
+			}
+		}, 500);
+
+		MessageManager.setCurrentForgroundActivity(null);
+
 	}
 
 	@Override
@@ -96,14 +131,14 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		Log.e("==> Running Activities:    %d", runningActivities);
 	}
 
-	private void appWentToForeground() {
+	private void appBecomeForeground() {
 		Log.e("App went to foreground.");
 		ApptentiveInternal.appIsInForeground = true;
 		PayloadSendWorker.appWentToForeground(appContext);
 		MessagePollingWorker.appWentToForeground(appContext);
 	}
 
-	private void appWentToBackground() {
+	private void appBecomeBackground() {
 		Log.e("App went to background.");
 		ApptentiveInternal.appIsInForeground = false;
 		PayloadSendWorker.appWentToBackground();
