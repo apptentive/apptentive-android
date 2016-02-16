@@ -155,6 +155,11 @@ public class FieldManager {
 							return customData.opt(customDataKey);
 						}
 						break;
+					case os_version:
+						String osVersion = device.optString(subQuery.name(), "0");
+						Apptentive.Version ret = new Apptentive.Version();
+						ret.setVersion(osVersion);
+						return ret;
 					case board:
 					case bootloader_version:
 					case brand:
@@ -172,7 +177,6 @@ public class FieldManager {
 					case model:
 					case network_type:
 					case os_name:
-					case os_version:
 					case os_build:
 					case product:
 					case radio_version:
