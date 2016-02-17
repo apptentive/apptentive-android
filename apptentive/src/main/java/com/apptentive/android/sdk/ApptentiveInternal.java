@@ -32,6 +32,7 @@ import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -55,6 +56,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
@@ -83,6 +85,7 @@ public class ApptentiveInternal {
 	private static IRatingProvider ratingProvider;
 	private static Map<String, String> ratingProviderArgs;
 	private static WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
+	public static final LinkedBlockingQueue configUpdateListeners = new LinkedBlockingQueue();
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private static Map<String, Object> customData;
@@ -118,15 +121,18 @@ public class ApptentiveInternal {
 		}
 	}
 
-	public static void onAppLaunch(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
-
+	public static void checkAndUpdateApptentiveConfigurations() {
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
 		if (conversationToken == null || personId == null) {
 			asyncFetchConversationToken(appContext);
 		} else {
 			fetchSdkState();
 		}
+	}
+	public static void onAppLaunch(final Activity activity) {
+		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+
+		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice(appContext);
 		syncSdk(appContext);
@@ -464,6 +470,14 @@ public class ApptentiveInternal {
 		return (onSurveyFinishedListener == null) ? null : onSurveyFinishedListener.get();
 	}
 
+	public static void addConfigUpdateListener(ApptentiveBaseFragment.ConfigUpdateListener listener) {
+		configUpdateListeners.add(listener);
+	}
+
+	public static void removeConfigUpdateListener(ApptentiveBaseFragment.ConfigUpdateListener listener) {
+		configUpdateListeners.remove(listener);
+	}
+
 	/**
 	 * Pass in a log level to override the default, which is {@link Log.Level#INFO}
 	 */
@@ -564,8 +578,7 @@ public class ApptentiveInternal {
 	}
 
 	public static void showMessageCenterFallback(Activity activity) {
-		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(activity.getApplicationContext());
-		activity.startActivity(intent);
+		EngagementModule.launchMessageCenterErrorActivity(activity);
 	}
 
 	public static boolean canShowMessageCenterInternal(Context context) {

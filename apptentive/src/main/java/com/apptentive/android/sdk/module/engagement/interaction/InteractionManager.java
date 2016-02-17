@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionsPayload;
@@ -20,7 +21,10 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONException;
+
+import java.util.Iterator;
 
 /**
  * @author Sky Kelsey
@@ -95,26 +99,41 @@ public class InteractionManager {
 
 		// We weren't able to connect to the internet.
 		SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		boolean updateSuccessful = true;
 		if (response.isException()) {
 			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
-			return;
+			updateSuccessful = false;
 		}
 		// We got a server error.
-		if (!response.isSuccessful()) {
+		else if (!response.isSuccessful()) {
 			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
-			return;
+			updateSuccessful = false;
 		}
 
-		String interactionsPayloadString = response.getContent();
+		if (updateSuccessful) {
+			String interactionsPayloadString = response.getContent();
 
-		// Store new integration cache expiration.
-		String cacheControl = response.getHeaders().get("Cache-Control");
-		Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-		if (cacheSeconds == null) {
-			cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+			// Store new integration cache expiration.
+			String cacheControl = response.getHeaders().get("Cache-Control");
+			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+			if (cacheSeconds == null) {
+				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+			}
+			updateCacheExpiration(appContext, cacheSeconds);
+			storeInteractionsPayloadString(appContext, interactionsPayloadString);
 		}
-		updateCacheExpiration(appContext, cacheSeconds);
-		storeInteractionsPayloadString(appContext, interactionsPayloadString);
+
+
+		Iterator it = ApptentiveInternal.configUpdateListeners.iterator();
+
+		while (it.hasNext()) {
+			ApptentiveBaseFragment.ConfigUpdateListener listener = (ApptentiveBaseFragment.ConfigUpdateListener) it.next();
+
+			if (listener != null) {
+				listener.onConfigurationUpdated(updateSuccessful);
+			}
+		}
+
 	}
 
 	/**
