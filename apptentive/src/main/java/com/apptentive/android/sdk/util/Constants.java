@@ -114,6 +114,16 @@ public class Constants {
 
 		String TOOLBAR_ID = "toolbarLayoutId";
 		String MODAL = "showAsModal";
+		String TYPE = "fragmentType";
+		String EXTRA = "fragmentExtraData";
+	}
+
+	public interface FragmentTypes {
+		int ABOUT = 0;
+		int MESSAGE_CENTER_ERROR = 1;
+		int INTERACTION = 2;
+		int ENGAGE_INTERNAL_EVENT = 3;
+		int	UNKOWN = 4 ;
 	}
 
 
