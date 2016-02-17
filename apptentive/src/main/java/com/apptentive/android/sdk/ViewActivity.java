@@ -9,7 +9,6 @@ package com.apptentive.android.sdk;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,15 +16,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+
 
 import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
@@ -126,7 +123,6 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 							activityExtraBoolean = getIntent().getBooleanExtra(ActivityContent.EXTRA, true);
 							break;
 						case MESSAGE_CENTER_ERROR:
-							activityContent = new MessageCenterErrorActivityContent();
 							break;
 						case INTERACTION:
 							break; // end INTERACTION
