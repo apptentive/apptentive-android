@@ -15,24 +15,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.model.FragmentFactory;
-import com.apptentive.android.sdk.module.ActivityContent;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-
+import com.apptentive.android.sdk.util.Constants;
 
 
 public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 
-	private ActivityContent.Type fragmentType;
-
-	private boolean activityExtraBoolean;
+	private int fragmentType;
 
 	private Toolbar toolbar;
 	private ViewPager viewPager;
@@ -45,14 +40,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		ApptentiveBaseFragment newFragment = null;
 		try {
 			Bundle bundle = getIntent().getExtras();
-			String fragmentTypeString = bundle.getString(ActivityContent.KEY);
+			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKOWN);
 
-			if (fragmentTypeString != null) {
-				fragmentType = ActivityContent.Type.parse(fragmentTypeString);
-				if (fragmentType == ActivityContent.Type.ABOUT) {
+			if (fragmentType != Constants.FragmentTypes.UNKOWN) {
+				if (fragmentType == Constants.FragmentTypes.ABOUT) {
 					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
 					setTheme(R.style.ApptentiveTheme_About);
-				} else if (fragmentType == ActivityContent.Type.INTERACTION) {
+				} else if (fragmentType == Constants.FragmentTypes.INTERACTION ||
+						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
 					if (newFragment != null) {
@@ -63,33 +58,10 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 				super.onCreate(savedInstanceState);
 
-				try {
-					switch (fragmentType) {
-						case ENGAGE_INTERNAL_EVENT:
-							String eventName = getIntent().getStringExtra(ActivityContent.EVENT_NAME);
-							if (eventName != null) {
-								EngagementModule.engageInternal(this, eventName);
-							}
-							break;
-						case ABOUT:
-							activityExtraBoolean = getIntent().getBooleanExtra(ActivityContent.EXTRA, true);
-							break;
-						case MESSAGE_CENTER_ERROR:
-							break;
-						case INTERACTION:
-							break; // end INTERACTION
-						default:
-							Log.w("No Activity specified. Finishing...");
-							break;
-					}
-
-					if (newFragment == null) {
-						finish();
-					}
-				} catch (Exception e) {
-					Log.e("Error starting ViewActivity.", e);
-					MetricModule.sendError(this, e, null, null);
+				if (newFragment == null) {
+					finish();
 				}
+
 			}
 		} catch (Exception e) {
 			Log.e("Error creating ViewActivity.", e);
@@ -126,9 +98,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 				if (!currentFragment.isShownAsModelDialog()) {
 					toolbar.setVisibility(View.VISIBLE);
 					String title = currentFragment.getTitle();
-					if (!TextUtils.isEmpty(title)) {
-						toolbar.setTitle(title);
-					}
+					toolbar.setTitle(title);
 				} else {
 					toolbar.setVisibility(View.GONE);
 				}
@@ -150,18 +120,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		};
 
 		viewPager.addOnPageChangeListener(pageChangeListener);
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		switch (fragmentType) {
-			case ABOUT:
-				AboutModule.getInstance().setupView(this, activityExtraBoolean);
-				break;
-			default:
-				break;
-		}
 	}
 
 	@Override
