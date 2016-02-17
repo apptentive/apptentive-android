@@ -22,12 +22,15 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterErrorActivityContent;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
 public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interaction> implements ApptentiveBaseFragment.ConfigUpdateListener {
+
+	private static final String EVENT_NAME_NO_INTERACTION_CLOSE = "no_interaction_close";
+	private static final String EVENT_NAME_NO_INTERACTION_NO_INTERNET = "no_interaction_no_internet";
+	private static final String EVENT_NAME_NO_INTERACTION_ATTEMPTING = "no_interaction_attempting";
 
 	private View progress;
 	private View root;
@@ -38,10 +41,23 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 		return fragment;
 	}
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		if (!hasLaunched) {
+			hasLaunched = true;
+			if (wasLastAttemptServerError(getContext()) ||
+					Util.isNetworkConnectionPresent(getContext().getApplicationContext())) {
+				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
+			} else {
+				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
+			}
+		}
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
 		// clone the inflater using the ContextThemeWrapper
@@ -82,7 +98,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 
 	public boolean onBackPressed() {
-		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, MessageCenterErrorActivityContent.EVENT_NAME_NO_INTERACTION_CLOSE, null, null, (ExtendedData[]) null);
+		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, null, null, (ExtendedData[]) null);
 		return false;
 	}
 
