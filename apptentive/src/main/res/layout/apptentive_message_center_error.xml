@@ -6,35 +6,10 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:cardView="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="?attr/apptentive_material_background"
-              android:gravity="center_vertical"
-              android:orientation="vertical">
-    <android.support.v7.widget.CardView android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        style="@style/ApptentiveTheme.Widget.CardView"
-                                        cardView:cardElevation="8dp">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="@dimen/apptentive_message_center_header_height"
-                      android:gravity="center"
-                      android:background="?attr/colorPrimary"
-                      android:orientation="vertical">
-            <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="@dimen/apptentive_message_center_header_height"
-                          android:gravity="start|center_vertical"
-                          android:orientation="horizontal">
-                <ImageButton android:id="@+id/back"
-                             android:layout_width="@dimen/apptentive_message_center_header_height"
-                             android:layout_height="@dimen/apptentive_message_center_header_height"
-                             android:background="?android:attr/selectableItemBackground"
-                             android:contentDescription="Back"
-                             android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"/>
-            </LinearLayout>
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+              android:background="?attr/apptentive_material_background">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:paddingLeft="@dimen/apptentive_message_center_greeting_side_margin"
@@ -53,4 +28,9 @@
                   android:textSize="14sp"
                   android:gravity="center"/>
     </LinearLayout>
-</LinearLayout>
+    <ProgressBar android:id="@+id/config_loading_progress"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="top|center"
+                 style="@android:style/Widget.ProgressBar"/>
+</FrameLayout>
