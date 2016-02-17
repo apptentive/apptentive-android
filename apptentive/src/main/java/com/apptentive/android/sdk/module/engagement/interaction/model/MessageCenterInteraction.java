@@ -9,12 +9,12 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import android.content.Context;
 import android.content.Intent;
 
+import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -254,8 +254,8 @@ public class MessageCenterInteraction extends Interaction {
 
 	public static Intent generateMessageCenterErrorIntent(Context context) {
 		Intent intent = new Intent();
-		intent.setClass(context, ViewActivity.class);
-		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.MESSAGE_CENTER_ERROR.name());
+		intent.setClass(context, ApptentiveViewActivity.class);
+		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.MESSAGE_CENTER_ERROR);
 		return intent;
 	}
 
