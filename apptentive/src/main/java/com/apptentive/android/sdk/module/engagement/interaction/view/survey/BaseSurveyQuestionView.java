@@ -8,15 +8,15 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
@@ -39,7 +39,8 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 
-		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_base, this);
 
 		setOnTouchListener(new OnTouchListener() {

@@ -8,9 +8,12 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
@@ -33,7 +36,8 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		Set<String> answers = surveyState.getAnswers(question.getId());
 
-		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
 
 		LinearLayout choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
