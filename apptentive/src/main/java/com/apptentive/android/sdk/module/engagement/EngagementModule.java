@@ -12,15 +12,15 @@ import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Map;
 
@@ -75,10 +75,15 @@ public class EngagementModule {
 			Log.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(activity, ApptentiveViewActivity.class);
-			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
+			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
 			activity.startActivity(intent);
 		}
+	}
+
+	public static void launchMessageCenterErrorActivity(Activity activity) {
+		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(activity);
+		activity.startActivity(intent);
 	}
 
 	public static boolean canShowInteraction(Context context, String vendor, String interaction, String eventName) {

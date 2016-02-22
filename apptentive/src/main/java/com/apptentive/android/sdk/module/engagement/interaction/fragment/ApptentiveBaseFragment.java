@@ -67,6 +67,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		void onFragmentTransition(ApptentiveBaseFragment currentFragment);
 	}
 
+	public interface ConfigUpdateListener {
+		void onConfigurationUpdated(boolean successful);
+	}
+
 	public FragmentManager getRetainedChildFragmentManager() {
 		if (retainedChildFragmentManager == null) {
 			retainedChildFragmentManager = getChildFragmentManager();
@@ -123,6 +127,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	}
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -132,7 +137,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
 			bShownAsModel = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
 			String interactionString = bundle.getString("interaction");
-			interaction = (T) Interaction.Factory.parseInteraction(interactionString);
+			if (!TextUtils.isEmpty(interactionString)) {
+				interaction = (T) Interaction.Factory.parseInteraction(interactionString);
+			}
 		}
 
 		if (bShownAsModel) {
@@ -146,7 +153,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		if (savedInstanceState != null) {
 			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
 		}
-		if (!hasLaunched) {
+		if (!hasLaunched && interaction != null) {
 			hasLaunched = true;
 			interaction.sendLaunchEvent(getActivity());
 		}
@@ -183,6 +190,12 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		if (bShownAsModel) {
 			setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
 		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		ApptentiveInternal.checkAndUpdateApptentiveConfigurations();
 	}
 
 	public void onStop() {

@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -50,8 +50,8 @@ public class AboutModule {
 		EngagementModule.engage(activity, "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 		Intent intent = new Intent();
 		intent.setClass(activity, ViewActivity.class);
-		intent.putExtra(ActivityContent.KEY, ActivityContent.Type.ABOUT.toString());
-		intent.putExtra(ActivityContent.EXTRA, showBrandingBand);
+		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ABOUT);
+		intent.putExtra(Constants.FragmentConfigKeys.EXTRA, showBrandingBand);
 		activity.startActivity(intent);
 	}
 
