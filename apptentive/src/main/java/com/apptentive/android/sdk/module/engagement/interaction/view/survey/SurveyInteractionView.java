@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -9,17 +9,18 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
-import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.*;
@@ -34,9 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-/**
- * @author Sky Kelsey
- */
 public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 	private static final String EVENT_CANCEL = "cancel";
@@ -71,18 +69,8 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 		activity.setContentView(R.layout.apptentive_survey);
 
-		// Hide branding if needed.
-		final View branding = activity.findViewById(R.id.apptentive_branding_view);
-		if (branding != null) {
-			if (Configuration.load(activity).isHideBranding(activity)) {
-				branding.setVisibility(View.GONE);
-			}
-		}
-
-		TextView title = (TextView) activity.findViewById(R.id.title);
-		title.setFocusable(true);
-		title.setFocusableInTouchMode(true);
-		title.setText(interaction.getName());
+		Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+		toolbar.setTitle(interaction.getName());
 
 		String descriptionText = interaction.getDescription();
 		if (!TextUtils.isEmpty(descriptionText)) {
@@ -130,7 +118,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(textQuestionView);
@@ -139,7 +127,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multichoiceQuestionView);
@@ -148,17 +136,23 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(activity, question);
-						send.setEnabled(isSurveyValid());
+						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multiselectQuestionView);
 			}
 		}
 
+		View infoButton = activity.findViewById(R.id.info);
+		infoButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AboutModule.getInstance().show(activity, false);
+			}
+		});
+/*
 		send.setEnabled(isSurveyValid());
-
-		// Force the top of the survey to be shown first.
-		title.requestFocus();
+*/
 	}
 
 	public boolean isSurveyValid() {

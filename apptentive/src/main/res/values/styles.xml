@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -67,6 +67,8 @@
         <item name="apptentiveFabStyle">@style/ApptentiveWidget.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
 
+        <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
+        <item name="apptentiveBorderedButtonSurveyStyle">?apptentiveBorderedButtonStyle</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -104,6 +106,11 @@
 
     <style name="Apptentive.Style.BorderlessButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?colorAccent</item>
+    </style>
+
+    <style name="Apptentive.Style.BorderedButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="backgroundTint">?colorPrimary</item>
+        <item name="android:textColor">@color/apptentive_material_primary_text_inverse</item>
     </style>
 
     <!-- General Theme override to change the Dialog design -->

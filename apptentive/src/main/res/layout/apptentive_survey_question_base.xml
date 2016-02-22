@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
+             xmlns:cardView="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:paddingTop="16dp">
-    <FrameLayout android:layout_width="fill_parent"
-                 android:layout_height="wrap_content"
-                 android:layout_gravity="top"
-                 android:background="@drawable/apptentive_survey_question_background">
+             android:paddingTop="4dp"
+             android:paddingLeft="4dp"
+             android:paddingRight="4dp"
+             android:background="@android:color/transparent">
+    <android.support.v7.widget.CardView android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        cardView:cardUseCompatPadding="true"
+                                        cardView:cardCornerRadius="2dp"
+                                        cardView:cardElevation="1dp">
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      android:orientation="vertical"
                       android:paddingTop="8dp"
-                      android:paddingBottom="2dp">
+                      android:paddingBottom="8dp"
+                      android:gravity="start"
+                      android:orientation="vertical">
             <TextView android:id="@+id/question_title"
+                      style="@style/ApptentiveTheme.TextAppearence"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextAppearence"
-                      android:paddingLeft="8dp"
-                      android:paddingRight="8dp"
-                      android:paddingBottom="8dp"
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingTop="8dp"
                       android:textSize="@dimen/apptentive_text_medium_small"
-                      android:textStyle="bold"
                       android:textColor="@color/apptentive_survey_question_text"/>
             <TextView android:id="@+id/question_instructions"
+                      style="@style/ApptentiveTheme.TextAppearence"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextAppearence"
-                      android:gravity="left"
-                      android:paddingLeft="8dp"
-                      android:paddingTop="4dp"
-                      android:paddingRight="8dp"
-                      android:paddingBottom="4dp"
+                      android:gravity="start"
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingBottom="8dp"
                       android:textSize="@dimen/apptentive_text_small_tiny"
-                      android:textStyle="bold"
-                      android:textColor="@color/apptentive_survey_question_text"/>
+                      android:textColor="@color/apptentive_survey_question_instruction_text_invalid"/>
             <FrameLayout android:id="@+id/question_top_separater"
                          android:layout_width="fill_parent"
                          android:layout_height="1dp"
-                         android:layout_marginLeft="8dp"
-                         android:layout_marginRight="8dp"
                          android:background="@color/apptentive_survey_question_separator"/>
             <LinearLayout android:id="@+id/answer_container"
                           android:layout_width="fill_parent"
@@ -56,9 +56,5 @@
                 <!-- Answer content goes here. -->
             </LinearLayout>
         </LinearLayout>
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                     android:id="@+id/question_background_validation"
-                     android:layout_width="fill_parent"
-                     android:layout_height="fill_parent"/>
-    </FrameLayout>
+    </android.support.v7.widget.CardView>
 </FrameLayout>

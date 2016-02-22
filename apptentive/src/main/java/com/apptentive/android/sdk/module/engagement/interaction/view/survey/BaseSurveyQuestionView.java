@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -23,9 +23,6 @@ import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.util.Util;
 
-/**
- * @author Sky Kelsey.
- */
 abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
 
 	protected Q question;
@@ -66,16 +63,12 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 	protected void setInstructions(String instructionsText) {
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
-		FrameLayout topSeparator = (FrameLayout) findViewById(R.id.question_top_separater);
 		if (instructionsText != null && instructionsText.length() > 0) {
 			instructions.setText(instructionsText);
-			topSeparator.setVisibility(View.GONE);
 			instructions.setVisibility(View.VISIBLE);
 		} else {
-			topSeparator.setVisibility(View.VISIBLE);
 			instructions.setVisibility(View.GONE);
 		}
-
 	}
 
 	protected LinearLayout getAnswerContainer() {
@@ -93,6 +86,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	}
 
 	protected void updateValidationState() {
+/*
 		Resources resources = getContext().getResources();
 		TextView instructions = (TextView) findViewById(R.id.question_instructions);
 		View validationFrame = findViewById(R.id.question_background_validation);
@@ -107,5 +101,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 			instructions.setTypeface(Typeface.DEFAULT);
 			validationFrame.setBackgroundColor(Color.TRANSPARENT);
 		}
+*/
 	}
 }
