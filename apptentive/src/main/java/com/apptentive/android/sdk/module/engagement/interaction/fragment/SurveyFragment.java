@@ -86,7 +86,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
 
 		if (interaction == null || surveySubmitted) {
-			finish();
+			getActivity().finish();
 		}
 
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
@@ -108,12 +108,12 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 						@Override
 						public void onDismiss(DialogInterface dialogInterface) {
-							finish();
+							getActivity().finish();
 						}
 					});
 					dialog.show();
 				} else {
-					finish();
+					getActivity().finish();
 				}
 
 				EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
