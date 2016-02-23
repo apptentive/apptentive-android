@@ -30,8 +30,12 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	private AtomicInteger foregroundActivities = new AtomicInteger(0);
 
 	private Runnable checkFgBgRoutine;
-	private boolean isAppForeground = false, paused = true;
-	private Handler handler = new Handler();
+	private Runnable checkAppExitRoutine;
+	private boolean isAppForeground, running;
+	private Handler delayedChecker = new Handler();
+
+	private static final long CHECK_DELAY_SHORT = 500;
+	private static final long CHECK_DELAY_LONG = 1000;
 
 	public ApptentiveActivityLifecycleCallbacks(Application application) {
 		appContext = application;
@@ -40,11 +44,17 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 		Log.e("onActivityCreated(%s)", activity.toString());
+
+		if (checkAppExitRoutine != null) {
+			delayedChecker.removeCallbacks(checkAppExitRoutine);
+			checkAppExitRoutine = null;
+		}
+
 		if (runningActivities.getAndIncrement() == 0) {
 			appLaunched(activity);
 		}
 
-		Log.e("==> Running Activities:    %d", runningActivities);
+		Log.e("==> Running Activities:    %d", runningActivities.get());
 	}
 
 	@Override
@@ -55,21 +65,23 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityResumed(Activity activity) {
 		Log.e("onActivityResumed(%s)", activity.toString());
-		paused = false;
+		running = true;
 		boolean wasAppBackground = !isAppForeground;
 		isAppForeground = true;
 
-		if (checkFgBgRoutine != null)
-			handler.removeCallbacks(checkFgBgRoutine);
+		if (checkFgBgRoutine != null) {
+			delayedChecker.removeCallbacks(checkFgBgRoutine);
+			checkFgBgRoutine = null;
+		}
 
-		if (wasAppBackground && foregroundActivities.getAndIncrement() == 0) {
-			appBecomeForeground();
+		if (foregroundActivities.getAndIncrement() == 0 && wasAppBackground) {
+			appEnteredForeground();
 		} else {
 			Log.d("application is still in foreground");
 		}
 
 
-		Log.e("==> Foreground Activities: %d", foregroundActivities);
+		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 		MessageManager.setCurrentForgroundActivity(activity);
 	}
 
@@ -77,33 +89,33 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	public void onActivityPaused(Activity activity) {
 		Log.e("onActivityPaused(%s)", activity.toString());
 
-		paused = true;
+		running = false;
 
 		foregroundActivities.decrementAndGet();
 		if (foregroundActivities.decrementAndGet() < 0) {
 			Log.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
 		}
-		Log.e("==> Foreground Activities: %d", foregroundActivities);
+		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 
 		if (checkFgBgRoutine != null) {
-			handler.removeCallbacks(checkFgBgRoutine);
+			delayedChecker.removeCallbacks(checkFgBgRoutine);
 		}
       /* When one activity transits to another one, there is a brief period durong which the former
       * is paused but the latter has not yet resumed. To prevent flase negative, check rountine is
       * conducted delayed
       */
-		handler.postDelayed(checkFgBgRoutine = new Runnable() {
+		delayedChecker.postDelayed(checkFgBgRoutine = new Runnable() {
 			@Override
 			public void run() {
-				if (isAppForeground && paused && foregroundActivities.get() == 0) {
+				if (isAppForeground && !running) {
 					isAppForeground = false;
-					appBecomeBackground();
+					appEnteredBackground();
 				} else {
 					Log.d("application is still in foreground");
 				}
 			}
-		}, 500);
+		}, CHECK_DELAY_SHORT);
 
 		MessageManager.setCurrentForgroundActivity(null);
 
@@ -120,27 +132,41 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	}
 
 	@Override
-	public void onActivityDestroyed(Activity activity) {
+	public void onActivityDestroyed(final Activity activity) {
 		Log.e("onActivityDestroyed(%s)", activity.toString());
 
 		if (runningActivities.decrementAndGet() < 0) {
 			Log.a("Incorrect number of running Activities encountered. Resetting to 0.");
 			runningActivities.set(0);
 		}
-		if (runningActivities.get() == 0) {
-			appExited(activity);
+
+		if (checkAppExitRoutine != null) {
+			delayedChecker.removeCallbacks(checkAppExitRoutine);
+			checkAppExitRoutine = null;
 		}
-		Log.e("==> Running Activities:    %d", runningActivities);
+
+		delayedChecker.postDelayed(checkAppExitRoutine = new Runnable() {
+			@Override
+			public void run() {
+				if (runningActivities.get() == 0) {
+					appExited(activity);
+				} else {
+					Log.d("application is still in foreground");
+				}
+			}
+		}, CHECK_DELAY_LONG);
+
+		Log.e("==> Running Activities:    %d", runningActivities.get());
 	}
 
-	private void appBecomeForeground() {
+	private void appEnteredForeground() {
 		Log.e("App went to foreground.");
 		ApptentiveInternal.appIsInForeground = true;
 		PayloadSendWorker.appWentToForeground(appContext);
 		MessagePollingWorker.appWentToForeground(appContext);
 	}
 
-	private void appBecomeBackground() {
+	private void appEnteredBackground() {
 		Log.e("App went to background.");
 		ApptentiveInternal.appIsInForeground = false;
 		PayloadSendWorker.appWentToBackground();

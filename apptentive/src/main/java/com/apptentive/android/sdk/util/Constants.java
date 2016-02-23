@@ -119,11 +119,11 @@ public class Constants {
 	}
 
 	public interface FragmentTypes {
-		int ABOUT = 0;
-		int MESSAGE_CENTER_ERROR = 1;
-		int INTERACTION = 2;
-		int ENGAGE_INTERNAL_EVENT = 3;
-		int	UNKOWN = 4 ;
+		int UNKNOWN = 0;
+		int ABOUT = 1;
+		int MESSAGE_CENTER_ERROR = 2;
+		int INTERACTION = 3;
+		int ENGAGE_INTERNAL_EVENT = 4;
 	}
 
 
