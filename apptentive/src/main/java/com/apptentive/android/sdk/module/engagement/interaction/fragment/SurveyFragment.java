@@ -4,28 +4,46 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
+package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.AboutModule;
 import com.apptentive.android.sdk.ApptentiveInternal;
+
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.SurveyResponse;
-import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.view.InteractionView;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation;
+import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
+import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyThankYouDialog;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -34,8 +52,9 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
 
-public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
+public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
 	private static final String EVENT_CANCEL = "cancel";
 	private static final String EVENT_SUBMIT = "submit";
@@ -47,50 +66,58 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 	private SurveyState surveyState;
 
-	public SurveyInteractionView(SurveyInteraction interaction) {
-		super(interaction);
-		if (surveyState == null) {
-			surveyState = new SurveyState(interaction);
-		}
+	public static SurveyFragment newInstance(Bundle bundle) {
+		SurveyFragment fragment = new SurveyFragment();
+		fragment.setArguments(bundle);
+		return fragment;
 	}
 
-	@Override
-	public void doOnCreate(final ViewActivity activity, Bundle savedInstanceState) {
 
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
 			surveyState = savedInstanceState.getParcelable(KEY_SURVEY_DATA);
 		}
-
-		if (interaction == null || surveySubmitted) {
-			activity.finish();
-			return;
+		if (surveyState == null) {
+			surveyState = new SurveyState(interaction);
 		}
 
-		activity.setContentView(R.layout.apptentive_survey);
 
-		final Button send = (Button) activity.findViewById(R.id.send);
+		if (interaction == null || surveySubmitted) {
+			getActivity().finish();
+		}
+
+		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
+		// clone the inflater using the ContextThemeWrapper
+		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
+		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
+
+
+		final Button send = (Button) v.findViewById(R.id.send);
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Util.hideSoftKeyboard(activity, view);
+				Util.hideSoftKeyboard(getActivity(), view);
 				surveySubmitted = true;
 				if (interaction.isShowSuccessMessage() && interaction.getSuccessMessage() != null) {
-					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
+					SurveyThankYouDialog dialog = new SurveyThankYouDialog(getActivity());
 					dialog.setMessage(interaction.getSuccessMessage());
 					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 						@Override
 						public void onDismiss(DialogInterface dialogInterface) {
-							activity.finish();
+							getActivity().finish();
 						}
 					});
 					dialog.show();
 				} else {
-					activity.finish();
+					getActivity().finish();
 				}
 
-				EngagementModule.engageInternal(activity, interaction, EVENT_SUBMIT);
-				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
+				EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
+				ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
 				Log.d("Survey Submitted.");
 				callListener(true);
 
@@ -98,34 +125,34 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			}
 		});
 
-		LinearLayout questions = (LinearLayout) activity.findViewById(R.id.questions);
+		LinearLayout questions = (LinearLayout) v.findViewById(R.id.questions);
 		questions.removeAllViews();
 
 		// Then render all the questions
 		for (final Question question : interaction.getQuestions()) {
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(activity, surveyState, (SinglelineQuestion) question);
+				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(getActivity(), surveyState, (SinglelineQuestion) question);
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
-						sendMetricForQuestion(activity, question);
+						sendMetricForQuestion(getActivity(), question);
 						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(textQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(activity, surveyState, (MultichoiceQuestion) question);
+				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(getActivity(), surveyState, (MultichoiceQuestion) question);
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
-						sendMetricForQuestion(activity, question);
+						sendMetricForQuestion(getActivity(), question);
 						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multichoiceQuestionView);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(activity, surveyState, (MultiselectQuestion) question);
+				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(getActivity(), surveyState, (MultiselectQuestion) question);
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
-						sendMetricForQuestion(activity, question);
+						sendMetricForQuestion(getActivity(), question);
 						//send.setEnabled(isSurveyValid());
 					}
 				});
@@ -133,16 +160,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			}
 		}
 
-		View infoButton = activity.findViewById(R.id.info);
-		infoButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AboutModule.getInstance().show(activity, false);
-			}
-		});
-/*
-		send.setEnabled(isSurveyValid());
-*/
+		return v;
 	}
 
 	public boolean isSurveyValid() {
@@ -172,20 +190,6 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		surveyState = null;
 	}
 
-
-	@Override
-	public boolean onBackPressed(Activity activity) {
-		// If this survey is required, do not let it be dismissed when the user clicks the back button.
-		if (!interaction.isRequired()) {
-			EngagementModule.engageInternal(activity, interaction, EVENT_CANCEL);
-			callListener(false);
-			cleanup();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	private void callListener(boolean completed) {
 		OnSurveyFinishedListener listener = ApptentiveInternal.getOnSurveyFinishedListener();
 		if (listener != null) {
@@ -200,9 +204,11 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 		outState.putParcelable(KEY_SURVEY_DATA, surveyState);
 	}
 
+
 	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
+	public boolean onBackPressed() {
+		EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
+		return false;
 	}
+
 }

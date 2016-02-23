@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.fragment.Message
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.NavigateToLinkFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.NoteFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.RatingDialogFragment;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.SurveyFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.UpgradeMessageFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
@@ -56,7 +57,7 @@ public class FragmentFactory {
 							bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							return AppStoreRatingFragment.newInstance(bundle);
 						case Survey:
-							break;
+							return SurveyFragment.newInstance(bundle);
 						case MessageCenter:
 							return MessageCenterFragment.newInstance(bundle);
 						case TextModal:
