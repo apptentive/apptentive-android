@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,21 +24,12 @@ import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
-import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
-import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyThankYouDialog;
@@ -52,7 +42,6 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 
 public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
@@ -72,10 +61,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		return fragment;
 	}
 
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
 			surveyState = savedInstanceState.getParcelable(KEY_SURVEY_DATA);
@@ -83,8 +70,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		if (surveyState == null) {
 			surveyState = new SurveyState(interaction);
 		}
-
-
 		if (interaction == null || surveySubmitted) {
 			getActivity().finish();
 		}
@@ -94,7 +79,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
-
 
 		TextView description = (TextView) v.findViewById(R.id.description);
 		description.setText(interaction.getDescription());
@@ -162,7 +146,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 				questions.addView(multiselectQuestionView);
 			}
 		}
-
 		return v;
 	}
 
@@ -207,11 +190,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		outState.putParcelable(KEY_SURVEY_DATA, surveyState);
 	}
 
-
 	@Override
 	public boolean onBackPressed() {
 		EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
 		return false;
 	}
-
 }
