@@ -75,7 +75,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+													 Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
 			surveyState = savedInstanceState.getParcelable(KEY_SURVEY_DATA);
@@ -95,6 +95,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
 
+
+		TextView description = (TextView) v.findViewById(R.id.description);
+		description.setText(interaction.getDescription());
 
 		final Button send = (Button) v.findViewById(R.id.send);
 		send.setOnClickListener(new View.OnClickListener() {
