@@ -6,28 +6,23 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent">
-
-<!--    <android.support.design.widget.AppBarLayout android:id="@+id/appbar"
-                                                android:layout_width="match_parent"
-                                                android:layout_height="196dp"
-                                                android:fitsSystemWindows="true"
-                                                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.design.widget.CollapsingToolbarLayout android:id="@+id/main.collapsing"
-                                                               android:layout_width="match_parent"
-                                                               android:layout_height="wrap_content"
-                                                               app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:background="#F4F4F4">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="vertical">
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingTop="?attr/actionBarSize"
                             android:paddingLeft="16dp"
                             android:paddingRight="16dp"
-                            android:paddingBottom="16dp">
+                            android:paddingBottom="16dp"
+                            android:background="?colorPrimary">
                 <Space android:layout_width="match_parent"
                        android:layout_height="?attr/actionBarSize"/>
                 <TextView android:id="@+id/description"
@@ -35,28 +30,17 @@
                           android:layout_height="wrap_content"
                           android:layout_alignParentTop="true"
                           android:textColor="#FFFFFF"
-                          android:textSize="18sp"
-                          android:text="Please answer a couple of questions to help us make this app better for you!"/>
+                          android:textSize="18sp"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_alignParentRight="true"
                              android:layout_alignParentBottom="true"
-                             android:contentDescription="About"
+                             android:layout_below="@id/description"
+                             android:contentDescription="@string/apptentive_about_title"
                              android:background="?android:attr/selectableItemBackground"
                              android:src="@drawable/apptentive_ic_info"/>
-
             </RelativeLayout>
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>-->
-
-
-    <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
-                                                android:layout_height="match_parent"
-                                                android:background="#F4F4F4">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="vertical">
             <LinearLayout android:id="@+id/questions"
                           android:layout_width="match_parent"
                           android:layout_height="match_parent"
@@ -68,22 +52,11 @@
                           android:padding="32dp"
                           android:gravity="center">
                 <android.support.v7.widget.AppCompatButton android:id="@+id/send"
+                                                           style="?apptentiveBorderedButtonSurveyStyle"
                                                            android:layout_width="wrap_content"
                                                            android:layout_height="56dp"
-                                                           style="?apptentiveBorderedButtonSurveyStyle"
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
-<!--    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-                                       android:layout_width="match_parent"
-                                       android:layout_height="?attr/actionBarSize"
-                                       android:background="?attr/colorPrimary"
-                                       android:navigationIcon="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
-                                       app:titleTextColor="@android:color/primary_text_dark"
-                                       app:navigationIcon="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
-                                       app:title="Survey Title"
-                                       app:layout_anchor="@id/appbar"
-                                       app:layout_anchorGravity="top"/>-->
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>
