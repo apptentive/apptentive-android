@@ -27,9 +27,9 @@ import com.apptentive.android.sdk.util.Constants.FragmentConfigKeys;
 public class FragmentFactory {
 	public static ApptentiveBaseFragment createFragmentInstance(@NonNull Bundle bundle) {
 
-		int fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKOWN);
+		int fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 		Interaction interaction;
-		if (fragmentType != Constants.FragmentTypes.UNKOWN) {
+		if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
 			if (fragmentType == Constants.FragmentTypes.INTERACTION) {
 				String interactionString;
 

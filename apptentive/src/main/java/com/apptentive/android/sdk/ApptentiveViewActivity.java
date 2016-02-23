@@ -40,9 +40,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		ApptentiveBaseFragment newFragment = null;
 		try {
 			Bundle bundle = getIntent().getExtras();
-			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKOWN);
+			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 
-			if (fragmentType != Constants.FragmentTypes.UNKOWN) {
+			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
 				if (fragmentType == Constants.FragmentTypes.ABOUT) {
 					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
 					setTheme(R.style.ApptentiveTheme_About);
