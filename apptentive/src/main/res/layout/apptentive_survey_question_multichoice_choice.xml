@@ -18,11 +18,9 @@
               android:layout_height="wrap_content"
               android:saveEnabled="false"/>
     <TextView android:id="@+id/choice_text"
-              android:layout_width="0dp"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_weight="1"
               android:paddingLeft="4dp"
-              android:paddingRight="4dp"
               android:paddingStart="4dp"
               style="@style/ApptentiveTheme.TextAppearence"
               android:textColor="@color/apptentive_survey_question_answer_text"
