@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -15,9 +15,6 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
 public abstract class Interaction extends JSONObject {
 
 	public static final String KEY_NAME = "interaction";
@@ -61,6 +58,14 @@ public abstract class Interaction extends JSONObject {
 		return null;
 	}
 
+	/**
+	 * Interactions that have a title that can be displayed in a toolbar should return it from this method.
+	 * @return The title to be set in the toolbar.
+	 */
+	public String getTitle() {
+		return null;
+	}
+
 	public Type getType() {
 		try {
 			if (!isNull(KEY_TYPE)) {
@@ -94,7 +99,7 @@ public abstract class Interaction extends JSONObject {
 		return new InteractionConfiguration();
 	}
 
-	public static enum Type {
+	public enum Type {
 		UpgradeMessage,
 		EnjoymentDialog,
 		RatingDialog,

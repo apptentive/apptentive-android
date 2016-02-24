@@ -208,11 +208,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				savedInstanceState.getInt(WHO_CARD_MODE);
 
 		if (interaction != null) {
-			sectionTitle = interaction.getTitle();
 			String contextualMessageBody = interaction.getContextualMessageBody();
 			contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
 		}
-
 	}
 
 	@Override

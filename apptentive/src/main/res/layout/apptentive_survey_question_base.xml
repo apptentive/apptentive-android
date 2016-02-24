@@ -5,6 +5,7 @@
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:cardView="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
@@ -26,7 +27,7 @@
                       android:orientation="vertical">
             <TextView android:id="@+id/question_title"
                       style="@style/ApptentiveTheme.TextAppearence"
-                      android:layout_width="fill_parent"
+                      android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:paddingLeft="16dp"
                       android:paddingRight="16dp"
@@ -35,7 +36,7 @@
                       android:textColor="@color/apptentive_survey_question_text"/>
             <TextView android:id="@+id/question_instructions"
                       style="@style/ApptentiveTheme.TextAppearence"
-                      android:layout_width="fill_parent"
+                      android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:gravity="start"
                       android:paddingLeft="16dp"
@@ -43,10 +44,10 @@
                       android:paddingBottom="8dp"
                       android:textSize="@dimen/apptentive_text_small_tiny"
                       android:textColor="@color/apptentive_survey_question_instruction_text_invalid"/>
-            <FrameLayout android:id="@+id/question_top_separater"
-                         android:layout_width="fill_parent"
-                         android:layout_height="1dp"
-                         android:background="@color/apptentive_survey_question_separator"/>
+            <View android:id="@+id/question_top_separater"
+                  android:layout_width="fill_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/apptentive_survey_question_separator"/>
             <LinearLayout android:id="@+id/answer_container"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"

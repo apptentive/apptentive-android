@@ -75,19 +75,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(activity, view);
 				surveySubmitted = true;
-				if (interaction.isShowSuccessMessage() && interaction.getSuccessMessage() != null) {
-					SurveyThankYouDialog dialog = new SurveyThankYouDialog(activity);
-					dialog.setMessage(interaction.getSuccessMessage());
-					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-						@Override
-						public void onDismiss(DialogInterface dialogInterface) {
-							activity.finish();
-						}
-					});
-					dialog.show();
-				} else {
-					activity.finish();
-				}
+				activity.finish();
 
 				EngagementModule.engageInternal(activity, interaction, EVENT_SUBMIT);
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
