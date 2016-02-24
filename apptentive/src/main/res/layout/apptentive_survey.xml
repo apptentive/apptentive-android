@@ -18,10 +18,7 @@
                       android:orientation="vertical">
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingTop="?attr/actionBarSize"
-                            android:paddingLeft="16dp"
-                            android:paddingRight="16dp"
-                            android:paddingBottom="16dp"
+                            android:padding="16dp"
                             android:background="?colorPrimary">
                 <Space android:layout_width="match_parent"
                        android:layout_height="?attr/actionBarSize"/>
