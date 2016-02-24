@@ -8,15 +8,17 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 
@@ -32,7 +34,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Sin
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
-import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyThankYouDialog;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
@@ -77,7 +78,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
 		// clone the inflater using the ContextThemeWrapper
-		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
+		final LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
 
 		TextView description = (TextView) v.findViewById(R.id.description);
@@ -88,27 +89,35 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 			@Override
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(getActivity(), view);
-				surveySubmitted = true;
-				if (interaction.isShowSuccessMessage() && interaction.getSuccessMessage() != null) {
-					SurveyThankYouDialog dialog = new SurveyThankYouDialog(getActivity());
-					dialog.setMessage(interaction.getSuccessMessage());
-					dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-						@Override
-						public void onDismiss(DialogInterface dialogInterface) {
-							getActivity().finish();
-						}
-					});
-					dialog.show();
-				} else {
+				if (isSurveyValid()) {
+					surveySubmitted = true;
+					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
+						Toast toast = new Toast(contextThemeWrapper);
+						toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
+						toast.setDuration(Toast.LENGTH_SHORT);
+						View toastView = themedInflater.inflate(R.layout.apptentive_survey_sent_toast, (LinearLayout) getView().findViewById(R.id.survey_sent_toast_root));
+						toast.setView(toastView);
+						((TextView) toastView.findViewById(R.id.survey_sent_toast_text)).setText(interaction.getSuccessMessage());
+
+						toast.show();
+					}
 					getActivity().finish();
+
+					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
+					ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
+					Log.d("Survey Submitted.");
+					callListener(true);
+					cleanup();
+				} else {
+					Toast toast = new Toast(contextThemeWrapper);
+					toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
+					toast.setDuration(Toast.LENGTH_SHORT);
+					View toastView = themedInflater.inflate(R.layout.apptentive_survey_invalid_toast, (LinearLayout) getView().findViewById(R.id.survey_invalid_toast_root));
+					toast.setView(toastView);
+					((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText("Missing Required Question");
+
+					toast.show();
 				}
-
-				EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
-				ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
-				Log.d("Survey Submitted.");
-				callListener(true);
-
-				cleanup();
 			}
 		});
 
@@ -122,7 +131,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(getActivity(), question);
-						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(textQuestionView);
@@ -131,7 +139,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(getActivity(), question);
-						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multichoiceQuestionView);
@@ -140,7 +147,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(getActivity(), question);
-						//send.setEnabled(isSurveyValid());
 					}
 				});
 				questions.addView(multiselectQuestionView);

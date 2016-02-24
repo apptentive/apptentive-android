@@ -54,7 +54,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	private Toolbar toolbar = null;
 	private List fragmentMenuItems = null;
 	private boolean isChangingConfigurations;
-	private boolean bShownAsModel;
+	private boolean bShownAsModal;
 
 	protected T interaction;
 	protected boolean hasLaunched;
@@ -135,15 +135,15 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 		if (bundle != null) {
 			toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
-			bShownAsModel = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
+			bShownAsModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
 			String interactionString = bundle.getString("interaction");
 			if (!TextUtils.isEmpty(interactionString)) {
 				interaction = (T) Interaction.Factory.parseInteraction(interactionString);
 			}
 		}
 
-		if (bShownAsModel) {
-			sectionTitle = null;
+		if (!bShownAsModal && interaction != null) {
+			sectionTitle = interaction.getTitle();
 		}
 
 		if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {
@@ -187,7 +187,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		}
 
-		if (bShownAsModel) {
+		if (bShownAsModal) {
 			setStatusBarColor(ApptentiveInternal.getDefaultStatusbarColor(getContext()));
 		}
 	}
@@ -256,7 +256,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	public boolean isShownAsModelDialog() {
-		return bShownAsModel;
+		return bShownAsModal;
 	}
 
 	public String getTitle() {

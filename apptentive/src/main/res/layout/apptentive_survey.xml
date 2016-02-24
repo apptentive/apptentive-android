@@ -18,10 +18,7 @@
                       android:orientation="vertical">
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingTop="?attr/actionBarSize"
-                            android:paddingLeft="16dp"
-                            android:paddingRight="16dp"
-                            android:paddingBottom="16dp"
+                            android:padding="16dp"
                             android:background="?colorPrimary">
                 <Space android:layout_width="match_parent"
                        android:layout_height="?attr/actionBarSize"/>
@@ -29,12 +26,19 @@
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_alignParentTop="true"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:paddingLeft="4dp"
+                          android:paddingStart="4dp"
+                          android:paddingRight="16dp"
+                          android:paddingEnd="16dp"
                           android:textColor="#FFFFFF"
                           android:textSize="18sp"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_alignParentRight="true"
+                             android:layout_alignParentEnd="true"
                              android:layout_alignParentBottom="true"
                              android:layout_below="@id/description"
                              android:contentDescription="@string/apptentive_about_title"
@@ -49,7 +53,10 @@
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:padding="32dp"
+                          android:paddingLeft="32dp"
+                          android:paddingRight="32dp"
+                          android:paddingTop="32dp"
+                          android:paddingBottom="64dp"
                           android:gravity="center">
                 <android.support.v7.widget.AppCompatButton android:id="@+id/send"
                                                            style="?apptentiveBorderedButtonSurveyStyle"
