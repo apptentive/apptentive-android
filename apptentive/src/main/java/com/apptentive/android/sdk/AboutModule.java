@@ -49,7 +49,7 @@ public class AboutModule {
 	public void show(Activity activity, boolean showBrandingBand) {
 		EngagementModule.engage(activity, "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 		Intent intent = new Intent();
-		intent.setClass(activity, ViewActivity.class);
+		intent.setClass(activity, ApptentiveViewActivity.class);
 		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ABOUT);
 		intent.putExtra(Constants.FragmentConfigKeys.EXTRA, showBrandingBand);
 		activity.startActivity(intent);

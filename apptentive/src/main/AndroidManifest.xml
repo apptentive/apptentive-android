@@ -15,6 +15,5 @@
 
     <application>
         <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity" android:theme="@style/ApptentiveTheme"/>
-        <activity android:name="com.apptentive.android.sdk.ViewActivity" android:theme="@style/ApptentiveTheme"/>
     </application>
 </manifest>
