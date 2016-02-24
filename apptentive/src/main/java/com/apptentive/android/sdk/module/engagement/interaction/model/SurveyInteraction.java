@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,6 +10,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Mul
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,9 +18,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Sky Kelsey
- */
 public class SurveyInteraction extends Interaction {
 
 	// Configuration
@@ -129,5 +127,8 @@ public class SurveyInteraction extends Interaction {
 		return false;
 	}
 
-
+	@Override
+	public String getTitle() {
+		return getName();
+	}
 }
