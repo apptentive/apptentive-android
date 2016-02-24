@@ -56,7 +56,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			choice.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					if (getContext() instanceof Activity) {
-						Util.hideSoftKeyboard((Activity) getContext(), MultichoiceSurveyQuestionView.this);
+						Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this);
 					}
 					choiceClicked(choice);
 				}

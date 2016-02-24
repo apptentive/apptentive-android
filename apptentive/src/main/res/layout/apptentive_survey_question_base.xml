@@ -5,6 +5,7 @@
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:cardView="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
@@ -44,9 +45,9 @@
                       android:textSize="@dimen/apptentive_text_small_tiny"
                       android:textColor="@color/apptentive_survey_question_instruction_text_invalid"/>
             <View android:id="@+id/question_top_separater"
-                         android:layout_width="fill_parent"
-                         android:layout_height="1dp"
-                         android:background="@color/apptentive_survey_question_separator"/>
+                  android:layout_width="fill_parent"
+                  android:layout_height="1dp"
+                  android:background="@color/apptentive_survey_question_separator"/>
             <LinearLayout android:id="@+id/answer_container"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
