@@ -185,6 +185,14 @@ public class ApptentiveInternal {
 		return null;
 	}
 
+	public static int getDefaultStatusbarColor(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.statusBarColorDefault;
+		}
+		return R.color.apptentive_transparency;
+	}
+
 	public static String getApptentiveConversationToken(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {

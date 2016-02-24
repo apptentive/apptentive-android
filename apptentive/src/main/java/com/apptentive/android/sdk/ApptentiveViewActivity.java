@@ -64,7 +64,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 			}
 		} catch (Exception e) {
-			Log.e("Error creating ViewActivity.", e);
+			Log.e("Error creating ApptentiveViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
 		}
 
@@ -186,9 +186,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
-		if (ApptentiveInternal.apptentiveTheme != null) {
-			getTheme().setTo(ApptentiveInternal.apptentiveTheme);
-		}
+		getTheme().setTo(ApptentiveInternal.getApptentiveTheme(this));
 	}
 
 	private void addFragmentToAdapter(ApptentiveBaseFragment f, String title) {
