@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -161,7 +162,12 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 
 		badgeSize = SIZE_NORMAL;
 		badgeTextColor = Color.BLACK;
-		unreadMsgCounter = MessageManager.getUnreadMessageCount(context);
+		MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+		if (mgr != null) {
+			unreadMsgCounter = mgr.getUnreadMessageCount(context);
+		} else {
+			unreadMsgCounter = 0;
+		}
 
 		unreadMessagesListener = new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {

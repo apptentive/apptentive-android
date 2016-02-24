@@ -84,6 +84,7 @@ public class PayloadSendWorker {
 						threadRunning.set(false);
 						return;
 					}
+					MessageManager mgr = ApptentiveInternal.getMessageManager(contextRef.get());
 
 					PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
 					if (thread != null && thread != PayloadSendThread.this) {
@@ -92,15 +93,19 @@ public class PayloadSendWorker {
 					}
 
 					PayloadStore db = getPayloadStore(contextRef.get());
-					if (TextUtils.isEmpty(ApptentiveInternal.conversationToken)){
+					if (TextUtils.isEmpty(ApptentiveInternal.getApptentiveConversationToken(contextRef.get()))){
 						Log.i("No conversation token yet.");
-						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+						if (mgr != null) {
+							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+						}
 						goToSleep(NO_TOKEN_SLEEP);
 						continue;
 					}
 					if (!Util.isNetworkConnectionPresent(contextRef.get())) {
 						Log.d("Can't send payloads. No network connection.");
-						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
+						if (mgr != null) {
+							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
+						}
 						goToSleep(NO_CONNECTION_SLEEP_TIME);
 						continue;
 					}
@@ -119,9 +124,13 @@ public class PayloadSendWorker {
 
 					switch (payload.getBaseType()) {
 						case message:
-							MessageManager.onResumeSending();
+							if (mgr != null) {
+								mgr.onResumeSending();
+							}
 							response = ApptentiveClient.postMessage(contextRef.get(), (ApptentiveMessage) payload);
-							MessageManager.onSentMessage(contextRef.get(), (ApptentiveMessage) payload, response);
+							if (mgr != null) {
+								mgr.onSentMessage(contextRef.get(), (ApptentiveMessage) payload, response);
+							}
 							break;
 						case event:
 							response = ApptentiveClient.postEvent(contextRef.get(), (Event) payload);
@@ -160,7 +169,9 @@ public class PayloadSendWorker {
 						} else if (response.isRejectedTemporarily()) {
 							Log.d("Unable to send JSON. Leaving in queue.");
 							if (response.isException()) {
-								MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+								if (mgr != null) {
+									mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+								}
 								goToSleep(NO_CONNECTION_SLEEP_TIME);
 							} else {
 								goToSleep(SERVER_ERROR_SLEEP_TIME);
