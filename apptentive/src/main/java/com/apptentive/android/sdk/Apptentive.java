@@ -44,8 +44,6 @@ import java.util.*;
  */
 public class Apptentive {
 
-	private Apptentive() {
-	}
 
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
@@ -57,8 +55,7 @@ public class Apptentive {
 
 	public static void register(Application application, String apptentiveApiKey) {
 		Log.i("Registering Apptentive.");
-		ApptentiveInternal.init(application, apptentiveApiKey);
-		application.registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(application));
+		ApptentiveInternal.getInstance(application, apptentiveApiKey);
 	}
 
 	// ****************************************************************************************
@@ -151,7 +148,10 @@ public class Apptentive {
 		if (value != null) {
 			value = value.trim();
 		}
-		ApptentiveInternal.addCustomDeviceData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomDeviceData(context, key, value);
+		}
 	}
 
 	/**
@@ -164,7 +164,10 @@ public class Apptentive {
 	 * @param value   A Number value.
 	 */
 	public static void addCustomDeviceData(Context context, String key, Number value) {
-		ApptentiveInternal.addCustomDeviceData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomDeviceData(context, key, value);
+		}
 	}
 
 	/**
@@ -177,15 +180,24 @@ public class Apptentive {
 	 * @param value   A Boolean value.
 	 */
 	public static void addCustomDeviceData(Context context, String key, Boolean value) {
-		ApptentiveInternal.addCustomDeviceData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomDeviceData(context, key, value);
+		}
 	}
 
 	private static void addCustomDeviceData(Context context, String key, Version version) {
-		ApptentiveInternal.addCustomDeviceData(context, key, version);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomDeviceData(context, key, version);
+		}
 	}
 
 	private static void addCustomDeviceData(Context context, String key, DateTime dateTime) {
-		ApptentiveInternal.addCustomDeviceData(context, key, dateTime);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomDeviceData(context, key, dateTime);
+		}
 	}
 
 	/**
@@ -238,7 +250,10 @@ public class Apptentive {
 		if (value != null) {
 			value = value.trim();
 		}
-		ApptentiveInternal.addCustomPersonData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomPersonData(context, key, value);
+		}
 	}
 
 	/**
@@ -251,7 +266,10 @@ public class Apptentive {
 	 * @param value   A Number value.
 	 */
 	public static void addCustomPersonData(Context context, String key, Number value) {
-		ApptentiveInternal.addCustomPersonData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomPersonData(context, key, value);
+		}
 	}
 
 	/**
@@ -264,15 +282,24 @@ public class Apptentive {
 	 * @param value   A Boolean value.
 	 */
 	public static void addCustomPersonData(Context context, String key, Boolean value) {
-		ApptentiveInternal.addCustomPersonData(context, key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomPersonData(context, key, value);
+		}
 	}
 
 	private static void addCustomPersonData(Context context, String key, Version version) {
-		ApptentiveInternal.addCustomPersonData(context, key, version);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomPersonData(context, key, version);
+		}
 	}
 
 	private static void addCustomPersonData(Context context, String key, DateTime dateTime) {
-		ApptentiveInternal.addCustomPersonData(context, key, dateTime);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			internal.addCustomPersonData(context, key, dateTime);
+		}
 	}
 
 	/**
@@ -302,7 +329,7 @@ public class Apptentive {
 	private static final String INTEGRATION_PUSH_TOKEN = "token";
 
 	private static void addIntegration(Context context, String integration, Map<String, String> config) {
-		if (integration == null || config == null) {
+		if (integration == null || config == null || context == null) {
 			return;
 		}
 		CustomData integrationConfig = DeviceManager.loadIntegrationConfig(context);
@@ -319,7 +346,7 @@ public class Apptentive {
 			}
 			Log.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
-			ApptentiveInternal.syncDevice(context);
+			ApptentiveInternal.getInstance(context).syncDevice(context);
 		} catch (JSONException e) {
 			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
@@ -384,6 +411,9 @@ public class Apptentive {
 	 */
 	public static void setPushNotificationIntegration(Context context, int pushProvider, String token) {
 		try {
+			if (context == null ) {
+				return;
+			}
 			CustomData integrationConfig = getIntegrationConfigurationWithoutPushProviders(context);
 			JSONObject pushObject = new JSONObject();
 			pushObject.put(INTEGRATION_PUSH_TOKEN, token);
@@ -405,7 +435,7 @@ public class Apptentive {
 					return;
 			}
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
-			ApptentiveInternal.syncDevice(context);
+			ApptentiveInternal.getInstance(context).syncDevice(context);
 		} catch (JSONException e) {
 			Log.e("Error setting push integration.", e);
 			return;
@@ -434,7 +464,11 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
-		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			return internal.getApptentivePushNotificationData(intent) != null;
+		}
+		return false;
 	}
 
 	/**
@@ -445,7 +479,11 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
-		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			return internal.getApptentivePushNotificationData(bundle) != null;
+		}
+		return false;
 	}
 
 	/**
@@ -460,9 +498,12 @@ public class Apptentive {
 	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Intent intent) {
-		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
-		if (apptentive != null) {
-			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			String apptentive = internal.getApptentivePushNotificationData(intent);
+			if (apptentive != null) {
+				return internal.setPendingPushNotification(context, apptentive);
+			}
 		}
 		return false;
 	}
@@ -479,9 +520,12 @@ public class Apptentive {
 	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Context context, Bundle data) {
-		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
-		if (apptentive != null) {
-			return ApptentiveInternal.setPendingPushNotification(context, apptentive);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			String apptentive = internal.getApptentivePushNotificationData(data);
+			if (apptentive != null) {
+				return internal.setPendingPushNotification(context, apptentive);
+			}
 		}
 		return false;
 	}
@@ -538,7 +582,10 @@ public class Apptentive {
 	 */
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
-		ApptentiveInternal.setRatingProvider(ratingProvider);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			internal.setRatingProvider(ratingProvider);
+		}
 	}
 
 	/**
@@ -549,7 +596,10 @@ public class Apptentive {
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
-		ApptentiveInternal.putRatingProviderArg(key, value);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			internal.putRatingProviderArg(key, value);
+		}
 	}
 
 	// ****************************************************************************************
@@ -580,7 +630,7 @@ public class Apptentive {
 	 */
 	public static boolean showMessageCenter(Activity activity, Map<String, Object> customData) {
 		try {
-			return ApptentiveInternal.showMessageCenterInternal(activity, customData);
+			return ApptentiveInternal.getInstance(activity).showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
@@ -596,7 +646,11 @@ public class Apptentive {
 	 * @return true if a call to {@link #showMessageCenter(Activity)} will display Message Center, else false.
 	 */
 	public static boolean canShowMessageCenter(Context context) {
-		return ApptentiveInternal.canShowMessageCenterInternal(context);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.canShowMessageCenterInternal(context);
+		}
+		return false;
 	}
 
 	/**
@@ -618,7 +672,10 @@ public class Apptentive {
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
-		MessageManager.addHostUnreadMessagesListener(listener);
+		MessageManager mgr = ApptentiveInternal.getMessageManager(null);
+		if (mgr != null) {
+			mgr.addHostUnreadMessagesListener(listener);
+		}
 	}
 
 	/**
@@ -629,7 +686,10 @@ public class Apptentive {
 	 */
 	public static int getUnreadMessageCount(Context context) {
 		try {
-			return MessageManager.getUnreadMessageCount(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+			if (mgr != null) {
+				return mgr.getUnreadMessageCount(context);
+			}
 		} catch (Exception e) {
 			MetricModule.sendError(context.getApplicationContext(), e, null, null);
 		}
@@ -649,9 +709,12 @@ public class Apptentive {
 			message.setBody(text);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.personId);
+			message.setSenderId(ApptentiveInternal.getInstance(context).personId);
 			message.setAssociatedFiles(context, null);
-			MessageManager.sendMessage(context.getApplicationContext(), message);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+			if (mgr != null) {
+				mgr.sendMessage(context.getApplicationContext(), message);
+			}
 		} catch (Exception e) {
 			Log.w("Error sending attachment text.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -677,7 +740,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.personId);
+			message.setSenderId(ApptentiveInternal.getInstance(context).personId);
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
@@ -708,7 +771,10 @@ public class Apptentive {
 			attachmentStoredFiles.add(storedFile);
 
 			message.setAssociatedFiles(context, attachmentStoredFiles);
-			MessageManager.sendMessage(context.getApplicationContext(), message);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+			if (mgr != null) {
+				mgr.sendMessage(context.getApplicationContext(), message);
+			}
 
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
@@ -755,7 +821,7 @@ public class Apptentive {
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.personId);
+			message.setSenderId(ApptentiveInternal.getInstance(context).personId);
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), null);
@@ -773,8 +839,11 @@ public class Apptentive {
 			attachmentStoredFiles.add(storedFile);
 
 			message.setAssociatedFiles(context, attachmentStoredFiles);
-			MessageManager.sendMessage(context.getApplicationContext(), message);
 
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+			if (mgr != null) {
+				mgr.sendMessage(context.getApplicationContext(), message);
+			}
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
@@ -876,7 +945,10 @@ public class Apptentive {
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
-		ApptentiveInternal.setOnSurveyFinishedListener(listener);
+		ApptentiveInternal internal = ApptentiveInternal.getInstance();
+		if (internal != null) {
+			internal.setOnSurveyFinishedListener(listener);
+		}
 	}
 
 	/**
