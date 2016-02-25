@@ -26,7 +26,7 @@ public class TextModalInteractionTest extends ApptentiveInstrumentationTestCase 
 	public void testTextModalInteraction() {
 		Log.e("Running test: testTextModalInteraction()\n\n");
 
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testTextModalInteraction.json");
 
 		Interaction interaction = Interaction.Factory.parseInteraction(json);

@@ -557,7 +557,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		Log.e("Running test: testCanShowInteraction()\n\n");
 		resetDevice();
 
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
 		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
 
