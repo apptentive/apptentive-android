@@ -20,9 +20,9 @@
                                         cardView:cardBackgroundColor="?attr/apptentiveCardViewBackground"
                                         cardView:cardCornerRadius="2dp"
                                         cardView:cardElevation="1dp">
-        <FrameLayout android:layout_width="fill_parent"
+        <FrameLayout android:layout_width="match_parent"
                      android:layout_height="wrap_content">
-            <LinearLayout android:layout_width="fill_parent"
+            <LinearLayout android:layout_width="match_parent"
                           android:layout_height="match_parent"
                           android:paddingTop="8dp"
                           android:paddingBottom="8dp"
@@ -37,7 +37,7 @@
                           android:paddingTop="8dp"
                           android:textSize="@dimen/apptentive_text_medium_small"
                           android:textColor="@color/apptentive_survey_question_text"/>
-                <RelativeLayout android:layout_width="fill_parent"
+                <RelativeLayout android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
                                 android:paddingLeft="16dp"
@@ -69,11 +69,11 @@
                               android:textColor="?attr/apptentive_material_hint_text"/>
                 </RelativeLayout>
                 <View android:id="@+id/question_top_separater"
-                      android:layout_width="fill_parent"
+                      android:layout_width="match_parent"
                       android:layout_height="1dp"
                       android:background="@color/apptentive_survey_question_separator"/>
                 <LinearLayout android:id="@+id/answer_container"
-                              android:layout_width="fill_parent"
+                              android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:layout_marginLeft="8dp"
                               android:layout_marginRight="8dp"

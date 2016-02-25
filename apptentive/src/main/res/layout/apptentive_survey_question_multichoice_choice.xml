@@ -8,7 +8,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/choice"
-              android:layout_width="fill_parent"
+              android:layout_width="match_parent"
               android:layout_height="48dp"
               android:gravity="center_vertical"
               android:orientation="horizontal">

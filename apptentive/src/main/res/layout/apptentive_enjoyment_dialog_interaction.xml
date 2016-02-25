@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
 ~ Please refer to the LICENSE file for the terms and conditions
 ~ under which redistribution and use of this file is permitted.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:apptentive="http://schemas.android.com/apk/res-auto"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
               android:gravity="center">
-    <ScrollView android:layout_width="fill_parent"
+    <ScrollView android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/apptentive_activity_side_padding_enjoyment"
                 android:paddingRight="@dimen/apptentive_activity_side_padding_enjoyment"
                 android:fadingEdge="none">
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:layout_width="fill_parent"
-                      android:layout_height="fill_parent"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
                       android:paddingTop="@dimen/apptentive_activity_vertical_padding"
                       android:paddingBottom="@dimen/apptentive_activity_vertical_padding"
                       android:gravity="center"
                       android:orientation="vertical">
             <LinearLayout android:id="@+id/top_area"
-                          android:layout_width="fill_parent"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveInteractionDialogTopArea"
                           android:orientation="vertical">
                 <TextView android:id="@+id/title"
-                          android:layout_width="fill_parent"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogTitle"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/bottom_area"
-                          android:layout_width="fill_parent"
+                          android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           style="@style/ApptentiveDialogBottomArea"
                           android:orientation="horizontal">
