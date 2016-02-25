@@ -33,7 +33,10 @@
 
 
         <!-- Apptentive Material specific values -->
-        <item name="apptentive_material_background">@color/apptentive_material_background</item>
+        <item name="apptentiveWindowBackground">@color/apptentive_window_background</item>
+        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
+        <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
+
         <item name="apptentive_material_toolbar_foreground">
             @color/apptentive_material_toolbar_foreground
         </item>

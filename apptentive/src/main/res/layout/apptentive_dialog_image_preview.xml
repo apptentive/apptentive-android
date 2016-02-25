@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -13,7 +13,7 @@
     <com.apptentive.android.sdk.util.image.PreviewImageView android:id="@+id/preview_image"
                                                             android:layout_width="match_parent"
                                                             android:layout_height="match_parent"
-                                                            android:background="@color/apptentive_material_background"
+                                                            android:background="@color/apptentive_window_background"
                                                             android:descendantFocusability="beforeDescendants"
                                                             android:contentDescription="@null"
                                                             android:src="@drawable/apptentive_ic_image_default_item"
