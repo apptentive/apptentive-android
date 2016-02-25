@@ -86,7 +86,7 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return ApptentiveInternal.defaultAppDisplayName;
+		return ApptentiveInternal.getDefaultAppDisplayName(null);
 	}
 
 	private JSONObject getMessageCenter() {

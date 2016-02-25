@@ -130,7 +130,7 @@ public class DeviceManager {
 		device.setBrand(Build.BRAND);
 		device.setCpu(Build.CPU_ABI);
 		device.setDevice(Build.DEVICE);
-		device.setUuid(ApptentiveInternal.androidId);
+		device.setUuid(ApptentiveInternal.getAndroidId(context));
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
 

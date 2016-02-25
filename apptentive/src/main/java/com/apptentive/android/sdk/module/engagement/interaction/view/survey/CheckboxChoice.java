@@ -28,7 +28,7 @@ public class CheckboxChoice extends FrameLayout {
 	public CheckboxChoice(Context context, String textString) {
 		super(context);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.getApptentiveTheme(getContext()));
 		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		View choice = inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
 

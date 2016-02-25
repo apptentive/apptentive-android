@@ -70,7 +70,7 @@ public class InteractionManager {
 			return;
 		}
 
-		boolean force = ApptentiveInternal.isAppDebuggable;
+		boolean force = ApptentiveInternal.isApptentiveDebuggable(context);
 
 		if (force || hasCacheExpired(context)) {
 			Log.i("Fetching new Interactions.");
@@ -124,15 +124,7 @@ public class InteractionManager {
 		}
 
 
-		Iterator it = ApptentiveInternal.configUpdateListeners.iterator();
-
-		while (it.hasNext()) {
-			ApptentiveBaseFragment.ConfigUpdateListener listener = (ApptentiveBaseFragment.ConfigUpdateListener) it.next();
-
-			if (listener != null) {
-				listener.onConfigurationUpdated(updateSuccessful);
-			}
-		}
+		ApptentiveInternal.getInstance(appContext).notifyConfigurationUpdated(updateSuccessful);
 
 	}
 

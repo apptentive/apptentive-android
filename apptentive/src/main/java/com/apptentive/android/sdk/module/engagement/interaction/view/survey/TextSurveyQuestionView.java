@@ -32,7 +32,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	public TextSurveyQuestionView(Context context, SurveyState surveyState, final SinglelineQuestion question) {
 		super(context, surveyState, question);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.getApptentiveTheme(getContext()));
 		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer());
 

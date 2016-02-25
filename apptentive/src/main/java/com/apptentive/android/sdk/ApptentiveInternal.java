@@ -201,6 +201,30 @@ public class ApptentiveInternal {
 		return null;
 	}
 
+	public static String getApptentiveApiKey(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.apiKey;
+		}
+		return null;
+	}
+
+	public static String getDefaultAppDisplayName(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.defaultAppDisplayName;
+		}
+		return null;
+	}
+
+	public static boolean isApptentiveDebuggable(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.isAppDebuggable;
+		}
+		return false;
+	}
+
 	public static void setApplicationContext(Context c) {
 		synchronized (ApptentiveInternal.class) {
 			ApptentiveInternal internal = ApptentiveInternal.getInstance();
@@ -208,6 +232,22 @@ public class ApptentiveInternal {
 				internal.appContext = c;
 			}
 		}
+	}
+
+	public static String getPersonId(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.personId;
+		}
+		return null;
+	}
+
+	public static String getAndroidId(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.androidId;
+		}
+		return null;
 	}
 
 	public void checkAndUpdateApptentiveConfigurations() {
@@ -753,5 +793,17 @@ public class ApptentiveInternal {
 		// Use commit() instead of apply(), otherwise it doesn't finish before the app is killed.
 		prefs.edit().clear().commit();
 		ApptentiveDatabase.reset(appContext);
+	}
+
+	public void notifyConfigurationUpdated(boolean successful) {
+		Iterator it = configUpdateListeners.iterator();
+
+		while (it.hasNext()) {
+			ApptentiveBaseFragment.ConfigUpdateListener listener = (ApptentiveBaseFragment.ConfigUpdateListener) it.next();
+
+			if (listener != null) {
+				listener.onConfigurationUpdated(successful);
+			}
+		}
 	}
 }

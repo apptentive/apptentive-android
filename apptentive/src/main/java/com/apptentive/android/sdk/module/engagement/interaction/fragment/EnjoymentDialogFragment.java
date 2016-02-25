@@ -38,7 +38,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_enjoyment_dialog_interaction, container, false);

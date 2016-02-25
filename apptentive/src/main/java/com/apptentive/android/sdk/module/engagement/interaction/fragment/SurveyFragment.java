@@ -76,7 +76,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		}
 
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		// clone the inflater using the ContextThemeWrapper
 		final LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
@@ -183,7 +183,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 	}
 
 	private void callListener(boolean completed) {
-		OnSurveyFinishedListener listener = ApptentiveInternal.getOnSurveyFinishedListener();
+		OnSurveyFinishedListener listener = ApptentiveInternal.getInstance(getContext()).getOnSurveyFinishedListener();
 		if (listener != null) {
 			listener.onSurveyFinished(completed);
 		}

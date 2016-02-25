@@ -36,7 +36,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		Set<String> answers = surveyState.getAnswers(question.getId());
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.getApptentiveTheme(getContext()));
 		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
 

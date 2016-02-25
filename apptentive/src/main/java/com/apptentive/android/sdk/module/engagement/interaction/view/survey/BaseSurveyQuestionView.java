@@ -39,7 +39,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.getApptentiveTheme(getContext()));
 		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_base, this);
 
