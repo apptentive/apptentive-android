@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.tests;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -24,8 +25,14 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected Context testContext;
 	protected Context targetContext;
 
-	static {
-		ApptentiveInternal.getInstance(null).setMinimumLogLevel(Log.Level.VERBOSE);
+
+	/**
+	 * Initializes this test case.
+	 *
+	 * @param params Instrumentation arguments.
+	 */
+	void initialize(Bundle params) {
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {
