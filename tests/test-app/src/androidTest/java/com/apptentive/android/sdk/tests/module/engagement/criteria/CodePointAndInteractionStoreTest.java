@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -204,7 +205,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 
 			// 4 - :
 			resetDevice();
-			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+			ApptentiveInternal.InteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test :");
 			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
@@ -220,7 +221,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 
 			// 5 - $lte
 			resetDevice();
-			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+			ApptentiveInternal.InteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test $lte");
 			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
@@ -237,7 +238,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 
 			// 6 - $lt
 			resetDevice();
-			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+			ApptentiveInternal.InteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test $lt");
 			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);

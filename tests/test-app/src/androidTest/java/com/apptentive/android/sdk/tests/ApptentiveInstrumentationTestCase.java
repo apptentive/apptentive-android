@@ -52,7 +52,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected void resetDevice() {
 		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
 		CodePointStore.clear(getTargetContext());
-		InteractionManager.clear(getTargetContext());
+		ApptentiveInternal.InteractionManager(getTargetContext()).clear(getTargetContext());
 	}
 
 	protected static void sleep(long millis) {
