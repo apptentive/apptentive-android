@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -27,12 +27,9 @@ import com.apptentive.android.sdk.util.cache.ImageMemoryCache;
 import com.apptentive.android.sdk.util.task.ApptentiveDownloaderTask;
 import com.apptentive.android.sdk.util.task.ApptentiveDrawableLoaderTask;
 
-/**
- * @author Barry Li
- */
 public class ApptentiveAttachmentLoader {
 
-	public static final int DRAWABLE_DOWNLOAD_TAG = R.id.drawable_downloader;
+	public static final int DRAWABLE_DOWNLOAD_TAG = R.id.apptentive_drawable_downloader;
 
 	private ImageMemoryCache bitmapMemoryCache;
 	private ArrayList<LoaderRequest> queuedDownLoaderRequests;
