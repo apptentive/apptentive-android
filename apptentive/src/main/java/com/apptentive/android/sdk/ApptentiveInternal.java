@@ -69,6 +69,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ApptentiveInternal {
 
 	MessageManager messageManager;
+	PayloadSendWorker payloadManager;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -127,10 +128,12 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
 					MessageManager msgManager = new MessageManager();
+					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					sApptentiveInternal = new ApptentiveInternal();
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					sApptentiveInternal.messageManager = msgManager;
+					sApptentiveInternal.payloadManager = payloadWorker;
 					if (sApptentiveInternal.appContext instanceof Application) {
 						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 					}
@@ -260,7 +263,6 @@ public class ApptentiveInternal {
 	}
 	public void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
-
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice(appContext);
@@ -274,14 +276,14 @@ public class ApptentiveInternal {
 
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
-		PayloadSendWorker.appWentToForeground(appContext);
-		//MessagePollingWorker.appWentToForeground(appContext);
+		payloadManager.appWentToForeground(appContext);
+		messageManager.appWentToForeground(appContext);
 	}
 
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
-		PayloadSendWorker.appWentToBackground();
-		//MessagePollingWorker.appWentToBackground();
+		payloadManager.appWentToBackground();
+		messageManager.appWentToBackground();
 	}
 
 

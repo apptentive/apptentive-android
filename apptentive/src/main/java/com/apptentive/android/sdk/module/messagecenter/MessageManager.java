@@ -346,7 +346,6 @@ public class MessageManager {
 	}
 
 
-
 	public void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
 			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
@@ -418,7 +417,6 @@ public class MessageManager {
 		}
 	}
 
-
 	// Set when Activity.onResume() is called
 	public void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {
@@ -479,4 +477,13 @@ public class MessageManager {
 		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
 				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
 	}
+
+	public void appWentToForeground(Context context) {
+		pollingWorker.appWentToForeground(context);
+	}
+
+	public void appWentToBackground() {
+		pollingWorker.appWentToBackground();
+	}
+
 }

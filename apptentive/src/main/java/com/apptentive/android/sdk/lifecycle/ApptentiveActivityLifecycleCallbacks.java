@@ -14,9 +14,6 @@ import android.os.Handler;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

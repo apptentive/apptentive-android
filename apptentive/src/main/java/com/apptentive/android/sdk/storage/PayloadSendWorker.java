@@ -32,13 +32,17 @@ public class PayloadSendWorker {
 	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
 	private static final int SERVER_ERROR_SLEEP_TIME = 5000;
 
-	private static PayloadSendThread sPayloadSendThread;
+	private PayloadSendThread sPayloadSendThread;
 
-	private static AtomicBoolean appInForeground = new AtomicBoolean(false);
-	private static AtomicBoolean threadRunning = new AtomicBoolean(false);
+	private AtomicBoolean appInForeground = new AtomicBoolean(false);
+	private AtomicBoolean threadRunning = new AtomicBoolean(false);
+
+
+	public PayloadSendWorker() {
+	}
 
 	// A synchronized getter/setter to the static instance of thread object
-	public static synchronized PayloadSendThread getAndSetPayloadSendThread(boolean expect,
+	public synchronized PayloadSendThread getAndSetPayloadSendThread(boolean expect,
 																																								boolean createNew,
 																																								Context context) {
 		if (expect && createNew && context != null) {
@@ -50,7 +54,7 @@ public class PayloadSendWorker {
 	}
 
 
-	private static PayloadSendThread createPayloadSendThread(final Context appContext) {
+	private PayloadSendThread createPayloadSendThread(final Context appContext) {
 		PayloadSendThread newThread = new PayloadSendThread(appContext);
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -64,11 +68,11 @@ public class PayloadSendWorker {
 		return newThread;
 	}
 
-	private static PayloadStore getPayloadStore(Context context) {
+	private PayloadStore getPayloadStore(Context context) {
 		return ApptentiveDatabase.getInstance(context);
 	}
 
-	private static class PayloadSendThread extends Thread {
+	private class PayloadSendThread extends Thread {
 		private WeakReference<Context> contextRef;
 
 		public PayloadSendThread(Context appContext) {
@@ -194,14 +198,14 @@ public class PayloadSendWorker {
 		}
 	}
 
-	private static void wakeUp() {
+	private void wakeUp() {
 		PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
 		if (thread != null && thread.isAlive()) {
 			thread.interrupt();
 		}
 	}
 
-	public static void appWentToForeground(Context context) {
+	public void appWentToForeground(Context context) {
 		appInForeground.set(true);
 		if (threadRunning.compareAndSet(false, true)) {
 			/* appInForeground was "false", and set to "true"
@@ -213,7 +217,7 @@ public class PayloadSendWorker {
 		}
 	}
 
-	public static void appWentToBackground() {
+	public void appWentToBackground() {
 		appInForeground.set(false);
 		wakeUp();
 	}
