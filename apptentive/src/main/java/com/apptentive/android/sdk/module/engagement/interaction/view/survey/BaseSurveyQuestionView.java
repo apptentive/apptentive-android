@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +30,10 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	protected SurveyState surveyState;
 
 	protected OnSurveyQuestionAnsweredListener listener;
+
+	protected View required;
+	protected View dash;
+	protected TextView instructions;
 
 	protected BaseSurveyQuestionView(Context context, SurveyState surveyState, Q question) {
 		super(context);
@@ -52,6 +57,10 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 			}
 		});
 
+		required = findViewById(R.id.question_required);
+		dash = findViewById(R.id.question_dash);
+		instructions = (TextView) findViewById(R.id.question_instructions);
+
 		TextView title = (TextView) findViewById(R.id.question_title);
 		title.setText(question.getValue());
 
@@ -60,8 +69,22 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	}
 
 	protected void setInstructions(String instructionsText) {
-		TextView instructions = (TextView) findViewById(R.id.question_instructions);
-		if (instructionsText != null && instructionsText.length() > 0) {
+		boolean hasInstructions = !TextUtils.isEmpty(instructionsText);
+
+		View required = findViewById(R.id.question_required);
+		if (question.isRequired()) {
+			required.setVisibility(View.VISIBLE);
+		} else {
+			required.setVisibility(View.GONE);
+		}
+
+		if (question.isRequired() && hasInstructions) {
+			dash.setVisibility(View.VISIBLE);
+		} else {
+			dash.setVisibility(View.GONE);
+		}
+
+		if (hasInstructions) {
 			instructions.setText(instructionsText);
 			instructions.setVisibility(View.VISIBLE);
 		} else {

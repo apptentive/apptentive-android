@@ -32,9 +32,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer());
 
-		String instructionsText = question.isRequired() ? context.getString(R.string.apptentive_required) : context.getString(R.string.apptentive_optional);
-		setInstructions(instructionsText);
-
 		EditText answer = (EditText) findViewById(R.id.answer_text);
 		Set<String> answers = surveyState.getAnswers(question.getId());
 		if (answers.size() > 0) {
