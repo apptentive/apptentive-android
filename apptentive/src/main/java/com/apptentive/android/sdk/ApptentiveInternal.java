@@ -133,10 +133,10 @@ public class ApptentiveInternal {
 					InteractionManager interactionMgr = new InteractionManager();
 					sApptentiveInternal = new ApptentiveInternal();
 					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadManager = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
+					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
 						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 					}
@@ -165,6 +165,17 @@ public class ApptentiveInternal {
 	public static ApptentiveInternal getInstance() {
 		return getInstance(null, null);
 	}
+
+	/**
+	 *
+	 * Use this method to set or clear the internal state (pass in null)
+	 *
+	 * @param instance
+	 */
+	public static void setInstance(ApptentiveInternal instance) {
+		ApptentiveInternal.sApptentiveInternal = instance;
+	}
+
 
 
 	public static Context getApplicationContext() {
