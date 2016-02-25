@@ -8,8 +8,6 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -686,7 +684,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 			EngagementModule.engageInternal(fragment.getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
-			MessageManager mgr = ApptentiveInternal.getMessageManager(null);
+			MessageManager mgr = ApptentiveInternal.MessageManager(null);
 			if (mgr != null) {
 				mgr.updateMessage(fragment.getActivity().getApplicationContext(), textMessages[0]);
 				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount(fragment.getActivity().getApplicationContext()));

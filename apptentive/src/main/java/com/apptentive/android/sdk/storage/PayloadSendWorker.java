@@ -88,7 +88,7 @@ public class PayloadSendWorker {
 						threadRunning.set(false);
 						return;
 					}
-					MessageManager mgr = ApptentiveInternal.getMessageManager(contextRef.get());
+					MessageManager mgr = ApptentiveInternal.MessageManager(contextRef.get());
 
 					PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
 					if (thread != null && thread != PayloadSendThread.this) {

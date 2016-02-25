@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CodePointStore;
@@ -60,7 +61,7 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Activity activity, String eventLabel) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), eventLabel);
+		Interaction interaction = ApptentiveInternal.InteractionManager(activity).getApplicableInteraction(activity.getApplicationContext(), eventLabel);
 		if (interaction != null) {
 			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);
@@ -92,7 +93,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(Context context, String eventLabel) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(context, eventLabel);
+		Interaction interaction = ApptentiveInternal.InteractionManager(context).getApplicableInteraction(context, eventLabel);
 		return interaction != null;
 	}
 

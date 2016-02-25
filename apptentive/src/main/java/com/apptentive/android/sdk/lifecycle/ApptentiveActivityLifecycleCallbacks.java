@@ -80,7 +80,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 
-		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
+		ApptentiveInternal.MessageManager(activity).setCurrentForgroundActivity(activity);
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		}, CHECK_DELAY_SHORT);
 
 
-		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(null);
+		ApptentiveInternal.MessageManager(activity).setCurrentForgroundActivity(null);
 
 	}
 

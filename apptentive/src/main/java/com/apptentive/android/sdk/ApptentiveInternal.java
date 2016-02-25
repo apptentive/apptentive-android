@@ -68,6 +68,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ApptentiveInternal {
 
+	InteractionManager interactionManager;
 	MessageManager messageManager;
 	PayloadSendWorker payloadManager;
 
@@ -129,11 +130,13 @@ public class ApptentiveInternal {
 				if (sApptentiveInternal == null && context != null) {
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
+					InteractionManager interactionMgr = new InteractionManager();
 					sApptentiveInternal = new ApptentiveInternal();
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadManager = payloadWorker;
+					sApptentiveInternal.interactionManager = interactionMgr;
 					if (sApptentiveInternal.appContext instanceof Application) {
 						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 					}
@@ -172,10 +175,18 @@ public class ApptentiveInternal {
 		return null;
 	}
 
-	public static MessageManager getMessageManager(Context context) {
+	public static MessageManager MessageManager(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
 			return internal.messageManager;
+		}
+		return null;
+	}
+
+	public static InteractionManager InteractionManager(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.interactionManager;
 		}
 		return null;
 	}
@@ -426,7 +437,7 @@ public class ApptentiveInternal {
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches(Context context) {
-		InteractionManager.updateCacheExpiration(context, 0);
+		interactionManager.updateCacheExpiration(context, 0);
 		Configuration config = Configuration.load(context);
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save(context);
@@ -683,7 +694,7 @@ public class ApptentiveInternal {
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
 
-			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+			MessageManager mgr = ApptentiveInternal.MessageManager(context);
 			if (mgr != null) {
 				mgr.startMessagePreFetchTask(context);
 			}
@@ -788,7 +799,7 @@ public class ApptentiveInternal {
 
 	private void fetchSdkState() {
 		asyncFetchAppConfiguration(appContext);
-		InteractionManager.asyncFetchAndStoreInteractions(appContext);
+		interactionManager.asyncFetchAndStoreInteractions(appContext);
 	}
 
 	public void resetSdkState() {
