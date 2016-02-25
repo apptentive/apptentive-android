@@ -32,6 +32,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Mul
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
@@ -42,6 +43,8 @@ import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 
 public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
@@ -55,6 +58,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 	private boolean surveySubmitted = false;
 
 	private SurveyState surveyState;
+
+	private LinearLayout questionsContainer;
 
 	public static SurveyFragment newInstance(Bundle bundle) {
 		SurveyFragment fragment = new SurveyFragment();
@@ -89,7 +94,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 			@Override
 			public void onClick(View view) {
 				Util.hideSoftKeyboard(getActivity(), view);
-				if (isSurveyValid()) {
+				boolean valid = validateAndUpdateState();
+				if (valid) {
 					surveySubmitted = true;
 					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
 						Toast toast = new Toast(contextThemeWrapper);
@@ -121,47 +127,56 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 			}
 		});
 
-		LinearLayout questions = (LinearLayout) v.findViewById(R.id.questions);
-		questions.removeAllViews();
+		questionsContainer = (LinearLayout) v.findViewById(R.id.questions);
+		questionsContainer.removeAllViews();
 
 		// Then render all the questions
 		for (final Question question : interaction.getQuestions()) {
+			final BaseSurveyQuestionView surveyQuestionView;
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				TextSurveyQuestionView textQuestionView = new TextSurveyQuestionView(getActivity(), surveyState, (SinglelineQuestion) question);
-				textQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
-						sendMetricForQuestion(getActivity(), question);
-					}
-				});
-				questions.addView(textQuestionView);
+				surveyQuestionView = new TextSurveyQuestionView(getActivity(), surveyState, (SinglelineQuestion) question);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				MultichoiceSurveyQuestionView multichoiceQuestionView = new MultichoiceSurveyQuestionView(getActivity(), surveyState, (MultichoiceQuestion) question);
-				multichoiceQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
-						sendMetricForQuestion(getActivity(), question);
-					}
-				});
-				questions.addView(multichoiceQuestionView);
+				surveyQuestionView = new MultichoiceSurveyQuestionView(getActivity(), surveyState, (MultichoiceQuestion) question);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				MultiselectSurveyQuestionView multiselectQuestionView = new MultiselectSurveyQuestionView(getActivity(), surveyState, (MultiselectQuestion) question);
-				multiselectQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
+				surveyQuestionView = new MultiselectSurveyQuestionView(getActivity(), surveyState, (MultiselectQuestion) question);
+			} else {
+				surveyQuestionView = null;
+			}
+			if (surveyQuestionView != null) {
+				surveyQuestionView.setTag(R.id.apptentive_survey_question_id, question.getId());
+				surveyQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
 					public void onAnswered() {
 						sendMetricForQuestion(getActivity(), question);
+						// Also clear validation state for questions that are no longer invalid.
+						if (surveyState.isQuestionValid(question)) {
+							surveyQuestionView.updateValidationState();
+						}
 					}
 				});
-				questions.addView(multiselectQuestionView);
+				questionsContainer.addView(surveyQuestionView);
 			}
 		}
 		return v;
 	}
 
-	public boolean isSurveyValid() {
-		for (Question question : interaction.getQuestions()) {
-			if (!surveyState.isQuestionValid(question)) {
-				return false;
+	/**
+	 * Run this when the user hits the send button, and only send if it returns true. This method will update the visual validation state of all questions.
+	 * @return true if all questions that have constraints have met those constraints.
+	 */
+	public boolean validateAndUpdateState() {
+		boolean validationPassed = true;
+		Map<String, Question> questionsMap = interaction.getQuestionsAsMap();
+		if (questionsContainer != null) {
+			for (int i = 0; i < questionsContainer.getChildCount(); i++) {
+				BaseSurveyQuestionView surveyQuestionView = (BaseSurveyQuestionView) questionsContainer.getChildAt(i);
+				String questionId = (String) surveyQuestionView.getTag(R.id.apptentive_survey_question_id);
+				if (!surveyState.isQuestionValid(questionsMap.get(questionId))) {
+					validationPassed = false;
+				}
+				surveyQuestionView.updateValidationState();
 			}
 		}
-		return true;
+		return validationPassed;
 	}
 
 	void sendMetricForQuestion(Activity activity, Question question) {

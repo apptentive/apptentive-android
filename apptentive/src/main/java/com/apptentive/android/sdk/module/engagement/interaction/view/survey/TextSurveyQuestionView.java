@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
@@ -24,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 
-/**
- * @author Sky Kelsey.
- */
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> {
 
 	public TextSurveyQuestionView(Context context, SurveyState surveyState, final SinglelineQuestion question) {
@@ -60,9 +56,8 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 					if (editable.length() != 0) {
 						state.addAnswer(questionId, editable.toString().trim());
 					}
-					updateValidationState();
-					fireListener();
 				}
+				fireListener();
 			}
 		});
 

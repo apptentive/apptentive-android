@@ -91,7 +91,6 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			}
 		}
 		surveyState.setAnswers(question.getId(), checkedChoices);
-		updateValidationState();
 		requestFocus();
 		fireListener();
 	}

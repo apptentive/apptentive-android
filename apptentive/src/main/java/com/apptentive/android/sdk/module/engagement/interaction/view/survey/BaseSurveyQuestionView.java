@@ -57,9 +57,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 		String instructionsText = question.getInstructions();
 		setInstructions(instructionsText);
-
-
-		updateValidationState();
 	}
 
 	protected void setInstructions(String instructionsText) {
@@ -80,28 +77,21 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		this.listener = listener;
 	}
 
+	/**
+	 * Always call this when the answer value changes.
+	 */
 	protected void fireListener() {
 		if (listener != null) {
 			listener.onAnswered();
 		}
 	}
 
-	protected void updateValidationState() {
-/*
-		Resources resources = getContext().getResources();
-		TextView instructions = (TextView) findViewById(R.id.question_instructions);
-		View validationFrame = findViewById(R.id.question_background_validation);
+	public void updateValidationState() {
+		View validationFailedBorder = findViewById(R.id.validation_failed_border);
 		if (question != null && !surveyState.isQuestionValid(question)) {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_invalid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_invalid));
-			instructions.setTypeface(Typeface.DEFAULT_BOLD);
-			validationFrame.setBackgroundDrawable(resources.getDrawable(R.drawable.apptentive_survey_question_background_invalid));
+			validationFailedBorder.setVisibility(View.VISIBLE);
 		} else {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_valid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_valid));
-			instructions.setTypeface(Typeface.DEFAULT);
-			validationFrame.setBackgroundColor(Color.TRANSPARENT);
+			validationFailedBorder.setVisibility(View.INVISIBLE);
 		}
-*/
 	}
 }
