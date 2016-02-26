@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.util.Util;
@@ -37,98 +36,98 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 0 - $gt
 			Log.e("Test $gt");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 1 - $gte
 			resetDevice();
 			Log.e("Test $gte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 2 - $ne
 			resetDevice();
 			Log.e("Test $ne");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 3 - $eq
 			resetDevice();
 			Log.e("Test $eq");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 4 - :
 			resetDevice();
 			Log.e("Test :");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 5 - $lte
 			resetDevice();
 			Log.e("Test $lte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 6 - $lt
 			resetDevice();
 			Log.e("Test $lt");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
@@ -151,110 +150,110 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 0 - $gt
 			resetDevice();
 			Log.e("Test $gt");
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 1 - $gte
 			resetDevice();
 			Log.e("Test $gte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 2 - $ne
 			resetDevice();
 			Log.e("Test $ne");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 3 - $eq
 			resetDevice();
 			Log.e("Test $eq");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 4 - :
 			resetDevice();
 			ApptentiveInternal.getInteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test :");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 5 - $lte
 			resetDevice();
 			ApptentiveInternal.getInteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test $lte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 6 - $lt
 			resetDevice();
 			ApptentiveInternal.getInteractionManager(getTargetContext()).storeInteractionsPayloadString(getTargetContext(), json);
 			Log.e("Test $lt");
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), false, "test.code.point", "1.1", 3);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
 
 		} catch (JSONException e) {
@@ -279,9 +278,9 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			resetDevice();
 			Log.e("Test $after");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			sleep(300);
 			assertTrue(criteria.isMet(getTargetContext()));
 			sleep(300);
@@ -290,9 +289,9 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 1 - $ne
 			resetDevice();
 			Log.e("Test $ne");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			sleep(300);
 			assertTrue(criteria.isMet(getTargetContext()));
 			sleep(300);
@@ -301,10 +300,10 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 2 - $eq // There's no easy way to test this unless we contrive the times.
 			resetDevice();
 			Log.e("Test $eq");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			sleep(300);
 			assertFalse(criteria.isMet(getTargetContext()));
 			sleep(300);
@@ -313,11 +312,11 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 3 - : // Ditto
 			resetDevice();
 			Log.e("Test :");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			sleep(300);
 			assertFalse(criteria.isMet(getTargetContext()));
 			sleep(300);
@@ -326,12 +325,12 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 4 - $before
 			resetDevice();
 			Log.e("Test $before");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "test.code.point");
 			sleep(300);
 			assertFalse(criteria.isMet(getTargetContext()));
 			sleep(300);
@@ -361,98 +360,98 @@ public class CodePointAndInteractionStoreTest extends ApptentiveInstrumentationT
 			// 0 - $gt
 			Log.e("Test $gt");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 1 - $gte
 			resetDevice();
 			Log.e("Test $gte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 2 - $ne
 			resetDevice();
 			Log.e("Test $ne");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
 
 			// 3 - $eq
 			resetDevice();
 			Log.e("Test $eq");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 4 - :
 			resetDevice();
 			Log.e("Test :");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 5 - $lte
 			resetDevice();
 			Log.e("Test $lte");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
 
 			// 6 - $lt
 			resetDevice();
 			Log.e("Test $lt");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertTrue(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
-			CodePointStore.storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
+			ApptentiveInternal.getCodePointStore(getTargetContext()).storeRecord(getTargetContext(), true, "test.interaction", appVersionName, appVersionCode);
 			assertFalse(criteria.isMet(getTargetContext()));
 
 		} catch (JSONException e) {

@@ -13,7 +13,6 @@ import android.test.InstrumentationTestCase;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
 /**
@@ -50,7 +49,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 
 	protected void resetDevice() {
 		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		CodePointStore.clear(getTargetContext());
+		ApptentiveInternal.getCodePointStore(getTargetContext()).clear(getTargetContext());
 		ApptentiveInternal.getInteractionManager(getTargetContext()).clear(getTargetContext());
 	}
 

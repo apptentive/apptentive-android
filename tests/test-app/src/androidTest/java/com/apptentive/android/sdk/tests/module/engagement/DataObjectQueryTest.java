@@ -11,7 +11,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
@@ -42,29 +41,29 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 
 		// 1
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNull(interaction);
 
 		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
 		// 3
 		Apptentive.addCustomPersonData(getTargetContext(), "foo", "bar");
 		PersonManager.storePersonAndReturnIt(getTargetContext());
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
 		// 4
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNull(interaction);
 
 		// 4
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 	}
@@ -86,17 +85,17 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 
 		// 1
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
 		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNull(interaction);
 
 		// 3
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 	}
@@ -117,12 +116,12 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 
 		// 1
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNotNull(interaction);
 
 		// 2
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
+		ApptentiveInternal.getCodePointStore(getTargetContext()).storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
 		interaction = ApptentiveInternal.getInteractionManager(getTargetContext()).getApplicableInteraction(getTargetContext(), "local#app#init");
 		assertNull(interaction);
 	}
