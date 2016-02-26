@@ -6,12 +6,10 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -22,7 +20,6 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
-import com.apptentive.android.sdk.util.Util;
 
 abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
 
@@ -35,27 +32,21 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	protected View dash;
 	protected TextView instructions;
 
+	protected final Context contextThemeWrapper;
+	protected final LayoutInflater inflater;
+
 	protected BaseSurveyQuestionView(Context context, SurveyState surveyState, Q question) {
 		super(context);
 		this.question = question;
 		this.surveyState = surveyState;
 
 		// Required to remove focus from any EditTexts.
-		setFocusable(true);
-		setFocusableInTouchMode(true);
+//		setFocusable(true);
+//		setFocusableInTouchMode(true);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
+		contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_base, this);
-
-		setOnTouchListener(new OnTouchListener() {
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				if (getContext() instanceof Activity) {
-					Util.hideSoftKeyboard((Activity) getContext(), BaseSurveyQuestionView.this);
-				}
-				return false;
-			}
-		});
 
 		required = findViewById(R.id.question_required);
 		dash = findViewById(R.id.question_dash);

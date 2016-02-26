@@ -9,4 +9,5 @@
     <item name="apptentive_message_center_view" type="id"/>
     <item name="apptentive_drawable_downloader" type="id"/>
     <item name="apptentive_survey_question_id" type="id"/>
+    <item name="apptentive_survey_answer_id" type="id"/>
 </resources>
