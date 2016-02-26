@@ -52,7 +52,9 @@ import org.json.JSONObject;
  *
  * @author Sky Kelsey
  */
-public class CodePointStore extends JSONObject {
+public class CodePointStore {
+
+	private JSONObject store;
 
 	public static final String KEY_CODE_POINT = "code_point";
 	public static final String KEY_INTERACTIONS = "interactions";
@@ -61,69 +63,52 @@ public class CodePointStore extends JSONObject {
 	public static final String KEY_VERSION = "version";
 	public static final String KEY_BUILD = "build";
 
-	private static CodePointStore instance;
-
-	private static CodePointStore getInstance(Context context) {
-		if (instance == null) {
-			instance = load(context);
-		}
-		return instance;
+	public CodePointStore(Context context) {
+		store = loadFromPreference(context);
 	}
 
-	private CodePointStore() {
-		super();
-	}
-
-	private CodePointStore(String json) throws JSONException {
-		super(json);
-	}
-
-	private static void save(Context context) {
+	private void saveToPreference(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, instance.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, store.toString()).commit();
 	}
 
-	private static CodePointStore load(Context context) {
+	private JSONObject loadFromPreference(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		return CodePointStore.load(prefs);
-	}
-
-	private static CodePointStore load(SharedPreferences prefs) {
 		String json = prefs.getString(Constants.PREF_KEY_CODE_POINT_STORE, null);
 		try {
 			if (json != null) {
-				return new CodePointStore(json);
+				return new JSONObject(json);
 			}
 		} catch (JSONException e) {
 			Log.e("Error loading CodePointStore from SharedPreferences.", e);
 		}
-		return new CodePointStore();
+		return new JSONObject();
 	}
 
-	public static synchronized void storeCodePointForCurrentAppVersion(Context context, String fullCodePoint) {
+
+	public synchronized void storeCodePointForCurrentAppVersion(Context context, String fullCodePoint) {
 		storeRecordForCurrentAppVersion(context, false, fullCodePoint);
 	}
 
-	public static synchronized void storeInteractionForCurrentAppVersion(Context context, String fullCodePoint) {
+	public synchronized void storeInteractionForCurrentAppVersion(Context context, String fullCodePoint) {
 		storeRecordForCurrentAppVersion(context, true, fullCodePoint);
 	}
 
-	private static void storeRecordForCurrentAppVersion(Context context, boolean isInteraction, String fullCodePoint) {
+	private void storeRecordForCurrentAppVersion(Context context, boolean isInteraction, String fullCodePoint) {
 		String version = Util.getAppVersionName(context);
 		int build = Util.getAppVersionCode(context);
 		storeRecord(context, isInteraction, fullCodePoint, version, build);
 	}
 
-	public static synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build) {
+	public synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build) {
 		storeRecord(context, isInteraction, fullCodePoint, version, build, Util.currentTimeSeconds());
 	}
 
-	public static synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
+	public synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
 		String buildString = String.valueOf(build);
-		CodePointStore store = getInstance(context);
-		if (store != null && fullCodePoint != null && version != null) {
+		if (fullCodePoint != null && version != null) {
 			try {
-				String recordTypeKey = isInteraction ? KEY_INTERACTIONS : KEY_CODE_POINT;
+				String recordTypeKey = isInteraction ? CodePointStore.KEY_INTERACTIONS : CodePointStore.KEY_CODE_POINT;
 				JSONObject recordType;
 				if (!store.isNull(recordTypeKey)) {
 					recordType = store.getJSONObject(recordTypeKey);
@@ -183,15 +168,14 @@ public class CodePointStore extends JSONObject {
 				}
 				buildJson.put(buildString, existingBuildCount + 1);
 
-				save(context);
+				saveToPreference(context);
 			} catch (JSONException e) {
 				Log.w("Unable to store code point %s.", e, fullCodePoint);
 			}
 		}
 	}
 
-	public static JSONObject getRecord(Context context, boolean interaction, String name) {
-		CodePointStore store = getInstance(context);
+	public JSONObject getRecord(boolean interaction, String name) {
 		String recordTypeKey = interaction ? KEY_INTERACTIONS : KEY_CODE_POINT;
 		try {
 			if (!store.isNull(recordTypeKey)) {
@@ -208,9 +192,9 @@ public class CodePointStore extends JSONObject {
 		return null;
 	}
 
-	public static Long getTotalInvokes(Context context, boolean interaction, String name) {
+	public Long getTotalInvokes(boolean interaction, String name) {
 		try {
-			JSONObject record = getRecord(context, interaction, name);
+			JSONObject record = getRecord(interaction, name);
 			if (record != null && record.has(KEY_TOTAL)) {
 				return record.getLong(KEY_TOTAL);
 			}
@@ -220,9 +204,9 @@ public class CodePointStore extends JSONObject {
 		return 0l;
 	}
 
-	public static Double getLastInvoke(Context context, boolean interaction, String name) {
+	public Double getLastInvoke(boolean interaction, String name) {
 		try {
-			JSONObject record = getRecord(context, interaction, name);
+			JSONObject record = getRecord(interaction, name);
 			if (record != null && record.has(KEY_LAST)) {
 				return record.getDouble(KEY_LAST);
 			}
@@ -232,9 +216,9 @@ public class CodePointStore extends JSONObject {
 		return null;
 	}
 
-	public static Long getVersionInvokes(Context context, boolean interaction, String name, String version) {
+	public Long getVersionInvokes(boolean interaction, String name, String version) {
 		try {
-			JSONObject record = getRecord(context, interaction, name);
+			JSONObject record = getRecord(interaction, name);
 			if (record != null && record.has(KEY_VERSION)) {
 				JSONObject versionJson = record.getJSONObject(KEY_VERSION);
 				if (versionJson.has(version)) {
@@ -247,9 +231,9 @@ public class CodePointStore extends JSONObject {
 		return 0l;
 	}
 
-	public static Long getBuildInvokes(Context context, boolean interaction, String name, String build) {
+	public Long getBuildInvokes(boolean interaction, String name, String build) {
 		try {
-			JSONObject record = getRecord(context, interaction, name);
+			JSONObject record = getRecord(interaction, name);
 			if (record != null && record.has(KEY_BUILD)) {
 				JSONObject buildJson = record.getJSONObject(KEY_BUILD);
 				if (buildJson.has(build)) {
@@ -262,13 +246,14 @@ public class CodePointStore extends JSONObject {
 		return 0l;
 	}
 
-	public static String toString(Context context) {
-		return "CodePointStore:  " + getInstance(context).toString();
+	public String toString() {
+		return "CodePointStore:  " + store.toString();
 	}
 
-	public static void clear(Context context) {
+	public void clear(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).commit();
-		instance = null;
+		store = new JSONObject();
 	}
+
 }

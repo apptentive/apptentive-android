@@ -25,6 +25,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.AppRelease;
+import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.CustomData;
@@ -72,6 +73,7 @@ public class ApptentiveInternal {
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
 	ApptentiveDatabase database;
+	CodePointStore codePointStore;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -135,10 +137,13 @@ public class ApptentiveInternal {
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
 					ApptentiveDatabase db = new ApptentiveDatabase(context.getApplicationContext());
+					CodePointStore store = new CodePointStore(context);
+
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.database = db;
+					sApptentiveInternal.codePointStore = store;
 
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
@@ -209,6 +214,15 @@ public class ApptentiveInternal {
 		if (internal != null) {
 			return internal.database;
 		}
+		return null;
+	}
+
+	public static CodePointStore getCodePointStore(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.codePointStore;
+		}
+
 		return null;
 	}
 
