@@ -10,9 +10,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
-    <android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
-                                                android:layout_height="match_parent"
-                                                android:background="#F4F4F4">
+    <com.apptentive.android.sdk.view.ApptentiveNestedScrollView android:layout_width="match_parent"
+                                                                android:layout_height="match_parent"
+                                                                android:background="#F4F4F4">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical">
@@ -65,5 +65,5 @@
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </com.apptentive.android.sdk.view.ApptentiveNestedScrollView>
 </LinearLayout>
