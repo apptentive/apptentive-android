@@ -48,7 +48,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
@@ -63,7 +62,7 @@ import java.util.List;
  * as both a nested scrolling parent and child on both new and old versions of Android.
  * Nested scrolling is enabled by default.
  */
-public class NestedScrollView extends FrameLayout implements NestedScrollingParent,
+public class ApptentiveNestedScrollView extends FrameLayout implements NestedScrollingParent,
 		NestedScrollingChild, ScrollingView {
 	static final int ANIMATED_SCROLL_GAP = 250;
 
@@ -89,7 +88,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
 		 * @param oldScrollX Previous horizontal scroll origin.
 		 * @param oldScrollY Previous vertical scroll origin.
 		 */
-		void onScrollChange(NestedScrollView v, int scrollX, int scrollY,
+		void onScrollChange(ApptentiveNestedScrollView v, int scrollX, int scrollY,
 												int oldScrollX, int oldScrollY);
 	}
 
@@ -180,15 +179,15 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
 
 	private OnScrollChangeListener mOnScrollChangeListener;
 
-	public NestedScrollView(Context context) {
+	public ApptentiveNestedScrollView(Context context) {
 		this(context, null);
 	}
 
-	public NestedScrollView(Context context, AttributeSet attrs) {
+	public ApptentiveNestedScrollView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public NestedScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public ApptentiveNestedScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		initScrollView();
 
@@ -1879,7 +1878,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
 			if (super.performAccessibilityAction(host, action, arguments)) {
 				return true;
 			}
-			final NestedScrollView nsvHost = (NestedScrollView) host;
+			final ApptentiveNestedScrollView nsvHost = (ApptentiveNestedScrollView) host;
 			if (!nsvHost.isEnabled()) {
 				return false;
 			}
@@ -1912,7 +1911,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
 		@Override
 		public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
 			super.onInitializeAccessibilityNodeInfo(host, info);
-			final NestedScrollView nsvHost = (NestedScrollView) host;
+			final ApptentiveNestedScrollView nsvHost = (ApptentiveNestedScrollView) host;
 			info.setClassName(ScrollView.class.getName());
 			if (nsvHost.isEnabled()) {
 				final int scrollRange = nsvHost.getScrollRange();
@@ -1931,7 +1930,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
 		@Override
 		public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
 			super.onInitializeAccessibilityEvent(host, event);
-			final NestedScrollView nsvHost = (NestedScrollView) host;
+			final ApptentiveNestedScrollView nsvHost = (ApptentiveNestedScrollView) host;
 			event.setClassName(ScrollView.class.getName());
 			final AccessibilityRecordCompat record = AccessibilityEventCompat.asRecord(event);
 			final boolean scrollable = nsvHost.getScrollRange() > 0;
