@@ -17,28 +17,26 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
 abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
 
 	protected Q question;
-	protected SurveyState surveyState;
+	private OnSurveyQuestionAnsweredListener listener;
 
-	protected OnSurveyQuestionAnsweredListener listener;
-
-	protected View required;
-	protected View dash;
-	protected TextView instructions;
+	protected View requiredView;
+	protected View dashView;
+	protected TextView instructionsView;
 
 	protected final Context contextThemeWrapper;
 	protected final LayoutInflater inflater;
 
-	protected BaseSurveyQuestionView(Context context, SurveyState surveyState, Q question) {
+	private View validationFailedBorder;
+
+	protected BaseSurveyQuestionView(Context context, Q question) {
 		super(context);
 		this.question = question;
-		this.surveyState = surveyState;
 
 		// Required to remove focus from any EditTexts.
 //		setFocusable(true);
@@ -48,38 +46,40 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_base, this);
 
-		required = findViewById(R.id.question_required);
-		dash = findViewById(R.id.question_dash);
-		instructions = (TextView) findViewById(R.id.question_instructions);
+		requiredView = findViewById(R.id.question_required);
+		dashView = findViewById(R.id.question_dash);
+		instructionsView = (TextView) findViewById(R.id.question_instructions);
 
 		TextView title = (TextView) findViewById(R.id.question_title);
 		title.setText(question.getValue());
 
 		String instructionsText = question.getInstructions();
 		setInstructions(instructionsText);
+
+		validationFailedBorder = findViewById(R.id.validation_failed_border);
 	}
 
 	protected void setInstructions(String instructionsText) {
 		boolean hasInstructions = !TextUtils.isEmpty(instructionsText);
 
-		View required = findViewById(R.id.question_required);
+		requiredView = findViewById(R.id.question_required);
 		if (question.isRequired()) {
-			required.setVisibility(View.VISIBLE);
+			requiredView.setVisibility(View.VISIBLE);
 		} else {
-			required.setVisibility(View.GONE);
+			requiredView.setVisibility(View.GONE);
 		}
 
 		if (question.isRequired() && hasInstructions) {
-			dash.setVisibility(View.VISIBLE);
+			dashView.setVisibility(View.VISIBLE);
 		} else {
-			dash.setVisibility(View.GONE);
+			dashView.setVisibility(View.GONE);
 		}
 
 		if (hasInstructions) {
-			instructions.setText(instructionsText);
-			instructions.setVisibility(View.VISIBLE);
+			instructionsView.setText(instructionsText);
+			instructionsView.setVisibility(View.VISIBLE);
 		} else {
-			instructions.setVisibility(View.GONE);
+			instructionsView.setVisibility(View.GONE);
 		}
 	}
 
@@ -96,16 +96,23 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	 */
 	protected void fireListener() {
 		if (listener != null) {
-			listener.onAnswered();
+			listener.onAnswered(this);
 		}
 	}
 
-	public void updateValidationState() {
-		View validationFailedBorder = findViewById(R.id.validation_failed_border);
-		if (question != null && !surveyState.isQuestionValid(question)) {
-			validationFailedBorder.setVisibility(View.VISIBLE);
-		} else {
+	/**
+	 * Each subclass needs to override this based on the rules for that class.
+	 * @return true if this question can be submitted, else false.
+	 */
+	public boolean isValid() {
+		return false;
+	}
+
+	public void updateValidationState(boolean valid) {
+		if (valid) {
 			validationFailedBorder.setVisibility(View.INVISIBLE);
+		} else {
+			validationFailedBorder.setVisibility(View.VISIBLE);
 		}
 	}
 }

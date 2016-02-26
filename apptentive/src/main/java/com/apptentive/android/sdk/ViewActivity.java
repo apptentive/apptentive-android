@@ -22,7 +22,6 @@ import com.apptentive.android.sdk.module.ActivityContent;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.*;
 import com.apptentive.android.sdk.module.engagement.interaction.view.*;
-import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyInteractionView;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
@@ -84,10 +83,6 @@ public class ViewActivity extends AppCompatActivity implements ActivityCompat.On
 							case AppStoreRating:
 								applyApptentiveTheme(false);
 								activityContent = new AppStoreRatingInteractionView((AppStoreRatingInteraction) interaction);
-								break;
-							case Survey:
-								applyApptentiveTheme(false);
-								activityContent = new SurveyInteractionView((SurveyInteraction) interaction);
 								break;
 							case MessageCenter:
 								applyApptentiveTheme(true);

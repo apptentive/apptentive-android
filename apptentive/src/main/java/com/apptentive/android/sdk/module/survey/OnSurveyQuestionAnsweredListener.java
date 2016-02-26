@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.survey;
 
-/**
- * @author Sky Kelsey.
- */
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
+
+
 public interface OnSurveyQuestionAnsweredListener {
-	public void onAnswered();
+	void onAnswered(BaseSurveyQuestionView questionView);
 }

@@ -24,30 +24,29 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
-public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
+public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener {
 
 	private static final String EVENT_CANCEL = "cancel";
 	private static final String EVENT_SUBMIT = "submit";
@@ -57,9 +56,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 	private static final String KEY_SURVEY_DATA = "survey_data";
 	private boolean surveySubmitted = false;
 
-	private SurveyState surveyState;
-
 	private LinearLayout questionsContainer;
+
+	private Set<String> questionsWithSentMetrics;
 
 	public static SurveyFragment newInstance(Bundle bundle) {
 		SurveyFragment fragment = new SurveyFragment();
@@ -69,16 +68,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (savedInstanceState != null) {
-			surveySubmitted = savedInstanceState.getBoolean(KEY_SURVEY_SUBMITTED, false);
-			surveyState = savedInstanceState.getParcelable(KEY_SURVEY_DATA);
-		}
-		if (surveyState == null) {
-			surveyState = new SurveyState(interaction);
-		}
 		if (interaction == null || surveySubmitted) {
 			getActivity().finish();
 		}
+
+		questionsWithSentMetrics = new HashSet<>(interaction.getQuestions().size());
 
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.apptentiveTheme);
@@ -110,10 +104,12 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 					getActivity().finish();
 
 					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
-					ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
+
+					// TODO: Extract survey state from views and send it as before.
+					//ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
+
 					Log.d("Survey Submitted.");
 					callListener(true);
-					cleanup();
 				} else {
 					Toast toast = new Toast(contextThemeWrapper);
 					toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
@@ -134,25 +130,17 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 		for (final Question question : interaction.getQuestions()) {
 			final BaseSurveyQuestionView surveyQuestionView;
 			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				surveyQuestionView = new TextSurveyQuestionView(getActivity(), surveyState, (SinglelineQuestion) question);
+				surveyQuestionView = new TextSurveyQuestionView(getActivity(), (SinglelineQuestion) question);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				surveyQuestionView = new MultichoiceSurveyQuestionView(getActivity(), surveyState, (MultichoiceQuestion) question);
+				surveyQuestionView = new MultichoiceSurveyQuestionView(getActivity(), (MultichoiceQuestion) question);
 			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				surveyQuestionView = new MultiselectSurveyQuestionView(getActivity(), surveyState, (MultiselectQuestion) question);
+				surveyQuestionView = new MultiselectSurveyQuestionView(getActivity(), (MultiselectQuestion) question);
 			} else {
 				surveyQuestionView = null;
 			}
 			if (surveyQuestionView != null) {
 				surveyQuestionView.setTag(R.id.apptentive_survey_question_id, question.getId());
-				surveyQuestionView.setOnSurveyQuestionAnsweredListener(new OnSurveyQuestionAnsweredListener() {
-					public void onAnswered() {
-						sendMetricForQuestion(getActivity(), question);
-						// Also clear validation state for questions that are no longer invalid.
-						if (surveyState.isQuestionValid(question)) {
-							surveyQuestionView.updateValidationState();
-						}
-					}
-				});
+				surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
 				questionsContainer.addView(surveyQuestionView);
 			}
 		}
@@ -161,40 +149,33 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 
 	/**
 	 * Run this when the user hits the send button, and only send if it returns true. This method will update the visual validation state of all questions.
+	 *
 	 * @return true if all questions that have constraints have met those constraints.
 	 */
 	public boolean validateAndUpdateState() {
 		boolean validationPassed = true;
-		Map<String, Question> questionsMap = interaction.getQuestionsAsMap();
 		if (questionsContainer != null) {
 			for (int i = 0; i < questionsContainer.getChildCount(); i++) {
 				BaseSurveyQuestionView surveyQuestionView = (BaseSurveyQuestionView) questionsContainer.getChildAt(i);
-				String questionId = (String) surveyQuestionView.getTag(R.id.apptentive_survey_question_id);
-				if (!surveyState.isQuestionValid(questionsMap.get(questionId))) {
+				boolean valid = surveyQuestionView.isValid();
+				surveyQuestionView.updateValidationState(valid);
+				if (!valid) {
 					validationPassed = false;
 				}
-				surveyQuestionView.updateValidationState();
 			}
 		}
 		return validationPassed;
 	}
 
-	void sendMetricForQuestion(Activity activity, Question question) {
-		String questionId = question.getId();
-		if (!surveyState.isMetricSent(questionId) && surveyState.isQuestionValid(question)) {
-			JSONObject answerData = new JSONObject();
-			try {
-				answerData.put("id", question.getId());
-			} catch (JSONException e) {
-				// Never happens.
-			}
-			EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData.toString());
-			surveyState.markMetricSent(questionId);
+	void sendMetricForQuestion(Activity activity, String questionId) {
+		JSONObject answerData = new JSONObject();
+		try {
+			answerData.put("id", questionId);
+		} catch (JSONException e) {
+			// Never happens.
 		}
-	}
-
-	private void cleanup() {
-		surveyState = null;
+		EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData.toString());
+		questionsWithSentMetrics.add(questionId);
 	}
 
 	private void callListener(boolean completed) {
@@ -205,15 +186,20 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean(KEY_SURVEY_SUBMITTED, surveySubmitted);
-		outState.putParcelable(KEY_SURVEY_DATA, surveyState);
-	}
-
-	@Override
 	public boolean onBackPressed() {
 		EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
 		return false;
+	}
+
+	@Override
+	public void onAnswered(BaseSurveyQuestionView questionView) {
+		String questionId = (String) questionView.getTag(R.id.apptentive_survey_question_id);
+		if (!questionsWithSentMetrics.contains(questionId)) {
+			sendMetricForQuestion(getActivity(), questionId);
+		}
+		// Also clear validation state for questions that are no longer invalid.
+		if (questionView.isValid()) {
+			questionView.updateValidationState(true);
+		}
 	}
 }

@@ -14,15 +14,17 @@ import android.widget.RadioGroup;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.*;
 
+
 public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements RadioGroup.OnCheckedChangeListener {
 
-	public MultichoiceSurveyQuestionView(Context context, SurveyState surveyState, MultichoiceQuestion question) {
-		super(context, surveyState, question);
+	boolean buttonChecked;
+
+	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
+		super(context, question);
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
@@ -42,9 +44,15 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		buttonChecked = true;
 		if (getContext() instanceof Activity) {
 			Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this);
 		}
 		fireListener();
+	}
+
+	@Override
+	public boolean isValid() {
+		return question.isRequired() && buttonChecked;
 	}
 }

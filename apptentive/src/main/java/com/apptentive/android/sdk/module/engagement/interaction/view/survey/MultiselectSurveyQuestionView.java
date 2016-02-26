@@ -16,20 +16,22 @@ import android.widget.LinearLayout;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.List;
 
+
 public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<MultiselectQuestion> implements CompoundButton.OnCheckedChangeListener {
 
-	public MultiselectSurveyQuestionView(Context context, SurveyState surveyState, MultiselectQuestion question) {
-		super(context, surveyState, question);
+	LinearLayout choiceContainer;
+
+	public MultiselectSurveyQuestionView(Context context, MultiselectQuestion question) {
+		super(context, question);
 
 		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multiselect, getAnswerContainer());
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
-		LinearLayout choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
+		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
@@ -48,5 +50,20 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 			Util.hideSoftKeyboard(getContext(), MultiselectSurveyQuestionView.this);
 		}
 		fireListener();
+	}
+
+	@Override
+	public boolean isValid() {
+		int checkedBoxes = 0;
+		for (int i = 0; i < choiceContainer.getChildCount(); i++) {
+			CheckBox checkBox = (CheckBox) choiceContainer.getChildAt(i);
+			if (checkBox.isChecked()) {
+				checkedBoxes++;
+			}
+		}
+		// If it is answered at all, it must be answered properly.
+		return
+				(!question.isRequired() && checkedBoxes == 0) ||
+						((question.getMinSelections() <= checkedBoxes) && (checkedBoxes <= question.getMaxSelections()));
 	}
 }
