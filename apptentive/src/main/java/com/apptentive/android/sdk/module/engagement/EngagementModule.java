@@ -17,7 +17,6 @@ import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -61,7 +60,7 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Activity activity, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.InteractionManager(activity).getApplicableInteraction(activity.getApplicationContext(), eventLabel);
+		Interaction interaction = ApptentiveInternal.getInteractionManager(activity).getApplicableInteraction(activity.getApplicationContext(), eventLabel);
 		if (interaction != null) {
 			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);
@@ -93,7 +92,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.InteractionManager(context).getApplicableInteraction(context, eventLabel);
+		Interaction interaction = ApptentiveInternal.getInteractionManager(context).getApplicableInteraction(context, eventLabel);
 		return interaction != null;
 	}
 

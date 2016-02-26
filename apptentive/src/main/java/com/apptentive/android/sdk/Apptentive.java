@@ -671,7 +671,7 @@ public class Apptentive {
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
-		MessageManager mgr = ApptentiveInternal.MessageManager(null);
+		MessageManager mgr = ApptentiveInternal.getMessageManager(null);
 		if (mgr != null) {
 			mgr.addHostUnreadMessagesListener(listener);
 		}
@@ -685,7 +685,7 @@ public class Apptentive {
 	 */
 	public static int getUnreadMessageCount(Context context) {
 		try {
-			MessageManager mgr = ApptentiveInternal.MessageManager(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
 				return mgr.getUnreadMessageCount(context);
 			}
@@ -710,7 +710,7 @@ public class Apptentive {
 			message.setHidden(true);
 			message.setSenderId(ApptentiveInternal.getInstance(context).personId);
 			message.setAssociatedFiles(context, null);
-			MessageManager mgr = ApptentiveInternal.MessageManager(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
 				mgr.sendMessage(context.getApplicationContext(), message);
 			}
@@ -770,7 +770,7 @@ public class Apptentive {
 			attachmentStoredFiles.add(storedFile);
 
 			message.setAssociatedFiles(context, attachmentStoredFiles);
-			MessageManager mgr = ApptentiveInternal.MessageManager(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
 				mgr.sendMessage(context.getApplicationContext(), message);
 			}
@@ -839,7 +839,7 @@ public class Apptentive {
 
 			message.setAssociatedFiles(context, attachmentStoredFiles);
 
-			MessageManager mgr = ApptentiveInternal.MessageManager(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
 				mgr.sendMessage(context.getApplicationContext(), message);
 			}

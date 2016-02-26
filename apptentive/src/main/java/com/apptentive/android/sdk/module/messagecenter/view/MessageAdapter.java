@@ -684,7 +684,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 			EngagementModule.engageInternal(fragment.getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
-			MessageManager mgr = ApptentiveInternal.MessageManager(null);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(null);
 			if (mgr != null) {
 				mgr.updateMessage(fragment.getActivity().getApplicationContext(), textMessages[0]);
 				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount(fragment.getActivity().getApplicationContext()));

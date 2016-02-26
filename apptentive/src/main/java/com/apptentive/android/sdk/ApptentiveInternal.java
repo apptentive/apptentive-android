@@ -70,7 +70,7 @@ public class ApptentiveInternal {
 
 	InteractionManager interactionManager;
 	MessageManager messageManager;
-	PayloadSendWorker payloadManager;
+	PayloadSendWorker payloadWorker;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -128,14 +128,8 @@ public class ApptentiveInternal {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
-					MessageManager msgManager = new MessageManager();
-					PayloadSendWorker payloadWorker = new PayloadSendWorker();
-					InteractionManager interactionMgr = new InteractionManager();
 					sApptentiveInternal = new ApptentiveInternal();
 					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.messageManager = msgManager;
-					sApptentiveInternal.payloadManager = payloadWorker;
-					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
 						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
@@ -186,20 +180,41 @@ public class ApptentiveInternal {
 		return null;
 	}
 
-	public static MessageManager MessageManager(Context context) {
+	public static MessageManager getMessageManager(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
-			return internal.messageManager;
+			return internal.MessageManager();
 		}
 		return null;
 	}
 
-	public static InteractionManager InteractionManager(Context context) {
+	public MessageManager MessageManager() {
+		if (messageManager == null) {
+			messageManager = new MessageManager();
+		}
+		return  messageManager;
+	}
+
+	public static InteractionManager getInteractionManager(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
-			return internal.interactionManager;
+			return internal.InteractionManager();
 		}
 		return null;
+	}
+
+	public InteractionManager InteractionManager() {
+		if (interactionManager == null) {
+			interactionManager = new InteractionManager();
+		}
+		return interactionManager;
+	}
+
+	public PayloadSendWorker PayloadSendWorker() {
+		if (payloadWorker == null) {
+			payloadWorker = new PayloadSendWorker();
+		}
+		return payloadWorker;
 	}
 
 	public static Resources.Theme getApptentiveTheme(Context context) {
@@ -298,14 +313,14 @@ public class ApptentiveInternal {
 
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
-		payloadManager.appWentToForeground(appContext);
-		messageManager.appWentToForeground(appContext);
+		PayloadSendWorker().appWentToForeground(appContext);
+		MessageManager().appWentToForeground(appContext);
 	}
 
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
-		payloadManager.appWentToBackground();
-		messageManager.appWentToBackground();
+		PayloadSendWorker().appWentToBackground();
+		MessageManager().appWentToBackground();
 	}
 
 
@@ -448,7 +463,7 @@ public class ApptentiveInternal {
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches(Context context) {
-		interactionManager.updateCacheExpiration(context, 0);
+		InteractionManager().updateCacheExpiration(context, 0);
 		Configuration config = Configuration.load(context);
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save(context);
@@ -705,7 +720,7 @@ public class ApptentiveInternal {
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
 
-			MessageManager mgr = ApptentiveInternal.MessageManager(context);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
 				mgr.startMessagePreFetchTask(context);
 			}
@@ -810,7 +825,7 @@ public class ApptentiveInternal {
 
 	private void fetchSdkState() {
 		asyncFetchAppConfiguration(appContext);
-		interactionManager.asyncFetchAndStoreInteractions(appContext);
+		InteractionManager().asyncFetchAndStoreInteractions(appContext);
 	}
 
 	public void resetSdkState() {

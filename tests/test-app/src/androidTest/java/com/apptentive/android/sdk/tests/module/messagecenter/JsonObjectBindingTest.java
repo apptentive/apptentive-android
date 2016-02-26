@@ -33,7 +33,7 @@ public class JsonObjectBindingTest extends ApptentiveInstrumentationTestCase {
 		String exampleResponse = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testParsingTextMessageResponse.json");
 		List<ApptentiveMessage> apptentiveMessages = null;
 		try {
-			MessageManager mgr = ApptentiveInternal.MessageManager(null);
+			MessageManager mgr = ApptentiveInternal.getMessageManager(null);
 			if (mgr != null) {
 				apptentiveMessages = mgr.parseMessagesString(getTargetContext(), exampleResponse);
 			}

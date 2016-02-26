@@ -15,13 +15,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Invocation;
@@ -140,7 +138,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
-									Interactions interactions = ApptentiveInternal.InteractionManager(getContext()).getInteractions(getContext());
+									Interactions interactions = ApptentiveInternal.getInteractionManager(getContext()).getInteractions(getContext());
 									if (interactions != null) {
 										invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 									}

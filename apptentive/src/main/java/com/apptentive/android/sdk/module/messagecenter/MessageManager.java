@@ -376,7 +376,7 @@ public class MessageManager {
 
 	@Deprecated
 	public static void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
-		MessageManager mgr = ApptentiveInternal.MessageManager(null);
+		MessageManager mgr = ApptentiveInternal.getMessageManager(null);
 		if (mgr != null) {
 			mgr.setHostUnreadMessagesListenerInternal(newlistener);
 		}

@@ -225,7 +225,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		setup(view);
 
-		MessageManager mgr = ApptentiveInternal.MessageManager(getContext());
+		MessageManager mgr = ApptentiveInternal.getMessageManager(getContext());
 		if (mgr != null) {
 			// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
 			mgr.addInternalOnMessagesUpdatedListener(this);
@@ -254,14 +254,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onStart() {
 		super.onStart();
-		ApptentiveInternal.MessageManager(getContext()).setMessageCenterInForeground(true);
+		ApptentiveInternal.getMessageManager(getContext()).setMessageCenterInForeground(true);
 
 	}
 
 	public void onStop() {
 		super.onStop();
 		clearPendingMessageCenterPushNotification();
-		ApptentiveInternal.MessageManager(getContext()).setMessageCenterInForeground(false);
+		ApptentiveInternal.getMessageManager(getContext()).setMessageCenterInForeground(false);
 
 	}
 
@@ -315,14 +315,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onPause() {
 		super.onPause();
-		ApptentiveInternal.MessageManager(getContext()).onPauseSending(0);
+		ApptentiveInternal.getMessageManager(getContext()).onPauseSending(0);
 
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApptentiveInternal.MessageManager(getContext()).onResumeSending();
+		ApptentiveInternal.getMessageManager(getContext()).onResumeSending();
 
 
 		/* imagePickerLaunched was set true when the picker intent was launched. If user had picked an image,
@@ -371,7 +371,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		boolean showKeyboard = false;
 		if (messageCenterListAdapter == null) {
 
-			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.MessageManager(getContext()).getMessageCenterListItems(hostingActivity);
+			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getMessageManager(getContext()).getMessageCenterListItems(hostingActivity);
 			if (items != null) {
 				// populate message list from db
 				prepareMessages(items);
@@ -491,7 +491,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		clearComposingUi(null, null, 0);
 		clearWhoCardUi(null, null, 0);
 		// Set to null, otherwise they will hold reference to the activity context
-		MessageManager mgr = ApptentiveInternal.MessageManager(getContext());
+		MessageManager mgr = ApptentiveInternal.getMessageManager(getContext());
 
 		mgr.clearInternalOnMessagesUpdatedListeners();
 		mgr.setAfterSendMessageListener(null);
@@ -1004,7 +1004,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		Util.hideSoftKeyboard(hostingActivity, hostingActivity.findViewById(android.R.id.content));
 		if (contextualMessage != null) {
 			unsendMessagesCount++;
-			ApptentiveInternal.MessageManager(getContext()).sendMessage(hostingActivity.getApplicationContext(), contextualMessage);
+			ApptentiveInternal.getMessageManager(getContext()).sendMessage(hostingActivity.getApplicationContext(), contextualMessage);
 			contextualMessage = null;
 		}
 		Editable content = getPendingComposingContent();
@@ -1540,7 +1540,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ArrayList<ImageItem> imagesToAttach = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
 					message.setAssociatedImages(fragment.hostingActivity, imagesToAttach);
 
-					ApptentiveInternal.MessageManager(fragment.getContext()).sendMessage(fragment.hostingActivity.getApplicationContext(), message);
+					ApptentiveInternal.getMessageManager(fragment.getContext()).sendMessage(fragment.hostingActivity.getApplicationContext(), message);
 
 
 					// Add new outgoing message with animation
