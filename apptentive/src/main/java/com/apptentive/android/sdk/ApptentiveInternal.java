@@ -142,7 +142,7 @@ public class ApptentiveInternal {
 
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
-						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
+						((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 					}
 				}
 			}
@@ -157,7 +157,7 @@ public class ApptentiveInternal {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
 	 */
 	public static ApptentiveInternal getInstance(Context context) {
-		return getInstance((context == null)? null: context, null);
+		return getInstance((context == null) ? null : context, null);
 	}
 
 	/**
@@ -171,7 +171,6 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 *
 	 * Use this method to set or clear the internal state (pass in null)
 	 *
 	 * @param instance to be set to
@@ -179,7 +178,6 @@ public class ApptentiveInternal {
 	public static void setInstance(ApptentiveInternal instance) {
 		ApptentiveInternal.sApptentiveInternal = instance;
 	}
-
 
 
 	public static Context getApplicationContext() {
@@ -295,6 +293,7 @@ public class ApptentiveInternal {
 			fetchSdkState();
 		}
 	}
+
 	public void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
 		checkAndUpdateApptentiveConfigurations();
@@ -373,15 +372,15 @@ public class ApptentiveInternal {
 			apptentiveTheme = appContext.getResources().newTheme();
 			apptentiveTheme.applyStyle(R.style.ApptentiveTheme, true);
 			if (appDefaultThemeId != 0) {
-					Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
-					appDefaultTheme.applyStyle(appDefaultThemeId, true);
-					TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
+				appDefaultTheme.applyStyle(appDefaultThemeId, true);
+				TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
 
-					try {
-						statusBarColorDefault = a.getColor(0, 0);
-					} finally {
-						a.recycle();
-					}
+				try {
+					statusBarColorDefault = a.getColor(0, 0);
+				} finally {
+					a.recycle();
+				}
 				apptentiveTheme.applyStyle(appDefaultThemeId, true);
 			}
 			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
@@ -625,7 +624,7 @@ public class ApptentiveInternal {
 		this.ratingProvider = ratingProvider;
 	}
 
-	public  Map<String, String> getRatingProviderArgs() {
+	public Map<String, String> getRatingProviderArgs() {
 		return ratingProviderArgs;
 	}
 
@@ -725,6 +724,14 @@ public class ApptentiveInternal {
 			return true;
 		}
 		return false;
+	}
+
+	public void showAboutInternal(Activity activity, boolean showBrandingBand) {
+		Intent intent = new Intent();
+		intent.setClass(activity, ApptentiveViewActivity.class);
+		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ABOUT);
+		intent.putExtra(Constants.FragmentConfigKeys.EXTRA, showBrandingBand);
+		activity.startActivity(intent);
 	}
 
 	public boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {

@@ -43,11 +43,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
-				if (fragmentType == Constants.FragmentTypes.ABOUT) {
-					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
-					setTheme(R.style.ApptentiveTheme_About);
-				} else if (fragmentType == Constants.FragmentTypes.INTERACTION ||
-						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR) {
+				if (fragmentType == Constants.FragmentTypes.INTERACTION ||
+						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
+						fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
 					if (newFragment != null) {

@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -16,7 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.AboutModule;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.util.Util;
@@ -64,8 +63,9 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 			public void onClick(View view) {
 				view.setClickable(false);
 				mClickHandler.sendEmptyMessageDelayed(view.getId(), DELAY_TIME);
-				AboutModule.getInstance().show((Activity) context, false);
+				ApptentiveInternal.getInstance(context).showAboutInternal(Util.castContextToActivity(context), false);
 			}
 		});
 	}
+
 }
