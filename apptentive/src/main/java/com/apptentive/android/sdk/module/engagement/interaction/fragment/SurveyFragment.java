@@ -104,7 +104,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> {
 					getActivity().finish();
 
 					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
-					ApptentiveDatabase.getInstance(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
+					ApptentiveInternal.getApptentiveDatabase(getActivity()).addPayload(new SurveyResponse(interaction, surveyState));
 					Log.d("Survey Submitted.");
 					callListener(true);
 					cleanup();

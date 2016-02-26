@@ -69,7 +69,7 @@ public class PayloadSendWorker {
 	}
 
 	private PayloadStore getPayloadStore(Context context) {
-		return ApptentiveDatabase.getInstance(context);
+		return ApptentiveInternal.getApptentiveDatabase(context);
 	}
 
 	private class PayloadSendThread extends Thread {

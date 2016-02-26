@@ -71,6 +71,7 @@ public class ApptentiveInternal {
 	InteractionManager interactionManager;
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
+	ApptentiveDatabase database;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -130,6 +131,15 @@ public class ApptentiveInternal {
 				if (sApptentiveInternal == null && context != null) {
 					sApptentiveInternal = new ApptentiveInternal();
 					sApptentiveInternal.appContext = context.getApplicationContext();
+					MessageManager msgManager = new MessageManager();
+					PayloadSendWorker payloadWorker = new PayloadSendWorker();
+					InteractionManager interactionMgr = new InteractionManager();
+					ApptentiveDatabase db = new ApptentiveDatabase(context.getApplicationContext());
+					sApptentiveInternal.messageManager = msgManager;
+					sApptentiveInternal.payloadWorker = payloadWorker;
+					sApptentiveInternal.interactionManager = interactionMgr;
+					sApptentiveInternal.database = db;
+
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
 						((Application)sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
@@ -164,7 +174,7 @@ public class ApptentiveInternal {
 	 *
 	 * Use this method to set or clear the internal state (pass in null)
 	 *
-	 * @param instance
+	 * @param instance to be set to
 	 */
 	public static void setInstance(ApptentiveInternal instance) {
 		ApptentiveInternal.sApptentiveInternal = instance;
@@ -183,38 +193,25 @@ public class ApptentiveInternal {
 	public static MessageManager getMessageManager(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
-			return internal.MessageManager();
+			return internal.messageManager;
 		}
 		return null;
-	}
-
-	public MessageManager MessageManager() {
-		if (messageManager == null) {
-			messageManager = new MessageManager();
-		}
-		return  messageManager;
 	}
 
 	public static InteractionManager getInteractionManager(Context context) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
-			return internal.InteractionManager();
+			return internal.interactionManager;
 		}
 		return null;
 	}
 
-	public InteractionManager InteractionManager() {
-		if (interactionManager == null) {
-			interactionManager = new InteractionManager();
+	public static ApptentiveDatabase getApptentiveDatabase(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.database;
 		}
-		return interactionManager;
-	}
-
-	public PayloadSendWorker PayloadSendWorker() {
-		if (payloadWorker == null) {
-			payloadWorker = new PayloadSendWorker();
-		}
-		return payloadWorker;
+		return null;
 	}
 
 	public static Resources.Theme getApptentiveTheme(Context context) {
@@ -313,14 +310,14 @@ public class ApptentiveInternal {
 
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
-		PayloadSendWorker().appWentToForeground(appContext);
-		MessageManager().appWentToForeground(appContext);
+		payloadWorker.appWentToForeground(appContext);
+		messageManager.appWentToForeground(appContext);
 	}
 
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
-		PayloadSendWorker().appWentToBackground();
-		MessageManager().appWentToBackground();
+		payloadWorker.appWentToBackground();
+		messageManager.appWentToBackground();
 	}
 
 
@@ -448,7 +445,7 @@ public class ApptentiveInternal {
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
 			Log.d("App release was updated.");
-			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
+			database.addPayload(appRelease);
 		}
 		invalidateCaches(context);
 	}
@@ -463,7 +460,7 @@ public class ApptentiveInternal {
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches(Context context) {
-		InteractionManager().updateCacheExpiration(context, 0);
+		interactionManager.updateCacheExpiration(context, 0);
 		Configuration config = Configuration.load(context);
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save(context);
@@ -583,7 +580,7 @@ public class ApptentiveInternal {
 		if (deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
+			database.addPayload(deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -597,7 +594,7 @@ public class ApptentiveInternal {
 		if (sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(sdk);
+			database.addPayload(sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -611,7 +608,7 @@ public class ApptentiveInternal {
 		if (person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			ApptentiveDatabase.getInstance(context).addPayload(person);
+			database.addPayload(person);
 		} else {
 			Log.d("Person was not updated.");
 		}
@@ -825,13 +822,13 @@ public class ApptentiveInternal {
 
 	private void fetchSdkState() {
 		asyncFetchAppConfiguration(appContext);
-		InteractionManager().asyncFetchAndStoreInteractions(appContext);
+		interactionManager.asyncFetchAndStoreInteractions(appContext);
 	}
 
 	public void resetSdkState() {
 		// Use commit() instead of apply(), otherwise it doesn't finish before the app is killed.
 		prefs.edit().clear().commit();
-		ApptentiveDatabase.reset(appContext);
+		database.reset(appContext);
 	}
 
 	public void notifyConfigurationUpdated(boolean successful) {

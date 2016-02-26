@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 
 import android.content.Context;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
@@ -154,7 +155,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
-		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
 		return db.addCompoundMessageFiles(attachmentStoredFiles);
 	}
 
@@ -168,7 +169,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 		setTextOnly(hasNoAttachments);
 
-		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
 		return db.addCompoundMessageFiles(attachedFiles);
 	}
 
@@ -177,12 +178,12 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		if (hasNoAttachments) {
 			return null;
 		}
-		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
 		return db.getAssociatedFiles(getNonce());
 	}
 
 	public void deleteAssociatedFiles(Context context) {
-		ApptentiveDatabase db = ApptentiveDatabase.getInstance(context);
+		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
 		List<StoredFile> associatedFiles = db.getAssociatedFiles(getNonce());
 		// Delete local cached files
 		if (associatedFiles == null || associatedFiles.size() == 0) {

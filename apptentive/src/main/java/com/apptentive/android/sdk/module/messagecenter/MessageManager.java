@@ -208,7 +208,7 @@ public class MessageManager {
 
 	public void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		getMessageStore(context).addOrUpdateMessages(apptentiveMessage);
-		ApptentiveDatabase.getInstance(context).addPayload(apptentiveMessage);
+		ApptentiveInternal.getApptentiveDatabase(context).addPayload(apptentiveMessage);
 	}
 
 	/**
@@ -316,7 +316,7 @@ public class MessageManager {
 	}
 
 	private MessageStore getMessageStore(Context context) {
-		return ApptentiveDatabase.getInstance(context);
+		return ApptentiveInternal.getApptentiveDatabase(context);
 	}
 
 	public int getUnreadMessageCount(Context context) {

@@ -132,18 +132,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	// Query all files associated with a given compound message nonce id
 	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_COMPOUND_MESSSAGE_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
 
-	private static ApptentiveDatabase instance;
-
 	private File fileDir; // data dir of the application
 
-	public static synchronized ApptentiveDatabase getInstance(Context context) {
-		if (instance == null) {
-			instance = new ApptentiveDatabase(context.getApplicationContext());
-		}
-		return instance;
-	}
 
-	public static void ensureClosed(SQLiteDatabase db) {
+	public void ensureClosed(SQLiteDatabase db) {
 		try {
 			if (db != null) {
 				db.close();
@@ -153,7 +145,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public static void ensureClosed(Cursor cursor) {
+	public void ensureClosed(Cursor cursor) {
 		try {
 			if (cursor != null) {
 				cursor.close();
@@ -163,7 +155,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	private ApptentiveDatabase(Context context) {
+	public ApptentiveDatabase(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		fileDir = context.getFilesDir();
 	}
@@ -658,14 +650,12 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	/**
-	 * This method should ONLY be used during development and testing. It will delete the database, including all saved
-	 * payloads, messages, and files.
-	 */
-	public static void reset(Context context) {
-		synchronized (instance) {
-			context.deleteDatabase(DATABASE_NAME);
-			instance = null;
-		}
+	public void reset(Context context) {
+		/**
+		 * The following ONLY be used during development and testing. It will delete the database, including all saved
+		 * payloads, messages, and files.
+		 */
+		context.deleteDatabase(DATABASE_NAME);
 	}
+
 }
