@@ -45,11 +45,13 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		});
 
 		if (question.isMultiLine()) {
-			answer.setGravity(Gravity.TOP);
+			answer.setGravity(Gravity.TOP | Gravity.START);
+			answer.setSingleLine(false);
 			answer.setMinLines(5);
 			answer.setMaxLines(12);
 		} else {
-			answer.setGravity(Gravity.CENTER_VERTICAL);
+			answer.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+			answer.setSingleLine(true);
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}

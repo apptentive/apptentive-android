@@ -12,13 +12,12 @@
               android:paddingBottom="4dp"
               android:orientation="vertical">
     <EditText android:id="@+id/answer_text"
+              style="@style/ApptentiveTheme.TextAppearence.EditText"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveTheme.TextAppearence.EditText"
               android:paddingTop="16dp"
               android:paddingBottom="16dp"
               android:textColor="@color/apptentive_survey_answer_text"
               android:textSize="@dimen/apptentive_text_small"
-              android:hint="Please leave detailed feedback…"
-              android:saveEnabled="false"/>
+              android:hint="Please leave detailed feedback…"/>
 </LinearLayout>

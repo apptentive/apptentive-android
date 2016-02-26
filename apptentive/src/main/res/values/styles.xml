@@ -266,7 +266,7 @@
         <item name="android:inputType">textCapSentences</item>
         <item name="android:textColorHint">?attr/apptentive_material_hint_text</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
-        <item name="android:gravity">bottom|left</item>item>
+        <item name="android:gravity">bottom|start</item>item>
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.EditText.WhoCard">
