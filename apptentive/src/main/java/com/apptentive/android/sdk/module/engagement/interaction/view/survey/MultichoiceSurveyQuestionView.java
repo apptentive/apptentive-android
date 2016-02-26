@@ -21,6 +21,7 @@ import java.util.*;
 
 public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements RadioGroup.OnCheckedChangeListener {
 
+	RadioGroup radioGroup;
 	boolean buttonChecked;
 
 	public MultichoiceSurveyQuestionView(Context context, MultichoiceQuestion question) {
@@ -29,7 +30,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
 		inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
-		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+		radioGroup = (RadioGroup) findViewById(R.id.radio_group);
 		radioGroup.setOnCheckedChangeListener(this);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
@@ -53,6 +54,17 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	@Override
 	public boolean isValid() {
-		return question.isRequired() && buttonChecked;
+		return !question.isRequired() || buttonChecked;
+	}
+
+	@Override
+	public Object getAnswer() {
+		for (int i = 0; i < radioGroup.getChildCount(); i++) {
+			RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
+			if (radioButton.isChecked()) {
+				return radioButton.getTag(R.id.apptentive_survey_answer_id);
+			}
+		}
+		return null;
 	}
 }

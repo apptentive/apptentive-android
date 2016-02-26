@@ -18,6 +18,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Ans
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.util.Util;
 
+import org.json.JSONArray;
+
 import java.util.List;
 
 
@@ -65,5 +67,17 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 		return
 				(!question.isRequired() && checkedBoxes == 0) ||
 						((question.getMinSelections() <= checkedBoxes) && (checkedBoxes <= question.getMaxSelections()));
+	}
+
+	@Override
+	public Object getAnswer() {
+		JSONArray jsonArray = new JSONArray();
+		for (int i = 0; i < choiceContainer.getChildCount(); i++) {
+			CheckBox checkBox = (CheckBox) choiceContainer.getChildAt(i);
+			if (checkBox.isChecked()) {
+				jsonArray.put(checkBox.getTag(R.id.apptentive_survey_answer_id));
+			}
+		}
+		return jsonArray;
 	}
 }

@@ -20,7 +20,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
-abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
+abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout implements SurveyQuestionView {
 
 	protected Q question;
 	private OnSurveyQuestionAnsweredListener listener;
@@ -37,10 +37,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	protected BaseSurveyQuestionView(Context context, Q question) {
 		super(context);
 		this.question = question;
-
-		// Required to remove focus from any EditTexts.
-//		setFocusable(true);
-//		setFocusableInTouchMode(true);
 
 		contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
 		inflater = LayoutInflater.from(contextThemeWrapper);
@@ -87,10 +83,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		return (LinearLayout) findViewById(R.id.answer_container);
 	}
 
-	public void setOnSurveyQuestionAnsweredListener(OnSurveyQuestionAnsweredListener listener) {
-		this.listener = listener;
-	}
-
 	/**
 	 * Always call this when the answer value changes.
 	 */
@@ -100,14 +92,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		}
 	}
 
-	/**
-	 * Each subclass needs to override this based on the rules for that class.
-	 * @return true if this question can be submitted, else false.
-	 */
-	public boolean isValid() {
-		return false;
-	}
-
 	public void updateValidationState(boolean valid) {
 		if (valid) {
 			validationFailedBorder.setVisibility(View.INVISIBLE);
@@ -115,4 +99,23 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 			validationFailedBorder.setVisibility(View.VISIBLE);
 		}
 	}
+
+	@Override
+	public void setOnSurveyQuestionAnsweredListener(OnSurveyQuestionAnsweredListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public String getQuestionId() {
+		return (String) getTag(R.id.apptentive_survey_question_id);
+	}
+
+	@Override
+	public void setQuestionId(String questionId) {
+		setTag(R.id.apptentive_survey_question_id, questionId);
+	}
+
+	public abstract boolean isValid();
+
+	public abstract Object getAnswer();
 }

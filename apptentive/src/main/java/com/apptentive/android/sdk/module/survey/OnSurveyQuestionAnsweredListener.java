@@ -6,9 +6,9 @@
 
 package com.apptentive.android.sdk.module.survey;
 
-import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyQuestionView;
 
 
 public interface OnSurveyQuestionAnsweredListener {
-	void onAnswered(BaseSurveyQuestionView questionView);
+	void onAnswered(SurveyQuestionView questionView);
 }

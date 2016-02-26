@@ -59,4 +59,14 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	public boolean isValid() {
 		return !question.isRequired() || !TextUtils.isEmpty(answer.getText().toString());
 	}
+
+	@Override
+	public Object getAnswer() {
+		String value = answer.getText().toString().trim();
+		if (TextUtils.isEmpty(value)) {
+			return null;
+		} else {
+			return value;
+		}
+	}
 }
