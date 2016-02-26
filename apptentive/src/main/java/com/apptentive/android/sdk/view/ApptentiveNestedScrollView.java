@@ -356,6 +356,7 @@ public class ApptentiveNestedScrollView extends FrameLayout implements NestedScr
 	}
 
 	private void initScrollView() {
+		//mScroller = new ScrollerCompat(getContext(), null);
 		mScroller = ScrollerCompat.create(getContext(), null);
 		setFocusable(true);
 		setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
@@ -688,7 +689,8 @@ public class ApptentiveNestedScrollView extends FrameLayout implements NestedScr
                 * otherwise don't.  mScroller.isFinished should be false when
                 * being flinged.
                 */
-				mIsBeingDragged = !mScroller.isFinished();
+				//mIsBeingDragged = !mScroller.isFinished();
+				mIsBeingDragged = false;
 				startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
 				break;
 			}
