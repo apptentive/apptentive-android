@@ -38,7 +38,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		super(context);
 		this.question = question;
 
-		contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
+		contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.getApptentiveTheme(context));
 		inflater = LayoutInflater.from(contextThemeWrapper);
 		inflater.inflate(R.layout.apptentive_survey_question_base, this);
 
