@@ -16,7 +16,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SurveyInteraction extends Interaction {
 
@@ -113,6 +115,15 @@ public class SurveyInteraction extends Interaction {
 			// Ignore
 		}
 		return null;
+	}
+
+	public Map<String, Question> getQuestionsAsMap() {
+		List<Question> questions = getQuestions();
+		Map<String, Question> ret = new HashMap<>(questions.size());
+		for(Question question : questions) {
+			ret.put(question.getId(), question);
+		}
+		return ret;
 	}
 
 	public boolean isRequired() {

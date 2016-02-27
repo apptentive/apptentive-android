@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
               android:gravity="center_vertical">
-    <ScrollView android:layout_width="fill_parent"
+    <ScrollView android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/apptentive_activity_side_padding"
                 android:paddingRight="@dimen/apptentive_activity_side_padding"
                 android:fadingEdge="none">
-        <FrameLayout android:layout_width="fill_parent"
+        <FrameLayout android:layout_width="match_parent"
                      android:layout_height="wrap_content"
                      android:paddingTop="@dimen/apptentive_activity_vertical_padding"
                      android:paddingBottom="@dimen/apptentive_activity_vertical_padding">
-            <LinearLayout android:layout_width="fill_parent"
+            <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:orientation="vertical"
                           android:background="@drawable/apptentive_activity_background">
@@ -53,7 +53,7 @@
                                  android:scaleType="fitCenter"
                                  android:tint="?attr/apptentive_material_toolbar_foreground"/>
                 </RelativeLayout>
-                <LinearLayout android:layout_width="fill_parent"
+                <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               style="@style/ApptentiveTheme.TextAppearence"
                               android:paddingLeft="16dp"
@@ -61,20 +61,20 @@
                               android:paddingTop="16dp"
                               android:paddingBottom="16dp"
                               android:orientation="vertical">
-                    <TextView android:layout_width="fill_parent"
+                    <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:paddingBottom="16dp"
                               android:textSize="@dimen/apptentive_text_medium"
                               android:textColor="@color/apptentive_about_text"
                               android:text="@string/apptentive_about_description"/>
-                    <TextView android:layout_width="fill_parent"
+                    <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:paddingBottom="16dp"
                               android:textColor="@color/apptentive_about_text"
                               android:textSize="@dimen/apptentive_text_medium"
                               android:text="@string/apptentive_about_privacy"/>
                     <TextView android:id="@+id/about_description_link"
-                              android:layout_width="fill_parent"
+                              android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"
@@ -82,7 +82,7 @@
                               android:textSize="@dimen/apptentive_text_medium_small"
                               android:text="@string/apptentive_about_description_link"/>
                     <TextView android:id="@+id/privacy_link"
-                              android:layout_width="fill_parent"
+                              android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"

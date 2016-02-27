@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -41,7 +41,7 @@
               android:text="00:00"
               android:textColor="@color/apptentive_material_toolbar_foreground"/>
     <TextView android:id="@+id/toast_message"
-              android:layout_width="fill_parent"
+              android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_below="@id/toast_title"
               android:layout_marginLeft="10dp"
