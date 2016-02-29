@@ -66,7 +66,7 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 													 Bundle savedInstanceState)  {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.apptentiveTheme);
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
 		View questionView = themedInflater.inflate(R.layout.apptentive_survey_question_multiselect, getAnswerContainer(v));
