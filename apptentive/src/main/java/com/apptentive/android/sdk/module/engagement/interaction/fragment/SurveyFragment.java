@@ -42,6 +42,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Text
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +54,8 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener {
+public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener,
+		ApptentiveNestedScrollView.OnScrollChangeListener {
 
 	private static final String EVENT_CANCEL = "cancel";
 	private static final String EVENT_SUBMIT = "submit";
@@ -178,6 +180,13 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				ApptentiveInternal.getInstance(getContext()).showAboutInternal(getActivity(), false);
 			}
 		});
+		ApptentiveNestedScrollView scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
+		scrollView.setOnScrollChangeListener(this);
+	}
+
+	@Override
+	public void onScrollChange(ApptentiveNestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+		showToolbarElevation(v.getTop() != scrollY);
 	}
 
 	/**
