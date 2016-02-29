@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +41,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -151,6 +152,32 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			}
 		}
 		return v;
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		ImageButton infoButton = (ImageButton) view.findViewById(R.id.info);
+		infoButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(final View view) {
+				// Set info button not clickable when it was first clicked
+				view.setClickable(false);
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						final Handler handler = new Handler();
+						handler.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								view.setClickable(true);
+							}
+						}, 100);
+
+					}
+				});
+				ApptentiveInternal.getInstance(getContext()).showAboutInternal(getActivity(), false);
+			}
+		});
 	}
 
 	/**
