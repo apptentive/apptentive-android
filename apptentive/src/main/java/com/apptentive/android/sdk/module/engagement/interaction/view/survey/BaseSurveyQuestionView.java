@@ -7,11 +7,13 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,7 +22,8 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
-abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout implements SurveyQuestionView {
+
+abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragment implements SurveyQuestionView {
 
 	protected Q question;
 	private OnSurveyQuestionAnsweredListener listener;
@@ -29,36 +32,39 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 	protected View dashView;
 	protected TextView instructionsView;
 
-	protected final Context contextThemeWrapper;
-	protected final LayoutInflater inflater;
-
 	private View validationFailedBorder;
 
-	protected BaseSurveyQuestionView(Context context, Q question) {
-		super(context);
-		this.question = question;
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+													 Bundle savedInstanceState) {
+		// Inflate the layout for this fragment
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.apptentiveTheme);
+		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
-		contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
-		inflater = LayoutInflater.from(contextThemeWrapper);
-		inflater.inflate(R.layout.apptentive_survey_question_base, this);
+		View v = themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);
+		return v;
+	}
 
-		requiredView = findViewById(R.id.question_required);
-		dashView = findViewById(R.id.question_dash);
-		instructionsView = (TextView) findViewById(R.id.question_instructions);
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		requiredView = view.findViewById(R.id.question_required);
+		dashView = view.findViewById(R.id.question_dash);
+		instructionsView = (TextView) view.findViewById(R.id.question_instructions);
 
-		TextView title = (TextView) findViewById(R.id.question_title);
+		TextView title = (TextView) view.findViewById(R.id.question_title);
 		title.setText(question.getValue());
 
 		String instructionsText = question.getInstructions();
-		setInstructions(instructionsText);
+		setInstructions(view, instructionsText);
 
-		validationFailedBorder = findViewById(R.id.validation_failed_border);
+		validationFailedBorder = view.findViewById(R.id.validation_failed_border);
 	}
 
-	protected void setInstructions(String instructionsText) {
+
+	protected void setInstructions(final View v, String instructionsText) {
 		boolean hasInstructions = !TextUtils.isEmpty(instructionsText);
 
-		requiredView = findViewById(R.id.question_required);
+		requiredView = v.findViewById(R.id.question_required);
 		if (question.isRequired()) {
 			requiredView.setVisibility(View.VISIBLE);
 		} else {
@@ -79,8 +85,8 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 		}
 	}
 
-	protected LinearLayout getAnswerContainer() {
-		return (LinearLayout) findViewById(R.id.answer_container);
+	protected LinearLayout getAnswerContainer(View rootView) {
+		return (LinearLayout) rootView.findViewById(R.id.answer_container);
 	}
 
 	/**
@@ -107,12 +113,12 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLa
 
 	@Override
 	public String getQuestionId() {
-		return (String) getTag(R.id.apptentive_survey_question_id);
+		return (String) getView().getTag(R.id.apptentive_survey_question_id);
 	}
 
 	@Override
 	public void setQuestionId(String questionId) {
-		setTag(R.id.apptentive_survey_question_id, questionId);
+		getView().setTag(R.id.apptentive_survey_question_id, questionId);
 	}
 
 	public abstract boolean isValid();

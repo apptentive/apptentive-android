@@ -129,25 +129,28 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			}
 		});
 
-		questionsContainer = (LinearLayout) v.findViewById(R.id.questions);
-		questionsContainer.removeAllViews();
+		if (savedInstanceState == null) {
+			questionsContainer = (LinearLayout) v.findViewById(R.id.questions);
+			questionsContainer.removeAllViews();
 
-		// Then render all the questions
-		for (final Question question : questions) {
-			final BaseSurveyQuestionView surveyQuestionView;
-			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				surveyQuestionView = new TextSurveyQuestionView(getActivity(), (SinglelineQuestion) question);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				surveyQuestionView = new MultichoiceSurveyQuestionView(getActivity(), (MultichoiceQuestion) question);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				surveyQuestionView = new MultiselectSurveyQuestionView(getActivity(), (MultiselectQuestion) question);
-			} else {
-				surveyQuestionView = null;
-			}
-			if (surveyQuestionView != null) {
-				surveyQuestionView.setQuestionId(question.getId());
-				surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-				questionsContainer.addView(surveyQuestionView);
+			// Then render all the questions
+			for (final Question question : questions) {
+				final BaseSurveyQuestionView surveyQuestionView;
+				if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
+					surveyQuestionView = TextSurveyQuestionView.newInstance((SinglelineQuestion) question);
+				} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
+					surveyQuestionView = MultichoiceSurveyQuestionView.newInstance((MultichoiceQuestion) question);
+
+				} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+					surveyQuestionView = MultiselectSurveyQuestionView.newInstance((MultiselectQuestion) question);
+				} else {
+					surveyQuestionView = null;
+				}
+				if (surveyQuestionView != null) {
+					surveyQuestionView.setQuestionId(question.getId());
+					surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
+					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView).commit();
+				}
 			}
 		}
 		return v;
