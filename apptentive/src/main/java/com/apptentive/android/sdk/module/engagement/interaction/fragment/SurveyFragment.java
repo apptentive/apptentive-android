@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -57,8 +58,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
-	private boolean surveySubmitted = false;
-
 	private LinearLayout questionsContainer;
 
 	private Set<String> questionsWithSentMetrics;
@@ -72,7 +71,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (interaction == null || surveySubmitted) {
+		if (interaction == null) {
 			getActivity().finish();
 		}
 
@@ -96,7 +95,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				Util.hideSoftKeyboard(getActivity(), view);
 				boolean valid = validateAndUpdateState();
 				if (valid) {
-					surveySubmitted = true;
 					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
 						Toast toast = new Toast(contextThemeWrapper);
 						toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
@@ -130,24 +128,26 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		});
 
 		questionsContainer = (LinearLayout) v.findViewById(R.id.questions);
-		questionsContainer.removeAllViews();
+		if (savedInstanceState == null) {
+			questionsContainer.removeAllViews();
 
-		// Then render all the questions
-		for (final Question question : questions) {
-			final BaseSurveyQuestionView surveyQuestionView;
-			if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
-				surveyQuestionView = new TextSurveyQuestionView(getActivity(), (SinglelineQuestion) question);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
-				surveyQuestionView = new MultichoiceSurveyQuestionView(getActivity(), (MultichoiceQuestion) question);
-			} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
-				surveyQuestionView = new MultiselectSurveyQuestionView(getActivity(), (MultiselectQuestion) question);
-			} else {
-				surveyQuestionView = null;
-			}
-			if (surveyQuestionView != null) {
-				surveyQuestionView.setQuestionId(question.getId());
-				surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-				questionsContainer.addView(surveyQuestionView);
+			// Then render all the questions
+			for (final Question question : questions) {
+				final BaseSurveyQuestionView surveyQuestionView;
+				if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
+					surveyQuestionView = TextSurveyQuestionView.newInstance((SinglelineQuestion) question);
+				} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
+					surveyQuestionView = MultichoiceSurveyQuestionView.newInstance((MultichoiceQuestion) question);
+
+				} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
+					surveyQuestionView = MultiselectSurveyQuestionView.newInstance((MultiselectQuestion) question);
+				} else {
+					surveyQuestionView = null;
+				}
+				if (surveyQuestionView != null) {
+					surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
+					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView).commit();
+				}
 			}
 		}
 		return v;
@@ -160,15 +160,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	 */
 	public boolean validateAndUpdateState() {
 		boolean validationPassed = true;
-		if (questionsContainer != null) {
-			for (int i = 0; i < questionsContainer.getChildCount(); i++) {
-				SurveyQuestionView surveyQuestionView = (SurveyQuestionView) questionsContainer.getChildAt(i);
-				answers.put(surveyQuestionView.getQuestionId(), surveyQuestionView.getAnswer());
-				boolean valid = surveyQuestionView.isValid();
-				surveyQuestionView.updateValidationState(valid);
-				if (!valid) {
-					validationPassed = false;
-				}
+
+		List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+		for (Fragment fragment : fragments) {
+			SurveyQuestionView surveyQuestionView = (SurveyQuestionView) fragment;
+			boolean isValid = surveyQuestionView.isValid();
+			surveyQuestionView.updateValidationState(isValid);
+			if (!isValid) {
+				validationPassed = false;
 			}
 		}
 		return validationPassed;

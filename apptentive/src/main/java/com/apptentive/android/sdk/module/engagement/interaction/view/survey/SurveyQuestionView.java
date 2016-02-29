@@ -14,8 +14,6 @@ public interface SurveyQuestionView {
 
 	String getQuestionId();
 
-	void setQuestionId(String questionId);
-
 	/**
 	 * @return true if this question can be submitted, else false.
 	 */
