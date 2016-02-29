@@ -57,8 +57,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
-	private boolean surveySubmitted = false;
-
 	private LinearLayout questionsContainer;
 
 	private Set<String> questionsWithSentMetrics;
@@ -72,7 +70,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (interaction == null || surveySubmitted) {
+		if (interaction == null) {
 			getActivity().finish();
 		}
 
@@ -96,7 +94,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				Util.hideSoftKeyboard(getActivity(), view);
 				boolean valid = validateAndUpdateState();
 				if (valid) {
-					surveySubmitted = true;
 					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
 						Toast toast = new Toast(contextThemeWrapper);
 						toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);

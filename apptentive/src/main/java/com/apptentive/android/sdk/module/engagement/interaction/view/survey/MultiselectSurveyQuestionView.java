@@ -36,9 +36,8 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
+			CheckBox choice = (CheckBox) inflater.inflate(R.layout.apptentive_survey_question_multiselect_choice, choiceContainer, false);
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
-			CheckBox choice = new CheckBox(contextThemeWrapper);
-			choice.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int) Util.dipsToPixels(contextThemeWrapper, 40)));
 			choice.setText(answerDefinition.getValue());
 			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());
 			choice.setOnCheckedChangeListener(this);

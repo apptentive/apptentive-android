@@ -6,16 +6,15 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:id="@+id/choice"
-             android:layout_width="match_parent"
-             android:layout_height="48dp"
-             android:gravity="center_vertical">
-    <!-- It is important to use saveEnabled=false here so that Android doesn't mess with our manual state saving. -->
-    <CheckBox android:id="@+id/checkbox"
-              style="ApptentiveTheme.TextAppearence"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:textColor="@color/apptentive_survey_question_answer_text"
-              android:textSize="@dimen/apptentive_text_small"/>
-</FrameLayout>
+<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+          style="ApptentiveTheme.TextAppearence"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="4dp"
+          android:paddingTop="4dp"
+          android:minHeight="48dp"
+          android:drawablePadding="16dp"
+          android:gravity="top|start"
+          android:textColor="@color/apptentive_survey_question_answer_text"
+          android:textSize="@dimen/apptentive_text_small"
+          android:saveEnabled="true"/>
