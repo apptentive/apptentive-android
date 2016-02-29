@@ -188,14 +188,14 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}
 
 		if (bShownAsModal) {
-			setStatusBarColor(ApptentiveInternal.statusBarColorDefault);
+			setStatusBarColor(ApptentiveInternal.getDefaultStatusbarColor(getContext()));
 		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApptentiveInternal.checkAndUpdateApptentiveConfigurations();
+		ApptentiveInternal.getInstance(getContext()).checkAndUpdateApptentiveConfigurations();
 	}
 
 	public void onStop() {

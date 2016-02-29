@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -9,12 +9,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:orientation="vertical">
         <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView android:id="@+id/message_list"
                                                                                     android:layout_width="match_parent"
                                                                                     android:layout_height="match_parent"
-                                                                                    android:background="?attr/apptentive_material_background"
+                                                                                    android:background="?attr/apptentiveWindowBackground"
                                                                                     android:cacheColorHint="@color/apptentive_transparency"
                                                                                     android:clipToPadding="false"
                                                                                     android:descendantFocusability="afterDescendants"

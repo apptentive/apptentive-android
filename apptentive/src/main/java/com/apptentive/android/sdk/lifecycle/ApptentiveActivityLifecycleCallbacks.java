@@ -14,9 +14,6 @@ import android.os.Handler;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.MessagePollingWorker;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +34,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	private static final long CHECK_DELAY_SHORT = 500;
 	private static final long CHECK_DELAY_LONG = 1000;
 
-	public ApptentiveActivityLifecycleCallbacks(Application application) {
+	public ApptentiveActivityLifecycleCallbacks(Context application) {
 		appContext = application;
 	}
 
@@ -75,18 +72,19 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		}
 
 		if (foregroundActivities.getAndIncrement() == 0 && wasAppBackground) {
-			appEnteredForeground();
+			appEnteredForeground(activity);
 		} else {
 			Log.d("application is still in foreground");
 		}
 
 
 		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
-		MessageManager.setCurrentForgroundActivity(activity);
+
+		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
 	}
 
 	@Override
-	public void onActivityPaused(Activity activity) {
+	public void onActivityPaused(final Activity activity) {
 		Log.e("onActivityPaused(%s)", activity.toString());
 
 		running = false;
@@ -110,14 +108,15 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			public void run() {
 				if (isAppForeground && !running) {
 					isAppForeground = false;
-					appEnteredBackground();
+					appEnteredBackground(activity);
 				} else {
 					Log.d("application is still in foreground");
 				}
 			}
 		}, CHECK_DELAY_SHORT);
 
-		MessageManager.setCurrentForgroundActivity(null);
+
+		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(null);
 
 	}
 
@@ -159,27 +158,23 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		Log.e("==> Running Activities:    %d", runningActivities.get());
 	}
 
-	private void appEnteredForeground() {
+	private void appEnteredForeground(Activity activity) {
 		Log.e("App went to foreground.");
-		ApptentiveInternal.appIsInForeground = true;
-		PayloadSendWorker.appWentToForeground(appContext);
-		MessagePollingWorker.appWentToForeground(appContext);
+		ApptentiveInternal.getInstance(activity).onAppEnterForeground();
 	}
 
-	private void appEnteredBackground() {
+	private void appEnteredBackground(Activity activity) {
 		Log.e("App went to background.");
-		ApptentiveInternal.appIsInForeground = false;
-		PayloadSendWorker.appWentToBackground();
-		MessagePollingWorker.appWentToBackground();
+		ApptentiveInternal.getInstance(activity).onAppEnterBackground();
 	}
 
 	private void appLaunched(Activity activity) {
 		Log.e("### App LAUNCH");
-		ApptentiveInternal.onAppLaunch(activity);
+		ApptentiveInternal.getInstance(activity).onAppLaunch(activity);
 	}
 
 	private void appExited(Activity activity) {
 		Log.e("### App EXIT");
-		ApptentiveInternal.onAppExit(activity);
+		ApptentiveInternal.getInstance(activity).onAppExit(activity);
 	}
 }

@@ -9,8 +9,8 @@ package com.apptentive.android.sdk.module.engagement.logic;
 import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Person;
@@ -95,10 +95,10 @@ public class FieldManager {
 						QueryPart queryPart2 = QueryPart.parse(tokens[3]);
 						switch (queryPart2) {
 							case total: // Get total for all versions of the app.
-								return new BigDecimal(CodePointStore.getTotalInvokes(context, isInteraction, name));
+								return new BigDecimal(ApptentiveInternal.getCodePointStore(context).getTotalInvokes(isInteraction, name));
 							case version:
 								String appVersion = String.valueOf(Util.getAppVersionCode(context));
-								return new BigDecimal(CodePointStore.getBuildInvokes(context, isInteraction, name, appVersion));
+								return new BigDecimal(ApptentiveInternal.getCodePointStore(context).getBuildInvokes(isInteraction, name, appVersion));
 							default:
 								break;
 						}
@@ -106,7 +106,7 @@ public class FieldManager {
 						QueryPart queryPart3 = QueryPart.parse(tokens[3]);
 						switch (queryPart3) {
 							case total:
-								Double lastInvoke = CodePointStore.getLastInvoke(context, isInteraction, name);
+								Double lastInvoke = ApptentiveInternal.getCodePointStore(context).getLastInvoke(isInteraction, name);
 								if (lastInvoke != null) {
 									return new Apptentive.DateTime(lastInvoke);
 								}

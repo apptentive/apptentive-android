@@ -43,11 +43,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
-				if (fragmentType == Constants.FragmentTypes.ABOUT) {
-					// Always apply Apptentive default red theme to Apptentive About, regardless hosting app theme override
-					setTheme(R.style.ApptentiveTheme_About);
-				} else if (fragmentType == Constants.FragmentTypes.INTERACTION ||
-						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR) {
+				if (fragmentType == Constants.FragmentTypes.INTERACTION ||
+						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
+						fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
 					if (newFragment != null) {
@@ -64,7 +62,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 			}
 		} catch (Exception e) {
-			Log.e("Error creating ViewActivity.", e);
+			Log.e("Error creating ApptentiveViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
 		}
 
@@ -186,9 +184,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
-		if (ApptentiveInternal.apptentiveTheme != null) {
-			getTheme().setTo(ApptentiveInternal.apptentiveTheme);
-		}
+		getTheme().setTo(ApptentiveInternal.getApptentiveTheme(this));
 	}
 
 	private void addFragmentToAdapter(ApptentiveBaseFragment f, String title) {

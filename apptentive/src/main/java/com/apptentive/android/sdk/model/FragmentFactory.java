@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.AboutFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.AppStoreRatingFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.EnjoymentDialogFragment;
@@ -74,6 +75,9 @@ public class FragmentFactory {
 				}
 			} else if (fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR) {
 				return MessageCenterErrorFragment.newInstance(bundle);
+			} else if (fragmentType == Constants.FragmentTypes.ABOUT) {
+				bundle.putBoolean(FragmentConfigKeys.MODAL, true);
+				return AboutFragment.newInstance(bundle);
 			}
 		}
 		return null;

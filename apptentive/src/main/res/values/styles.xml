@@ -33,7 +33,10 @@
 
 
         <!-- Apptentive Material specific values -->
-        <item name="apptentive_material_background">@color/apptentive_material_background</item>
+        <item name="apptentiveWindowBackground">@color/apptentive_window_background</item>
+        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
+        <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
+
         <item name="apptentive_material_toolbar_foreground">
             @color/apptentive_material_toolbar_foreground
         </item>
@@ -73,8 +76,6 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
-        <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
-        <item name="apptentiveBorderedButtonSurveyStyle">?apptentiveBorderedButtonStyle</item>
     </style>
 
 
@@ -263,7 +264,7 @@
         <item name="android:inputType">textCapSentences</item>
         <item name="android:textColorHint">?attr/apptentive_material_hint_text</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
-        <item name="android:gravity">bottom|left</item>item>
+        <item name="android:gravity">bottom|start</item>item>
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.EditText.WhoCard">

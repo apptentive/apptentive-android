@@ -98,11 +98,11 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 			Apptentive.addCustomDeviceData(getTargetContext(), "boolean_true", true);
 			Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
 			//Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
-			ApptentiveInternal.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
+			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
 			Apptentive.Version version = new Apptentive.Version();
 			version.setVersion("1.2.3");
 			//Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
-			ApptentiveInternal.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
+			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
 			Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
 
 			DeviceManager.storeDeviceAndReturnIt(getTargetContext());

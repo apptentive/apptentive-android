@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -831,6 +832,20 @@ public class Util {
 		storedFile.setLocalFilePath(localFilePath);
 		storedFile.setMimeType(mimeType);
 		return storedFile;
+	}
+
+	public static Activity castContextToActivity(Context context) {
+		if (context == null) {
+			return null;
+		}
+		else if (context instanceof Activity) {
+			return (Activity) context;
+		}
+		else if (context instanceof ContextWrapper) {
+			return castContextToActivity(((ContextWrapper) context).getBaseContext());
+		}
+
+		return null;
 	}
 
 }

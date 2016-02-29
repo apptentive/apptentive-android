@@ -8,110 +8,111 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.util.Util;
+
+import org.json.JSONException;
 
 import java.util.*;
 
-public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> {
 
-	protected Map<String, CheckboxChoice> answersChoices;
-	protected Map<CheckboxChoice, String> answersChoicesReverse;
+public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements RadioGroup.OnCheckedChangeListener {
 
-	public MultichoiceSurveyQuestionView(Context context, SurveyState surveyState, MultichoiceQuestion question) {
-		super(context, surveyState, question);
-		answersChoices = new HashMap<String, CheckboxChoice>();
-		answersChoicesReverse = new HashMap<CheckboxChoice, String>();
+	RadioGroup radioGroup;
+	boolean buttonChecked;
+	private int selectItem;
+
+	public static MultichoiceSurveyQuestionView newInstance(MultichoiceQuestion question) {
+
+		MultichoiceSurveyQuestionView f = new MultichoiceSurveyQuestionView();
+
+		Bundle b = new Bundle();
+		b.putString("question", question.toString());
+		f.setArguments(b);
+		return f;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		selectItem = -1;
+		Bundle bundle = getArguments();
+
+		if (bundle != null) {
+			try {
+				question = new MultichoiceQuestion(bundle.getString("question"));
+			} catch (JSONException e) {
+
+			}
+		}
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		View v = super.onCreateView(inflater, container, savedInstanceState);
+
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
-		Set<String> answers = surveyState.getAnswers(question.getId());
+		View questionView = themedInflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer(v));
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
-		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer());
-
-		LinearLayout choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
+		radioGroup = (RadioGroup) questionView.findViewById(R.id.radio_group);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
+			RadioButton choice = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, radioGroup, false);
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
-			final CheckboxChoice choice = new CheckboxChoice(context, answerDefinition.getValue());
-			if (answers.contains(answerDefinition.getId())) {
-				choice.post(new Runnable() {
-					@Override
-					public void run() {
-						choice.check();
-					}
-				});
+			choice.setText(answerDefinition.getValue());
+			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());
+			if (selectItem == i) {
+				choice.setChecked(true);
 			}
-			choice.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					if (getContext() instanceof Activity) {
-						Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this);
-					}
-					choiceClicked(choice);
-				}
-			});
-			answersChoices.put(answerDefinition.getId(), choice);
-			answersChoicesReverse.put(choice, answerDefinition.getId());
-			choiceContainer.addView(choice);
+			radioGroup.addView(choice);
 		}
+
+		radioGroup.setOnCheckedChangeListener(this);
+
+		return v;
 	}
 
-	/**
-	 * Override to change the behavior of clicking this.
-	 */
-	protected void choiceClicked(CheckboxChoice choice) {
-
-		String clickedId = answersChoicesReverse.get(choice);
-
-		Set<String> answers = surveyState.getAnswers(question.getId());
-		boolean alreadyAnswered = answers != null && answers.contains(clickedId);
-		if (alreadyAnswered) {
-			choice.toggle();
-		} else {
-			if (countSelectedChoices() != 0) {
-				clearAllChoices();
-			}
-			choice.toggle();
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		buttonChecked = true;
+		RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
+		selectItem = group.indexOfChild(checkedRadioButton);
+		if (getContext() instanceof Activity) {
+			Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this.getView());
 		}
-		Set<String> checkedChoices = new HashSet<String>();
-		for (String id : answersChoices.keySet()) {
-			if (answersChoices.get(id).isChecked()) {
-				checkedChoices.add(id);
-			}
-		}
-		surveyState.setAnswers(question.getId(), checkedChoices);
-		updateValidationState();
-		requestFocus();
 		fireListener();
 	}
 
-	protected int countSelectedChoices() {
-		int ret = 0;
-		for (String id : answersChoices.keySet()) {
-			if (answersChoices.get(id).isChecked()) {
-				ret++;
-			}
-		}
-		return ret;
+	@Override
+	public boolean isValid() {
+		return !question.isRequired() || buttonChecked;
 	}
 
-	protected void clearAllChoices() {
-		surveyState.clearAnswers(question.getId());
-		for (String id : answersChoices.keySet()) {
-			if (answersChoices.get(id).isChecked()) {
-				answersChoices.get(id).toggle();
+	@Override
+	public Object getAnswer() {
+		for (int i = 0; i < radioGroup.getChildCount(); i++) {
+			RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
+			if (radioButton.isChecked()) {
+				return radioButton.getTag(R.id.apptentive_survey_answer_id);
 			}
 		}
+		return null;
 	}
 }

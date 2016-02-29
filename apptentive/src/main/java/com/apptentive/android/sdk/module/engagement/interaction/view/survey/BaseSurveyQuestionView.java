@@ -6,102 +6,117 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SurveyState;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
-import com.apptentive.android.sdk.util.Util;
 
-abstract public class BaseSurveyQuestionView<Q extends Question> extends FrameLayout {
+
+abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragment implements SurveyQuestionView {
 
 	protected Q question;
-	protected SurveyState surveyState;
+	private OnSurveyQuestionAnsweredListener listener;
 
-	protected OnSurveyQuestionAnsweredListener listener;
+	protected View requiredView;
+	protected View dashView;
+	protected TextView instructionsView;
 
-	protected BaseSurveyQuestionView(Context context, SurveyState surveyState, Q question) {
-		super(context);
-		this.question = question;
-		this.surveyState = surveyState;
+	private View validationFailedBorder;
 
-		// Required to remove focus from any EditTexts.
-		setFocusable(true);
-		setFocusableInTouchMode(true);
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+													 Bundle savedInstanceState) {
+		// Inflate the layout for this fragment
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(context, ApptentiveInternal.apptentiveTheme);
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
-		inflater.inflate(R.layout.apptentive_survey_question_base, this);
+		View v = themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);
+		return v;
+	}
 
-		setOnTouchListener(new OnTouchListener() {
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				if (getContext() instanceof Activity) {
-					Util.hideSoftKeyboard((Activity) getContext(), BaseSurveyQuestionView.this);
-				}
-				return false;
-			}
-		});
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		requiredView = view.findViewById(R.id.question_required);
+		dashView = view.findViewById(R.id.question_dash);
+		instructionsView = (TextView) view.findViewById(R.id.question_instructions);
 
-		TextView title = (TextView) findViewById(R.id.question_title);
+		TextView title = (TextView) view.findViewById(R.id.question_title);
 		title.setText(question.getValue());
 
 		String instructionsText = question.getInstructions();
-		setInstructions(instructionsText);
+		setInstructions(view, instructionsText);
 
-
-		updateValidationState();
+		validationFailedBorder = view.findViewById(R.id.validation_failed_border);
 	}
 
-	protected void setInstructions(String instructionsText) {
-		TextView instructions = (TextView) findViewById(R.id.question_instructions);
-		if (instructionsText != null && instructionsText.length() > 0) {
-			instructions.setText(instructionsText);
-			instructions.setVisibility(View.VISIBLE);
+
+	protected void setInstructions(final View v, String instructionsText) {
+		boolean hasInstructions = !TextUtils.isEmpty(instructionsText);
+
+		requiredView = v.findViewById(R.id.question_required);
+		if (question.isRequired()) {
+			requiredView.setVisibility(View.VISIBLE);
 		} else {
-			instructions.setVisibility(View.GONE);
+			requiredView.setVisibility(View.GONE);
+		}
+
+		if (question.isRequired() && hasInstructions) {
+			dashView.setVisibility(View.VISIBLE);
+		} else {
+			dashView.setVisibility(View.GONE);
+		}
+
+		if (hasInstructions) {
+			instructionsView.setText(instructionsText);
+			instructionsView.setVisibility(View.VISIBLE);
+		} else {
+			instructionsView.setVisibility(View.GONE);
 		}
 	}
 
-	protected LinearLayout getAnswerContainer() {
-		return (LinearLayout) findViewById(R.id.answer_container);
+	protected LinearLayout getAnswerContainer(View rootView) {
+		return (LinearLayout) rootView.findViewById(R.id.answer_container);
 	}
 
+	/**
+	 * Always call this when the answer value changes.
+	 */
+	protected void fireListener() {
+		if (listener != null) {
+			listener.onAnswered(this);
+		}
+	}
+
+	public void updateValidationState(boolean valid) {
+		if (valid) {
+			validationFailedBorder.setVisibility(View.INVISIBLE);
+		} else {
+			validationFailedBorder.setVisibility(View.VISIBLE);
+		}
+	}
+
+	@Override
 	public void setOnSurveyQuestionAnsweredListener(OnSurveyQuestionAnsweredListener listener) {
 		this.listener = listener;
 	}
 
-	protected void fireListener() {
-		if (listener != null) {
-			listener.onAnswered();
-		}
+	@Override
+	public String getQuestionId() {
+		return question.getId();
 	}
 
-	protected void updateValidationState() {
-/*
-		Resources resources = getContext().getResources();
-		TextView instructions = (TextView) findViewById(R.id.question_instructions);
-		View validationFrame = findViewById(R.id.question_background_validation);
-		if (question != null && !surveyState.isQuestionValid(question)) {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_invalid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_invalid));
-			instructions.setTypeface(Typeface.DEFAULT_BOLD);
-			validationFrame.setBackgroundDrawable(resources.getDrawable(R.drawable.apptentive_survey_question_background_invalid));
-		} else {
-			instructions.setTextColor(resources.getColor(R.color.apptentive_survey_question_instruction_text_valid));
-			instructions.setBackgroundColor(resources.getColor(R.color.apptentive_survey_question_instruction_background_valid));
-			instructions.setTypeface(Typeface.DEFAULT);
-			validationFrame.setBackgroundColor(Color.TRANSPARENT);
-		}
-*/
-	}
+	public abstract boolean isValid();
+
+	public abstract Object getAnswer();
 }

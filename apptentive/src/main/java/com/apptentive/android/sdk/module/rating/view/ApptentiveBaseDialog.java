@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,8 +26,8 @@ public abstract class ApptentiveBaseDialog extends Dialog {
 
 		// Let the dialog take up the whole device width.
 		WindowManager.LayoutParams params = getWindow().getAttributes();
-		params.width = ViewGroup.LayoutParams.FILL_PARENT;
-		params.height = ViewGroup.LayoutParams.FILL_PARENT;
+		params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
 		params.gravity = Gravity.CENTER;
 		getWindow().setAttributes(params);
 		getWindow().setBackgroundDrawable(new ColorDrawable(0x7F000000));

@@ -31,25 +31,25 @@ import java.util.Iterator;
  */
 public class InteractionManager {
 
-	private static Interactions interactions;
-	private static Targets targets;
-	private static Boolean pollForInteractions;
+	private Interactions interactions;
+	private Targets targets;
+	private Boolean pollForInteractions;
 
-	public static Interactions getInteractions(Context context) {
+	public Interactions getInteractions(Context context) {
 		if (interactions == null) {
 			interactions = loadInteractions(context);
 		}
 		return interactions;
 	}
 
-	public static Targets getTargets(Context context) {
+	public Targets getTargets(Context context) {
 		if (targets == null) {
 			targets = loadTargets(context);
 		}
 		return targets;
 	}
 
-	public static Interaction getApplicableInteraction(Context context, String eventLabel) {
+	public Interaction getApplicableInteraction(Context context, String eventLabel) {
 
 		Targets targets = getTargets(context);
 
@@ -63,14 +63,14 @@ public class InteractionManager {
 		return null;
 	}
 
-	public static void asyncFetchAndStoreInteractions(final Context context) {
+	public void asyncFetchAndStoreInteractions(final Context context) {
 
 		if (!isPollForInteractions(context)) {
 			Log.v("Interaction polling is disabled.");
 			return;
 		}
 
-		boolean force = ApptentiveInternal.isAppDebuggable;
+		boolean force = ApptentiveInternal.isApptentiveDebuggable(context);
 
 		if (force || hasCacheExpired(context)) {
 			Log.i("Fetching new Interactions.");
@@ -94,7 +94,7 @@ public class InteractionManager {
 		}
 	}
 
-	private static void fetchAndStoreInteractions(Context appContext) {
+	private void fetchAndStoreInteractions(Context appContext) {
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(appContext);
 
 		// We weren't able to connect to the internet.
@@ -124,29 +124,21 @@ public class InteractionManager {
 		}
 
 
-		Iterator it = ApptentiveInternal.configUpdateListeners.iterator();
-
-		while (it.hasNext()) {
-			ApptentiveBaseFragment.ConfigUpdateListener listener = (ApptentiveBaseFragment.ConfigUpdateListener) it.next();
-
-			if (listener != null) {
-				listener.onConfigurationUpdated(updateSuccessful);
-			}
-		}
+		ApptentiveInternal.getInstance(appContext).notifyConfigurationUpdated(updateSuccessful);
 
 	}
 
 	/**
 	 * Made public for testing. There is no other reason to use this method directly.
 	 */
-	public static void storeInteractionsPayloadString(Context context, String interactionsPayloadString) {
+	public void storeInteractionsPayloadString(Context context, String interactionsPayloadString) {
 		try {
 			InteractionsPayload payload = new InteractionsPayload(interactionsPayloadString);
 			Interactions interactions = payload.getInteractions();
 			Targets targets = payload.getTargets();
 			if (interactions != null && targets != null) {
-				InteractionManager.interactions = interactions;
-				InteractionManager.targets = targets;
+				this.interactions = interactions;
+				this.targets = targets;
 				saveInteractions(context);
 				saveTargets(context);
 			} else {
@@ -157,7 +149,7 @@ public class InteractionManager {
 		}
 	}
 
-	public static void clear(Context context) {
+	public void clear(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).commit();
 		prefs.edit().remove(Constants.PREF_KEY_TARGETS).commit();
@@ -165,12 +157,12 @@ public class InteractionManager {
 		targets = null;
 	}
 
-	private static void saveInteractions(Context context) {
+	private void saveInteractions(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).commit();
 	}
 
-	private static Interactions loadInteractions(Context context) {
+	private Interactions loadInteractions(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String interactionsString = prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 		if (interactionsString != null) {
@@ -183,12 +175,12 @@ public class InteractionManager {
 		return null;
 	}
 
-	private static void saveTargets(Context context) {
+	private void saveTargets(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).commit();
 	}
 
-	private static Targets loadTargets(Context context) {
+	private Targets loadTargets(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String targetsString = prefs.getString(Constants.PREF_KEY_TARGETS, null);
 		if (targetsString != null) {
@@ -201,19 +193,19 @@ public class InteractionManager {
 		return null;
 	}
 
-	private static boolean hasCacheExpired(Context context) {
+	private boolean hasCacheExpired(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		long expiration = prefs.getLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, 0);
 		return expiration < System.currentTimeMillis();
 	}
 
-	public static void updateCacheExpiration(Context context, long duration) {
+	public void updateCacheExpiration(Context context, long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();
 	}
 
-	public static boolean isPollForInteractions(Context context) {
+	public boolean isPollForInteractions(Context context) {
 		if (pollForInteractions == null) {
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			pollForInteractions = prefs.getBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, true);
@@ -221,8 +213,8 @@ public class InteractionManager {
 		return pollForInteractions;
 	}
 
-	public static void setPollForInteractions(Context context, boolean pollForInteractions) {
-		InteractionManager.pollForInteractions = pollForInteractions;
+	public void setPollForInteractions(Context context, boolean pollForInteractions) {
+		this.pollForInteractions = pollForInteractions;
 		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).commit();
 	}

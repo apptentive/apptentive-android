@@ -59,23 +59,26 @@ public class MessageManager {
 	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
 	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
 
-	private static WeakReference<Activity> currentForgroundApptentiveActivity;
+	private WeakReference<Activity> currentForgroundApptentiveActivity;
 
-	private static WeakReference<AfterSendMessageListener> afterSendMessageListener;
+	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
-	private static final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewIncomingMessagesListener>>();
+	private final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewIncomingMessagesListener>>();
 
 
 	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
 	 * Use WeakReference to prevent memory leak
 	 */
-	private static final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
+	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
 
-	private static Handler sUIHandler;
+	private Handler uiHandler;
+	private MessagePollingWorker pollingWorker;
 
-	private static Handler getHandlerInstance() {
-		if (sUIHandler == null) {
-			sUIHandler = new Handler(Looper.getMainLooper()) {
+
+
+	public MessageManager() {
+		if (uiHandler == null) {
+			uiHandler = new Handler(Looper.getMainLooper()) {
 				@Override
 				public void handleMessage(android.os.Message msg) {
 					switch (msg.what) {
@@ -99,14 +102,16 @@ public class MessageManager {
 				}
 			};
 		}
-		return sUIHandler;
+		if (pollingWorker == null) {
+			pollingWorker = new MessagePollingWorker(this);
+		}
 	}
 
 	/*
 	 * Starts an asynctask to pre-fetch messages. This is to be called as part of Push notification action
 	 * when push is received on the device.
 	 */
-	public static void startMessagePreFetchTask(final Context applicationContext) {
+	public void startMessagePreFetchTask(final Context applicationContext) {
 		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
 			@Override
 			protected Void doInBackground(Object... params) {
@@ -118,14 +123,13 @@ public class MessageManager {
 
 			@Override
 			protected void onPostExecute(Void v) {
-				sUIHandler = null;
 			}
 		};
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, applicationContext, MessagePollingWorker.messageCenterInForeground.get());
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, applicationContext, isMessageCenterInForeground());
 		} else {
-			task.execute(applicationContext, MessagePollingWorker.messageCenterInForeground.get());
+			task.execute(applicationContext, isMessageCenterInForeground());
 		}
 	}
 
@@ -135,8 +139,8 @@ public class MessageManager {
 	 *
 	 * @return true if messages were returned, else false.
 	 */
-	public static synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
-		if (ApptentiveInternal.conversationToken == null) {
+	public synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
+		if (ApptentiveInternal.getApptentiveConversationToken(appContext) == null) {
 			Log.d("Can't fetch messages because the conversation has not yet been initialized.");
 			return false;
 		}
@@ -165,8 +169,8 @@ public class MessageManager {
 						}
 					}
 					incomingUnreadMessages++;
-					Message msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
-					getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
+					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
+					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
 					msg.sendToTarget();
 				}
 			}
@@ -175,13 +179,13 @@ public class MessageManager {
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the forground activity is not alreay message center activity
 				if (!isMessageCenterForeground && showToast) {
-					msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
-					getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
+					msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
+					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
 					msg.sendToTarget();
 				}
 			}
-			msg = getHandlerInstance().obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
-			getHandlerInstance().removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
+			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
+			uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
 			msg.sendToTarget();
 
 			return incomingUnreadMessages > 0;
@@ -189,7 +193,7 @@ public class MessageManager {
 		return false;
 	}
 
-	public static List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
+	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
 		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
 		List<ApptentiveMessage> messagesAll = getMessageStore(context).getAllMessages(context.getApplicationContext());
 		// Do not display hidden messages on Message Center
@@ -202,20 +206,20 @@ public class MessageManager {
 		return messagesToShow;
 	}
 
-	public static void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
+	public void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		getMessageStore(context).addOrUpdateMessages(apptentiveMessage);
-		ApptentiveDatabase.getInstance(context).addPayload(apptentiveMessage);
+		ApptentiveInternal.getApptentiveDatabase(context).addPayload(apptentiveMessage);
 	}
 
 	/**
 	 * This doesn't need to be run during normal program execution. Testing only.
 	 */
-	public static void deleteAllMessages(Context context) {
+	public void deleteAllMessages(Context context) {
 		Log.e("Deleting all messages.");
 		getMessageStore(context).deleteAllMessages();
 	}
 
-	private static List<ApptentiveMessage> fetchMessages(Context appContext, String afterId) {
+	private List<ApptentiveMessage> fetchMessages(Context appContext, String afterId) {
 		Log.d("Fetching messages newer than: " + afterId);
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(appContext, null, afterId, null);
 
@@ -233,11 +237,11 @@ public class MessageManager {
 		return ret;
 	}
 
-	public static void updateMessage(Context context, ApptentiveMessage apptentiveMessage) {
+	public void updateMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		getMessageStore(context).updateMessage(apptentiveMessage);
 	}
 
-	public static List<ApptentiveMessage> parseMessagesString(Context appContext, String messageString) throws JSONException {
+	public List<ApptentiveMessage> parseMessagesString(Context appContext, String messageString) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {
@@ -255,19 +259,19 @@ public class MessageManager {
 		return ret;
 	}
 
-	public static void onResumeSending() {
+	public void onResumeSending() {
 		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 			afterSendMessageListener.get().onResumeSending();
 		}
 	}
 
-	public static void onPauseSending(int reason_code) {
+	public void onPauseSending(int reason_code) {
 		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 			afterSendMessageListener.get().onPauseSending(reason_code);
 		}
 	}
 
-	public static void onSentMessage(Context context, ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
+	public void onSentMessage(Context context, ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
 
 		if (response.isRejectedPermanently() || response.isBadPayload()) {
 			if (apptentiveMessage instanceof CompoundMessage) {
@@ -311,11 +315,11 @@ public class MessageManager {
 		}
 	}
 
-	private static MessageStore getMessageStore(Context context) {
-		return ApptentiveDatabase.getInstance(context);
+	private MessageStore getMessageStore(Context context) {
+		return ApptentiveInternal.getApptentiveDatabase(context);
 	}
 
-	public static int getUnreadMessageCount(Context context) {
+	public int getUnreadMessageCount(Context context) {
 		return getMessageStore(context).getUnreadMessageCount();
 	}
 
@@ -329,7 +333,11 @@ public class MessageManager {
 		void onResumeSending();
 	}
 
-	public static void setAfterSendMessageListener(AfterSendMessageListener listener) {
+	public interface OnNewIncomingMessagesListener {
+		void onNewMessageReceived(final CompoundMessage apptentiveMsg);
+	}
+
+	public void setAfterSendMessageListener(AfterSendMessageListener listener) {
 		if (listener != null) {
 			afterSendMessageListener = new WeakReference<AfterSendMessageListener>(listener);
 		} else {
@@ -337,11 +345,8 @@ public class MessageManager {
 		}
 	}
 
-	public interface OnNewIncomingMessagesListener {
-		void onNewMessageReceived(final CompoundMessage apptentiveMsg);
-	}
 
-	public static void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
+	public void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
 			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<OnNewIncomingMessagesListener> listenerRef = iterator.next();
@@ -356,11 +361,11 @@ public class MessageManager {
 		}
 	}
 
-	public static void clearInternalOnMessagesUpdatedListeners() {
+	public void clearInternalOnMessagesUpdatedListeners() {
 		internalNewMessagesListeners.clear();
 	}
 
-	public static void notifyInternalNewMessagesListeners(final CompoundMessage apptentiveMsg) {
+	public void notifyInternalNewMessagesListeners(final CompoundMessage apptentiveMsg) {
 		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
@@ -371,13 +376,20 @@ public class MessageManager {
 
 	@Deprecated
 	public static void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+		MessageManager mgr = ApptentiveInternal.getMessageManager(null);
+		if (mgr != null) {
+			mgr.setHostUnreadMessagesListenerInternal(newlistener);
+		}
+	}
+
+	public void setHostUnreadMessagesListenerInternal(UnreadMessagesListener newlistener) {
 		if (newlistener != null) {
 			clearHostUnreadMessagesListeners();
 			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
 		}
 	}
 
-	public static void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+	public void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
 		if (newlistener != null) {
 			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
@@ -392,11 +404,11 @@ public class MessageManager {
 		}
 	}
 
-	public static void clearHostUnreadMessagesListeners() {
+	public void clearHostUnreadMessagesListeners() {
 		hostUnreadMessagesListeners.clear();
 	}
 
-	public static void notifyHostUnreadMessagesListeners(int unreadMessages) {
+	public void notifyHostUnreadMessagesListeners(int unreadMessages) {
 		for (WeakReference<UnreadMessagesListener> listenerRef : hostUnreadMessagesListeners) {
 			UnreadMessagesListener listener = listenerRef.get();
 			if (listener != null) {
@@ -405,9 +417,8 @@ public class MessageManager {
 		}
 	}
 
-
 	// Set when Activity.onResume() is called
-	public static void setCurrentForgroundActivity(Activity activity) {
+	public void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {
 			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
 		} else if (currentForgroundApptentiveActivity != null) {
@@ -419,7 +430,15 @@ public class MessageManager {
 		}
 	}
 
-	private static void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
+	public void setMessageCenterInForeground(boolean bInForeground) {
+		pollingWorker.setMessageCenterInForeground(bInForeground);
+	}
+
+	public boolean isMessageCenterInForeground() {
+		return pollingWorker.messageCenterInForeground.get();
+	}
+
+	private void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
@@ -445,7 +464,7 @@ public class MessageManager {
 		}
 	}
 
-	private static PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
+	private PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
 		Intent intent;
 		if (Apptentive.canShowMessageCenter(applicationContext)) {
 			intent = new Intent();
@@ -458,4 +477,13 @@ public class MessageManager {
 		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
 				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
 	}
+
+	public void appWentToForeground(Context context) {
+		pollingWorker.appWentToForeground(context);
+	}
+
+	public void appWentToBackground() {
+		pollingWorker.appWentToBackground();
+	}
+
 }

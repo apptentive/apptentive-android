@@ -10,13 +10,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -50,7 +49,7 @@ public class EngagementModule {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
+			ApptentiveInternal.getCodePointStore(activity).storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
 			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
@@ -60,9 +59,9 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Activity activity, String eventLabel) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), eventLabel);
+		Interaction interaction = ApptentiveInternal.getInteractionManager(activity).getApplicableInteraction(activity.getApplicationContext(), eventLabel);
 		if (interaction != null) {
-			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
+			ApptentiveInternal.getCodePointStore(activity).storeInteractionForCurrentAppVersion(activity, interaction.getId());
 			launchInteraction(activity, interaction);
 			return true;
 		}
@@ -92,7 +91,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(Context context, String eventLabel) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(context, eventLabel);
+		Interaction interaction = ApptentiveInternal.getInteractionManager(context).getApplicableInteraction(context, eventLabel);
 		return interaction != null;
 	}
 
