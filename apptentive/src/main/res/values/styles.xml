@@ -60,14 +60,11 @@
             @color/apptentive_material_pressed_highlight
         </item>
 
-        <!-- Here we setting apptentive widget styles -->
-        <item name="apptentiveAvatarViewGreetingStyle">
-            @style/ApptentiveWidget.ApptentiveAvatarView.Greeting
-        </item>
-        <item name="apptentiveAvatarViewMessageStyle">
-            @style/ApptentiveWidget.ApptentiveAvatarView.Message
-        </item>
-        <item name="apptentiveFabStyle">@style/ApptentiveWidget.FloatingActionButton</item>
+        <!-- Here we set Apptentive widget styles -->
+        <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
+        <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
+
+        <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.ImageButton.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
         <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
 
@@ -99,8 +96,6 @@
     <style name="ApptentiveTheme.TranslucentStatus.FullScreen" parent="ApptentiveTheme.TranslucentStatus">
         <item name="android:windowFullscreen">true</item>
     </style>
-
-    <style name="ApptentiveTheme.Widget"/>
 
     <style name="Apptentive"/>
 
@@ -137,12 +132,14 @@
     </style>
 
 
-    <style name="ApptentiveTheme.Widget.CardView" parent="android:Widget">
+    <style name="Apptentive.Style.Widget" parent="android:Widget"/>
+
+    <style name="Apptentive.Style.Widget.CardView">
         <item name="android:layout_margin">0dp</item>
         <item name="android:padding">0dp</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.CardView.Message">
+    <style name="Apptentive.Style.Widget.CardView.Message">
         <item name="android:paddingTop">
             @dimen/apptentive_message_center_fallback_divider_line_width
         </item>
@@ -151,12 +148,14 @@
         </item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.CardView.Composing">
+    <style name="Apptentive.Style.Widget.CardView.Composing">
         <item name="android:layout_margin">0dp</item>
         <item name="android:padding">0dp</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.CardContent.Outgoing" parent="android:Widget">
+    <style name="Apptentive.Style.Widget.CardContent"/>
+
+    <style name="Apptentive.Style.Widget.CardContent.Outgoing">
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
         <item name="android:paddingTop">14dp</item>
@@ -165,7 +164,7 @@
         <item name="android:background">@color/apptentive_message_center_outgoing_background</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.CardContent.Incoming" parent="android:Widget">
+    <style name="Apptentive.Style.Widget.CardContent.Incoming">
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
         <item name="android:paddingTop">14dp</item>
@@ -174,7 +173,7 @@
         <item name="android:background">@color/apptentive_message_center_incoming_background</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.CardContent.WhoCard" parent="android:Widget">
+    <style name="Apptentive.Style.Widget.CardContent.WhoCard">
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
         <item name="android:paddingBottom">5dp</item>
@@ -182,7 +181,7 @@
         <item name="android:background">@color/apptentive_white</item>
     </style>
 
-    <style name="ApptentiveTheme.Widget.Divider">
+    <style name="Apptentive.Style.Widget.Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
         <item name="android:background">?android:attr/listDivider</item>
@@ -358,34 +357,36 @@
         <item name="android:gravity">center_vertical|right</item>
     </style>
 
-    <style name="ApptentiveWidget.ApptentiveAvatarView" parent="android:Widget">
+    <style name="Apptentive.Style.Widget.AvatarView">
         <item name="android:src">@drawable/avatar</item>
     </style>
 
-    <style name="ApptentiveWidget.ApptentiveAvatarView.Greeting">
+    <style name="Apptentive.Style.Widget.AvatarView.Greeting">
         <item name="apptentive_borderColor">?attr/apptentive_material_toolbar_foreground</item>
         <item name="apptentive_borderWidth">2dp</item>
         <item name="apptentive_borderSpace">1.5dp</item>
     </style>
 
-    <style name="ApptentiveWidget.ApptentiveAvatarView.Message">
+    <style name="Apptentive.Style.Widget.AvatarView.Message">
         <item name="apptentive_borderColor">?attr/colorAccent</item>
     </style>
 
-    <style name="ApptentiveWidget.NewMessageBadge" parent="android:Widget">
+    <style name="Apptentive.Style.Widget.NewMessageBadge">
         <item name="apptentive_badgeSize">normal</item>
         <item name="apptentive_counterColor">@color/apptentive_material_primary_text</item>
     </style>
 
-    <style name="ApptentiveWidget.NewMessageBadge.Mini" parent="ApptentiveWidget.NewMessageBadge">
+    <style name="Apptentive.Style.Widget.NewMessageBadge.Mini">
         <item name="apptentive_badgeSize">mini</item>
     </style>
 
-    <style name="ApptentiveWidget.FloatingActionButton" parent="android:Widget.ImageButton">
+    <style name="Apptentive.Style.Widget.ImageButton" parent="android:Widget.ImageButton"/>
+
+    <style name="Apptentive.Style.Widget.ImageButton.FloatingActionButton">
         <item name="apptentive_floatingActionButtonSize">normal</item>
     </style>
 
-    <style name="ApptentiveWidget.FloatingActionButton.Mini" parent="ApptentiveWidget.FloatingActionButton">
+    <style name="Apptentive.Style.Widget.ImageButton.FloatingActionButton.Mini">
         <item name="apptentive_floatingActionButtonSize">mini</item>
     </style>
 
