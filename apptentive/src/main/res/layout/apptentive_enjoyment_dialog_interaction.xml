@@ -31,7 +31,7 @@
                 <TextView android:id="@+id/title"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextAppearence.ApptentiveDialogTitle"/>
+                          style="@style/Apptentive.Style.TextAppearence.ApptentiveDialogTitle"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/bottom_area"
                           android:layout_width="match_parent"
@@ -41,12 +41,12 @@
                 <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/no"
                                                                                                              android:layout_width="wrap_content"
                                                                                                              android:layout_height="wrap_content"
-                                                                                                             style="@style/ApptentiveTheme.TextAppearence"
+                                                                                                             style="@style/Apptentive.Style.TextAppearence"
                                                                                                              apptentive:apptentive_buttonText="@string/apptentive_no"/>
                 <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/yes"
                                                                                                              android:layout_width="wrap_content"
                                                                                                              android:layout_height="wrap_content"
-                                                                                                             style="@style/ApptentiveTheme.TextAppearence"
+                                                                                                             style="@style/Apptentive.Style.TextAppearence"
                                                                                                              apptentive:apptentive_buttonText="@string/apptentive_yes"/>
             </LinearLayout>
         </LinearLayout>

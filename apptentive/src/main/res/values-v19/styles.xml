@@ -15,11 +15,11 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveTheme.TextAppearence" parent="@android:style/TextAppearance">
+    <style name="Apptentive.Style.TextAppearence" parent="@android:style/TextAppearance">
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="ApptentiveTheme.TextAppearence.TextView">
+    <style name="Apptentive.Style.TextAppearence.TextView">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:textColor">?attr/apptentive_material_primary_text</item>
         <item name="android:textStyle">normal</item>

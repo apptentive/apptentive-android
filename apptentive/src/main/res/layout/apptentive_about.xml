@@ -55,7 +55,7 @@
                 </RelativeLayout>
                 <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
-                              style="@style/ApptentiveTheme.TextAppearence"
+                              style="@style/Apptentive.Style.TextAppearence"
                               android:paddingLeft="16dp"
                               android:paddingRight="16dp"
                               android:paddingTop="16dp"

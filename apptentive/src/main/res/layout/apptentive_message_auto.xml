@@ -15,7 +15,7 @@
     <TextView android:id="@+id/datestamp"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveTheme.TextAppearence.TextView.TimeStamp"
+              style="@style/Apptentive.Style.TextAppearence.TextView.TimeStamp"
               android:visibility="gone"/>
     <android.support.v7.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             <TextView android:id="@+id/apptentive_message_auto_body"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextAppearence.TextView"
+                      style="@style/Apptentive.Style.TextAppearence.TextView"
                       android:paddingTop="@dimen/apptentive_message_center_default_margin_small"
                       android:paddingBottom="@dimen/apptentive_message_center_default_margin_small"
                       android:paddingLeft="10dp"

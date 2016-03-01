@@ -29,13 +29,13 @@
                       android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
                       android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
                       android:layout_marginTop="@dimen/apptentive_message_center_card_view_content_margin"
-                      style="@style/ApptentiveTheme.TextAppearence.TextView"/>
+                      style="@style/Apptentive.Style.TextAppearence.TextView"/>
             <EditText android:id="@+id/who_name"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
                       android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
-                      style="@style/ApptentiveTheme.TextAppearence.EditText.WhoCard"
+                      style="@style/Apptentive.Style.TextAppearence.EditText.WhoCard"
                       android:inputType="textCapSentences"/>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
@@ -48,12 +48,12 @@
                 <EditText android:id="@+id/who_email"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextAppearence.EditText.WhoCard"
+                          style="@style/Apptentive.Style.TextAppearence.EditText.WhoCard"
                           android:inputType="textEmailAddress"/>
                 <TextView android:id="@+id/email_explanation"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextAppearence.TextView"
+                          style="@style/Apptentive.Style.TextAppearence.TextView"
                           android:textColor="?attr/apptentive_material_secondary_text"
                           android:textSize="@dimen/apptentive_text_small"/>
             </LinearLayout>
@@ -68,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
-                        style="@style/ApptentiveTheme.TextAppearence"
+                        style="@style/Apptentive.Style.TextAppearence"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="Skip"
                         android:textColor="?attr/colorAccent"/>
@@ -76,7 +76,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
-                        style="@style/ApptentiveTheme.TextAppearence"
+                        style="@style/Apptentive.Style.TextAppearence"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="Send"
                         android:textColor="?attr/colorAccent"/>

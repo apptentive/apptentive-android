@@ -12,6 +12,8 @@
         <attr name="apptentiveCardViewBackground" format="color|reference" />
 
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
+        <attr name="apptentiveTextAppearanceMedium" format="reference" />
+
 
         <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
         <attr name="apptentive_material_primary_text" format="color|reference" />
