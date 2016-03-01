@@ -81,6 +81,8 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 
 		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
+
+		ApptentiveInternal.getInstance(activity).onActivityResumed();
 	}
 
 	@Override

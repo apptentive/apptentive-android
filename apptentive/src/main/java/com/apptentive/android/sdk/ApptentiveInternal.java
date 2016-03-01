@@ -136,8 +136,8 @@ public class ApptentiveInternal {
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
-					ApptentiveDatabase db = new ApptentiveDatabase(context.getApplicationContext());
-					CodePointStore store = new CodePointStore(context);
+					ApptentiveDatabase db = new ApptentiveDatabase(sApptentiveInternal.appContext);
+					CodePointStore store = new CodePointStore(sApptentiveInternal.appContext);
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
@@ -310,15 +310,18 @@ public class ApptentiveInternal {
 
 	public void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	}
+
+	public void onAppExit(final Activity activity) {
+		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
+	}
+
+	public void onActivityResumed() {
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice(appContext);
 		syncSdk(appContext);
 		syncPerson(appContext);
-	}
-
-	public void onAppExit(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onAppEnterForeground() {
