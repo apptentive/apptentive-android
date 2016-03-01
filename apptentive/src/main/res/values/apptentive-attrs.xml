@@ -37,7 +37,6 @@
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
     <attr name="apptentiveToolbarStyle" format="reference"/>
     <attr name="apptentiveBorderedButtonStyle" format="reference"/>
-    <attr name="apptentiveBorderedButtonSurveyStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="apptentive_buttonText" format="string"/>

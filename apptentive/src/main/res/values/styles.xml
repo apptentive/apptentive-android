@@ -70,7 +70,6 @@
         <item name="apptentiveFabStyle">@style/ApptentiveWidget.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
         <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
-        <item name="apptentiveBorderedButtonSurveyStyle">?apptentiveBorderedButtonStyle</item>
 
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

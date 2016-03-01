@@ -62,7 +62,7 @@
                 <android.support.v7.widget.AppCompatButton android:id="@+id/send"
                                                            android:layout_width="wrap_content"
                                                            android:layout_height="56dp"
-                                                           style="?apptentiveBorderedButtonSurveyStyle"
+                                                           style="?apptentiveBorderedButtonStyle"
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
