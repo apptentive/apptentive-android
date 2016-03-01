@@ -114,7 +114,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					// TODO: Extract survey state from views and send it as before.
 
-					ApptentiveInternal.getApptentiveDatabase(getActivity()).addPayload(new SurveyResponse(interaction, answers));
+					ApptentiveInternal.getApptentiveDatabase(getActivity()).addPayload(getContext(), new SurveyResponse(interaction, answers));
 					Log.d("Survey Submitted.");
 					callListener(true);
 				} else {

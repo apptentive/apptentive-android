@@ -60,6 +60,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -95,6 +97,8 @@ public class ApptentiveInternal {
 	WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
 	final LinkedBlockingQueue configUpdateListeners = new LinkedBlockingQueue();
+
+	ExecutorService cachedExecutor;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
@@ -144,6 +148,7 @@ public class ApptentiveInternal {
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.database = db;
 					sApptentiveInternal.codePointStore = store;
+					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
@@ -205,6 +210,14 @@ public class ApptentiveInternal {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
 			return internal.interactionManager;
+		}
+		return null;
+	}
+
+	public static PayloadSendWorker getPayloadWorker(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.payloadWorker;
 		}
 		return null;
 	}
@@ -297,6 +310,14 @@ public class ApptentiveInternal {
 			return internal.androidId;
 		}
 		return null;
+	}
+
+	public void runOnWorkerThread(Runnable r) {
+		cachedExecutor.execute(r);
+	}
+
+	public void scheduleOnWorkerThread(Runnable r) {
+		cachedExecutor.submit(r);
 	}
 
 	public void checkAndUpdateApptentiveConfigurations() {
@@ -458,7 +479,7 @@ public class ApptentiveInternal {
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
 			Log.d("App release was updated.");
-			database.addPayload(appRelease);
+			database.addPayload(context, appRelease);
 		}
 		invalidateCaches(context);
 	}
@@ -593,7 +614,7 @@ public class ApptentiveInternal {
 		if (deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			database.addPayload(deviceInfo);
+			database.addPayload(context, deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -607,7 +628,7 @@ public class ApptentiveInternal {
 		if (sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			database.addPayload(sdk);
+			database.addPayload(context, sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -621,7 +642,7 @@ public class ApptentiveInternal {
 		if (person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			database.addPayload(person);
+			database.addPayload(context, person);
 		} else {
 			Log.d("Person was not updated.");
 		}

@@ -208,7 +208,7 @@ public class MessageManager {
 
 	public void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
 		getMessageStore(context).addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getApptentiveDatabase(context).addPayload(apptentiveMessage);
+		ApptentiveInternal.getApptentiveDatabase(context).addPayload(context, apptentiveMessage);
 	}
 
 	/**
