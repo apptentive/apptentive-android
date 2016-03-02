@@ -101,8 +101,8 @@
     </style>
 
     <style name="Apptentive.Style.BorderedButton" parent="Widget.AppCompat.Button.Colored">
-        <item name="backgroundTint">?colorPrimary</item>
-        <item name="android:textColor">@color/apptentive_text_color_primary_inverse</item>
+        <item name="backgroundTint">?android:attr/colorPrimary</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
     </style>
 
     <!-- General Theme override to change the Dialog design -->
