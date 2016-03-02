@@ -14,7 +14,6 @@
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
         <attr name="apptentiveTextAppearanceMedium" format="reference" />
 
-        <attr name="apptentiveTextColorPrimary" format="color|reference" />
         <attr name="apptentiveTextColorPrimaryInverse" format="color|reference" />
         <attr name="apptentiveTextColorSecondary" format="color|reference" />
         <attr name="apptentiveTextColorSecondaryInverse" format="color|reference" />
