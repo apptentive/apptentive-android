@@ -54,7 +54,7 @@
     <color name="apptentive_material_toolbar_foreground">@color/icons</color>
     <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
 
-    <color name="apptentive_material_primary_text">@color/primary_text</color>
+    <color name="apptentive_text_color_primary">@color/primary_text</color>
     <color name="apptentive_material_primary_icon">@color/secondary_text</color>
     <color name="apptentive_material_primary_text_inverse">@color/icons</color>
 

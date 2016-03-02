@@ -21,7 +21,7 @@
 
     <style name="Apptentive.Style.TextAppearence.TextView">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
-        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">left</item>
     </style>

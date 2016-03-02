@@ -30,6 +30,7 @@
         <item name="colorPrimary">@color/apptentive_material_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
         <item name="colorAccent">@color/apptentive_material_accent</item>
+        <item name="android:textColorPrimary">@color/apptentive_text_color_primary</item>
 
 
         <!-- Apptentive Material specific values -->
@@ -40,7 +41,7 @@
         <item name="apptentive_material_toolbar_foreground">
             @color/apptentive_material_toolbar_foreground
         </item>
-        <item name="apptentive_material_primary_text">@color/apptentive_material_primary_text</item>
+        <item name="apptentiveTextColorPrimary">?android:textColorPrimary</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text
         </item>
@@ -63,6 +64,9 @@
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
+
+        <item name="apptentiveMessageCenterBadgeStyle">@style/Apptentive.Style.Widget.Badge</item>
+
 
         <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.ImageButton.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
@@ -115,7 +119,7 @@
         <item name="colorPrimary">@color/apptentive_material_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
         <item name="colorAccent">@color/apptentive_material_accent</item>
-        <item name="android:textColorPrimary">@color/apptentive_material_primary_text</item>
+        <item name="android:textColorPrimary">@color/apptentive_text_color_primary</item>
         <!-- Used for the background -->
     </style>
 
@@ -201,7 +205,7 @@
 
     <style name="Apptentive.Style.TextAppearence.TextView">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
-        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">left</item>
     </style>
@@ -271,7 +275,7 @@
     <style name="Apptentive.Style.TextAppearence.EditText">
         <item name="android:inputType">textCapSentences</item>
         <item name="android:textColorHint">?attr/apptentive_material_hint_text</item>
-        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
         <item name="android:gravity">bottom|start</item>item>
     </style>
 
@@ -371,13 +375,9 @@
         <item name="apptentive_borderColor">?attr/colorAccent</item>
     </style>
 
-    <style name="Apptentive.Style.Widget.NewMessageBadge">
+    <style name="Apptentive.Style.Widget.Badge">
         <item name="apptentive_badgeSize">normal</item>
-        <item name="apptentive_counterColor">@color/apptentive_material_primary_text</item>
-    </style>
-
-    <style name="Apptentive.Style.Widget.NewMessageBadge.Mini">
-        <item name="apptentive_badgeSize">mini</item>
+        <item name="apptentive_counterColor">?apptentiveTextColorPrimary</item>
     </style>
 
     <style name="Apptentive.Style.Widget.ImageButton" parent="android:Widget.ImageButton"/>

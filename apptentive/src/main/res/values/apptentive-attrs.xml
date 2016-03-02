@@ -16,7 +16,7 @@
 
 
         <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
-        <attr name="apptentive_material_primary_text" format="color|reference" />
+        <attr name="apptentiveTextColorPrimary" format="color|reference" />
         <attr name="apptentive_material_primary_icon" format="color|reference" />
         <attr name="apptentive_material_secondary_text" format="color|reference" />
         <attr name="apptentive_material_hint_text" format="color|reference" />
