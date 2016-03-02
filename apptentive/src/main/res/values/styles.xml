@@ -32,10 +32,6 @@
         <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse</item>
         <item name="android:textColorHint">@color/apptentive_text_color_hint</item>
 
-        <item name="apptentiveTextColorPrimaryInverse">?android:textColorPrimaryInverse</item>
-        <item name="apptentiveTextColorSecondary">?android:textColorSecondary</item>
-        <item name="apptentiveTextColorSecondaryInverse">?android:textColorSecondaryInverse</item>
-
         <!-- Apptentive Material specific values -->
         <item name="apptentiveWindowBackground">@color/apptentive_window_background</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
@@ -234,12 +230,12 @@
 
     <style name="Apptentive.Style.TextAppearence.Toolbar">
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/apptentiveTextColorPrimaryInverse</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textSize">24sp</item>
     </style>
 
     <style name="Apptentive.Style.TextAppearence.Greeting">
-        <item name="android:textColor">?attr/apptentiveTextColorPrimaryInverse</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textSize">24sp</item>
         <item name="android:paddingTop">4dp</item>
     </style>
@@ -365,7 +361,7 @@
     </style>
 
     <style name="Apptentive.Style.Widget.AvatarView.Greeting">
-        <item name="apptentive_borderColor">?attr/apptentiveTextColorPrimaryInverse</item>
+        <item name="apptentive_borderColor">?android:attr/textColorPrimaryInverse</item>
         <item name="apptentive_borderWidth">2dp</item>
         <item name="apptentive_borderSpace">1.5dp</item>
     </style>

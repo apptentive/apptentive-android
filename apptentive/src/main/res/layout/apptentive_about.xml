@@ -41,7 +41,7 @@
                                  android:src="@drawable/apptentive_ic_close"
                                  android:background="?android:attr/selectableItemBackground"
                                  android:scaleType="fitCenter"
-                                 android:tint="?attr/apptentiveTextColorPrimaryInverse"/>
+                                 android:tint="?android:attr/textColorPrimaryInverse"/>
                     <ImageButton android:id="@+id/branding"
                                  android:layout_width="wrap_content"
                                  android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -51,7 +51,7 @@
                                  android:src="@drawable/apptentive_ic_about"
                                  android:background="@null"
                                  android:scaleType="fitCenter"
-                                 android:tint="?attr/apptentiveTextColorPrimaryInverse"/>
+                                 android:tint="?android:attr/textColorPrimaryInverse"/>
                 </RelativeLayout>
                 <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
