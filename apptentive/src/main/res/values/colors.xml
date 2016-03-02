@@ -6,12 +6,32 @@
   -->
 
 <resources>
-    <!-- Material DEFAULT colors -->
-    <color name="colorPrimary">#F44336</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorPrimaryLight">#E57373</color>
-    <color name="colorAccent">#1E88E5</color>
+    <color name="apptentive_color_primary">#F44336</color>
+    <color name="apptentive_color_primary_dark">#D32F2F</color>
+    <color name="apptentive_color_primary_light">#E57373</color>
+    <color name="apptentive_color_accent">#1E88E5</color>
 
+    <!-- Apptentive Material default Light colors -->
+    <color name="apptentive_window_background">#ECECEC</color>
+    <color name="apptentive_card_view_background">#FFFFFF</color>
+    <color name="apptentive_validation_failed_color">#D93849</color>
+
+    <!-- 87% of #000000 is DE -->
+    <color name="apptentive_text_color_primary">#DE000000</color>
+    <color name="apptentive_text_color_primary_inverse">#FFFFFF</color>
+
+    <!-- 54% of #000000 is 8A -->
+    <color name="apptentive_text_color_secondary">#8A000000</color>
+    <color name="apptentive_text_color_secondary_inverse">#42000000</color>
+
+    <!-- 26% of #000000 is 42 -->
+    <color name="apptentive_text_color_hint">#42000000</color>
+
+
+    <!-- TODO: Refactor colors below here -->
+
+    <!-- Apptentive Material DEFAULT text / items colors -->
+    <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
 
     <!-- Material DEFAULT text / items colors -->
     <color name="icons">#FFFFFF</color>
@@ -27,38 +47,6 @@
     <color name="disabled_text">#B8B8B8</color>
 
     <color name="disabled_icon">#DCDCDF</color>
-
-    <!-- Material DEFAULT colors -->
-    <!-- chained the primary, primaryDark, primaryLight, accent colors for compatibility -->
-    <color name="primary">@color/colorPrimary</color>
-    <color name="primary_dark">@color/colorPrimaryDark</color>
-    <color name="primary_light">@color/colorPrimaryLight</color>
-    <color name="accent">@color/colorAccent</color>
-
-    <color name="apptentive_material_primary">@color/primary</color>
-    <color name="apptentive_material_primary_dark">@color/primary_dark</color>
-    <color name="apptentive_material_primary_light">@color/primary_light</color>
-    <color name="apptentive_material_accent">@color/accent</color>
-
-    <!-- Apptentive Material default Light colors -->
-    <color name="apptentive_window_background">#ECECEC</color>
-    <color name="apptentive_card_view_background">#FFFFFF</color>
-    <color name="apptentive_validation_failed_color">#D93849</color>
-
-    <!-- Apptentive Material DEFAULT text / items colors -->
-    <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
-
-    <!-- 87% von #000000 -> DE -->
-    <color name="apptentive_text_color_primary">#DE000000</color>
-    <color name="apptentive_text_color_primary_inverse">#FFFFFF</color>
-
-    <!-- 54% von #000000 -> 8A -->
-    <color name="apptentive_text_color_secondary">#AFAFAF</color>
-    <color name="apptentive_text_color_secondary_inverse">#42000000</color>
-
-    <!-- 26% von #000000 -> 42 -->
-    <color name="apptentive_text_color_hint">#42000000</color>
-
 
     <color name="apptentive_material_disabled_text">@color/disabled_text</color>
     <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>

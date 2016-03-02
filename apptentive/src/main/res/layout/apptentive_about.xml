@@ -78,7 +78,7 @@
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"
-                              android:textColor="@color/apptentive_material_primary_light"
+                              android:textColor="@color/apptentive_color_primary_light"
                               android:textSize="@dimen/apptentive_text_medium_small"
                               android:text="@string/apptentive_about_description_link"/>
                     <TextView android:id="@+id/privacy_link"
@@ -86,7 +86,7 @@
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"
-                              android:textColor="@color/apptentive_material_primary_light"
+                              android:textColor="@color/apptentive_color_primary_light"
                               android:textSize="@dimen/apptentive_text_medium_small"
                               android:text="@string/apptentive_about_privacy_link"/>
                 </LinearLayout>

@@ -847,8 +847,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			if (barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(hostingActivity, R.attr.colorAccent,
-						R.color.colorAccent));
+				barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.colorAccent));
 			} else {
 				barView.sendButton.setEnabled(false);
 				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(hostingActivity, R.attr.apptentive_material_disabled_icon,
