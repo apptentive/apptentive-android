@@ -12,11 +12,6 @@
 
     <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"/>
 
-    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
-
     <!-- Default theme used by Apptentive about -->
     <style name="ApptentiveTheme.About" parent="ApptentiveTheme">
         <item name="colorPrimary">@color/apptentive_red</item>
@@ -31,6 +26,9 @@
         <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
         <item name="colorAccent">@color/apptentive_material_accent</item>
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary</item>
+        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_inverse</item>
+        <item name="android:textColorSecondary">@color/apptentive_text_color_secondary</item>
+        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse</item>
 
 
         <!-- Apptentive Material specific values -->
@@ -43,8 +41,7 @@
         </item>
         <item name="apptentiveTextColorPrimary">?android:textColorPrimary</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
-        <item name="apptentive_material_secondary_text">@color/apptentive_material_secondary_text
-        </item>
+        <item name="apptentiveTextColorSecondary">?android:textColorSecondary</item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
         <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text
         </item>
@@ -69,7 +66,7 @@
 
 
         <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.ImageButton.FloatingActionButton</item>
-        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar</item>
+        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
         <item name="apptentiveBorderedButtonStyle">@style/Apptentive.Style.BorderedButton</item>
 
         <item name="android:windowIsTranslucent">true</item>
@@ -111,7 +108,7 @@
 
     <style name="Apptentive.Style.BorderedButton" parent="Widget.AppCompat.Button.Colored">
         <item name="backgroundTint">?colorPrimary</item>
-        <item name="android:textColor">@color/apptentive_material_primary_text_inverse</item>
+        <item name="android:textColor">@color/apptentive_text_color_primary_inverse</item>
     </style>
 
     <!-- General Theme override to change the Dialog design -->
@@ -128,13 +125,17 @@
         <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
     </style>
 
-
-    <style name="Apptentive.Style.Toolbar" parent="Base.Widget.AppCompat.Toolbar">
+    <style name="Apptentive.Style.Toolbar.Light" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
+    <style name="Apptentive.Style.Toolbar.Dark" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
 
     <style name="Apptentive.Style.Widget" parent="android:Widget"/>
 
@@ -213,14 +214,14 @@
     <style name="Apptentive.Style.TextAppearence.TextView.Sender">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
-        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
     </style>
 
     <style name="Apptentive.Style.TextAppearence.TextView.Status">
         <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">2dp</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
-        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
     </style>
 
     <style name="Apptentive.Style.TextAppearence.TextView.TimeStamp">
@@ -230,7 +231,7 @@
         <item name="android:gravity">left|bottom</item>
         <item name="android:minHeight">70dp</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
-        <item name="android:textColor">?attr/apptentive_material_secondary_text</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
     </style>
 
     <style name="Apptentive.Style.TextAppearence.Toolbar">

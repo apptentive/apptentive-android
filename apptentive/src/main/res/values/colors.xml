@@ -12,7 +12,6 @@
     <color name="colorPrimaryLight">#E57373</color>
     <color name="colorAccent">#1E88E5</color>
 
-    <color name="window_background">#ECECEC</color>
 
     <!-- Material DEFAULT text / items colors -->
     <color name="icons">#FFFFFF</color>
@@ -20,10 +19,6 @@
     <!-- 70% von #FFFFFF -> B3 -->
     <color name="icons_secondary">#B3FFFFFF</color>
 
-    <!-- 87% von #000000 -> DE -->
-    <color name="primary_text">#DE000000</color>
-    <!-- 54% von #000000 -> 8A -->
-    <color name="secondary_text">#AFAFAF</color>
     <!-- 26% von #000000 -> 42 -->
     <color name="hint_text">#42000000</color>
     <!-- 12% von #000000 -> 1F -->
@@ -46,7 +41,7 @@
     <color name="apptentive_material_accent">@color/accent</color>
 
     <!-- Apptentive Material default Light colors -->
-    <color name="apptentive_window_background">@color/window_background</color>
+    <color name="apptentive_window_background">#ECECEC</color>
     <color name="apptentive_card_view_background">#FFFFFF</color>
     <color name="apptentive_validation_failed_color">#D93849</color>
 
@@ -54,11 +49,16 @@
     <color name="apptentive_material_toolbar_foreground">@color/icons</color>
     <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
 
-    <color name="apptentive_text_color_primary">@color/primary_text</color>
-    <color name="apptentive_material_primary_icon">@color/secondary_text</color>
-    <color name="apptentive_material_primary_text_inverse">@color/icons</color>
+    <!-- 87% von #000000 -> DE -->
+    <color name="apptentive_text_color_primary">#DE000000</color>
+    <color name="apptentive_text_color_primary_inverse">#FFFFFF</color>
 
-    <color name="apptentive_material_secondary_text">@color/secondary_text</color>
+    <!-- 54% von #000000 -> 8A -->
+    <color name="apptentive_text_color_secondary">#AFAFAF</color>
+    <color name="apptentive_text_color_secondary_inverse">#42000000</color>
+
+    <color name="apptentive_material_primary_icon">#AFAFAF</color>
+
     <color name="apptentive_material_hint_text">@color/hint_text</color>
     <color name="apptentive_material_disabled_text">@color/disabled_text</color>
     <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>

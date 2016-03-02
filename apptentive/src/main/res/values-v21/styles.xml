@@ -12,15 +12,4 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
-
-    <style name="ApptentiveTheme.ActionBar" parent="ApptentiveTheme">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
-
-    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
 </resources>

@@ -11,10 +11,6 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
     <style name="Apptentive.Style.TextAppearence" parent="@android:style/TextAppearance">
         <item name="android:fontFamily">sans-serif</item>
     </style>
@@ -25,5 +21,4 @@
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">left</item>
     </style>
-
 </resources>

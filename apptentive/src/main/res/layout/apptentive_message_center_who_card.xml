@@ -54,7 +54,7 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           style="@style/Apptentive.Style.TextAppearence.TextView"
-                          android:textColor="?attr/apptentive_material_secondary_text"
+                          android:textColor="?attr/apptentiveTextColorSecondary"
                           android:textSize="@dimen/apptentive_text_small"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/whocard_buttons"
