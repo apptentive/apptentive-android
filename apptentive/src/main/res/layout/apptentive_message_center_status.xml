@@ -34,7 +34,7 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:gravity="@integer/apptentive_message_center_status_text_gravity"
-                      android:textColor="?attr/apptentive_material_hint_text"
+                      android:textColor="?android:attr/textColorHint"
                       android:textSize="16sp"
                       android:textStyle="normal"/>
         </LinearLayout>

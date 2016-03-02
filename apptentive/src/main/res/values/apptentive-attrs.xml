@@ -19,7 +19,6 @@
         <attr name="apptentiveTextColorSecondary" format="color|reference" />
         <attr name="apptentiveTextColorSecondaryInverse" format="color|reference" />
 
-        <attr name="apptentive_material_hint_text" format="color|reference" />
         <attr name="apptentive_material_disabled_text" format="color|reference" />
         <attr name="apptentive_material_disabled_icon" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />

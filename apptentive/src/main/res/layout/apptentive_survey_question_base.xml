@@ -56,7 +56,7 @@
                               android:layout_toRightOf="@id/question_required"
                               android:layout_toEndOf="@id/question_required"
                               android:textSize="@dimen/apptentive_text_small_tiny"
-                              android:textColor="?attr/apptentive_material_hint_text"
+                              android:textColorHint="?android:attr/textColorHint"
                               android:text=" &#8211; "/>
                     <TextView android:id="@+id/question_instructions"
                               style="@style/Apptentive.Style.TextAppearence"
@@ -65,7 +65,7 @@
                               android:layout_toRightOf="@id/question_dash"
                               android:layout_toEndOf="@id/question_dash"
                               android:textSize="@dimen/apptentive_text_small_tiny"
-                              android:textColor="?attr/apptentive_material_hint_text"/>
+                              android:textColor="?android:attr/textColorPrimary"/>
                 </RelativeLayout>
                 <View android:id="@+id/question_top_separater"
                       android:layout_width="match_parent"

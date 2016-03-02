@@ -30,6 +30,7 @@
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_inverse</item>
         <item name="android:textColorSecondary">@color/apptentive_text_color_secondary</item>
         <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse</item>
+        <item name="android:textColorHint">@color/apptentive_text_color_hint</item>
 
         <item name="apptentiveTextColorPrimary">?android:textColorPrimary</item>
         <item name="apptentiveTextColorPrimaryInverse">?android:textColorPrimaryInverse</item>
@@ -41,7 +42,6 @@
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
 
-        <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
         <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text
         </item>
         <item name="apptentive_material_disabled_icon">@color/apptentive_material_disabled_icon
@@ -274,7 +274,7 @@
 
     <style name="Apptentive.Style.TextAppearence.EditText">
         <item name="android:inputType">textCapSentences</item>
-        <item name="android:textColorHint">?attr/apptentive_material_hint_text</item>
+        <item name="android:textColorHint">?android:attr/textColorHint</item>
         <item name="android:textColor">?attr/apptentiveTextColorPrimary</item>
         <item name="android:gravity">bottom|start</item>item>
     </style>
