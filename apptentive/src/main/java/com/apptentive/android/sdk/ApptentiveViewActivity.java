@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.model.FragmentFactory;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -57,7 +58,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 				super.onCreate(savedInstanceState);
 
 				if (newFragment == null) {
+					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
+						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
+						if (eventName != null) {
+							EngagementModule.engageInternal(this, eventName);
+						}
+					}
 					finish();
+					return;
 				}
 
 			}

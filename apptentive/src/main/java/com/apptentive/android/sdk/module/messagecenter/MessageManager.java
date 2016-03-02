@@ -442,7 +442,7 @@ public class MessageManager {
 		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
 			Activity foreground = currentForgroundApptentiveActivity.get();
 			if (foreground != null) {
-				PendingIntent pendingIntent = prepareMessageCenterPendingIntent(foreground.getApplicationContext());
+				PendingIntent pendingIntent = ApptentiveInternal.prepareMessageCenterPendingIntent(foreground.getApplicationContext());
 				if (pendingIntent != null) {
 					final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
 					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
@@ -464,19 +464,6 @@ public class MessageManager {
 		}
 	}
 
-	private PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
-		Intent intent;
-		if (Apptentive.canShowMessageCenter(applicationContext)) {
-			intent = new Intent();
-			intent.setClass(applicationContext, ApptentiveViewActivity.class);
-			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT);
-			intent.putExtra(Constants.FragmentConfigKeys.EXTRA, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
-		} else {
-			intent = MessageCenterInteraction.generateMessageCenterErrorIntent(applicationContext);
-		}
-		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
-				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
-	}
 
 	public void appWentToForeground(Context context) {
 		pollingWorker.appWentToForeground(context);
