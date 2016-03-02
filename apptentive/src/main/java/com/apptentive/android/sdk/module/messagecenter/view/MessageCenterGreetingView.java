@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,9 +20,6 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.util.Util;
 
-/**
- * @author Sky Kelsey
- */
 public class MessageCenterGreetingView extends FrameLayout implements MessageCenterListItemView {
 
 	public ApptentiveAvatarView avatar;
@@ -51,7 +48,7 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 		}
 		if (body != null) {
 			body.setText(messageCenterGreeting.body);
-			int defaultColor = Util.getThemeColor(context, R.attr.apptentive_material_toolbar_foreground);
+			int defaultColor = Util.getThemeColor(context, R.attr.apptentiveTextColorPrimaryInverse);
 			int dimmerColor = Util.dimmer(defaultColor, 0.7f);
 			body.setTextColor(dimmerColor);
 		}
@@ -67,5 +64,4 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 			}
 		});
 	}
-
 }

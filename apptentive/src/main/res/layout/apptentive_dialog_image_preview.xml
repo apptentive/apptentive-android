@@ -34,7 +34,7 @@
                      android:visibility="gone"
                      android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
                      android:background="?android:attr/selectableItemBackground"
-                     android:tint="@color/apptentive_material_toolbar_foreground"/>
+                     android:tint="?attr/apptentiveTextColorPrimaryInverse"/>
     </RelativeLayout>
     <ProgressBar android:id="@+id/preview_progress"
                  android:layout_width="wrap_content"

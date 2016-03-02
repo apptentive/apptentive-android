@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -15,9 +15,10 @@
         <attr name="apptentiveTextAppearanceMedium" format="reference" />
 
         <attr name="apptentiveTextColorPrimary" format="color|reference" />
+        <attr name="apptentiveTextColorPrimaryInverse" format="color|reference" />
         <attr name="apptentiveTextColorSecondary" format="color|reference" />
+        <attr name="apptentiveTextColorSecondaryInverse" format="color|reference" />
 
-        <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
         <attr name="apptentive_material_primary_icon" format="color|reference" />
         <attr name="apptentive_material_hint_text" format="color|reference" />
         <attr name="apptentive_material_disabled_text" format="color|reference" />

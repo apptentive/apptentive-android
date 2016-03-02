@@ -25,23 +25,23 @@
         <item name="colorPrimary">@color/apptentive_material_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_material_primary_dark</item>
         <item name="colorAccent">@color/apptentive_material_accent</item>
+
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_inverse</item>
         <item name="android:textColorSecondary">@color/apptentive_text_color_secondary</item>
         <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse</item>
 
+        <item name="apptentiveTextColorPrimary">?android:textColorPrimary</item>
+        <item name="apptentiveTextColorPrimaryInverse">?android:textColorPrimaryInverse</item>
+        <item name="apptentiveTextColorSecondary">?android:textColorSecondary</item>
+        <item name="apptentiveTextColorSecondaryInverse">?android:textColorSecondaryInverse</item>
 
         <!-- Apptentive Material specific values -->
         <item name="apptentiveWindowBackground">@color/apptentive_window_background</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
 
-        <item name="apptentive_material_toolbar_foreground">
-            @color/apptentive_material_toolbar_foreground
-        </item>
-        <item name="apptentiveTextColorPrimary">?android:textColorPrimary</item>
         <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
-        <item name="apptentiveTextColorSecondary">?android:textColorSecondary</item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
         <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text
         </item>
@@ -236,12 +236,12 @@
 
     <style name="Apptentive.Style.TextAppearence.Toolbar">
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimaryInverse</item>
         <item name="android:textSize">24sp</item>
     </style>
 
     <style name="Apptentive.Style.TextAppearence.Greeting">
-        <item name="android:textColor">?attr/apptentive_material_toolbar_foreground</item>
+        <item name="android:textColor">?attr/apptentiveTextColorPrimaryInverse</item>
         <item name="android:textSize">24sp</item>
         <item name="android:paddingTop">4dp</item>
     </style>
@@ -367,7 +367,7 @@
     </style>
 
     <style name="Apptentive.Style.Widget.AvatarView.Greeting">
-        <item name="apptentive_borderColor">?attr/apptentive_material_toolbar_foreground</item>
+        <item name="apptentive_borderColor">?attr/apptentiveTextColorPrimaryInverse</item>
         <item name="apptentive_borderWidth">2dp</item>
         <item name="apptentive_borderSpace">1.5dp</item>
     </style>
