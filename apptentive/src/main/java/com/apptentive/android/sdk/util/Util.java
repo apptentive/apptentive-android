@@ -15,6 +15,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -439,9 +440,13 @@ public class Util {
 		return d;
 	}
 
-	public static int getThemeColor(Context ctx, int attr) {
+	public static int getThemeColor(Context context, int attr) {
+		return getThemeColor(context.getTheme(), attr);
+	}
+
+	public static int getThemeColor(Resources.Theme theme, int attr) {
 		TypedValue tv = new TypedValue();
-		if (ctx.getTheme().resolveAttribute(attr, tv, true)) {
+		if (theme.resolveAttribute(attr, tv, true)) {
 			return tv.data;
 		}
 		return 0;
