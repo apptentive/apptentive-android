@@ -41,7 +41,6 @@
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
 
-        <item name="apptentive_material_primary_icon">@color/apptentive_material_primary_icon</item>
         <item name="apptentive_material_hint_text">@color/apptentive_material_hint_text</item>
         <item name="apptentive_material_disabled_text">@color/apptentive_material_disabled_text
         </item>

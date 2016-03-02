@@ -56,8 +56,6 @@
     <color name="apptentive_text_color_secondary">#AFAFAF</color>
     <color name="apptentive_text_color_secondary_inverse">#42000000</color>
 
-    <color name="apptentive_material_primary_icon">#AFAFAF</color>
-
     <color name="apptentive_material_hint_text">@color/hint_text</color>
     <color name="apptentive_material_disabled_text">@color/disabled_text</color>
     <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>
