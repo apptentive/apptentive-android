@@ -163,7 +163,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		super.onViewCreated(view, savedInstanceState);
 		if (toolbarLayoutId != 0) {
 			toolbar = (Toolbar) this.getActivity().findViewById(toolbarLayoutId);
-			if (getMenuResourceId() != 0) {
+			if (getMenuResourceId() != 0 && toolbar != null) {
 				Menu parentMenu = toolbar.getMenu();
 				ArrayList parentMenuItems = new ArrayList();
 
