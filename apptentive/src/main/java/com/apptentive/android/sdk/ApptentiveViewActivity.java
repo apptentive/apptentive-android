@@ -102,9 +102,15 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			public void onPageSelected(int position) {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 				if (!currentFragment.isShownAsModelDialog()) {
-					toolbar.setVisibility(View.VISIBLE);
-					String title = currentFragment.getTitle();
-					toolbar.setTitle(title);
+
+					final String title = currentFragment.getTitle();
+					toolbar.post(new Runnable() {
+						@Override
+						public void run() {
+							toolbar.setVisibility(View.VISIBLE);
+							toolbar.setTitle(title);
+						}
+					});
 				} else {
 					toolbar.setVisibility(View.GONE);
 				}

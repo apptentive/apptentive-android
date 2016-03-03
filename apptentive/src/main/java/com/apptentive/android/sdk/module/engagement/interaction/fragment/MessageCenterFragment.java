@@ -576,7 +576,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private boolean addExpectationStatusIfNeeded() {
 		ApptentiveMessage apptentiveMessage = null;
-		MessageCenterUtil.MessageCenterListItem message = messages.get(messages.size() - 1);
+		int numOfMessages = messages.size();
+		if (numOfMessages == 0) {
+			return false;
+		}
+
+		MessageCenterUtil.MessageCenterListItem message = messages.get(numOfMessages - 1);
 
 		if (message != null && message instanceof ApptentiveMessage) {
 			apptentiveMessage = (ApptentiveMessage) message;
