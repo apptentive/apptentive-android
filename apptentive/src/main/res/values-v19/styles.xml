@@ -19,6 +19,6 @@
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:gravity">left</item>
+        <item name="android:gravity">start</item>
     </style>
 </resources>
