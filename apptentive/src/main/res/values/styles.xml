@@ -186,31 +186,31 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence" parent="@android:style/TextAppearance">
+    <style name="Apptentive.Style.TextView" parent="@android:style/TextAppearance">
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.TextView">
+    <style name="Apptentive.Style.TextView.TextView">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textStyle">normal</item>
         <item name="android:gravity">left</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.TextView.Sender">
+    <style name="Apptentive.Style.TextView.TextView.Sender">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.TextView.Status">
+    <style name="Apptentive.Style.TextView.TextView.Status">
         <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">2dp</item>
         <item name="android:textSize">@dimen/apptentive_text_small</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.TextView.TimeStamp">
+    <style name="Apptentive.Style.TextView.TextView.TimeStamp">
         <item name="android:textStyle">bold</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingBottom">12dp</item>
@@ -220,36 +220,36 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.Header">
+    <style name="Apptentive.Style.TextView.Header">
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.Header.Title">
+    <style name="Apptentive.Style.TextView.Header.Title">
         <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.Header.Body">
+    <style name="Apptentive.Style.TextView.Header.Body">
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">5dp</item>
         <item name="android:alpha">0.7</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveInteractionPositiveButton">
+    <style name="Apptentive.Style.TextView.ApptentiveInteractionPositiveButton">
         <item name="android:background">@drawable/apptentive_dialog_positive_button</item>
         <item name="android:textColor">@drawable/apptentive_dialog_positive_button_text</item>
         <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveInteractionNegativeButton">
+    <style name="Apptentive.Style.TextView.ApptentiveInteractionNegativeButton">
         <item name="android:background">@drawable/apptentive_dialog_negative_button</item>
         <item name="android:textColor">@drawable/apptentive_dialog_negative_button_text</item>
         <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveInteractionDialogBody">
+    <style name="Apptentive.Style.TextView.ApptentiveInteractionDialogBody">
         <item name="android:textColor">@color/apptentive_dialog_body_text</item>
         <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
         <item name="android:textStyle">normal</item>
@@ -257,19 +257,19 @@
         <item name="android:autoLink">all</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText">
+    <style name="Apptentive.Style.TextView.EditText">
         <item name="android:inputType">textCapSentences</item>
         <item name="android:textColorHint">?android:attr/textColorHint</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:gravity">bottom|start</item>item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText.WhoCard">
+    <style name="Apptentive.Style.TextView.EditText.WhoCard">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText.Composer">
+    <style name="Apptentive.Style.TextView.EditText.Composer">
         <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:singleLine">false</item>
         <item name="android:inputType">textCapSentences|textMultiLine</item>
@@ -278,17 +278,17 @@
         <item name="android:background">@null</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText.ApptentiveInteraction">
+    <style name="Apptentive.Style.TextView.EditText.ApptentiveInteraction">
         <item name="android:background">@drawable/android_textfield_activated_holo_light</item>
         <item name="android:textSize">@dimen/apptentive_dialog_edittext</item>
         <item name="android:textCursorDrawable">@null</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText.ApptentiveInteraction.DialogAutoCompleteTextView">
+    <style name="Apptentive.Style.TextView.EditText.ApptentiveInteraction.DialogAutoCompleteTextView">
         <item name="android:cursorVisible">true</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.EditText.ApptentiveInteraction.DialogAutoCompleteTextViewEmail">
+    <style name="Apptentive.Style.TextView.EditText.ApptentiveInteraction.DialogAutoCompleteTextViewEmail">
         <item name="android:cursorVisible">true</item>
         <item name="android:inputType">textEmailAddress</item>
         <item name="android:completionThreshold">1</item>
@@ -296,14 +296,14 @@
         <item name="android:imeOptions">actionNext</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveDialogTitle">
+    <style name="Apptentive.Style.TextView.ApptentiveDialogTitle">
         <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/apptentive_dialog_title_text</item>
         <item name="android:gravity">left</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveDialogBody">
+    <style name="Apptentive.Style.TextView.ApptentiveDialogBody">
         <item name="android:paddingTop">@dimen/apptentive_dialog_content_spacing</item>
         <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
         <item name="android:textStyle">normal</item>
@@ -312,7 +312,7 @@
         <item name="android:gravity">left</item>
     </style>
 
-    <style name="Apptentive.Style.TextAppearence.ApptentiveDialogButtonText">
+    <style name="Apptentive.Style.TextView.ApptentiveDialogButtonText">
         <item name="android:paddingLeft">@dimen/apptentive_dialog_button_padding_left</item>
         <item name="android:paddingRight">@dimen/apptentive_dialog_button_padding_right</item>
         <item name="android:minWidth">@dimen/apptentive_dialog_button_visible_area_min_width</item>

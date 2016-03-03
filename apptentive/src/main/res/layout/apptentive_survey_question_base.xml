@@ -29,7 +29,7 @@
                           android:gravity="start"
                           android:orientation="vertical">
                 <TextView android:id="@+id/question_title"
-                          style="@style/Apptentive.Style.TextAppearence"
+                          style="@style/Apptentive.Style.TextView"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:paddingLeft="16dp"
@@ -43,14 +43,14 @@
                                 android:paddingRight="16dp"
                                 android:gravity="start">
                     <TextView android:id="@+id/question_required"
-                              style="@style/Apptentive.Style.TextAppearence"
+                              style="@style/Apptentive.Style.TextView"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:textSize="@dimen/apptentive_text_small_tiny"
                               android:textColor="?attr/apptentiveValidationFailedColor"
                               android:text="@string/apptentive_required"/>
                     <TextView android:id="@+id/question_dash"
-                              style="@style/Apptentive.Style.TextAppearence"
+                              style="@style/Apptentive.Style.TextView"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:layout_toRightOf="@id/question_required"
@@ -59,7 +59,7 @@
                               android:textColorHint="?android:attr/textColorHint"
                               android:text=" &#8211; "/>
                     <TextView android:id="@+id/question_instructions"
-                              style="@style/Apptentive.Style.TextAppearence"
+                              style="@style/Apptentive.Style.TextView"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:layout_toRightOf="@id/question_dash"

@@ -31,12 +31,12 @@
                 <TextView android:id="@+id/title"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextAppearence.ApptentiveDialogTitle"
+                          style="@style/Apptentive.Style.TextView.ApptentiveDialogTitle"
                           android:text="@string/apptentive_thank_you"/>
                 <TextView android:id="@+id/body"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextAppearence.ApptentiveDialogBody"/>
+                          style="@style/Apptentive.Style.TextView.ApptentiveDialogBody"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/bottom_area"
                           android:layout_width="match_parent"

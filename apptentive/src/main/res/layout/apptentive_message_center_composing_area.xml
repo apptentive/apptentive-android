@@ -29,7 +29,7 @@
                   android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
                   android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
                   android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
-                  style="@style/Apptentive.Style.TextAppearence.EditText.Composer"/>
+                  style="@style/Apptentive.Style.TextView.EditText.Composer"/>
         <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                        android:layout_width="match_parent"
                                                                        android:layout_height="wrap_content"
