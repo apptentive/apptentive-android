@@ -9,19 +9,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
+             android:paddingBottom="8dp"
              android:clipToPadding="false"
              android:descendantFocusability="blocksDescendants"
-             android:background="@android:color/transparent"
-             android:paddingBottom="@dimen/apptentive_message_center_default_margin_small">
+             android:background="@android:color/transparent">
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="32dp"
-                    android:paddingBottom="0dp"
                     android:paddingLeft="@dimen/apptentive_message_center_greeting_side_margin"
                     android:paddingRight="@dimen/apptentive_message_center_greeting_side_margin"
                     android:background="?attr/colorPrimary"
-                    android:orientation="horizontal"
-                    android:clipToPadding="false">
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
         <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
                                                                                    android:layout_width="72dp"
                                                                                    android:layout_height="72dp"
@@ -35,7 +34,6 @@
                       android:layout_toRightOf="@id/avatar"
                       android:layout_toEndOf="@id/avatar"
                       android:layout_centerVertical="true"
-                      android:layout_marginBottom="@dimen/apptentive_message_center_icon_dimension"
                       android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_start"
                       android:paddingStart="@dimen/apptentive_message_center_greeting_text_padding_start"
                       android:gravity="start"
@@ -56,6 +54,7 @@
                      android:layout_alignParentRight="true"
                      android:layout_alignParentEnd="true"
                      android:layout_alignParentBottom="true"
+                     android:layout_below="@id/greeting_content"
                      style="@style/Apptentive.Style.Widget.ImageButton.Info"/>
     </RelativeLayout>
 </FrameLayout>
