@@ -36,7 +36,7 @@
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@id/cancel_composing"
                   android:layout_centerVertical="true"
-                  style="@style/Apptentive.Style.TextView.TextView"
+                  style="@style/Apptentive.Style.TextView"
                   android:singleLine="true"
                   android:textStyle="bold"
                   android:textColor="?android:attr/textColorSecondary"

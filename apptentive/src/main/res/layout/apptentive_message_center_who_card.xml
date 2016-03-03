@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -29,7 +29,7 @@
                       android:layout_marginLeft="@dimen/apptentive_message_center_card_view_content_margin"
                       android:layout_marginRight="@dimen/apptentive_message_center_card_view_content_margin"
                       android:layout_marginTop="@dimen/apptentive_message_center_card_view_content_margin"
-                      style="@style/Apptentive.Style.TextView.TextView"/>
+                      style="@style/Apptentive.Style.TextView"/>
             <EditText android:id="@+id/who_name"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                 <TextView android:id="@+id/email_explanation"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextView.TextView"
+                          style="@style/Apptentive.Style.TextView"
                           android:textColor="?android:attr/textColorSecondary"
                           android:textSize="@dimen/apptentive_text_small"/>
             </LinearLayout>
