@@ -31,9 +31,7 @@
         <TextView android:id="@+id/body"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:gravity="@integer/apptentive_message_center_status_text_gravity"
-                  android:textColor="?android:attr/textColorHint"
-                  android:textSize="16sp"
-                  android:textStyle="normal"/>
+                  style="@style/Apptentive.Style.TextView.Status"
+                  android:gravity="@integer/apptentive_message_center_status_text_gravity"/>
     </LinearLayout>
 </LinearLayout>

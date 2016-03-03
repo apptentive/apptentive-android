@@ -15,7 +15,7 @@
     <TextView android:id="@+id/datestamp"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              style="@style/Apptentive.Style.TextView.TextView.TimeStamp"
+              style="@style/Apptentive.Style.TextView.TimeStamp"
               android:visibility="gone"/>
     <android.support.v7.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 <TextView android:id="@+id/status"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextView.TextView.Status"
+                          style="@style/Apptentive.Style.TextView.Status"
                           android:visibility="gone"/>
             </LinearLayout>
             <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progressBar"
