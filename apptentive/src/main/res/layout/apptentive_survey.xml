@@ -20,21 +20,20 @@
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="16dp"
-                            android:background="?colorPrimary">
+                            android:background="?attr/colorPrimary">
                 <Space android:layout_width="match_parent"
-                       android:layout_height="?attr/actionBarSize"/>
+                       android:layout_height="?android:attr/actionBarSize"/>
                 <TextView android:id="@+id/description"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_alignParentTop="true"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
+                          style="@style/Apptentive.Style.TextAppearence.Header.Body"
                           android:paddingLeft="4dp"
                           android:paddingStart="4dp"
                           android:paddingRight="16dp"
-                          android:paddingEnd="16dp"
-                          android:textColor="#FFFFFF"
-                          android:textSize="18sp"/>
+                          android:paddingEnd="16dp"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -62,7 +61,7 @@
                 <android.support.v7.widget.AppCompatButton android:id="@+id/send"
                                                            android:layout_width="wrap_content"
                                                            android:layout_height="56dp"
-                                                           style="?apptentiveBorderedButtonStyle"
+                                                           style="?attr/apptentiveBorderedButtonStyle"
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>

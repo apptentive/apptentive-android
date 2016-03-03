@@ -48,9 +48,6 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 		}
 		if (body != null) {
 			body.setText(messageCenterGreeting.body);
-			int defaultColor = Util.getThemeColor(context, android.R.attr.textColorPrimaryInverse);
-			int dimmerColor = Util.dimmer(defaultColor, 0.7f);
-			body.setTextColor(dimmerColor);
 		}
 
 		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
