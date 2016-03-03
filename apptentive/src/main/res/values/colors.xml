@@ -12,7 +12,7 @@
     <color name="apptentive_color_accent">#1E88E5</color>
 
     <!-- Apptentive Material default Light colors -->
-    <color name="apptentive_window_background">#ECECEC</color>
+    <color name="apptentive_view_background">#ECECEC</color>
     <color name="apptentive_card_view_background">#FFFFFF</color>
     <color name="apptentive_validation_failed_color">#D93849</color>
 

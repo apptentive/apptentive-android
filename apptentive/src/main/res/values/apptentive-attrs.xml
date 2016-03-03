@@ -8,7 +8,7 @@
 <resources>
 
     <declare-styleable name="ApptentiveThemeTemplate">
-        <attr name="apptentiveWindowBackground" format="color|reference" />
+        <attr name="apptentiveViewBackground" format="color|reference" />
         <attr name="apptentiveCardViewBackground" format="color|reference" />
 
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
@@ -30,7 +30,6 @@
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
     <attr name="apptentiveToolbarStyle" format="reference"/>
-    <attr name="apptentiveBorderedButtonStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="apptentive_buttonText" format="string"/>

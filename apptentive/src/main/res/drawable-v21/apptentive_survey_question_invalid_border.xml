@@ -10,6 +10,6 @@
        android:shape="rectangle">
     <solid android:color="@android:color/transparent"/>
     <stroke android:width="1dp"
-            android:color="@color/apptentive_validation_failed_color"/>
+            android:color="?attr/apptentiveValidationFailedColor"/>
     <corners android:radius="2dp"/>
 </shape>

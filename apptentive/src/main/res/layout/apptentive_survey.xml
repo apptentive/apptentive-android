@@ -9,11 +9,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical">
+              android:orientation="vertical"
+              android:background="?attr/apptentiveViewBackground">
     <com.apptentive.android.sdk.view.ApptentiveNestedScrollView android:id="@+id/survey_scrollview"
                                                                 android:layout_width="match_parent"
-                                                                android:layout_height="match_parent"
-                                                                android:background="#F4F4F4">
+                                                                android:layout_height="match_parent">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical">
@@ -41,9 +41,7 @@
                              android:layout_alignParentEnd="true"
                              android:layout_alignParentBottom="true"
                              android:layout_below="@id/description"
-                             android:contentDescription="@string/apptentive_about_title"
-                             android:background="?android:attr/selectableItemBackground"
-                             android:src="@drawable/apptentive_ic_info"/>
+                             style="@style/Apptentive.Style.Widget.ImageButton.Info"/>
             </RelativeLayout>
             <LinearLayout android:id="@+id/questions"
                           android:layout_width="match_parent"
@@ -61,7 +59,7 @@
                 <android.support.v7.widget.AppCompatButton android:id="@+id/send"
                                                            android:layout_width="wrap_content"
                                                            android:layout_height="56dp"
-                                                           style="?attr/apptentiveBorderedButtonStyle"
+                                                           style="@style/Apptentive.Style.Widget.Button.Colored"
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>

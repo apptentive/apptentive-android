@@ -13,7 +13,7 @@
     <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView android:id="@+id/message_list"
                                                                                 android:layout_width="match_parent"
                                                                                 android:layout_height="match_parent"
-                                                                                android:background="?attr/apptentiveWindowBackground"
+                                                                                android:background="?attr/apptentiveViewBackground"
                                                                                 android:cacheColorHint="@color/apptentive_transparency"
                                                                                 android:clipToPadding="false"
                                                                                 android:descendantFocusability="afterDescendants"

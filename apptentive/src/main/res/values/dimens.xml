@@ -81,7 +81,7 @@
 
 
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
-    <dimen name="apptentive_message_center_greeting_text_padding_left">26dp</dimen>
+    <dimen name="apptentive_message_center_greeting_text_padding_start">26dp</dimen>
 
     <dimen name="apptentive_message_center_bottom_padding">60dp</dimen>
 
