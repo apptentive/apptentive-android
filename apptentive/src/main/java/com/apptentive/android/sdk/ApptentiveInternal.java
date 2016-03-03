@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -728,7 +729,7 @@ public class ApptentiveInternal {
 		if (apptentivePushData != null) {
 			Log.d("Saving Apptentive push notification data.");
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
+						prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
 
 			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
@@ -750,7 +751,7 @@ public class ApptentiveInternal {
 
 	public boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {
 		boolean interactionShown = false;
-		if (EngagementModule.canShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
+		if (canShowMessageCenterInternal(activity)) {
 			if (customData != null) {
 				Iterator<String> keysIterator = customData.keySet().iterator();
 				while (keysIterator.hasNext()) {
@@ -862,5 +863,19 @@ public class ApptentiveInternal {
 				listener.onConfigurationUpdated(successful);
 			}
 		}
+	}
+
+	public static PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
+		Intent intent;
+		if (Apptentive.canShowMessageCenter(applicationContext)) {
+			intent = new Intent();
+			intent.setClass(applicationContext, ApptentiveViewActivity.class);
+			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT);
+			intent.putExtra(Constants.FragmentConfigKeys.EXTRA, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+		} else {
+			intent = MessageCenterInteraction.generateMessageCenterErrorIntent(applicationContext);
+		}
+		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
+				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
 	}
 }

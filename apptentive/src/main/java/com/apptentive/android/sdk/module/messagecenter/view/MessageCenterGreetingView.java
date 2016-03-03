@@ -44,8 +44,8 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View view = inflater.inflate(R.layout.apptentive_message_center_greeting, this);
-		TextView title = (TextView) view.findViewById(R.id.title);
-		TextView body = (TextView) view.findViewById(R.id.body);
+		TextView title = (TextView) view.findViewById(R.id.greeting_title);
+		TextView body = (TextView) view.findViewById(R.id.greeting_body);
 		if (title != null) {
 			title.setText(messageCenterGreeting.title);
 		}

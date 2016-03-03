@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.model.FragmentFactory;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
@@ -57,7 +58,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 				super.onCreate(savedInstanceState);
 
 				if (newFragment == null) {
+					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
+						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
+						if (eventName != null) {
+							EngagementModule.engageInternal(this, eventName);
+						}
+					}
 					finish();
+					return;
 				}
 
 			}
@@ -94,9 +102,15 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			public void onPageSelected(int position) {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 				if (!currentFragment.isShownAsModelDialog()) {
-					toolbar.setVisibility(View.VISIBLE);
-					String title = currentFragment.getTitle();
-					toolbar.setTitle(title);
+
+					final String title = currentFragment.getTitle();
+					toolbar.post(new Runnable() {
+						@Override
+						public void run() {
+							toolbar.setVisibility(View.VISIBLE);
+							toolbar.setTitle(title);
+						}
+					});
 				} else {
 					toolbar.setVisibility(View.GONE);
 				}

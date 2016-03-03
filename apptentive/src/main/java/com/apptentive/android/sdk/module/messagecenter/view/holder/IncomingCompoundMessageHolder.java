@@ -44,19 +44,34 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		listener = view.getListener();
 	}
 
-	public void updateMessage(String name, String datestamp, String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
+	public void updateMessage(final String name, final String datestamp, final String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
 		super.updateMessage(datestamp, 0, null);
 
 		if (messageBodyView != null) {
-			messageBodyView.setText(text);
+			messageBodyView.post(new Runnable() {
+				@Override
+				public void run() {
+					messageBodyView.setText(text);
+				}
+			});
 		}
 
 		if (nameView != null) {
 			if (name != null && !name.isEmpty()) {
-				nameView.setVisibility(View.VISIBLE);
-				nameView.setText(name);
+				nameView.post(new Runnable() {
+					@Override
+					public void run() {
+						nameView.setVisibility(View.VISIBLE);
+						nameView.setText(name);
+					}
+				});
 			} else {
-				nameView.setVisibility(View.GONE);
+				nameView.post(new Runnable() {
+					@Override
+					public void run() {
+						nameView.setVisibility(View.GONE);
+					}
+				});
 			}
 		}
 

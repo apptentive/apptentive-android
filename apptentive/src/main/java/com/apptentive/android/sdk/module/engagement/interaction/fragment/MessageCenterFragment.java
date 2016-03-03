@@ -370,7 +370,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		boolean showKeyboard = false;
 		if (messageCenterListAdapter == null) {
-
 			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getMessageManager(getContext()).getMessageCenterListItems(hostingActivity);
 			if (items != null) {
 				// populate message list from db
@@ -404,6 +403,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 
 			updateMessageSentStates(); // Force timestamp recompilation.
+
+			messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 		}
 
 		if (composingItem != null) {
@@ -414,7 +415,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		}
 
-		messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 		messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 		messageCenterListView.setAdapter(messageCenterListAdapter);
 		if (listViewSavedTopIndex != -1) {
@@ -576,7 +576,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private boolean addExpectationStatusIfNeeded() {
 		ApptentiveMessage apptentiveMessage = null;
-		MessageCenterUtil.MessageCenterListItem message = messages.get(messages.size() - 1);
+		int numOfMessages = messages.size();
+		if (numOfMessages == 0) {
+			return false;
+		}
+
+		MessageCenterUtil.MessageCenterListItem message = messages.get(numOfMessages - 1);
 
 		if (message != null && message instanceof ApptentiveMessage) {
 			apptentiveMessage = (ApptentiveMessage) message;

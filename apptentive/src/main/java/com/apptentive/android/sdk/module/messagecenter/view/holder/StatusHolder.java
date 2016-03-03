@@ -21,23 +21,34 @@ public class StatusHolder extends MessageCenterListItemHolder {
 	private ImageView icon;
 
 	public StatusHolder(MessageCenterStatusView view) {
-		body = (TextView) view.findViewById(R.id.body);
+		body = (TextView) view.findViewById(R.id.status_body);
 		icon = (ImageView) view.findViewById(R.id.icon);
 	}
 
-	public void updateMessage(String body, Integer icon) {
-		if (this.body != null && body != null) {
-			this.body.setVisibility(TextView.VISIBLE);
-			this.body.setText(body);
+	public void updateMessage(final String bodyText, Integer iconRes) {
+		if (body != null && body != null) {
+			body.post(new Runnable() {
+				@Override
+				public void run() {
+					body.setVisibility(TextView.VISIBLE);
+					body.setText(bodyText);
+				}
+			});
+
 		} else {
-			this.body.setVisibility(View.GONE);
+			body.post(new Runnable() {
+				@Override
+				public void run() {
+					body.setVisibility(View.GONE);
+				}
+			});
 		}
-		if (this.icon != null && icon != null) {
-			this.icon.setImageResource(icon);
-			this.icon.setVisibility(View.VISIBLE);
+		if (icon != null && iconRes != null) {
+			icon.setImageResource(iconRes);
+			icon.setVisibility(View.VISIBLE);
 		}
 		else {
-			this.icon.setVisibility(View.GONE);
+			icon.setVisibility(View.GONE);
 		}
 	}
 }
