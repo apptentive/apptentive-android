@@ -669,6 +669,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (statusItem != null) {
 			messages.remove(statusItem);
 			statusItem = null;
+			messageCenterListAdapter.notifyDataSetChanged();
 		}
 	}
 
