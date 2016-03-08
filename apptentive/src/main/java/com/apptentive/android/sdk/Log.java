@@ -35,7 +35,10 @@ public class Log {
 				if(throwable.getMessage() != null){
 					android.util.Log.println(level.getLevel(), TAG, throwable.getMessage());
 				}
-				android.util.Log.println(level.getLevel(), TAG, android.util.Log.getStackTraceString(throwable));
+				while(throwable != null) {
+					android.util.Log.println(level.getLevel(), TAG, android.util.Log.getStackTraceString(throwable));
+					throwable = throwable.getCause();
+				}
 			}
 		}
 	}
