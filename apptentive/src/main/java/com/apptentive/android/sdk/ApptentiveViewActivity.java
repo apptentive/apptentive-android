@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.model.FragmentFactory;
@@ -132,6 +133,10 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		};
 
 		viewPager.addOnPageChangeListener(pageChangeListener);
+
+
+		// Needed to prevent the window from being panned up when the keyboard is opened.
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 	}
 
 	@Override
