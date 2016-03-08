@@ -10,7 +10,7 @@
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/MessageCenterMessageFrame"
+              style="@style/Apptentive.MessageCenterMessageFrame"
               android:descendantFocusability="blocksDescendants">
     <TextView android:id="@+id/datestamp"
               android:layout_width="match_parent"
@@ -23,7 +23,12 @@
                                         cardView:cardElevation="2dp">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      style="@style/Apptentive.Style.Widget.CardContent.Incoming">
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingTop="14dp"
+                      android:paddingBottom="14dp"
+                      android:orientation="horizontal"
+                      android:background="@color/apptentive_message_center_incoming_background">
             <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
                                                                                        android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
                                                                                        android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
@@ -31,7 +36,9 @@
             <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveMessageCenterMessageContent"
+                          android:paddingLeft="18dp"
+                          android:paddingStart="18dp"
+                          android:gravity="start"
                           android:orientation="vertical">
                 <TextView android:id="@+id/sender_name"
                           android:layout_width="wrap_content"

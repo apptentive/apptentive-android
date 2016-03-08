@@ -5,7 +5,7 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<resources>
+<resources xmlns:cardView="http://schemas.android.com/apk/res-auto">
 
     <!-- ApptentiveTheme is the theme used by all Apptentive UIs. It is default to Light Base Theme, if not provided by the app-->
     <style name="ApptentiveThemeOverride"/>
@@ -127,14 +127,15 @@
 
     <style name="Apptentive.Style.Widget" parent="android:Widget"/>
 
-    <style name="Apptentive.Style.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
+    <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored"/>
 
 
-    <style name="Apptentive.Style.Widget.CardView">
+    <style name="Apptentive.Style.Widget.CardView" parent="CardView">
         <item name="android:layout_margin">0dp</item>
         <item name="android:padding">0dp</item>
     </style>
@@ -142,6 +143,7 @@
     <style name="Apptentive.Style.Widget.CardView.Message">
         <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="cardElevation">2dp</item>
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Composing">
@@ -158,23 +160,6 @@
         <item name="android:paddingBottom">14dp</item>
         <item name="android:orientation">vertical</item>
         <item name="android:background">@color/apptentive_message_center_outgoing_background</item>
-    </style>
-
-    <style name="Apptentive.Style.Widget.CardContent.Incoming">
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:orientation">horizontal</item>
-        <item name="android:background">@color/apptentive_message_center_incoming_background</item>
-    </style>
-
-    <style name="Apptentive.Style.Widget.CardContent.WhoCard">
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-        <item name="android:paddingBottom">5dp</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:background">@color/apptentive_white</item>
     </style>
 
     <style name="Apptentive.Style.Widget.Divider">
@@ -228,11 +213,9 @@
 
     <style name="Apptentive.TextAppearance.Caption" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Caption.Bold">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -278,11 +261,6 @@
         <item name="android:textColorHint">?android:attr/textColorHint</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:gravity">bottom|start</item>item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.EditText.WhoCard">
-        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
-        <item name="android:singleLine">true</item>
     </style>
 
     <style name="Apptentive.Style.TextView.EditText.Composer">
@@ -396,27 +374,17 @@
         <item name="apptentive_floatingActionButtonSize">mini</item>
     </style>
 
-    <style name="MessageCenterMessageFrame">
+    <style name="Apptentive.MessageCenterMessageFrame">
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">8dp</item>
-        <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_left_margin
-        </item>
-        <item name="android:paddingRight">
-            @dimen/apptentive_message_center_message_list_right_margin
-        </item>
+        <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_margin_side</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_message_list_margin_side</item>
         <item name="android:clipToPadding">false</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:orientation">vertical</item>
     </style>
 
-    <style name="ApptentiveMessageCenterMessageContent">
-        <item name="android:paddingLeft">18dp</item>
-        <item name="android:gravity">left</item>
-        <item name="android:orientation">vertical</item>
-    </style>
-
-
-    <style name="ApptentiveMessageCenterMessageOutgoingProgressBar">
+    <style name="Apptentive.MessageCenterMessageOutgoingProgressBar">
         <item name="android:layout_marginTop">5dp</item>
         <item name="apptentive_progressBarColor">?attr/colorAccent</item>
     </style>

@@ -12,8 +12,7 @@
     <dimen name="apptentive_dialog_vertical_padding">16dp</dimen>
 
     <dimen name="apptentive_message_center_header_height">64dp</dimen>
-    <dimen name="apptentive_message_center_message_list_left_margin">100dp</dimen>
-    <dimen name="apptentive_message_center_message_list_right_margin">100dp</dimen>
+    <dimen name="apptentive_message_center_message_list_margin_side">100dp</dimen>
     <dimen name="apptentive_message_center_card_view_composing_margin_side">100dp</dimen>
     <dimen name="apptentive_message_center_message_list_side_border">1dp</dimen>
     <dimen name="apptentive_message_center_footer_height">96dp</dimen>
