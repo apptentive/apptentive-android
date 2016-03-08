@@ -31,6 +31,7 @@
                   android:layout_marginStart="16dp"
                   android:layout_marginRight="8dp"
                   android:layout_marginEnd="8dp"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Body"
                   style="@style/Apptentive.Style.TextView.EditText.Composer"/>
         <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                        android:layout_width="match_parent"

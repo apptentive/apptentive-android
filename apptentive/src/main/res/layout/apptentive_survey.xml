@@ -11,9 +11,9 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:background="?attr/apptentiveViewBackground">
-    <com.apptentive.android.sdk.view.ApptentiveNestedScrollView android:id="@+id/survey_scrollview"
-                                                                android:layout_width="match_parent"
-                                                                android:layout_height="match_parent">
+    <android.support.v4.widget.NestedScrollView android:id="@+id/survey_scrollview"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical">
@@ -21,19 +21,19 @@
                             android:layout_height="wrap_content"
                             android:padding="16dp"
                             android:background="?attr/colorPrimary">
-                <Space android:layout_width="match_parent"
-                       android:layout_height="?android:attr/actionBarSize"/>
                 <TextView android:id="@+id/description"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_alignParentTop="true"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
-                          style="@style/Apptentive.Style.TextView.Header.Body"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary.Inverse"
+                          style="@style/Apptentive.Style.TextView"
                           android:paddingLeft="4dp"
                           android:paddingStart="4dp"
                           android:paddingRight="16dp"
-                          android:paddingEnd="16dp"/>
+                          android:paddingEnd="16dp"
+                          android:alpha="0.8"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -63,5 +63,5 @@
                                                            android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
-    </com.apptentive.android.sdk.view.ApptentiveNestedScrollView>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

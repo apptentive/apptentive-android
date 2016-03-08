@@ -31,6 +31,10 @@
         <item name="android:textColorSecondary">@color/apptentive_text_color_secondary</item>
         <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse</item>
         <item name="android:textColorHint">@color/apptentive_text_color_hint</item>
+        <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse</item>
+
+        <item name="android:textViewStyle">@style/Apptentive.Style.Widget.TextView</item>
+        <!--<item name="android:textAppearanceSmall">@style/Apptentive.TextAppearance.Small</item>-->
 
         <!-- Apptentive Material specific values -->
         <item name="apptentiveViewBackground">@color/apptentive_view_background</item>
@@ -127,10 +131,7 @@
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
-    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
-        <item name="backgroundTint">?attr/colorPrimary</item>
-        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
-    </style>
+    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored"/>
 
 
     <style name="Apptentive.Style.Widget.CardView">
@@ -139,12 +140,8 @@
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Message">
-        <item name="android:paddingTop">
-            @dimen/apptentive_message_center_fallback_divider_line_width
-        </item>
-        <item name="android:paddingBottom">
-            @dimen/apptentive_message_center_fallback_divider_line_width
-        </item>
+        <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Composing">
@@ -186,53 +183,72 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-    <style name="Apptentive.Style.TextView" parent="@android:style/TextAppearance">
+    <style name="Apptentive.Global.Widget.TextView" parent="@android:style/Widget.TextView">
         <item name="android:typeface">sans</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Headline" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Headline.Inverse" parent="@android:style/TextAppearance.Large.Inverse">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subheading.Primary" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subheading.Primary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subheading.Secondary" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subheading.Secondary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Body" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption.Bold">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="Apptentive.Style.TextView">
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.Style.TextView.Composing"/>
 
-    <style name="Apptentive.Style.TextView.Composing.Title">
-        <item name="android:singleLine">true</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.Sender">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/apptentive_text_small</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.Status">
-        <item name="android:textColor">?android:attr/textColorHint</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.TimeStamp">
-        <item name="android:textStyle">bold</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:gravity">left|bottom</item>
+    <style name="Apptentive.Style.TextView.Timestamp">
         <item name="android:minHeight">70dp</item>
-        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.Header">
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.Header.Title">
-        <item name="android:textSize">24sp</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.Header.Body">
-        <item name="android:textSize">16sp</item>
-        <item name="android:lineSpacingExtra">5dp</item>
-        <item name="android:alpha">0.7</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:gravity">start|bottom</item>
     </style>
 
     <style name="Apptentive.Style.TextView.ApptentiveInteractionPositiveButton">
@@ -270,7 +286,6 @@
     </style>
 
     <style name="Apptentive.Style.TextView.EditText.Composer">
-        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
         <item name="android:singleLine">false</item>
         <item name="android:inputType">textCapSentences|textMultiLine</item>
         <item name="android:minLines">5</item>
@@ -365,6 +380,10 @@
         <item name="apptentive_counterColor">?android:attr/textColorPrimary</item>
     </style>
 
+    <!--
+        <style name="Apptentive.Style.Widget.Button" parent="android:TextAppearance.Small.Inverse"/>
+        <style name="Apptentive.Style.Widget.Button" parent="android:Widget.Button"/>
+    -->
     <style name="Apptentive.Style.Widget.ImageButton" parent="android:Widget.ImageButton"/>
 
     <style name="Apptentive.Style.Widget.ImageButton.Info">

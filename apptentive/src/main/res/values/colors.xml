@@ -12,20 +12,19 @@
     <color name="apptentive_color_accent">#1E88E5</color>
 
     <!-- Apptentive Material default Light colors -->
-    <color name="apptentive_view_background">#ECECEC</color>
+    <color name="apptentive_view_background">#EEEEEE</color>
     <color name="apptentive_card_view_background">#FFFFFF</color>
     <color name="apptentive_validation_failed_color">#D93849</color>
 
-    <!-- 87% of #000000 is DE -->
-    <color name="apptentive_text_color_primary">#DE000000</color>
+    <color name="apptentive_text_color_primary">#000000</color>
     <color name="apptentive_text_color_primary_inverse">#FFFFFF</color>
 
-    <!-- 54% of #000000 is 8A -->
-    <color name="apptentive_text_color_secondary">#8A000000</color>
-    <color name="apptentive_text_color_secondary_inverse">#42000000</color>
+    <color name="apptentive_text_color_secondary">#9E9E9E</color>
+    <color name="apptentive_text_color_secondary_inverse">#E0E0E0</color>
 
     <!-- 26% of #000000 is 42 -->
-    <color name="apptentive_text_color_hint">#42000000</color>
+    <color name="apptentive_text_color_hint">#808080</color>
+    <color name="apptentive_text_color_hint_inverse">#808080</color>
 
 
     <!-- TODO: Refactor colors below here -->
