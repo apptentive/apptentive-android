@@ -63,7 +63,7 @@
         <item name="apptentiveMessageCenterBadgeStyle">@style/Apptentive.Style.Widget.Badge</item>
 
 
-        <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.ImageButton.FloatingActionButton</item>
+        <item name="apptentiveFabStyle">@style/Apptentive.Widget.ImageButton.FloatingActionButton</item>
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
 
         <item name="android:windowIsTranslucent">true</item>
@@ -380,23 +380,19 @@
         <item name="apptentive_counterColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <!--
-        <style name="Apptentive.Style.Widget.Button" parent="android:TextAppearance.Small.Inverse"/>
-        <style name="Apptentive.Style.Widget.Button" parent="android:Widget.Button"/>
-    -->
-    <style name="Apptentive.Style.Widget.ImageButton" parent="android:Widget.ImageButton"/>
+    <style name="Apptentive.Widget.ImageButton" parent="android:Widget.ImageButton"/>
 
-    <style name="Apptentive.Style.Widget.ImageButton.Info">
+    <style name="Apptentive.Widget.ImageButton.Info">
         <item name="android:contentDescription">@string/apptentive_about_title</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:src">@drawable/apptentive_ic_info</item>
     </style>
 
-    <style name="Apptentive.Style.Widget.ImageButton.FloatingActionButton">
+    <style name="Apptentive.Widget.ImageButton.FloatingActionButton">
         <item name="apptentive_floatingActionButtonSize">normal</item>
     </style>
 
-    <style name="Apptentive.Style.Widget.ImageButton.FloatingActionButton.Mini">
+    <style name="Apptentive.Widget.ImageButton.FloatingActionButton.Mini">
         <item name="apptentive_floatingActionButtonSize">mini</item>
     </style>
 

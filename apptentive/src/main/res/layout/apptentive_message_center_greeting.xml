@@ -58,6 +58,6 @@
                      android:layout_alignParentEnd="true"
                      android:layout_alignParentBottom="true"
                      android:layout_below="@id/greeting_content"
-                     style="@style/Apptentive.Style.Widget.ImageButton.Info"/>
+                     style="@style/Apptentive.Widget.ImageButton.Info"/>
     </RelativeLayout>
 </FrameLayout>

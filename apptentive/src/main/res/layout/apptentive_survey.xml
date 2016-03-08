@@ -41,7 +41,7 @@
                              android:layout_alignParentEnd="true"
                              android:layout_alignParentBottom="true"
                              android:layout_below="@id/description"
-                             style="@style/Apptentive.Style.Widget.ImageButton.Info"/>
+                             style="@style/Apptentive.Widget.ImageButton.Info"/>
             </RelativeLayout>
             <LinearLayout android:id="@+id/questions"
                           android:layout_width="match_parent"
