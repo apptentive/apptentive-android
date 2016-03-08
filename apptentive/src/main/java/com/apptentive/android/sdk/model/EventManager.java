@@ -22,6 +22,6 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Context context, Event event) {
-		getEventStore(context).addPayload(event);
+		getEventStore(context).addPayload(context, event);
 	}
 }
