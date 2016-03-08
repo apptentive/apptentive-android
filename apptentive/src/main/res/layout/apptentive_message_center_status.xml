@@ -9,11 +9,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="?attr/apptentiveViewBackground"
-              android:gravity="center"
-              android:orientation="horizontal"
+              android:paddingTop="10dp"
               android:paddingBottom="48dp"
-              android:paddingTop="10dp">
+              android:gravity="center"
+              android:background="?attr/apptentiveViewBackground"
+              android:orientation="horizontal">
     <LinearLayout android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:paddingLeft="@dimen/apptentive_message_center_status_side_padding"
@@ -25,14 +25,13 @@
                    android:layout_height="wrap_content"
                    android:paddingTop="12dp"
                    android:paddingBottom="12dp"
-                   android:paddingRight="16dp"
                    android:paddingLeft="16dp"
+                   android:paddingRight="16dp"
                    android:scaleType="center"/>
         <TextView android:id="@+id/body"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                  style="@style/Apptentive.Style.TextView"
-                  android:gravity="@integer/apptentive_message_center_status_text_gravity"/>
+                  style="@style/Apptentive.Style.TextView"/>
     </LinearLayout>
 </LinearLayout>
