@@ -13,4 +13,7 @@
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
     <dimen name="apptentive_message_center_greeting_text_padding_start">16dp</dimen>
 
+    <dimen name="apptentive_layout_width_for_weight">0dp</dimen>
+    <dimen name="apptentive_layout_height_for_weight">@dimen/wrap_content</dimen>
+
 </resources>

@@ -19,7 +19,7 @@
                   android:paddingLeft="@dimen/apptentive_message_center_status_side_padding"
                   android:paddingRight="@dimen/apptentive_message_center_status_side_padding"
                   android:gravity="center"
-                  android:orientation="@integer/apptentive_message_center_status_orientation">
+                  android:orientation="@integer/apptentive_orientation_fill_length">
         <ImageView android:id="@+id/icon"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"

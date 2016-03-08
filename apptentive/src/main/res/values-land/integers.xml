@@ -6,6 +6,6 @@
 -->
 
 <resources>
-    <integer name="apptentive_message_center_status_orientation">@integer/apptentive_orientation_horizontal</integer>
+    <integer name="apptentive_orientation_fill_length">@integer/apptentive_orientation_horizontal</integer>
     <integer name="apptentive_message_center_status_text_gravity">@integer/apptentive_gravity_left</integer>
 </resources>
