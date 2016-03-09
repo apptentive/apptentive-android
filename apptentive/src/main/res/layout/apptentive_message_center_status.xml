@@ -28,7 +28,7 @@
                    android:paddingLeft="16dp"
                    android:paddingRight="16dp"
                    android:scaleType="center"/>
-        <TextView android:id="@+id/body"
+        <TextView android:id="@+id/status_body"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textAppearance="@style/Apptentive.TextAppearance.Caption"
