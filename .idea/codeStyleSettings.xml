@@ -197,7 +197,7 @@
                 <rule>
                   <match>
                     <AND>
-                      <NAME>*:textAppearance</NAME>
+                      <NAME>.*:textAppearance</NAME>
                       <XML_NAMESPACE>.*</XML_NAMESPACE>
                     </AND>
                   </match>
