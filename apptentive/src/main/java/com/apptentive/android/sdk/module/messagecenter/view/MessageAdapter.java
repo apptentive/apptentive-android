@@ -336,13 +336,18 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 						status = fragment.getResources().getString(R.string.apptentive_failed);
 						bShowProgress = false;
 					}
-					View container = view.findViewById(R.id.apptentive_compound_message_body_container);
-					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
-					view.measure(widthMeasureSpec, 0);
-					int viewWidth = container.getMeasuredWidth();
+					int imagebandWidth = 0;
+					if (files != null && files.size() > 0) {
+						View container = view.findViewById(R.id.apptentive_compound_message_body_container);
+						int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+						view.measure(widthMeasureSpec, 0);
+						int viewWidth = container.getMeasuredWidth();
+						imagebandWidth = viewWidth - container.getPaddingLeft() - container.getPaddingRight();
+					}
+
 					int statusTextColor = getStatusColor(createdTime);
 					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							bShowProgress, messageBody, viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+							bShowProgress, messageBody, imagebandWidth,
 							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
 					break;
 				}

@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,15 +26,25 @@ public class MessageHolder extends MessageCenterListItemHolder {
 		status = (TextView) view.findViewById(R.id.status);
 	}
 
-	public void updateMessage(String datestamp, int statusColor, String status) {
-		if (this.datestamp != null) {
-			this.datestamp.setText(datestamp);
-			this.datestamp.setVisibility(datestamp != null ? View.VISIBLE : View.GONE);
+	public void updateMessage(final String datestampString, final int statusColor, final String statusString) {
+		if (datestamp != null) {
+			datestamp.post(new Runnable() {
+				@Override
+				public void run() {
+					datestamp.setText(datestampString);
+					datestamp.setVisibility(!TextUtils.isEmpty(datestampString) ? View.VISIBLE : View.GONE);
+				}
+			});
 		}
-		if (this.status != null) {
-			this.status.setText(status);
-			this.status.setTextColor(statusColor);
-			this.status.setVisibility(status != null ? View.VISIBLE : View.GONE);
+		if (status != null) {
+			status.post(new Runnable() {
+				@Override
+				public void run() {
+					status.setText(statusString);
+					status.setTextColor(statusColor);
+					status.setVisibility(!TextUtils.isEmpty(statusString) ? View.VISIBLE : View.GONE);
+				}
+			});
 		}
 	}
 }

@@ -47,9 +47,14 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 			}
 		}
 		if (messageBodyView != null) {
-			messageBodyView.setText(body);
+			messageBodyView.post(new Runnable() {
+				@Override
+				public void run() {
+					messageBodyView.setText(body);
+				}
+			});
 		}
-		// Set up attahments view
+		// Set up attachments view
 		if (imageBandView != null) {
 			if (imagesToAttach == null || imagesToAttach.size() == 0) {
 				imageBandView.setVisibility(View.GONE);

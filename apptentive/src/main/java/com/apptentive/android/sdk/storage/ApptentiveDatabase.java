@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
@@ -195,7 +196,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public synchronized void addPayload(Payload... payloads) {
+	public synchronized void addPayload(Context context, Payload... payloads) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -208,6 +209,11 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
+
+			PayloadSendWorker worker = ApptentiveInternal.getPayloadWorker(context);
+			if (worker != null) {
+				worker.setCanRunPayloadThread(context, true);
+			}
 		} catch (SQLException sqe) {
 			Log.e("addPayload EXCEPTION: " + sqe.getMessage());
 		} finally {

@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -410,7 +411,7 @@ public class Apptentive {
 	 */
 	public static void setPushNotificationIntegration(Context context, int pushProvider, String token) {
 		try {
-			if (context == null ) {
+			if (context == null) {
 				return;
 			}
 			CustomData integrationConfig = getIntegrationConfigurationWithoutPushProviders(context);
@@ -506,6 +507,7 @@ public class Apptentive {
 		}
 		return false;
 	}
+
 
 	/**
 	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use

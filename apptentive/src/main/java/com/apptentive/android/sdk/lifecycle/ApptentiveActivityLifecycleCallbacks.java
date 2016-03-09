@@ -88,7 +88,6 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 		running = false;
 
-		foregroundActivities.decrementAndGet();
 		if (foregroundActivities.decrementAndGet() < 0) {
 			Log.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);

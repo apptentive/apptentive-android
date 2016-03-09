@@ -25,6 +25,11 @@ public class AutomatedMessageHolder extends MessageHolder {
 
 	public void updateMessage(String dateStamp, final CompoundMessage newMessage) {
 		super.updateMessage(dateStamp, 0, null);
-		body.setText(newMessage.getBody());
+		body.post(new Runnable() {
+			@Override
+			public void run() {
+				body.setText(newMessage.getBody());
+			}
+		});
 	}
 }

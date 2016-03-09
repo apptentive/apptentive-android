@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,6 +61,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -95,6 +98,8 @@ public class ApptentiveInternal {
 	WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
 	final LinkedBlockingQueue configUpdateListeners = new LinkedBlockingQueue();
+
+	ExecutorService cachedExecutor;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
@@ -144,6 +149,7 @@ public class ApptentiveInternal {
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.database = db;
 					sApptentiveInternal.codePointStore = store;
+					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 
 					sApptentiveInternal.init(sApptentiveInternal.appContext, apptentiveApiKey);
 					if (sApptentiveInternal.appContext instanceof Application) {
@@ -205,6 +211,14 @@ public class ApptentiveInternal {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
 		if (internal != null) {
 			return internal.interactionManager;
+		}
+		return null;
+	}
+
+	public static PayloadSendWorker getPayloadWorker(Context context) {
+		ApptentiveInternal internal = ApptentiveInternal.getInstance(context);
+		if (internal != null) {
+			return internal.payloadWorker;
 		}
 		return null;
 	}
@@ -297,6 +311,14 @@ public class ApptentiveInternal {
 			return internal.androidId;
 		}
 		return null;
+	}
+
+	public void runOnWorkerThread(Runnable r) {
+		cachedExecutor.execute(r);
+	}
+
+	public void scheduleOnWorkerThread(Runnable r) {
+		cachedExecutor.submit(r);
 	}
 
 	public void checkAndUpdateApptentiveConfigurations() {
@@ -472,7 +494,7 @@ public class ApptentiveInternal {
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
 			Log.d("App release was updated.");
-			database.addPayload(appRelease);
+			database.addPayload(context, appRelease);
 		}
 		invalidateCaches(context);
 	}
@@ -607,7 +629,7 @@ public class ApptentiveInternal {
 		if (deviceInfo != null) {
 			Log.d("Device info was updated.");
 			Log.v(deviceInfo.toString());
-			database.addPayload(deviceInfo);
+			database.addPayload(context, deviceInfo);
 		} else {
 			Log.d("Device info was not updated.");
 		}
@@ -621,7 +643,7 @@ public class ApptentiveInternal {
 		if (sdk != null) {
 			Log.d("Sdk was updated.");
 			Log.v(sdk.toString());
-			database.addPayload(sdk);
+			database.addPayload(context, sdk);
 		} else {
 			Log.d("Sdk was not updated.");
 		}
@@ -635,7 +657,7 @@ public class ApptentiveInternal {
 		if (person != null) {
 			Log.d("Person was updated.");
 			Log.v(person.toString());
-			database.addPayload(person);
+			database.addPayload(context, person);
 		} else {
 			Log.d("Person was not updated.");
 		}
@@ -742,7 +764,7 @@ public class ApptentiveInternal {
 		if (apptentivePushData != null) {
 			Log.d("Saving Apptentive push notification data.");
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
+						prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
 
 			MessageManager mgr = ApptentiveInternal.getMessageManager(context);
 			if (mgr != null) {
@@ -764,7 +786,7 @@ public class ApptentiveInternal {
 
 	public boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {
 		boolean interactionShown = false;
-		if (EngagementModule.canShowInteraction(activity, "com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME)) {
+		if (canShowMessageCenterInternal(activity)) {
 			if (customData != null) {
 				Iterator<String> keysIterator = customData.keySet().iterator();
 				while (keysIterator.hasNext()) {
@@ -876,5 +898,19 @@ public class ApptentiveInternal {
 				listener.onConfigurationUpdated(successful);
 			}
 		}
+	}
+
+	public static PendingIntent prepareMessageCenterPendingIntent(Context applicationContext) {
+		Intent intent;
+		if (Apptentive.canShowMessageCenter(applicationContext)) {
+			intent = new Intent();
+			intent.setClass(applicationContext, ApptentiveViewActivity.class);
+			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT);
+			intent.putExtra(Constants.FragmentConfigKeys.EXTRA, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+		} else {
+			intent = MessageCenterInteraction.generateMessageCenterErrorIntent(applicationContext);
+		}
+		return (intent != null) ? PendingIntent.getActivity(applicationContext, 0, intent,
+				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
 	}
 }
