@@ -8,4 +8,7 @@
 <resources>
     <integer name="apptentive_orientation_fill_length">@integer/apptentive_orientation_horizontal</integer>
     <integer name="apptentive_message_center_status_text_gravity">@integer/apptentive_gravity_start</integer>
+
+    <integer name="apptentive_layout_width_for_weight">0</integer>
+    <integer name="apptentive_layout_height_for_weight">@integer/wrap_content</integer>
 </resources>

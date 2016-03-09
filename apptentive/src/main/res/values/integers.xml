@@ -21,4 +21,10 @@
     <integer name="apptentive_image_grid_default_column_number">4</integer>
     <integer name="apptentive_image_grid_default_column_number_incoming">3</integer>
     <integer name="apptentive_image_grid_default_attachments_total">4</integer>
+
+    <integer name="match_parent">-1</integer>
+    <integer name="wrap_content">-2</integer>
+
+    <integer name="apptentive_layout_width_for_weight">@integer/match_parent</integer>
+    <integer name="apptentive_layout_height_for_weight">0</integer>
 </resources>
