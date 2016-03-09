@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -11,8 +11,8 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="-1dp"
              android:paddingBottom="2dp"
-             android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin"
-             android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin"
+             android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
+             android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:clipToPadding="false"
              android:descendantFocusability="afterDescendants"
              android:background="@android:color/transparent">
@@ -25,21 +25,24 @@
         <EditText android:id="@+id/composing_et"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="@dimen/apptentive_message_center_default_margin_medium"
-                  android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
-                  android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
-                  android:layout_marginRight="@dimen/apptentive_message_center_default_margin_small"
-                  style="@style/ApptentiveTheme.TextAppearence.EditText.Composer"/>
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="16dp"
+                  android:layout_marginLeft="16dp"
+                  android:layout_marginStart="16dp"
+                  android:layout_marginRight="8dp"
+                  android:layout_marginEnd="8dp"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Body"
+                  style="@style/Apptentive.Style.TextView.EditText.Composer"/>
         <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                        android:layout_width="match_parent"
                                                                        android:layout_height="wrap_content"
-                                                                       android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_medium"
-                                                                       android:layout_marginLeft="@dimen/apptentive_message_center_default_margin_medium"
-                                                                       android:layout_marginRight="@dimen/apptentive_message_center_default_margin_medium"
+                                                                       android:layout_marginBottom="16dp"
+                                                                       android:layout_marginLeft="16dp"
+                                                                       android:layout_marginRight="16dp"
                                                                        android:visibility="gone"
+                                                                       android:clipToPadding="false"
                                                                        android:horizontalSpacing="@dimen/apptentive_image_grid_space_size"
                                                                        android:verticalSpacing="@dimen/apptentive_image_grid_space_size"
-                                                                       android:clipToPadding="false"
                                                                        android:numColumns="@integer/apptentive_image_grid_default_column_number"/>
     </LinearLayout>
 </FrameLayout>

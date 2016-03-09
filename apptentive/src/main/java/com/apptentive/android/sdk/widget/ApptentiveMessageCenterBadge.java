@@ -192,7 +192,7 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 			return;
 		}
 
-		a = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveMessageCenterBadge, defStyle, R.style.ApptentiveWidget_NewMessageBadge);
+		a = theme.obtainStyledAttributes(attrs, R.styleable.ApptentiveMessageCenterBadge, defStyle, 0);
 		if (a == null) {
 			return;
 		}

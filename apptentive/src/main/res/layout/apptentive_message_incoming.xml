@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -10,19 +10,25 @@
               xmlns:cardView="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/MessageCenterMessageFrame"
+              style="@style/Apptentive.MessageCenterMessageFrame"
               android:descendantFocusability="blocksDescendants">
     <TextView android:id="@+id/datestamp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              style="@style/ApptentiveTheme.TextAppearence.TextView.TimeStamp"/>
+              android:textAppearance="@style/Apptentive.TextAppearance.Caption.Bold"
+              style="@style/Apptentive.Style.TextView.Timestamp"/>
     <android.support.v7.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        style="@style/ApptentiveTheme.Widget.CardView.Message"
+                                        style="@style/Apptentive.Style.Widget.CardView.Message"
                                         cardView:cardElevation="2dp">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.Widget.CardContent.Incoming">
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingTop="14dp"
+                      android:paddingBottom="14dp"
+                      android:orientation="horizontal"
+                      android:background="@color/apptentive_message_center_incoming_background">
             <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
                                                                                        android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
                                                                                        android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"
@@ -30,17 +36,21 @@
             <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveMessageCenterMessageContent"
+                          android:paddingLeft="18dp"
+                          android:paddingStart="18dp"
+                          android:gravity="start"
                           android:orientation="vertical">
                 <TextView android:id="@+id/sender_name"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextAppearence.TextView.Sender"/>
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"
+                          style="@style/Apptentive.Style.TextView"/>
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveTheme.TextAppearence.TextView"
-                          android:autoLink="web|email|phone|map"/>
+                          android:textAppearance="@style/Apptentive.TextAppearance.Body"
+                          style="@style/Apptentive.Style.TextView"
+                          android:autoLink="all"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                                android:layout_width="match_parent"
                                                                                android:layout_height="wrap_content"

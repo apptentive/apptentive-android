@@ -11,19 +11,8 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ApptentiveTheme.ActionBar.TranslucentStatus" parent="ApptentiveTheme.ActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="ApptentiveTheme.TextAppearence" parent="@android:style/TextAppearance">
+    <style name="Apptentive.Style.Widget.TextView" parent="@android:style/Widget.TextView">
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">start</item>
     </style>
-
-    <style name="ApptentiveTheme.TextAppearence.TextView">
-        <item name="android:textSize">@dimen/apptentive_text_medium_small</item>
-        <item name="android:textColor">?attr/apptentive_material_primary_text</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:gravity">left</item>
-    </style>
-
 </resources>

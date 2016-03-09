@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -8,16 +8,12 @@
 <resources>
 
     <declare-styleable name="ApptentiveThemeTemplate">
-        <attr name="apptentiveWindowBackground" format="color|reference" />
+        <attr name="apptentiveViewBackground" format="color|reference" />
         <attr name="apptentiveCardViewBackground" format="color|reference" />
 
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
+        <attr name="apptentiveTextAppearanceMedium" format="reference" />
 
-        <attr name="apptentive_material_toolbar_foreground" format="color|reference" />
-        <attr name="apptentive_material_primary_text" format="color|reference" />
-        <attr name="apptentive_material_primary_icon" format="color|reference" />
-        <attr name="apptentive_material_secondary_text" format="color|reference" />
-        <attr name="apptentive_material_hint_text" format="color|reference" />
         <attr name="apptentive_material_disabled_text" format="color|reference" />
         <attr name="apptentive_material_disabled_icon" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />
@@ -34,8 +30,6 @@
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
     <attr name="apptentiveToolbarStyle" format="reference"/>
-    <attr name="apptentiveBorderedButtonStyle" format="reference"/>
-    <attr name="apptentiveBorderedButtonSurveyStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveDialogButton">
         <attr name="apptentive_buttonText" format="string"/>

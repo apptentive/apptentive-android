@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -9,58 +9,62 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
+             android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
+             android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:clipToPadding="false"
-             android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin"
-             android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin"
              android:background="@android:color/transparent">
     <RelativeLayout android:id="@+id/composing_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:minHeight="@dimen/apptentive_message_center_composing_bar_min_height"
                     android:background="@drawable/apptentive_rounded_corner_shape_composing_bar"
-                    android:minHeight="@dimen/apptentive_message_center_composing_bar_height"
                     android:orientation="horizontal">
         <ImageButton android:id="@+id/cancel_composing"
                      android:layout_width="wrap_content"
-                     android:layout_height="@dimen/apptentive_message_center_composing_bar_height"
-                     android:layout_alignParentLeft="true"
+                     android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"
                      android:layout_centerVertical="true"
-                     android:paddingLeft="@dimen/apptentive_message_center_default_margin_medium"
+                     android:layout_alignParentLeft="true"
+                     android:layout_alignParentStart="true"
+                     android:paddingLeft="16dp"
+                     android:paddingStart="16dp"
                      android:paddingRight="10dp"
+                     android:paddingEnd="10dp"
                      android:contentDescription="Close"
-                     android:src="@drawable/apptentive_ic_close"
                      android:background="?android:attr/selectableItemBackground"
+                     android:src="@drawable/apptentive_ic_close"
                      android:scaleType="fitCenter"
                      android:tint="?attr/colorAccent"/>
         <TextView android:id="@+id/composing"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/cancel_composing"
                   android:layout_centerVertical="true"
-                  style="@style/ApptentiveTheme.TextAppearence.TextView"
-                  android:singleLine="true"
-                  android:textStyle="bold"
-                  android:textColor="?attr/apptentive_material_secondary_text"
-                  android:textSize="@dimen/apptentive_text_medium_small"/>
+                  android:layout_toRightOf="@id/cancel_composing"
+                  android:layout_toEndOf="@id/cancel_composing"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"
+                  style="@style/Apptentive.Style.TextView"/>
         <ImageButton android:id="@+id/btn_send_message"
                      android:layout_width="wrap_content"
-                     android:layout_height="@dimen/apptentive_message_center_composing_bar_height"
-                     android:layout_alignParentRight="true"
+                     android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"
                      android:layout_centerVertical="true"
-                     android:paddingLeft="@dimen/apptentive_message_center_default_margin_medium"
-                     android:paddingRight="@dimen/apptentive_message_center_default_margin_medium"
+                     android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
+                     android:paddingLeft="16dp"
+                     android:paddingRight="16dp"
                      android:background="?android:attr/selectableItemBackground"
-                     android:scaleType="fitCenter"
+                     android:tint="?attr/colorAccent"
                      android:src="@drawable/apptentive_ic_action_send"
-                     android:tint="?attr/colorAccent"/>
+                     android:scaleType="fitCenter"
+                     android:contentDescription="Send"/>
         <ImageButton android:id="@+id/btn_attach_image"
                      android:layout_width="wrap_content"
                      android:layout_height="@dimen/apptentive_message_center_icon_dimension"
-                     android:layout_toLeftOf="@+id/btn_send_message"
                      android:layout_centerVertical="true"
+                     android:layout_toLeftOf="@+id/btn_send_message"
+                     android:layout_toStartOf="@+id/btn_send_message"
                      android:background="?android:attr/selectableItemBackground"
-                     android:contentDescription="Attach"
-                     android:scaleType="fitCenter"
+                     android:tint="?attr/colorAccent"
                      android:src="@drawable/apptentive_ic_action_attach"
-                     android:tint="?attr/colorAccent"/>
+                     android:scaleType="fitCenter"
+                     android:contentDescription="Attach"/>
     </RelativeLayout>
 </FrameLayout>

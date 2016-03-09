@@ -73,7 +73,7 @@
           </extensions>
         </Objective-C-extensions>
         <XML>
-          <option name="XML_ATTRIBUTE_WRAP" value="2" />
+          <option name="XML_ATTRIBUTE_WRAP" value="0" />
           <option name="XML_TEXT_WRAP" value="0" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
@@ -189,6 +189,16 @@
                     <AND>
                       <NAME>.*:layout_.*</NAME>
                       <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
+                    </AND>
+                  </match>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <NAME>*:textAppearance</NAME>
+                      <XML_NAMESPACE>.*</XML_NAMESPACE>
                     </AND>
                   </match>
                 </rule>

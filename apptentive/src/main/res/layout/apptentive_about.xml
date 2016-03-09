@@ -41,7 +41,7 @@
                                  android:src="@drawable/apptentive_ic_close"
                                  android:background="?android:attr/selectableItemBackground"
                                  android:scaleType="fitCenter"
-                                 android:tint="?attr/apptentive_material_toolbar_foreground"/>
+                                 android:tint="?android:attr/textColorPrimaryInverse"/>
                     <ImageButton android:id="@+id/branding"
                                  android:layout_width="wrap_content"
                                  android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -51,11 +51,10 @@
                                  android:src="@drawable/apptentive_ic_about"
                                  android:background="@null"
                                  android:scaleType="fitCenter"
-                                 android:tint="?attr/apptentive_material_toolbar_foreground"/>
+                                 android:tint="?android:attr/textColorPrimaryInverse"/>
                 </RelativeLayout>
                 <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
-                              style="@style/ApptentiveTheme.TextAppearence"
                               android:paddingLeft="16dp"
                               android:paddingRight="16dp"
                               android:paddingTop="16dp"
@@ -78,7 +77,7 @@
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"
-                              android:textColor="@color/apptentive_material_primary_light"
+                              android:textColor="@color/apptentive_color_primary_light"
                               android:textSize="@dimen/apptentive_text_medium_small"
                               android:text="@string/apptentive_about_description_link"/>
                     <TextView android:id="@+id/privacy_link"
@@ -86,7 +85,7 @@
                               android:layout_height="wrap_content"
                               android:gravity="center"
                               android:paddingBottom="16dp"
-                              android:textColor="@color/apptentive_material_primary_light"
+                              android:textColor="@color/apptentive_color_primary_light"
                               android:textSize="@dimen/apptentive_text_medium_small"
                               android:text="@string/apptentive_about_privacy_link"/>
                 </LinearLayout>

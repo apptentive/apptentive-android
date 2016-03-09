@@ -13,7 +13,7 @@
     <com.apptentive.android.sdk.util.image.PreviewImageView android:id="@+id/preview_image"
                                                             android:layout_width="match_parent"
                                                             android:layout_height="match_parent"
-                                                            android:background="@color/apptentive_window_background"
+                                                            android:background="?attr/apptentiveViewBackground"
                                                             android:descendantFocusability="beforeDescendants"
                                                             android:contentDescription="@null"
                                                             android:src="@drawable/apptentive_ic_image_default_item"
@@ -34,7 +34,7 @@
                      android:visibility="gone"
                      android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
                      android:background="?android:attr/selectableItemBackground"
-                     android:tint="@color/apptentive_material_toolbar_foreground"/>
+                     android:tint="?android:attr/textColorPrimaryInverse"/>
     </RelativeLayout>
     <ProgressBar android:id="@+id/preview_progress"
                  android:layout_width="wrap_content"

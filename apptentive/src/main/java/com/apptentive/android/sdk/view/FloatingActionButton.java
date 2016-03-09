@@ -232,7 +232,7 @@ public class FloatingActionButton extends ImageButton {
 		setColor(a.getColor(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor, Color.GRAY));
 		ColorStateList colorStateList = a.getColorStateList(R.styleable.FloatingActionButton_apptentive_floatingActionButtonColor);
 		if (colorStateList == null) {
-			int colorAccent = Util.getThemeColorFromAttrOrRes(context, R.attr.colorAccent, R.color.colorAccent);
+			int colorAccent = Util.getThemeColor(context, R.attr.colorAccent);
 			colorStateList = new ColorStateList(
 					new int[][]{
 							new int[]{} // Null state list sets default colors

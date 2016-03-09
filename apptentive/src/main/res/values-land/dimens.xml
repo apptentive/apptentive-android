@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -11,6 +11,5 @@
     <dimen name="apptentive_header_padding_bottom">0dp</dimen>
 
     <dimen name="apptentive_message_center_greeting_side_margin">24dp</dimen>
-    <dimen name="apptentive_message_center_greeting_text_padding_left">16dp</dimen>
-
+    <dimen name="apptentive_message_center_greeting_text_padding_start">16dp</dimen>
 </resources>

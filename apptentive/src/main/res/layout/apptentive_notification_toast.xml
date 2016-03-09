@@ -27,19 +27,19 @@
               android:layout_marginTop="6dp"
               android:layout_toLeftOf="@+id/toast_timestamp"
               android:layout_toRightOf="@id/toast_avatar"
-              style="@style/ApptentiveTheme.TextAppearence.TextView"
+              style="@style/Apptentive.Style.TextView"
               android:text="Message Title"
-              android:textColor="@color/apptentive_material_toolbar_foreground"
+              android:textColor="?android:attr/textColorPrimaryInverse"
               android:textSize="@dimen/apptentive_text_medium_small"/>
     <TextView android:id="@+id/toast_timestamp"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
               android:layout_alignTop="@id/toast_title"
-              style="@style/ApptentiveTheme.TextAppearence.TextView"
+              style="@style/Apptentive.Style.TextView"
               android:paddingRight="2dp"
               android:text="00:00"
-              android:textColor="@color/apptentive_material_toolbar_foreground"/>
+              android:textColor="?android:attr/textColorPrimaryInverse"/>
     <TextView android:id="@+id/toast_message"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -47,9 +47,9 @@
               android:layout_marginLeft="10dp"
               android:layout_marginRight="5dp"
               android:layout_toRightOf="@id/toast_avatar"
-              style="@style/ApptentiveTheme.TextAppearence.TextView"
+              style="@style/Apptentive.Style.TextView"
               android:maxLines="2"
               android:text="Apptentive New Message"
-              android:textColor="@color/apptentive_material_toolbar_foreground"
+              android:textColor="?android:attr/textColorPrimaryInverse"
               android:textSize="@dimen/apptentive_text_small"/>
 </RelativeLayout>

@@ -141,8 +141,8 @@ public class ApptentiveInternal {
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
-					ApptentiveDatabase db = new ApptentiveDatabase(context.getApplicationContext());
-					CodePointStore store = new CodePointStore(context);
+					ApptentiveDatabase db = new ApptentiveDatabase(sApptentiveInternal.appContext);
+					CodePointStore store = new CodePointStore(sApptentiveInternal.appContext);
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
@@ -332,15 +332,20 @@ public class ApptentiveInternal {
 
 	public void onAppLaunch(final Activity activity) {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	}
+
+	public void onAppExit(final Activity activity) {
+		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
+	}
+
+	public void onActivityResumed(Activity activity) {
+		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
+
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice(appContext);
 		syncSdk(appContext);
 		syncPerson(appContext);
-	}
-
-	public void onAppExit(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onAppEnterForeground() {
@@ -403,22 +408,31 @@ public class ApptentiveInternal {
 				}
 			}
 
-			// Set up apptentive theme by applying default from Apptentive, app, and custom override
+			// Set up Apptentive theme by applying default from Apptentive, app, and custom override
 			int appDefaultThemeId = ai.theme;
+			boolean appHasTheme = appDefaultThemeId != 0;
 			apptentiveTheme = appContext.getResources().newTheme();
 			apptentiveTheme.applyStyle(R.style.ApptentiveTheme, true);
-			if (appDefaultThemeId != 0) {
+
+			if (appHasTheme) {
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
 				appDefaultTheme.applyStyle(appDefaultThemeId, true);
-				TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
 
+				TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
 				try {
 					statusBarColorDefault = a.getColor(0, 0);
 				} finally {
 					a.recycle();
 				}
-				apptentiveTheme.applyStyle(appDefaultThemeId, true);
+
+				// If the app contains colorPrimaryDark, it is using an AppCompat theme. Therefore, we want to use it.
+				// If it's not using an AppCompat theme, we don't want to apply it to our SDK, and use our default theme instead.
+				boolean appThemeIsAppCompatTheme = Util.getThemeColor(appDefaultTheme, R.attr.colorPrimaryDark) != 0;
+				if (appThemeIsAppCompatTheme) {
+					apptentiveTheme.applyStyle(appDefaultThemeId, true);
+				}
 			}
+
 			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
 			apptentiveTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
 

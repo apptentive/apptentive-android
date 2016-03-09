@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -9,14 +9,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
+             android:paddingBottom="8dp"
              android:clipToPadding="false"
              android:descendantFocusability="blocksDescendants"
-             android:background="@android:color/transparent"
-             android:paddingBottom="@dimen/apptentive_message_center_default_margin_small">
+             android:background="@android:color/transparent">
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/ApptentiveMessageCenterGreetingContainer"
-                    android:clipToPadding="false">
+                    android:paddingTop="32dp"
+                    android:paddingLeft="@dimen/apptentive_message_center_greeting_side_margin"
+                    android:paddingRight="@dimen/apptentive_message_center_greeting_side_margin"
+                    android:background="?attr/colorPrimary"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
         <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
                                                                                    android:layout_width="72dp"
                                                                                    android:layout_height="72dp"
@@ -28,28 +32,32 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_toRightOf="@id/avatar"
+                      android:layout_toEndOf="@id/avatar"
                       android:layout_centerVertical="true"
-                      android:layout_marginBottom="@dimen/apptentive_message_center_icon_dimension"
-                      android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_left"
-                      android:gravity="left"
+                      android:paddingLeft="@dimen/apptentive_message_center_greeting_text_padding_start"
+                      android:paddingStart="@dimen/apptentive_message_center_greeting_text_padding_start"
+                      android:gravity="start"
                       android:orientation="vertical">
             <TextView android:id="@+id/greeting_title"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextAppearence.Greeting"
+                      android:textAppearance="@style/Apptentive.TextAppearance.Headline.Inverse"
+                      style="@style/Apptentive.Style.TextView"
                       android:text="Hello"/>
             <TextView android:id="@+id/greeting_body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      style="@style/ApptentiveTheme.TextAppearence.Greeting.Body"/>
+                      android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary.Inverse"
+                      style="@style/Apptentive.Style.TextView"
+                      android:alpha="0.8"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"
                      android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                      android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                      android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
                      android:layout_alignParentBottom="true"
-                     android:contentDescription="About"
-                     android:background="?android:attr/selectableItemBackground"
-                     android:src="@drawable/apptentive_ic_info"/>
+                     android:layout_below="@id/greeting_content"
+                     style="@style/Apptentive.Widget.ImageButton.Info"/>
     </RelativeLayout>
 </FrameLayout>
