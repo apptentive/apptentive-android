@@ -316,7 +316,9 @@ public class ApptentiveInternal {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
-	public void onActivityResumed() {
+	public void onActivityResumed(Activity activity) {
+		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
+
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice(appContext);

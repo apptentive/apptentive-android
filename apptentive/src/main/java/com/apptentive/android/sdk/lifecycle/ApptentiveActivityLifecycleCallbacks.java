@@ -77,12 +77,9 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			Log.d("application is still in foreground");
 		}
 
-
 		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 
-		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(activity);
-
-		ApptentiveInternal.getInstance(activity).onActivityResumed();
+		ApptentiveInternal.getInstance(activity).onActivityResumed(activity);
 	}
 
 	@Override
