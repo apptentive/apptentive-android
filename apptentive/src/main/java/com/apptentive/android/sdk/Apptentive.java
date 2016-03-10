@@ -54,7 +54,8 @@ public class Apptentive {
 
 	public static void register(Application application, String apptentiveApiKey) {
 		Log.i("Registering Apptentive.");
-		ApptentiveInternal.getInstance(application, apptentiveApiKey);
+		ApptentiveInternal.createInstance(application, apptentiveApiKey);
+		ApptentiveInternal.setLifeCycleCallback();
 	}
 
 	// ****************************************************************************************

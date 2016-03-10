@@ -133,7 +133,7 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Initialize or return a thread-safe instance of the Apptentive SDK. If this
+	 * Create a new or return a existing thread-safe instance of the Apptentive SDK. If this
 	 * or any other {@link #getInstance()} has already been called in the application's lifecycle, the
 	 * API key will be ignored and the current instance will be returned.
 	 *
@@ -145,7 +145,7 @@ public class ApptentiveInternal {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal getInstance(Context context, final String apptentiveApiKey) {
+	public static ApptentiveInternal createInstance(Context context, final String apptentiveApiKey) {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
@@ -180,7 +180,7 @@ public class ApptentiveInternal {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
 	 */
 	public static ApptentiveInternal getInstance(Context context) {
-		return getInstance((context == null) ? null : context, null);
+		return createInstance((context == null) ? null : context, null);
 	}
 
 	/**
@@ -190,12 +190,9 @@ public class ApptentiveInternal {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or null
 	 */
 	public static ApptentiveInternal getInstance() {
-		// Lazy initialization
+		// Lazy initialization, only once for each application launch
 		if (isApptentiveInitialized.compareAndSet(false, true)) {
 			sApptentiveInternal.init();
-			if (sApptentiveInternal.appContext instanceof Application) {
-				((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
-			}
 		}
 		return sApptentiveInternal;
 	}
@@ -203,19 +200,33 @@ public class ApptentiveInternal {
 	/**
 	 * Use this method to set or clear the internal state (pass in null)
 	 * Note: designed to be used for unit testing only
-	 * @param instance to be set to
+	 * @param instance the internal instance to be set to
 	 */
 	public static void setInstance(ApptentiveInternal instance) {
 		sApptentiveInternal = instance;
 		isApptentiveInitialized.set(false);
 	}
 
+	/**
+	 * Use this method to set or clear the internal app context (pass in null)
+	 * Note: designed to be used for unit testing only
+	 * @param c the new application context to be set to
+	 */
 	public static void setApplicationContext(Context c) {
 		synchronized (ApptentiveInternal.class) {
 			ApptentiveInternal internal = ApptentiveInternal.getInstance();
 			if (internal != null) {
 				internal.appContext = c;
 			}
+		}
+	}
+
+	/* Called by {@link #Apptentive.register()} to register global lifecycle
+	 * callbacks.
+	 */
+	static void setLifeCycleCallback() {
+		if (sApptentiveInternal != null && sApptentiveInternal.appContext instanceof Application) {
+			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 		}
 	}
 

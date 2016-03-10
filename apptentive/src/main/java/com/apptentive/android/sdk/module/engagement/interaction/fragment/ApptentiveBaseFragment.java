@@ -106,9 +106,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-		if (ApptentiveInternal.getInstance().getApplicationContext() == null) {
-			ApptentiveInternal.setApplicationContext(context.getApplicationContext());
-		}
 
 		if (retainedChildFragmentManager != null) {
 			try {
