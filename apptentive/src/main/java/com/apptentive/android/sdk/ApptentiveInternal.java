@@ -150,12 +150,15 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
 					sApptentiveInternal = new ApptentiveInternal();
+
 					sApptentiveInternal.appContext = context.getApplicationContext();
+					sApptentiveInternal.prefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
 					ApptentiveDatabase db = new ApptentiveDatabase(sApptentiveInternal.appContext);
-					CodePointStore store = new CodePointStore(sApptentiveInternal.appContext);
+					CodePointStore store = new CodePointStore();
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
@@ -189,7 +192,7 @@ public class ApptentiveInternal {
 	public static ApptentiveInternal getInstance() {
 		// Lazy initialization
 		if (isApptentiveInitialized.compareAndSet(false, true)) {
-			sApptentiveInternal.init(sApptentiveInternal.appContext);
+			sApptentiveInternal.init();
 			if (sApptentiveInternal.appContext instanceof Application) {
 				((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
 			}
@@ -360,9 +363,10 @@ public class ApptentiveInternal {
 	}
 
 
-	public void init(final Context applicationContext) {
-		appContext = applicationContext;
-		prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public void init() {
+
+		codePointStore.init();
+		messageManager.init();
 		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 		conversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
 		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
