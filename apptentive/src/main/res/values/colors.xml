@@ -26,6 +26,8 @@
     <color name="apptentive_text_color_hint">#808080</color>
     <color name="apptentive_text_color_hint_inverse">#808080</color>
 
+    <color name="apptentive_color_snackbar">#323232</color>
+
 
     <!-- TODO: Refactor colors below here -->
 

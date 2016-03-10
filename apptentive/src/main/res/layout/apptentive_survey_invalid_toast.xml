@@ -9,16 +9,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/survey_invalid_toast_root"
               android:layout_width="match_parent"
-              android:layout_height="48dp"
-              android:minHeight="48dp"
-              android:background="#D93849"
-              android:gravity="center"
-              android:orientation="horizontal">
+              android:layout_height="wrap_content">
     <TextView android:id="@+id/survey_invalid_toast_text"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_width="match_parent"
+              android:layout_height="48dp"
+              android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary.Inverse"
+              style="@style/Apptentive.Global.Widget.TextView"
               android:paddingLeft="24dp"
-              android:paddingStart="24dp"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="#FFFFFF"/>
+              android:paddingRight="24dp"
+              android:gravity="center"
+              android:background="?attr/apptentiveValidationFailedColor"/>
 </LinearLayout>

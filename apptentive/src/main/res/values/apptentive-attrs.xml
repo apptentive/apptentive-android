@@ -14,6 +14,8 @@
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
         <attr name="apptentiveTextAppearanceMedium" format="reference" />
 
+        <attr name="apptentiveColorSnackbar" format="color|reference" />
+
         <attr name="apptentive_material_disabled_text" format="color|reference" />
         <attr name="apptentive_material_disabled_icon" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />
