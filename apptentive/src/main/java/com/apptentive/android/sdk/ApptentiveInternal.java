@@ -781,15 +781,18 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	public void showAboutInternal(Activity activity, boolean showBrandingBand) {
+	public void showAboutInternal(Context context, boolean showBrandingBand) {
 		Intent intent = new Intent();
-		intent.setClass(activity, ApptentiveViewActivity.class);
+		intent.setClass(context, ApptentiveViewActivity.class);
 		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ABOUT);
 		intent.putExtra(Constants.FragmentConfigKeys.EXTRA, showBrandingBand);
-		activity.startActivity(intent);
+		if (!(context instanceof Activity)) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		}
+		context.startActivity(intent);
 	}
 
-	public boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {
+	public boolean showMessageCenterInternal(Context context, Map<String, Object> customData) {
 		boolean interactionShown = false;
 		if (canShowMessageCenterInternal()) {
 			if (customData != null) {
@@ -812,18 +815,18 @@ public class ApptentiveInternal {
 				}
 			}
 			this.customData = customData;
-			interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			interactionShown = EngagementModule.engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
 				this.customData = null;
 			}
 		} else {
-			showMessageCenterFallback(activity);
+			showMessageCenterFallback(context);
 		}
 		return interactionShown;
 	}
 
-	public void showMessageCenterFallback(Activity activity) {
-		EngagementModule.launchMessageCenterErrorActivity(activity);
+	public void showMessageCenterFallback(Context context) {
+		EngagementModule.launchMessageCenterErrorActivity(context);
 	}
 
 	public boolean canShowMessageCenterInternal() {
