@@ -258,8 +258,6 @@
 
     <style name="Apptentive.Style.TextView.EditText">
         <item name="android:inputType">textCapSentences</item>
-        <item name="android:textColorHint">?android:attr/textColorHint</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:gravity">bottom|start</item>item>
     </style>
 

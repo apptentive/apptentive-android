@@ -7,13 +7,12 @@
   -->
 
 <RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
-             style="ApptentiveTheme.TextAppearence"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_marginTop="4dp"
+             android:textAppearance="@style/Apptentive.TextAppearance.Body"
+             style="ApptentiveTheme.TextAppearence"
              android:paddingTop="4dp"
              android:minHeight="48dp"
              android:drawablePadding="16dp"
-             android:gravity="top|start"
-             android:textColor="@color/apptentive_survey_question_answer_text"
-             android:textSize="@dimen/apptentive_text_small"/>
+             android:gravity="top|start"/>

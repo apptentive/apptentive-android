@@ -6,21 +6,14 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="4dp"
-              android:layout_marginStart="4dp"
-              android:paddingBottom="4dp"
-              android:orientation="vertical">
-    <EditText android:id="@+id/answer_text"
-              style="@style/Apptentive.Style.TextView.EditText"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingTop="16dp"
-              android:paddingBottom="16dp"
-              android:gravity="start"
-              android:textColor="@color/apptentive_survey_answer_text"
-              android:textSize="@dimen/apptentive_text_small"
-              android:hint="Please leave detailed feedback…"/>
-</LinearLayout>
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/answer_text"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="4dp"
+          android:layout_marginStart="4dp"
+          android:layout_marginTop="16dp"
+          android:layout_marginBottom="16dp"
+          android:textAppearance="@style/Apptentive.TextAppearance.Body"
+          style="@style/Apptentive.Style.TextView.EditText"
+          android:hint="Please leave detailed feedback…"/>
