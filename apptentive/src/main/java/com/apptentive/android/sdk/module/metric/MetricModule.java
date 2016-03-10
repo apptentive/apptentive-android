@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.metric;
 
-import android.content.Context;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
@@ -23,33 +22,32 @@ public class MetricModule {
 
 	private static final String KEY_EXCEPTION = "exception";
 
-	public static void sendMetric(Context context, Event.EventLabel type) {
-		sendMetric(context, type, null);
+	public static void sendMetric(Event.EventLabel type) {
+		sendMetric(type, null);
 	}
 
-	public static void sendMetric(Context context, Event.EventLabel type, String trigger) {
-		sendMetric(context, type, trigger, null);
+	public static void sendMetric(Event.EventLabel type, String trigger) {
+		sendMetric(type, trigger, null);
 	}
 
-	public static void sendMetric(Context context, Event.EventLabel type, String trigger, Map<String, String> data) {
-		Configuration config = Configuration.load(context);
+	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
+		Configuration config = Configuration.load();
 		if (config.isMetricsEnabled()) {
 			Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
-			EventManager.sendEvent(context, event);
+			EventManager.sendEvent(event);
 		}
 	}
 
 	/**
 	 * Used for internal error reporting when we intercept a Throwable that may have otherwise caused a crash.
 	 *
-	 * @param context     The context from which this method was called.
 	 * @param throwable   An optional throwable that was caught, and which we want to log.
 	 * @param description An optional description of what happened.
 	 * @param extraData   Any extra data that may have contributed to the Throwable being thrown.
 	 */
-	public static void sendError(Context context, Throwable throwable, String description, String extraData) {
+	public static void sendError(Throwable throwable, String description, String extraData) {
 		Event.EventLabel type = Event.EventLabel.error;
 		try {
 			JSONObject data = new JSONObject();
@@ -66,11 +64,11 @@ public class MetricModule {
 			if (extraData != null) {
 				data.put("extraData", extraData);
 			}
-			Configuration config = Configuration.load(context);
+			Configuration config = Configuration.load();
 			if (config.isMetricsEnabled()) {
 				Log.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
 				Event event = new Event(type.getLabelName(), data);
-				EventManager.sendEvent(context, event);
+				EventManager.sendEvent(event);
 			}
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to

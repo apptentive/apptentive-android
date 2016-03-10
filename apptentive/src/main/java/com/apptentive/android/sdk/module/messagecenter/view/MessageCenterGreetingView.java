@@ -57,7 +57,7 @@ public class MessageCenterGreetingView extends FrameLayout implements MessageCen
 			public void onClick(View view) {
 				view.setClickable(false);
 				mClickHandler.sendEmptyMessageDelayed(view.getId(), DELAY_TIME);
-				ApptentiveInternal.getInstance(context).showAboutInternal(Util.castContextToActivity(context), false);
+				ApptentiveInternal.getInstance().showAboutInternal(Util.castContextToActivity(context), false);
 			}
 		});
 	}

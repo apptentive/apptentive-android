@@ -217,7 +217,7 @@ public class ApptentiveAttachmentLoader {
 				try {
 					Log.d("ApptentiveAttachmentLoader doDownload: " + uri);
 					// Conversation token is needed if the download url is an redrect link from an Apptentive endpoint
-					String conversationToken = ApptentiveInternal.getApptentiveConversationToken(null);
+					String conversationToken = ApptentiveInternal.getInstance().getApptentiveConversationToken();
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, conversationToken);
 					} else {
@@ -252,7 +252,7 @@ public class ApptentiveAttachmentLoader {
 		private void loadImageFromDisk(ImageView imageView) {
 			if (imageView != null && !mIsCancelled) {
 				Log.d("ApptentiveAttachmentLoader loadImageFromDisk: " + uri);
-				mDrawableLoaderTask = new ApptentiveDrawableLoaderTask(imageView.getContext(), imageView, this);
+				mDrawableLoaderTask = new ApptentiveDrawableLoaderTask(imageView, this);
 				try {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 						mDrawableLoaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, String.valueOf(imageViewWidth), String.valueOf(imageViewHeight));

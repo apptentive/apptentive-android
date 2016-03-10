@@ -52,7 +52,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_textmodal_interaction_center, container, false);
@@ -130,7 +130,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 								List<Invocation> invocations = launchInteractionButton.getInvocations();
 								String interactionIdToLaunch = null;
 								for (Invocation invocation : invocations) {
-									if (invocation.isCriteriaMet(getContext())) {
+									if (invocation.isCriteriaMet()) {
 										interactionIdToLaunch = invocation.getInteractionId();
 										break;
 									}
@@ -138,7 +138,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
-									Interactions interactions = ApptentiveInternal.getInteractionManager(getContext()).getInteractions(getContext());
+									Interactions interactions = ApptentiveInternal.getInstance().getInteractionManager().getInteractions();
 									if (interactions != null) {
 										invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 									}

@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
-import android.content.Context;
 
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Util;
@@ -60,13 +59,12 @@ public class ConditionalClause implements Clause {
 	/**
 	 * The test in this conditional clause are implicitly ANDed together, so return false if any of them is false, and continue the loop for each test that is true;
 	 *
-	 * @param context
 	 * @return
 	 */
 	@Override
-	public boolean evaluate(Context context) {
+	public boolean evaluate() {
 		Log.v("    - %s", fieldName);
-		Comparable fieldValue = FieldManager.getValue(context, fieldName);
+		Comparable fieldValue = FieldManager.getValue(fieldName);
 		for (ConditionalTest test : conditionalTests) {
 			Log.v("      - %s %s %s?", Util.classToString(fieldValue), test.operator, Util.classToString(test.parameter));
 			if (!test.operator.apply(fieldValue, test.parameter)) {

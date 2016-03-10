@@ -13,5 +13,5 @@ import android.content.Context;
  */
 public interface Clause {
 
-	boolean evaluate(Context context);
+	boolean evaluate();
 }

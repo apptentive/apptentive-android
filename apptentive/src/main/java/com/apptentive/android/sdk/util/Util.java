@@ -37,6 +37,7 @@ import android.webkit.URLUtil;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
 
@@ -165,8 +166,8 @@ public class Util {
 		}
 	}
 
-	public static boolean isNetworkConnectionPresent(Context appContext) {
-		ConnectivityManager cm = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+	public static boolean isNetworkConnectionPresent() {
+		ConnectivityManager cm = (ConnectivityManager) ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null;
 	}
 
@@ -243,9 +244,9 @@ public class Util {
 		}
 	}
 
-	public static Object getPackageMetaData(Context context, String key) {
+	public static Object getPackageMetaData(Context appContext, String key) {
 		try {
-			return context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData.get(key);
+			return appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA).metaData.get(key);
 		} catch (Exception e) {
 			return null;
 		}
@@ -257,8 +258,8 @@ public class Util {
 	 * <p>Example: <code>&lt;meta-data android:name="sdk_distribution" android:value="'1.00'"/></code></p>
 	 * <p>This will evaluate to a String "1.00". If you leave off the single quotes, this method will just cast to a String, so the result would be a String "1.0".</p>
 	 */
-	public static String getPackageMetaDataSingleQuotedString(Context context, String key) {
-		Object object = getPackageMetaData(context, key);
+	public static String getPackageMetaDataSingleQuotedString(Context appContext, String key) {
+		Object object = getPackageMetaData(appContext, key);
 		if (object == null) {
 			return null;
 		}
@@ -279,10 +280,10 @@ public class Util {
 		return sw.toString();
 	}
 
-	public static String getAppVersionName(Context context) {
+	public static String getAppVersionName(Context appContext) {
 		try {
-			PackageManager packageManager = context.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			PackageManager packageManager = appContext.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Error getting app version name.", e);
@@ -290,10 +291,10 @@ public class Util {
 		return null;
 	}
 
-	public static int getAppVersionCode(Context context) {
+	public static int getAppVersionCode(Context appContext) {
 		try {
-			PackageManager packageManager = context.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			PackageManager packageManager = appContext.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e("Error getting app version code.", e);
@@ -542,8 +543,8 @@ public class Util {
 		}
 	}
 
-	public static String getMimeTypeFromUri(Context context, Uri contentUri) {
-		return context.getContentResolver().getType(contentUri);
+	public static String getMimeTypeFromUri(Context appContext, Uri contentUri) {
+		return appContext.getContentResolver().getType(contentUri);
 	}
 
 	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
@@ -762,15 +763,15 @@ public class Util {
 	/**
 	 * This method creates a cached file exactly copying from the input stream.
 	 *
-	 * @param context       context for resolving uri
 	 * @param sourceUrl     the source file path or uri string
 	 * @param localFilePath the cache file path string
 	 * @param mimeType      the mimeType of the source inputstream
 	 * @return null if failed, otherwise a StoredFile object
 	 */
-	public static StoredFile createLocalStoredFile(Context context, String sourceUrl, String localFilePath, String mimeType) {
+	public static StoredFile createLocalStoredFile(String sourceUrl, String localFilePath, String mimeType) {
 		InputStream is = null;
 		try {
+			Context context = ApptentiveInternal.getInstance().getApplicationContext();
 			if (URLUtil.isContentUrl(sourceUrl) && context != null) {
 				Uri uri = Uri.parse(sourceUrl);
 				is = context.getContentResolver().openInputStream(uri);

@@ -64,7 +64,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 							 Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();

@@ -26,7 +26,6 @@ import com.apptentive.android.sdk.util.image.ImageUtil;
  */
 public class ApptentiveDrawableLoaderTask extends AsyncTask<String, Void, Bitmap> {
 	private WeakReference<ImageView> imageViewReference;
-	private WeakReference<Context> contextReference;
 	private BitmapLoadListener mListener;
 	protected BitmapFactory.Options options;
 	private boolean decoderError;
@@ -42,9 +41,8 @@ public class ApptentiveDrawableLoaderTask extends AsyncTask<String, Void, Bitmap
 		void onLoadCancelled();
 	}
 
-	public ApptentiveDrawableLoaderTask(Context context, ImageView imageView, BitmapLoadListener listener) {
+	public ApptentiveDrawableLoaderTask(ImageView imageView, BitmapLoadListener listener) {
 		imageViewReference = new WeakReference<ImageView>(imageView);
-		contextReference = new WeakReference<Context>(context);
 		mListener = listener;
 	}
 
@@ -120,7 +118,7 @@ public class ApptentiveDrawableLoaderTask extends AsyncTask<String, Void, Bitmap
 
 		decoderError = false;
 		try {
-			bitmap = ImageUtil.createScaledBitmapFromLocalImageSource(contextReference.get(), fileLocation, width, height, null, imageOrientation);
+			bitmap = ImageUtil.createScaledBitmapFromLocalImageSource(fileLocation, width, height, null, imageOrientation);
 		} catch (FileNotFoundException e) {
 			if (!URLUtil.isValidUrl(fileLocation)) {
 				decoderError = true;

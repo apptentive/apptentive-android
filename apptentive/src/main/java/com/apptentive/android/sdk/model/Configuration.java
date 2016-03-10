@@ -45,13 +45,13 @@ public class Configuration extends JSONObject {
 		super(json);
 	}
 
-	public void save(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public void save() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).apply();
 	}
 
-	public static Configuration load(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static Configuration load() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		return Configuration.load(prefs);
 	}
 
@@ -86,7 +86,7 @@ public class Configuration extends JSONObject {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return ApptentiveInternal.getDefaultAppDisplayName(null);
+		return ApptentiveInternal.getInstance().getDefaultAppDisplayName();
 	}
 
 	private JSONObject getMessageCenter() {

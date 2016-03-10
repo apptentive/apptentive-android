@@ -6,10 +6,10 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -32,13 +32,13 @@ public class VersionHistoryStore {
 	 * timestamp. Each entry ends with a ';' to separate it from subsequent entries. A list is stored for both the
 	 * version name and version code.
 	 */
-	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName) {
-		updateVersionHistory(context, newVersionCode, newVersionName, Util.currentTimeSeconds());
+	public static void updateVersionHistory(Integer newVersionCode, String newVersionName) {
+		updateVersionHistory(newVersionCode, newVersionName, Util.currentTimeSeconds());
 	}
 
-	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, double date) {
+	public static void updateVersionHistory(Integer newVersionCode, String newVersionName, double date) {
 		Log.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
-		List<VersionHistoryEntry> versionHistory = getVersionHistory(context);
+		List<VersionHistoryEntry> versionHistory = getVersionHistory();
 		boolean alreadySawVersionCode = false;
 		boolean alreadySawVersionName = false;
 		for (VersionHistoryEntry entry : versionHistory) {
@@ -52,7 +52,7 @@ public class VersionHistoryStore {
 		// If either the versionCode or versionName are new, record a new update.
 		if (!alreadySawVersionCode || !alreadySawVersionName) {
 			versionHistory.add(new VersionHistoryEntry(date, newVersionCode, newVersionName));
-			saveVersionHistory(context, versionHistory);
+			saveVersionHistory(versionHistory);
 		}
 	}
 
@@ -64,15 +64,15 @@ public class VersionHistoryStore {
 	 * @param selector - The type of version entry we are looking for: total, version, or build.
 	 * @return A DateTime representing the number of seconds since we first saw the desired app release entry. A DateTime with current time if never seen.
 	 */
-	public static Apptentive.DateTime getTimeAtInstall(Context context, Selector selector) {
-		List<VersionHistoryEntry> entries = getVersionHistory(context);
+	public static Apptentive.DateTime getTimeAtInstall(Selector selector) {
+		List<VersionHistoryEntry> entries = getVersionHistory();
 		if (entries != null) {
 			for (VersionHistoryEntry entry : entries) {
 				switch (selector) {
 					case total:
 						return new Apptentive.DateTime(entry.seconds);
 					case build:
-						if (entry.versionCode.equals(Util.getAppVersionCode(context))) {
+						if (entry.versionCode.equals(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()))) {
 							return new Apptentive.DateTime(entry.seconds);
 						}
 				}
@@ -88,8 +88,8 @@ public class VersionHistoryStore {
 	 * @param selector - The type of version entry we are looking for: version, or build.
 	 * @return True if there are records with more than one version or build, depending on the value of selector.
 	 */
-	public static boolean isUpdate(Context context, Selector selector) {
-		List<VersionHistoryEntry> entries = getVersionHistory(context);
+	public static boolean isUpdate(Selector selector) {
+		List<VersionHistoryEntry> entries = getVersionHistory();
 		Set<String> uniques = new HashSet<String>();
 		if (entries != null) {
 			for (VersionHistoryEntry entry : entries) {
@@ -108,8 +108,8 @@ public class VersionHistoryStore {
 		return uniques.size() > 1;
 	}
 
-	public static VersionHistoryEntry getLastVersionSeen(Context context) {
-		List<VersionHistoryEntry> entries = getVersionHistory(context);
+	public static VersionHistoryEntry getLastVersionSeen() {
+		List<VersionHistoryEntry> entries = getVersionHistory();
 		if (entries != null && !entries.isEmpty()) {
 			return entries.get(entries.size() - 1);
 		}
@@ -122,9 +122,9 @@ public class VersionHistoryStore {
 	 *
 	 * @return A List of VersionHistoryEntry objects.
 	 */
-	public static List<VersionHistoryEntry> getVersionHistory(Context context) {
+	public static List<VersionHistoryEntry> getVersionHistory() {
 		List<VersionHistoryEntry> versionHistory = new ArrayList<VersionHistoryEntry>();
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String versionHistoryString = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY, null);
 		if (versionHistoryString != null) {
 			String[] parts = versionHistoryString.split(ENTRY_SEP);
@@ -135,8 +135,8 @@ public class VersionHistoryStore {
 		return versionHistory;
 	}
 
-	private static void saveVersionHistory(Context context, List<VersionHistoryEntry> versionHistory) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void saveVersionHistory(List<VersionHistoryEntry> versionHistory) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		StringBuilder versionHistoryString = new StringBuilder();
 		for (VersionHistoryEntry entry : versionHistory) {
 			versionHistoryString.append(entry.toString()).append(ENTRY_SEP);

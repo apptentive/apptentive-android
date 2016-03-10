@@ -90,7 +90,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	public Context getContext() {
 		Context context = super.getContext();
-		return context != null ? context : ApptentiveInternal.getApplicationContext();
+		return context != null ? context : ApptentiveInternal.getInstance().getApplicationContext();
 	}
 
 	public void setOnTransitionListener(OnFragmentTransitionListener onTransitionListener) {
@@ -106,7 +106,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-		if (ApptentiveInternal.getApplicationContext() == null) {
+		if (ApptentiveInternal.getInstance().getApplicationContext() == null) {
 			ApptentiveInternal.setApplicationContext(context.getApplicationContext());
 		}
 
@@ -188,14 +188,14 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}
 
 		if (bShownAsModal) {
-			setStatusBarColor(ApptentiveInternal.getDefaultStatusbarColor(getContext()));
+			setStatusBarColor(ApptentiveInternal.getInstance().getDefaultStatusbarColor());
 		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApptentiveInternal.getInstance(getContext()).checkAndUpdateApptentiveConfigurations();
+		ApptentiveInternal.getInstance().checkAndUpdateApptentiveConfigurations();
 	}
 
 	public void onStop() {

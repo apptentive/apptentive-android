@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.content.Context;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import org.json.JSONException;
@@ -24,12 +24,13 @@ public class EnjoymentDialogInteraction extends Interaction {
 		super(json);
 	}
 
-	public String getTitle(Context context) {
+	public String getTitle() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration != null && !configuration.isNull(KEY_TITLE)) {
 			return configuration.optString(KEY_TITLE, null);
 		}
-		return context.getResources().getString(R.string.apptentive_do_you_love_this_app, Configuration.load(context).getAppDisplayName());
+		return ApptentiveInternal.getInstance().getApplicationContext().getResources().
+				getString(R.string.apptentive_do_you_love_this_app, Configuration.load().getAppDisplayName());
 	}
 
 	public String getYesText() {

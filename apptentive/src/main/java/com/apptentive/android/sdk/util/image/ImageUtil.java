@@ -17,6 +17,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.util.CountingOutputStream;
@@ -67,7 +68,6 @@ public class ImageUtil {
 	 * smaller than the original. It will create only the returned bitmap in memory.
 	 * From <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large Bitmaps Efficiently</a>
 	 *
-	 * @param context
 	 * @param fileAbsolutePath Full absolute path  to the image file. (optional, maybe null)
 	 * @param fileUri          content uri of the source image. (optional, maybe null)
 	 * @param minShrunkWidth   If edge of this image is greater than minShrunkWidth, the image will be shrunken such it is not smaller than minShrunkWidth.
@@ -76,8 +76,9 @@ public class ImageUtil {
 	 * @param orientation      The orientation for the image expressed as degrees
 	 * @return A bitmap whose edges are equal to or less than minShrunkEdge in length.
 	 */
-	private static Bitmap createLightweightScaledBitmap(Context context, String fileAbsolutePath, Uri fileUri, int minShrunkWidth, int minShrunkHeight, Bitmap.Config config, int orientation) {
+	private static Bitmap createLightweightScaledBitmap(String fileAbsolutePath, Uri fileUri, int minShrunkWidth, int minShrunkHeight, Bitmap.Config config, int orientation) {
 		boolean bCreateFromUri;
+		Context context = ApptentiveInternal.getInstance().getApplicationContext();
 		if (context != null && fileUri != null) {
 			bCreateFromUri = true;
 		} else if (!TextUtils.isEmpty(fileAbsolutePath)) {
@@ -181,7 +182,6 @@ public class ImageUtil {
 	 * performs a scaling of this resulting bitmap to achieve the final size. It will create two bitmaps in memory while it
 	 * is running.
 	 *
-	 * @param context
 	 * @param fileUrl     either full absolute path to the source image file or the content uri to the source image
 	 * @param maxWidth    The maximum width to scale this image to, or 0 to ignore this parameter.
 	 * @param maxHeight   The maximum height to scale this image to, or 0 to ignore this parameter.
@@ -189,14 +189,14 @@ public class ImageUtil {
 	 * @param orientation The orientation for the image expressed as degrees
 	 * @return A Bitmap scaled by maxWidth, maxHeight, and config.
 	 */
-	public synchronized static Bitmap createScaledBitmapFromLocalImageSource(Context context, String fileUrl, int maxWidth, int maxHeight, Bitmap.Config config, int orientation)
+	public synchronized static Bitmap createScaledBitmapFromLocalImageSource(String fileUrl, int maxWidth, int maxHeight, Bitmap.Config config, int orientation)
 			throws FileNotFoundException {
 		Bitmap tempBitmap = null;
 
 		if (URLUtil.isContentUrl(fileUrl)) {
 			try {
 				Uri uri = Uri.parse(fileUrl);
-				tempBitmap = createLightweightScaledBitmap(context, null, uri, maxWidth, maxHeight, config, orientation);
+				tempBitmap = createLightweightScaledBitmap(null, uri, maxWidth, maxHeight, config, orientation);
 			} catch (NullPointerException e) {
 				throw new NullPointerException("Failed to create scaled bitmap");
 			}
@@ -204,7 +204,7 @@ public class ImageUtil {
 			File file = new File(fileUrl);
 			if (file.exists()) {
 				try {
-					tempBitmap = createLightweightScaledBitmap(null, fileUrl, null, maxWidth, maxHeight, config, orientation);
+					tempBitmap = createLightweightScaledBitmap(fileUrl, null, maxWidth, maxHeight, config, orientation);
 				} catch (NullPointerException e) {
 					throw new NullPointerException("Failed to create scaled bitmap");
 				}
@@ -264,7 +264,7 @@ public class ImageUtil {
 	 * @param cachedFileName file name of the cache to be created (with full path)
 	 * @return true if cache file is created successfully
 	 */
-	public static boolean createScaledDownImageCacheFile(Context context, String sourcePath, String cachedFileName) {
+	public static boolean createScaledDownImageCacheFile(String sourcePath, String cachedFileName) {
 		File localFile = new File(cachedFileName);
 
 		// Retrieve image orientation
@@ -281,7 +281,7 @@ public class ImageUtil {
 		try {
 			cos = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(localFile)));
 			System.gc();
-			Bitmap smaller = ImageUtil.createScaledBitmapFromLocalImageSource(context, sourcePath, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+			Bitmap smaller = ImageUtil.createScaledBitmapFromLocalImageSource(sourcePath, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
 			// TODO: Is JPEG what we want here?
 			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
 			cos.flush();

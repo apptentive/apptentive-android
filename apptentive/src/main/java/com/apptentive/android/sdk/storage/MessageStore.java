@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.Context;
 
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 
@@ -21,7 +20,7 @@ public interface MessageStore extends PayloadStore {
 
 	public void updateMessage(ApptentiveMessage apptentiveMessage);
 
-	public List<ApptentiveMessage> getAllMessages(Context appContext);
+	public List<ApptentiveMessage> getAllMessages();
 
 	public String getLastReceivedMessageId();
 

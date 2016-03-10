@@ -79,7 +79,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 		Log.e("==> Foreground Activities: %d", foregroundActivities.get());
 
-		ApptentiveInternal.getInstance(activity).onActivityResumed(activity);
+		ApptentiveInternal.getInstance().onActivityResumed(activity);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		}, CHECK_DELAY_SHORT);
 
 
-		ApptentiveInternal.getMessageManager(activity).setCurrentForgroundActivity(null);
+		ApptentiveInternal.getInstance().getMessageManager().setCurrentForgroundActivity(null);
 
 	}
 
@@ -158,21 +158,21 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	private void appEnteredForeground(Activity activity) {
 		Log.e("App went to foreground.");
-		ApptentiveInternal.getInstance(activity).onAppEnterForeground();
+		ApptentiveInternal.getInstance().onAppEnterForeground();
 	}
 
 	private void appEnteredBackground(Activity activity) {
 		Log.e("App went to background.");
-		ApptentiveInternal.getInstance(activity).onAppEnterBackground();
+		ApptentiveInternal.getInstance().onAppEnterBackground();
 	}
 
 	private void appLaunched(Activity activity) {
 		Log.e("### App LAUNCH");
-		ApptentiveInternal.getInstance(activity).onAppLaunch(activity);
+		ApptentiveInternal.getInstance().onAppLaunch(activity);
 	}
 
 	private void appExited(Activity activity) {
 		Log.e("### App EXIT");
-		ApptentiveInternal.getInstance(activity).onAppExit(activity);
+		ApptentiveInternal.getInstance().onAppExit(activity);
 	}
 }
