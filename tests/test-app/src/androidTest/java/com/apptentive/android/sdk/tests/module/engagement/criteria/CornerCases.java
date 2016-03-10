@@ -29,12 +29,12 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCornerCasesThatShouldBeTrue.json");
-		Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String)null);
-		DeviceManager.storeDeviceAndReturnIt(getTargetContext());
+		Apptentive.addCustomDeviceData("key_with_null_value", (String)null);
+		DeviceManager.storeDeviceAndReturnIt();
 		try {
 			Clause criteria = ClauseParser.parse(json);
 			assertNotNull("Criteria was null, but it shouldn't be.", criteria);
-			boolean result = criteria.evaluate(getTargetContext());
+			boolean result = criteria.evaluate();
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
@@ -48,12 +48,12 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCornerCasesThatShouldBeFalse.json");
-		Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
-		DeviceManager.storeDeviceAndReturnIt(getTargetContext());
+		Apptentive.addCustomDeviceData("key_with_null_value", (String) null);
+		DeviceManager.storeDeviceAndReturnIt();
 		try {
 			Clause criteria = ClauseParser.parse(json);
 			assertNotNull("Criteria was null, but it shouldn't be.", criteria);
-			boolean result = criteria.evaluate(getTargetContext());
+			boolean result = criteria.evaluate();
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);

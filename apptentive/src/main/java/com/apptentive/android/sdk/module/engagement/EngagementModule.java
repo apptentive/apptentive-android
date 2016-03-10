@@ -60,7 +60,7 @@ public class EngagementModule {
 	public static boolean doEngage(Activity activity, String eventLabel) {
 		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
-			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(activity, interaction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(interaction.getId());
 			launchInteraction(activity, interaction);
 			return true;
 		}
