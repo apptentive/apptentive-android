@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -27,61 +28,72 @@ import java.util.Map;
  */
 public class EngagementModule {
 
-	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, String eventName) {
+		return engage(context, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String eventName, String data) {
-		return engage(activity, "com.apptentive", "app", null, eventName,  data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, String eventName, String data) {
+		return engage(context, "com.apptentive", "app", null, eventName,  data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName) {
-		return engage(activity, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Interaction interaction, String eventName) {
+		return engage(context, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, Interaction interaction, String eventName, String data) {
-		return engage(activity, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Interaction interaction, String eventName, String data) {
+		return engage(context, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public static synchronized boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
 			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion(eventLabel);
 			EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
-			return doEngage(activity, eventLabel);
+			return doEngage(context, eventLabel);
 		} catch (Exception e) {
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
 	}
 
-	public static boolean doEngage(Activity activity, String eventLabel) {
+	public static boolean doEngage(Context context, String eventLabel) {
 		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
 			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(interaction.getId());
-			launchInteraction(activity, interaction);
+			launchInteraction(context, interaction);
 			return true;
 		}
 		Log.d("No interaction to show.");
 		return false;
 	}
 
-	public static void launchInteraction(Activity activity, Interaction interaction) {
+	public static void launchInteraction(Context context, Interaction interaction) {
 		if (interaction != null) {
 			Log.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
-			intent.setClass(activity, ApptentiveViewActivity.class);
+			intent.setClass(context, ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
-			activity.startActivity(intent);
+			/* non-activity context start an Activity, but it requires that a new task be created.
+			 * This may fit specific use cases, but can create non-standard back stack behaviors in
+			 * hosting application. non-activity context include application context, context from Service
+			 * ContentProvider, and BroadcastReceiver
+			 */
+			if (!(context instanceof Activity)) {
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+			}
+			context.startActivity(intent);
 		}
 	}
 
-	public static void launchMessageCenterErrorActivity(Activity activity) {
-		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(activity);
-		activity.startActivity(intent);
+	public static void launchMessageCenterErrorActivity(Context context) {
+		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(context);
+		if (!(context instanceof Activity)) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		}
+		context.startActivity(intent);
 	}
 
 	public static boolean canShowInteraction(String vendor, String interaction, String eventName) {

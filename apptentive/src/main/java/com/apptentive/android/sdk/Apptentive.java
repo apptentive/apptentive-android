@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -536,15 +535,15 @@ public class Apptentive {
 	 * push notifications, so you can and should call it any time your push notification launches an
 	 * Activity.
 	 *
-	 * @param activity The Activity from which this method is called.
+	 * @param context The context from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
 	 */
-	public static boolean handleOpenedPushNotification(Activity activity) {
+	public static boolean handleOpenedPushNotification(Context context) {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return false;
 		}
 
-		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
 		if (pushData != null) {
@@ -557,7 +556,7 @@ public class Apptentive {
 				}
 				switch (action) {
 					case pmc:
-						Apptentive.showMessageCenter(activity);
+						Apptentive.showMessageCenter(context);
 						return true;
 					default:
 						Log.v("Unknown Apptentive push notification action: \"%s\"", action.name());
@@ -609,12 +608,12 @@ public class Apptentive {
 	/**
 	 * Opens the Apptentive Message Center UI Activity
 	 *
-	 * @param activity The Activity from which to launch the Message Center
+	 * @param context The context from which to launch the Message Center
 	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Activity activity) {
+	public static boolean showMessageCenter(Context context) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return showMessageCenter(activity, null);
+			return showMessageCenter(context, null);
 		}
 		return false;
 	}
@@ -624,16 +623,16 @@ public class Apptentive {
 	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
-	 * @param activity   The Activity from which to launch the Message Center
+	 * @param context    The context from which to launch the Message Center
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
 	 *                   If any message is sent by the Person, this data is sent with it, and then
 	 *                   cleared. If no message is sent, this data is discarded.
 	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Activity activity, Map<String, Object> customData) {
+	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
 		try {
 			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().showMessageCenterInternal(activity, customData);
+				return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 			}
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
@@ -646,7 +645,7 @@ public class Apptentive {
 	 * Our SDK must connect to our server at least once to download initial configuration for Message
 	 * Center. Call this method to see whether or not Message Center can be displayed.
 	 *
-	 * @return true if a call to {@link #showMessageCenter(Activity)} will display Message Center, else false.
+	 * @return true if a call to {@link #showMessageCenter(Context)} will display Message Center, else false.
 	 */
 	public static boolean canShowMessageCenter() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -853,14 +852,14 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity The Activity from which this method is called.
-	 * @param event    A unique String representing the line this method is called on. For instance, you may want to have
-	 *                 the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                 call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param context The context from which this method is called.
+	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
+	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event) {
-		return EngagementModule.engage(activity, "local", "app", null, event, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engage(Context context, String event) {
+		return EngagementModule.engage(context, "local", "app", null, event, null, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -869,7 +868,7 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity   The Activity from which this method is called.
+	 * @param context    The context from which this method is called.
 	 * @param event      A unique String representing the line this method is called on. For instance, you may want to have
 	 *                   the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                   call <strong><code>engage(activity, "finished_upload");</code></strong>
@@ -877,8 +876,8 @@ public class Apptentive {
 	 *                   is sent to the server for tracking information in the context of the engaged Event.
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(activity, "local", "app", null, event, null, customData, (ExtendedData[]) null);
+	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData) {
+		return EngagementModule.engage(context, "local", "app", null, event, null, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -887,7 +886,7 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param activity     The Activity from which this method is called.
+	 * @param context      The context from which this method is called.
 	 * @param event        A unique String representing the line this method is called on. For instance, you may want to have
 	 *                     the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                     call <strong><code>engage(activity, "finished_upload");</code></strong>
@@ -899,8 +898,8 @@ public class Apptentive {
 	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include each type only once.
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(activity, "local", "app", null, event, null, customData, extendedData);
+	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
+		return EngagementModule.engage(context, "local", "app", null, event, null, customData, extendedData);
 	}
 
 	/**
@@ -916,7 +915,7 @@ public class Apptentive {
 
 	/**
 	 * This method can be used to determine if a call to one of the <strong><code>engage()</code></strong> methods such as
-	 * {@link #engage(Activity, String)} using the same event name will
+	 * {@link #engage(Context, String)} using the same event name will
 	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
 	 * displayed before you create a UI Button, etc.
 	 *
