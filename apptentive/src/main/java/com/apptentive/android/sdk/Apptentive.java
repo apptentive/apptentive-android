@@ -46,6 +46,7 @@ public class Apptentive {
 
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
+	 *
 	 * @param application The {@link Application} object for this app.
 	 */
 	public static void register(Application application) {
@@ -69,7 +70,7 @@ public class Apptentive {
 	 * idempotent. Calls to this method will overwrite any previously entered email, so if you don't want to overwrite
 	 * the email provided by the user, make sure to check the value with {@link #getPersonEmail()} before you call this method.
 	 *
-	 * @param email   The user's email address.
+	 * @param email The user's email address.
 	 */
 	public static void setPersonEmail(String email) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -97,7 +98,7 @@ public class Apptentive {
 	 * previously entered email, so if you don't want to overwrite the email provided by the user, make sure to check
 	 * the value with {@link #getPersonName()} before you call this method.
 	 *
-	 * @param name    The user's name.
+	 * @param name The user's name.
 	 */
 	public static void setPersonName(String name) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -111,7 +112,7 @@ public class Apptentive {
 	 *
 	 * @return The person's name if set, else null.
 	 */
-	public static String getPersonName(){
+	public static String getPersonName() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			return PersonManager.loadPersonName();
 		}
@@ -147,8 +148,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A String value.
+	 * @param key   The key to store the data under.
+	 * @param value A String value.
 	 */
 	public static void addCustomDeviceData(String key, String value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -164,8 +165,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A Number value.
+	 * @param key   The key to store the data under.
+	 * @param value A Number value.
 	 */
 	public static void addCustomDeviceData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -178,8 +179,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A Boolean value.
+	 * @param key   The key to store the data under.
+	 * @param value A Boolean value.
 	 */
 	public static void addCustomDeviceData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -202,7 +203,7 @@ public class Apptentive {
 	/**
 	 * Remove a piece of custom data from the device. Calls to this method are idempotent.
 	 *
-	 * @param key     The key to remove.
+	 * @param key The key to remove.
 	 */
 	public static void removeCustomDeviceData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -243,8 +244,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A String value.
+	 * @param key   The key to store the data under.
+	 * @param value A String value.
 	 */
 	public static void addCustomPersonData(String key, String value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -260,8 +261,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A Number value.
+	 * @param key   The key to store the data under.
+	 * @param value A Number value.
 	 */
 	public static void addCustomPersonData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -274,8 +275,8 @@ public class Apptentive {
 	 * in the Conversation view, and can be used in Interaction targeting.  Calls to this method are
 	 * idempotent.
 	 *
-	 * @param key     The key to store the data under.
-	 * @param value   A Boolean value.
+	 * @param key   The key to store the data under.
+	 * @param value A Boolean value.
 	 */
 	public static void addCustomPersonData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -298,7 +299,7 @@ public class Apptentive {
 	/**
 	 * Remove a piece of custom data from the Person. Calls to this method are idempotent.
 	 *
-	 * @param key     The key to remove.
+	 * @param key The key to remove.
 	 */
 	public static void removeCustomPersonData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -461,6 +462,9 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
 		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
 	}
 
@@ -472,6 +476,9 @@ public class Apptentive {
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
 		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
 	}
 
@@ -482,15 +489,17 @@ public class Apptentive {
 	 * notification did not come from Apptentive, this method has no effect.</p>
 	 * <p>Use this method when using Parse and Amazon SNS as push providers.</p>
 	 *
-	 * @param intent  The Intent that you received when the user opened a push notification.
+	 * @param intent The Intent that you received when the user opened a push notification.
 	 * @return true if the push data came from Apptentive.
 	 */
 	public static boolean setPendingPushNotification(Intent intent) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
+
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
 		if (apptentive != null) {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
-			}
+			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
 		}
 		return false;
 	}
@@ -503,15 +512,17 @@ public class Apptentive {
 	 * notifications, or when using Urban Airship as a push provider. Calling this method for a push
 	 * that did not come from Apptentive has no effect.
 	 *
-	 * @param data    A Bundle containing the GCM data object from the push notification.
+	 * @param data A Bundle containing the GCM data object from the push notification.
 	 * @return true if the push data came from Apptentive.
 	 */
-	public static boolean setPendingPushNotification( Bundle data) {
+	public static boolean setPendingPushNotification(Bundle data) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
+
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
 		if (apptentive != null) {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
-			}
+			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
 		}
 		return false;
 	}
@@ -529,6 +540,10 @@ public class Apptentive {
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
 	 */
 	public static boolean handleOpenedPushNotification(Activity activity) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
+
 		SharedPreferences prefs = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
@@ -684,7 +699,7 @@ public class Apptentive {
 	 * Sends a text message to the server. This message will be visible in the conversation view on the server, but will
 	 * not be shown in the client's Message Center.
 	 *
-	 * @param text    The message you wish to send.
+	 * @param text The message you wish to send.
 	 */
 	public static void sendAttachmentText(String text) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
@@ -711,7 +726,7 @@ public class Apptentive {
 	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
 	 * point the temporary file will be deleted.
 	 *
-	 * @param uri     The URI of the local resource file.
+	 * @param uri The URI of the local resource file.
 	 */
 	public static void sendAttachmentFile(String uri) {
 		try {
@@ -772,11 +787,10 @@ public class Apptentive {
 	 * in the client's Message Center. A local copy of this file will be made until the message is transmitted, at which
 	 * point the temporary file will be deleted.
 	 *
-	 * @param context  The Context from which this method was called.
 	 * @param content  A byte array of the file contents.
 	 * @param mimeType The mime type of the file.
 	 */
-	public static void sendAttachmentFile(Context context, byte[] content, String mimeType) {
+	public static void sendAttachmentFile(byte[] content, String mimeType) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			ByteArrayInputStream is = null;
 			try {
@@ -826,7 +840,7 @@ public class Apptentive {
 			attachmentStoredFiles.add(storedFile);
 
 			message.setAssociatedFiles(attachmentStoredFiles);
-				ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
+			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 		} catch (Exception e) {
 			Log.w("Error sending attachment file.", e);
 			MetricModule.sendError(e, null, null);
@@ -890,9 +904,9 @@ public class Apptentive {
 	}
 
 	/**
-	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
-	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
+	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 * @deprecated Use {@link #canShowInteraction(String)}() instead. The behavior is identical. Only the name has changed.
 	 */
@@ -906,9 +920,9 @@ public class Apptentive {
 	 * result in the display of an  Interaction. This is useful if you need to know whether an Interaction will be
 	 * displayed before you create a UI Button, etc.
 	 *
-	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
-	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
+	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
+	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 */
 	public static synchronized boolean canShowInteraction(String event) {

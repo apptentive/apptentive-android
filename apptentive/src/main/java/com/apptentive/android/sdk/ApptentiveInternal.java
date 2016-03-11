@@ -136,7 +136,7 @@ public class ApptentiveInternal {
 	 * Create a new or return a existing thread-safe instance of the Apptentive SDK. If this
 	 * or any other {@link #getInstance()} has already been called in the application's lifecycle, the
 	 * API key will be ignored and the current instance will be returned.
-	 *
+	 * <p/>
 	 * This will be called from the application's onCreate(), before any other application objects have been
 	 * created. Since the time spent in this function directly impacts the performance of starting the first activity,
 	 * service, or receiver in the hosting app's process, the initialization of Apptentive is deferred to the first time
@@ -200,6 +200,7 @@ public class ApptentiveInternal {
 	/**
 	 * Use this method to set or clear the internal state (pass in null)
 	 * Note: designed to be used for unit testing only
+	 *
 	 * @param instance the internal instance to be set to
 	 */
 	public static void setInstance(ApptentiveInternal instance) {
@@ -210,13 +211,14 @@ public class ApptentiveInternal {
 	/**
 	 * Use this method to set or clear the internal app context (pass in null)
 	 * Note: designed to be used for unit testing only
-	 * @param c the new application context to be set to
+	 *
+	 * @param appContext the new application context to be set to
 	 */
-	public static void setApplicationContext(Context c) {
+	public static void setApplicationContext(Context appContext) {
 		synchronized (ApptentiveInternal.class) {
 			ApptentiveInternal internal = ApptentiveInternal.getInstance();
 			if (internal != null) {
-				internal.appContext = c;
+				internal.appContext = appContext;
 			}
 		}
 	}
@@ -260,11 +262,11 @@ public class ApptentiveInternal {
 	}
 
 	public Resources.Theme getApptentiveTheme() {
-			return apptentiveTheme;
+		return apptentiveTheme;
 	}
 
 	public int getDefaultStatusbarColor() {
-			return statusBarColorDefault;
+		return statusBarColorDefault;
 	}
 
 	public String getApptentiveConversationToken() {
