@@ -30,7 +30,8 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	 * @param params Instrumentation arguments.
 	 */
 	void initialize(Bundle params) {
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext());
+		ApptentiveInternal.getInstance().setMinimumLogLevel(Log.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {
@@ -49,8 +50,8 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 
 	protected void resetDevice() {
 		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		ApptentiveInternal.getCodePointStore(getTargetContext()).clear(getTargetContext());
-		ApptentiveInternal.getInteractionManager(getTargetContext()).clear(getTargetContext());
+		ApptentiveInternal.getInstance().getCodePointStore().clear();
+		ApptentiveInternal.getInstance().getInteractionManager().clear();
 	}
 
 	protected static void sleep(long millis) {

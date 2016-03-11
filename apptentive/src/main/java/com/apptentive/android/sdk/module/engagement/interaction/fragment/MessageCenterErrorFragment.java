@@ -47,7 +47,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 		if (!hasLaunched) {
 			hasLaunched = true;
 			if (wasLastAttemptServerError(getContext()) ||
-					Util.isNetworkConnectionPresent(getContext().getApplicationContext())) {
+					Util.isNetworkConnectionPresent()) {
 				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
 			} else {
 				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
@@ -59,7 +59,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		root = themedInflater.inflate(R.layout.apptentive_message_center_error, container, false);
@@ -70,21 +70,21 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 	@Override
 	public void onResume() {
-		ApptentiveInternal.getInstance(getContext()).addConfigUpdateListener(this);
+		ApptentiveInternal.getInstance().addConfigUpdateListener(this);
 		super.onResume();
 		updateStatus();
 	}
 
 	@Override
 	public void onPause() {
-		ApptentiveInternal.getInstance(getContext()).removeConfigUpdateListener(this);
+		ApptentiveInternal.getInstance().removeConfigUpdateListener(this);
 		super.onPause();
 	}
 
 	@Override
 	public void onConfigurationUpdated(boolean successful) {
-		if (successful && Apptentive.canShowMessageCenter(getContext())) {
-			ApptentiveInternal.getInstance(getContext()).showMessageCenterInternal(getActivity(), null);
+		if (successful && Apptentive.canShowMessageCenter()) {
+			ApptentiveInternal.getInstance().showMessageCenterInternal(getActivity(), null);
 			transit();
 		} else {
 			updateStatus();
@@ -104,7 +104,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 	private void updateStatus() {
 		if (wasLastAttemptServerError(getContext()) ||
-				Util.isNetworkConnectionPresent(getContext().getApplicationContext())) {
+				Util.isNetworkConnectionPresent()) {
 			progress.setVisibility(View.VISIBLE);
 			((ImageView) root.findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_icon_server_error);
 			((TextView) root.findViewById(R.id.message)).setText(R.string.apptentive_message_center_server_error);

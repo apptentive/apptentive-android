@@ -46,11 +46,11 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 		String errorMessage = activity.getResources().getString(R.string.apptentive_rating_error);
 		boolean showingDialog = false;
 		try {
-			IRatingProvider ratingProvider = ApptentiveInternal.getInstance(getContext()).getRatingProvider();
+			IRatingProvider ratingProvider = ApptentiveInternal.getInstance().getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
 
-			String appDisplayName = Configuration.load(activity).getAppDisplayName();
-			Map<String, String> ratingProviderArgs = ApptentiveInternal.getInstance(getContext()).getRatingProviderArgs();
+			String appDisplayName = Configuration.load().getAppDisplayName();
+			Map<String, String> ratingProviderArgs = ApptentiveInternal.getInstance().getRatingProviderArgs();
 			Map<String, String> finalRatingProviderArgs;
 			if (ratingProviderArgs != null) {
 				finalRatingProviderArgs = new HashMap<String, String>(ratingProviderArgs);
@@ -91,7 +91,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 	private void displayError(final Activity activity, String message) {
 		Log.e(message);
-		final Context contextThemeWrapper = new ContextThemeWrapper(activity, ApptentiveInternal.getApptentiveTheme(getContext()));
+		final Context contextThemeWrapper = new ContextThemeWrapper(activity, ApptentiveInternal.getInstance().getApptentiveTheme());
 		final AlertDialog alertDialog = new AlertDialog.Builder(contextThemeWrapper).create();
 		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
 		alertDialog.setMessage(message);

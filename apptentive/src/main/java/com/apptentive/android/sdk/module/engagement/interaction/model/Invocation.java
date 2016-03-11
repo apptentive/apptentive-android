@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,12 +32,12 @@ public class Invocation extends JSONObject {
 		return null;
 	}
 
-	public boolean isCriteriaMet(Context context) {
+	public boolean isCriteriaMet() {
 		try {
 			if (!isNull(KEY_CRITERIA)) {
 				JSONObject criteriaObject = getJSONObject(KEY_CRITERIA);
 				InteractionCriteria criteria = new InteractionCriteria(criteriaObject.toString());
-				return criteria.isMet(context);
+				return criteria.isMet();
 			}
 		} catch (JSONException e) {
 			// Ignore

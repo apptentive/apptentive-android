@@ -39,7 +39,7 @@ public class RatingDialogInteraction extends Interaction {
 		if (configuration != null && !configuration.isNull(KEY_BODY)) {
 			return configuration.optString(KEY_BODY, null);
 		}
-		return String.format(context.getResources().getString(R.string.apptentive_rating_message_fs), Configuration.load(context).getAppDisplayName());
+		return String.format(context.getResources().getString(R.string.apptentive_rating_message_fs), Configuration.load().getAppDisplayName());
 	}
 
 	public String getRateText(Context context) {
@@ -47,7 +47,7 @@ public class RatingDialogInteraction extends Interaction {
 		if (configuration != null && !configuration.isNull(KEY_RATE_TEXT)) {
 			return configuration.optString(KEY_RATE_TEXT, null);
 		}
-		return String.format(context.getResources().getString(R.string.apptentive_rate_this_app), Configuration.load(context).getAppDisplayName());
+		return String.format(context.getResources().getString(R.string.apptentive_rate_this_app), Configuration.load().getAppDisplayName());
 	}
 
 	public String getRemindText() {

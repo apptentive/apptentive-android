@@ -6,10 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
-
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.EventStore;
 
 /**
@@ -17,11 +14,11 @@ import com.apptentive.android.sdk.storage.EventStore;
  */
 public class EventManager {
 
-	private static EventStore getEventStore(Context context) {
-		return ApptentiveInternal.getApptentiveDatabase(context);
+	private static EventStore getEventStore() {
+		return ApptentiveInternal.getInstance().getApptentiveDatabase();
 	}
 
-	public static void sendEvent(Context context, Event event) {
-		getEventStore(context).addPayload(context, event);
+	public static void sendEvent(Event event) {
+		getEventStore().addPayload(event);
 	}
 }

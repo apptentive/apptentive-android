@@ -162,9 +162,9 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 
 		badgeSize = SIZE_NORMAL;
 		badgeTextColor = Color.BLACK;
-		MessageManager mgr = ApptentiveInternal.getMessageManager(context);
+		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 		if (mgr != null) {
-			unreadMsgCounter = mgr.getUnreadMessageCount(context);
+			unreadMsgCounter = mgr.getUnreadMessageCount();
 		} else {
 			unreadMsgCounter = 0;
 		}

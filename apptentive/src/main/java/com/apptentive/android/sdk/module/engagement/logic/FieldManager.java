@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
-import android.content.Context;
-
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
@@ -27,16 +25,16 @@ import java.math.BigDecimal;
  */
 public class FieldManager {
 
-	public static boolean exists(Context context, String query) {
-		return getValue(context, query) != null;
+	public static boolean exists(String query) {
+		return getValue(query) != null;
 	}
 
-	public static Comparable getValue(Context context, String query) {
-		Object rawValue = doGetValue(context, query);
+	public static Comparable getValue(String query) {
+		Object rawValue = doGetValue(query);
 		return (Comparable) ClauseParser.parseValue(rawValue);
 	}
 
-	public static Object doGetValue(Context context, String query) {
+	public static Object doGetValue(String query) {
 		query = query.trim();
 		String[] tokens = query.split("/");
 		QueryPart topLevelQuery = QueryPart.parse(tokens[0]);
@@ -46,7 +44,7 @@ public class FieldManager {
 				QueryPart applicationQuery = QueryPart.parse(tokens[1]);
 				switch (applicationQuery) {
 					case version:
-						int version = Util.getAppVersionCode(context);
+						int version = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
 						if (version == -1) {
 							version = 0; // Default
 						}
@@ -68,7 +66,7 @@ public class FieldManager {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
 					case version:
-						return VersionHistoryStore.isUpdate(context, VersionHistoryStore.Selector.build);
+						return VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.build);
 					default:
 						break;
 				}
@@ -78,9 +76,9 @@ public class FieldManager {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
 					case total:
-						return VersionHistoryStore.getTimeAtInstall(context, VersionHistoryStore.Selector.total);
+						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.total);
 					case version:
-						return VersionHistoryStore.getTimeAtInstall(context, VersionHistoryStore.Selector.build);
+						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.build);
 				}
 				return new Apptentive.DateTime(Util.currentTimeSeconds());
 			}
@@ -95,10 +93,10 @@ public class FieldManager {
 						QueryPart queryPart2 = QueryPart.parse(tokens[3]);
 						switch (queryPart2) {
 							case total: // Get total for all versions of the app.
-								return new BigDecimal(ApptentiveInternal.getCodePointStore(context).getTotalInvokes(isInteraction, name));
+								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getTotalInvokes(isInteraction, name));
 							case version:
-								String appVersion = String.valueOf(Util.getAppVersionCode(context));
-								return new BigDecimal(ApptentiveInternal.getCodePointStore(context).getBuildInvokes(isInteraction, name, appVersion));
+								String appVersion = String.valueOf(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()));
+								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(isInteraction, name, appVersion));
 							default:
 								break;
 						}
@@ -106,7 +104,7 @@ public class FieldManager {
 						QueryPart queryPart3 = QueryPart.parse(tokens[3]);
 						switch (queryPart3) {
 							case total:
-								Double lastInvoke = ApptentiveInternal.getCodePointStore(context).getLastInvoke(isInteraction, name);
+								Double lastInvoke = ApptentiveInternal.getInstance().getCodePointStore().getLastInvoke(isInteraction, name);
 								if (lastInvoke != null) {
 									return new Apptentive.DateTime(lastInvoke);
 								}
@@ -120,7 +118,7 @@ public class FieldManager {
 			}
 			case person: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Person person = PersonManager.getStoredPerson(context);
+				Person person = PersonManager.getStoredPerson();
 				if (person == null) {
 					return null;
 				}
@@ -143,7 +141,7 @@ public class FieldManager {
 			}
 			case device: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Device device = DeviceManager.getStoredDevice(context);
+				Device device = DeviceManager.getStoredDevice();
 				if (device == null) {
 					return null;
 				}

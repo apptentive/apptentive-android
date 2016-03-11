@@ -196,7 +196,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public synchronized void addPayload(Context context, Payload... payloads) {
+	public synchronized void addPayload(Payload... payloads) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -210,9 +210,9 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db.setTransactionSuccessful();
 			db.endTransaction();
 
-			PayloadSendWorker worker = ApptentiveInternal.getPayloadWorker(context);
+			PayloadSendWorker worker = ApptentiveInternal.getInstance().getPayloadWorker();
 			if (worker != null) {
-				worker.setCanRunPayloadThread(context, true);
+				worker.setCanRunPayloadThread(true);
 			}
 		} catch (SQLException sqe) {
 			Log.e("addPayload EXCEPTION: " + sqe.getMessage());
@@ -247,7 +247,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized Payload getOldestUnsentPayload(Context appContext) {
+	public synchronized Payload getOldestUnsentPayload() {
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -350,7 +350,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized List<ApptentiveMessage> getAllMessages(Context appContext) {
+	public synchronized List<ApptentiveMessage> getAllMessages() {
 		List<ApptentiveMessage> apptentiveMessages = new ArrayList<ApptentiveMessage>();
 		SQLiteDatabase db = null;
 		Cursor cursor = null;

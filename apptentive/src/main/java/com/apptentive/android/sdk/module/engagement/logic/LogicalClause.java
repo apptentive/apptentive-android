@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
-import android.content.Context;
 
 import com.apptentive.android.sdk.Log;
 
@@ -55,11 +54,11 @@ public class LogicalClause implements Clause {
 	}
 
 	@Override
-	public boolean evaluate(Context context) {
+	public boolean evaluate() {
 		Log.v("  - <%s>", operator.name());
 		if (operator == LogicalOperator.$and) {
 			for (Clause clause : children) {
-				boolean ret = clause.evaluate(context);
+				boolean ret = clause.evaluate();
 				Log.v("        - => %b", ret);
 				if (!ret) {
 					Log.v("  - </%s>", operator.name());
@@ -70,7 +69,7 @@ public class LogicalClause implements Clause {
 			return true;
 		} else if (operator == LogicalOperator.$or) {
 			for (Clause clause : children) {
-				boolean ret = clause.evaluate(context);
+				boolean ret = clause.evaluate();
 				Log.v("        - => %b", ret);
 				if (ret) {
 					Log.v("  - </%s>", operator.name());
@@ -84,7 +83,7 @@ public class LogicalClause implements Clause {
 				throw new IllegalArgumentException("$not condition must have exactly one child, has ." + children.size());
 			}
 			Clause clause = children.get(0);
-			boolean ret = clause.evaluate(context);
+			boolean ret = clause.evaluate();
 			Log.v("        - => %b", ret);
 			Log.v("  - </%s>", operator.name());
 			return !ret;

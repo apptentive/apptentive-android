@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -22,7 +21,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -48,10 +46,9 @@ public class PayloadSendWorker {
 	}
 
 	public synchronized  void runPayloadSendRunnable(boolean expect,
-																																								boolean createNew,
-																																								Context context) {
-		if (expect && createNew && context != null && payloadSendRunnable == null) {
-			payloadSendRunnable = new PayloadSendRunnable(context);
+																																								boolean createNew) {
+		if (expect && createNew && payloadSendRunnable == null) {
+			payloadSendRunnable = new PayloadSendRunnable();
 		} else if (!expect) {
 			payloadSendRunnable = null;
 			uiHandler = null;
@@ -64,7 +61,7 @@ public class PayloadSendWorker {
 					public void handleMessage(android.os.Message msg) {
 						switch (msg.what) {
 							case UI_THREAD_MESSAGE_RETRY:
-								runPayloadSendRunnable(true, true, (Context) msg.obj);
+								runPayloadSendRunnable(true, true);
 								break;
 							default:
 								super.handleMessage(msg);
@@ -74,20 +71,18 @@ public class PayloadSendWorker {
 			}
 			if (threadCanRun.get() && !threadRunning.get()) {
 				threadRunning.set(true);
-				ApptentiveInternal.getInstance(context).runOnWorkerThread(payloadSendRunnable);
+				ApptentiveInternal.getInstance().runOnWorkerThread(payloadSendRunnable);
 			}
 		}
 	}
 
-	private PayloadStore getPayloadStore(Context context) {
-		return ApptentiveInternal.getApptentiveDatabase(context);
+	private PayloadStore getPayloadStore() {
+		return ApptentiveInternal.getInstance().getApptentiveDatabase();
 	}
 
 	private class PayloadSendRunnable implements Runnable {
-		private WeakReference<Context> contextRef;
 
-		public PayloadSendRunnable(Context appContext) {
-			contextRef = new WeakReference<Context>(appContext);
+		public PayloadSendRunnable() {
 		}
 
 		public void run() {
@@ -95,33 +90,28 @@ public class PayloadSendWorker {
 				Log.v("Started %s", toString());
 
 				while (appInForeground.get()) {
-					if (contextRef.get() == null) {
-						threadRunning.set(false);
-						return;
-					}
-					MessageManager mgr = ApptentiveInternal.getMessageManager(contextRef.get());
+					MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
-
-					PayloadStore db = getPayloadStore(contextRef.get());
-					if (TextUtils.isEmpty(ApptentiveInternal.getApptentiveConversationToken(contextRef.get()))){
+					PayloadStore db = getPayloadStore();
+					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getApptentiveConversationToken())){
 						Log.i("No conversation token yet.");
 						if (mgr != null) {
 							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						}
-						retryLater(NO_TOKEN_SLEEP, contextRef.get());
+						retryLater(NO_TOKEN_SLEEP);
 						break;
 					}
-					if (!Util.isNetworkConnectionPresent(contextRef.get())) {
+					if (!Util.isNetworkConnectionPresent()) {
 						Log.d("Can't send payloads. No network connection.");
 						if (mgr != null) {
 							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
 						}
-						retryLater(NO_CONNECTION_SLEEP_TIME, contextRef.get());
+						retryLater(NO_CONNECTION_SLEEP_TIME);
 						break;
 					}
 					Log.v("Checking for payloads to send.");
 					Payload payload;
-					payload = db.getOldestUnsentPayload(contextRef.get());
+					payload = db.getOldestUnsentPayload();
 					if (payload == null) {
 						// There is no payload in the db. Terminate the thread
 						threadCanRun.set(false);
@@ -137,29 +127,29 @@ public class PayloadSendWorker {
 							if (mgr != null) {
 								mgr.onResumeSending();
 							}
-							response = ApptentiveClient.postMessage(contextRef.get(), (ApptentiveMessage) payload);
+							response = ApptentiveClient.postMessage((ApptentiveMessage) payload);
 							if (mgr != null) {
-								mgr.onSentMessage(contextRef.get(), (ApptentiveMessage) payload, response);
+								mgr.onSentMessage((ApptentiveMessage) payload, response);
 							}
 							break;
 						case event:
-							response = ApptentiveClient.postEvent(contextRef.get(), (Event) payload);
+							response = ApptentiveClient.postEvent((Event) payload);
 							break;
 						case device:
-							response = ApptentiveClient.putDevice(contextRef.get(), (Device) payload);
-							DeviceManager.onSentDeviceInfo(contextRef.get());
+							response = ApptentiveClient.putDevice((Device) payload);
+							DeviceManager.onSentDeviceInfo();
 							break;
 						case sdk:
-							response = ApptentiveClient.putSdk(contextRef.get(), (Sdk) payload);
+							response = ApptentiveClient.putSdk((Sdk) payload);
 							break;
 						case app_release:
-							response = ApptentiveClient.putAppRelease(contextRef.get(), (AppRelease) payload);
+							response = ApptentiveClient.putAppRelease((AppRelease) payload);
 							break;
 						case person:
-							response = ApptentiveClient.putPerson(contextRef.get(), (Person) payload);
+							response = ApptentiveClient.putPerson((Person) payload);
 							break;
 						case survey:
-							response = ApptentiveClient.postSurvey(contextRef.get(), (SurveyResponse) payload);
+							response = ApptentiveClient.postSurvey((SurveyResponse) payload);
 							break;
 						default:
 							Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
@@ -182,17 +172,17 @@ public class PayloadSendWorker {
 								if (mgr != null) {
 									mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 								}
-								retryLater(NO_CONNECTION_SLEEP_TIME, contextRef.get());
+								retryLater(NO_CONNECTION_SLEEP_TIME);
 								break;
 							} else {
-								retryLater(SERVER_ERROR_SLEEP_TIME, contextRef.get());
+								retryLater(SERVER_ERROR_SLEEP_TIME);
 								break;
 							}
 						}
 					}
 				}
 			} catch (Throwable throwable) {
-				MetricModule.sendError(contextRef.get(), throwable, null, null);
+				MetricModule.sendError(throwable, null, null);
 			} finally
 			{
 				Log.v("Stopping PayloadSendThread.");
@@ -200,25 +190,25 @@ public class PayloadSendWorker {
 			}
 		}
 
-		private void retryLater(int millis, Context context) {
-			Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_RETRY, context);
+		private void retryLater(int millis) {
+			Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_RETRY);
 			uiHandler.removeMessages(UI_THREAD_MESSAGE_RETRY);
 			uiHandler.sendMessageDelayed(msg, millis);
 		}
 	}
 
-	public void appWentToForeground(Context context) {
+	public void appWentToForeground() {
 		appInForeground.set(true);
-		runPayloadSendRunnable(true, true, context);
+		runPayloadSendRunnable(true, true);
 	}
 
 	public void appWentToBackground() {
 		appInForeground.set(false);
-		runPayloadSendRunnable(true, false, null);
+		runPayloadSendRunnable(true, false);
 	}
 
-	public void setCanRunPayloadThread(Context context, boolean b) {
+	public void setCanRunPayloadThread(boolean b) {
 		threadCanRun.set(b);
-		runPayloadSendRunnable(true, true, context);
+		runPayloadSendRunnable(true, true);
 	}
 }

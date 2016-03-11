@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.content.Context;
 import com.apptentive.android.sdk.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +22,7 @@ public class Targets extends JSONObject {
 		super(json);
 	}
 
-	public String getApplicableInteraction(Context context, String eventLabel) {
+	public String getApplicableInteraction(String eventLabel) {
 		JSONArray invocations = optJSONArray(eventLabel);
 		if (invocations != null) {
 			for (int i = 0; i < invocations.length(); i++) {
@@ -31,7 +30,7 @@ public class Targets extends JSONObject {
 				if (invocationObject != null) {
 					try {
 						Invocation invocation = new Invocation(invocationObject.toString());
-						if (invocation.isCriteriaMet(context)) {
+						if (invocation.isCriteriaMet()) {
 							return invocation.getInteractionId();
 						}
 					} catch (JSONException e) {
