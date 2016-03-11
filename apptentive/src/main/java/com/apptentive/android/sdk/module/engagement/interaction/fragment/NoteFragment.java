@@ -156,7 +156,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
 								if (invokedInteraction != null) {
-									EngagementModule.launchInteraction(getContext(), invokedInteraction);
+									EngagementModule.launchInteraction(getActivity(), invokedInteraction);
 								}
 								transit();
 
