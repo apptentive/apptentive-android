@@ -185,13 +185,13 @@ public class ApptentiveInternal {
 
 	/**
 	 * Retrieve the existing instance of the Apptentive class. If {@link Apptentive#register(Application)} is
-	 * not called prior to this, it may return null instance
+	 * not called prior to this, it will return null; Otherwise, it will return the singleton instance initialized.
 	 *
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or null
 	 */
 	public static ApptentiveInternal getInstance() {
-		// Lazy initialization, only once for each application launch
-		if (isApptentiveInitialized.compareAndSet(false, true)) {
+		// Lazy initialization, only once for each application launch when getInstance() is called for the 1st time
+		if (sApptentiveInternal != null && isApptentiveInitialized.compareAndSet(false, true)) {
 			sApptentiveInternal.init();
 		}
 		return sApptentiveInternal;
