@@ -372,16 +372,9 @@ public class MessageManager {
 	}
 
 	@Deprecated
-	public static void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
-		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-		if (mgr != null) {
-			mgr.setHostUnreadMessagesListenerInternal(newlistener);
-		}
-	}
-
-	public void setHostUnreadMessagesListenerInternal(UnreadMessagesListener newlistener) {
+	public void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+		clearHostUnreadMessagesListeners();
 		if (newlistener != null) {
-			clearHostUnreadMessagesListeners();
 			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
 		}
 	}
