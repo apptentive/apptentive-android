@@ -31,27 +31,9 @@
 
     <!-- TODO: Refactor colors below here -->
 
-    <!-- Apptentive Material DEFAULT text / items colors -->
-    <color name="apptentive_material_toolbar_foreground_secondary">@color/icons_secondary</color>
-
-    <!-- Material DEFAULT text / items colors -->
-    <color name="icons">#FFFFFF</color>
-
-    <!-- 70% von #FFFFFF -> B3 -->
-    <color name="icons_secondary">#B3FFFFFF</color>
-
-    <!-- 26% von #000000 -> 42 -->
-    <color name="hint_text">#42000000</color>
-    <!-- 12% von #000000 -> 1F -->
-    <color name="divider">#1F000000</color>
-
-    <color name="disabled_text">#B8B8B8</color>
-
-    <color name="disabled_icon">#DCDCDF</color>
-
-    <color name="apptentive_material_disabled_text">@color/disabled_text</color>
-    <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>
-    <color name="apptentive_material_divider">@color/divider</color>
+    <color name="apptentive_material_disabled_text">#B8B8B8</color>
+    <color name="apptentive_material_disabled_icon">#DCDCDF</color>
+    <color name="apptentive_material_divider">#1F000000</color>
     <!-- Apptentive Material DEFAULT drawer colors -->
     <color name="apptentive_material_selected_text">#F44336</color>
     <color name="apptentive_material_dark_disabled_icon">#42FFFFFF</color>
