@@ -612,10 +612,7 @@ public class Apptentive {
 	 * @return true if Message Center was shown, else false.
 	 */
 	public static boolean showMessageCenter(Context context) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return showMessageCenter(context, null);
-		}
-		return false;
+		return showMessageCenter(context, null);
 	}
 
 	/**
@@ -655,14 +652,20 @@ public class Apptentive {
 	}
 
 	/**
-	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
+	 * Set one and only listener to be notified when the number of unread messages in the Message Center changes.
+	 * if the app calls this method to set up a custom listener, the apptentive unread message badge, also an UnreadMessagesListener,
+	 * won't get notification. Please use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate.
-	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
+	 * @param listener An UnreadMessageListener that you instantiate. Pass null to remove existing listener.
+	 *                  Do not pass in an anonymous class, such as setUnreadMessagesListener(new UnreadMessagesListener() {...}).
+	 *                 Instead, create your listener as an instance variable and pass that in. This
+	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		MessageManager.setHostUnreadMessagesListener(listener);
+		if (ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
+		}
 	}
 
 	/**
@@ -935,8 +938,12 @@ public class Apptentive {
 
 	/**
 	 * Pass in a listener. The listener will be called whenever a survey is finished.
+	 * Do not pass in an anonymous class, such as setOnSurveyFinishedListener(new OnSurveyFinishedListener() {...}).
+	 * Instead, create your listener as an instance variable and pass that in. This allows us to keep
+	 * a weak reference to avoid memory leaks.
 	 *
-	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener to call when the survey is finished.
+	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener
+	 *                  to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance();
