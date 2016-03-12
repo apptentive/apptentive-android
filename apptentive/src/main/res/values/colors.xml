@@ -53,53 +53,18 @@
     <color name="apptentive_material_disabled_icon">@color/disabled_icon</color>
     <color name="apptentive_material_divider">@color/divider</color>
     <!-- Apptentive Material DEFAULT drawer colors -->
-    <color name="apptentive_material_selected">#E8E8E8</color>
     <color name="apptentive_material_selected_text">#F44336</color>
-    <color name="apptentive_material_header_selection_text">#FFF</color>
-    <color name="apptentive_material_pressed_highlight">#1F000033</color>
-
-    <!-- Apptentive Material DEFAULT DARK colors -->
-    <color name="apptentive_material_dark_background">#303030</color>
-    <!-- Apptentive Material DEFAULT DARK text / items colors -->
-    <color name="apptentive_material_dark_toolbar_foreground">#000</color>
-    <color name="apptentive_material_dark_primary_text">#DEFFFFFF</color>
-    <color name="apptentive_material_dark_primary_icon">#8AFFFFFF</color>
-    <color name="apptentive_material_dark_secondary_text">#8AFFFFFF</color>
-    <color name="apptentive_material_dark_hint_text">#42FFFFFF</color>
-    <color name="apptentive_material_dark_disabled_text">#42FFFFFF</color>
     <color name="apptentive_material_dark_disabled_icon">#42FFFFFF</color>
-    <color name="apptentive_material_dark_divider">#1FFFFFFF</color>
-    <!-- Apptentive Material DEFAULT DARK drawer colors -->
-    <color name="apptentive_material_dark_selected">#202020</color>
-    <color name="apptentive_material_dark_selected_text">#F44336</color>
-    <color name="apptentive_material_dark_header_selection_text">#FFF</color>
-    <color name="apptentive_material_dark_pressed_highlight">#1F000033</color>
-
 
     <color name="apptentive_transparency">#00000000</color>
     <color name="apptentive_white">#FFFFFF</color>
-    <color name="apptentive_black">#000000</color>
     <color name="apptentive_red">#DC2636</color>
 
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
     <color name="apptentive_message_center_incoming_background">#F5F5F5</color>
 
 
-    <color name="apptentive_message_auto_separator">#BBBBBB</color>
-
-    <color name="apptentive_dialog_background">@color/apptentive_white</color>
-    <color name="apptentive_dialog_form_text">@color/apptentive_black</color>
-
     <color name="apptentive_activity_frame">#99000000</color>
-    <color name="apptentive_activity_background">@color/apptentive_white</color>
 
-    <color name="apptentive_survey_separator">#56B8D8</color>
     <color name="apptentive_survey_question_separator">#DDDDDD</color>
-
-    <color name="apptentive_branding_text">@color/apptentive_black</color>
-
-    <color name="apptentive_about_title">@color/apptentive_black</color>
-    <color name="apptentive_about_text">@color/apptentive_black</color>
-    <color name="apptentive_about_link">#004444</color>
-    <color name="apptentive_about_version">#AAAAAA</color>
 </resources>

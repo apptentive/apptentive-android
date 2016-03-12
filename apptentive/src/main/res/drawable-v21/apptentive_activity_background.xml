@@ -8,6 +8,6 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
-    <solid android:color="@color/apptentive_card_view_background"/>
+    <solid android:color="?attr/apptentiveCardViewBackground"/>
     <corners android:radius="3dp"/>
 </shape>

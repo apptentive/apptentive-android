@@ -20,11 +20,7 @@
         <attr name="apptentive_material_disabled_icon" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />
 
-        <attr name="apptentive_material_selected" format="color|reference" />
         <attr name="apptentive_material_selected_text" format="color|reference" />
-        <!-- header attrs-->
-        <attr name="apptentive_material_header_selection_text" format="color|reference" />
-        <attr name="apptentive_material_pressed_highlight" format="color|reference" />
     </declare-styleable>
 
 

@@ -17,7 +17,7 @@
         <item name="colorPrimary">@color/apptentive_red</item>
     </style>
 
-<style name="foo" parent="Widget.Design.Snackbar">
+    <style name="foo" parent="Widget.Design.Snackbar">
     </style>
     <!-- Base Theme-->
     <style name="ApptentiveBaseVersionBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -48,15 +48,7 @@
         <item name="apptentive_material_disabled_icon">@color/apptentive_material_disabled_icon
         </item>
         <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
-        <item name="apptentive_material_selected">@color/apptentive_material_selected</item>
-        <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text
-        </item>
-        <item name="apptentive_material_header_selection_text">
-            @color/apptentive_material_header_selection_text
-        </item>
-        <item name="apptentive_material_pressed_highlight">
-            @color/apptentive_material_pressed_highlight
-        </item>
+        <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
 
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
@@ -289,12 +281,18 @@
         <item name="apptentive_counterColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Apptentive.Widget.ImageButton" parent="android:Widget.ImageButton"/>
+    <style name="Apptentive.Widget.ImageButton" parent="Widget.AppCompat.ImageButton"/>
 
     <style name="Apptentive.Widget.ImageButton.Info">
         <item name="android:contentDescription">@string/apptentive_about_title</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:src">@drawable/apptentive_ic_info</item>
+    </style>
+
+    <style name="Apptentive.Widget.ImageButton.Composing">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:tint">?attr/colorAccent</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 
     <style name="Apptentive.Widget.ImageButton.FloatingActionButton">
