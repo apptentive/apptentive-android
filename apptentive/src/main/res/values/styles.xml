@@ -239,28 +239,6 @@
         <item name="android:gravity">start|bottom</item>
     </style>
 
-    <style name="Apptentive.Style.TextView.ApptentiveInteractionPositiveButton">
-        <item name="android:background">@drawable/apptentive_dialog_positive_button</item>
-        <item name="android:textColor">@drawable/apptentive_dialog_positive_button_text</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.ApptentiveInteractionNegativeButton">
-        <item name="android:background">@drawable/apptentive_dialog_negative_button</item>
-        <item name="android:textColor">@drawable/apptentive_dialog_negative_button_text</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="Apptentive.Style.TextView.ApptentiveInteractionDialogBody">
-        <item name="android:textColor">@color/apptentive_dialog_body_text</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:gravity">center_vertical|left</item>
-        <item name="android:autoLink">all</item>
-    </style>
-
     <style name="Apptentive.Style.TextView.EditText">
         <item name="android:inputType">textCapSentences</item>
         <item name="android:gravity">bottom|start</item>item>
@@ -290,56 +268,6 @@
         <item name="android:completionThreshold">1</item>
         <item name="android:singleLine">true</item>
         <item name="android:imeOptions">actionNext</item>
-    </style>
-
-<!--
-    <style name="Apptentive.Style.TextView.ApptentiveDialogTitle">
-        <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/apptentive_dialog_title_text</item>
-        <item name="android:gravity">left</item>
-    </style>
--->
-
-<!--
-    <style name="Apptentive.Style.TextView.ApptentiveDialogBody">
-        <item name="android:paddingTop">@dimen/apptentive_dialog_content_spacing</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/apptentive_dialog_body_text</item>
-        <item name="android:lineSpacingMultiplier">1.2</item>
-        <item name="android:gravity">left</item>
-    </style>
--->
-
-    <style name="Apptentive.Style.TextView.ApptentiveDialogButtonText">
-        <item name="android:paddingLeft">@dimen/apptentive_dialog_button_padding_left</item>
-        <item name="android:paddingRight">@dimen/apptentive_dialog_button_padding_right</item>
-        <item name="android:minWidth">@dimen/apptentive_dialog_button_visible_area_min_width</item>
-        <item name="android:minHeight">@dimen/apptentive_dialog_button_visible_area_min_height
-        </item>
-        <item name="android:background">@drawable/apptentive_dialog_button</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/apptentive_dialog_button_text</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/apptentive_dialog_button_text</item>
-    </style>
-
-    <style name="ApptentiveButtonClickArea">
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <style name="ApptentiveInteractionDialogTopArea">
-        <item name="android:background">@drawable/apptentive_dialog_top_area_background</item>
-    </style>
-
-    <style name="ApptentiveDialogBottomArea">
-        <item name="android:paddingTop">@dimen/apptentive_dialog_buttons_padding_top</item>
-        <item name="android:paddingBottom">@dimen/apptentive_dialog_buttons_padding_bottom</item>
-        <item name="android:paddingRight">12dp</item>
-        <item name="android:background">@drawable/apptentive_dialog_bottom_area_background</item>
-        <item name="android:gravity">center_vertical|right</item>
     </style>
 
     <style name="Apptentive.Style.Widget.AvatarView">
