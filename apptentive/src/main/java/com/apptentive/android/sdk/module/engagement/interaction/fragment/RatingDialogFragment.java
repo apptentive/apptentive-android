@@ -12,6 +12,7 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -19,7 +20,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInteraction> {
 
@@ -34,10 +34,8 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 		return ratingFragment;
 	}
 
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		// clone the inflater using the ContextThemeWrapper
@@ -55,7 +53,7 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 		bodyView.setText(body);
 
 		// Rate
-		ApptentiveDialogButton rateButton = (ApptentiveDialogButton) v.findViewById(R.id.rate);
+		Button rateButton = (Button) v.findViewById(R.id.rate);
 		String rate = interaction.getRateText(getContext());
 		rateButton.setText(rate);
 		rateButton.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +65,7 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 		});
 
 		// Remind
-		ApptentiveDialogButton remindButton = (ApptentiveDialogButton) v.findViewById(R.id.remind);
+		Button remindButton = (Button) v.findViewById(R.id.remind);
 		String remind = interaction.getRemindText();
 		if (remind != null) {
 			remindButton.setText(remind);
@@ -81,7 +79,7 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 		});
 
 		// Decline
-		ApptentiveDialogButton declineButton = (ApptentiveDialogButton) v.findViewById(R.id.decline);
+		Button declineButton = (Button) v.findViewById(R.id.decline);
 		String decline = interaction.getDeclineText();
 		if (decline != null) {
 			declineButton.setText(decline);
@@ -93,7 +91,6 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 				transit();
 			}
 		});
-
 		return v;
 	}
 

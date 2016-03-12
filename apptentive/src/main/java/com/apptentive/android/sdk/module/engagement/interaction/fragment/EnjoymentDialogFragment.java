@@ -12,14 +12,13 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> {
 
@@ -33,10 +32,8 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		return enjoymentFragment;
 	}
 
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		// clone the inflater using the ContextThemeWrapper
@@ -48,7 +45,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 
 		// No
 		String noText = interaction.getNoText();
-		ApptentiveDialogButton noButton = (ApptentiveDialogButton) v.findViewById(R.id.no);
+		Button noButton = (Button) v.findViewById(R.id.no);
 		if (noText != null) {
 			noButton.setText(noText);
 		}
@@ -62,7 +59,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 
 		// Yes
 		String yesText = interaction.getYesText();
-		ApptentiveDialogButton yesButton = (ApptentiveDialogButton) v.findViewById(R.id.yes);
+		Button yesButton = (Button) v.findViewById(R.id.yes);
 		if (yesText != null) {
 			yesButton.setText(yesText);
 		}

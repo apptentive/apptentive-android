@@ -33,10 +33,6 @@
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
     <attr name="apptentiveToolbarStyle" format="reference"/>
 
-    <declare-styleable name="ApptentiveDialogButton">
-        <attr name="apptentive_buttonText" format="string"/>
-    </declare-styleable>
-
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
         <attr name="apptentive_backgroundColor" format="color"/>
         <attr name="apptentive_progressBarColor" format="color"/>

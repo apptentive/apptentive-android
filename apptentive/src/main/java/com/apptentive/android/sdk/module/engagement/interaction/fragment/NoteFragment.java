@@ -12,6 +12,7 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +28,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
-import com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,10 +47,8 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 		return fragment;
 	}
 
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
 		// clone the inflater using the ContextThemeWrapper
@@ -70,7 +68,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 			body.setText(interaction.getBody());
 		}
 
-		LinearLayout bottomArea = (LinearLayout) v.findViewById(R.id.bottom_area);
+		LinearLayout bottomArea = (LinearLayout) v.findViewById(R.id.button_container);
 		Actions actionsObject = interaction.getActions();
 		boolean vertical;
 		List<Action> actions = null;
@@ -102,7 +100,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 			for (int i = 0; i < actions.size(); i++) {
 				final Action buttonAction = actions.get(i);
 				final int position = i;
-				ApptentiveDialogButton button = new ApptentiveDialogButton(getContext());
+				Button button = (Button) inflater.inflate(R.layout.apptentive_textmodal_interaction_button, bottomArea, false);
 				button.setText(buttonAction.getLabel());
 				switch (buttonAction.getType()) {
 					case dismiss:
@@ -169,7 +167,6 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 		} else {
 			bottomArea.setVisibility(View.GONE);
 		}
-
 		return v;
 	}
 
@@ -178,5 +175,4 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL);
 		return false;
 	}
-
 }

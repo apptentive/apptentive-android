@@ -132,6 +132,9 @@
     <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:minWidth">36dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
     </style>
 
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored"/>
@@ -289,13 +292,16 @@
         <item name="android:imeOptions">actionNext</item>
     </style>
 
+<!--
     <style name="Apptentive.Style.TextView.ApptentiveDialogTitle">
         <item name="android:textSize">@dimen/apptentive_dialog_title_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/apptentive_dialog_title_text</item>
         <item name="android:gravity">left</item>
     </style>
+-->
 
+<!--
     <style name="Apptentive.Style.TextView.ApptentiveDialogBody">
         <item name="android:paddingTop">@dimen/apptentive_dialog_content_spacing</item>
         <item name="android:textSize">@dimen/apptentive_dialog_body_text</item>
@@ -304,6 +310,7 @@
         <item name="android:lineSpacingMultiplier">1.2</item>
         <item name="android:gravity">left</item>
     </style>
+-->
 
     <style name="Apptentive.Style.TextView.ApptentiveDialogButtonText">
         <item name="android:paddingLeft">@dimen/apptentive_dialog_button_padding_left</item>
@@ -324,10 +331,6 @@
     </style>
 
     <style name="ApptentiveInteractionDialogTopArea">
-        <item name="android:paddingTop">@dimen/apptentive_dialog_content_padding_top</item>
-        <item name="android:paddingBottom">@dimen/apptentive_dialog_content_padding_bottom</item>
-        <item name="android:paddingLeft">@dimen/apptentive_dialog_content_padding_left</item>
-        <item name="android:paddingRight">@dimen/apptentive_dialog_content_padding_right</item>
         <item name="android:background">@drawable/apptentive_dialog_top_area_background</item>
     </style>
 
