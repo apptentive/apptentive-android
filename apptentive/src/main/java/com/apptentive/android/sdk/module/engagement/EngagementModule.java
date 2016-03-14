@@ -29,11 +29,11 @@ import java.util.Map;
 public class EngagementModule {
 
 	public static synchronized boolean engageInternal(Context context, String eventName) {
-		return engage(context, "com.apptentive", "app", null, eventName,  null, null, (ExtendedData[]) null);
+		return engage(context, "com.apptentive", "app", null, eventName, null, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Context context, String eventName, String data) {
-		return engage(context, "com.apptentive", "app", null, eventName,  data, null, (ExtendedData[]) null);
+		return engage(context, "com.apptentive", "app", null, eventName, data, null, (ExtendedData[]) null);
 	}
 
 	public static synchronized boolean engageInternal(Context context, Interaction interaction, String eventName) {
@@ -73,7 +73,7 @@ public class EngagementModule {
 		if (interaction != null) {
 			Log.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
-			intent.setClass(context, ApptentiveViewActivity.class);
+			intent.setClass(context.getApplicationContext(), ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
 			/* non-activity context start an Activity, but it requires that a new task be created.
@@ -82,7 +82,13 @@ public class EngagementModule {
 			 * ContentProvider, and BroadcastReceiver
 			 */
 			if (!(context instanceof Activity)) {
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+				// check if any activity from the hosting app is running
+				Activity activity = ApptentiveInternal.getInstance().getCurrentTaskStackBottomActivity();
+				if (activity != null) {
+					context = activity;
+				} else {
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+				}
 			}
 			context.startActivity(intent);
 		}

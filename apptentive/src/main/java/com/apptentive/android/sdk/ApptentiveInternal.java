@@ -103,6 +103,8 @@ public class ApptentiveInternal {
 
 	ExecutorService cachedExecutor;
 
+	private WeakReference<Activity> currentTaskStackBottomActivity;
+
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
 
@@ -241,6 +243,19 @@ public class ApptentiveInternal {
 		return appContext;
 	}
 
+	/* Get the last running activity from the current application, i.e. at the bottom of the task
+	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityDestroyed(Activity)}
+	 *
+	 * If Apptentive interaction is to be launched from a non-activity context, use the last running activity at
+	 * the bottom of the task.
+	 */
+	public Activity getCurrentTaskStackBottomActivity() {
+		if (currentTaskStackBottomActivity != null) {
+			return currentTaskStackBottomActivity.get();
+		}
+		return null;
+	}
+
 	public MessageManager getMessageManager() {
 		return messageManager;
 	}
@@ -353,6 +368,12 @@ public class ApptentiveInternal {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
+	public void onActivityStarted(Activity activity) {
+		if (activity != null) {
+			currentTaskStackBottomActivity = new WeakReference<Activity>(activity);
+		}
+	}
+
 	public void onActivityResumed(Activity activity) {
 		messageManager.setCurrentForgroundActivity(activity);
 
@@ -361,6 +382,15 @@ public class ApptentiveInternal {
 		syncDevice();
 		syncSdk();
 		syncPerson();
+	}
+
+	public void onActivityDestroyed(Activity activity) {
+		if (activity != null && currentTaskStackBottomActivity != null) {
+			Activity currentBottomActivity = currentTaskStackBottomActivity.get();
+			if (currentBottomActivity != null && currentBottomActivity == activity) {
+				currentTaskStackBottomActivity = null;
+			}
+		}
 	}
 
 	public void onAppEnterForeground() {

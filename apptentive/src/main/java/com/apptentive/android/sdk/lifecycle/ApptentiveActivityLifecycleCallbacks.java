@@ -57,6 +57,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityStarted(Activity activity) {
 		Log.e("onActivityStarted(%s)", activity.toString());
+		ApptentiveInternal.getInstance().onActivityStarted(activity);
 	}
 
 	@Override
@@ -131,6 +132,8 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityDestroyed(final Activity activity) {
 		Log.e("onActivityDestroyed(%s)", activity.toString());
+
+		ApptentiveInternal.getInstance().onActivityDestroyed(activity);
 
 		if (runningActivities.decrementAndGet() < 0) {
 			Log.a("Incorrect number of running Activities encountered. Resetting to 0.");
