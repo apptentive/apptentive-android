@@ -176,54 +176,64 @@
     </style>
 
     <style name="Apptentive.TextAppearance.Headline" parent="@android:style/TextAppearance.Large">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Headline.Inverse" parent="@android:style/TextAppearance.Large.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Title" parent="@android:style/TextAppearance.Medium">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Title.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Subheading.Primary" parent="@android:style/TextAppearance.Medium">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Subheading.Primary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Subheading.Secondary" parent="@android:style/TextAppearance.Medium">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Subheading.Secondary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
         <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Body" parent="@android:style/TextAppearance.Small">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeBody</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:gravity">start</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Caption" parent="@android:style/TextAppearance.Small">
+        <item name="android:typeface">?attr/apptentiveTypeface</item>
         <item name="android:textSize">?attr/apptentiveTextSizeCaption</item>
         <item name="android:gravity">start</item>
     </style>
@@ -233,8 +243,8 @@
     </style>
 
     <style name="Apptentive.Style.TextView">
-        <item name="android:typeface">?attr/apptentiveTypeface</item>
-        <item name="android:gravity">start</item>
+        <!--<item name="android:typeface">?attr/apptentiveTypeface</item>-->
+        <!--<item name="android:gravity">start</item>-->
     </style>
 
     <style name="Apptentive.Style.TextView.Composing"/>
