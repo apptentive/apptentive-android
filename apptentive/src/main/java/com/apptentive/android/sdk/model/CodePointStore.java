@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -63,17 +65,21 @@ public class CodePointStore {
 	public static final String KEY_VERSION = "version";
 	public static final String KEY_BUILD = "build";
 
-	public CodePointStore(Context context) {
-		store = loadFromPreference(context);
+	public CodePointStore() {
+
 	}
 
-	private void saveToPreference(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public void init() {
+		store = loadFromPreference();
+	}
+
+	private void saveToPreference() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, store.toString()).commit();
 	}
 
-	private JSONObject loadFromPreference(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private JSONObject loadFromPreference() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String json = prefs.getString(Constants.PREF_KEY_CODE_POINT_STORE, null);
 		try {
 			if (json != null) {
@@ -86,25 +92,26 @@ public class CodePointStore {
 	}
 
 
-	public synchronized void storeCodePointForCurrentAppVersion(Context context, String fullCodePoint) {
-		storeRecordForCurrentAppVersion(context, false, fullCodePoint);
+	public synchronized void storeCodePointForCurrentAppVersion(String fullCodePoint) {
+		storeRecordForCurrentAppVersion(false, fullCodePoint);
 	}
 
-	public synchronized void storeInteractionForCurrentAppVersion(Context context, String fullCodePoint) {
-		storeRecordForCurrentAppVersion(context, true, fullCodePoint);
+	public synchronized void storeInteractionForCurrentAppVersion(String fullCodePoint) {
+		storeRecordForCurrentAppVersion(true, fullCodePoint);
 	}
 
-	private void storeRecordForCurrentAppVersion(Context context, boolean isInteraction, String fullCodePoint) {
+	private void storeRecordForCurrentAppVersion(boolean isInteraction, String fullCodePoint) {
+		Context context = ApptentiveInternal.getInstance().getApplicationContext();
 		String version = Util.getAppVersionName(context);
 		int build = Util.getAppVersionCode(context);
-		storeRecord(context, isInteraction, fullCodePoint, version, build);
+		storeRecord(isInteraction, fullCodePoint, version, build);
 	}
 
-	public synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build) {
-		storeRecord(context, isInteraction, fullCodePoint, version, build, Util.currentTimeSeconds());
+	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String version, int build) {
+		storeRecord(isInteraction, fullCodePoint, version, build, Util.currentTimeSeconds());
 	}
 
-	public synchronized void storeRecord(Context context, boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
+	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
 		String buildString = String.valueOf(build);
 		if (fullCodePoint != null && version != null) {
 			try {
@@ -168,7 +175,7 @@ public class CodePointStore {
 				}
 				buildJson.put(buildString, existingBuildCount + 1);
 
-				saveToPreference(context);
+				saveToPreference();
 			} catch (JSONException e) {
 				Log.w("Unable to store code point %s.", e, fullCodePoint);
 			}
@@ -250,8 +257,8 @@ public class CodePointStore {
 		return "CodePointStore:  " + store.toString();
 	}
 
-	public void clear(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public void clear() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).commit();
 		store = new JSONObject();
 	}

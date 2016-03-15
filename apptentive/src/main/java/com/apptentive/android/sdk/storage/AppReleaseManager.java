@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
@@ -22,14 +24,14 @@ import org.json.JSONException;
  */
 public class AppReleaseManager {
 
-	public static AppRelease storeAppReleaseAndReturnDiff(Context context) {
-		AppRelease stored = getStoredAppRelease(context);
-		AppRelease current = generateCurrentAppRelease(context);
+	public static AppRelease storeAppReleaseAndReturnDiff() {
+		AppRelease stored = getStoredAppRelease();
+		AppRelease current = generateCurrentAppRelease();
 
 		Object diff = JsonDiffer.getDiff(stored, current);
 		if(diff != null) {
 			try {
-				storeAppRelease(context, current);
+				storeAppRelease(current);
 				return new AppRelease(diff.toString());
 			} catch (JSONException e) {
 				Log.e("Error casting to AppRelease.", e);
@@ -38,10 +40,11 @@ public class AppReleaseManager {
 		return null;
 	}
 
-	private static AppRelease generateCurrentAppRelease(Context context) {
+	private static AppRelease generateCurrentAppRelease() {
 		AppRelease appRelease = new AppRelease();
 
 		try {
+			Context context = ApptentiveInternal.getInstance().getApplicationContext();
 			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appRelease.setVersion(packageInfo.versionName);
 			appRelease.setIdentifier(packageInfo.packageName);
@@ -54,8 +57,8 @@ public class AppReleaseManager {
 		return appRelease;
 	}
 
-	public static AppRelease getStoredAppRelease(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static AppRelease getStoredAppRelease() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String appReleaseString = prefs.getString(Constants.PREF_KEY_APP_RELEASE, null);
 		try {
 			return new AppRelease(appReleaseString);
@@ -65,8 +68,8 @@ public class AppReleaseManager {
 		return null;
 	}
 
-	private static void storeAppRelease(Context context, AppRelease appRelease) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void storeAppRelease(AppRelease appRelease) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_APP_RELEASE, appRelease.toString()).commit();
 	}
 }

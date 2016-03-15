@@ -244,8 +244,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
 						whoCardView = new MessageCenterWhoCardView(fragment.getContext(), composingActionListener);
-						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(fragment.getContext()),
-								Apptentive.getPersonEmail(fragment.getContext()));
+						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(),
+								Apptentive.getPersonEmail());
 						setupWhoCardView(position);
 					}
 					view = whoCardView;
@@ -279,8 +279,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			} else if (type == TYPE_WHOCARD) {
 				if (whoCardView == null) {
 					whoCardView = (MessageCenterWhoCardView) convertView;
-					whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(fragment.getContext()),
-							Apptentive.getPersonEmail(fragment.getContext()));
+					whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(),
+							Apptentive.getPersonEmail());
 					setupWhoCardView(position);
 				}
 				view = whoCardView;
@@ -324,7 +324,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					CompoundMessage textMessage = (CompoundMessage) listItem;
 					String datestamp = textMessage.getDatestamp();
 					Double createdTime = textMessage.getCreatedAt();
-					List<StoredFile> files = textMessage.getAssociatedFiles(fragment.getContext());
+					List<StoredFile> files = textMessage.getAssociatedFiles();
 					String messageBody = textMessage.getBody();
 					String status;
 					boolean bShowProgress;
@@ -689,10 +689,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 			EngagementModule.engageInternal(fragment.getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
-			MessageManager mgr = ApptentiveInternal.getMessageManager(null);
+			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 			if (mgr != null) {
-				mgr.updateMessage(fragment.getActivity().getApplicationContext(), textMessages[0]);
-				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount(fragment.getActivity().getApplicationContext()));
+				mgr.updateMessage(textMessages[0]);
+				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount());
 			}
 			return null;
 		}
@@ -710,7 +710,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	private void startLoadAttachedImageTask(CompoundMessage message, int position, OutgoingCompoundMessageHolder holder) {
-		List<StoredFile> storedFiles = message.getAssociatedFiles(fragment.getActivity().getApplicationContext());
+		List<StoredFile> storedFiles = message.getAssociatedFiles();
 		if (storedFiles == null || storedFiles.size() == 0) {
 			return;
 		}
@@ -758,7 +758,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
-				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(fragment.getContext(), paths[0], maxImageWidth, maxImageHeight, null, 0);
+				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(paths[0], maxImageWidth, maxImageHeight, null, 0);
 				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
 				Log.e("Error opening stored image.", e);

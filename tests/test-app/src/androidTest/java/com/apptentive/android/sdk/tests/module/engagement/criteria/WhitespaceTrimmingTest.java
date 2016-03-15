@@ -32,11 +32,11 @@ public class WhitespaceTrimmingTest extends ApptentiveInstrumentationTestCase {
 	private void doTest(String testFile) {
 		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
 		try {
-			Apptentive.addCustomDeviceData(getTargetContext(), " string_qwerty ", " qwerty ");
-			Apptentive.addCustomDeviceData(getTargetContext(), " string with spaces ", " string with spaces ");
-			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
+			Apptentive.addCustomDeviceData(" string_qwerty ", " qwerty ");
+			Apptentive.addCustomDeviceData( " string with spaces ", " string with spaces ");
+			DeviceManager.storeDeviceAndReturnIt();
 			InteractionCriteria criteria = new InteractionCriteria(json);
-			assertTrue(criteria.isMet(getTargetContext()));
+			assertTrue(criteria.isMet());
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
 			assertNull(e);

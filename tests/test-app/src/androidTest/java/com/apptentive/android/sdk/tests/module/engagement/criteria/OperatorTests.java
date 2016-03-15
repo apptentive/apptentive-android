@@ -93,21 +93,21 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 	private void doTest(String testFile) {
 		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
 		try {
-			Apptentive.addCustomDeviceData(getTargetContext(), "number_5", 5);
-			Apptentive.addCustomDeviceData(getTargetContext(), "string_qwerty", "qwerty");
-			Apptentive.addCustomDeviceData(getTargetContext(), "boolean_true", true);
+			Apptentive.addCustomDeviceData("number_5", 5);
+			Apptentive.addCustomDeviceData("string_qwerty", "qwerty");
+			Apptentive.addCustomDeviceData("boolean_true", true);
 			Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
 			//Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
-			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
+			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData("datetime_1000", dateTime);
 			Apptentive.Version version = new Apptentive.Version();
 			version.setVersion("1.2.3");
 			//Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
-			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
-			Apptentive.addCustomDeviceData(getTargetContext(), "key_with_null_value", (String) null);
+			ApptentiveInternal.getInstance().addCustomDeviceData("version_1.2.3", version);
+			Apptentive.addCustomDeviceData("key_with_null_value", (String) null);
 
-			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
+			DeviceManager.storeDeviceAndReturnIt();
 			InteractionCriteria criteria = new InteractionCriteria(json);
-			assertTrue(criteria.isMet(getTargetContext()));
+			assertTrue(criteria.isMet());
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);
 			assertNull(e);

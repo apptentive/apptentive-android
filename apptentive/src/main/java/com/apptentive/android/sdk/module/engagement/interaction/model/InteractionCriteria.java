@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.content.Context;
-
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
@@ -25,13 +23,13 @@ public class InteractionCriteria {
 		this.json = json;
 	}
 
-	public boolean isMet(Context context) {
+	public boolean isMet() {
 		try {
 			Clause rootClause = ClauseParser.parse(json);
 			Log.i("Evaluating Criteria");
 			boolean ret = false;
 			if (rootClause != null) {
-				ret = rootClause.evaluate(context);
+				ret = rootClause.evaluate();
 			}
 			Log.i("- => %b", ret);
 			return ret;

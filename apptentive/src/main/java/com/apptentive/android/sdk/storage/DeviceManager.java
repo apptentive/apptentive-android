@@ -35,20 +35,20 @@ public class DeviceManager {
 	 *
 	 * @return A Device containing diff data which, when added to the last sent Device, yields the new Device.
 	 */
-	public static Device storeDeviceAndReturnDiff(Context context) {
+	public static Device storeDeviceAndReturnDiff() {
 
-		Device stored = getStoredDevice(context);
+		Device stored = getStoredDevice();
 
-		Device current = generateNewDevice(context);
-		CustomData customData = loadCustomDeviceData(context);
+		Device current = generateNewDevice();
+		CustomData customData = loadCustomDeviceData();
 		current.setCustomData(customData);
-		CustomData integrationConfig = loadIntegrationConfig(context);
+		CustomData integrationConfig = loadIntegrationConfig();
 		current.setIntegrationConfig(integrationConfig);
 
 		Object diff = JsonDiffer.getDiff(stored, current);
 		if (diff != null) {
 			try {
-				storeDevice(context, current);
+				storeDevice(current);
 				return new Device(diff.toString());
 			} catch (JSONException e) {
 				Log.e("Error casting to Device.", e);
@@ -61,18 +61,18 @@ public class DeviceManager {
 	 * Provided so we can be sure that the device we send during conversation creation is 100% accurate. Since we do not
 	 * queue this device up in the payload queue, it could otherwise be lost.
 	 */
-	public static Device storeDeviceAndReturnIt(Context context) {
-		Device current = generateNewDevice(context);
-		CustomData customData = loadCustomDeviceData(context);
+	public static Device storeDeviceAndReturnIt() {
+		Device current = generateNewDevice();
+		CustomData customData = loadCustomDeviceData();
 		current.setCustomData(customData);
-		CustomData integrationConfig = loadIntegrationConfig(context);
+		CustomData integrationConfig = loadIntegrationConfig();
 		current.setIntegrationConfig(integrationConfig);
-		storeDevice(context, current);
+		storeDevice(current);
 		return current;
 	}
 
-	public static CustomData loadCustomDeviceData(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static CustomData loadCustomDeviceData() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
 		try {
 			return new CustomData(deviceDataString);
@@ -87,14 +87,14 @@ public class DeviceManager {
 		return null; // This should never happen.
 	}
 
-	public static void storeCustomDeviceData(Context context, CustomData deviceData) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void storeCustomDeviceData(CustomData deviceData) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String deviceDataString = deviceData.toString();
 		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).apply();
 	}
 
-	public static CustomData loadIntegrationConfig(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static CustomData loadIntegrationConfig() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String integrationConfigString = prefs.getString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, null);
 		try {
 			return new CustomData(integrationConfigString);
@@ -109,13 +109,13 @@ public class DeviceManager {
 		return null; // This should never happen.
 	}
 
-	public static void storeIntegrationConfig(Context context, CustomData integrationConfig) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void storeIntegrationConfig(CustomData integrationConfig) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String integrationConfigString = integrationConfig.toString();
 		prefs.edit().putString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, integrationConfigString).apply();
 	}
 
-	private static Device generateNewDevice(Context context) {
+	private static Device generateNewDevice() {
 		Device device = new Device();
 
 		// First, get all the information we can load from static resources.
@@ -130,12 +130,12 @@ public class DeviceManager {
 		device.setBrand(Build.BRAND);
 		device.setCpu(Build.CPU_ABI);
 		device.setDevice(Build.DEVICE);
-		device.setUuid(ApptentiveInternal.getAndroidId(context));
+		device.setUuid(ApptentiveInternal.getInstance().getAndroidId());
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
 
 		// Second, set the stuff that requires querying system services.
-		TelephonyManager tm = ((TelephonyManager) (context.getSystemService(Context.TELEPHONY_SERVICE)));
+		TelephonyManager tm = ((TelephonyManager) (ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE)));
 		device.setCarrier(tm.getSimOperatorName());
 		device.setCurrentCarrier(tm.getNetworkOperatorName());
 		device.setNetworkType(Constants.networkTypeAsString(tm.getNetworkType()));
@@ -156,8 +156,8 @@ public class DeviceManager {
 		return device;
 	}
 
-	public static Device getStoredDevice(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static Device getStoredDevice() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE, null);
 		try {
 			return new Device(deviceString);
@@ -167,11 +167,11 @@ public class DeviceManager {
 		return null;
 	}
 
-	private static void storeDevice(Context context, Device device) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void storeDevice(Device device) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_DEVICE, device.toString()).apply();
 	}
 
-	public static void onSentDeviceInfo(Context appContext) {
+	public static void onSentDeviceInfo() {
 	}
 }

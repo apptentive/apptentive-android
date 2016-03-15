@@ -9,12 +9,12 @@ import com.apptentive.android.sdk.model.Payload;
  */
 public interface PayloadStore {
 
-	public void addPayload(Context context, Payload... payloads);
+	public void addPayload(Payload... payloads);
 
 	public void deletePayload(Payload payload);
 
 	public void deleteAllPayloads();
 
-	public Payload getOldestUnsentPayload(Context appContext);
+	public Payload getOldestUnsentPayload();
 
 }

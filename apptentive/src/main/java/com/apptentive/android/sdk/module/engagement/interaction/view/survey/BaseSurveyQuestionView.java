@@ -38,7 +38,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
 		View v = themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);

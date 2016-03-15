@@ -108,8 +108,8 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			sendButton.setText(item.button_2);
 			sendButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					Apptentive.setPersonEmail(getContext(), emailEditText.getText().toString().trim());
-					Apptentive.setPersonName(getContext(), nameEditText.getText().toString().trim());
+					Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
+					Apptentive.setPersonName(nameEditText.getText().toString().trim());
 					listener.onSubmitWhoCard(item.button_2);
 				}
 			});

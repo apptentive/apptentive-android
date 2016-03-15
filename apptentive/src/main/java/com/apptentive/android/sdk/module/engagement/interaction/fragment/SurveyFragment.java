@@ -83,7 +83,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		answers = new LinkedHashMap<String, Object>(questions.size());
 
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
 		final LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
@@ -114,7 +114,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					// TODO: Extract survey state from views and send it as before.
 
-					ApptentiveInternal.getApptentiveDatabase(getActivity()).addPayload(getContext(), new SurveyResponse(interaction, answers));
+					ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(new SurveyResponse(interaction, answers));
 					Log.d("Survey Submitted.");
 					callListener(true);
 				} else {
@@ -177,7 +177,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					}
 				});
-				ApptentiveInternal.getInstance(getContext()).showAboutInternal(getActivity(), false);
+				ApptentiveInternal.getInstance().showAboutInternal(getActivity(), false);
 			}
 		});
 		ApptentiveNestedScrollView scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
@@ -221,7 +221,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	private void callListener(boolean completed) {
-		OnSurveyFinishedListener listener = ApptentiveInternal.getInstance(getContext()).getOnSurveyFinishedListener();
+		OnSurveyFinishedListener listener = ApptentiveInternal.getInstance().getOnSurveyFinishedListener();
 		if (listener != null) {
 			listener.onSurveyFinished(completed);
 		}

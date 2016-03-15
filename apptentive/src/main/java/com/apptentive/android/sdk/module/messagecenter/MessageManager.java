@@ -10,29 +10,23 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONArray;
@@ -77,6 +71,10 @@ public class MessageManager {
 
 
 	public MessageManager() {
+
+	}
+
+	public void init() {
 		if (uiHandler == null) {
 			uiHandler = new Handler(Looper.getMainLooper()) {
 				@Override
@@ -111,13 +109,12 @@ public class MessageManager {
 	 * Starts an asynctask to pre-fetch messages. This is to be called as part of Push notification action
 	 * when push is received on the device.
 	 */
-	public void startMessagePreFetchTask(final Context applicationContext) {
+	public void startMessagePreFetchTask() {
 		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
 			@Override
 			protected Void doInBackground(Object... params) {
-				Context context = (Context) params[0];
-				boolean updateMC = (Boolean) params[1];
-				fetchAndStoreMessages(context, updateMC, false);
+				boolean updateMC = (Boolean) params[0];
+				fetchAndStoreMessages(updateMC, false);
 				return null;
 			}
 
@@ -127,9 +124,9 @@ public class MessageManager {
 		};
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, applicationContext, isMessageCenterInForeground());
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, isMessageCenterInForeground());
 		} else {
-			task.execute(applicationContext, isMessageCenterInForeground());
+			task.execute(isMessageCenterInForeground());
 		}
 	}
 
@@ -139,19 +136,19 @@ public class MessageManager {
 	 *
 	 * @return true if messages were returned, else false.
 	 */
-	public synchronized boolean fetchAndStoreMessages(Context appContext, boolean isMessageCenterForeground, boolean showToast) {
-		if (ApptentiveInternal.getApptentiveConversationToken(appContext) == null) {
+	public synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
+		if (ApptentiveInternal.getInstance().getApptentiveConversationToken() == null) {
 			Log.d("Can't fetch messages because the conversation has not yet been initialized.");
 			return false;
 		}
-		if (!Util.isNetworkConnectionPresent(appContext)) {
+		if (!Util.isNetworkConnectionPresent()) {
 			Log.d("Can't fetch messages because a network connection is not present.");
 			return false;
 		}
 
 		// Fetch the messages.
-		String lastId = getMessageStore(appContext).getLastReceivedMessageId();
-		List<ApptentiveMessage> messagesToSave = fetchMessages(appContext, lastId);
+		String lastId = getMessageStore().getLastReceivedMessageId();
+		List<ApptentiveMessage> messagesToSave = fetchMessages(lastId);
 
 		CompoundMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
@@ -174,7 +171,7 @@ public class MessageManager {
 					msg.sendToTarget();
 				}
 			}
-			getMessageStore(appContext).addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
+			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			Message msg;
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the forground activity is not alreay message center activity
@@ -184,7 +181,7 @@ public class MessageManager {
 					msg.sendToTarget();
 				}
 			}
-			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(appContext), 0);
+			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(), 0);
 			uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
 			msg.sendToTarget();
 
@@ -193,9 +190,9 @@ public class MessageManager {
 		return false;
 	}
 
-	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems(Context context) {
+	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems() {
 		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
-		List<ApptentiveMessage> messagesAll = getMessageStore(context).getAllMessages(context.getApplicationContext());
+		List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages();
 		// Do not display hidden messages on Message Center
 		for (ApptentiveMessage message : messagesAll) {
 			if (!message.isHidden()) {
@@ -206,9 +203,9 @@ public class MessageManager {
 		return messagesToShow;
 	}
 
-	public void sendMessage(Context context, ApptentiveMessage apptentiveMessage) {
-		getMessageStore(context).addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getApptentiveDatabase(context).addPayload(context, apptentiveMessage);
+	public void sendMessage(ApptentiveMessage apptentiveMessage) {
+		getMessageStore().addOrUpdateMessages(apptentiveMessage);
+		ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(apptentiveMessage);
 	}
 
 	/**
@@ -216,19 +213,19 @@ public class MessageManager {
 	 */
 	public void deleteAllMessages(Context context) {
 		Log.e("Deleting all messages.");
-		getMessageStore(context).deleteAllMessages();
+		getMessageStore().deleteAllMessages();
 	}
 
-	private List<ApptentiveMessage> fetchMessages(Context appContext, String afterId) {
+	private List<ApptentiveMessage> fetchMessages(String afterId) {
 		Log.d("Fetching messages newer than: " + afterId);
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(appContext, null, afterId, null);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		if (!response.isSuccessful()) {
 			return ret;
 		}
 		try {
-			ret = parseMessagesString(appContext, response.getContent());
+			ret = parseMessagesString(response.getContent());
 		} catch (JSONException e) {
 			Log.e("Error parsing messages JSON.", e);
 		} catch (Exception e) {
@@ -237,11 +234,11 @@ public class MessageManager {
 		return ret;
 	}
 
-	public void updateMessage(Context context, ApptentiveMessage apptentiveMessage) {
-		getMessageStore(context).updateMessage(apptentiveMessage);
+	public void updateMessage(ApptentiveMessage apptentiveMessage) {
+		getMessageStore().updateMessage(apptentiveMessage);
 	}
 
-	public List<ApptentiveMessage> parseMessagesString(Context appContext, String messageString) throws JSONException {
+	public List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("items")) {
@@ -271,12 +268,12 @@ public class MessageManager {
 		}
 	}
 
-	public void onSentMessage(Context context, ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
+	public void onSentMessage(ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
 
 		if (response.isRejectedPermanently() || response.isBadPayload()) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
-				getMessageStore(context).updateMessage(apptentiveMessage);
+				getMessageStore().updateMessage(apptentiveMessage);
 				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 					afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
 				}
@@ -293,8 +290,8 @@ public class MessageManager {
 		if (response.isSuccessful()) {
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
-				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles(context);
-				getMessageStore(context).deleteMessage(apptentiveMessage.getNonce());
+				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
+				getMessageStore().deleteMessage(apptentiveMessage.getNonce());
 				return;
 			}
 			try {
@@ -307,7 +304,7 @@ public class MessageManager {
 			} catch (JSONException e) {
 				Log.e("Error parsing sent apptentiveMessage response.", e);
 			}
-			getMessageStore(context).updateMessage(apptentiveMessage);
+			getMessageStore().updateMessage(apptentiveMessage);
 
 			if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
@@ -315,12 +312,12 @@ public class MessageManager {
 		}
 	}
 
-	private MessageStore getMessageStore(Context context) {
-		return ApptentiveInternal.getApptentiveDatabase(context);
+	private MessageStore getMessageStore() {
+		return ApptentiveInternal.getInstance().getApptentiveDatabase();
 	}
 
-	public int getUnreadMessageCount(Context context) {
-		return getMessageStore(context).getUnreadMessageCount();
+	public int getUnreadMessageCount() {
+		return getMessageStore().getUnreadMessageCount();
 	}
 
 
@@ -375,16 +372,9 @@ public class MessageManager {
 	}
 
 	@Deprecated
-	public static void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
-		MessageManager mgr = ApptentiveInternal.getMessageManager(null);
-		if (mgr != null) {
-			mgr.setHostUnreadMessagesListenerInternal(newlistener);
-		}
-	}
-
-	public void setHostUnreadMessagesListenerInternal(UnreadMessagesListener newlistener) {
+	public void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+		clearHostUnreadMessagesListeners();
 		if (newlistener != null) {
-			clearHostUnreadMessagesListeners();
 			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
 		}
 	}
@@ -465,8 +455,8 @@ public class MessageManager {
 	}
 
 
-	public void appWentToForeground(Context context) {
-		pollingWorker.appWentToForeground(context);
+	public void appWentToForeground() {
+		pollingWorker.appWentToForeground();
 	}
 
 	public void appWentToBackground() {

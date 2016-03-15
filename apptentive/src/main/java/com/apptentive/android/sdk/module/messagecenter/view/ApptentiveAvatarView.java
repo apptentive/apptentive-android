@@ -238,7 +238,7 @@ public class ApptentiveAvatarView extends ImageView {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
 				Log.w("UncaughtException in AvatarView.", throwable);
-				MetricModule.sendError(getContext().getApplicationContext(), throwable, null, null);
+				MetricModule.sendError(throwable, null, null);
 			}
 		};
 		thread.setUncaughtExceptionHandler(handler);

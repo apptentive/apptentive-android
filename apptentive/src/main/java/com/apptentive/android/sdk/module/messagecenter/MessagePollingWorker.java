@@ -6,15 +6,12 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
-import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.util.Util;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -37,22 +34,21 @@ public class MessagePollingWorker {
 
 	// A synchronized getter/setter to the static instance of thread object
 	public synchronized MessagePollingThread getAndSetMessagePollingThread(boolean expect,
-																		   boolean create,
-																		   Context context) {
-		if (expect && create && context != null) {
-			sPollingThread = createPollingThread(context.getApplicationContext());
+																		   boolean create) {
+		if (expect && create) {
+			sPollingThread = createPollingThread();
 		} else if (!expect) {
 			sPollingThread = null;
 		}
 		return sPollingThread;
 	}
 
-	private MessagePollingThread createPollingThread(final Context context) {
-		MessagePollingThread newThread = new MessagePollingThread(context);
+	private MessagePollingThread createPollingThread() {
+		MessagePollingThread newThread = new MessagePollingThread();
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				MetricModule.sendError(context, throwable, null, null);
+				MetricModule.sendError(throwable, null, null);
 			}
 		};
 		newThread.setUncaughtExceptionHandler(handler);
@@ -63,14 +59,13 @@ public class MessagePollingWorker {
 
 
 	private class MessagePollingThread extends Thread {
-		private WeakReference<Context> contextRef;
+
 		private long backgroundPollingInterval = -1;
 		private long foregroundPollingInterval = -1;
 		private Configuration conf;
 
-		public MessagePollingThread(Context context) {
-			contextRef = new WeakReference<Context>(context);
-			conf = Configuration.load(context);
+		public MessagePollingThread() {
+			conf = Configuration.load();
 			backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
 			foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
 		}
@@ -80,18 +75,14 @@ public class MessagePollingWorker {
 				Log.v("Started %s", toString());
 
 				while (appInForeground.get()) {
-					if (contextRef.get() == null) {
-						threadRunning.set(false);
-						return;
-					}
-					MessagePollingThread thread = getAndSetMessagePollingThread(true, false, null);
+					MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
 					if (thread != null && thread != MessagePollingThread.this) {
 						return;
 					}
 					long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
-					if (Apptentive.canShowMessageCenter(contextRef.get())) {
+					if (Apptentive.canShowMessageCenter()) {
 						Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
-						manager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
+						manager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 					}
 					goToSleep(pollingInterval);
 				}
@@ -113,20 +104,20 @@ public class MessagePollingWorker {
 
 	private void wakeUp() {
 		Log.v("Waking MessagePollingThread.");
-		MessagePollingThread thread = getAndSetMessagePollingThread(true, false, null);
+		MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
 		if (thread != null && thread.isAlive()) {
 			thread.interrupt();
 		}
 	}
 
 	// Called from main UI thread to create a new worker thread
-	public void appWentToForeground(Context context) {
+	public void appWentToForeground() {
 		appInForeground.set(true);
 		if (threadRunning.compareAndSet(false, true)) {
 			/* appInForeground was "false", and set to "true"
 			*  thread was not running, and set to be running
 			*/
-			getAndSetMessagePollingThread(true, true, context);
+			getAndSetMessagePollingThread(true, true);
 		} else {
 			wakeUp();
 		}

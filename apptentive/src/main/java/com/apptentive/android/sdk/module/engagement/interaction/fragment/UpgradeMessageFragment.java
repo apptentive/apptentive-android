@@ -43,7 +43,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getApptentiveTheme(getContext()));
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		View v = themedInflater.inflate(R.layout.apptentive_upgrade_message_interaction, container, false);
@@ -62,7 +62,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 		// If branding is not desired, turn the view off.
 		final View branding = v.findViewById(R.id.apptentive_branding_view);
 		if (branding != null) {
-			if (!interaction.isShowPoweredBy() || Configuration.load(getContext()).isHideBranding(getContext())) {
+			if (!interaction.isShowPoweredBy() || Configuration.load().isHideBranding(getContext())) {
 				branding.setVisibility(View.GONE);
 			}
 		}

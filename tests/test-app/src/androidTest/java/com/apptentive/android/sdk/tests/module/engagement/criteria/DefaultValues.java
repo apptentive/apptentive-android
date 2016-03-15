@@ -31,7 +31,7 @@ public class DefaultValues extends ApptentiveInstrumentationTestCase {
 		try {
 			Clause criteria = ClauseParser.parse(json);
 			assertNotNull("Criteria was null, but it shouldn't be.", criteria);
-			boolean result = criteria.evaluate(getTargetContext());
+			boolean result = criteria.evaluate();
 			assertTrue(result);
 		} catch (JSONException e) {
 			Log.e("Error parsing test JSON.", e);

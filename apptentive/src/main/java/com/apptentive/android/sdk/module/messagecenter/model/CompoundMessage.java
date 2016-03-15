@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import android.content.Context;
-
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -134,7 +132,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	}
 
 
-	public boolean setAssociatedImages(Context context, List<ImageItem> attachedImages) {
+	public boolean setAssociatedImages(List<ImageItem> attachedImages) {
 
 		if (attachedImages == null || attachedImages.size() == 0) {
 			hasNoAttachments = true;
@@ -155,11 +153,11 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
-		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
+		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
 		return db.addCompoundMessageFiles(attachmentStoredFiles);
 	}
 
-	public boolean setAssociatedFiles(Context context, List<StoredFile> attachedFiles) {
+	public boolean setAssociatedFiles(List<StoredFile> attachedFiles) {
 
 		if (attachedFiles == null || attachedFiles.size() == 0) {
 			hasNoAttachments = true;
@@ -169,21 +167,21 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 		setTextOnly(hasNoAttachments);
 
-		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
+		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
 		return db.addCompoundMessageFiles(attachedFiles);
 	}
 
 
-	public List<StoredFile> getAssociatedFiles(Context context) {
+	public List<StoredFile> getAssociatedFiles() {
 		if (hasNoAttachments) {
 			return null;
 		}
-		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
+		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
 		return db.getAssociatedFiles(getNonce());
 	}
 
-	public void deleteAssociatedFiles(Context context) {
-		ApptentiveDatabase db = ApptentiveInternal.getApptentiveDatabase(context);
+	public void deleteAssociatedFiles() {
+		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
 		List<StoredFile> associatedFiles = db.getAssociatedFiles(getNonce());
 		// Delete local cached files
 		if (associatedFiles == null || associatedFiles.size() == 0) {

@@ -6,9 +6,9 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Person;
@@ -22,23 +22,23 @@ import org.json.JSONException;
  */
 public class PersonManager {
 
-	public static Person storePersonAndReturnDiff(Context context) {
-		Person stored = getStoredPerson(context);
+	public static Person storePersonAndReturnDiff() {
+		Person stored = getStoredPerson();
 
 		Person current = generateCurrentPerson();
-		CustomData customData = loadCustomPersonData(context);
+		CustomData customData = loadCustomPersonData();
 		current.setCustomData(customData);
 
-		String email = loadPersonEmail(context);
+		String email = loadPersonEmail();
 		current.setEmail(email);
 
-		String name = loadPersonName(context);
+		String name = loadPersonName();
 		current.setName(name);
 
 		Object diff = JsonDiffer.getDiff(stored, current);
 		if (diff != null) {
 			try {
-				storePerson(context, current);
+				storePerson(current);
 				return new Person(diff.toString());
 			} catch (JSONException e) {
 				Log.e("Error casting to Person.", e);
@@ -52,24 +52,24 @@ public class PersonManager {
 	 * Provided so we can be sure that the person we send during conversation creation is 100% accurate. Since we do not
 	 * queue this person up in the payload queue, it could otherwise be lost.
 	 */
-	public static Person storePersonAndReturnIt(Context context) {
+	public static Person storePersonAndReturnIt() {
 		Person current = generateCurrentPerson();
 
-		CustomData customData = loadCustomPersonData(context);
+		CustomData customData = loadCustomPersonData();
 		current.setCustomData(customData);
 
-		String email = loadPersonEmail(context);
+		String email = loadPersonEmail();
 		current.setEmail(email);
 
-		String name = loadPersonName(context);
+		String name = loadPersonName();
 		current.setName(name);
 
-		storePerson(context, current);
+		storePerson(current);
 		return current;
 	}
 
-	public static CustomData loadCustomPersonData(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static CustomData loadCustomPersonData() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String personDataString = prefs.getString(Constants.PREF_KEY_PERSON_DATA, null);
 		try {
 			return new CustomData(personDataString);
@@ -84,8 +84,8 @@ public class PersonManager {
 		return null;
 	}
 
-	public static void storeCustomPersonData(Context context, CustomData deviceData) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void storeCustomPersonData(CustomData deviceData) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String personDataString = deviceData.toString();
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_DATA, personDataString).apply();
 	}
@@ -94,28 +94,28 @@ public class PersonManager {
 		return new Person();
 	}
 
-	public static String loadPersonEmail(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static String loadPersonEmail() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		return prefs.getString(Constants.PREF_KEY_PERSON_EMAIL, null);
 	}
 
-	public static void storePersonEmail(Context context, String email) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void storePersonEmail(String email) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_EMAIL, email).apply();
 	}
 
-	public static String loadPersonName(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static String loadPersonName() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		return prefs.getString(Constants.PREF_KEY_PERSON_NAME, null);
 	}
 
-	public static void storePersonName(Context context, String name) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static void storePersonName(String name) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, name).apply();
 	}
 
-	public static Person getStoredPerson(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	public static Person getStoredPerson() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String PersonString = prefs.getString(Constants.PREF_KEY_PERSON, null);
 		try {
 			return new Person(PersonString);
@@ -125,8 +125,8 @@ public class PersonManager {
 		return null;
 	}
 
-	private static void storePerson(Context context, Person Person) {
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+	private static void storePerson(Person Person) {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_PERSON, Person.toString()).apply();
 	}
 }

@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -49,19 +48,19 @@ public class EngagementModule {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
-			ApptentiveInternal.getCodePointStore(activity).storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, interactionId, data, customData, extendedData));
+			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion(eventLabel);
+			EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(activity, eventLabel);
 		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+			MetricModule.sendError(e, null, null);
 		}
 		return false;
 	}
 
 	public static boolean doEngage(Activity activity, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInteractionManager(activity).getApplicableInteraction(activity.getApplicationContext(), eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
-			ApptentiveInternal.getCodePointStore(activity).storeInteractionForCurrentAppVersion(activity, interaction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(interaction.getId());
 			launchInteraction(activity, interaction);
 			return true;
 		}
@@ -85,13 +84,13 @@ public class EngagementModule {
 		activity.startActivity(intent);
 	}
 
-	public static boolean canShowInteraction(Context context, String vendor, String interaction, String eventName) {
+	public static boolean canShowInteraction(String vendor, String interaction, String eventName) {
 		String eventLabel = generateEventLabel(vendor, interaction, eventName);
-		return canShowInteraction(context, eventLabel);
+		return canShowInteraction(eventLabel);
 	}
 
-	private static boolean canShowInteraction(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInteractionManager(context).getApplicableInteraction(context, eventLabel);
+	private static boolean canShowInteraction(String eventLabel) {
+		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 
