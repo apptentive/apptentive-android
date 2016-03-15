@@ -43,8 +43,6 @@
         <item name="apptentiveTextSizeBody">@dimen/apptentive_text_size_body</item>
         <item name="apptentiveTextSizeCaption">@dimen/apptentive_text_size_caption</item>
 
-        <!--<item name="android:textViewStyle">@style/Apptentive.Global.Widget.TextView</item>-->
-
         <!-- Apptentive Material specific values -->
         <item name="apptentiveViewBackground">@color/apptentive_view_background</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
@@ -242,14 +240,7 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Apptentive.Style.TextView">
-        <!--<item name="android:typeface">?attr/apptentiveTypeface</item>-->
-        <!--<item name="android:gravity">start</item>-->
-    </style>
-
-    <style name="Apptentive.Style.TextView.Composing"/>
-
-    <style name="Apptentive.Style.TextView.Timestamp">
+    <style name="Apptentive.Style.TextView.Timestamp" parent="">
         <item name="android:minHeight">70dp</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingStart">16dp</item>

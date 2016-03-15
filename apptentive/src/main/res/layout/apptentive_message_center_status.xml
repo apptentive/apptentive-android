@@ -31,7 +31,6 @@
         <TextView android:id="@+id/status_body"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                  style="@style/Apptentive.Style.TextView"/>
+                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
     </LinearLayout>
 </LinearLayout>

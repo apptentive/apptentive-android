@@ -28,14 +28,12 @@
                           android:layout_height="wrap_content"
                           android:layout_gravity="start"
                           android:textAppearance="@style/Apptentive.TextAppearance.Title"
-                          style="@style/Apptentive.Style.TextView"
                           android:text="@string/apptentive_thank_you"/>
                 <TextView android:id="@+id/body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_gravity="start"
                           android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"
-                          style="@style/Apptentive.Style.TextView"
                           android:paddingTop="@dimen/apptentive_dialog_content_spacing"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/button_container"

@@ -43,13 +43,11 @@
                 <TextView android:id="@+id/sender_name"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"
-                          style="@style/Apptentive.Style.TextView"/>
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"/>
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Body"
-                          style="@style/Apptentive.Style.TextView"
                           android:autoLink="all"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                                android:layout_width="match_parent"

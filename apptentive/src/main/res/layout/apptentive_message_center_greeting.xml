@@ -42,13 +42,11 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textAppearance="@style/Apptentive.TextAppearance.Headline.Inverse"
-                      style="@style/Apptentive.Style.TextView"
                       android:text="Hello"/>
             <TextView android:id="@+id/greeting_body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary.Inverse"
-                      style="@style/Apptentive.Style.TextView"
                       android:alpha="0.8"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"

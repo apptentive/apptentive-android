@@ -63,13 +63,11 @@
                     <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary"
-                              style="@style/Apptentive.Style.TextView"
                               android:text="@string/apptentive_about_description"/>
                     <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:layout_marginTop="16dp"
                               android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary"
-                              style="@style/Apptentive.Style.TextView"
                               android:text="@string/apptentive_about_privacy"/>
                     <Button android:id="@+id/about_description_link"
                               android:layout_width="wrap_content"

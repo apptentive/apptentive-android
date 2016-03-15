@@ -30,16 +30,12 @@
                 <TextView android:id="@+id/title"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Title"
-                          style="@style/Apptentive.Style.TextView"/>
-                <!--<item name="android:textStyle">bold</item>-->
+                          android:textAppearance="@style/Apptentive.TextAppearance.Title"/>
                 <TextView android:id="@+id/body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"
-                          style="@style/Apptentive.Style.TextView"
                           android:paddingTop="@dimen/apptentive_dialog_content_spacing"/>
-                <!--<item name="android:lineSpacingMultiplier">1.2</item>-->
             </LinearLayout>
             <LinearLayout android:id="@+id/button_container"
                           android:layout_width="match_parent"

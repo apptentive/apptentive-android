@@ -27,8 +27,7 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_gravity="start"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Title"
-                          style="@style/Apptentive.Style.TextView"/>
+                          android:textAppearance="@style/Apptentive.TextAppearance.Title"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/button_container"
                           android:layout_width="match_parent"

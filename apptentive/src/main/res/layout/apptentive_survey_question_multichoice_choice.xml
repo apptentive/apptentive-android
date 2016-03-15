@@ -11,7 +11,6 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="4dp"
              android:textAppearance="@style/Apptentive.TextAppearance.Body"
-             style="@style/Apptentive.Style.TextView"
              android:paddingTop="4dp"
              android:minHeight="48dp"
              android:drawablePadding="16dp"

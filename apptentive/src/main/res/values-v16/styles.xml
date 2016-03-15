@@ -5,11 +5,6 @@
   -->
 
 <resources>
-    <style name="Apptentive.Style.TextView">
-        <!--<item name="android:fontFamily">?apptentiveFontFamily</item>-->
-        <!--<item name="android:gravity">start</item>-->
-    </style>
-
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
         <item name="android:fontFamily">?apptentiveFontFamily</item>
     </style>
