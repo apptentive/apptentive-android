@@ -75,7 +75,7 @@ public class CodePointStore {
 
 	private void saveToPreference() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, store.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, store.toString()).apply();
 	}
 
 	private JSONObject loadFromPreference() {
@@ -250,7 +250,7 @@ public class CodePointStore {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return 0l;
+		return 0L;
 	}
 
 	public String toString() {
@@ -259,7 +259,7 @@ public class CodePointStore {
 
 	public void clear() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).commit();
+		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).apply();
 		store = new JSONObject();
 	}
 
