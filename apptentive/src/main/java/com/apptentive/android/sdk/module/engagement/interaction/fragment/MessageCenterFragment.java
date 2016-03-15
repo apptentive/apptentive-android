@@ -510,7 +510,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				switch (action) {
 					case pmc:
 						Log.i("Clearing pending Message Center push notification.");
-						prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).commit();
+						prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
 						break;
 				}
 			} catch (JSONException e) {
@@ -866,7 +866,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messageEditText.onRestoreInstanceState(composingViewSavedState);
 			composingViewSavedState = null;
 			SharedPreferences.Editor editor = prefs.edit();
-			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).commit();
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).apply();
 		}
 		// Restore composing text
 		if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE)) {
@@ -876,7 +876,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			// Stored pending composing text has been restored, remove it from the persistent storage
 			SharedPreferences.Editor editor = prefs.edit();
-			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).commit();
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).apply();
 		}
 
 
@@ -905,7 +905,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			// Stored pending attachemnts have been restored, remove it from the persistent storage
 			SharedPreferences.Editor editor = prefs.edit();
-			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).commit();
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).apply();
 		}
 
 		if (savedAttachmentstList != null) {

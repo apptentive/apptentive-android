@@ -149,15 +149,15 @@ public class InteractionManager {
 
 	public void clear() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).commit();
-		prefs.edit().remove(Constants.PREF_KEY_TARGETS).commit();
+		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).apply();
+		prefs.edit().remove(Constants.PREF_KEY_TARGETS).apply();
 		interactions = null;
 		targets = null;
 	}
 
 	private void saveInteractions() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).apply();
 	}
 
 	private Interactions loadInteractions() {
@@ -175,7 +175,7 @@ public class InteractionManager {
 
 	private void saveTargets() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).apply();
 	}
 
 	private Targets loadTargets() {
@@ -200,7 +200,7 @@ public class InteractionManager {
 	public void updateCacheExpiration(long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).commit();
+		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).apply();
 	}
 
 	public boolean isPollForInteractions() {
@@ -214,6 +214,6 @@ public class InteractionManager {
 	public void setPollForInteractions(boolean pollForInteractions) {
 		this.pollForInteractions = pollForInteractions;
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).commit();
+		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).apply();
 	}
 }
