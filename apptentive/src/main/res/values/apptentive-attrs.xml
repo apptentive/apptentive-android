@@ -14,15 +14,22 @@
         <attr name="apptentiveValidationFailedColor" format="color|reference" />
         <attr name="apptentiveTextAppearanceMedium" format="reference" />
 
+        <attr name="apptentiveColorSnackbar" format="color|reference" />
+
+        <attr name="apptentiveTextSizeHeadline" format="dimension|reference" />
+        <attr name="apptentiveTextSizeTitle" format="dimension|reference" />
+        <attr name="apptentiveTextSizeSubheading" format="dimension|reference" />
+        <attr name="apptentiveTextSizeBody" format="dimension|reference" />
+        <attr name="apptentiveTextSizeCaption" format="dimension|reference" />
+
+        <attr name="apptentiveFontFamily" format="string|reference" />
+        <attr name="apptentiveTypeface" format="integer|reference" />
+
         <attr name="apptentive_material_disabled_text" format="color|reference" />
         <attr name="apptentive_material_disabled_icon" format="color|reference" />
         <attr name="apptentive_material_divider" format="color|reference" />
 
-        <attr name="apptentive_material_selected" format="color|reference" />
         <attr name="apptentive_material_selected_text" format="color|reference" />
-        <!-- header attrs-->
-        <attr name="apptentive_material_header_selection_text" format="color|reference" />
-        <attr name="apptentive_material_pressed_highlight" format="color|reference" />
     </declare-styleable>
 
 
@@ -30,10 +37,6 @@
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
     <attr name="apptentiveToolbarStyle" format="reference"/>
-
-    <declare-styleable name="ApptentiveDialogButton">
-        <attr name="apptentive_buttonText" format="string"/>
-    </declare-styleable>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
         <attr name="apptentive_backgroundColor" format="color"/>

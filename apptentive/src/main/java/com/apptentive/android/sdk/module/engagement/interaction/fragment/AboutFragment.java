@@ -13,7 +13,7 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
@@ -56,8 +56,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.ApptentiveTheme_About);
 		// clone the inflater using the ContextThemeWrapper
@@ -69,8 +68,6 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 
 		if (!showBrandingBand) {
 			root.findViewById(R.id.apptentive_branding_view).setVisibility(View.GONE);
-		} else {
-			root.findViewById(R.id.apptentive_branding_view).setClickable(false); // Don't let the about view launch itself.
 		}
 
 		View close = root.findViewById(R.id.close_about);
@@ -82,7 +79,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 			}
 		});
 
-		TextView information = (TextView) root.findViewById(R.id.about_description_link);
+		Button information = (Button) root.findViewById(R.id.about_description_link);
 		information.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -93,7 +90,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 			}
 		});
 
-		TextView privacy = (TextView) root.findViewById(R.id.privacy_link);
+		Button privacy = (Button) root.findViewById(R.id.privacy_link);
 		privacy.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -107,10 +104,8 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 		return root;
 	}
 
-
 	public boolean onBackPressed() {
 		EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
 		return false;
 	}
-
 }

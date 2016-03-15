@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -9,10 +9,5 @@
     <!-- DEFAULT (LIGHT) -->
     <style name="ApptentiveTheme.TranslucentStatus" parent="ApptentiveTheme">
         <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="Apptentive.Style.Widget.TextView" parent="@android:style/Widget.TextView">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:gravity">start</item>
     </style>
 </resources>
