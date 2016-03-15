@@ -27,7 +27,7 @@
                   android:gravity="center_vertical"
                   android:text="Powered by"/>
         <ImageView android:layout_width="100dp"
-                   android:layout_height="32dp"
+                   android:layout_height="35dp"
                    android:src="@drawable/apptentive_logo_black"/>
     </LinearLayout>
 </LinearLayout>
