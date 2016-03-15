@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <style name="Apptentive.Style.TextView">
+        <item name="android:fontFamily">?apptentiveFontFamily</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:fontFamily">?apptentiveFontFamily</item>
+    </style>
+
+    <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:fontFamily">?apptentiveFontFamily</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:minWidth">36dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+    </style>
+</resources>
