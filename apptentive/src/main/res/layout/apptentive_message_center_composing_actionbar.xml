@@ -38,7 +38,7 @@
                   android:layout_centerVertical="true"
                   android:layout_toRightOf="@id/cancel_composing"
                   android:layout_toEndOf="@id/cancel_composing"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary"/>
+                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"/>
         <ImageButton android:id="@+id/btn_send_message"
                      android:layout_width="wrap_content"
                      android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"

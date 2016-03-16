@@ -5,12 +5,70 @@
   -->
 
 <resources>
-    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
+    <style name="Apptentive.TextAppearance.Headline" parent="@style/TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyHeadline</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Headline.Inverse">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textColorHint">?android:attr/textColorHintInverse</item>
+        <item name="android:textColorHighlight">?android:attr/textColorHighlightInverse</item>
+        <item name="android:textColorLink">?android:attr/textColorLinkInverse</item>
+
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyTitle</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title.Inverse" parent="@style/TextAppearance.AppCompat.Title.Inverse">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyTitle</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilySubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Inverse" parent="@style/TextAppearance.AppCompat.Subhead.Inverse">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilySubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Secondary">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilySubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Secondary.Inverse" parent="Apptentive.TextAppearance.Subhead.Inverse">
+        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Body2" parent="@style/TextAppearance.AppCompat.Body2">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyBody2</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeBody2</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Body1" parent="@style/TextAppearance.AppCompat.Body1">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyBody1</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeBody1</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption" parent="@style/TextAppearance.AppCompat.Caption">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyCaption</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeCaption</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption.Bold">
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
+        <item name="android:fontFamily">?apptentiveFontFamilyButtonBorderless</item>
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:minWidth">36dp</item>
@@ -18,66 +76,7 @@
         <item name="android:paddingRight">8dp</item>
     </style>
 
-    <style name="Apptentive.TextAppearance.Headline" parent="@android:style/TextAppearance.Large">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Headline.Inverse" parent="@android:style/TextAppearance.Large.Inverse">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Title" parent="@android:style/TextAppearance.Medium">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Title.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Subheading.Primary" parent="@android:style/TextAppearance.Medium">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Subheading.Primary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Subheading.Secondary" parent="@android:style/TextAppearance.Medium">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Subheading.Secondary.Inverse" parent="@android:style/TextAppearance.Medium.Inverse">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeSubheading</item>
-        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Body" parent="@android:style/TextAppearance.Small">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeBody</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:gravity">start</item>
-    </style>
-
-    <style name="Apptentive.TextAppearance.Caption" parent="@android:style/TextAppearance.Small">
-        <item name="android:fontFamily">?apptentiveFontFamily</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeCaption</item>
-        <item name="android:gravity">start</item>
+    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:fontFamily">?apptentiveFontFamilyButtonColored</item>
     </style>
 </resources>

@@ -26,7 +26,7 @@
         <TextView android:id="@+id/survey_sent_toast_text"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary.Inverse"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Inverse"
                   android:paddingLeft="24dp"
                   android:paddingStart="24dp"/>
     </LinearLayout>

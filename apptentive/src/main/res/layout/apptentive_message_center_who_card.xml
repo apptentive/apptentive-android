@@ -40,7 +40,7 @@
                           android:layout_height="@integer/apptentive_layout_height_for_weight"
                           android:layout_weight="1"
                           android:layout_marginBottom="8dp"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Body"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Body1"
                           android:inputType="textCapSentences"/>
                 <LinearLayout android:layout_width="@integer/apptentive_layout_width_for_weight"
                               android:layout_height="@integer/apptentive_layout_height_for_weight"
@@ -50,7 +50,7 @@
                     <EditText android:id="@+id/who_email"
                               android:layout_width="match_parent"
                               android:layout_height="wrap_content"
-                              android:textAppearance="@style/Apptentive.TextAppearance.Body"
+                              android:textAppearance="@style/Apptentive.TextAppearance.Body1"
                               android:inputType="textEmailAddress"/>
                     <TextView android:id="@+id/email_explanation"
                               android:layout_width="wrap_content"
