@@ -27,4 +27,10 @@
 
     <integer name="apptentive_layout_width_for_weight">@integer/match_parent</integer>
     <integer name="apptentive_layout_height_for_weight">0</integer>
+
+    <!-- These are the built-in android:typeface attributes for pre-API-16 support -->
+    <integer name="apptentive_typeface_normal">0</integer>
+    <integer name="apptentive_typeface_sans">1</integer>
+    <integer name="apptentive_typeface_serif">2</integer>
+    <integer name="apptentive_typeface_monospace">3</integer>
 </resources>

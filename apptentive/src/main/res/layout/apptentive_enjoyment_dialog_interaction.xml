@@ -7,7 +7,6 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:apptentive="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center">
@@ -16,38 +15,38 @@
                 android:paddingLeft="@dimen/apptentive_activity_side_padding_enjoyment"
                 android:paddingRight="@dimen/apptentive_activity_side_padding_enjoyment"
                 android:fadingEdge="none">
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:paddingTop="@dimen/apptentive_activity_vertical_padding"
-                      android:paddingBottom="@dimen/apptentive_activity_vertical_padding"
-                      android:gravity="center"
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@drawable/apptentive_dialog_background"
                       android:orientation="vertical">
-            <LinearLayout android:id="@+id/top_area"
-                          android:layout_width="match_parent"
+            <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveInteractionDialogTopArea"
+                          android:padding="24dp"
                           android:orientation="vertical">
                 <TextView android:id="@+id/title"
-                          android:layout_width="match_parent"
+                          android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextView.ApptentiveDialogTitle"/>
+                          android:layout_gravity="start"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Title"/>
             </LinearLayout>
-            <LinearLayout android:id="@+id/bottom_area"
+            <LinearLayout android:id="@+id/button_container"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          style="@style/ApptentiveDialogBottomArea"
+                          android:padding="8dp"
+                          android:gravity="end"
                           android:orientation="horizontal">
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/no"
-                                                                                                             android:layout_width="wrap_content"
-                                                                                                             android:layout_height="wrap_content"
-                                                                                                             style="@style/Apptentive.Style.TextView"
-                                                                                                             apptentive:apptentive_buttonText="@string/apptentive_no"/>
-                <com.apptentive.android.sdk.module.engagement.interaction.view.common.ApptentiveDialogButton android:id="@+id/yes"
-                                                                                                             android:layout_width="wrap_content"
-                                                                                                             android:layout_height="wrap_content"
-                                                                                                             style="@style/Apptentive.Style.TextView"
-                                                                                                             apptentive:apptentive_buttonText="@string/apptentive_yes"/>
+                <Button android:id="@+id/no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        style="@style/Apptentive.Widget.Button.Borderless"/>
+                <Button android:id="@+id/yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        style="@style/Apptentive.Widget.Button.Borderless"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

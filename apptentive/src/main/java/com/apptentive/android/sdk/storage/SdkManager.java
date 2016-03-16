@@ -77,6 +77,6 @@ public class SdkManager {
 
 	private static void storeSdk(Sdk sdk) {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_SDK, sdk.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_SDK, sdk.toString()).apply();
 	}
 }

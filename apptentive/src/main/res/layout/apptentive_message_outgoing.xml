@@ -39,7 +39,7 @@
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          style="@style/Apptentive.Style.TextView"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Body"
                           android:autoLink="all"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                                android:layout_width="match_parent"
@@ -56,7 +56,6 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                          style="@style/Apptentive.Style.TextView"
                           android:visibility="gone"/>
             </LinearLayout>
             <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progressBar"

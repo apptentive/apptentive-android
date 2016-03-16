@@ -892,8 +892,7 @@ public class ApptentiveInternal {
 	}
 
 	public void resetSdkState() {
-		// Use commit() instead of apply(), otherwise it doesn't finish before the app is killed.
-		prefs.edit().clear().commit();
+		prefs.edit().clear().apply();
 		database.reset(appContext);
 	}
 

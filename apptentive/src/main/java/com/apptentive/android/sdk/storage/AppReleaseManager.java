@@ -70,6 +70,6 @@ public class AppReleaseManager {
 
 	private static void storeAppRelease(AppRelease appRelease) {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_APP_RELEASE, appRelease.toString()).commit();
+		prefs.edit().putString(Constants.PREF_KEY_APP_RELEASE, appRelease.toString()).apply();
 	}
 }

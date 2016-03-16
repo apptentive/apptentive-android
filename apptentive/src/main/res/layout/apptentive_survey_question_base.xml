@@ -32,7 +32,6 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary"
-                          style="@style/Apptentive.Style.TextView"
                           android:paddingLeft="16dp"
                           android:paddingRight="16dp"/>
                 <LinearLayout android:layout_width="match_parent"
@@ -46,20 +45,17 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                              style="@style/Apptentive.Style.TextView"
                               android:textColor="?attr/apptentiveValidationFailedColor"
                               android:text="@string/apptentive_required"/>
                     <TextView android:id="@+id/question_dash"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                              style="@style/Apptentive.Style.TextView"
                               android:text=" &#8211; "/>
                     <TextView android:id="@+id/question_instructions"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
-                              android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                              style="@style/Apptentive.Style.TextView"/>
+                              android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
                 </LinearLayout>
                 <View android:id="@+id/question_top_separater"
                       android:layout_width="match_parent"

@@ -100,8 +100,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				if (valid) {
 					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
 						Toast toast = new Toast(contextThemeWrapper);
-						toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
-						toast.setDuration(Toast.LENGTH_SHORT);
+						toast.setGravity(Gravity.FILL, 0, 0);
+						toast.setDuration(Toast.LENGTH_LONG);
 						View toastView = themedInflater.inflate(R.layout.apptentive_survey_sent_toast, (LinearLayout) getView().findViewById(R.id.survey_sent_toast_root));
 						toast.setView(toastView);
 						((TextView) toastView.findViewById(R.id.survey_sent_toast_text)).setText(interaction.getSuccessMessage());
