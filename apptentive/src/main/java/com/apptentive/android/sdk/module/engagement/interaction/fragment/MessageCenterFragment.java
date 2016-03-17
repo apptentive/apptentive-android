@@ -88,6 +88,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		ImageGridViewAdapter.Callback {
 
 	private MenuItem profileMenuItem;
+	private boolean bShowProfileMenuItem = true;
 
 	// keys used to save instance in the event of rotation
 	private final static String LIST_TOP_INDEX = "list_top_index";
@@ -173,19 +174,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		mcFragment.setArguments(bundle);
 		return mcFragment;
 	}
-
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		if (contextualMessage != null || composingItem != null) {
-			hideFab();
-			hideProfileButton();
-		} else if (whoCardItem != null) {
-			hideFab();
-		}
-	}
-
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -338,6 +326,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected void attachFragmentMenuListeners(Menu menu) {
 		profileMenuItem = menu.findItem(R.id.profile);
 		profileMenuItem.setOnMenuItemClickListener(this);
+		updateMenuVisibility();
+	}
+
+	@Override
+	protected void updateMenuVisibility() {
+		profileMenuItem.setVisible(bShowProfileMenuItem);
 	}
 
 	private void setup(View rootView) {
@@ -357,7 +351,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			public void onClick(View v) {
 				addComposerItems();
 				hideFab();
-				hideProfileButton();
 				messageCenterListAdapter.setForceShowKeyboard(true);
 				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
@@ -440,7 +433,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				} else {
 					addWhoCardItem(WHO_CARD_MODE_EDIT);
 				}
-				hideFab();
 				messageCenterListAdapter.setForceShowKeyboard(true);
 				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 			}
@@ -858,6 +850,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onComposingViewCreated() {
+
+		hideProfileButton();
+		hideFab();
+
 		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
 		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -917,6 +913,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText) {
+
+		hideFab();
+		hideProfileButton();
+
 		if (pendingWhoCardName != null) {
 			nameEditText.onRestoreInstanceState(pendingWhoCardName);
 			pendingWhoCardName = null;
@@ -1347,12 +1347,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void showProfileButton() {
-		//AnimationUtil.fadeIn(profileButton, null);
-		profileMenuItem.setVisible(true);
+		bShowProfileMenuItem = true;
+		updateMenuVisibility();
 	}
 
 	private void hideProfileButton() {
-		profileMenuItem.setVisible(false);
+		bShowProfileMenuItem = false;
+		updateMenuVisibility();
 	}
 
 	/*
@@ -1449,22 +1450,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	}
 
-	private CompoundMessage createAutoReplay(String messageTobeScanned) {
-		String msg = "Our offices are currently closed. Check out our FAQ on: <br> <ul>";
-		boolean foundMatch = false;
-		if (messageTobeScanned.toLowerCase().contains("activation") || messageTobeScanned.toLowerCase().contains("activate")) {
-			foundMatch = true;
-			msg += "<br> <li> <a href=\"apptentive://faq/faqs-detail/614\">How to Activate</a> </li>";
-		}
-		if (messageTobeScanned.toLowerCase().contains("transfer") || messageTobeScanned.toLowerCase().contains("transfers")) {
-			foundMatch = true;
-			msg += "<br> <li> <a href=\"apptentive://faq/faqs-listing/56\">Transfers</a> </li>";
-		}
-		if (foundMatch) {
-			return CompoundMessage.createAutoMessage(null, msg + "</ul>");
-		}
-		return null;
-	}
 
 	private static class MessagingActionHandler extends Handler {
 
@@ -1512,15 +1497,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						}
 					}
 					fragment.updateMessageSentStates();
-					fragment.contextualMessage = fragment.createAutoReplay(((CompoundMessage) apptentiveMessage).getBody());
-					if (fragment.contextualMessage == null) {
-						fragment.addExpectationStatusIfNeeded();
-					} else {
-						fragment.clearPendingComposingMessage();
-						fragment.clearStatusItem();
-						fragment.messages.add(fragment.contextualMessage);
-						fragment.contextualMessage = null;
-					}
+					fragment.addExpectationStatusIfNeeded();
+
 
 					// Update the sent message, make sure it stays in view
 					int firstIndex = fragment.messageCenterListView.getFirstVisiblePosition();
