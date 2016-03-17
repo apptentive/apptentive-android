@@ -103,6 +103,8 @@ public class ApptentiveInternal {
 
 	ExecutorService cachedExecutor;
 
+	private WeakReference<Activity> currentTaskStackBottomActivity;
+
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
 
@@ -150,7 +152,7 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
 					sApptentiveInternal = new ApptentiveInternal();
-
+					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.prefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
@@ -191,8 +193,13 @@ public class ApptentiveInternal {
 	 */
 	public static ApptentiveInternal getInstance() {
 		// Lazy initialization, only once for each application launch when getInstance() is called for the 1st time
-		if (sApptentiveInternal != null && isApptentiveInitialized.compareAndSet(false, true)) {
-			sApptentiveInternal.init();
+		if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
+			synchronized (ApptentiveInternal.class) {
+				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
+					isApptentiveInitialized.set(true);
+					sApptentiveInternal.init();
+				}
+			}
 		}
 		return sApptentiveInternal;
 	}
@@ -239,6 +246,19 @@ public class ApptentiveInternal {
 
 	public Context getApplicationContext() {
 		return appContext;
+	}
+
+	/* Get the last running activity from the current application, i.e. at the bottom of the task
+	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityDestroyed(Activity)}
+	 *
+	 * If Apptentive interaction is to be launched from a non-activity context, use the last running activity at
+	 * the bottom of the task.
+	 */
+	public Activity getCurrentTaskStackBottomActivity() {
+		if (currentTaskStackBottomActivity != null) {
+			return currentTaskStackBottomActivity.get();
+		}
+		return null;
 	}
 
 	public MessageManager getMessageManager() {
@@ -353,6 +373,12 @@ public class ApptentiveInternal {
 		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
 	}
 
+	public void onActivityStarted(Activity activity) {
+		if (activity != null) {
+			currentTaskStackBottomActivity = new WeakReference<Activity>(activity);
+		}
+	}
+
 	public void onActivityResumed(Activity activity) {
 		messageManager.setCurrentForgroundActivity(activity);
 
@@ -361,6 +387,15 @@ public class ApptentiveInternal {
 		syncDevice();
 		syncSdk();
 		syncPerson();
+	}
+
+	public void onActivityDestroyed(Activity activity) {
+		if (activity != null && currentTaskStackBottomActivity != null) {
+			Activity currentBottomActivity = currentTaskStackBottomActivity.get();
+			if (currentBottomActivity != null && currentBottomActivity == activity) {
+				currentTaskStackBottomActivity = null;
+			}
+		}
 	}
 
 	public void onAppEnterForeground() {
@@ -496,7 +531,6 @@ public class ApptentiveInternal {
 		// Grab app info we need to access later on.
 		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		Log.d("Android ID: ", androidId);
-
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
 		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
@@ -783,15 +817,18 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	public void showAboutInternal(Activity activity, boolean showBrandingBand) {
+	public void showAboutInternal(Context context, boolean showBrandingBand) {
 		Intent intent = new Intent();
-		intent.setClass(activity, ApptentiveViewActivity.class);
+		intent.setClass(context, ApptentiveViewActivity.class);
 		intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ABOUT);
 		intent.putExtra(Constants.FragmentConfigKeys.EXTRA, showBrandingBand);
-		activity.startActivity(intent);
+		if (!(context instanceof Activity)) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		}
+		context.startActivity(intent);
 	}
 
-	public boolean showMessageCenterInternal(Activity activity, Map<String, Object> customData) {
+	public boolean showMessageCenterInternal(Context context, Map<String, Object> customData) {
 		boolean interactionShown = false;
 		if (canShowMessageCenterInternal()) {
 			if (customData != null) {
@@ -814,18 +851,18 @@ public class ApptentiveInternal {
 				}
 			}
 			this.customData = customData;
-			interactionShown = EngagementModule.engageInternal(activity, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			interactionShown = EngagementModule.engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
 				this.customData = null;
 			}
 		} else {
-			showMessageCenterFallback(activity);
+			showMessageCenterFallback(context);
 		}
 		return interactionShown;
 	}
 
-	public void showMessageCenterFallback(Activity activity) {
-		EngagementModule.launchMessageCenterErrorActivity(activity);
+	public void showMessageCenterFallback(Context context) {
+		EngagementModule.launchMessageCenterErrorActivity(context);
 	}
 
 	public boolean canShowMessageCenterInternal() {

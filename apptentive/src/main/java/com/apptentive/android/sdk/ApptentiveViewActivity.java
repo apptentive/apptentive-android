@@ -7,10 +7,13 @@
 package com.apptentive.android.sdk;
 
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
+import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -156,7 +159,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		}
 
 		super.onBackPressed();
-
+		startLauncherActivityIfRoot();
 	}
 
 	@Override
@@ -212,6 +215,25 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		}
 		viewPager_Adapter.add(f, title);
 		viewPager_Adapter.notifyDataSetChanged();
+	}
+
+	/* If Apptentive interaction activity is the only activity of a task, backing from it will
+	 * automatically launch the app main activity.
+	 *
+	 * This is to make sure when Apptentive interaction is
+	 * launched from non-activity context, such as pending intent when application is not running,service
+	 * context, or applciation context, exiting fom Apptentive interaction will land on a  default app
+	 * activity, instead of desktop.
+	 * */
+	private void startLauncherActivityIfRoot() {
+		if (isTaskRoot()) {
+			PackageManager packageManager = getPackageManager();
+			Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
+			ComponentName componentName = intent.getComponent();
+			/** Backwards compatible method that will clear all activities in the stack. */
+			Intent mainIntent = IntentCompat.makeRestartActivityTask(componentName);
+			startActivity(mainIntent);
+		}
 	}
 
 }
