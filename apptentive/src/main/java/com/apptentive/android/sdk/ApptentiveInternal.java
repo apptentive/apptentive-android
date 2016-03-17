@@ -152,7 +152,7 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
 					sApptentiveInternal = new ApptentiveInternal();
-
+					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.prefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
@@ -193,8 +193,13 @@ public class ApptentiveInternal {
 	 */
 	public static ApptentiveInternal getInstance() {
 		// Lazy initialization, only once for each application launch when getInstance() is called for the 1st time
-		if (sApptentiveInternal != null && isApptentiveInitialized.compareAndSet(false, true)) {
-			sApptentiveInternal.init();
+		if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
+			synchronized (ApptentiveInternal.class) {
+				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
+					isApptentiveInitialized.set(true);
+					sApptentiveInternal.init();
+				}
+			}
 		}
 		return sApptentiveInternal;
 	}
@@ -526,7 +531,6 @@ public class ApptentiveInternal {
 		// Grab app info we need to access later on.
 		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		Log.d("Android ID: ", androidId);
-
 		Log.d("Default Locale: %s", Locale.getDefault().toString());
 		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}

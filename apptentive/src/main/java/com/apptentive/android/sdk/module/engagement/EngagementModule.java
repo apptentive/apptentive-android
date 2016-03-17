@@ -45,6 +45,9 @@ public class EngagementModule {
 	}
 
 	public static synchronized boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
