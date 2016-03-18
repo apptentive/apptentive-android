@@ -17,8 +17,6 @@
         <item name="colorPrimary">@color/apptentive_red</item>
     </style>
 
-    <style name="foo" parent="Widget.Design.Snackbar">
-    </style>
     <!-- Base Theme-->
     <style name="ApptentiveBaseVersionBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
@@ -79,7 +77,6 @@
         <item name="windowNoTitle">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/apptentive_activity_frame</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">false</item>
         <item name="windowActionBarOverlay">false</item>
@@ -87,6 +84,10 @@
         <item name="actionBarPopupTheme">@null</item>
         <item name="actionBarTheme">@null</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <style name="ApptentiveBaseVersionBaseModalStyle">
+        <item name="android:windowBackground">@color/apptentive_activity_frame</item>
     </style>
 
     <!-- Default theme used by image preview -->
