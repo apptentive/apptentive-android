@@ -10,9 +10,11 @@ package com.apptentive.android.sdk;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -55,7 +57,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 					newFragment = FragmentFactory.createFragmentInstance(bundle);
 					if (newFragment != null) {
 						newFragment.setOnTransitionListener(this);
-						applyApptentiveTheme(!newFragment.isShownAsModelDialog());
+						applyApptentiveTheme(newFragment.isShownAsModelDialog());
 					}
 				}
 
@@ -205,8 +207,12 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		}
 	}
 
-	private void applyApptentiveTheme(boolean isFullScreenInteraction) {
-		getTheme().setTo(ApptentiveInternal.getInstance().getApptentiveTheme());
+	private void applyApptentiveTheme(boolean isModalInteraction) {
+		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
+		if (isModalInteraction) {
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
+		}
+		getTheme().setTo(apptentiveTheme);
 	}
 
 	private void addFragmentToAdapter(ApptentiveBaseFragment f, String title) {
