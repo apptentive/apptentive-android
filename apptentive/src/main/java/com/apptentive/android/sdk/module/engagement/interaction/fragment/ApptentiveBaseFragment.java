@@ -253,7 +253,12 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	public boolean isShownAsModelDialog() {
-		return bShownAsModal;
+		Bundle bundle = getArguments();
+
+		if (bundle != null) {
+			return bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
+		}
+		return false;
 	}
 
 	public String getTitle() {
