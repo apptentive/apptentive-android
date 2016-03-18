@@ -156,6 +156,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}
 	}
 
+	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		if (toolbarLayoutId != 0) {
@@ -195,6 +196,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		ApptentiveInternal.getInstance().checkAndUpdateApptentiveConfigurations();
 	}
 
+	@Override
 	public void onStop() {
 		super.onStop();
 		if (Build.VERSION.SDK_INT >= 11) {
@@ -203,6 +205,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	}
 
+	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
 		if (toolbar != null && fragmentMenuItems != null) {
@@ -218,6 +221,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	}
 
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(this.getMenuResourceId(), menu);
 		attachFragmentMenuListeners(menu);
@@ -239,6 +243,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	protected void attachFragmentMenuListeners(Menu menu) {}
+
+	protected void updateMenuVisibility() {
+
+	}
 
 	public Activity getActivity(Fragment fragment) {
 		if (fragment == null) {
