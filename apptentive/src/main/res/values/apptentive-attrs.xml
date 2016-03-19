@@ -46,6 +46,8 @@
         <attr name="apptentive_material_disabled_icon" format="color|reference"/>
         <attr name="apptentive_material_divider" format="color|reference"/>
 
+        <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
+
         <attr name="apptentive_material_selected_text" format="color|reference"/>
     </declare-styleable>
 

@@ -59,6 +59,8 @@
         <item name="apptentiveTextSizeButtonBorderless">@dimen/apptentive_text_size_button</item>
         <item name="apptentiveTextSizeButtonColored">@dimen/apptentive_text_size_button</item>
 
+        <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
+
         <!-- Apptentive Material specific values -->
         <item name="apptentiveViewBackground">@color/apptentive_view_background</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background</item>
@@ -242,7 +244,7 @@
 
     <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:typeface">?attr/apptentiveTypefaceButtonBorderless</item>
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?attr/apptentiveTextColorButtonBorderless</item>
         <item name="android:textSize">?attr/apptentiveTextSizeButtonBorderless</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:minWidth">36dp</item>
