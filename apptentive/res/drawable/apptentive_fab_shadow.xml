@@ -14,8 +14,8 @@
         android:endColor="#0000"
         />
     <padding
-        android:left="@dimen/floating_action_button_shadow_radius"
+        android:left="@dimen/apptentive_floating_action_button_shadow_radius"
         android:top="0dp"
-        android:right="@dimen/floating_action_button_shadow_radius"
-        android:bottom="@dimen/floating_action_button_shadow_radius"/>
+        android:right="@dimen/apptentive_floating_action_button_shadow_radius"
+        android:bottom="@dimen/apptentive_floating_action_button_shadow_radius"/>
 </shape>

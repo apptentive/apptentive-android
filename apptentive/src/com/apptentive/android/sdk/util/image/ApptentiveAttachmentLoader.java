@@ -32,7 +32,7 @@ import com.apptentive.android.sdk.util.task.ApptentiveDrawableLoaderTask;
  */
 public class ApptentiveAttachmentLoader {
 
-	public static final int DRAWABLE_DOWNLOAD_TAG = R.id.drawable_downloader;
+	public static final int DRAWABLE_DOWNLOAD_TAG = R.id.apptentive_drawable_downloader;
 
 	private ImageMemoryCache bitmapMemoryCache;
 	private ArrayList<LoaderRequest> queuedDownLoaderRequests;

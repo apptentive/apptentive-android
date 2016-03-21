@@ -282,13 +282,13 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 	@Override
 	public void finish() {
 		super.finish();
-		overridePendingTransition(0, R.anim.slide_down_out);
+		overridePendingTransition(0, R.anim.apptentive_slide_down_out);
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		overridePendingTransition(R.anim.slide_up_in, 0);
+		overridePendingTransition(R.anim.apptentive_slide_up_in, 0);
 	}
 
 	@Override

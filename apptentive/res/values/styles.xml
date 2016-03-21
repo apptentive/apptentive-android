@@ -456,7 +456,7 @@
 
     <!-- For dialog Animation -->
     <style name="ApptentiveDialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_down_out</item>
+        <item name="android:windowEnterAnimation">@anim/apptentive_slide_up_in</item>
+        <item name="android:windowExitAnimation">@anim/apptentive_slide_down_out</item>
     </style>
 </resources>

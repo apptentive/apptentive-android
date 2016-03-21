@@ -236,7 +236,7 @@ public class FloatingActionButton extends ImageButton {
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (mImplicitElevation) {
-				setElevation(getResources().getDimension(R.dimen.floating_action_button_elevation));
+				setElevation(getResources().getDimension(R.dimen.apptentive_floating_action_button_elevation));
 			}
 		}
 	}
@@ -296,7 +296,7 @@ public class FloatingActionButton extends ImageButton {
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (mImplicitElevation) {
-				setElevation(mShadow ? getResources().getDimension(R.dimen.floating_action_button_elevation) : 0f);
+				setElevation(mShadow ? getResources().getDimension(R.dimen.apptentive_floating_action_button_elevation) : 0f);
 			}
 		}
 
