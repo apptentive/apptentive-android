@@ -106,12 +106,12 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-
+    // Android bug work-around: https://code.google.com/p/android/issues/detail?id=42601
 		if (retainedChildFragmentManager != null) {
 			try {
-				Field e = Fragment.class.getDeclaredField("mChildFragmentManager");
-				e.setAccessible(true);
-				e.set(this, this.retainedChildFragmentManager);
+				Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+				childFragmentManager.setAccessible(true);
+				childFragmentManager.set(this, this.retainedChildFragmentManager);
 			} catch (NoSuchFieldException nosuchfieldexception) {
 				Log.d("NoSuchFieldException", nosuchfieldexception);
 			} catch (IllegalAccessException illegalaccessexception) {
@@ -122,6 +122,22 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		// not create new fragment (onCreate() won't be called) when configuration changes, i.e. rotation
 		setRetainInstance(true);
 
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+
+		try {
+			Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+			childFragmentManager.setAccessible(true);
+			childFragmentManager.set(this, null);
+
+		} catch (NoSuchFieldException e) {
+			Log.d("NoSuchFieldException", e);
+		} catch (IllegalAccessException e) {
+			Log.d("IllegalAccessException", e);
+		}
 	}
 
 	@Override

@@ -140,14 +140,14 @@ public class DeviceManager {
 		device.setCurrentCarrier(tm.getNetworkOperatorName());
 		device.setNetworkType(Constants.networkTypeAsString(tm.getNetworkType()));
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-			try {
-				device.setBootloaderVersion((String) Build.class.getField("BOOTLOADER").get(null));
-			} catch (Exception e) {
-				//
-			}
-			device.setRadioVersion(Build.getRadioVersion());
+
+		try {
+			device.setBootloaderVersion((String) Build.class.getField("BOOTLOADER").get(null));
+		} catch (Exception e) {
+			//
 		}
+		device.setRadioVersion(Build.getRadioVersion());
+
 
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());
