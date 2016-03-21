@@ -1,3 +1,10 @@
+# 2016-03-22 - 2.1.4
+
+#### Bug Fixed and Improvements
+
+*   All Apptentive resources now have "apptentive_" prefix
+*   Apptentive Log class is renamed to "ApptentiveLog" 
+
 # 2016-01-22 - 2.1.3
 
 #### Bug Fixed and Improvements
