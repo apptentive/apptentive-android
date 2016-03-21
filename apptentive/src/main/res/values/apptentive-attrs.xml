@@ -8,30 +8,46 @@
 <resources>
 
     <declare-styleable name="ApptentiveThemeTemplate">
-        <attr name="apptentiveViewBackground" format="color|reference" />
-        <attr name="apptentiveCardViewBackground" format="color|reference" />
+        <attr name="apptentiveViewBackground" format="color|reference"/>
+        <attr name="apptentiveCardViewBackground" format="color|reference"/>
 
-        <attr name="apptentiveValidationFailedColor" format="color|reference" />
-        <attr name="apptentiveTextAppearanceMedium" format="reference" />
+        <attr name="apptentiveValidationFailedColor" format="color|reference"/>
 
-        <attr name="apptentiveColorSnackbar" format="color|reference" />
+        <attr name="apptentiveColorSnackbar" format="color|reference"/>
 
-        <attr name="apptentiveTextSizeHeadline" format="dimension|reference" />
-        <attr name="apptentiveTextSizeTitle" format="dimension|reference" />
-        <attr name="apptentiveTextSizeSubheading" format="dimension|reference" />
-        <attr name="apptentiveTextSizeBody" format="dimension|reference" />
-        <attr name="apptentiveTextSizeCaption" format="dimension|reference" />
+        <attr name="apptentiveTextSizeHeadline" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeTitle" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeSubhead" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeBody1" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeBody2" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeCaption" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeButtonBorderless" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeButtonColored" format="dimension|reference"/>
 
-        <attr name="apptentiveFontFamily" format="string|reference" />
-        <attr name="apptentiveTypeface" format="integer|reference" />
+        <attr name="apptentiveTypefaceHeadline" format="integer|reference"/>
+        <attr name="apptentiveTypefaceTitle" format="integer|reference"/>
+        <attr name="apptentiveTypefaceSubhead" format="integer|reference"/>
+        <attr name="apptentiveTypefaceBody1" format="integer|reference"/>
+        <attr name="apptentiveTypefaceBody2" format="integer|reference"/>
+        <attr name="apptentiveTypefaceCaption" format="integer|reference"/>
+        <attr name="apptentiveTypefaceButtonBorderless" format="integer|reference"/>
+        <attr name="apptentiveTypefaceButtonColored" format="integer|reference"/>
 
-        <attr name="apptentive_material_disabled_text" format="color|reference" />
-        <attr name="apptentive_material_disabled_icon" format="color|reference" />
-        <attr name="apptentive_material_divider" format="color|reference" />
+        <attr name="apptentiveFontFamilyHeadline" format="string|reference"/>
+        <attr name="apptentiveFontFamilyTitle" format="string|reference"/>
+        <attr name="apptentiveFontFamilySubhead" format="string|reference"/>
+        <attr name="apptentiveFontFamilyBody1" format="string|reference"/>
+        <attr name="apptentiveFontFamilyBody2" format="string|reference"/>
+        <attr name="apptentiveFontFamilyCaption" format="string|reference"/>
+        <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
+        <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
 
-        <attr name="apptentive_material_selected_text" format="color|reference" />
+        <attr name="apptentive_material_disabled_text" format="color|reference"/>
+        <attr name="apptentive_material_disabled_icon" format="color|reference"/>
+        <attr name="apptentive_material_divider" format="color|reference"/>
+
+        <attr name="apptentive_material_selected_text" format="color|reference"/>
     </declare-styleable>
-
 
 
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>

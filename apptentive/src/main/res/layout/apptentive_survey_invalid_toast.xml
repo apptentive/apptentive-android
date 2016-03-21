@@ -13,7 +13,7 @@
     <TextView android:id="@+id/survey_invalid_toast_text"
               android:layout_width="match_parent"
               android:layout_height="48dp"
-              android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary.Inverse"
+              android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Inverse"
               android:paddingLeft="24dp"
               android:paddingRight="24dp"
               android:gravity="center"

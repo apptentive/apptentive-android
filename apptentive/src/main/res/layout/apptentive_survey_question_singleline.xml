@@ -14,7 +14,7 @@
           android:layout_marginStart="4dp"
           android:layout_marginTop="16dp"
           android:layout_marginBottom="16dp"
-          android:textAppearance="@style/Apptentive.TextAppearance.Body"
+          android:textAppearance="@style/Apptentive.TextAppearance.Body1"
           android:gravity="bottom|start"
           android:inputType="text|textCapSentences"
           android:hint="Please leave detailed feedback…"/>

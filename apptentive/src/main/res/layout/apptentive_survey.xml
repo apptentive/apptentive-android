@@ -27,7 +27,7 @@
                           android:layout_alignParentTop="true"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Primary.Inverse"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Inverse"
                           android:paddingLeft="4dp"
                           android:paddingStart="4dp"
                           android:paddingRight="16dp"

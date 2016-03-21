@@ -46,7 +46,7 @@
             <TextView android:id="@+id/greeting_body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:textAppearance="@style/Apptentive.TextAppearance.Subheading.Secondary.Inverse"
+                      android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary.Inverse"
                       android:alpha="0.8"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"
