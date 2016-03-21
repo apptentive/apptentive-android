@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.model;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
@@ -35,7 +35,7 @@ public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testBasicVersionComparison() {
-		Log.e("Running test: testBasicVersionComparison()\n\n");
+		ApptentiveLog.e("Running test: testBasicVersionComparison()\n\n");
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testBasicVersionComparison.json");
 
 		try {
@@ -73,7 +73,7 @@ public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
 				assertEquals(String.format("Comparison of [\"%s\" %s \"%s\"] failed", left, operator, right), expected, actual);
 			}
 		} catch (JSONException e) {
-			Log.e("Error loading experiment results.", e);
+			ApptentiveLog.e("Error loading experiment results.", e);
 		}
 
 	}

@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONException;
 
@@ -25,69 +25,69 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
 	public void testOperatorExists() {
-		Log.e("Running test: testOperatorExists()\n\n");
+		ApptentiveLog.e("Running test: testOperatorExists()\n\n");
 		doTest("testOperatorExists.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorNot() {
-		Log.e("Running test: testOperatorNot()\n\n");
+		ApptentiveLog.e("Running test: testOperatorNot()\n\n");
 		doTest("testOperatorNot.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorLessThan() {
-		Log.e("Running test: testOperatorLessThan()\n\n");
+		ApptentiveLog.e("Running test: testOperatorLessThan()\n\n");
 		doTest("testOperatorLessThan.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorLessThanOrEqual() {
-		Log.e("Running test: testOperatorLessThanOrEqual()\n\n");
+		ApptentiveLog.e("Running test: testOperatorLessThanOrEqual()\n\n");
 		doTest("testOperatorLessThanOrEqual.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorGreaterThanOrEqual() {
-		Log.e("Running test: testOperatorGreaterThanOrEqual()\n\n");
+		ApptentiveLog.e("Running test: testOperatorGreaterThanOrEqual()\n\n");
 		doTest("testOperatorGreaterThanOrEqual.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorGreaterThan() {
-		Log.e("Running test: testOperatorGreaterThan()\n\n");
+		ApptentiveLog.e("Running test: testOperatorGreaterThan()\n\n");
 		doTest("testOperatorGreaterThan.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorContains() {
-		Log.e("Running test: testOperatorContains()\n\n");
+		ApptentiveLog.e("Running test: testOperatorContains()\n\n");
 		doTest("testOperatorContains.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorStartsWith() {
-		Log.e("Running test: testOperatorStartsWith()\n\n");
+		ApptentiveLog.e("Running test: testOperatorStartsWith()\n\n");
 		doTest("testOperatorStartsWith.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorEndsWith() {
-		Log.e("Running test: testOperatorEndsWith()\n\n");
+		ApptentiveLog.e("Running test: testOperatorEndsWith()\n\n");
 		doTest("testOperatorEndsWith.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorBefore() {
-		Log.e("Running test: testOperatorBefore()\n\n");
+		ApptentiveLog.e("Running test: testOperatorBefore()\n\n");
 		doTest("testOperatorBefore.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testOperatorAfter() {
-		Log.e("Running test: testOperatorAfter()\n\n");
+		ApptentiveLog.e("Running test: testOperatorAfter()\n\n");
 		doTest("testOperatorAfter.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	private void doTest(String testFile) {
@@ -109,7 +109,7 @@ public class OperatorTests extends ApptentiveInstrumentationTestCase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet(getTargetContext()));
 		} catch (JSONException e) {
-			Log.e("Error parsing test JSON.", e);
+			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
 	}

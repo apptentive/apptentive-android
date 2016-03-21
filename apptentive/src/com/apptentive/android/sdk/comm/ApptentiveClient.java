@@ -11,7 +11,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
@@ -129,12 +129,12 @@ public class ApptentiveClient {
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(Context appContext, String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase(appContext) + uri;
-		Log.d("Performing %s request to %s", method.name(), uri);
+		ApptentiveLog.d("Performing %s request to %s", method.name(), uri);
 		//Log.e("OAUTH Token: %s", oauthToken);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		if (!Util.isNetworkConnectionPresent(appContext)) {
-			Log.d("Network unavailable.");
+			ApptentiveLog.d("Network unavailable.");
 			return ret;
 		}
 
@@ -163,14 +163,14 @@ public class ApptentiveClient {
 					sendPostPutRequest(connection, "POST", body);
 					break;
 				default:
-					Log.e("Unrecognized method: " + method.name());
+					ApptentiveLog.e("Unrecognized method: " + method.name());
 					return ret;
 			}
 
 			int responseCode = connection.getResponseCode();
 			ret.setCode(responseCode);
 			ret.setReason(connection.getResponseMessage());
-			Log.d("Response Status Line: " + connection.getResponseMessage());
+			ApptentiveLog.d("Response Status Line: " + connection.getResponseMessage());
 
 			// Get the Http response header values
 			Map<String, String> headers = new HashMap<String, String>();
@@ -181,28 +181,28 @@ public class ApptentiveClient {
 			ret.setHeaders(headers);
 
 			// Read the response, if available
-			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			ApptentiveLog.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
 			if (responseCode >= 200 && responseCode < 300) {
 				ret.setContent(getResponse(connection, ret.isZipped()));
-				Log.v("Response: %s", ret.getContent());
+				ApptentiveLog.v("Response: %s", ret.getContent());
 			} else {
 				ret.setContent(getErrorResponse(connection, ret.isZipped()));
-				Log.w("Response: %s", ret.getContent());
+				ApptentiveLog.w("Response: %s", ret.getContent());
 			}
 		} catch (IllegalArgumentException e) {
-			Log.w("Error communicating with server.", e);
+			ApptentiveLog.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
-			Log.w("Timeout communicating with server.", e);
+			ApptentiveLog.w("Timeout communicating with server.", e);
 		} catch (final MalformedURLException e) {
-			Log.w("MalformedUrlException", e);
+			ApptentiveLog.w("MalformedUrlException", e);
 		} catch (final IOException e) {
-			Log.w("IOException", e);
+			ApptentiveLog.w("IOException", e);
 			// Read the error response.
 			try {
 				ret.setContent(getErrorResponse(connection, ret.isZipped()));
-				Log.w("Response: " + ret.getContent());
+				ApptentiveLog.w("Response: " + ret.getContent());
 			} catch (IOException ex) {
-				Log.w("Can't read error stream.", ex);
+				ApptentiveLog.w("Can't read error stream.", ex);
 			}
 		}
 		return ret;
@@ -210,7 +210,7 @@ public class ApptentiveClient {
 
 	private static void sendPostPutRequest(final HttpURLConnection connection, final String requestMethod, String body) throws IOException {
 
-		Log.d("%s body: %s", requestMethod, body);
+		ApptentiveLog.d("%s body: %s", requestMethod, body);
 
 		connection.setRequestMethod(requestMethod);
 		connection.setDoInput(true);
@@ -234,12 +234,12 @@ public class ApptentiveClient {
 
 	private static ApptentiveHttpResponse performMultipartFilePost(Context appContext, String oauthToken, String uri, String postBody, List<StoredFile> associatedFiles) {
 		uri = getEndpointBase(appContext) + uri;
-		Log.d("Performing multipart POST to %s", uri);
-		Log.d("Multipart POST body: %s", postBody);
+		ApptentiveLog.d("Performing multipart POST to %s", uri);
+		ApptentiveLog.d("Multipart POST body: %s", postBody);
 
 		ApptentiveHttpResponse ret = new ApptentiveHttpResponse();
 		if (!Util.isNetworkConnectionPresent(appContext)) {
-			Log.d("Network unavailable.");
+			ApptentiveLog.d("Network unavailable.");
 			return ret;
 		}
 
@@ -336,7 +336,7 @@ public class ApptentiveClient {
 							bytesRead = fis.read(buffer, 0, bufferSize);
 						}
 					} catch (IOException e) {
-						Log.d("Error writing file bytes to HTTP connection.", e);
+						ApptentiveLog.d("Error writing file bytes to HTTP connection.", e);
 						ret.setBadPayload(true);
 						throw e;
 					} finally {
@@ -370,20 +370,20 @@ public class ApptentiveClient {
 				Util.ensureClosed(nbaos);
 			}
 
-			Log.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
-			Log.v("Response: %s", ret.getContent());
+			ApptentiveLog.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
+			ApptentiveLog.v("Response: %s", ret.getContent());
 		} catch (FileNotFoundException e) {
-			Log.e("Error getting file to upload.", e);
+			ApptentiveLog.e("Error getting file to upload.", e);
 		} catch (MalformedURLException e) {
-			Log.e("Error constructing url for file upload.", e);
+			ApptentiveLog.e("Error constructing url for file upload.", e);
 		} catch (SocketTimeoutException e) {
-			Log.w("Timeout communicating with server.");
+			ApptentiveLog.w("Timeout communicating with server.");
 		} catch (IOException e) {
-			Log.e("Error executing file upload.", e);
+			ApptentiveLog.e("Error executing file upload.", e);
 			try {
 				ret.setContent(getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
-				Log.w("Can't read error stream.", ex);
+				ApptentiveLog.w("Can't read error stream.", ex);
 			}
 		} finally {
 			Util.ensureClosed(os);

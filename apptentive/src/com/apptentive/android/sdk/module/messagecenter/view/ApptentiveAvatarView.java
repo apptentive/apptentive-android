@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
@@ -150,7 +150,7 @@ public class ApptentiveAvatarView extends ImageView {
 				d.draw(canvas);
 				return b;
 			} catch (OutOfMemoryError e) {
-				Log.w("Error creating bitmap.", e);
+				ApptentiveLog.w("Error creating bitmap.", e);
 				return null;
 			}
 		}
@@ -222,7 +222,7 @@ public class ApptentiveAvatarView extends ImageView {
 					URL url = new URL(urlString);
 					bitmap = BitmapFactory.decodeStream(url.openStream());
 				} catch (IOException e) {
-					Log.d("Error opening avatar from URL: \"%s\"", e, urlString);
+					ApptentiveLog.d("Error opening avatar from URL: \"%s\"", e, urlString);
 				}
 				if (bitmap != null) {
 					final Bitmap finalBitmap = bitmap;
@@ -237,7 +237,7 @@ public class ApptentiveAvatarView extends ImageView {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("UncaughtException in AvatarView.", throwable);
+				ApptentiveLog.w("UncaughtException in AvatarView.", throwable);
 				MetricModule.sendError(getContext().getApplicationContext(), throwable, null, null);
 			}
 		};

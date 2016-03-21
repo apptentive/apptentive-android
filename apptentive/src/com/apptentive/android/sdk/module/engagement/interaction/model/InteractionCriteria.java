@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import android.content.Context;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 
@@ -28,17 +28,17 @@ public class InteractionCriteria {
 	public boolean isMet(Context context) {
 		try {
 			Clause rootClause = ClauseParser.parse(json);
-			Log.i("Evaluating Criteria");
+			ApptentiveLog.i("Evaluating Criteria");
 			boolean ret = false;
 			if (rootClause != null) {
 				ret = rootClause.evaluate(context);
 			}
-			Log.i("- => %b", ret);
+			ApptentiveLog.i("- => %b", ret);
 			return ret;
 		} catch (JSONException e) {
-			Log.w("Error parsing and running InteractionCriteria predicate logic.", e);
+			ApptentiveLog.w("Error parsing and running InteractionCriteria predicate logic.", e);
 		} catch (Exception e) {
-			Log.w("Error parsing and running InteractionCriteria predicate logic.", e);
+			ApptentiveLog.w("Error parsing and running InteractionCriteria predicate logic.", e);
 		}
 		return false;
 	}

@@ -11,7 +11,7 @@ import android.os.Build;
 import android.test.InstrumentationTestCase;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.tests.util.FileUtil;
@@ -25,7 +25,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected Context targetContext;
 
 	static {
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {

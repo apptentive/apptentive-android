@@ -9,10 +9,9 @@ package com.apptentive.android.sdk.module.messagecenter;
 import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.util.Util;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,7 +70,7 @@ public class MessagePollingWorker {
 
 		public void run() {
 			try {
-					Log.v("Started %s", toString());
+					ApptentiveLog.v("Started %s", toString());
 
 					while (appInForeground.get()) {
 						if (contextRef.get() == null) {
@@ -84,7 +83,7 @@ public class MessagePollingWorker {
 						}
 						long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
 						if (Apptentive.canShowMessageCenter(contextRef.get())) {
-							Log.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
+							ApptentiveLog.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
 							MessageManager.fetchAndStoreMessages(contextRef.get(), messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 						}
 						MessagePollingWorker.goToSleep(pollingInterval);
@@ -92,7 +91,7 @@ public class MessagePollingWorker {
 			} finally {
 				threadRunning.set(false);
 				sPollingThread = null;
-				Log.v("Stopping MessagePollingThread.");
+				ApptentiveLog.v("Stopping MessagePollingThread.");
 			}
 		}
 	}
@@ -106,7 +105,7 @@ public class MessagePollingWorker {
 	}
 
 	private static void wakeUp() {
-		Log.v("Waking MessagePollingThread.");
+		ApptentiveLog.v("Waking MessagePollingThread.");
 		MessagePollingThread thread = getAndSetMessagePollingThread(true, false, null);
 		if (thread != null && thread.isAlive()) {
 			thread.interrupt();

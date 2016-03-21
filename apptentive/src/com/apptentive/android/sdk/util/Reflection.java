@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.util;
 
 import android.os.Build;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import java.lang.reflect.Method;
 
@@ -59,11 +59,11 @@ public class Reflection {
 			Method method = Build.class.getMethod("getRadioVersion");
 			Object invoked = method.invoke(null);
 			String ret = invoked.toString();
-			Log.v("Build.getRadioVersion() = %s", ret);
+			ApptentiveLog.v("Build.getRadioVersion() = %s", ret);
 			return ret;
 		} catch(Exception e) {
 			try{
-				Log.v("Build.RADIO = %s", (String)Build.class.getField("RADIO").get(null));
+				ApptentiveLog.v("Build.RADIO = %s", (String)Build.class.getField("RADIO").get(null));
 				return (String)Build.class.getField("RADIO").get(null);
 			} catch(Exception f) {
 				return null;

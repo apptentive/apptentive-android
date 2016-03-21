@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -37,7 +37,7 @@ public class VersionHistoryStore {
 	}
 
 	public static void updateVersionHistory(Context context, Integer newVersionCode, String newVersionName, double date) {
-		Log.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
+		ApptentiveLog.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
 		List<VersionHistoryEntry> versionHistory = getVersionHistory(context);
 		boolean alreadySawVersionCode = false;
 		boolean alreadySawVersionName = false;

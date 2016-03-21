@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,7 +43,7 @@ public abstract class Payload extends JSONObject {
 		try {
 			wrapper.put(getBaseType().name(), this);
 		} catch (JSONException e) {
-			Log.w("Error wrapping Payload in JSONObject.", e);
+			ApptentiveLog.w("Error wrapping Payload in JSONObject.", e);
 			return null;
 		}
 		return wrapper.toString();
@@ -80,7 +80,7 @@ public abstract class Payload extends JSONObject {
 			try {
 				return BaseType.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown Payload.BaseType: " + type);
+				ApptentiveLog.v("Error parsing unknown Payload.BaseType: " + type);
 			}
 			return unknown;
 		}

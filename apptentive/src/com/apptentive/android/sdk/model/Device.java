@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 /**
@@ -70,7 +70,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_UUID, uuid);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_UUID);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_UUID);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_OS_NAME, osName);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_OS_NAME);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_OS_NAME);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_OS_VERSION, osVersion);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_OS_VERSION);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_OS_VERSION);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_OS_BUILD, osBuild);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_OS_BUILD);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_OS_BUILD);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_OS_API_LEVEL, osApiLevel);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_OS_API_LEVEL);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_OS_API_LEVEL);
 		}
 	}
 
@@ -165,7 +165,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_MANUFACTURER, manufacturer);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_MANUFACTURER);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_MANUFACTURER);
 		}
 	}
 
@@ -184,7 +184,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_MODEL, model);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_MODEL);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_MODEL);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_BOARD, board);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_BOARD);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_BOARD);
 		}
 	}
 
@@ -222,7 +222,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_PRODUCT, product);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_PRODUCT);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_PRODUCT);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_BRAND, brand);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_BRAND);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_BRAND);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_CPU, cpu);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_CPU);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_CPU);
 		}
 	}
 
@@ -279,7 +279,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_DEVICE, device);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_DEVICE);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_DEVICE);
 		}
 	}
 
@@ -298,7 +298,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_CARRIER, carrier);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_CARRIER);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_CARRIER);
 		}
 	}
 
@@ -317,7 +317,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_CURRENT_CARRIER, currentCarrier);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_CURRENT_CARRIER);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_CURRENT_CARRIER);
 		}
 	}
 
@@ -336,7 +336,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_NETWORK_TYPE, networkType);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_NETWORK_TYPE);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_NETWORK_TYPE);
 		}
 	}
 
@@ -355,7 +355,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_BUILD_TYPE, buildType);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_BUILD_TYPE);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_BUILD_TYPE);
 		}
 	}
 
@@ -374,7 +374,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_BUILD_ID, buildId);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_BUILD_ID);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_BUILD_ID);
 		}
 	}
 
@@ -393,7 +393,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_BOOTLOADER_VERSION, bootloaderVersion);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_BOOTLOADER_VERSION);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_BOOTLOADER_VERSION);
 		}
 	}
 
@@ -412,7 +412,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_RADIO_VERSION, radioVersion);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_RADIO_VERSION);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_RADIO_VERSION);
 		}
 	}
 
@@ -432,7 +432,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
 		}
 	}
 
@@ -452,7 +452,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_INTEGRATION_CONFIG, integrationConfig);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_INTEGRATION_CONFIG);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_INTEGRATION_CONFIG);
 		}
 	}
 
@@ -471,7 +471,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_LOCALE_COUNTRY_CODE, localeCountryCode);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_LOCALE_COUNTRY_CODE);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_LOCALE_COUNTRY_CODE);
 		}
 	}
 
@@ -490,7 +490,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_LOCALE_LANGUAGE_CODE, localeLanguageCode);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_LOCALE_LANGUAGE_CODE);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_LOCALE_LANGUAGE_CODE);
 		}
 	}
 
@@ -509,7 +509,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_LOCALE_RAW, localeRaw);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_LOCALE_RAW);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_LOCALE_RAW);
 		}
 	}
 
@@ -528,7 +528,7 @@ public class Device extends Payload {
 		try {
 			put(KEY_UTC_OFFSET, utcOffset);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_UTC_OFFSET);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_UTC_OFFSET);
 		}
 	}
 

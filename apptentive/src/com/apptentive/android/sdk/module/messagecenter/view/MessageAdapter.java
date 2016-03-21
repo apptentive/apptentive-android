@@ -24,7 +24,7 @@ import android.os.AsyncTask;
 import android.widget.EditText;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -256,7 +256,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					break;
 				default:
 					view = null;
-					Log.i("Unrecognized type: %d", type);
+					ApptentiveLog.i("Unrecognized type: %d", type);
 					break;
 			}
 			if (view != null) {
@@ -644,7 +644,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			float scale = ImageUtil.calculateBitmapScaleFactor(options.outWidth, options.outHeight, maxImageWidth, maxImageHeight);
 			ret = new Point((int) (scale * options.outWidth), (int) (scale * options.outHeight));
 		} catch (Exception e) {
-			Log.e("Error opening stored file.", e);
+			ApptentiveLog.e("Error opening stored file.", e);
 		} finally {
 			Util.ensureClosed(fis);
 		}
@@ -752,14 +752,14 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				maxImageHeight = maxImageHeight > MAX_IMAGE_DISPLAY_HEIGHT ? MAX_IMAGE_DISPLAY_HEIGHT : maxImageHeight;
 				// Loading image from File Store. Pass 0 for orientation because images have been rotated when stored
 				imageBitmap = ImageUtil.createScaledBitmapFromLocalImageSource(activityContext, paths[0], maxImageWidth, maxImageHeight, null, 0);
-				Log.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
+				ApptentiveLog.v("Loaded bitmap and re-sized to: %d x %d", imageBitmap.getWidth(), imageBitmap.getHeight());
 			} catch (Exception e) {
-				Log.e("Error opening stored image.", e);
+				ApptentiveLog.e("Error opening stored image.", e);
 			} catch (OutOfMemoryError e) {
 				// It's generally not a good idea to catch an OutOfMemoryException. But in this case, the OutOfMemoryException
 				// had to result from allocating a bitmap, so the system should be in a good state.
 				// TODO: Log an event to the server so we know an OutOfMemoryException occurred.
-				Log.e("Ran out of memory opening image.", e);
+				ApptentiveLog.e("Ran out of memory opening image.", e);
 			}
 			return imageBitmap;
 		}

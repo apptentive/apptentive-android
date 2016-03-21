@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -24,9 +24,9 @@ public class WhitespaceTrimmingTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
 	public void testWhitespaceTrimming() {
-		Log.e("Running test: testWhitespaceTrimming()\n\n");
+		ApptentiveLog.e("Running test: testWhitespaceTrimming()\n\n");
 		doTest("testWhitespaceTrimming.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	private void doTest(String testFile) {
@@ -38,7 +38,7 @@ public class WhitespaceTrimmingTest extends ApptentiveInstrumentationTestCase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet(getTargetContext()));
 		} catch (JSONException e) {
-			Log.e("Error parsing test JSON.", e);
+			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
 	}

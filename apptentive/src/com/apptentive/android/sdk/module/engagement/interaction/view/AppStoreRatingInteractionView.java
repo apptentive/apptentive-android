@@ -12,7 +12,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
@@ -66,7 +66,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 		} catch (InsufficientRatingArgumentsException e) {
 			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
 			showingDialog = true;
-			Log.e(e.getMessage());
+			ApptentiveLog.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} finally {
 			if (!showingDialog) {
@@ -81,7 +81,7 @@ public class AppStoreRatingInteractionView extends InteractionView<AppStoreRatin
 	}
 
 	private void displayError(final Activity activity, String message) {
-		Log.e(message);
+		ApptentiveLog.e(message);
 		final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
 		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
 		alertDialog.setMessage(message);

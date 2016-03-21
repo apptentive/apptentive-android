@@ -55,7 +55,7 @@ public class ApptentiveInternal {
 			try {
 				return PushAction.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				Log.d("Error parsing unknown PushAction: " + name);
+				ApptentiveLog.d("Error parsing unknown PushAction: " + name);
 			}
 			return unknown;
 		}
@@ -100,17 +100,17 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Pass in a log level to override the default, which is {@link Log.Level#INFO}
+	 * Pass in a log level to override the default, which is {@link ApptentiveLog.Level#INFO}
 	 *
 	 */
-	public static void setMinimumLogLevel(Log.Level level) {
-		Log.overrideLogLevel(level);
+	public static void setMinimumLogLevel(ApptentiveLog.Level level) {
+		ApptentiveLog.overrideLogLevel(level);
 	}
 
 	private static String pushCallbackActivityName;
 	public static void setPushCallbackActivity(Class<? extends Activity> activity) {
 		pushCallbackActivityName = activity.getName();
-		Log.d("Setting push callback activity name to %s", pushCallbackActivityName);
+		ApptentiveLog.d("Setting push callback activity name to %s", pushCallbackActivityName);
 	}
 
 	public static String getPushCallbackActivityName() {
@@ -127,20 +127,20 @@ public class ApptentiveInternal {
 	static String getApptentivePushNotificationData(Intent intent) {
 		String apptentive = null;
 		if (intent != null) {
-			Log.v("Got an Intent.");
+			ApptentiveLog.v("Got an Intent.");
 			// Parse
 			if (intent.hasExtra(PARSE_PUSH_EXTRA_KEY)) {
 				String parseStringExtra = intent.getStringExtra(PARSE_PUSH_EXTRA_KEY);
-				Log.v("Got a Parse Push.");
+				ApptentiveLog.v("Got a Parse Push.");
 				try {
 					JSONObject parseJson = new JSONObject(parseStringExtra);
 					apptentive = parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
 				} catch (JSONException e) {
-					Log.e("Corrupt Parse String Extra: %s", parseStringExtra);
+					ApptentiveLog.e("Corrupt Parse String Extra: %s", parseStringExtra);
 				}
 			} else {
 				// Straight GCM / SNS
-				Log.v("Got a non-Parse push.");
+				ApptentiveLog.v("Got a non-Parse push.");
 				apptentive = intent.getStringExtra(APPTENTIVE_PUSH_EXTRA_KEY);
 			}
 		}
@@ -156,7 +156,7 @@ public class ApptentiveInternal {
 
 	static boolean setPendingPushNotification(Context context, String apptentivePushData) {
 		if (apptentivePushData != null) {
-			Log.d("Saving Apptentive push notification data.");
+			ApptentiveLog.d("Saving Apptentive push notification data.");
 			SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).commit();
 			MessageManager.startMessagePreFetchTask(context);
@@ -181,7 +181,7 @@ public class ApptentiveInternal {
 								value instanceof Float ||
 								value instanceof Integer ||
 								value instanceof Short)) {
-							Log.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
+							ApptentiveLog.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
 							keysIterator.remove();
 						}
 					}
@@ -224,7 +224,7 @@ public class ApptentiveInternal {
 				customData.put(key, value);
 				DeviceManager.storeCustomDeviceData(context, customData);
 			} catch (JSONException e) {
-				Log.w("Unable to add custom device data.", e);
+				ApptentiveLog.w("Unable to add custom device data.", e);
 			}
 		}
 	}
@@ -239,7 +239,7 @@ public class ApptentiveInternal {
 				customData.put(key, value);
 				PersonManager.storeCustomPersonData(context, customData);
 			} catch (JSONException e) {
-				Log.w("Unable to add custom person data.", e);
+				ApptentiveLog.w("Unable to add custom person data.", e);
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -108,7 +108,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 									data.put(Action.KEY_LABEL, buttonAction.getLabel());
 									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 								} catch (JSONException e) {
-									Log.e("Error creating Event data object.", e);
+									ApptentiveLog.e("Error creating Event data object.", e);
 								}
 								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
 								activity.finish();
@@ -144,7 +144,7 @@ public class TextModalInteractionView extends InteractionView<TextModalInteracti
 									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 									data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
 								} catch (JSONException e) {
-									Log.e("Error creating Event data object.", e);
+									ApptentiveLog.e("Error creating Event data object.", e);
 								}
 
 								EngagementModule.engageInternal(activity, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());

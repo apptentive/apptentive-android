@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -18,7 +18,7 @@ public class ConditionalTest {
 	public Comparable parameter;
 
 	public ConditionalTest(ConditionalOperator operator, Object parameter) {
-		Log.v("      + ConditionalTest: %s: %s", operator.name(), Util.classToString(parameter));
+		ApptentiveLog.v("      + ConditionalTest: %s: %s", operator.name(), Util.classToString(parameter));
 		this.operator = operator;
 		if (parameter != null && !(parameter instanceof Comparable)) {
 			throw new IllegalArgumentException(String.format("Encountered non-Comparable parameter: %s", Util.classToString(parameter)));

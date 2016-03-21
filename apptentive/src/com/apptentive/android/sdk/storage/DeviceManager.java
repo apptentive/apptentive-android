@@ -11,7 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
@@ -51,7 +51,7 @@ public class DeviceManager {
 				storeDevice(context, current);
 				return new Device(diff.toString());
 			} catch (JSONException e) {
-				Log.e("Error casting to Device.", e);
+				ApptentiveLog.e("Error casting to Device.", e);
 			}
 		}
 		return null;

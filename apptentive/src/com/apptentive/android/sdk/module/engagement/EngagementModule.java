@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.engagement;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Event;
@@ -46,7 +46,7 @@ public class EngagementModule {
 	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
-			Log.d("engage(%s)", eventLabel);
+			ApptentiveLog.d("engage(%s)", eventLabel);
 
 			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
 			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, interactionId, data, customData, extendedData));
@@ -64,13 +64,13 @@ public class EngagementModule {
 			launchInteraction(activity, interaction);
 			return true;
 		}
-		Log.d("No interaction to show.");
+		ApptentiveLog.d("No interaction to show.");
 		return false;
 	}
 
 	public static void launchInteraction(Activity activity, Interaction interaction) {
 		if (interaction != null) {
-			Log.i("Launching interaction: %s", interaction.getType().toString());
+			ApptentiveLog.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(activity, ViewActivity.class);
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());

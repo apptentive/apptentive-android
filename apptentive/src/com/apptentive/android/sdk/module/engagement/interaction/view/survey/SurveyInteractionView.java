@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.SurveyResponse;
@@ -112,7 +112,7 @@ public class SurveyInteractionView extends InteractionView<SurveyInteraction> {
 
 				EngagementModule.engageInternal(activity, interaction, EVENT_SUBMIT);
 				ApptentiveDatabase.getInstance(activity).addPayload(new SurveyResponse(interaction, surveyState));
-				Log.d("Survey Submitted.");
+				ApptentiveLog.d("Survey Submitted.");
 				callListener(true);
 
 				cleanup();

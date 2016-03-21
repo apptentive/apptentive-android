@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 /**
@@ -55,7 +55,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_ID, id);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_ID + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_ID + " of " + KEY);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_EMAIL, email);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_EMAIL + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_EMAIL + " of " + KEY);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_NAME, name);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_NAME + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_NAME + " of " + KEY);
 		}
 	}
 
@@ -112,7 +112,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_FACEBOOK_ID, facebookId);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_FACEBOOK_ID + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_FACEBOOK_ID + " of " + KEY);
 		}
 	}
 
@@ -131,7 +131,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_PHONE_NUMBER, phoneNumber);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_PHONE_NUMBER + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_PHONE_NUMBER + " of " + KEY);
 		}
 	}
 
@@ -150,7 +150,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_STREET, street);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_STREET + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_STREET + " of " + KEY);
 		}
 	}
 
@@ -169,7 +169,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_CITY, city);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_CITY + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_CITY + " of " + KEY);
 		}
 	}
 
@@ -188,7 +188,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_ZIP, zip);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_ZIP + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_ZIP + " of " + KEY);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_COUNTRY, country);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_COUNTRY + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_COUNTRY + " of " + KEY);
 		}
 	}
 
@@ -226,7 +226,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_BIRTHDAY, birthday);
 		} catch (JSONException e) {
-			Log.e("Unable to set field " + KEY_BIRTHDAY + " of " + KEY);
+			ApptentiveLog.e("Unable to set field " + KEY_BIRTHDAY + " of " + KEY);
 		}
 	}
 
@@ -246,7 +246,7 @@ public class Person extends Payload {
 		try {
 			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
+			ApptentiveLog.w("Error adding %s to Device.", KEY_CUSTOM_DATA);
 		}
 	}
 }

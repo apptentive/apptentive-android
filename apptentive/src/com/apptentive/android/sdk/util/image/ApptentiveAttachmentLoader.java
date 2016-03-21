@@ -21,7 +21,7 @@ import android.webkit.URLUtil;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.cache.ImageMemoryCache;
 import com.apptentive.android.sdk.util.task.ApptentiveDownloaderTask;
@@ -163,15 +163,15 @@ public class ApptentiveAttachmentLoader {
 		public void load() {
 			ImageView imageView = mImageViewRef.get();
 			if (imageView != null) {
-				Log.d("ApptentiveAttachmentLoader load requested:" + uri);
-				Log.d("ApptentiveAttachmentLoader load requested on:" + imageView.toString() );
+				ApptentiveLog.d("ApptentiveAttachmentLoader load requested:" + uri);
+				ApptentiveLog.d("ApptentiveAttachmentLoader load requested on:" + imageView.toString() );
 
 				// Handle the duplicate requests on the same grid item view
 				LoaderRequest oldLoaderRequest = (LoaderRequest) imageView.getTag(DRAWABLE_DOWNLOAD_TAG);
 				if (oldLoaderRequest != null) {
 					// If old request on the same view also loads from the same source, cancel the current one
 					if (oldLoaderRequest.getUrl().equals(uri)) {
-						Log.d("ApptentiveAttachmentLoader load new request denied:" + uri );
+						ApptentiveLog.d("ApptentiveAttachmentLoader load new request denied:" + uri );
 						return;
 					}
 					// If old request on the same view loads from different source, cancel the old one
@@ -179,7 +179,7 @@ public class ApptentiveAttachmentLoader {
 				}
 
 				if (TextUtils.isEmpty(uri)) {
-					Log.d("ApptentiveAttachmentLoader loadDrawable(clear)");
+					ApptentiveLog.d("ApptentiveAttachmentLoader loadDrawable(clear)");
 					loadDrawable(null);
 					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 					return;
@@ -190,7 +190,7 @@ public class ApptentiveAttachmentLoader {
 				if (cachedBitmap != null) {
 					mWasDownloaded = false;
 
-					Log.d("ApptentiveAttachmentLoader loadDrawable(found in cache)");
+					ApptentiveLog.d("ApptentiveAttachmentLoader loadDrawable(found in cache)");
 					loadDrawable(cachedBitmap);
 					imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 				} else {
@@ -218,7 +218,7 @@ public class ApptentiveAttachmentLoader {
 			if (imageView != null && imageView.getTag(DRAWABLE_DOWNLOAD_TAG) == this && URLUtil.isNetworkUrl(uri)) {
 				mDrawableDownloaderTask = new ApptentiveDownloaderTask(imageView, this);
 				try {
-					Log.d("ApptentiveAttachmentLoader doDownload: " + uri);
+					ApptentiveLog.d("ApptentiveAttachmentLoader doDownload: " + uri);
 					// Conversation token is needed if the download url is an redrect link from an Apptentive endpoint
 					String conversationToken = GlobalInfo.getConversationToken(imageView.getContext().getApplicationContext());
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -254,7 +254,7 @@ public class ApptentiveAttachmentLoader {
 		@SuppressLint("NewApi")
 		private void loadImageFromDisk(ImageView imageView) {
 			if (imageView != null && !mIsCancelled) {
-				Log.d("ApptentiveAttachmentLoader loadImageFromDisk: " + uri);
+				ApptentiveLog.d("ApptentiveAttachmentLoader loadImageFromDisk: " + uri);
 				mDrawableLoaderTask = new ApptentiveDrawableLoaderTask(imageView.getContext(), imageView, this);
 				try {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -275,7 +275,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private void cancel() {
-			Log.d("ApptentiveAttachmentLoader cancel requested for: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader cancel requested for: " + uri);
 			mIsCancelled = true;
 
 			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
@@ -376,7 +376,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private void loadDrawable(Bitmap d, boolean animate) {
-			Log.d("ApptentiveAttachmentLoader loadDrawable");
+			ApptentiveLog.d("ApptentiveAttachmentLoader loadDrawable");
 			ImageView imageView = getImageView();
 			if (imageView != null) {
 				if (loadingTaskCallback != null) {
@@ -388,7 +388,7 @@ public class ApptentiveAttachmentLoader {
 		// called when the download starts
 		@Override
 		public void onDownloadStart() {
-			Log.d("ApptentiveAttachmentLoader onDownloadStarted");
+			ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadStarted");
 			ImageView imageView = getImageView();
 			if (imageView != null) {
 				if (loadingTaskCallback != null) {
@@ -400,7 +400,7 @@ public class ApptentiveAttachmentLoader {
 		// called when the download is in progress
 		@Override
 		public void onProgress(int progress) {
-			Log.d("ApptentiveAttachmentLoader onProgress: " + progress);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onProgress: " + progress);
 			ImageView imageView = getImageView();
 			if (imageView != null) {
 				if (loadingTaskCallback != null) {
@@ -411,7 +411,7 @@ public class ApptentiveAttachmentLoader {
 			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
 			if (duplicates != null) {
 				for (LoaderRequest dup : duplicates) {
-					Log.d("ApptentiveAttachmentLoader onProgress (dup): " + progress);
+					ApptentiveLog.d("ApptentiveAttachmentLoader onProgress (dup): " + progress);
 					// update the progress on the duplicate downloads
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
@@ -424,7 +424,7 @@ public class ApptentiveAttachmentLoader {
 		// called when the download has completed
 		@Override
 		public void onDownloadComplete() {
-			Log.d("ApptentiveAttachmentLoader onDownloadComplete: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadComplete: " + uri);
 
 			runningDownLoaderRequests.remove(this);
 			filesBeingDownloaded.remove(diskCacheFilePath);
@@ -445,7 +445,7 @@ public class ApptentiveAttachmentLoader {
 			ArrayList<LoaderRequest> duplicates = duplicateDownloads.get(uri);
 			if (duplicates != null) {
 				for (LoaderRequest dup : duplicates) {
-					Log.d("ApptentiveAttachmentLoader onDownloadComplete (dup): " + dup.uri);
+					ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadComplete (dup): " + dup.uri);
 					// load the image.
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
@@ -471,7 +471,7 @@ public class ApptentiveAttachmentLoader {
 		// called if there is an error with the download
 		@Override
 		public void onDownloadError() {
-			Log.d("ApptentiveAttachmentLoader onDownloadError: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadError: " + uri);
 			runningDownLoaderRequests.remove(this);
 			filesBeingDownloaded.remove(diskCacheFilePath);
 			ImageView imageView = getImageView();
@@ -495,7 +495,7 @@ public class ApptentiveAttachmentLoader {
 					duplicateDownloads.remove(uri);
 				}
 				for (LoaderRequest dup : duplicates) {
-					Log.d("ApptentiveAttachmentLoader onDownloadError (dup): " + dup.uri);
+					ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadError (dup): " + dup.uri);
 					// load the image.
 					if (dup != null && dup.getImageView() != null &&
 							dup.getImageView().getTag(DRAWABLE_DOWNLOAD_TAG) == dup) {
@@ -521,7 +521,7 @@ public class ApptentiveAttachmentLoader {
 		@Override
 		public void onDownloadCancel() {
 			mIsCancelled = true;
-			Log.d("ApptentiveAttachmentLoader onDownloadCancel: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onDownloadCancel: " + uri);
 			runningDownLoaderRequests.remove(this);
 			filesBeingDownloaded.remove(diskCacheFilePath);
 
@@ -556,7 +556,7 @@ public class ApptentiveAttachmentLoader {
 
 			if (!queuedDownLoaderRequests.isEmpty()) {
 				LoaderRequest d = queuedDownLoaderRequests.remove(0);
-				Log.d("ApptentiveAttachmentLoader starting DL of: " + d.getUrl());
+				ApptentiveLog.d("ApptentiveAttachmentLoader starting DL of: " + d.getUrl());
 				d.doDownload();
 			}
 		}
@@ -564,7 +564,7 @@ public class ApptentiveAttachmentLoader {
 		// called if the file is not found on the file system
 		@Override
 		public void notFound() {
-			Log.d("ApptentiveAttachmentLoader notFound: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader notFound: " + uri);
 			if (mIsCancelled) {
 				return;
 			}
@@ -592,7 +592,7 @@ public class ApptentiveAttachmentLoader {
 				int downloadIndex = indexOfDownloadWithDifferentURL();
 				while (queuedIndex != -1) {
 					queuedDownLoaderRequests.remove(queuedIndex);
-					Log.d("ApptentiveAttachmentLoader notFound(Removing): " + uri);
+					ApptentiveLog.d("ApptentiveAttachmentLoader notFound(Removing): " + uri);
 					queuedIndex = indexOfQueuedDownloadWithDifferentURL();
 				}
 				if (downloadIndex != -1) {
@@ -600,16 +600,16 @@ public class ApptentiveAttachmentLoader {
 					ApptentiveDownloaderTask downloadTask = runningLoaderRequest.getDrawableDownloaderTask();
 					if (downloadTask != null) {
 						downloadTask.cancel(true);
-						Log.d("ApptentiveAttachmentLoader notFound(Cancelling): " + uri);
+						ApptentiveLog.d("ApptentiveAttachmentLoader notFound(Cancelling): " + uri);
 					}
 				}
 
 				if (!(isBeingDownloaded() || isQueuedForDownload())) {
 					if (runningDownLoaderRequests.size() >= maxDownloads) {
-						Log.d("ApptentiveAttachmentLoader notFound(Queuing): " + uri);
+						ApptentiveLog.d("ApptentiveAttachmentLoader notFound(Queuing): " + uri);
 						queuedDownLoaderRequests.add(this);
 					} else {
-						Log.d("ApptentiveAttachmentLoader notFound(Downloading): " + uri);
+						ApptentiveLog.d("ApptentiveAttachmentLoader notFound(Downloading): " + uri);
 						doDownload();
 					}
 				}
@@ -621,7 +621,7 @@ public class ApptentiveAttachmentLoader {
 			bitmapMemoryCache.addObjectToCache(ImageMemoryCache.generateMemoryCacheEntryKey(uri, imageViewWidth, imageViewHeight), b);
 			ImageView imageView = getImageView();
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
-				Log.d("ApptentiveAttachmentLoader loadDrawable(add to cache)");
+				ApptentiveLog.d("ApptentiveAttachmentLoader loadDrawable(add to cache)");
 				loadDrawable(b);
 				imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);
 			}
@@ -630,7 +630,7 @@ public class ApptentiveAttachmentLoader {
 
 		@Override
 		public void onLoadError() {
-			Log.d("ApptentiveAttachmentLoader onLoadError: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onLoadError: " + uri);
 			ImageView imageView = getImageView();
 
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
@@ -645,7 +645,7 @@ public class ApptentiveAttachmentLoader {
 
 		@Override
 		public void onLoadCancelled() {
-			Log.d("ApptentiveAttachmentLoader onLoadCancelled: " + uri);
+			ApptentiveLog.d("ApptentiveAttachmentLoader onLoadCancelled: " + uri);
 			ImageView imageView = getImageView();
 			if (imageView != null && this == imageView.getTag(DRAWABLE_DOWNLOAD_TAG)) {
 				imageView.setTag(DRAWABLE_DOWNLOAD_TAG, null);

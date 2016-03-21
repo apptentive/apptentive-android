@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 import com.apptentive.android.sdk.storage.DeviceManager;
@@ -25,7 +25,7 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
 	public void testCornerCasesThatShouldBeTrue() throws JSONException {
-		Log.e("Running test: testCornerCasesThatShouldBeTrue()\n\n");
+		ApptentiveLog.e("Running test: testCornerCasesThatShouldBeTrue()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCornerCasesThatShouldBeTrue.json");
@@ -37,14 +37,14 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 			boolean result = criteria.evaluate(getTargetContext());
 			assertTrue(result);
 		} catch (JSONException e) {
-			Log.e("Error parsing test JSON.", e);
+			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCornerCasesThatShouldBeFalse() throws JSONException {
-		Log.e("Running test: testCornerCasesThatShouldBeFalse()\n\n");
+		ApptentiveLog.e("Running test: testCornerCasesThatShouldBeFalse()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testCornerCasesThatShouldBeFalse.json");
@@ -56,10 +56,10 @@ public class CornerCases extends ApptentiveInstrumentationTestCase {
 			boolean result = criteria.evaluate(getTargetContext());
 			assertTrue(result);
 		} catch (JSONException e) {
-			Log.e("Error parsing test JSON.", e);
+			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 }

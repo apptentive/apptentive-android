@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class Event extends ConversationItem {
 				put(KEY_DATA, data);
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to construct Event.", e);
+			ApptentiveLog.e("Unable to construct Event.", e);
 		}
 	}
 
@@ -53,7 +53,7 @@ public class Event extends ConversationItem {
 				put(KEY_DATA, dataObject);
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to construct Event.", e);
+			ApptentiveLog.e("Unable to construct Event.", e);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class Event extends ConversationItem {
 				}
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to construct Event.", e);
+			ApptentiveLog.e("Unable to construct Event.", e);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class Event extends ConversationItem {
 				try {
 					ret.put(key, value);
 				} catch (Exception e) {
-					Log.w("Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
+					ApptentiveLog.w("Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
 				}
 			}
 		}
@@ -128,7 +128,7 @@ public class Event extends ConversationItem {
 				dataObject.put(key, data.get(key));
 			}
 		} catch (JSONException e) {
-			Log.e("Unable to add data to Event.", e);
+			ApptentiveLog.e("Unable to add data to Event.", e);
 		}
 	}
 

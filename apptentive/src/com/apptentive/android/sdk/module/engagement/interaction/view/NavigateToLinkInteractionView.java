@@ -11,7 +11,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 import com.apptentive.android.sdk.util.Util;
@@ -52,7 +52,7 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 				success = true;
 			}
 		} catch (ActivityNotFoundException e) {
-			Log.w("NavigateToLink Error: ", e);
+			ApptentiveLog.w("NavigateToLink Error: ", e);
 		} finally {
 			JSONObject data = new JSONObject();
 			try {
@@ -60,7 +60,7 @@ public class NavigateToLinkInteractionView extends InteractionView<NavigateToLin
 				data.put(NavigateToLinkInteraction.KEY_TARGET, interaction.getTarget().lowercaseName());
 				data.put(NavigateToLinkInteraction.EVENT_KEY_SUCCESS, success);
 			} catch (JSONException e) {
-				Log.e("Error creating Event data object.", e);
+				ApptentiveLog.e("Error creating Event data object.", e);
 			}
 			EngagementModule.engageInternal(activity, interaction, NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data.toString());
 			// Always finish this Activity.

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.metric;
 
 import android.content.Context;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
@@ -34,7 +34,7 @@ public class MetricModule {
 	public static void sendMetric(Context context, Event.EventLabel type, String trigger, Map<String, String> data) {
 		Configuration config = Configuration.load(context);
 		if (config.isMetricsEnabled()) {
-			Log.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
+			ApptentiveLog.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			Event event = new Event(type.getLabelName(), trigger);
 			event.putData(data);
 			EventManager.sendEvent(context, event);
@@ -68,14 +68,14 @@ public class MetricModule {
 			}
 			Configuration config = Configuration.load(context);
 			if (config.isMetricsEnabled()) {
-				Log.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
+				ApptentiveLog.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
 				Event event = new Event(type.getLabelName(), data);
 				EventManager.sendEvent(context, event);
 			}
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to
 			// prevent the app from crashing.
-			Log.w("Error creating Error Metric. Nothing we can do but log this.", e);
+			ApptentiveLog.w("Error creating Error Metric. Nothing we can do but log this.", e);
 		}
 	}
 }

@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.model.*;
@@ -75,7 +75,7 @@ public class PayloadSendWorker {
 
 		public void run() {
 			try {
-				Log.v("Started %s", toString());
+				ApptentiveLog.v("Started %s", toString());
 
 				while (appInForeground.get()) {
 					if (contextRef.get() == null) {
@@ -85,24 +85,24 @@ public class PayloadSendWorker {
 
 					PayloadSendThread thread = getAndSetPayloadSendThread(true, false, null);
 					if (thread != null && thread != PayloadSendThread.this) {
-						Log.i("something wrong");
+						ApptentiveLog.i("something wrong");
 						return;
 					}
 
 					PayloadStore db = getPayloadStore(contextRef.get());
 					if (Util.isEmpty(GlobalInfo.getConversationToken(contextRef.get()))) {
-						Log.i("No conversation token yet.");
+						ApptentiveLog.i("No conversation token yet.");
 						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						goToSleep(NO_TOKEN_SLEEP);
 						continue;
 					}
 					if (!Util.isNetworkConnectionPresent(contextRef.get())) {
-						Log.d("Can't send payloads. No network connection.");
+						ApptentiveLog.d("Can't send payloads. No network connection.");
 						MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
 						goToSleep(NO_CONNECTION_SLEEP_TIME);
 						continue;
 					}
-					Log.v("Checking for payloads to send.");
+					ApptentiveLog.v("Checking for payloads to send.");
 					Payload payload;
 					payload = db.getOldestUnsentPayload(contextRef.get());
 					if (payload == null) {
@@ -110,7 +110,7 @@ public class PayloadSendWorker {
 						goToSleep(EMPTY_QUEUE_SLEEP_TIME);
 						continue;
 					}
-					Log.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
+					ApptentiveLog.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
 
 					ApptentiveHttpResponse response = null;
 
@@ -141,7 +141,7 @@ public class PayloadSendWorker {
 							response = ApptentiveClient.postSurvey(contextRef.get(), (SurveyResponse) payload);
 							break;
 						default:
-							Log.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
+							ApptentiveLog.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
 							db.deletePayload(payload);
 							break;
 					}
@@ -149,14 +149,14 @@ public class PayloadSendWorker {
 					// Each Payload type is handled by the appropriate handler, but if sent correctly, or failed permanently to send, it should be removed from the queue.
 					if (response != null) {
 						if (response.isSuccessful()) {
-							Log.d("Payload submission successful. Removing from send queue.");
+							ApptentiveLog.d("Payload submission successful. Removing from send queue.");
 							db.deletePayload(payload);
 						} else if (response.isRejectedPermanently() || response.isBadPayload()) {
-							Log.d("Payload rejected. Removing from send queue.");
-							Log.v("Rejected json:", payload.toString());
+							ApptentiveLog.d("Payload rejected. Removing from send queue.");
+							ApptentiveLog.v("Rejected json:", payload.toString());
 							db.deletePayload(payload);
 						} else if (response.isRejectedTemporarily()) {
-							Log.d("Unable to send JSON. Leaving in queue.");
+							ApptentiveLog.d("Unable to send JSON. Leaving in queue.");
 							if (response.isException()) {
 								MessageManager.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 								goToSleep(NO_CONNECTION_SLEEP_TIME);
@@ -167,7 +167,7 @@ public class PayloadSendWorker {
 					}
 				}
 			} finally {
-				Log.v("Stopping PayloadSendThread.");
+				ApptentiveLog.v("Stopping PayloadSendThread.");
 				threadRunning.set(false);
 			}
 		}

@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -62,14 +62,14 @@ public class InteractionManager {
 	public static void asyncFetchAndStoreInteractions(final Context context) {
 
 		if (!isPollForInteractions(context)) {
-			Log.v("Interaction polling is disabled.");
+			ApptentiveLog.v("Interaction polling is disabled.");
 			return;
 		}
 
 		boolean force = GlobalInfo.isAppDebuggable;
 
 		if (force || hasCacheExpired(context)) {
-			Log.i("Fetching new Interactions.");
+			ApptentiveLog.i("Fetching new Interactions.");
 			Thread thread = new Thread() {
 				public void run() {
 					fetchAndStoreInteractions(context);
@@ -78,7 +78,7 @@ public class InteractionManager {
 			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 				@Override
 				public void uncaughtException(Thread thread, Throwable throwable) {
-					Log.w("UncaughtException in InteractionManager.", throwable);
+					ApptentiveLog.w("UncaughtException in InteractionManager.", throwable);
 					MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
 				}
 			};
@@ -86,7 +86,7 @@ public class InteractionManager {
 			thread.setName("Apptentive-FetchInteractions");
 			thread.start();
 		} else {
-			Log.v("Using cached Interactions.");
+			ApptentiveLog.v("Using cached Interactions.");
 		}
 	}
 
@@ -131,10 +131,10 @@ public class InteractionManager {
 				saveInteractions(context);
 				saveTargets(context);
 			} else {
-				Log.e("Unable to save payloads.");
+				ApptentiveLog.e("Unable to save payloads.");
 			}
 		} catch (JSONException e) {
-			Log.w("Invalid InteractionsPayload received.");
+			ApptentiveLog.w("Invalid InteractionsPayload received.");
 		}
 	}
 
@@ -158,7 +158,7 @@ public class InteractionManager {
 			try {
 				return new Interactions(interactionsString);
 			} catch (JSONException e) {
-				Log.w("Exception creating Interactions object.", e);
+				ApptentiveLog.w("Exception creating Interactions object.", e);
 			}
 		}
 		return null;
@@ -176,7 +176,7 @@ public class InteractionManager {
 			try {
 				return new Targets(targetsString);
 			} catch (JSONException e) {
-				Log.w("Exception creating Targets object.", e);
+				ApptentiveLog.w("Exception creating Targets object.", e);
 			}
 		}
 		return null;

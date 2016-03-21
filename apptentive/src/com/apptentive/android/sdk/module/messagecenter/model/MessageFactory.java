@@ -10,7 +10,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class MessageFactory {
 					break;
 			}
 		} catch (JSONException e) {
-			Log.v("Error parsing json as Message: %s", e, json);
+			ApptentiveLog.v("Error parsing json as Message: %s", e, json);
 		} catch (IllegalArgumentException e) {
 			// Exception treated as unknown type
 		}

@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.engagement.logic;
 
 import android.content.Context;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ public class ConditionalClause implements Clause {
 		this.fieldName = field.trim();
 		conditionalTests = new ArrayList<ConditionalTest>();
 
-		Log.v("    + ConditionalClause for query: \"%s\"", fieldName);
+		ApptentiveLog.v("    + ConditionalClause for query: \"%s\"", fieldName);
 		if (inputValue instanceof JSONObject && !isComplexType((JSONObject) inputValue)) {
 			conditionalTests = getConditions((JSONObject) inputValue);
 		} else {
@@ -65,10 +65,10 @@ public class ConditionalClause implements Clause {
 	 */
 	@Override
 	public boolean evaluate(Context context) {
-		Log.v("    - %s", fieldName);
+		ApptentiveLog.v("    - %s", fieldName);
 		Comparable fieldValue = FieldManager.getValue(context, fieldName);
 		for (ConditionalTest test : conditionalTests) {
-			Log.v("      - %s %s %s?", Util.classToString(fieldValue), test.operator, Util.classToString(test.parameter));
+			ApptentiveLog.v("      - %s %s %s?", Util.classToString(fieldValue), test.operator, Util.classToString(test.parameter));
 			if (!test.operator.apply(fieldValue, test.parameter)) {
 				return false;
 			}

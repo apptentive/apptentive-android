@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.lifecycle;
 import android.app.Activity;
 import android.content.Context;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.SessionEvent;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -64,7 +64,7 @@ public class ActivityLifecycleManager {
 	}
 
 	private static void sendEvent(Activity activity, SessionEvent event, boolean crash) {
-		Log.d("Sending " + event.getDebugString());
+		ApptentiveLog.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
 				if (!crash) {
@@ -102,14 +102,14 @@ public class ActivityLifecycleManager {
 			// Due to the nature of the Activity Lifecycle, onStart() of the next Activity may be called before or after
 			// the onStart() of the current previous Activity. This complicated the detection. This is the distilled logic.
 			if (pairs == 0 && starts == 0) {
-				Log.v("First start.");
+				ApptentiveLog.v("First start.");
 				addEvents(start);
 				sendEvent(activity, start);
 			} else if (pairs == 0 && starts == 1) {
-				Log.v("Continuation Start. (1)");
+				ApptentiveLog.v("Continuation Start. (1)");
 				addEvents(start);
 			} else if (pairs == 0 && starts == 2) {
-				Log.i("Starting new session after crash. (1)");
+				ApptentiveLog.i("Starting new session after crash. (1)");
 				removeAllEvents();
 				sendEvent(activity, lastStart != null ? lastStart : start, true);
 				addEvents(lastStart, start);
@@ -118,26 +118,26 @@ public class ActivityLifecycleManager {
 				boolean expired = expiration < start.getTime();
 				addEvents(start);
 				if (expired) {
-					Log.d("Session expired. Starting new session.");
+					ApptentiveLog.d("Session expired. Starting new session.");
 					sendEvent(activity, lastStop);
 					sendEvent(activity, start);
 				} else {
-					Log.v("Continuation Start. (2)");
+					ApptentiveLog.v("Continuation Start. (2)");
 				}
 			} else if (pairs == 1 && starts == 2) {
-				Log.v("Continuation start. (3)");
+				ApptentiveLog.v("Continuation start. (3)");
 				addEvents(start);
 			} else if (pairs == 1 && starts == 3) {
-				Log.i("Starting new session after crash. (2)");
+				ApptentiveLog.i("Starting new session after crash. (2)");
 				sendEvent(activity, lastStart != null ? lastStart : start, true);
 				// Reconstruct Queue.
 				removeAllEvents();
 				addEvents(lastStart, start);
 			} else {
-				Log.w("ERROR: Unexpected state in LifecycleManager: " + getQueueAsString());
+				ApptentiveLog.w("ERROR: Unexpected state in LifecycleManager: " + getQueueAsString());
 			}
 		} catch (Exception e) {
-			Log.e("Error while handling activity start.", e);
+			ApptentiveLog.e("Error while handling activity start.", e);
 		}
 	}
 
@@ -149,7 +149,7 @@ public class ActivityLifecycleManager {
 			init(activity);
 			addEvents(new SessionEvent(new Date().getTime(), SessionEvent.Action.STOP, activity.toString()));
 		} catch (Exception e) {
-			Log.e("Error while handling activity stop.", e);
+			ApptentiveLog.e("Error while handling activity stop.", e);
 		}
 	}
 

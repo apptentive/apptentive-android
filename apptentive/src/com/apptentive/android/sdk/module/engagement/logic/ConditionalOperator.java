@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.logic;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
@@ -151,7 +151,7 @@ public enum ConditionalOperator {
 			Double offset = ((BigDecimal) second).doubleValue();
 			Double currentTime = Util.currentTimeSeconds();
 			Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-			Log.v("      		- %s?", Util.classToString(offsetDateTime));
+			ApptentiveLog.v("      		- %s?", Util.classToString(offsetDateTime));
 			return ((Apptentive.DateTime) first).compareTo(offsetDateTime) < 0;
 		}
 	},
@@ -168,7 +168,7 @@ public enum ConditionalOperator {
 			Double offset = ((BigDecimal) second).doubleValue();
 			Double currentTime = Util.currentTimeSeconds();
 			Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-			Log.v("      		- %s?", Util.classToString(offsetDateTime));
+			ApptentiveLog.v("      		- %s?", Util.classToString(offsetDateTime));
 			return ((Apptentive.DateTime) first).compareTo(offsetDateTime) > 0;
 		}
 	},

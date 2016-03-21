@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,7 +54,7 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 			String activityContentTypeString = getIntent().getStringExtra(ActivityContent.KEY);
 			Interaction interaction = null;
 			if (activityContentTypeString != null) {
-				Log.v("Started ViewActivity normally for %s.", activityContent);
+				ApptentiveLog.v("Started ViewActivity normally for %s.", activityContent);
 				activeContentType = ActivityContent.Type.parse(activityContentTypeString);
 
 				/* The default status bar color fallback order are,
@@ -141,7 +140,7 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 						case INTERACTION:
 							break; // end INTERACTION
 						default:
-							Log.w("No Activity specified. Finishing...");
+							ApptentiveLog.w("No Activity specified. Finishing...");
 							break;
 					}
 					if (activityContentRequired) {
@@ -152,12 +151,12 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 						}
 					}
 				} catch (Exception e) {
-					Log.e("Error starting ViewActivity.", e);
+					ApptentiveLog.e("Error starting ViewActivity.", e);
 					MetricModule.sendError(this, e, null, null);
 				}
 			}
 		} catch (Exception e) {
-			Log.e("Error creating ViewActivity.", e);
+			ApptentiveLog.e("Error creating ViewActivity.", e);
 			MetricModule.sendError(this, e, null, null);
 		}
 		if (activeContentType == null) {
@@ -183,7 +182,7 @@ public class ViewActivity extends ApptentiveInternalActivity implements Activity
 				super.onStart();
 				break;
 			default:
-				Log.w("No Activity specified. Finishing...");
+				ApptentiveLog.w("No Activity specified. Finishing...");
 				finish();
 				break;
 		}

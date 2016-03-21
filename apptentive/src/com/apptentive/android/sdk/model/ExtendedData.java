@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,7 +40,7 @@ public abstract class ExtendedData extends JSONObject {
 		try {
 			put(KEY_VERSION, version);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to ExtendedData.", KEY_VERSION, e);
+			ApptentiveLog.w("Error adding %s to ExtendedData.", KEY_VERSION, e);
 		}
 		return;
 	}
@@ -57,7 +57,7 @@ public abstract class ExtendedData extends JSONObject {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ExtendedData.BaseType: " + type);
+				ApptentiveLog.v("Error parsing unknown ExtendedData.BaseType: " + type);
 			}
 			return unknown;
 		}

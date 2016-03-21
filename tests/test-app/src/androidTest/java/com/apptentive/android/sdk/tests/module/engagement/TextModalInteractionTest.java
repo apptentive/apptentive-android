@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
@@ -24,9 +24,9 @@ public class TextModalInteractionTest extends ApptentiveInstrumentationTestCase 
 	private static final String TEST_DATA_DIR = "engagement/interactions";
 
 	public void testTextModalInteraction() {
-		Log.e("Running test: testTextModalInteraction()\n\n");
+		ApptentiveLog.e("Running test: testTextModalInteraction()\n\n");
 
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testTextModalInteraction.json");
 
 		Interaction interaction = Interaction.Factory.parseInteraction(json);

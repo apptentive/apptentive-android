@@ -16,11 +16,10 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.ViewActivity;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -147,11 +146,11 @@ public class MessageManager {
 		// Fetch the messages.
 		String lastId = getMessageStore(appContext).getLastReceivedMessageId();
 		List<ApptentiveMessage> messagesToSave = fetchMessages(appContext, lastId);
-		Log.d("Fetching messages after last id: " + lastId);
+		ApptentiveLog.d("Fetching messages after last id: " + lastId);
 
 		CompoundMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
-			Log.d("Messages retrieved.");
+			ApptentiveLog.d("Messages retrieved.");
 			// Also get the count of incoming unread messages.
 			int incomingUnreadMessages = 0;
 			// Mark messages from server where sender is the app user as read.
@@ -211,12 +210,12 @@ public class MessageManager {
 	 * This doesn't need to be run during normal program execution. Testing only.
 	 */
 	public static void deleteAllMessages(Context context) {
-		Log.e("Deleting all messages.");
+		ApptentiveLog.e("Deleting all messages.");
 		getMessageStore(context).deleteAllMessages();
 	}
 
 	private static List<ApptentiveMessage> fetchMessages(Context appContext, String afterId) {
-		Log.d("Fetching messages newer than: " + afterId);
+		ApptentiveLog.d("Fetching messages newer than: " + afterId);
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(appContext, null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
@@ -226,9 +225,9 @@ public class MessageManager {
 		try {
 			ret = parseMessagesString(appContext, response.getContent());
 		} catch (JSONException e) {
-			Log.e("Error parsing messages JSON.", e);
+			ApptentiveLog.e("Error parsing messages JSON.", e);
 		} catch (Exception e) {
-			Log.e("Unexpected error parsing messages JSON.", e);
+			ApptentiveLog.e("Unexpected error parsing messages JSON.", e);
 		}
 		return ret;
 	}
@@ -301,7 +300,7 @@ public class MessageManager {
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
-				Log.e("Error parsing sent apptentiveMessage response.", e);
+				ApptentiveLog.e("Error parsing sent apptentiveMessage response.", e);
 			}
 			getMessageStore(context).updateMessage(apptentiveMessage);
 

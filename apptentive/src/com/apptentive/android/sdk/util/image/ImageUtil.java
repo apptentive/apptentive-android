@@ -17,7 +17,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.util.CountingOutputStream;
 import com.apptentive.android.sdk.util.Util;
@@ -121,14 +121,14 @@ public class ImageUtil {
 			height = decodeBoundsOptions.outHeight;
 		}
 
-		Log.v("Original bitmap dimensions: %d x %d", width, height);
+		ApptentiveLog.v("Original bitmap dimensions: %d x %d", width, height);
 		int sampleRatio = Math.min(width / minShrunkWidth, height / minShrunkHeight);
 		if (sampleRatio >= 2) {
 			options.inSampleSize = sampleRatio;
 		}
 		options.inScaled = false;
 		options.inJustDecodeBounds = false;
-		Log.v("Bitmap sample size = %d", options.inSampleSize);
+		ApptentiveLog.v("Bitmap sample size = %d", options.inSampleSize);
 
 		Bitmap retImg = null;
 		if (bCreateFromUri && context != null) {
@@ -146,7 +146,7 @@ public class ImageUtil {
 		}
 
 
-		Log.d("Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
+		ApptentiveLog.d("Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
 
 		if ((orientation != 0 && orientation != -1) && retImg != null) {
 			Matrix matrix = new Matrix();
@@ -228,13 +228,13 @@ public class ImageUtil {
 		if (ratio < 1.0f) { // Don't blow up small images, only shrink bigger ones.
 			int newWidth = (int) (ratio * width);
 			int newHeight = (int) (ratio * height);
-			Log.v("Scaling image further down to %d x %d", newWidth, newHeight);
+			ApptentiveLog.v("Scaling image further down to %d x %d", newWidth, newHeight);
 			try {
 				outBitmap = Bitmap.createScaledBitmap(tempBitmap, newWidth, newHeight, true);
 			} catch (IllegalArgumentException e) {
 				throw new NullPointerException("Failed to create scaled bitmap");
 			}
-			Log.d("Final bitmap dimensions: %d x %d", outBitmap.getWidth(), outBitmap.getHeight());
+			ApptentiveLog.d("Final bitmap dimensions: %d x %d", outBitmap.getWidth(), outBitmap.getHeight());
 			tempBitmap.recycle();
 		}
 		return outBitmap;
@@ -285,14 +285,14 @@ public class ImageUtil {
 			// TODO: Is JPEG what we want here?
 			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
 			cos.flush();
-			Log.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 			smaller.recycle();
 			System.gc();
 		} catch (FileNotFoundException e) {
-			Log.e("File not found while storing image.", e);
+			ApptentiveLog.e("File not found while storing image.", e);
 			return false;
 		} catch (Exception e) {
-			Log.a("Error storing image.", e);
+			ApptentiveLog.a("Error storing image.", e);
 			return false;
 		} finally {
 			Util.ensureClosed(cos);

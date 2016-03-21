@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 /**
  * @author Sky Kelsey
@@ -77,7 +77,7 @@ public abstract class ActivityContent {
 					return Type.valueOf(type);
 				}
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ActivityContent.Type: " + type);
+				ApptentiveLog.v("Error parsing unknown ActivityContent.Type: " + type);
 			}
 			return unknown;
 		}

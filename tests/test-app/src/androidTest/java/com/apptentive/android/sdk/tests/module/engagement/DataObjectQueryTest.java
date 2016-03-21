@@ -9,11 +9,10 @@ package com.apptentive.android.sdk.tests.module.engagement;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
@@ -26,7 +25,7 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement/payloads/";
 
 	public void testQueriesAgainstPerson() {
-		Log.e("Running test: testQueriesAgainstPerson()\n\n");
+		ApptentiveLog.e("Running test: testQueriesAgainstPerson()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstPerson.json");
@@ -71,7 +70,7 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testQueriesAgainstDevice() {
-		Log.e("Running test: testQueriesAgainstDevice()\n\n");
+		ApptentiveLog.e("Running test: testQueriesAgainstDevice()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstDevice.json");
@@ -103,7 +102,7 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testQueriesAgainstSdk() {
-		Log.e("Running test: testQueriesAgainstSdk()\n\n");
+		ApptentiveLog.e("Running test: testQueriesAgainstSdk()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstSdk.json");

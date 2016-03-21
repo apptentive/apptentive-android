@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import org.json.JSONException;
 

@@ -11,13 +11,13 @@ import java.util.IllegalFormatException;
 /**
  * @author Sky Kelsey
  */
-public class Log {
+public class ApptentiveLog {
 	private static final String TAG = "Apptentive";
 
 	private static Level logLevel = Level.DEFAULT;
 
 	public static void overrideLogLevel(Level level) {
-		Log.logLevel = level;
+		ApptentiveLog.logLevel = level;
 	}
 
 	private static void doLog(Level level, Throwable throwable, String message, Object... args){

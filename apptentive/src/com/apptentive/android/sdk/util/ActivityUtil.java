@@ -14,7 +14,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import com.apptentive.android.sdk.GlobalInfo;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class ActivityUtil {
 			if (GlobalInfo.isAppDebuggable) {
 				throw e;
 			} else {
-				Log.e("Missing required permission: \"android.permission.GET_TASKS\".", e);
+				ApptentiveLog.e("Missing required permission: \"android.permission.GET_TASKS\".", e);
 			}
 			return false;
 		}
@@ -61,7 +61,7 @@ public class ActivityUtil {
 					}
 				}
 			} catch (PackageManager.NameNotFoundException e) {
-				Log.e("Package name not found: %s", e, activity.getPackageName());
+				ApptentiveLog.e("Package name not found: %s", e, activity.getPackageName());
 				return false; // Never happens.
 			}
 		}
@@ -104,7 +104,7 @@ public class ActivityUtil {
 			cls = null;
 		}
 		if(cls == null) {
-			Log.e("Class %s does not exist.", className);
+			ApptentiveLog.e("Class %s does not exist.", className);
 		}
 		return cls;
 	}

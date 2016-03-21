@@ -8,7 +8,6 @@ package com.apptentive.android.sdk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -84,7 +83,7 @@ public class Apptentive {
 			runningActivities++;
 			MessageManager.setCurrentForgroundActivity(activity);
 		} catch (Exception e) {
-			Log.w("Error starting Apptentive Activity.", e);
+			ApptentiveLog.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
 	}
@@ -99,7 +98,7 @@ public class Apptentive {
 			ActivityLifecycleManager.activityStopped(activity);
 			runningActivities--;
 			if (runningActivities < 0) {
-				Log.e("Incorrect number of running Activities encountered. Resetting to 0. Did you make sure to call Apptentive.onStart() and Apptentive.onStop() in all your Activities?");
+				ApptentiveLog.e("Incorrect number of running Activities encountered. Resetting to 0. Did you make sure to call Apptentive.onStart() and Apptentive.onStop() in all your Activities?");
 				runningActivities = 0;
 			}
 			// If there are no running activities, wake the thread so it can stop immediately and gracefully.
@@ -109,7 +108,7 @@ public class Apptentive {
 			}
 			MessageManager.setCurrentForgroundActivity(null);
 		} catch (Exception e) {
-			Log.w("Error stopping Apptentive Activity.", e);
+			ApptentiveLog.w("Error stopping Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
 	}
@@ -188,7 +187,7 @@ public class Apptentive {
 			}
 			DeviceManager.storeCustomDeviceData(context, customData);
 		} catch (JSONException e) {
-			Log.w("Unable to set custom device data.", e);
+			ApptentiveLog.w("Unable to set custom device data.", e);
 		}
 	}
 
@@ -267,7 +266,7 @@ public class Apptentive {
 	 * @deprecated
 	 */
 	public static void setCustomPersonData(Context context, Map<String, String> customPersonData) {
-		Log.w("Setting custom person data: %s", customPersonData.toString());
+		ApptentiveLog.w("Setting custom person data: %s", customPersonData.toString());
 		try {
 			CustomData customData = new CustomData();
 			for (String key : customPersonData.keySet()) {
@@ -275,7 +274,7 @@ public class Apptentive {
 			}
 			PersonManager.storeCustomPersonData(context, customData);
 		} catch (JSONException e) {
-			Log.e("Unable to set custom person data.", e);
+			ApptentiveLog.e("Unable to set custom person data.", e);
 		}
 	}
 
@@ -371,11 +370,11 @@ public class Apptentive {
 			for (String key : config.keySet()) {
 				configJson.put(key, config.get(key));
 			}
-			Log.d("Adding integration config: %s", config.toString());
+			ApptentiveLog.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
 			syncDevice(context);
 		} catch (JSONException e) {
-			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
+			ApptentiveLog.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
 	}
 
@@ -455,13 +454,13 @@ public class Apptentive {
 					integrationConfig.put(INTEGRATION_AWS_SNS, pushObject);
 					break;
 				default:
-					Log.e("Invalid pushProvider: %d", pushProvider);
+					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 					return;
 			}
 			DeviceManager.storeIntegrationConfig(context, integrationConfig);
 			syncDevice(context);
 		} catch (JSONException e) {
-			Log.e("Error setting push integration.", e);
+			ApptentiveLog.e("Error setting push integration.", e);
 			return;
 		}
 	}
@@ -557,7 +556,7 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.i("Handling opened Apptentive push notification.");
+			ApptentiveLog.i("Handling opened Apptentive push notification.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
 				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
@@ -569,10 +568,10 @@ public class Apptentive {
 						Apptentive.showMessageCenter(activity);
 						return true;
 					default:
-						Log.v("Unknown Apptentive push notification action: \"%s\"", action.name());
+						ApptentiveLog.v("Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
 			} catch (JSONException e) {
-				Log.w("Error parsing JSON from push notification.", e);
+				ApptentiveLog.w("Error parsing JSON from push notification.", e);
 				MetricModule.sendError(activity.getApplicationContext(), e, "Parsing Push notification", pushData);
 			}
 		}
@@ -636,7 +635,7 @@ public class Apptentive {
 		try {
 			return ApptentiveInternal.showMessageCenterInternal(activity, customData);
 		} catch (Exception e) {
-			Log.w("Error starting Apptentive Activity.", e);
+			ApptentiveLog.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
 		}
 		return false;
@@ -707,7 +706,7 @@ public class Apptentive {
 			message.setAssociatedFiles(context, null);
 			MessageManager.sendMessage(context.getApplicationContext(), message);
 		} catch (Exception e) {
-			Log.w("Error sending attachment text.", e);
+			ApptentiveLog.w("Error sending attachment text.", e);
 			MetricModule.sendError(context, e, null, null);
 		}
 	}
@@ -765,7 +764,7 @@ public class Apptentive {
 			MessageManager.sendMessage(context.getApplicationContext(), message);
 
 		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
 		}
 	}
@@ -830,7 +829,7 @@ public class Apptentive {
 			MessageManager.sendMessage(context.getApplicationContext(), message);
 
 		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error sending attachment file.", e);
 			MetricModule.sendError(context, e, null, null);
 		}
 	}
@@ -959,32 +958,32 @@ public class Apptentive {
 				if (metaData != null) {
 					if (apiKey == null) {
 						apiKey = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY);
-						Log.d("Saving API key for the first time: %s", apiKey);
+						ApptentiveLog.d("Saving API key for the first time: %s", apiKey);
 						prefs.edit().putString(Constants.PREF_KEY_API_KEY, apiKey).apply();
 					} else {
-						Log.d("Using cached API Key: %s", apiKey);
+						ApptentiveLog.d("Using cached API Key: %s", apiKey);
 					}
 					logLevelOverride = metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
 					apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 					ApptentiveClient.useStagingServer = metaData.getBoolean(Constants.MANIFEST_KEY_USE_STAGING_SERVER);
 				}
 				if (apptentiveDebug) {
-					Log.i("Apptentive debug logging set to VERBOSE.");
-					ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+					ApptentiveLog.i("Apptentive debug logging set to VERBOSE.");
+					ApptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 				} else if (logLevelOverride != null) {
-					Log.i("Overriding log level: %s", logLevelOverride);
-					ApptentiveInternal.setMinimumLogLevel(Log.Level.parse(logLevelOverride));
+					ApptentiveLog.i("Overriding log level: %s", logLevelOverride);
+					ApptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.parse(logLevelOverride));
 				} else {
 					GlobalInfo.isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 					if (GlobalInfo.isAppDebuggable) {
-						ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+						ApptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 					}
 				}
 			} catch (Exception e) {
-				Log.e("Unexpected error while reading application info.", e);
+				ApptentiveLog.e("Unexpected error while reading application info.", e);
 			}
 
-			Log.i("Debug mode enabled? %b", GlobalInfo.isAppDebuggable);
+			ApptentiveLog.i("Debug mode enabled? %b", GlobalInfo.isAppDebuggable);
 
 			// If we are in debug mode, but no api key is found, throw an exception. Otherwise, just assert log. We don't want to crash a production app.
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
@@ -998,11 +997,11 @@ public class Apptentive {
 					alertDialog.setCanceledOnTouchOutside(false);
 					alertDialog.show();
 				}
-				Log.e(errorString);
+				ApptentiveLog.e(errorString);
 			}
 			GlobalInfo.apiKey = apiKey;
 
-			Log.i("API Key: %s", GlobalInfo.apiKey);
+			ApptentiveLog.i("API Key: %s", GlobalInfo.apiKey);
 
 			// Grab app info we need to access later on.
 			GlobalInfo.appPackage = appContext.getPackageName();
@@ -1048,9 +1047,9 @@ public class Apptentive {
 			}
 
 			GlobalInfo.initialized = true;
-			Log.v("Done initializing...");
+			ApptentiveLog.v("Done initializing...");
 		} else {
-			Log.v("Already initialized...");
+			ApptentiveLog.v("Already initialized...");
 		}
 
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
@@ -1066,23 +1065,23 @@ public class Apptentive {
 		syncSdk(appContext);
 		syncPerson(appContext);
 
-		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		Log.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
+		ApptentiveLog.d("Conversation id: %s", appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private static void onAppVersionChanged(Context context, Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
-		Log.i("App version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+		ApptentiveLog.i("App version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(context, currentVersionCode, currentVersionName);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(context);
 		if (appRelease != null) {
-			Log.d("App release was updated.");
+			ApptentiveLog.d("App release was updated.");
 			ApptentiveDatabase.getInstance(context).addPayload(appRelease);
 		}
 		invalidateCaches(context);
 	}
 
 	private static void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
-		Log.i("Sdk version changed: %s => %s", previousSdkVersion, currentSdkVersion);
+		ApptentiveLog.i("Sdk version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
 		invalidateCaches(context);
 	}
@@ -1109,7 +1108,7 @@ public class Apptentive {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				ApptentiveLog.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
 				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
 			}
 		};
@@ -1134,23 +1133,23 @@ public class Apptentive {
 		// TODO: Allow host app to send a user id, if available.
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(context, request);
 		if (response == null) {
-			Log.w("Got null response fetching ConversationToken.");
+			ApptentiveLog.w("Got null response fetching ConversationToken.");
 			return;
 		}
 		if (response.isSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
-				Log.d("ConversationToken: " + conversationToken);
+				ApptentiveLog.d("ConversationToken: " + conversationToken);
 				String conversationId = root.getString("id");
-				Log.d("New Conversation id: %s", conversationId);
+				ApptentiveLog.d("New Conversation id: %s", conversationId);
 
 				if (conversationToken != null && !conversationToken.equals("")) {
 					GlobalInfo.setConversationToken(context, conversationToken);
 					GlobalInfo.setConversationId(context, conversationId);
 				}
 				String personId = root.getString("person_id");
-				Log.d("PersonId: " + personId);
+				ApptentiveLog.d("PersonId: " + personId);
 				if (personId != null && !personId.equals("")) {
 					GlobalInfo.setPersonId(context, personId);
 				}
@@ -1158,7 +1157,7 @@ public class Apptentive {
 				asyncFetchAppConfiguration(context);
 				InteractionManager.asyncFetchAndStoreInteractions(context);
 			} catch (JSONException e) {
-				Log.e("Error parsing ConversationToken response json.", e);
+				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
 			}
 		}
 	}
@@ -1171,7 +1170,7 @@ public class Apptentive {
 
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if (force || Configuration.load(context).hasConfigurationCacheExpired()) {
-			Log.i("Fetching new Configuration.");
+			ApptentiveLog.i("Fetching new Configuration.");
 			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration(context);
 			try {
 				Map<String, String> headers = response.getHeaders();
@@ -1181,16 +1180,16 @@ public class Apptentive {
 					if (cacheSeconds == null) {
 						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 					}
-					Log.d("Caching configuration for %d seconds.", cacheSeconds);
+					ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
 					Configuration config = new Configuration(response.getContent());
 					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
 					config.save(context);
 				}
 			} catch (JSONException e) {
-				Log.e("Error parsing app configuration from server.", e);
+				ApptentiveLog.e("Error parsing app configuration from server.", e);
 			}
 		} else {
-			Log.v("Using cached Configuration.");
+			ApptentiveLog.v("Using cached Configuration.");
 		}
 	}
 
@@ -1203,7 +1202,7 @@ public class Apptentive {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				ApptentiveLog.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
 				MetricModule.sendError(context.getApplicationContext(), throwable, null, null);
 			}
 		};
@@ -1220,11 +1219,11 @@ public class Apptentive {
 	private static void syncDevice(Context context) {
 		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff(context);
 		if (deviceInfo != null) {
-			Log.d("Device info was updated.");
-			Log.v(deviceInfo.toString());
+			ApptentiveLog.d("Device info was updated.");
+			ApptentiveLog.v(deviceInfo.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(deviceInfo);
 		} else {
-			Log.d("Device info was not updated.");
+			ApptentiveLog.d("Device info was not updated.");
 		}
 	}
 
@@ -1236,11 +1235,11 @@ public class Apptentive {
 	private static void syncSdk(Context context) {
 		Sdk sdk = SdkManager.storeSdkAndReturnDiff(context);
 		if (sdk != null) {
-			Log.d("Sdk was updated.");
-			Log.v(sdk.toString());
+			ApptentiveLog.d("Sdk was updated.");
+			ApptentiveLog.v(sdk.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(sdk);
 		} else {
-			Log.d("Sdk was not updated.");
+			ApptentiveLog.d("Sdk was not updated.");
 		}
 	}
 
@@ -1252,11 +1251,11 @@ public class Apptentive {
 	private static void syncPerson(Context context) {
 		Person person = PersonManager.storePersonAndReturnDiff(context);
 		if (person != null) {
-			Log.d("Person was updated.");
-			Log.v(person.toString());
+			ApptentiveLog.d("Person was updated.");
+			ApptentiveLog.v(person.toString());
 			ApptentiveDatabase.getInstance(context).addPayload(person);
 		} else {
-			Log.d("Person was not updated.");
+			ApptentiveLog.d("Person was not updated.");
 		}
 	}
 
@@ -1306,7 +1305,7 @@ public class Apptentive {
 				put(KEY_TYPE, TYPE);
 				put(TYPE, version);
 			} catch (JSONException e) {
-				Log.e("Error creating Apptentive.Version.", e);
+				ApptentiveLog.e("Error creating Apptentive.Version.", e);
 			}
 		}
 
@@ -1370,7 +1369,7 @@ public class Apptentive {
 				put(KEY_TYPE, TYPE);
 				put(SEC, dateTime);
 			} catch (JSONException e) {
-				Log.e("Error creating Apptentive.DateTime.", e);
+				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
 			}
 		}
 
