@@ -8,8 +8,10 @@
 <resources>
 
     <declare-styleable name="ApptentiveThemeTemplate">
+        <attr name="apptentiveWindowBackground" format="color|reference"/>
         <attr name="apptentiveViewBackground" format="color|reference"/>
         <attr name="apptentiveCardViewBackground" format="color|reference"/>
+        <attr name="apptentiveDialogBackground" format="reference"/>
 
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
 

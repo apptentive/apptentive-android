@@ -391,7 +391,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 				a.recycle();
 			}
 
-			int overlayColor = ContextCompat.getColor(getContext(), R.color.apptentive_activity_frame);
+			int overlayColor = ContextCompat.getColor(getContext(), R.color.apptentive_activity_frame_dark);
 			getActivity().getWindow().setStatusBarColor(Util.alphaMixColors(statusBarColorOveride, overlayColor));
 		}
 	}

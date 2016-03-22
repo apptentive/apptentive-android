@@ -17,7 +17,7 @@
                 android:fadingEdge="none">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:background="@drawable/apptentive_activity_background"
+                      android:background="?attr/apptentiveDialogBackground"
                       android:orientation="vertical">
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="match_parent"
