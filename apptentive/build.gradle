@@ -124,8 +124,6 @@ task androidJavadocs(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     // Don't document everything. Just the public API classes.
     include 'com/apptentive/android/sdk/Apptentive.java'
-    include 'com/apptentive/android/sdk/ApptentiveActivity.java'
-    include 'com/apptentive/android/sdk/ApptentiveListActivity.java'
     include 'com/apptentive/android/sdk/module/rating/impl/AmazonAppstoreRatingProvider.java'
     include 'com/apptentive/android/sdk/module/rating/impl/GooglePlayRatingProvider.java'
     include 'com/apptentive/android/sdk/module/rating/InsufficientRatingArgumentsException.java'
