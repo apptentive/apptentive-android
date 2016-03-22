@@ -23,7 +23,7 @@
                                                                                    android:layout_centerVertical="true"
                                                                                    style="?attr/apptentiveAvatarViewGreetingStyle"
                                                                                    android:gravity="center_vertical"
-                                                                                   android:src="@drawable/avatar"/>
+                                                                                   android:src="@drawable/apptentive_ic_avatar"/>
         <LinearLayout android:id="@+id/greeting_content"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"

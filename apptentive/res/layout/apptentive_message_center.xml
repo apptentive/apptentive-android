@@ -83,5 +83,5 @@
                                                           android:layout_alignParentRight="true"
                                                           android:layout_marginBottom="@dimen/apptentive_message_center_fab_height"
                                                           android:layout_marginRight="@dimen/apptentive_message_center_fab_right"
-                                                          android:src="@drawable/ic_edit"/>
+                                                          android:src="@drawable/apptentive_ic_edit"/>
 </RelativeLayout>

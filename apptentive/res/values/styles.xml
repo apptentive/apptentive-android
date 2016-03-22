@@ -318,7 +318,7 @@
     </style>
 
     <style name="ApptentiveTheme.TextAppearence.EditText.ApptentiveInteraction">
-        <item name="android:background">@drawable/android_textfield_activated_holo_light</item>
+        <item name="android:background">@drawable/apptentive_textfield_activated_holo_light</item>
         <item name="android:textSize">@dimen/apptentive_dialog_edittext</item>
         <item name="android:textCursorDrawable">@null</item>
     </style>
@@ -385,7 +385,7 @@
     </style>
 
     <style name="ApptentiveAvatarView">
-        <item name="android:src">@drawable/avatar</item>
+        <item name="android:src">@drawable/apptentive_ic_avatar</item>
     </style>
 
     <style name="ApptentiveAvatarView.Greeting">

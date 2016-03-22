@@ -428,7 +428,7 @@ public class MessageManager {
 					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
 					builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
 							.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-							.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
+							.setSmallIcon(R.drawable.apptentive_ic_avatar).setContentText(apptentiveMsg.getBody())
 							.setContentIntent(pendingIntent)
 							.setFullScreenIntent(pendingIntent, false);
 					foreground.runOnUiThread(new Runnable() {
