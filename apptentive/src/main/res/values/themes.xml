@@ -9,7 +9,15 @@
     <!-- ApptentiveTheme is the theme used by all Apptentive UIs. It is default to Light Base Theme, if not provided by the app-->
     <style name="ApptentiveThemeOverride"/>
 
-    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme"/>
+    <style name="ApptentiveBaseThemeLight" parent="Theme.AppCompat.Light.NoActionBar"/>
+    <style name="ApptentiveBaseThemeDark" parent="Theme.AppCompat.NoActionBar"/>
+
+    <style name="ApptentiveBaseTheme" parent="ApptentiveBaseThemeLight"/>
+
+    <!-- Default theme used by image preview -->
+    <style name="ApptentiveTheme.TranslucentStatus.FullScreen" parent="ApptentiveTheme.TranslucentStatus">
+        <item name="android:windowFullscreen">true</item>
+    </style>
 
     <!-- Default theme used by Apptentive about -->
     <style name="ApptentiveTheme.About" parent="ApptentiveTheme">
@@ -17,7 +25,7 @@
     </style>
 
     <!-- Base Theme-->
-    <style name="ApptentiveBaseVersionBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme">
 
         <item name="apptentiveTypefaceHeadline">@integer/apptentive_typeface_sans</item>
         <item name="apptentiveTypefaceTitle">@integer/apptentive_typeface_sans</item>
@@ -88,10 +96,13 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+
+        <!-- Requires API 11 -->
+        <item name="android:dialogTheme">@style/Apptentive.Style.Dialog</item>
+        <item name="alertDialogTheme">@style/Apptentive.Style.AlertDialog</item>
     </style>
 
-
-    <style name="ApptentiveBaseVersionBaseFrameStyle">
+    <style name="ApptentiveBaseFrameTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
@@ -105,12 +116,7 @@
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
     </style>
 
-    <style name="ApptentiveBaseVersionBaseModalStyle">
+    <style name="ApptentiveBaseDialogTheme">
         <item name="android:windowBackground">@color/apptentive_activity_frame</item>
-    </style>
-
-    <!-- Default theme used by image preview -->
-    <style name="ApptentiveTheme.TranslucentStatus.FullScreen" parent="ApptentiveTheme.TranslucentStatus">
-        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>

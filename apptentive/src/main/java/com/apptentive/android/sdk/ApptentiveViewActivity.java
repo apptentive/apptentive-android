@@ -210,7 +210,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private void applyApptentiveTheme(boolean isModalInteraction) {
 		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
 		if (isModalInteraction) {
-			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseModalStyle, true);
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseDialogTheme, true);
 		}
 		getTheme().setTo(apptentiveTheme);
 	}

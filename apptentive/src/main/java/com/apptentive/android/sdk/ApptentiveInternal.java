@@ -484,7 +484,7 @@ public class ApptentiveInternal {
 				}
 			}
 
-			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseFrameStyle, true);
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseFrameTheme, true);
 			apptentiveTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
 
 		} catch (Exception e) {
