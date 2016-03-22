@@ -36,7 +36,7 @@ public class MyGcmListenerService extends GcmListenerService {
 		Intent intent = new Intent(this, ExampleActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		Apptentive.setPendingPushNotification(getApplicationContext(), data);
+		Apptentive.setPendingPushNotification(data);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
 
