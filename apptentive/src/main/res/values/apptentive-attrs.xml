@@ -44,7 +44,6 @@
         <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
 
-        <attr name="apptentive_material_disabled_text" format="color|reference"/>
         <attr name="apptentive_material_disabled_icon" format="color|reference"/>
         <attr name="apptentive_material_divider" format="color|reference"/>
 

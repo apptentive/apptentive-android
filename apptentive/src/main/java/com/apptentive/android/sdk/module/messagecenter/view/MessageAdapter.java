@@ -623,12 +623,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	protected int getStatusColor(Double seconds) {
 		if (seconds == null) {
 			// failed color (red)
-			return isInPauseState ? Util.getThemeColorFromAttrOrRes(fragment.getContext(), R.attr.apptentive_material_selected_text,
-					R.color.apptentive_material_selected_text) : 0;
+			return isInPauseState ? Util.getThemeColor(fragment.getContext(), R.attr.apptentiveValidationFailedColor) : 0;
 		}
 		// other status color
-		return Util.getThemeColorFromAttrOrRes(fragment.getContext(), R.attr.apptentive_material_disabled_text,
-				R.color.apptentive_material_disabled_text);
+		return Util.getThemeColor(fragment.getContext(), android.R.attr.textColorSecondary);
 	}
 
 	private Point getBitmapDimensions(StoredFile storedFile) {

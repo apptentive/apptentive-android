@@ -39,7 +39,6 @@
 
     <!-- TODO: Refactor colors below here -->
 
-    <color name="apptentive_material_disabled_text">#B8B8B8</color>
     <color name="apptentive_material_disabled_icon">#DCDCDF</color>
     <color name="apptentive_material_divider">#1F000000</color>
     <!-- Apptentive Material DEFAULT drawer colors -->
