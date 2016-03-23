@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +35,7 @@ public class Interactions extends JSONObject {
 				return Interaction.Factory.parseInteraction(getJSONObject(id).toString());
 			}
 		} catch (JSONException e) {
-			Log.w("Exception parsing interactions array.", e);
+			ApptentiveLog.w("Exception parsing interactions array.", e);
 		}
 		return null;
 	}

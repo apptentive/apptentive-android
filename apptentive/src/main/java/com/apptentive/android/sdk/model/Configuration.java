@@ -13,7 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,7 +62,7 @@ public class Configuration extends JSONObject {
 				return new Configuration(json);
 			}
 		} catch (JSONException e) {
-			Log.e("Error loading Configuration from SharedPreferences.", e);
+			ApptentiveLog.e("Error loading Configuration from SharedPreferences.", e);
 		}
 		return new Configuration();
 	}
@@ -167,7 +167,7 @@ public class Configuration extends JSONObject {
 			Bundle metaData = ai.metaData;
 			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
-			Log.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
+			ApptentiveLog.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
@@ -188,7 +188,7 @@ public class Configuration extends JSONObject {
 		try {
 			put(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS, configurationCacheExpirationMillis);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+			ApptentiveLog.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 		}
 	}
 

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -93,7 +93,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		try {
 			put(KEY_BODY, body);
 		} catch (JSONException e) {
-			Log.e("Unable to set message body.");
+			ApptentiveLog.e("Unable to set message body.");
 		}
 	}
 
@@ -110,7 +110,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		try {
 			put(KEY_TITLE, title);
 		} catch (JSONException e) {
-			Log.e("Unable to set title.");
+			ApptentiveLog.e("Unable to set title.");
 		}
 	}
 
@@ -127,7 +127,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		try {
 			put(KEY_TEXT_ONLY, bVal);
 		} catch (JSONException e) {
-			Log.e("Unable to set file filePath.");
+			ApptentiveLog.e("Unable to set file filePath.");
 		}
 	}
 

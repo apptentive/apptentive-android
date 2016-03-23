@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model.common;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,7 +43,7 @@ public abstract class Action<T extends Action> extends JSONObject {
 			try {
 				return Type.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown Action.Type: " + name);
+				ApptentiveLog.v("Error parsing unknown Action.Type: " + name);
 			}
 			return unknown;
 		}

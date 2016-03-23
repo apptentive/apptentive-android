@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 
@@ -72,7 +72,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 		} catch (InsufficientRatingArgumentsException e) {
 			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
 			showingDialog = true;
-			Log.e(e.getMessage());
+			ApptentiveLog.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} finally {
 		}
@@ -90,7 +90,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 	}
 
 	private void displayError(final Activity activity, String message) {
-		Log.e(message);
+		ApptentiveLog.e(message);
 		final Context contextThemeWrapper = new ContextThemeWrapper(activity, ApptentiveInternal.getInstance().getApptentiveTheme());
 		final AlertDialog alertDialog = new AlertDialog.Builder(contextThemeWrapper).create();
 		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));

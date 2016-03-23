@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -115,7 +115,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					// TODO: Extract survey state from views and send it as before.
 
 					ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(new SurveyResponse(interaction, answers));
-					Log.d("Survey Submitted.");
+					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {
 					Toast toast = new Toast(contextThemeWrapper);

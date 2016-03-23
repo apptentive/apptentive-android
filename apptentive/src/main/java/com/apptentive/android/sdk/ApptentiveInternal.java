@@ -118,7 +118,7 @@ public class ApptentiveInternal {
 			try {
 				return PushAction.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				Log.d("Error parsing unknown PushAction: " + name);
+				ApptentiveLog.d("Error parsing unknown PushAction: " + name);
 			}
 			return unknown;
 		}
@@ -328,7 +328,7 @@ public class ApptentiveInternal {
 				customData.put(key, value);
 				DeviceManager.storeCustomDeviceData(customData);
 			} catch (JSONException e) {
-				Log.w("Unable to add custom device data.", e);
+				ApptentiveLog.w("Unable to add custom device data.", e);
 			}
 		}
 	}
@@ -343,7 +343,7 @@ public class ApptentiveInternal {
 				customData.put(key, value);
 				PersonManager.storeCustomPersonData(customData);
 			} catch (JSONException e) {
-				Log.w("Unable to add custom person data.", e);
+				ApptentiveLog.w("Unable to add custom person data.", e);
 			}
 		}
 	}
@@ -488,22 +488,22 @@ public class ApptentiveInternal {
 			apptentiveTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
 
 		} catch (Exception e) {
-			Log.e("Unexpected error while reading application or package info.", e);
+			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
 		}
 
 		// Set debuggable and appropriate log level.
 		if (apptentiveDebug) {
-			Log.i("Apptentive debug logging set to VERBOSE.");
-			setMinimumLogLevel(Log.Level.VERBOSE);
+			ApptentiveLog.i("Apptentive debug logging set to VERBOSE.");
+			setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		} else if (logLevelOverride != null) {
-			Log.i("Overriding log level: %s", logLevelOverride);
-			setMinimumLogLevel(Log.Level.parse(logLevelOverride));
+			ApptentiveLog.i("Overriding log level: %s", logLevelOverride);
+			setMinimumLogLevel(ApptentiveLog.Level.parse(logLevelOverride));
 		} else {
 			if (isAppDebuggable) {
-				setMinimumLogLevel(Log.Level.VERBOSE);
+				setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 			}
 		}
-		Log.i("Debug mode enabled? %b", isAppDebuggable);
+		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
 
 		String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
 		if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
@@ -521,33 +521,33 @@ public class ApptentiveInternal {
 			if (isAppDebuggable) {
 				throw new RuntimeException(errorMessage);
 			} else {
-				Log.a(errorMessage);
+				ApptentiveLog.a(errorMessage);
 			}
 		} else {
-			Log.d("Using cached Apptentive API Key");
+			ApptentiveLog.d("Using cached Apptentive API Key");
 		}
-		Log.d("Apptentive API Key: %s", apiKey);
+		ApptentiveLog.d("Apptentive API Key: %s", apiKey);
 
 		// Grab app info we need to access later on.
 		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		Log.d("Android ID: ", androidId);
-		Log.d("Default Locale: %s", Locale.getDefault().toString());
-		Log.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+		ApptentiveLog.d("Android ID: ", androidId);
+		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
+		ApptentiveLog.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
-		Log.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff();
 		if (appRelease != null) {
-			Log.d("App release was updated.");
+			ApptentiveLog.d("App release was updated.");
 			database.addPayload(appRelease);
 		}
 		invalidateCaches();
 	}
 
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
-		Log.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
+		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
 		invalidateCaches();
 	}
@@ -572,7 +572,7 @@ public class ApptentiveInternal {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				ApptentiveLog.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
 				MetricModule.sendError(throwable, null, null);
 			}
 		};
@@ -592,29 +592,29 @@ public class ApptentiveInternal {
 
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
-			Log.w("Got null response fetching ConversationToken.");
+			ApptentiveLog.w("Got null response fetching ConversationToken.");
 			return;
 		}
 		if (response.isSuccessful()) {
 			try {
 				JSONObject root = new JSONObject(response.getContent());
 				String conversationToken = root.getString("token");
-				Log.d("ConversationToken: " + conversationToken);
+				ApptentiveLog.d("ConversationToken: " + conversationToken);
 				String conversationId = root.getString("id");
-				Log.d("New Conversation id: %s", conversationId);
+				ApptentiveLog.d("New Conversation id: %s", conversationId);
 
 				if (conversationToken != null && !conversationToken.equals("")) {
 					setConversationToken(conversationToken);
 					setConversationId(conversationId);
 				}
 				String personId = root.getString("person_id");
-				Log.d("PersonId: " + personId);
+				ApptentiveLog.d("PersonId: " + personId);
 				if (personId != null && !personId.equals("")) {
 					setPersonId(personId);
 				}
 				fetchSdkState();
 			} catch (JSONException e) {
-				Log.e("Error parsing ConversationToken response json.", e);
+				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
 			}
 		}
 	}
@@ -627,7 +627,7 @@ public class ApptentiveInternal {
 
 		// Don't get the app configuration unless forced, or the cache has expired.
 		if (force || Configuration.load().hasConfigurationCacheExpired()) {
-			Log.i("Fetching new Configuration.");
+			ApptentiveLog.i("Fetching new Configuration.");
 			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
 			try {
 				Map<String, String> headers = response.getHeaders();
@@ -637,16 +637,16 @@ public class ApptentiveInternal {
 					if (cacheSeconds == null) {
 						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 					}
-					Log.d("Caching configuration for %d seconds.", cacheSeconds);
+					ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
 					Configuration config = new Configuration(response.getContent());
 					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
 					config.save();
 				}
 			} catch (JSONException e) {
-				Log.e("Error parsing app configuration from server.", e);
+				ApptentiveLog.e("Error parsing app configuration from server.", e);
 			}
 		} else {
-			Log.v("Using cached Configuration.");
+			ApptentiveLog.v("Using cached Configuration.");
 		}
 	}
 
@@ -659,7 +659,7 @@ public class ApptentiveInternal {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				Log.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
+				ApptentiveLog.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
 				MetricModule.sendError(throwable, null, null);
 			}
 		};
@@ -674,11 +674,11 @@ public class ApptentiveInternal {
 	void syncDevice() {
 		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff();
 		if (deviceInfo != null) {
-			Log.d("Device info was updated.");
-			Log.v(deviceInfo.toString());
+			ApptentiveLog.d("Device info was updated.");
+			ApptentiveLog.v(deviceInfo.toString());
 			database.addPayload(deviceInfo);
 		} else {
-			Log.d("Device info was not updated.");
+			ApptentiveLog.d("Device info was not updated.");
 		}
 	}
 
@@ -688,11 +688,11 @@ public class ApptentiveInternal {
 	private void syncSdk() {
 		Sdk sdk = SdkManager.storeSdkAndReturnDiff();
 		if (sdk != null) {
-			Log.d("Sdk was updated.");
-			Log.v(sdk.toString());
+			ApptentiveLog.d("Sdk was updated.");
+			ApptentiveLog.v(sdk.toString());
 			database.addPayload(sdk);
 		} else {
-			Log.d("Sdk was not updated.");
+			ApptentiveLog.d("Sdk was not updated.");
 		}
 	}
 
@@ -702,11 +702,11 @@ public class ApptentiveInternal {
 	private void syncPerson() {
 		Person person = PersonManager.storePersonAndReturnDiff();
 		if (person != null) {
-			Log.d("Person was updated.");
-			Log.v(person.toString());
+			ApptentiveLog.d("Person was updated.");
+			ApptentiveLog.v(person.toString());
 			database.addPayload(person);
 		} else {
-			Log.d("Person was not updated.");
+			ApptentiveLog.d("Person was not updated.");
 		}
 	}
 
@@ -753,17 +753,17 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Pass in a log level to override the default, which is {@link Log.Level#INFO}
+	 * Pass in a log level to override the default, which is {@link ApptentiveLog.Level#INFO}
 	 */
-	public void setMinimumLogLevel(Log.Level level) {
-		Log.overrideLogLevel(level);
+	public void setMinimumLogLevel(ApptentiveLog.Level level) {
+		ApptentiveLog.overrideLogLevel(level);
 	}
 
 	private String pushCallbackActivityName;
 
 	public void setPushCallbackActivity(Class<? extends Activity> activity) {
 		pushCallbackActivityName = activity.getName();
-		Log.d("Setting push callback activity name to %s", pushCallbackActivityName);
+		ApptentiveLog.d("Setting push callback activity name to %s", pushCallbackActivityName);
 	}
 
 	public String getPushCallbackActivityName() {
@@ -780,20 +780,20 @@ public class ApptentiveInternal {
 	static String getApptentivePushNotificationData(Intent intent) {
 		String apptentive = null;
 		if (intent != null) {
-			Log.v("Got an Intent.");
+			ApptentiveLog.v("Got an Intent.");
 			// Parse
 			if (intent.hasExtra(PARSE_PUSH_EXTRA_KEY)) {
 				String parseStringExtra = intent.getStringExtra(PARSE_PUSH_EXTRA_KEY);
-				Log.v("Got a Parse Push.");
+				ApptentiveLog.v("Got a Parse Push.");
 				try {
 					JSONObject parseJson = new JSONObject(parseStringExtra);
 					apptentive = parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
 				} catch (JSONException e) {
-					Log.e("Corrupt Parse String Extra: %s", parseStringExtra);
+					ApptentiveLog.e("Corrupt Parse String Extra: %s", parseStringExtra);
 				}
 			} else {
 				// Straight GCM / SNS
-				Log.v("Got a non-Parse push.");
+				ApptentiveLog.v("Got a non-Parse push.");
 				apptentive = intent.getStringExtra(APPTENTIVE_PUSH_EXTRA_KEY);
 			}
 		}
@@ -809,7 +809,7 @@ public class ApptentiveInternal {
 
 	boolean setPendingPushNotification(String apptentivePushData) {
 		if (apptentivePushData != null) {
-			Log.d("Saving Apptentive push notification data.");
+			ApptentiveLog.d("Saving Apptentive push notification data.");
 			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
 			messageManager.startMessagePreFetchTask();
 			return true;
@@ -844,7 +844,7 @@ public class ApptentiveInternal {
 								value instanceof Float ||
 								value instanceof Integer ||
 								value instanceof Short)) {
-							Log.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
+							ApptentiveLog.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
 							keysIterator.remove();
 						}
 					}

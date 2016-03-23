@@ -14,7 +14,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.apptentive.android.sdk.Log;
+
+import com.apptentive.android.sdk.ApptentiveLog;
 
 
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -63,7 +64,7 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 				success = true;
 			}
 		} catch (ActivityNotFoundException e) {
-			Log.w("NavigateToLink Error: ", e);
+			ApptentiveLog.w("NavigateToLink Error: ", e);
 		} finally {
 			JSONObject data = new JSONObject();
 			try {
@@ -71,7 +72,7 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 				data.put(NavigateToLinkInteraction.KEY_TARGET, interaction.getTarget().lowercaseName());
 				data.put(NavigateToLinkInteraction.EVENT_KEY_SUCCESS, success);
 			} catch (JSONException e) {
-				Log.e("Error creating Event data object.", e);
+				ApptentiveLog.e("Error creating Event data object.", e);
 			}
 			EngagementModule.engageInternal(getActivity(), interaction, NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data.toString());
 		}

@@ -22,7 +22,7 @@ import android.widget.ImageView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -83,7 +83,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 			PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
 			return ContextCompat.getDrawable(getContext(), pi.applicationInfo.icon);
 		} catch (Exception e) {
-			Log.e("Error loading app icon.", e);
+			ApptentiveLog.e("Error loading app icon.", e);
 		}
 		return null;
 	}

@@ -6,7 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class Targets extends JSONObject {
 				}
 			}
 		}
-		Log.v("No runnable Interactions for EventLabel: %s", eventLabel);
+		ApptentiveLog.v("No runnable Interactions for EventLabel: %s", eventLabel);
 		return null;
 	}
 }

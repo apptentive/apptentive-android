@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.util;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +59,7 @@ public class JsonDiffer {
 					// Do nothing.
 				}
 			} catch (JSONException e) {
-				Log.w("Error diffing object with key %s", e, key);
+				ApptentiveLog.w("Error diffing object with key %s", e, key);
 			} finally {
 				it.remove();
 			}
@@ -80,7 +80,7 @@ public class JsonDiffer {
 		if (ret.length() == 0) {
 			ret = null;
 		}
-		Log.v("Generated diff: %s", ret);
+		ApptentiveLog.v("Generated diff: %s", ret);
 		return ret;
 	}
 
@@ -105,7 +105,7 @@ public class JsonDiffer {
 						return false;
 					}
 				} catch (JSONException e) {
-					Log.w("Error comparing JSONObjects", e);
+					ApptentiveLog.w("Error comparing JSONObjects", e);
 					return false;
 				}
 			}
@@ -123,7 +123,7 @@ public class JsonDiffer {
 					}
 				}
 			} catch (JSONException e) {
-				Log.e("", e);
+				ApptentiveLog.e("", e);
 				return false;
 			}
 			return true;

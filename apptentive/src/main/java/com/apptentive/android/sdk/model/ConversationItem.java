@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
@@ -41,7 +41,7 @@ public abstract class ConversationItem extends Payload {
 		try {
 			put(KEY_NONCE, nonce);
 		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_NONCE);
+			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_NONCE);
 		}
 	}
 
@@ -69,7 +69,7 @@ public abstract class ConversationItem extends Payload {
 		try {
 			put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
 		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT);
+			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT);
 		}
 	}
 
@@ -80,7 +80,7 @@ public abstract class ConversationItem extends Payload {
 		try {
 			put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
 		} catch (JSONException e) {
-			Log.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_UTC_OFFSET);
+			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_UTC_OFFSET);
 		}
 	}
 

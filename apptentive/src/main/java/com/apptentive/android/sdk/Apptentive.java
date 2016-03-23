@@ -53,7 +53,7 @@ public class Apptentive {
 	}
 
 	public static void register(Application application, String apptentiveApiKey) {
-		Log.i("Registering Apptentive.");
+		ApptentiveLog.i("Registering Apptentive.");
 		ApptentiveInternal.createInstance(application, apptentiveApiKey);
 		ApptentiveInternal.setLifeCycleCallback();
 	}
@@ -137,7 +137,7 @@ public class Apptentive {
 				}
 				DeviceManager.storeCustomDeviceData(customData);
 			} catch (JSONException e) {
-				Log.w("Unable to set custom device data.", e);
+				ApptentiveLog.w("Unable to set custom device data.", e);
 			}
 		}
 	}
@@ -224,7 +224,7 @@ public class Apptentive {
 	 * @deprecated
 	 */
 	public static void setCustomPersonData(Map<String, String> customPersonData) {
-		Log.w("Setting custom person data: %s", customPersonData.toString());
+		ApptentiveLog.w("Setting custom person data: %s", customPersonData.toString());
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			try {
 				CustomData customData = new CustomData();
@@ -233,7 +233,7 @@ public class Apptentive {
 				}
 				PersonManager.storeCustomPersonData(customData);
 			} catch (JSONException e) {
-				Log.e("Unable to set custom person data.", e);
+				ApptentiveLog.e("Unable to set custom person data.", e);
 			}
 		}
 	}
@@ -342,11 +342,11 @@ public class Apptentive {
 			for (String key : config.keySet()) {
 				configJson.put(key, config.get(key));
 			}
-			Log.d("Adding integration config: %s", config.toString());
+			ApptentiveLog.d("Adding integration config: %s", config.toString());
 			DeviceManager.storeIntegrationConfig(integrationConfig);
 			ApptentiveInternal.getInstance().syncDevice();
 		} catch (JSONException e) {
-			Log.e("Error adding integration: %s, %s", e, integration, config.toString());
+			ApptentiveLog.e("Error adding integration: %s, %s", e, integration, config.toString());
 		}
 	}
 
@@ -428,13 +428,13 @@ public class Apptentive {
 					integrationConfig.put(INTEGRATION_AWS_SNS, pushObject);
 					break;
 				default:
-					Log.e("Invalid pushProvider: %d", pushProvider);
+					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 					return;
 			}
 			DeviceManager.storeIntegrationConfig(integrationConfig);
 			ApptentiveInternal.getInstance().syncDevice();
 		} catch (JSONException e) {
-			Log.e("Error setting push integration.", e);
+			ApptentiveLog.e("Error setting push integration.", e);
 			return;
 		}
 	}
@@ -547,7 +547,7 @@ public class Apptentive {
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
 		if (pushData != null) {
-			Log.i("Handling opened Apptentive push notification.");
+			ApptentiveLog.i("Handling opened Apptentive push notification.");
 			try {
 				JSONObject pushJson = new JSONObject(pushData);
 				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
@@ -559,10 +559,10 @@ public class Apptentive {
 						Apptentive.showMessageCenter(context);
 						return true;
 					default:
-						Log.v("Unknown Apptentive push notification action: \"%s\"", action.name());
+						ApptentiveLog.v("Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
 			} catch (JSONException e) {
-				Log.w("Error parsing JSON from push notification.", e);
+				ApptentiveLog.w("Error parsing JSON from push notification.", e);
 				MetricModule.sendError(e, "Parsing Push notification", pushData);
 			}
 		}
@@ -632,7 +632,7 @@ public class Apptentive {
 				return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 			}
 		} catch (Exception e) {
-			Log.w("Error starting Apptentive Activity.", e);
+			ApptentiveLog.w("Error starting Apptentive Activity.", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -717,7 +717,7 @@ public class Apptentive {
 					mgr.sendMessage(message);
 				}
 			} catch (Exception e) {
-				Log.w("Error sending attachment text.", e);
+				ApptentiveLog.w("Error sending attachment text.", e);
 				MetricModule.sendError(e, null, null);
 			}
 		}
@@ -779,7 +779,7 @@ public class Apptentive {
 			}
 
 		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error sending attachment file.", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -844,7 +844,7 @@ public class Apptentive {
 			message.setAssociatedFiles(attachmentStoredFiles);
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 		} catch (Exception e) {
-			Log.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error sending attachment file.", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -998,7 +998,7 @@ public class Apptentive {
 				put(KEY_TYPE, TYPE);
 				put(TYPE, version);
 			} catch (JSONException e) {
-				Log.e("Error creating Apptentive.Version.", e);
+				ApptentiveLog.e("Error creating Apptentive.Version.", e);
 			}
 		}
 
@@ -1062,7 +1062,7 @@ public class Apptentive {
 				put(KEY_TYPE, TYPE);
 				put(SEC, dateTime);
 			} catch (JSONException e) {
-				Log.e("Error creating Apptentive.DateTime.", e);
+				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
 			}
 		}
 

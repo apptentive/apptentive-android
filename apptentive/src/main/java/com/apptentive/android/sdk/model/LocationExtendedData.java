@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -41,7 +41,7 @@ public class LocationExtendedData extends ExtendedData {
 			coordinates.put(0, longitude);
 			coordinates.put(1, latitude);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to LocationExtendedData.", KEY_COORDINATES, e);
+			ApptentiveLog.w("Error adding %s to LocationExtendedData.", KEY_COORDINATES, e);
 		}
 	}
 }

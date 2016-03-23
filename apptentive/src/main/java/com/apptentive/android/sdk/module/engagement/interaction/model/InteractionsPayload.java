@@ -6,7 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +45,7 @@ public class InteractionsPayload extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
-			Log.w("Unable to load Interactions from InteractionsPayload.", e);
+			ApptentiveLog.w("Unable to load Interactions from InteractionsPayload.", e);
 		}
 		return null;
 	}
@@ -56,7 +57,7 @@ public class InteractionsPayload extends JSONObject {
 				return new Targets(targets.toString());
 			}
 		} catch (JSONException e) {
-			Log.w("Unable to load Targets from InteractionsPayload.", e);
+			ApptentiveLog.w("Unable to load Targets from InteractionsPayload.", e);
 		}
 		return null;
 	}

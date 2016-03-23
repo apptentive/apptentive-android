@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 
 import java.io.File;
@@ -460,7 +460,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
 									if (downloadItems.contains(data.originalPath)) {
-										Log.d("ApptentiveAttachmentLoader onLoaded callback");
+										ApptentiveLog.d("ApptentiveAttachmentLoader onLoaded callback");
 										downloadItems.remove(data.originalPath);
 										Util.openFileAttachment(view.getContext(), data.originalPath, data.localCachePath, data.mimeType);
 									}
@@ -494,7 +494,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 										} else if (progress >= 0) {
 											progressBarDownload.setVisibility(View.VISIBLE);
 											progressBarDownload.setProgress(progress);
-											Log.d("ApptentiveAttachmentLoader progress callback: " + progress);
+											ApptentiveLog.d("ApptentiveAttachmentLoader progress callback: " + progress);
 										}
 									}
 								}

@@ -32,7 +32,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
@@ -113,9 +113,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 				e.setAccessible(true);
 				e.set(this, this.retainedChildFragmentManager);
 			} catch (NoSuchFieldException nosuchfieldexception) {
-				Log.d("NoSuchFieldException", nosuchfieldexception);
+				ApptentiveLog.d("NoSuchFieldException", nosuchfieldexception);
 			} catch (IllegalAccessException illegalaccessexception) {
-				Log.d("IllegalAccessException", illegalaccessexception);
+				ApptentiveLog.d("IllegalAccessException", illegalaccessexception);
 			}
 		}
 

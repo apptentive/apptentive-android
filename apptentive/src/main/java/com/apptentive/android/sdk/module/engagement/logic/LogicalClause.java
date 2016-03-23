@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.logic;
 
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +30,7 @@ public class LogicalClause implements Clause {
 		operatorName = key.trim();
 		operator = LogicalOperator.parse(operatorName);
 		children = new ArrayList<Clause>();
-		Log.v("  + LogicalClause of type \"%s\"", operatorName);
+		ApptentiveLog.v("  + LogicalClause of type \"%s\"", operatorName);
 		if (value instanceof JSONArray) {
 			JSONArray jsonArray = (JSONArray) value;
 			for (int i = 0; i < jsonArray.length(); i++) {
@@ -49,34 +49,34 @@ public class LogicalClause implements Clause {
 				}
 			}
 		} else {
-			Log.w("Unrecognized LogicalClause: %s", value.toString());
+			ApptentiveLog.w("Unrecognized LogicalClause: %s", value.toString());
 		}
 	}
 
 	@Override
 	public boolean evaluate() {
-		Log.v("  - <%s>", operator.name());
+		ApptentiveLog.v("  - <%s>", operator.name());
 		if (operator == LogicalOperator.$and) {
 			for (Clause clause : children) {
 				boolean ret = clause.evaluate();
-				Log.v("        - => %b", ret);
+				ApptentiveLog.v("        - => %b", ret);
 				if (!ret) {
-					Log.v("  - </%s>", operator.name());
+					ApptentiveLog.v("  - </%s>", operator.name());
 					return false;
 				}
 			}
-			Log.v("  - </%s>", operator.name());
+			ApptentiveLog.v("  - </%s>", operator.name());
 			return true;
 		} else if (operator == LogicalOperator.$or) {
 			for (Clause clause : children) {
 				boolean ret = clause.evaluate();
-				Log.v("        - => %b", ret);
+				ApptentiveLog.v("        - => %b", ret);
 				if (ret) {
-					Log.v("  - </%s>", operator.name());
+					ApptentiveLog.v("  - </%s>", operator.name());
 					return true;
 				}
 			}
-			Log.v("  - </%s> => false", operator.name());
+			ApptentiveLog.v("  - </%s> => false", operator.name());
 			return false;
 		} else if (operator == LogicalOperator.$not) {
 			if (children.size() != 1) {
@@ -84,13 +84,13 @@ public class LogicalClause implements Clause {
 			}
 			Clause clause = children.get(0);
 			boolean ret = clause.evaluate();
-			Log.v("        - => %b", ret);
-			Log.v("  - </%s>", operator.name());
+			ApptentiveLog.v("        - => %b", ret);
+			ApptentiveLog.v("  - </%s>", operator.name());
 			return !ret;
 		} else {
 			// Unsupported
-			Log.v("Unsupported operation: \"%s\" => false", operatorName);
-			Log.v("  - </%s>", operator.name());
+			ApptentiveLog.v("Unsupported operation: \"%s\" => false", operatorName);
+			ApptentiveLog.v("  - </%s>", operator.name());
 			return false;
 		}
 

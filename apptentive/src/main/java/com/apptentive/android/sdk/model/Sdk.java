@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 /**
@@ -51,7 +51,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_VERSION, version);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_VERSION);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_VERSION);
 		}
 	}
 
@@ -70,7 +70,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_AUTHOR_NAME, authorName);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_AUTHOR_NAME);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_NAME);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_AUTHOR_EMAIL, authorEmail);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_PLATFORM, platform);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_PLATFORM);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PLATFORM);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_DISTRIBUTION, distribution);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
 		}
 	}
 
@@ -165,7 +165,7 @@ public class Sdk extends Payload {
 		try {
 			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
+			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
 		}
 	}
 }

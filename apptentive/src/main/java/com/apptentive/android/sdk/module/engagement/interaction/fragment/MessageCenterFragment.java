@@ -40,8 +40,8 @@ import android.widget.ListView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -255,7 +255,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			switch (requestCode) {
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER: {
 					if (data == null) {
-						Log.d("no image is picked");
+						ApptentiveLog.d("no image is picked");
 						return;
 					}
 					imagePickerLaunched = false;
@@ -501,12 +501,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				switch (action) {
 					case pmc:
-						Log.i("Clearing pending Message Center push notification.");
+						ApptentiveLog.i("Clearing pending Message Center push notification.");
 						prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
 						break;
 				}
 			} catch (JSONException e) {
-				Log.w("Error parsing JSON from push notification.", e);
+				ApptentiveLog.w("Error parsing JSON from push notification.", e);
 				MetricModule.sendError(e, "Parsing Push notification", pushData);
 			}
 		}
@@ -733,20 +733,20 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void openNonImageAttachment(final ImageItem image) {
 		if (image == null) {
-			Log.d("No attachment argument.");
+			ApptentiveLog.d("No attachment argument.");
 			return;
 		}
 
 		try {
 			Util.openFileAttachment(hostingActivity, image.originalPath, image.localCachePath, image.mimeType);
 		} catch (Exception e) {
-			Log.e("Error loading attachment", e);
+			ApptentiveLog.e("Error loading attachment", e);
 		}
 	}
 
 	public void showAttachmentDialog(final ImageItem image) {
 		if (image == null) {
-			Log.d("No attachment argument.");
+			ApptentiveLog.d("No attachment argument.");
 			return;
 		}
 
@@ -755,7 +755,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
 			dialog.show(getRetainedChildFragmentManager(), "preview_dialog");
 		} catch (Exception e) {
-			Log.e("Error loading attachment preview.", e);
+			ApptentiveLog.e("Error loading attachment preview.", e);
 		}
 	}
 
@@ -1205,7 +1205,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (Exception e) {
 			e.printStackTrace();
 			imagePickerLaunched = false;
-			Log.d("can't launch image picker");
+			ApptentiveLog.d("can't launch image picker");
 		}
 	}
 

@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.storage;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
@@ -31,7 +31,7 @@ public class SdkManager {
 				storeSdk(current);
 				return new Sdk(diff.toString());
 			} catch (JSONException e) {
-				Log.e("Error casting to Sdk.", e);
+				ApptentiveLog.e("Error casting to Sdk.", e);
 			}
 		}
 		return null;

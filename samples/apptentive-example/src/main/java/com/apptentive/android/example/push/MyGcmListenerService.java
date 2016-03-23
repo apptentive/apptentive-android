@@ -18,7 +18,7 @@ import android.support.v4.app.NotificationCompat;
 import com.apptentive.android.example.ExampleActivity;
 import com.apptentive.android.example.R;
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.google.android.gms.gcm.GcmListenerService;
 
 /**
@@ -29,9 +29,9 @@ public class MyGcmListenerService extends GcmListenerService {
 	public void onMessageReceived(String from, Bundle data) {
 		String title = data.getString("gcm.notification.title");
 		String body = data.getString("gcm.notification.body");
-		Log.e("From: " + from);
-		Log.e("Title: " + title);
-		Log.e("Body: " + body);
+		ApptentiveLog.e("From: " + from);
+		ApptentiveLog.e("Title: " + title);
+		ApptentiveLog.e("Body: " + body);
 
 		Intent intent = new Intent(this, ExampleActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

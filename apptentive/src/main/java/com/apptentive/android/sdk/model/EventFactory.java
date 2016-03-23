@@ -6,7 +6,8 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 
 /**
@@ -17,7 +18,7 @@ public class EventFactory {
 		try {
 			return new Event(json);
 		} catch (JSONException e) {
-			Log.v("Error parsing json as Event: %s", e, json);
+			ApptentiveLog.v("Error parsing json as Event: %s", e, json);
 		} catch (IllegalArgumentException e) {
 			// Unknown unknown #rumsfeld
 		}

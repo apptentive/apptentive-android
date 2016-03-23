@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 
 import org.json.JSONException;
@@ -37,7 +37,7 @@ public class PayloadFactory {
 					// Ignore
 				}
 			case unknown:
-				Log.v("Ignoring unknown RecordType.");
+				ApptentiveLog.v("Ignoring unknown RecordType.");
 				break;
 			default:
 				break;

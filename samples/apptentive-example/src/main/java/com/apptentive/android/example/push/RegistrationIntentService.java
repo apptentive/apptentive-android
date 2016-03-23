@@ -11,7 +11,7 @@ import android.content.Intent;
 
 import com.apptentive.android.example.R;
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -35,7 +35,7 @@ public class RegistrationIntentService extends IntentService {
 			String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 			Apptentive.setPushNotificationIntegration(Apptentive.PUSH_PROVIDER_APPTENTIVE, token);
 		} catch (IOException e) {
-			Log.e("Unable to get instanceId token.", e);
+			ApptentiveLog.e("Unable to get instanceId token.", e);
 		}
 	}
 }

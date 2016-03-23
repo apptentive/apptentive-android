@@ -11,8 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
-import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.ExtendedData;
@@ -50,7 +50,7 @@ public class EngagementModule {
 		}
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
-			Log.d("engage(%s)", eventLabel);
+			ApptentiveLog.d("engage(%s)", eventLabel);
 
 			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion(eventLabel);
 			EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
@@ -68,13 +68,13 @@ public class EngagementModule {
 			launchInteraction(context, interaction);
 			return true;
 		}
-		Log.d("No interaction to show.");
+		ApptentiveLog.d("No interaction to show.");
 		return false;
 	}
 
 	public static void launchInteraction(Context context, Interaction interaction) {
 		if (interaction != null) {
-			Log.i("Launching interaction: %s", interaction.getType().toString());
+			ApptentiveLog.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(context.getApplicationContext(), ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);

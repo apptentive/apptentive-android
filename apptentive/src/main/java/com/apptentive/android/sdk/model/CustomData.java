@@ -1,6 +1,6 @@
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,7 +54,7 @@ public class CustomData extends JSONObject {
 					rightMap.put(key, right.getString(key));
 				}
 			} catch (JSONException e) {
-				Log.e("Error comparing two device data entries: \"%s\"  AND  \"%s\"", left.toString(), right.toString());
+				ApptentiveLog.e("Error comparing two device data entries: \"%s\"  AND  \"%s\"", left.toString(), right.toString());
 			}
 			return leftMap.equals(rightMap);
 		}

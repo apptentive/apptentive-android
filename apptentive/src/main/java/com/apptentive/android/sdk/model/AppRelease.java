@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 /**
@@ -47,7 +47,7 @@ public class AppRelease extends Payload {
 		try {
 			put(KEY_VERSION, version);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to AppRelease.", KEY_VERSION);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class AppRelease extends Payload {
 		try {
 			put(KEY_BUILD_NUMBER, buildNumber);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to AppRelease.", KEY_BUILD_NUMBER);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_BUILD_NUMBER);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class AppRelease extends Payload {
 		try {
 			put(KEY_IDENTIFIER, identifier);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class AppRelease extends Payload {
 		try {
 			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class AppRelease extends Payload {
 		try {
 			put(KEY_APP_STORE, appStore);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to AppRelease.", KEY_APP_STORE);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_APP_STORE);
 		}
 	}
 }

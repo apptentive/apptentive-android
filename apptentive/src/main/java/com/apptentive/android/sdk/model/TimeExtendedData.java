@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 import java.util.Date;
@@ -66,7 +66,7 @@ public class TimeExtendedData extends ExtendedData {
 		try {
 			put(KEY_TIMESTAMP, dateInSeconds);
 		} catch (JSONException e) {
-			Log.w("Error adding %s to TimeExtendedData.", KEY_TIMESTAMP, e);
+			ApptentiveLog.w("Error adding %s to TimeExtendedData.", KEY_TIMESTAMP, e);
 		}
 	}
 }
