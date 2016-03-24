@@ -134,9 +134,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			childFragmentManager.set(this, null);
 
 		} catch (NoSuchFieldException e) {
-			Log.d("NoSuchFieldException", e);
+			ApptentiveLog.d("NoSuchFieldException", e);
 		} catch (IllegalAccessException e) {
-			Log.d("IllegalAccessException", e);
+			ApptentiveLog.d("IllegalAccessException", e);
 		}
 	}
 
