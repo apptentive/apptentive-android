@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.model;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
@@ -35,7 +35,7 @@ public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testDateTimeComparison() {
-		Log.e("Running test: testDateTimeComparison()\n\n");
+		ApptentiveLog.e("Running test: testDateTimeComparison()\n\n");
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testDateTimeComparison.json");
 
 		try {
@@ -48,7 +48,7 @@ public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
 				String operator = experiment.getString(1);
 				int expected = operatorLookup.get(operator);
 
-				Log.e("Comparing [\"%s\" %s \"%s\"]", left, operator, right);
+				ApptentiveLog.e("Comparing [\"%s\" %s \"%s\"]", left, operator, right);
 
 				Apptentive.DateTime leftDateTime = new Apptentive.DateTime(left);
 				Apptentive.DateTime rightDateTime = new Apptentive.DateTime(right);
@@ -57,7 +57,7 @@ public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
 				assertEquals(String.format("Comparison of [\"%s\" %s \"%s\"] failed", left, operator, right), expected, actual);
 			}
 		} catch (JSONException e) {
-			Log.e("Error loading experiment results.", e);
+			ApptentiveLog.e("Error loading experiment results.", e);
 		}
 
 	}

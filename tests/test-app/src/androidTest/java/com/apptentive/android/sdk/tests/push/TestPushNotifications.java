@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.tests.push;
 import android.content.Intent;
 import android.os.Bundle;
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ import org.json.JSONObject;
 public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 
 	public void testUrbanAirshipPushNotificationIdentification() {
-		Log.e("Running test: testUrbanAirshipPushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testUrbanAirshipPushNotificationIdentification()\n\n");
 
 		// Null bundle push
 		{
@@ -60,7 +60,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testParsePushNotificationIdentification() {
-		Log.e("Running test: testParsePushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testParsePushNotificationIdentification()\n\n");
 
 		// Null Intent
 		{
@@ -119,7 +119,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testAwsSnsPushNotificationIdentification() {
-		Log.e("Running test: testAwsSnsPushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testAwsSnsPushNotificationIdentification()\n\n");
 
 		// Null Intent
 		{

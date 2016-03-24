@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -23,9 +23,9 @@ public class NavigateToLinkInteractionTest extends ApptentiveInstrumentationTest
 	private static final String TEST_DATA_DIR = "engagement/interactions";
 
 	public void testNavigateToLinkInteractionNew() {
-		Log.e("Running test: testNavigateToLinkInteractionNew()\n\n");
+		ApptentiveLog.e("Running test: testNavigateToLinkInteractionNew()\n\n");
 
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionNew.json");
 
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
@@ -39,9 +39,9 @@ public class NavigateToLinkInteractionTest extends ApptentiveInstrumentationTest
 	}
 
 	public void testNavigateToLinkInteractionSelf() {
-		Log.e("Running test: testNavigateToLinkInteractionSelf()\n\n");
+		ApptentiveLog.e("Running test: testNavigateToLinkInteractionSelf()\n\n");
 
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionSelf.json");
 
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
@@ -55,9 +55,9 @@ public class NavigateToLinkInteractionTest extends ApptentiveInstrumentationTest
 	}
 
 	public void testNavigateToLinkInteractionMissing() {
-		Log.e("Running test: testNavigateToLinkInteractionNew()\n\n");
+		ApptentiveLog.e("Running test: testNavigateToLinkInteractionNew()\n\n");
 
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionMissing.json");
 
 		Interaction interaction = Interaction.Factory.parseInteraction(json);

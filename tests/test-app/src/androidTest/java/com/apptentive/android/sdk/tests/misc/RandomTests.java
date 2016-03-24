@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.misc;
 
 import android.test.AndroidTestCase;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.HashMap;
@@ -20,14 +20,14 @@ import java.util.Set;
 public class RandomTests extends AndroidTestCase {
 
 	public void testGetMajorOsVersion() {
-		Log.e("Running test: testGetMajorOsVersion()\n\n");
+		ApptentiveLog.e("Running test: testGetMajorOsVersion()\n\n");
 		Integer osVersion = Util.getMajorOsVersion();
-		Log.e("OS version: %d", osVersion);
+		ApptentiveLog.e("OS version: %d", osVersion);
 		assertNotNull(osVersion);
 	}
 
 	public void testParseWebColorAsAndroidColor() {
-		Log.e("testParseWebColorAsAndroidColor()");
+		ApptentiveLog.e("testParseWebColorAsAndroidColor()");
 		Map<String, Integer> data = new HashMap<String, Integer>(){{
 			put("#AABBCCDD", 0xDDAABBCC);
 			put("#FFFFFFFF", 0xFFFFFFFF);

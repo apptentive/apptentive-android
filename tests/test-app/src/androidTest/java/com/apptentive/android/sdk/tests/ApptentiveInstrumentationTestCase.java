@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
 /**
@@ -31,7 +31,7 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	 */
 	void initialize(Bundle params) {
 		ApptentiveInternal.getInstance(getTargetContext());
-		ApptentiveInternal.getInstance().setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance().setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {

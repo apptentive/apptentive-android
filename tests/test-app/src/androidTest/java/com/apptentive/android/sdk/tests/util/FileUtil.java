@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.tests.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.*;
@@ -32,7 +32,7 @@ public class FileUtil {
 			}
 			return builder.toString();
 		} catch (IOException e) {
-			Log.e("Error reading from raw resource with ID \"%d\"", e, resourceId);
+			ApptentiveLog.e("Error reading from raw resource with ID \"%d\"", e, resourceId);
 		} finally {
 			Util.ensureClosed(reader);
 		}
@@ -53,7 +53,7 @@ public class FileUtil {
 			}
 			return builder.toString();
 		} catch (IOException e) {
-			Log.e("Error reading from file \"%s\"", e, path);
+			ApptentiveLog.e("Error reading from file \"%s\"", e, path);
 		} finally {
 			Util.ensureClosed(reader);
 		}
@@ -66,7 +66,7 @@ public class FileUtil {
 		try {
 			reader = new BufferedReader(new InputStreamReader(assetManager.open(path)));
 		} catch (IOException e) {
-			Log.e("Error opening Reader from asset path \"%s\"", path);
+			ApptentiveLog.e("Error opening Reader from asset path \"%s\"", path);
 		}
 		return reader;
 	}

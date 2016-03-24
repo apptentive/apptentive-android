@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
@@ -29,7 +29,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
 	public void testInteractionInvocationStorage() {
-		Log.e("Running test: testInteractionInvocationStorage()\n\n");
+		ApptentiveLog.e("Running test: testInteractionInvocationStorage()\n\n");
 		resetDevice();
 		final String testInteraction = "test.interaction";
 		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.0", 1);
@@ -76,11 +76,11 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		Double lastInvoke = ApptentiveInternal.getInstance().getCodePointStore().getLastInvoke(true, testInteraction);
 		assertFalse(lastInvoke.equals(0d));
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaTimeAtInstall() {
-		Log.e("Running test: testCriteriaTimeAtInstall()\n\n");
+		ApptentiveLog.e("Running test: testCriteriaTimeAtInstall()\n\n");
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaTimeAtInstall.json");
 
@@ -150,11 +150,11 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(interaction);
 
 
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaApplicationVersion() {
-		Log.e("Running test: testCriteriaApplicationVersion()\n\n");
+		ApptentiveLog.e("Running test: testCriteriaApplicationVersion()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaApplicationVersion.json");
@@ -177,13 +177,13 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaProcessingPerformance() {
-		Log.e("Running test: testCriteriaProcessingPerformance()");
+		ApptentiveLog.e("Running test: testCriteriaProcessingPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
@@ -209,14 +209,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 7d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionSelectionPerformance() {
-		Log.e("Running test: testInteractionSelectionPerformance()");
+		ApptentiveLog.e("Running test: testInteractionSelectionPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
@@ -242,14 +242,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 7d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionStorageAndSelectionPerformance() {
-		Log.e("Running test: testInteractionStorageAndSelectionPerformance()");
+		ApptentiveLog.e("Running test: testInteractionStorageAndSelectionPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
@@ -277,12 +277,12 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 50d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testSavingCodePointAndCheckingForApplicableInteraction() {
-		Log.e("Running test: testSavingCodePointAndCheckingForApplicableInteraction()");
+		ApptentiveLog.e("Running test: testSavingCodePointAndCheckingForApplicableInteraction()");
 		resetDevice();
 		final int iterations = 100;
 
@@ -298,12 +298,12 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 20d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testSelectionWithInteractionIdUsedInCriteria() {
-		Log.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
+		ApptentiveLog.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testSelectionWithInteractionIdUsedInCriteria.json");
@@ -322,7 +322,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testInteractionPriority() {
-		Log.e("Running test: testInteractionPriority()");
+		ApptentiveLog.e("Running test: testInteractionPriority()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testInteractionPriority.json");
@@ -349,7 +349,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testMissingNullEmptyCriteria() {
-		Log.e("Running test: testMissingNullEmptyCriteria()");
+		ApptentiveLog.e("Running test: testMissingNullEmptyCriteria()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testMissingNullEmptyCriteria.json");
@@ -367,7 +367,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testCorruptedJson() {
-		Log.e("Running test: testCorruptedJson()");
+		ApptentiveLog.e("Running test: testCorruptedJson()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCorruptedJson.json");
@@ -378,7 +378,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testActualUpgradeMessage() {
-		Log.e("Running test: testActualUpgradeMessage()");
+		ApptentiveLog.e("Running test: testActualUpgradeMessage()");
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
 		Interaction interaction;
@@ -386,7 +386,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Test version targeted UpgradeMessage
 
 		// Saw this build too long ago.
-		Log.e("ONE");
+		ApptentiveLog.e("ONE");
 		resetDevice();
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 1000000);
@@ -394,14 +394,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Haven't upgraded
-		Log.e("TWO");
+		ApptentiveLog.e("TWO");
 		resetDevice();
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 499500);
 		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Just right
-		Log.e("THREE");
+		ApptentiveLog.e("THREE");
 		resetDevice();
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 1000000);
@@ -409,7 +409,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Already shown
-		Log.e("FOUR");
+		ApptentiveLog.e("FOUR");
 		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label");
 		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
 		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
@@ -419,7 +419,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	 * Update this when the Rating Flow group of interactions changes, or with different permutations of that flow.
 	 */
 	public void testRealRatingInteractions() {
-		Log.e("Running test: testRealRatingInteractions()");
+		ApptentiveLog.e("Running test: testRealRatingInteractions()");
 
 		Context targetContext = getTargetContext();
 
@@ -430,21 +430,21 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Conditions not yet met.
 		resetDevice();
-		Log.e("ONE");
+		ApptentiveLog.e("ONE");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
 		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 100000);
 		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("by.build"));
 
 		// Conditions partially met.
 		resetDevice();
-		Log.e("TWO");
+		ApptentiveLog.e("TWO");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
 		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 500000);
 		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init"));
 
 		// Conditions partially met the other way.
 		resetDevice();
-		Log.e("THREE");
+		ApptentiveLog.e("THREE");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
 		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
@@ -453,7 +453,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Conditions almost met.
 		resetDevice();
-		Log.e("FOUR");
+		ApptentiveLog.e("FOUR");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 430000);
 		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
@@ -463,7 +463,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Conditions met barely.
 		resetDevice();
-		Log.e("FIVE");
+		ApptentiveLog.e("FIVE");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 432000);
 		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
@@ -476,14 +476,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Conditions are always met.
 		resetDevice();
-		Log.e("SIX");
+		ApptentiveLog.e("SIX");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 		assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes"));
 
 		// Re-prompt isn't ready yet.
 		{
 			resetDevice();
-			Log.e("SEVEN");
+			ApptentiveLog.e("SEVEN");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
@@ -495,7 +495,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Re-prompt isn't ready yet.
 		{
 			resetDevice();
-			Log.e("EIGHT");
+			ApptentiveLog.e("EIGHT");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
@@ -507,7 +507,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Re-prompt is ready.
 		{
 			resetDevice();
-			Log.e("NINE");
+			ApptentiveLog.e("NINE");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
@@ -519,7 +519,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Don't re-prompt, since we've already rated.
 		{
 			resetDevice();
-			Log.e("TEN");
+			ApptentiveLog.e("TEN");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
@@ -532,7 +532,7 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Don't re-prompt, since we've declined to rate.
 		{
 			resetDevice();
-			Log.e("ELEVEN");
+			ApptentiveLog.e("ELEVEN");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
@@ -546,17 +546,17 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		{
 			resetDevice();
-			Log.e("TWELVE");
+			ApptentiveLog.e("TWELVE");
 			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 			assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#no"));
 		}
 	}
 
 	public void testCanShowInteraction() {
-		Log.e("Running test: testCanShowInteraction()\n\n");
+		ApptentiveLog.e("Running test: testCanShowInteraction()\n\n");
 		resetDevice();
 
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
