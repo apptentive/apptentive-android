@@ -28,7 +28,7 @@
                       android:paddingTop="14dp"
                       android:paddingBottom="14dp"
                       android:orientation="horizontal"
-                      android:background="?attr/apptentiveCardViewBackground">
+                      android:background="?attr/apptentiveCardViewBackgroundAlternate">
             <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
                                                                                        android:layout_width="@dimen/apptentive_message_center_avatar_image_diameter"
                                                                                        android:layout_height="@dimen/apptentive_message_center_avatar_image_diameter"

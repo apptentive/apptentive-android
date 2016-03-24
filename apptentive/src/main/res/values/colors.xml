@@ -12,8 +12,11 @@
     <color name="apptentive_view_background_dark">#111111</color>
     <color name="apptentive_card_view_background_light">#FFFFFF</color>
     <color name="apptentive_card_view_background_dark">#424242</color>
+    <color name="apptentive_card_view_background_alternate_light">#F5F5F5</color>
+    <color name="apptentive_card_view_background_alternate_dark">#616161</color>
     <color name="apptentive_card_border_color_light">#1F000000</color>
     <color name="apptentive_card_border_color_dark">#1FFFFFFF</color>
+    <color name="apptentive_color_snackbar">#323232</color>
 
     <color name="apptentive_color_primary">#F44336</color>
     <color name="apptentive_color_primary_dark">#D32F2F</color>
@@ -36,15 +39,5 @@
     <color name="apptentive_text_color_hint_dark">#80ffffff</color>
     <color name="apptentive_text_color_hint_inverse_dark">#80000000</color>
 
-    <color name="apptentive_color_snackbar">#323232</color>
-
-
-    <!-- TODO: Refactor colors below here -->
-
-    <!-- Apptentive Material DEFAULT drawer colors -->
-    <color name="apptentive_white">#FFFFFF</color>
-    <color name="apptentive_red">#DC2636</color>
-
-    <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
-    <color name="apptentive_message_center_incoming_background">#F5F5F5</color>
+    <color name="apptentive_brand_red">#DC2636</color>
 </resources>

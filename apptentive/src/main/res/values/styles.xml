@@ -57,15 +57,6 @@
 
     <style name="Apptentive.Style.Widget.CardContent"/>
 
-    <style name="Apptentive.Style.Widget.CardContent.Outgoing">
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:background">@color/apptentive_message_center_outgoing_background</item>
-    </style>
-
     <style name="Apptentive.Style.Widget.Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>

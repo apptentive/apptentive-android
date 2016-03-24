@@ -11,6 +11,7 @@
         <attr name="apptentiveWindowBackground" format="color|reference"/>
         <attr name="apptentiveViewBackground" format="color|reference"/>
         <attr name="apptentiveCardViewBackground" format="color|reference"/>
+        <attr name="apptentiveCardViewBackgroundAlternate" format="color|reference"/>
         <attr name="apptentiveDialogBackground" format="reference"/>
         <attr name="apptentiveCardBorderColor" format="color|reference"/>
 
