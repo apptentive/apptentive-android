@@ -12,6 +12,7 @@
         <attr name="apptentiveViewBackground" format="color|reference"/>
         <attr name="apptentiveCardViewBackground" format="color|reference"/>
         <attr name="apptentiveDialogBackground" format="reference"/>
+        <attr name="apptentiveCardBorderColor" format="color|reference"/>
 
         <attr name="apptentiveButtonTintColor" format="color|reference"/>
         <attr name="apptentiveButtonTintColorDisabled" format="color|reference"/>
@@ -47,9 +48,6 @@
         <attr name="apptentiveFontFamilyCaption" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
-
-        <!--<attr name="apptentive_material_disabled_icon" format="color|reference"/>-->
-        <attr name="apptentive_material_divider" format="color|reference"/>
 
         <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
 

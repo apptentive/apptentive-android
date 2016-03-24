@@ -13,9 +13,9 @@
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
-        <item name="apptentiveViewBackground">@color/apptentive_view_background_light</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
+        <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
 
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_light</item>
@@ -32,9 +32,9 @@
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
-        <item name="apptentiveViewBackground">@color/apptentive_view_background_dark</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
+        <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
 
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_dark</item>
@@ -93,18 +93,9 @@
         <item name="apptentiveFontFamilyButtonBorderless">@string/apptentive_font_family_button_material</item>
         <item name="apptentiveFontFamilyButtonColored">@string/apptentive_font_family_button_material</item>
 
+        <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
+
         <!-- Apptentive Material specific values -->
-
-        <!--
-            colorButtonNormal
-            <color name="button_material_light">#ffd6d7d7</color>
-            <color name="button_material_dark">#ff5a595b</color>
-            <item name="disabled_alpha_material_light" format="float" type="dimen">0.26</item>
-            <item name="disabled_alpha_material_dark" format="float" type="dimen">0.30</item>
-
-        -->
-        <!--<item name="apptentive_material_disabled_icon">?attr/colorButtonNormal</item>-->
-        <item name="apptentive_material_divider">@color/apptentive_material_divider</item>
         <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
 
         <!-- Here we set Apptentive widget styles -->
