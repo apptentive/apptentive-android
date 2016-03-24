@@ -19,7 +19,7 @@
                                         cardView:cardUseCompatPadding="true"
                                         cardView:cardBackgroundColor="?attr/apptentiveCardViewBackground"
                                         cardView:cardCornerRadius="2dp"
-                                        cardView:cardElevation="1dp">
+                                        cardView:cardElevation="?attr/apptentiveCardViewElevation">
         <FrameLayout android:layout_width="match_parent"
                      android:layout_height="wrap_content">
             <LinearLayout android:layout_width="match_parent"

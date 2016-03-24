@@ -47,7 +47,7 @@
     <style name="Apptentive.Style.Widget.CardView.Message">
         <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
         <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
-        <item name="cardElevation">2dp</item>
+        <item name="cardElevation">?attr/apptentiveCardViewElevation</item>
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Composing">
