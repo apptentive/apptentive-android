@@ -14,13 +14,14 @@
         <attr name="apptentiveDialogBackground" format="reference"/>
         <attr name="apptentiveCardBorderColor" format="color|reference"/>
 
+        <attr name="apptentiveValidationFailedColor" format="color|reference"/>
+        <attr name="apptentiveColorSnackbar" format="color|reference"/>
+
+        <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
         <attr name="apptentiveButtonTintColor" format="color|reference"/>
         <attr name="apptentiveButtonTintColorDisabled" format="color|reference"/>
         <attr name="apptentiveButtonTintColorStateList" format="color|reference"/>
 
-        <attr name="apptentiveValidationFailedColor" format="color|reference"/>
-
-        <attr name="apptentiveColorSnackbar" format="color|reference"/>
 
         <attr name="apptentiveTextSizeHeadline" format="dimension|reference"/>
         <attr name="apptentiveTextSizeTitle" format="dimension|reference"/>
@@ -48,10 +49,6 @@
         <attr name="apptentiveFontFamilyCaption" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
-
-        <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
-
-        <attr name="apptentive_material_selected_text" format="color|reference"/>
     </declare-styleable>
 
 

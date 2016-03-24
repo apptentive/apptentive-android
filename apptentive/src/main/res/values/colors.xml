@@ -42,7 +42,6 @@
     <!-- TODO: Refactor colors below here -->
 
     <!-- Apptentive Material DEFAULT drawer colors -->
-    <color name="apptentive_material_selected_text">#F44336</color>
     <color name="apptentive_material_dark_disabled_icon">#42FFFFFF</color>
 
     <color name="apptentive_transparency">#00000000</color>

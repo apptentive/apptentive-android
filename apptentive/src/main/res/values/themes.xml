@@ -95,9 +95,6 @@
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 
-        <!-- Apptentive Material specific values -->
-        <item name="apptentive_material_selected_text">@color/apptentive_material_selected_text</item>
-
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
