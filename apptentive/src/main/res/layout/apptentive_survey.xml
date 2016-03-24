@@ -50,16 +50,17 @@
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:paddingLeft="32dp"
-                          android:paddingRight="32dp"
-                          android:paddingTop="32dp"
-                          android:paddingBottom="64dp"
+                          android:paddingLeft="24dp"
+                          android:paddingRight="24dp"
+                          android:paddingTop="24dp"
+                          android:paddingBottom="56dp"
                           android:gravity="center">
-                <android.support.v7.widget.AppCompatButton android:id="@+id/send"
-                                                           android:layout_width="wrap_content"
-                                                           android:layout_height="56dp"
-                                                           style="@style/Apptentive.Style.Widget.Button.Colored"
-                                                           android:text="@string/apptentive_survey_send_response"/>
+                <Button android:id="@+id/send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:layout_margin="8dp"
+                        style="@style/Apptentive.Style.Widget.Button.Colored"
+                        android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
     </com.apptentive.android.sdk.view.ApptentiveNestedScrollView>
