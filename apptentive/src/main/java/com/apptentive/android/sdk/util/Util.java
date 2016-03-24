@@ -441,6 +441,14 @@ public class Util {
 		return d;
 	}
 
+	public static int getResourceIdFromAttribute(Resources.Theme theme, int attr) {
+		TypedValue tv = new TypedValue();
+		if (theme.resolveAttribute(attr, tv, true)) {
+			return tv.resourceId;
+		}
+		return 0;
+	}
+
 	public static int getThemeColor(Context context, int attr) {
 		return getThemeColor(context.getTheme(), attr);
 	}

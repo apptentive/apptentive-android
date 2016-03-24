@@ -839,11 +839,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			if (barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(true);
-				barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.colorAccent));
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.apptentiveButtonTintColor));
+				}
 			} else {
 				barView.sendButton.setEnabled(false);
-				barView.sendButton.setColorFilter(Util.getThemeColorFromAttrOrRes(hostingActivity, R.attr.apptentive_material_disabled_icon,
-						R.color.apptentive_material_dark_disabled_icon));
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.apptentiveButtonTintColorDisabled));
+				}
 			}
 		}
 	}
