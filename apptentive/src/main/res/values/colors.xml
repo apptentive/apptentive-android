@@ -51,6 +51,4 @@
 
     <color name="apptentive_message_center_outgoing_background">@color/apptentive_white</color>
     <color name="apptentive_message_center_incoming_background">#F5F5F5</color>
-
-    <color name="apptentive_survey_question_separator">#DDDDDD</color>
 </resources>
