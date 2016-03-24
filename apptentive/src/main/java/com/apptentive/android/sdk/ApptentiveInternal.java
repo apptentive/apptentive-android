@@ -92,7 +92,7 @@ public class ApptentiveInternal {
 	String androidId;
 	String appPackageName;
 	Resources.Theme apptentiveTheme;
-	int statusBarColorDefault = R.color.apptentive_transparency;
+	int statusBarColorDefault = android.R.color.transparent;
 	String defaultAppDisplayName = "this app";
 
 	IRatingProvider ratingProvider;
