@@ -65,7 +65,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 		ImageButton closeButton = (ImageButton) findViewById(R.id.cancel_composing);
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Drawable d = DrawableCompat.wrap(closeButton.getDrawable());
 			DrawableCompat.setTintList(d, colors);
 			d.applyTheme(theme);
@@ -101,7 +101,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		sendButton = (ImageButton) findViewById(R.id.btn_send_message);
 		sendButton.setEnabled(false);
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Drawable d = DrawableCompat.wrap(sendButton.getDrawable());
 			DrawableCompat.setTintList(d, colors);
 			d.applyTheme(theme);
@@ -124,13 +124,13 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 
 		attachButton = (ImageButton) findViewById(R.id.btn_attach_image);
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Drawable d = DrawableCompat.wrap(attachButton.getDrawable());
 			DrawableCompat.setTintList(d, colors);
 			d.applyTheme(theme);
 			attachButton.setImageDrawable(d);
 		}
-		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			attachButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
