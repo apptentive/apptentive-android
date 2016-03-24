@@ -38,7 +38,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.StoredFile;
 
 import java.io.*;
@@ -86,7 +86,7 @@ public class Util {
 				s = start + millis + end;
 			}
 		} catch (Exception e) {
-			Log.e("Error parsing date: " + iso8601DateString, e);
+			ApptentiveLog.e("Error parsing date: " + iso8601DateString, e);
 			return new Date();
 		}
 		// Parse, accounting for millis, if provided.
@@ -97,7 +97,7 @@ public class Util {
 				return new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT).parse(s);
 			}
 		} catch (ParseException e) {
-			Log.e("Exception parsing date: " + s, e);
+			ApptentiveLog.e("Exception parsing date: " + s, e);
 		}
 
 		// Return null as default. Nothing we can do but log it.
@@ -196,7 +196,7 @@ public class Util {
 		// Galaxy Nexus: Port: PX=720x1184 DP=360x592, Land: PX=1196x720 DP=598x360
 		// Nexus 7:      Port: PX=800x1205 DP=601x905, Land: PX=1280x736 DP=962x553
 		Point point = Util.getScreenSize(context);
-		Log.e("Screen size: PX=%dx%d DP=%dx%d", point.x, point.y, Util.pixelsToDips(context, point.x), Util.pixelsToDips(context, point.y));
+		ApptentiveLog.e("Screen size: PX=%dx%d DP=%dx%d", point.x, point.y, Util.pixelsToDips(context, point.x), Util.pixelsToDips(context, point.y));
 	}
 
 	public static String trim(String string) {
@@ -223,7 +223,7 @@ public class Util {
 							Integer ret = Integer.parseInt(expiration);
 							return ret;
 						} catch (NumberFormatException e) {
-							Log.e("Error parsing cache expiration as number: %s", e, expiration);
+							ApptentiveLog.e("Error parsing cache expiration as number: %s", e, expiration);
 						}
 					}
 				}
@@ -286,7 +286,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.e("Error getting app version name.", e);
+			ApptentiveLog.e("Error getting app version name.", e);
 		}
 		return null;
 	}
@@ -297,7 +297,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.e("Error getting app version code.", e);
+			ApptentiveLog.e("Error getting app version code.", e);
 		}
 		return -1;
 	}
@@ -357,7 +357,7 @@ public class Util {
 				return Integer.parseInt(parts[0]);
 			}
 		} catch (Exception e) {
-			Log.w("Error getting major OS version", e);
+			ApptentiveLog.w("Error getting major OS version", e);
 		}
 		return -1;
 	}
@@ -439,6 +439,14 @@ public class Util {
 		} catch (Exception ex) {
 		}
 		return d;
+	}
+
+	public static int getResourceIdFromAttribute(Resources.Theme theme, int attr) {
+		TypedValue tv = new TypedValue();
+		if (theme.resolveAttribute(attr, tv, true)) {
+			return tv.resourceId;
+		}
+		return 0;
 	}
 
 	public static int getThemeColor(Context context, int attr) {
@@ -707,7 +715,7 @@ public class Util {
 					context.startActivity(intent);
 					return true;
 				} catch (ActivityNotFoundException e) {
-					Log.e("Activity not found to open attachment: ", e);
+					ApptentiveLog.e("Activity not found to open attachment: ", e);
 				}
 			}
 		} else {
@@ -822,9 +830,9 @@ public class Util {
 			while ((count = is.read(buf, 0, 2048)) != -1) {
 				cos.write(buf, 0, count);
 			}
-			Log.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
-			Log.e("Error creating local copy of file attachment.");
+			ApptentiveLog.e("Error creating local copy of file attachment.");
 			return null;
 		} finally {
 			Util.ensureClosed(cos);

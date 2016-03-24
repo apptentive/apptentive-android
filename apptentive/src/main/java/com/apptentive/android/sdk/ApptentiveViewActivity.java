@@ -14,7 +14,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -76,7 +75,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 			}
 		} catch (Exception e) {
-			Log.e("Error creating ApptentiveViewActivity.", e);
+			ApptentiveLog.e("Error creating ApptentiveViewActivity.", e);
 			MetricModule.sendError(e, null, null);
 		}
 
@@ -210,7 +209,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private void applyApptentiveTheme(boolean isModalInteraction) {
 		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
 		if (isModalInteraction) {
-			apptentiveTheme.applyStyle(R.style.ApptentiveBaseVersionBaseModalStyle, true);
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseDialogTheme, true);
 		}
 		getTheme().setTo(apptentiveTheme);
 	}

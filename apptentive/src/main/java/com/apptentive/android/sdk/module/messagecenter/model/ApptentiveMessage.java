@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ConversationItem;
 
 import org.json.JSONException;
@@ -61,7 +61,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		try {
 			put(KEY_ID, id);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_ID);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_ID);
 		}
 	}
 
@@ -89,7 +89,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		try {
 			put(KEY_CREATED_AT, createdAt);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CREATED_AT);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CREATED_AT);
 		}
 	}
 
@@ -109,7 +109,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		try {
 			put(KEY_TYPE, type.name());
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_TYPE);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_TYPE);
 		}
 	}
 
@@ -126,7 +126,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		try {
 			put(KEY_HIDDEN, hidden);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_HIDDEN);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_HIDDEN);
 		}
 	}
 
@@ -144,7 +144,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			}
 			put(KEY_CUSTOM_DATA, customDataJson);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CUSTOM_DATA);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CUSTOM_DATA);
 		}
 	}
 
@@ -193,7 +193,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			}
 			sender.put(KEY_SENDER_ID, senderId);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_SENDER_ID);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_SENDER_ID);
 		}
 	}
 
@@ -240,7 +240,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		try {
 			put(KEY_AUTOMATED, isAutomated);
 		} catch (JSONException e) {
-			Log.e("Exception setting ApptentiveMessage's %s field.", e, KEY_AUTOMATED);
+			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_AUTOMATED);
 		}
 	}
 
@@ -275,7 +275,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			try {
 				return Type.valueOf(rawType);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ApptentiveMessage.Type: " + rawType);
+				ApptentiveLog.v("Error parsing unknown ApptentiveMessage.Type: " + rawType);
 			}
 			return unknown;
 		}
@@ -291,7 +291,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			try {
 				return State.valueOf(state);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown ApptentiveMessage.State: " + state);
+				ApptentiveLog.v("Error parsing unknown ApptentiveMessage.State: " + state);
 			}
 			return unknown;
 		}

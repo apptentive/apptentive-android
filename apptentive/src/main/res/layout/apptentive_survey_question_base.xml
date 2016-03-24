@@ -60,7 +60,7 @@
                 <View android:id="@+id/question_top_separater"
                       android:layout_width="match_parent"
                       android:layout_height="1dp"
-                      android:background="@color/apptentive_survey_question_separator"/>
+                      android:background="?attr/apptentiveCardBorderColor"/>
                 <LinearLayout android:id="@+id/answer_container"
                               android:layout_width="match_parent"
                               android:layout_height="wrap_content"

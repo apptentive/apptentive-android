@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.logic;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -22,14 +22,14 @@ public class ClauseParser {
 	private static final String KEY_COMPLEX_TYPE = "_type";
 
 	public static Clause parse(String json) throws JSONException {
-		Log.v("+ Parsing Interaction Criteria.");
+		ApptentiveLog.v("+ Parsing Interaction Criteria.");
 		if (json == null) {
-			Log.e("+ Interaction Criteria is null.");
+			ApptentiveLog.e("+ Interaction Criteria is null.");
 			return null;
 		}
 		JSONObject root = new JSONObject(json);
 		Clause ret = ClauseParser.parse(null, root);
-		Log.v("+ Finished parsing Interaction Criteria.");
+		ApptentiveLog.v("+ Finished parsing Interaction Criteria.");
 		return ret;
 	}
 

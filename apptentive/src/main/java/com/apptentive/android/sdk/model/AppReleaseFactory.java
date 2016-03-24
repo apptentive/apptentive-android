@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 /**
@@ -17,7 +17,7 @@ public class AppReleaseFactory {
 		try {
 			return new AppRelease(json);
 		} catch (JSONException e) {
-			Log.v("Error parsing json as AppRelease: %s", e, json);
+			ApptentiveLog.v("Error parsing json as AppRelease: %s", e, json);
 		} catch (IllegalArgumentException e) {
 			// Unknown unknown #rumsfeld
 		}

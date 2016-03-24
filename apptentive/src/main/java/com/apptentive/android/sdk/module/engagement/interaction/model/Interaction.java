@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import android.app.Activity;
 import android.content.Context;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 
 import org.json.JSONException;
@@ -114,7 +114,7 @@ public abstract class Interaction extends JSONObject {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				Log.v("Error parsing unknown Interaction.Type: " + type);
+				ApptentiveLog.v("Error parsing unknown Interaction.Type: " + type);
 			}
 			return unknown;
 		}

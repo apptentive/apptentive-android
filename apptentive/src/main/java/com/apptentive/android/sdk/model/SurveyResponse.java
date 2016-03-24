@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 
 import org.json.JSONException;
@@ -36,7 +36,7 @@ public class SurveyResponse extends ConversationItem {
 
 			put(KEY_SURVEY_ANSWERS, answersJson);
 		} catch (JSONException e) {
-			Log.e("Unable to construct survey payload.", e);
+			ApptentiveLog.e("Unable to construct survey payload.", e);
 		}
 	}
 

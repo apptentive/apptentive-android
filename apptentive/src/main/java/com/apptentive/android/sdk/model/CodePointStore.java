@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
@@ -86,7 +86,7 @@ public class CodePointStore {
 				return new JSONObject(json);
 			}
 		} catch (JSONException e) {
-			Log.e("Error loading CodePointStore from SharedPreferences.", e);
+			ApptentiveLog.e("Error loading CodePointStore from SharedPreferences.", e);
 		}
 		return new JSONObject();
 	}
@@ -177,7 +177,7 @@ public class CodePointStore {
 
 				saveToPreference();
 			} catch (JSONException e) {
-				Log.w("Unable to store code point %s.", e, fullCodePoint);
+				ApptentiveLog.w("Unable to store code point %s.", e, fullCodePoint);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class CodePointStore {
 				}
 			}
 		} catch (JSONException e) {
-			Log.w("Error loading code point record for \"%s\"", name);
+			ApptentiveLog.w("Error loading code point record for \"%s\"", name);
 		}
 		return null;
 	}

@@ -142,7 +142,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 				break;
 			case MotionEvent.ACTION_UP:
 				toastView.setBackgroundColor(getResources().
-						getColor(R.color.apptentive_transparency));
+						getColor(android.R.color.transparent));
 				velocityTracker.computeCurrentVelocity(1000, maxVelocity);
 				int dis = (int) velocityTracker.getYVelocity(pointerId);
 				if (scrollOrientationEnum == ScrollOrientationEnum.NONE) {

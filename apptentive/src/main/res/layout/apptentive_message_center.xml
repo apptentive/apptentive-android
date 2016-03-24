@@ -15,9 +15,11 @@
                                                                                 android:layout_width="match_parent"
                                                                                 android:layout_height="match_parent"
                                                                                 android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
-                                                                                android:cacheColorHint="@color/apptentive_transparency"
+                                                                                android:cacheColorHint="@android:color/transparent"
                                                                                 android:clipToPadding="false"
                                                                                 android:descendantFocusability="afterDescendants"
+                                                                                android:divider="@null"
+                                                                                android:dividerHeight="0dp"
                                                                                 android:scrollbars="vertical"/>
     <com.apptentive.android.sdk.view.FloatingActionButton android:id="@+id/composing_fab"
                                                           android:layout_width="wrap_content"

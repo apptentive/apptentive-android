@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,7 +23,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(Device.KEY, device);
 		} catch (JSONException e) {
-			Log.e("Error adding %s to ConversationTokenRequest", Device.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Device.KEY);
 		}
 	}
 
@@ -31,7 +31,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(Sdk.KEY, sdk);
 		} catch (JSONException e) {
-			Log.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(Person.KEY, person);
 		} catch (JSONException e) {
-			Log.e("Error adding %s to ConversationTokenRequest", Person.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Person.KEY);
 		}
 	}
 

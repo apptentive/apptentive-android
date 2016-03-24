@@ -12,7 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.JsonDiffer;
@@ -34,7 +34,7 @@ public class AppReleaseManager {
 				storeAppRelease(current);
 				return new AppRelease(diff.toString());
 			} catch (JSONException e) {
-				Log.e("Error casting to AppRelease.", e);
+				ApptentiveLog.e("Error casting to AppRelease.", e);
 			}
 		}
 		return null;
@@ -52,7 +52,7 @@ public class AppReleaseManager {
 			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
 			appRelease.setAppStore(Util.getInstallerPackageName(context));
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.e("Can't load PackageInfo.", e);
+			ApptentiveLog.e("Can't load PackageInfo.", e);
 		}
 		return appRelease;
 	}

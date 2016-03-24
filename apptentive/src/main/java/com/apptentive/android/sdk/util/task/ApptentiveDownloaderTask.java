@@ -23,7 +23,7 @@ import java.util.Map;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.util.Util;
@@ -68,7 +68,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		try {
 			finished = downloadBitmap((String) params[0], (String) params[1], (String) params[2]);
 		} catch (Exception e) {
-			Log.d("Error downloading bitmap", e);
+			ApptentiveLog.d("Error downloading bitmap", e);
 		}
 		return finished;
 	}
@@ -82,7 +82,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 
 	@Override
 	protected void onCancelled(ApptentiveHttpResponse response) {
-		Log.d("ApptentiveDownloaderTask onCancelled, response code:  " + ((response != null) ? response.getCode() : ""));
+		ApptentiveLog.d("ApptentiveDownloaderTask onCancelled, response code:  " + ((response != null) ? response.getCode() : ""));
 		download = false;
 		listener.onDownloadCancel();
 	}
@@ -93,7 +93,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		if (isCancelled()) {
 			response.setCode(-1);
 		}
-		Log.d("ApptentiveDownloaderTask onPostExecute, response code:  " + response.getCode());
+		ApptentiveLog.d("ApptentiveDownloaderTask onPostExecute, response code:  " + response.getCode());
 
 		if (response.isSuccessful()) {
 			listener.onDownloadComplete();
@@ -170,7 +170,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 			ret.setCode(responseCode);
 			ret.setReason(connection.getResponseMessage());
 
-			Log.d("Response Status Line: " + connection.getResponseMessage());
+			ApptentiveLog.d("Response Status Line: " + connection.getResponseMessage());
 
 			// Get the Http response header values
 			Map<String, String> headers = new HashMap<String, String>();
@@ -226,18 +226,18 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			Log.w("Error communicating with server.", e);
+			ApptentiveLog.w("Error communicating with server.", e);
 		} catch (SocketTimeoutException e) {
-			Log.w("Timeout communicating with server.", e);
+			ApptentiveLog.w("Timeout communicating with server.", e);
 		} catch (final MalformedURLException e) {
-			Log.w("ClientProtocolException", e);
+			ApptentiveLog.w("ClientProtocolException", e);
 		} catch (final IOException e) {
-			Log.w("ClientProtocolException", e);
+			ApptentiveLog.w("ClientProtocolException", e);
 			// Read the error response.
 			try {
 				ret.setContent(ApptentiveClient.getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
-				Log.w("Can't read error stream.", ex);
+				ApptentiveLog.w("Can't read error stream.", ex);
 			}
 		}
 

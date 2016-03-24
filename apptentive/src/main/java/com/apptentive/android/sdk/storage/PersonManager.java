@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.storage;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.util.Constants;
@@ -41,7 +41,7 @@ public class PersonManager {
 				storePerson(current);
 				return new Person(diff.toString());
 			} catch (JSONException e) {
-				Log.e("Error casting to Person.", e);
+				ApptentiveLog.e("Error casting to Person.", e);
 			}
 		}
 
