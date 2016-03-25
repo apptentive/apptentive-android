@@ -38,10 +38,6 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private Button skipButton;
 	private Button sendButton;
 
-	private TextWatcher nameTextWatcher;
-	private TextWatcher emailTextWatcher;
-	private boolean emailIsValid;
-
 	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnListviewItemActionListener listener) {
 		super(activityContext);
 		this.listener = listener;
@@ -108,92 +104,23 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			sendButton.setText(item.button_2);
 			sendButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
-					Apptentive.setPersonName(nameEditText.getText().toString().trim());
-					listener.onSubmitWhoCard(item.button_2);
+					if (isWhoCardContentValid(item.getType())) {
+						Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
+						Apptentive.setPersonName(nameEditText.getText().toString().trim());
+						listener.onSubmitWhoCard(item.button_2);
+					}
 				}
 			});
-			sendButton.setEnabled(false);
 		}
 
-		if (nameTextWatcher != null) {
-			nameEditText.removeTextChangedListener(nameTextWatcher);
-		}
 
 		if (!TextUtils.isEmpty(name)) {
 			nameEditText.setText(name);
 		}
 
-		nameTextWatcher = new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				// Disable send button when the content hasn't change yet
-				sendButton.setEnabled(false);
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				// If email field content is valid, any change in name field would enable send button
-				if (emailIsValid) {
-					sendButton.setEnabled(true);
-				}
-			}
-		};
-
-		nameEditText.addTextChangedListener(nameTextWatcher);
-
-		if (emailTextWatcher != null) {
-			emailEditText.removeTextChangedListener(emailTextWatcher);
-		}
-
-		// email passed into updateUi() is saved profile email, it must have been validated
 		if (!TextUtils.isEmpty(email)) {
 			emailEditText.setText(email);
-			emailIsValid = true;
-		} else if (item.getType() >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
-			// Allow user only change name with email being blank if profile is requested
-			emailIsValid = true;
-		} else {
-			skipButton.setEnabled(false);
 		}
-
-		emailTextWatcher = new TextWatcher() {
-
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-				// Disable send button when the content hasn't change yet
-				sendButton.setEnabled(false);
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				String emailContent = editable.toString().trim();
-				if (Util.isEmailValid(emailContent)) {
-					// email must be in valid format after the change. If it is, enable send button
-					sendButton.setEnabled(true);
-					emailIsValid = true;
-				} else
-					// Allow user remove email completely when editing prifle of "Email Requested"
-					if (TextUtils.isEmpty(emailContent) && item.getType() >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
-						sendButton.setEnabled(true);
-						emailIsValid = true;
-					} else {
-						// email not valid after change, so disable the send button
-						sendButton.setEnabled(false);
-						emailIsValid = false;
-					}
-			}
-		};
-
-		emailEditText.addTextChangedListener(emailTextWatcher);
 
 	}
 
@@ -203,5 +130,17 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 	public EditText getEmailField() {
 		return emailEditText;
+	}
+
+	private boolean isWhoCardContentValid(int type) {
+		String emailContent = emailEditText.getText().toString();
+		if (Util.isEmailValid(emailContent)) {
+			return true;
+		}
+		// Allow user only change name but leave email blank if profile is only requested, not required
+		if (TextUtils.isEmpty(emailContent) && type >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
+			return true;
+		}
+		return false;
 	}
 }
