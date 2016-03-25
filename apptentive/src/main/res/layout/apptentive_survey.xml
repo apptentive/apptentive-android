@@ -19,7 +19,11 @@
                       android:orientation="vertical">
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp"
+                            android:paddingTop="12dp"
+                            android:paddingLeft="60dp"
+                            android:paddingStart="60dp"
+                            android:paddingRight="12dp"
+                            android:paddingEnd="12dp"
                             android:background="?attr/colorPrimary">
                 <TextView android:id="@+id/description"
                           android:layout_width="match_parent"
@@ -28,14 +32,13 @@
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
                           android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Inverse"
-                          android:paddingLeft="4dp"
-                          android:paddingStart="4dp"
                           android:paddingRight="16dp"
                           android:paddingEnd="16dp"
                           android:alpha="0.8"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
+                             android:layout_marginBottom="2dp"
                              android:layout_alignParentRight="true"
                              android:layout_alignParentEnd="true"
                              android:layout_alignParentBottom="true"
@@ -50,16 +53,15 @@
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:paddingLeft="32dp"
-                          android:paddingRight="32dp"
-                          android:paddingTop="32dp"
-                          android:paddingBottom="64dp"
+                          android:paddingTop="16dp"
+                          android:paddingBottom="40dp"
                           android:gravity="center">
-                <android.support.v7.widget.AppCompatButton android:id="@+id/send"
-                                                           android:layout_width="wrap_content"
-                                                           android:layout_height="56dp"
-                                                           style="@style/Apptentive.Style.Widget.Button.Colored"
-                                                           android:text="@string/apptentive_survey_send_response"/>
+                <Button android:id="@+id/send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:layout_margin="8dp"
+                        style="@style/Apptentive.Style.Widget.Button.Colored"
+                        android:text="@string/apptentive_survey_send_response"/>
             </LinearLayout>
         </LinearLayout>
     </com.apptentive.android.sdk.view.ApptentiveNestedScrollView>
