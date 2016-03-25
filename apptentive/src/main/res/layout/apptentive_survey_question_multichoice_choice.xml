@@ -9,9 +9,8 @@
 <RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_marginTop="4dp"
              android:textAppearance="@style/Apptentive.TextAppearance.Body1"
-             android:paddingTop="4dp"
+             android:paddingTop="5dp"
              android:minHeight="48dp"
-             android:drawablePadding="16dp"
+             android:drawablePadding="0dp"
              android:gravity="top|start"/>
