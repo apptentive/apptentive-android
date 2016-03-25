@@ -48,7 +48,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		requiredView = view.findViewById(R.id.question_required);
-		dashView = view.findViewById(R.id.question_dash);
 		instructionsView = (TextView) view.findViewById(R.id.question_instructions);
 
 		TextView title = (TextView) view.findViewById(R.id.question_title);
@@ -69,12 +68,6 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 			requiredView.setVisibility(View.VISIBLE);
 		} else {
 			requiredView.setVisibility(View.GONE);
-		}
-
-		if (question.isRequired() && hasInstructions) {
-			dashView.setVisibility(View.VISIBLE);
-		} else {
-			dashView.setVisibility(View.GONE);
 		}
 
 		if (hasInstructions) {
