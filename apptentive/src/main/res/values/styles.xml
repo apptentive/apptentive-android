@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+
+    <style name="Apptentive"/>
+
+    <style name="Apptentive.Style"/>
+
+    <!-- General Theme override to change the Dialog design -->
+    <style name="Apptentive.Style.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/apptentive_color_primary</item>
+        <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
+        <item name="colorAccent">@color/apptentive_color_accent</item>
+        <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
+        <!-- Used for the background -->
+    </style>
+
+    <style name="Apptentive.Style.AlertDialog" parent="Apptentive.Style.Dialog">
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    </style>
+
+    <style name="Apptentive.Style.Toolbar.Light" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
+    <style name="Apptentive.Style.Toolbar.Dark" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget" parent="android:Widget"/>
+
+    <style name="Apptentive.Style.Widget.CardView" parent="CardView">
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.CardView.Message">
+        <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="cardElevation">?attr/apptentiveCardViewElevation</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.CardView.Composing">
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.CardContent"/>
+
+    <style name="Apptentive.Style.Widget.Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Headline" parent="@style/TextAppearance.AppCompat.Headline">
+        <item name="android:typeface">?attr/apptentiveTypefaceHeadline</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Headline.Inverse">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textColorHint">?android:attr/textColorHintInverse</item>
+        <item name="android:textColorHighlight">?android:attr/textColorHighlightInverse</item>
+        <item name="android:textColorLink">?android:attr/textColorLinkInverse</item>
+
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="android:typeface">?attr/apptentiveTypefaceTitle</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Title.Inverse" parent="@style/TextAppearance.AppCompat.Title.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypefaceTitle</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:typeface">?attr/apptentiveTypefaceSubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Inverse" parent="@style/TextAppearance.AppCompat.Subhead.Inverse">
+        <item name="android:typeface">?attr/apptentiveTypefaceSubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Secondary">
+        <item name="android:typeface">?attr/apptentiveTypefaceSubhead</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Subhead.Secondary.Inverse" parent="Apptentive.TextAppearance.Subhead.Inverse">
+        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Body2" parent="@style/TextAppearance.AppCompat.Body2">
+        <item name="android:typeface">?attr/apptentiveTypefaceBody2</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeBody2</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Body1" parent="@style/TextAppearance.AppCompat.Body1">
+        <item name="android:typeface">?attr/apptentiveTypefaceBody1</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeBody1</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption" parent="@style/TextAppearance.AppCompat.Caption">
+        <item name="android:typeface">?attr/apptentiveTypefaceCaption</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeCaption</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Caption.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:typeface">?attr/apptentiveTypefaceButtonBorderless</item>
+        <item name="android:textColor">?attr/apptentiveTextColorButtonBorderless</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeButtonBorderless</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:minWidth">36dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:typeface">?attr/apptentiveTypefaceButtonColored</item>
+        <item name="android:textSize">?attr/apptentiveTextSizeButtonColored</item>
+    </style>
+
+
+    <style name="Apptentive.Style.TextView.Timestamp" parent="">
+        <item name="android:minHeight">70dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:gravity">start|bottom</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.AvatarView">
+        <item name="android:src">@drawable/avatar</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.AvatarView.Greeting">
+        <item name="apptentive_borderColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="apptentive_borderWidth">2dp</item>
+        <item name="apptentive_borderSpace">1.5dp</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.AvatarView.Message">
+        <item name="apptentive_borderColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.Badge">
+        <item name="apptentive_badgeSize">normal</item>
+        <item name="apptentive_counterColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Apptentive.Widget.ImageButton" parent="Widget.AppCompat.ImageButton"/>
+
+    <style name="Apptentive.Widget.ImageButton.Info">
+        <item name="android:contentDescription">@string/apptentive_about_title</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:src">@drawable/apptentive_ic_info</item>
+    </style>
+
+    <style name="Apptentive.Widget.ImageButton.Composing">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:tint">?attr/colorAccent</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="Apptentive.Widget.ImageButton.FloatingActionButton">
+        <item name="apptentive_floatingActionButtonSize">normal</item>
+    </style>
+
+    <style name="Apptentive.Widget.ImageButton.FloatingActionButton.Mini">
+        <item name="apptentive_floatingActionButtonSize">mini</item>
+    </style>
+
+    <style name="Apptentive.MessageCenterMessageFrame">
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_margin_side</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_message_list_margin_side</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="Apptentive.MessageCenterMessageOutgoingProgressBar">
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="apptentive_progressBarColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="ApptentiveMessageCenterAttachmentDownloadProgressBar">
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="apptentive_progressBarColor">?attr/colorAccent</item>
+    </style>
+
+    <!-- For dialog Animation -->
+    <style name="ApptentiveDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_out</item>
+    </style>
+</resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:cardView="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:paddingTop="4dp"
+             android:paddingLeft="4dp"
+             android:paddingRight="4dp"
+             android:background="@android:color/transparent">
+    <android.support.v7.widget.CardView android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        cardView:cardUseCompatPadding="true"
+                                        cardView:cardBackgroundColor="?attr/apptentiveCardViewBackground"
+                                        cardView:cardCornerRadius="2dp"
+                                        cardView:cardElevation="?attr/apptentiveCardViewElevation">
+        <FrameLayout android:layout_width="match_parent"
+                     android:layout_height="wrap_content">
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:gravity="start"
+                          android:orientation="vertical">
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_margin="16dp"
+                              android:orientation="vertical">
+                    <TextView android:id="@+id/question_title"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:textAppearance="@style/Apptentive.TextAppearance.Subhead"/>
+                    <TextView android:id="@+id/question_required"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+                              android:textColor="?attr/apptentiveValidationFailedColor"
+                              android:text="@string/apptentive_required"/>
+                    <TextView android:id="@+id/question_instructions"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
+                </LinearLayout>
+                <View android:layout_width="match_parent"
+                      android:layout_height="1dp"
+                      android:background="?attr/apptentiveCardBorderColor"/>
+                <LinearLayout android:id="@+id/answer_container"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="12dp"
+                              android:layout_marginLeft="12dp"
+                              android:layout_marginRight="12dp"
+                              android:orientation="vertical">
+                    <!-- Answer content goes here. -->
+                </LinearLayout>
+            </LinearLayout>
+            <FrameLayout android:id="@+id/validation_failed_border"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:background="@drawable/apptentive_survey_question_invalid_border"
+                         android:visibility="invisible">
+            </FrameLayout>
+        </FrameLayout>
+    </android.support.v7.widget.CardView>
+</FrameLayout>

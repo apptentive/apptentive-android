@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <color name="apptentive_activity_frame_light">#C0757575</color>
+    <color name="apptentive_activity_frame_dark">#C0BDBDBD</color>
+    <color name="apptentive_view_background_light">#EEEEEE</color>
+    <color name="apptentive_view_background_dark">#111111</color>
+    <color name="apptentive_card_view_background_light">#FFFFFF</color>
+    <color name="apptentive_card_view_background_dark">#424242</color>
+    <color name="apptentive_card_view_background_alternate_light">#F5F5F5</color>
+    <color name="apptentive_card_view_background_alternate_dark">#616161</color>
+    <color name="apptentive_card_border_color_light">#1F000000</color>
+    <color name="apptentive_card_border_color_dark">#1FFFFFFF</color>
+    <color name="apptentive_color_snackbar">#323232</color>
+
+    <color name="apptentive_color_primary">#F44336</color>
+    <color name="apptentive_color_primary_dark">#D32F2F</color>
+    <color name="apptentive_color_primary_light">#E57373</color>
+    <color name="apptentive_color_accent">#1E88E5</color>
+
+    <color name="apptentive_validation_failed_color">#D93849</color>
+
+    <color name="apptentive_text_color_primary_light">#000000</color>
+    <color name="apptentive_text_color_primary_inverse_light">#FFFFFF</color>
+    <color name="apptentive_text_color_secondary_light">#9E9E9E</color>
+    <color name="apptentive_text_color_secondary_inverse_light">#E0E0E0</color>
+    <color name="apptentive_text_color_hint_light">#80000000</color>
+    <color name="apptentive_text_color_hint_inverse_light">#80ffffff</color>
+
+    <color name="apptentive_text_color_primary_dark">#FFFFFF</color>
+    <color name="apptentive_text_color_primary_inverse_dark">#000000</color>
+    <color name="apptentive_text_color_secondary_dark">#E0E0E0</color>
+    <color name="apptentive_text_color_secondary_inverse_dark">#9E9E9E</color>
+    <color name="apptentive_text_color_hint_dark">#80ffffff</color>
+    <color name="apptentive_text_color_hint_inverse_dark">#80000000</color>
+
+    <color name="apptentive_brand_red">#DC2636</color>
+</resources>

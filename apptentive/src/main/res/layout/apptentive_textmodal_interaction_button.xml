@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+~ Please refer to the LICENSE file for the terms and conditions
+~ under which redistribution and use of this file is permitted.
+-->
+
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        style="@style/Apptentive.Widget.Button.Borderless"/>

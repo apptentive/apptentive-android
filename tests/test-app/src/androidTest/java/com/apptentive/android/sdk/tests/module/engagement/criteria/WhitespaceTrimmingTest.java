@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -24,21 +24,21 @@ public class WhitespaceTrimmingTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
 	public void testWhitespaceTrimming() {
-		Log.e("Running test: testWhitespaceTrimming()\n\n");
+		ApptentiveLog.e("Running test: testWhitespaceTrimming()\n\n");
 		doTest("testWhitespaceTrimming.json");
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	private void doTest(String testFile) {
 		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
 		try {
-			Apptentive.addCustomDeviceData(getTargetContext(), " string_qwerty ", " qwerty ");
-			Apptentive.addCustomDeviceData(getTargetContext(), " string with spaces ", " string with spaces ");
-			DeviceManager.storeDeviceAndReturnIt(getTargetContext());
+			Apptentive.addCustomDeviceData(" string_qwerty ", " qwerty ");
+			Apptentive.addCustomDeviceData( " string with spaces ", " string with spaces ");
+			DeviceManager.storeDeviceAndReturnIt();
 			InteractionCriteria criteria = new InteractionCriteria(json);
-			assertTrue(criteria.isMet(getTargetContext()));
+			assertTrue(criteria.isMet());
 		} catch (JSONException e) {
-			Log.e("Error parsing test JSON.", e);
+			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
 	}

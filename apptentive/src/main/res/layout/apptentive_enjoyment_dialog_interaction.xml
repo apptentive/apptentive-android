@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+~ Please refer to the LICENSE file for the terms and conditions
+~ under which redistribution and use of this file is permitted.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_enjoyment"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_enjoyment"
+                android:fadingEdge="none">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="?attr/apptentiveDialogBackground"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:padding="24dp"
+                          android:orientation="vertical">
+                <TextView android:id="@+id/title"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_gravity="start"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Title"/>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/button_container"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:padding="8dp"
+                          android:gravity="end"
+                          android:orientation="horizontal">
+                <Button android:id="@+id/no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        style="@style/Apptentive.Widget.Button.Borderless"/>
+                <Button android:id="@+id/yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        style="@style/Apptentive.Widget.Button.Borderless"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

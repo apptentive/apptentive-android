@@ -11,11 +11,9 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
-import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -31,58 +29,58 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
 	public void testInteractionInvocationStorage() {
-		Log.e("Running test: testInteractionInvocationStorage()\n\n");
+		ApptentiveLog.e("Running test: testInteractionInvocationStorage()\n\n");
 		resetDevice();
 		final String testInteraction = "test.interaction";
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.0", 1);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.1", 2);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.1", 3);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.1", 3);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "1.1", 3);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 4);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 4);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 4);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 4);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 5);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.0", 5);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.1", 6);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.1", 6);
-		CodePointStore.storeRecord(getTargetContext(), true, testInteraction, "2.1", 6);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.0", 1);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.1", 2);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.1", 3);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.1", 3);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "1.1", 3);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 4);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 4);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 4);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 4);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 5);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.0", 5);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.1", 6);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.1", 6);
+		ApptentiveInternal.getInstance().getCodePointStore().storeRecord(true, testInteraction, "2.1", 6);
 
 		long value = 0;
 
-		value = CodePointStore.getTotalInvokes(getTargetContext(), true, testInteraction);
+		value = ApptentiveInternal.getInstance().getCodePointStore().getTotalInvokes(true, testInteraction);
 		assertEquals(value, 14);
 
-		value = CodePointStore.getVersionInvokes(getTargetContext(), true, testInteraction, "1.0");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getVersionInvokes(true, testInteraction, "1.0");
 		assertEquals(value, 1);
-		value = CodePointStore.getVersionInvokes(getTargetContext(), true, testInteraction, "1.1");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getVersionInvokes(true, testInteraction, "1.1");
 		assertEquals(value, 4);
-		value = CodePointStore.getVersionInvokes(getTargetContext(), true, testInteraction, "2.0");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getVersionInvokes(true, testInteraction, "2.0");
 		assertEquals(value, 6);
-		value = CodePointStore.getVersionInvokes(getTargetContext(), true, testInteraction, "2.1");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getVersionInvokes(true, testInteraction, "2.1");
 		assertEquals(value, 3);
 
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "1");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "1");
 		assertEquals(value, 1);
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "2");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "2");
 		assertEquals(value, 1);
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "3");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "3");
 		assertEquals(value, 3);
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "4");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "4");
 		assertEquals(value, 4);
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "5");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "5");
 		assertEquals(value, 2);
-		value = CodePointStore.getBuildInvokes(getTargetContext(), true, testInteraction, "6");
+		value = ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(true, testInteraction, "6");
 		assertEquals(value, 3);
 
-		Double lastInvoke = CodePointStore.getLastInvoke(getTargetContext(), true, testInteraction);
+		Double lastInvoke = ApptentiveInternal.getInstance().getCodePointStore().getLastInvoke(true, testInteraction);
 		assertFalse(lastInvoke.equals(0d));
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaTimeAtInstall() {
-		Log.e("Running test: testCriteriaTimeAtInstall()\n\n");
+		ApptentiveLog.e("Running test: testCriteriaTimeAtInstall()\n\n");
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaTimeAtInstall.json");
 
@@ -90,118 +88,119 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// 0
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 5);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 5);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 3);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 3);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNotNull(interaction);
 
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 1);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 1);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
 		// 1
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 5);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 5);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.1", Util.currentTimeSeconds() - 5);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 3);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		VersionHistoryStore.updateVersionHistory( 3, "1.1", Util.currentTimeSeconds() - 5);
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 3);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNotNull(interaction);
 
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.1", Util.currentTimeSeconds() - 3);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 1);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		VersionHistoryStore.updateVersionHistory( 3, "1.1", Util.currentTimeSeconds() - 3);
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 1);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
 		// 2
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 4, "2.0", Util.currentTimeSeconds() - 5);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		VersionHistoryStore.updateVersionHistory( 4, "2.0", Util.currentTimeSeconds() - 5);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
 		// 3
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.1", Util.currentTimeSeconds() - 5);
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		VersionHistoryStore.updateVersionHistory( 3, "1.1", Util.currentTimeSeconds() - 5);
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNotNull(interaction);
 
 
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaApplicationVersion() {
-		Log.e("Running test: testCriteriaApplicationVersion()\n\n");
+		ApptentiveLog.e("Running test: testCriteriaApplicationVersion()\n\n");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCriteriaApplicationVersion.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
 		Interaction interaction;
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNotNull(interaction);
 
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNotNull(interaction);
 
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
-		Log.e("Finished test.");
+		ApptentiveLog.e("Finished test.");
 	}
 
 	public void testCriteriaProcessingPerformance() {
-		Log.e("Running test: testCriteriaProcessingPerformance()");
+		ApptentiveLog.e("Running test: testCriteriaProcessingPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
 		final int iterations = 100;
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+			Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "complex_criteria");
 			assertNotNull(interaction);
 		}
 		long end = System.currentTimeMillis();
@@ -210,31 +209,31 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 7d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionSelectionPerformance() {
-		Log.e("Running test: testInteractionSelectionPerformance()");
+		ApptentiveLog.e("Running test: testInteractionSelectionPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
 		final int iterations = 100;
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+			Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "complex_criteria");
 			assertNotNull(interaction);
 		}
 		long end = System.currentTimeMillis();
@@ -243,14 +242,14 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 7d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testInteractionStorageAndSelectionPerformance() {
-		Log.e("Running test: testInteractionStorageAndSelectionPerformance()");
+		ApptentiveLog.e("Running test: testInteractionStorageAndSelectionPerformance()");
 		if (isRunningOnEmulator()) {
-			Log.e("Running on emulator. Skipping test.");
+			ApptentiveLog.e("Running on emulator. Skipping test.");
 			return;
 		}
 		resetDevice();
@@ -258,18 +257,18 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
 
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "app.launch");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "big.win");
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "app.launch");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "big.win");
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
 			resetDevice();
-			VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
-			InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "complex_criteria");
+			VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()));
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "complex_criteria");
 			assertNotNull(interaction);
 		}
 		long end = System.currentTimeMillis();
@@ -278,19 +277,19 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 50d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testSavingCodePointAndCheckingForApplicableInteraction() {
-		Log.e("Running test: testSavingCodePointAndCheckingForApplicableInteraction()");
+		ApptentiveLog.e("Running test: testSavingCodePointAndCheckingForApplicableInteraction()");
 		resetDevice();
 		final int iterations = 100;
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++) {
-			CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "non.existant.code.point");
-			Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "non.existant.code.point");
+			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "non.existant.code.point");
+			Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "non.existant.code.point");
 			assertNull(interaction);
 		}
 		long end = System.currentTimeMillis();
@@ -299,87 +298,87 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		double average = (double) duration / iterations;
 		double limit = 20d;
 		String message = String.format("Finished %d iterations in %,dms, average of %.2fms per run, limit was %.2fms", iterations, duration, average, limit);
-		Log.e(message);
+		ApptentiveLog.e(message);
 		assertTrue(message, average < limit);
 	}
 
 	public void testSelectionWithInteractionIdUsedInCriteria() {
-		Log.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
+		ApptentiveLog.e("Running test: testSelectionWithInteractionIdUsedInCriteria()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testSelectionWithInteractionIdUsedInCriteria.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
+		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.2");
 		assertNull(interaction);
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNotNull(interaction);
-		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
+		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.2");
 		assertNotNull(interaction);
 
 	}
 
 	public void testInteractionPriority() {
-		Log.e("Running test: testInteractionPriority()");
+		ApptentiveLog.e("Running test: testInteractionPriority()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testInteractionPriority.json");
 
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNotNull(interaction);
 		assertEquals(interaction.getId(), "526fe2836dd8bf546a00000a");
-		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
+		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNotNull(interaction);
 		assertEquals(interaction.getId(), "526fe2836dd8bf546a00000b");
-		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
+		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNotNull(interaction);
 		assertEquals(interaction.getId(), "526fe2836dd8bf546a00000c");
-		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
+		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNull(interaction);
 	}
 
 	public void testMissingNullEmptyCriteria() {
-		Log.e("Running test: testMissingNullEmptyCriteria()");
+		ApptentiveLog.e("Running test: testMissingNullEmptyCriteria()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testMissingNullEmptyCriteria.json");
 
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		Interaction interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.1");
+		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.1");
 		assertNull(interaction);
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.2");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.2");
 		assertNull(interaction);
 
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "code.point.3");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "code.point.3");
 		assertNotNull(interaction);
 	}
 
 	public void testCorruptedJson() {
-		Log.e("Running test: testCorruptedJson()");
+		ApptentiveLog.e("Running test: testCorruptedJson()");
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCorruptedJson.json");
 
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		Interactions interactions = InteractionManager.getInteractions(getTargetContext());
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		Interactions interactions = ApptentiveInternal.getInstance().getInteractionManager().getInteractions();
 		assertNull(interactions);
 	}
 
 	public void testActualUpgradeMessage() {
-		Log.e("Running test: testActualUpgradeMessage()");
+		ApptentiveLog.e("Running test: testActualUpgradeMessage()");
 
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
 		Interaction interaction;
@@ -387,40 +386,40 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		// Test version targeted UpgradeMessage
 
 		// Saw this build too long ago.
-		Log.e("ONE");
+		ApptentiveLog.e("ONE");
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 600000);
-		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "event_label"));
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 1000000);
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 600000);
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Haven't upgraded
-		Log.e("TWO");
+		ApptentiveLog.e("TWO");
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 499500);
-		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "event_label"));
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 499500);
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Just right
-		Log.e("THREE");
+		ApptentiveLog.e("THREE");
 		resetDevice();
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), 3, "1.0", Util.currentTimeSeconds() - 1000000);
-		VersionHistoryStore.updateVersionHistory(getTargetContext(), Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 499500);
-		assertNotNull(InteractionManager.getApplicableInteraction(getTargetContext(), "event_label"));
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 1000000);
+		VersionHistoryStore.updateVersionHistory( Util.getAppVersionCode(getTargetContext()), Util.getAppVersionName(getTargetContext()), Util.currentTimeSeconds() - 499500);
+		assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 
 		// Already shown
-		Log.e("FOUR");
-		interaction = InteractionManager.getApplicableInteraction(getTargetContext(), "event_label");
-		CodePointStore.storeInteractionForCurrentAppVersion(getTargetContext(), interaction.getId());
-		assertNull(InteractionManager.getApplicableInteraction(getTargetContext(), "event_label"));
+		ApptentiveLog.e("FOUR");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label");
+		ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( interaction.getId());
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "event_label"));
 	}
 
 	/**
 	 * Update this when the Rating Flow group of interactions changes, or with different permutations of that flow.
 	 */
 	public void testRealRatingInteractions() {
-		Log.e("Running test: testRealRatingInteractions()");
+		ApptentiveLog.e("Running test: testRealRatingInteractions()");
 
 		Context targetContext = getTargetContext();
 
@@ -431,141 +430,141 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 
 		// Conditions not yet met.
 		resetDevice();
-		Log.e("ONE");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 100000);
-		assertNull(InteractionManager.getApplicableInteraction(targetContext, "by.build"));
+		ApptentiveLog.e("ONE");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
+		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 100000);
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("by.build"));
 
 		// Conditions partially met.
 		resetDevice();
-		Log.e("TWO");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 500000);
-		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		ApptentiveLog.e("TWO");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
+		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 500000);
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init"));
 
 		// Conditions partially met the other way.
 		resetDevice();
-		Log.e("THREE");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		ApptentiveLog.e("THREE");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 
 		// Conditions almost met.
 		resetDevice();
-		Log.e("FOUR");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 430000);
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		ApptentiveLog.e("FOUR");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 430000);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 
 		// Conditions met barely.
 		resetDevice();
-		Log.e("FIVE");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		VersionHistoryStore.updateVersionHistory(targetContext, 3, "1.0", Util.currentTimeSeconds() - 432000);
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "local#app#init");
-		assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+		ApptentiveLog.e("FIVE");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		VersionHistoryStore.updateVersionHistory( 3, "1.0", Util.currentTimeSeconds() - 432000);
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "local#app#init");
+		assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 
 
 		//// Test Rating Dialog.
 
 		// Conditions are always met.
 		resetDevice();
-		Log.e("SIX");
-		InteractionManager.storeInteractionsPayloadString(targetContext, json);
-		assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes"));
+		ApptentiveLog.e("SIX");
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+		assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes"));
 
 		// Re-prompt isn't ready yet.
 		{
 			resetDevice();
-			Log.e("SEVEN");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			ApptentiveLog.e("SEVEN");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
-			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
-			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#remind");
-			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( ratingDialogInteraction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "com.apptentive#RatingDialog#remind");
+			assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 		}
 
 		// Re-prompt isn't ready yet.
 		{
 			resetDevice();
-			Log.e("EIGHT");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			ApptentiveLog.e("EIGHT");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
-			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
-			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 420000);
-			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( ratingDialogInteraction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeRecord( false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 420000);
+			assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 		}
 
 		// Re-prompt is ready.
 		{
 			resetDevice();
-			Log.e("NINE");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			ApptentiveLog.e("NINE");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
-			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
-			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
-			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( ratingDialogInteraction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeRecord( false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 		}
 
 		// Don't re-prompt, since we've already rated.
 		{
 			resetDevice();
-			Log.e("TEN");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			ApptentiveLog.e("TEN");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
-			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
-			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
-			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#rate");
-			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( ratingDialogInteraction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeRecord( false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "com.apptentive#RatingDialog#rate");
+			assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 		}
 
 		// Don't re-prompt, since we've declined to rate.
 		{
 			resetDevice();
-			Log.e("ELEVEN");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			Interaction ratingDialogInteraction = InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#yes");
+			ApptentiveLog.e("ELEVEN");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			Interaction ratingDialogInteraction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#yes");
 			assertNotNull(ratingDialogInteraction);
-			CodePointStore.storeInteractionForCurrentAppVersion(targetContext, ratingDialogInteraction.getId());
-			CodePointStore.storeRecord(targetContext, false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
-			CodePointStore.storeCodePointForCurrentAppVersion(targetContext, "com.apptentive#RatingDialog#decline");
-			assertNull(InteractionManager.getApplicableInteraction(targetContext, "local#app#init"));
+			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion( ratingDialogInteraction.getId());
+			ApptentiveInternal.getInstance().getCodePointStore().storeRecord( false, "com.apptentive#RatingDialog#remind", Util.getAppVersionName(targetContext), Util.getAppVersionCode(targetContext), Util.currentTimeSeconds() - 432000);
+			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "com.apptentive#RatingDialog#decline");
+			assertNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init"));
 		}
 
 		// Test Message Center
 
 		{
 			resetDevice();
-			Log.e("TWELVE");
-			InteractionManager.storeInteractionsPayloadString(targetContext, json);
-			assertNotNull(InteractionManager.getApplicableInteraction(targetContext, "com.apptentive#EnjoymentDialog#no"));
+			ApptentiveLog.e("TWELVE");
+			ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
+			assertNotNull(ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "com.apptentive#EnjoymentDialog#no"));
 		}
 	}
 
 	public void testCanShowInteraction() {
-		Log.e("Running test: testCanShowInteraction()\n\n");
+		ApptentiveLog.e("Running test: testCanShowInteraction()\n\n");
 		resetDevice();
 
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
-		InteractionManager.storeInteractionsPayloadString(getTargetContext(), json);
+		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
-		boolean willShow = Apptentive.canShowInteraction(getTargetContext(), "init");
+		boolean willShow = Apptentive.canShowInteraction("init");
 		assertFalse(willShow);
 
-		CodePointStore.storeCodePointForCurrentAppVersion(getTargetContext(), "switch.code.point");
-		willShow = Apptentive.canShowInteraction(getTargetContext(), "init");
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch.code.point");
+		willShow = Apptentive.canShowInteraction("init");
 		assertTrue(willShow);
 	}
 

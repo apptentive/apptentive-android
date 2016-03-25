@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.tests.module.engagement;
 
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
 
@@ -24,7 +24,7 @@ public class EventTest extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
 	public void testEventLabelCreation() {
-		Log.e("Running test: testEventLabelCreation()\n\n");
+		ApptentiveLog.e("Running test: testEventLabelCreation()\n\n");
 
 		BufferedReader reader = null;
 		try {
@@ -41,11 +41,11 @@ public class EventTest extends ApptentiveInstrumentationTestCase {
 				String eventName = reader.readLine();
 				String expected = reader.readLine();
 				String result = EngagementModule.generateEventLabel(vendor, interaction, eventName);
-				Log.i(".\nexpected: %s\nresult:   %s", expected, result);
+				ApptentiveLog.i(".\nexpected: %s\nresult:   %s", expected, result);
 				assertTrue(result.equals(expected));
 			}
 		} catch (IOException e) {
-			Log.e("Error reading asset.", e);
+			ApptentiveLog.e("Error reading asset.", e);
 			throw new RuntimeException(e);
 		} finally {
 			Util.ensureClosed(reader);

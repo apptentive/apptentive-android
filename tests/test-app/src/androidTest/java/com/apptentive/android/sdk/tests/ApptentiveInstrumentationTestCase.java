@@ -8,12 +8,11 @@ package com.apptentive.android.sdk.tests;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.Log;
-import com.apptentive.android.sdk.model.CodePointStore;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
 /**
@@ -24,8 +23,15 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 	protected Context testContext;
 	protected Context targetContext;
 
-	static {
-		ApptentiveInternal.setMinimumLogLevel(Log.Level.VERBOSE);
+
+	/**
+	 * Initializes this test case.
+	 *
+	 * @param params Instrumentation arguments.
+	 */
+	void initialize(Bundle params) {
+		ApptentiveInternal.getInstance(getTargetContext());
+		ApptentiveInternal.getInstance().setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 	}
 
 	protected Context getTestContext() {
@@ -44,8 +50,8 @@ public class ApptentiveInstrumentationTestCase extends InstrumentationTestCase {
 
 	protected void resetDevice() {
 		getTargetContext().getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		CodePointStore.clear(getTargetContext());
-		InteractionManager.clear(getTargetContext());
+		ApptentiveInternal.getInstance().getCodePointStore().clear();
+		ApptentiveInternal.getInstance().getInteractionManager().clear();
 	}
 
 	protected static void sleep(long millis) {

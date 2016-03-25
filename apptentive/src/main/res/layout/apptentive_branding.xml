@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/apptentive_branding_view"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+    <FrameLayout android:layout_width="match_parent"
+                 android:layout_height="4dp"
+                 android:background="?attr/colorAccent"/>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="48dp"
+                  android:gravity="center"
+                  android:orientation="horizontal">
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="32dp"
+                  android:layout_marginBottom="2dp"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+                  android:paddingRight="4dp"
+                  android:paddingEnd="4dp"
+                  android:gravity="center_vertical"
+                  android:text="Powered by"/>
+        <ImageView android:layout_width="100dp"
+                   android:layout_height="35dp"
+                   android:src="@drawable/apptentive_logo_black"/>
+    </LinearLayout>
+</LinearLayout>

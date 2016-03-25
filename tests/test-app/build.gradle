@@ -10,8 +10,10 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 23
+        versionCode 4
+        versionName "2.0"
     }
 
     lintOptions {
@@ -20,7 +22,7 @@ android {
 
     defaultConfig {
         testApplicationId "com.apptentive.android.sdk.tests"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testInstrumentationRunner "com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestRunner"
         testHandleProfiling true
         testFunctionalTest true
     }

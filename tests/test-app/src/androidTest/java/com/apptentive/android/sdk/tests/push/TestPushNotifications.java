@@ -6,11 +6,10 @@
 
 package com.apptentive.android.sdk.tests.push;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,14 +20,14 @@ import org.json.JSONObject;
 public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 
 	public void testUrbanAirshipPushNotificationIdentification() {
-		Log.e("Running test: testUrbanAirshipPushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testUrbanAirshipPushNotificationIdentification()\n\n");
 
 		// Null bundle push
 		{
 			resetDevice();
 			Bundle bundle = null;
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), bundle));
+			assertFalse(Apptentive.setPendingPushNotification(bundle));
 		}
 
 		// Non-Apptentive push.
@@ -37,7 +36,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Bundle bundle = new Bundle();
 			bundle.putString("foo", "bar");
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), bundle));
+			assertFalse(Apptentive.setPendingPushNotification(bundle));
 		}
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
@@ -46,7 +45,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Bundle bundle = new Bundle();
 			bundle.putString("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(bundle));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), bundle));
+			assertTrue(Apptentive.setPendingPushNotification(bundle));
 		}
 
 		// Valid Apptentive push. Verify this can display in a UI test.
@@ -56,19 +55,19 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			bundle.putString("apptentive", "{\"action\": \"pmc\"}");
 			Apptentive.isApptentivePushNotification(bundle);
 			assertTrue(Apptentive.isApptentivePushNotification(bundle));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), bundle));
+			assertTrue(Apptentive.setPendingPushNotification(bundle));
 		}
 	}
 
 	public void testParsePushNotificationIdentification() {
-		Log.e("Running test: testParsePushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testParsePushNotificationIdentification()\n\n");
 
 		// Null Intent
 		{
 			resetDevice();
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertFalse(Apptentive.setPendingPushNotification(intent));
 		}
 
 		// Not a push
@@ -76,7 +75,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			resetDevice();
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertFalse(Apptentive.setPendingPushNotification(intent));
 		}
 
 		// Non-Apptentive push
@@ -87,7 +86,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Intent intent = new Intent();
 			intent.putExtra("com.parse.Data", parseExtraJson.toString());
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertFalse(Apptentive.setPendingPushNotification(intent));
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
@@ -100,7 +99,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Intent intent = new Intent();
 			intent.putExtra("com.parse.Data", parseExtraJson.toString());
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertTrue(Apptentive.setPendingPushNotification(intent));
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
@@ -113,21 +112,21 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Intent intent = new Intent();
 			intent.putExtra("com.parse.Data", parseExtraJson.toString());
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertTrue(Apptentive.setPendingPushNotification(intent));
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void testAwsSnsPushNotificationIdentification() {
-		Log.e("Running test: testAwsSnsPushNotificationIdentification()\n\n");
+		ApptentiveLog.e("Running test: testAwsSnsPushNotificationIdentification()\n\n");
 
 		// Null Intent
 		{
 			resetDevice();
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertFalse(Apptentive.setPendingPushNotification(intent));
 		}
 
 		// Not a push
@@ -135,7 +134,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			resetDevice();
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertFalse(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertFalse(Apptentive.setPendingPushNotification(intent));
 		}
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
@@ -144,7 +143,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Intent intent = new Intent();
 			intent.putExtra("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertTrue(Apptentive.setPendingPushNotification(intent));
 		}
 
 		// Valid Apptentive push
@@ -153,7 +152,7 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 			Intent intent = new Intent();
 			intent.putExtra("apptentive", "{\"action\": \"pmc\"}");
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertTrue(Apptentive.setPendingPushNotification(getTargetContext(), intent));
+			assertTrue(Apptentive.setPendingPushNotification(intent));
 		}
 	}
 }

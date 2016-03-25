@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+~ Please refer to the LICENSE file for the terms and conditions
+~ under which redistribution and use of this file is permitted.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_note"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_note"
+                android:fadingEdge="none">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="16dp"
+                      android:paddingRight="16dp"
+                      android:paddingTop="@dimen/apptentive_activity_vertical_padding"
+                      android:paddingBottom="@dimen/apptentive_activity_vertical_padding"
+                      android:background="?attr/apptentiveDialogBackground"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:padding="24dp"
+                          android:orientation="vertical">
+                <TextView android:id="@+id/title"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Title"/>
+                <TextView android:id="@+id/body"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"
+                          android:paddingTop="@dimen/apptentive_dialog_content_spacing"/>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/button_container"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:padding="8dp"
+                          android:gravity="center_vertical|end"
+                          android:orientation="horizontal"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

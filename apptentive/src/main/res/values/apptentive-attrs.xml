@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+
+    <declare-styleable name="ApptentiveThemeTemplate">
+        <attr name="apptentiveWindowBackground" format="color|reference"/>
+        <attr name="apptentiveViewBackground" format="color|reference"/>
+        <attr name="apptentiveCardViewBackground" format="color|reference"/>
+        <attr name="apptentiveCardViewBackgroundAlternate" format="color|reference"/>
+        <attr name="apptentiveDialogBackground" format="reference"/>
+        <attr name="apptentiveCardBorderColor" format="color|reference"/>
+
+        <attr name="apptentiveValidationFailedColor" format="color|reference"/>
+        <attr name="apptentiveColorSnackbar" format="color|reference"/>
+
+        <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
+        <attr name="apptentiveButtonTintColor" format="color|reference"/>
+        <attr name="apptentiveButtonTintColorDisabled" format="color|reference"/>
+        <attr name="apptentiveButtonTintColorStateList" format="color|reference"/>
+
+
+        <attr name="apptentiveTextSizeHeadline" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeTitle" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeSubhead" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeBody1" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeBody2" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeCaption" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeButtonBorderless" format="dimension|reference"/>
+        <attr name="apptentiveTextSizeButtonColored" format="dimension|reference"/>
+
+        <attr name="apptentiveTypefaceHeadline" format="integer|reference"/>
+        <attr name="apptentiveTypefaceTitle" format="integer|reference"/>
+        <attr name="apptentiveTypefaceSubhead" format="integer|reference"/>
+        <attr name="apptentiveTypefaceBody1" format="integer|reference"/>
+        <attr name="apptentiveTypefaceBody2" format="integer|reference"/>
+        <attr name="apptentiveTypefaceCaption" format="integer|reference"/>
+        <attr name="apptentiveTypefaceButtonBorderless" format="integer|reference"/>
+        <attr name="apptentiveTypefaceButtonColored" format="integer|reference"/>
+
+        <attr name="apptentiveFontFamilyHeadline" format="string|reference"/>
+        <attr name="apptentiveFontFamilyTitle" format="string|reference"/>
+        <attr name="apptentiveFontFamilySubhead" format="string|reference"/>
+        <attr name="apptentiveFontFamilyBody1" format="string|reference"/>
+        <attr name="apptentiveFontFamilyBody2" format="string|reference"/>
+        <attr name="apptentiveFontFamilyCaption" format="string|reference"/>
+        <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
+        <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
+
+        <attr name="apptentiveCardViewElevation" format="dimension|reference"/>
+    </declare-styleable>
+
+
+    <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
+    <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
+    <attr name="apptentiveToolbarStyle" format="reference"/>
+
+    <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
+        <attr name="apptentive_backgroundColor" format="color"/>
+        <attr name="apptentive_progressBarColor" format="color"/>
+        <attr name="apptentive_progress" format="integer"/>
+    </declare-styleable>
+
+
+    <!-- Default style attribute which will be used during construction of ApptentiveMessageCenterBadge. -->
+    <attr name="apptentiveMessageCenterBadgeStyle" format="reference"/>
+
+    <declare-styleable name="ApptentiveMessageCenterBadge">
+        <!-- counter color -->
+        <attr name="apptentive_counterColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="apptentive_badgeSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+    </declare-styleable>
+
+    <attr name="apptentiveFabStyle" format="reference"/>
+    <attr name="apptentiveAvatarStyle" format="reference"/>
+
+    <declare-styleable name="FloatingActionButton">
+        <!-- Background color -->
+        <attr name="apptentive_floatingActionButtonColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="apptentive_floatingActionButtonSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+        <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
+        <attr name="apptentive_floatingActionButtonImplicitElevation" format="boolean"/>
+        <!-- Show shadow or not, default value is true -->
+        <attr name="apptentive_floatingActionButtonShadow" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ApptentiveAvatarView">
+        <attr name="apptentive_borderWidth" format="dimension"/>
+        <attr name="apptentive_borderSpace" format="dimension"/>
+        <attr name="apptentive_borderColor" format="color"/>
+    </declare-styleable>
+</resources>

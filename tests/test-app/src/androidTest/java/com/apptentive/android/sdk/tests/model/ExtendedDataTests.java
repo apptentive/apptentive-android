@@ -10,7 +10,7 @@ import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.Log;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	private static final String TEST_DATA_DIR = "model" + File.separator;
 
 	public void testCommerceExtendedData() {
-		Log.e("testCommerceExtendedData()");
+		ApptentiveLog.e("testCommerceExtendedData()");
 		try {
 			JSONObject expected = new CommerceExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testCommerceExtendedData.json"));
 
@@ -47,7 +47,7 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testLocationExtendedData() {
-		Log.e("testLocationExtendedData()");
+		ApptentiveLog.e("testLocationExtendedData()");
 		try {
 			JSONObject expected = new LocationExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testLocationExtendedData.json"));
 
@@ -60,7 +60,7 @@ public class ExtendedDataTests extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testTimeExtendedData() {
-		Log.e("testTimeExtendedData()");
+		ApptentiveLog.e("testTimeExtendedData()");
 		try {
 			JSONObject expected = new TimeExtendedData(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testTimeExtendedData.json"));
 

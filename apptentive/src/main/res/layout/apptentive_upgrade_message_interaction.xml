@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/apptentive_activity_side_padding_upgrade"
+                android:paddingRight="@dimen/apptentive_activity_side_padding_upgrade"
+                android:fadingEdge="none">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="?attr/apptentiveDialogBackground"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:layout_marginTop="@dimen/apptentive_activity_vertical_padding"
+                          android:layout_marginBottom="@dimen/apptentive_activity_vertical_padding"
+                          android:padding="8dp"
+                          android:gravity="center_horizontal"
+                          android:orientation="vertical">
+                <ImageView android:id="@+id/icon"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:padding="8dp"
+                           android:adjustViewBounds="true"
+                           android:scaleType="center"/>
+                <WebView android:id="@+id/webview"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:paddingLeft="16dp"
+                         android:paddingRight="16dp"/>
+            </LinearLayout>
+            <include layout="@layout/apptentive_branding"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
