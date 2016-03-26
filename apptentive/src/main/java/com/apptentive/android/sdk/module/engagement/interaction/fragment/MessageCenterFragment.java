@@ -211,7 +211,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
 
-		setup(view);
+		setup(view, (onSavedInstanceState == null));
 
 		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
@@ -237,6 +237,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		hostingActivity = (Activity) context;
 		messagingActionHandler = new MessageCenterFragment.MessagingActionHandler(this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		messageCenterListAdapter = null;
+		messageCenterListView.setAdapter(null);
 	}
 
 	public void onStart() {
@@ -334,7 +341,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		profileMenuItem.setVisible(bShowProfileMenuItem);
 	}
 
-	private void setup(View rootView) {
+	private void setup(View rootView, boolean bInitMessages) {
 		messageCenterListView = (ListView) rootView.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setOnScrollListener(this);
@@ -357,7 +364,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		});
 
 		boolean showKeyboard = false;
-		if (messageCenterListAdapter == null) {
+		if (bInitMessages) {
 			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
 			if (items != null) {
 				// populate message list from db
@@ -392,8 +399,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			updateMessageSentStates(); // Force timestamp recompilation.
 
-			messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 		}
+
+		messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 
 		if (composingItem != null) {
 			showKeyboard = true;
