@@ -40,34 +40,20 @@ public class FragmentFactory {
 				if (interaction != null) {
 					switch (interaction.getType()) {
 						case UpgradeMessage:
-							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
-								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
-							}
 							return UpgradeMessageFragment.newInstance(bundle);
 						case EnjoymentDialog:
-							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
-								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
-							}
 							return EnjoymentDialogFragment.newInstance(bundle);
 						case RatingDialog:
-							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
-								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
-							}
 							return RatingDialogFragment.newInstance(bundle);
 						case AppStoreRating:
-							bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							return AppStoreRatingFragment.newInstance(bundle);
 						case Survey:
 							return SurveyFragment.newInstance(bundle);
 						case MessageCenter:
 							return MessageCenterFragment.newInstance(bundle);
 						case TextModal:
-							if (!bundle.containsKey(FragmentConfigKeys.MODAL)) {
-								bundle.putBoolean(FragmentConfigKeys.MODAL, true);
-							}
 							return NoteFragment.newInstance(bundle);
 						case NavigateToLink:
-							bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 							return NavigateToLinkFragment.newInstance(bundle);
 						default:
 							break;
@@ -76,10 +62,40 @@ public class FragmentFactory {
 			} else if (fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR) {
 				return MessageCenterErrorFragment.newInstance(bundle);
 			} else if (fragmentType == Constants.FragmentTypes.ABOUT) {
-				bundle.putBoolean(FragmentConfigKeys.MODAL, true);
 				return AboutFragment.newInstance(bundle);
 			}
 		}
 		return null;
+	}
+
+	public static Bundle addDisplayModeToFragmentBundle(@NonNull Bundle bundle) {
+		// If bundle to launch the interaction already contains the mode value, honor it and return
+		if (bundle.containsKey(FragmentConfigKeys.MODAL)) {
+			return bundle;
+		}
+		// Otherwise, make survey and message center default to full screen, and others are modal dialog.
+		int fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
+		Interaction interaction;
+		boolean defaultVal = true;
+
+		if (fragmentType == Constants.FragmentTypes.INTERACTION) {
+			String interactionString;
+			interactionString = bundle.getCharSequence(Interaction.KEY_NAME).toString();
+			interaction = Interaction.Factory.parseInteraction(interactionString);
+			if (interaction != null) {
+				switch (interaction.getType()) {
+					case Survey:
+						defaultVal = false;
+						break;
+					case MessageCenter:
+						defaultVal = false;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		bundle.putBoolean(FragmentConfigKeys.MODAL, defaultVal);
+		return bundle;
 	}
 }

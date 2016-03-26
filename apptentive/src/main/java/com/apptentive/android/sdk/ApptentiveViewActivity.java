@@ -43,9 +43,22 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private int current_tab;
 
 	protected void onCreate(Bundle savedInstanceState) {
+		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
+		// Add theme based on the display mode of the interaction: modal or not
+		applyApptentiveTheme(bundle.getBoolean(Constants.FragmentConfigKeys.MODAL));
+
+		super.onCreate(savedInstanceState);
+
 		ApptentiveBaseFragment newFragment = null;
+		if (savedInstanceState != null) {
+			// retrieve the retained fragment after orientation change using saved tag
+			String savedFragmentTag = savedInstanceState.getString("fragmentTag");
+			newFragment = (ApptentiveBaseFragment) getSupportFragmentManager().findFragmentByTag(savedFragmentTag);
+			if (newFragment == null) {
+				throw new RuntimeException("tag structure changed. Fail to retrieve retained fragment after orientation change");
+			}
+		}
 		try {
-			Bundle bundle = getIntent().getExtras();
 			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
@@ -53,14 +66,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
 						fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
-					newFragment = FragmentFactory.createFragmentInstance(bundle);
-					if (newFragment != null) {
-						newFragment.setOnTransitionListener(this);
+					if (newFragment == null) {
+						newFragment = FragmentFactory.createFragmentInstance(bundle);
 						applyApptentiveTheme(newFragment.isShownAsModelDialog());
 					}
+					if (newFragment != null) {
+						newFragment.setOnTransitionListener(this);
+					}
 				}
-
-				super.onCreate(savedInstanceState);
 
 				if (newFragment == null) {
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
@@ -91,7 +104,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 		//current_tab = extra.getInt(SELECTED_TAB_EXTRA_KEY, 0);
 		current_tab = 0;
-
 
 		addFragmentToAdapter(newFragment, newFragment.getTitle());
 
@@ -176,6 +188,13 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// Save the tag of the current fragment before oritation change
+		outState.putString("fragmentTag", getFragmentTag(current_tab));
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void onFragmentTransition(ApptentiveBaseFragment currentFragment) {
 		if (currentFragment != null) {
 			int numberOfPages = viewPager_Adapter.getCount();
@@ -239,6 +258,15 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			Intent mainIntent = IntentCompat.makeRestartActivityTask(componentName);
 			startActivity(mainIntent);
 		}
+	}
+
+	/* Get the auto-generated fragment tag in ViewPager. This tag will be used to obtain a reference to the retained fragment
+	 * hosted in ViewPager.
+	 * If Google change the tag structure in the future, it would break the code leaving us unable to
+	 * find the reference. A run time exception will be thrown from {@link #onCreate(Bundle)}
+	 */
+	private String getFragmentTag(int pos) {
+		return "android:switcher:" + viewPager.getId() + ":" + viewPager_Adapter.getItemId(0);
 	}
 
 }
