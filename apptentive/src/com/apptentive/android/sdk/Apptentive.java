@@ -654,7 +654,7 @@ public class Apptentive {
 	/**
 	 * Set a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate.
+	 * @param listener An UnreadMessagesListener that you instantiate.
 	 * @deprecated use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
 	 */
 	@Deprecated
@@ -665,7 +665,7 @@ public class Apptentive {
 	/**
 	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate. Do not pass in an anonymous class.
+	 * @param listener An UnreadMessagesListener that you instantiate. Do not pass in an anonymous class.
 	 *                 Instead, create your listener as an instance variable and pass that in. This
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
