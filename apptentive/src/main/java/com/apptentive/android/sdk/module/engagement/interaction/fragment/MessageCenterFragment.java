@@ -210,8 +210,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
-
-		setup(view, (onSavedInstanceState == null));
+    boolean isInitialViewCreation = (onSavedInstanceState == null);
+		/* When isInitialViewCreation is false, the view is being recreated after orientation change.
+		 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
+		 */
+		setup(view, isInitialViewCreation);
 
 		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
@@ -341,7 +344,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		profileMenuItem.setVisible(bShowProfileMenuItem);
 	}
 
-	private void setup(View rootView, boolean bInitMessages) {
+	private void setup(View rootView, boolean isInitMessages) {
 		messageCenterListView = (ListView) rootView.findViewById(R.id.message_list);
 		messageCenterListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		messageCenterListView.setOnScrollListener(this);
@@ -364,7 +367,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		});
 
 		boolean showKeyboard = false;
-		if (bInitMessages) {
+		if (isInitMessages) {
 			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
 			if (items != null) {
 				// populate message list from db

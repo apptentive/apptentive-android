@@ -33,6 +33,7 @@ import com.apptentive.android.sdk.util.Constants;
 
 public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 
+	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
 
 	private Toolbar toolbar;
@@ -52,10 +53,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		ApptentiveBaseFragment newFragment = null;
 		if (savedInstanceState != null) {
 			// retrieve the retained fragment after orientation change using saved tag
-			String savedFragmentTag = savedInstanceState.getString("fragmentTag");
+			String savedFragmentTag = savedInstanceState.getString(FRAGMENT_TAG);
 			newFragment = (ApptentiveBaseFragment) getSupportFragmentManager().findFragmentByTag(savedFragmentTag);
+			/* Since we always store tags of fragments in the ViewPager upon orientation change,
+			 * failure of retrieval indicate internal error
+			 */
 			if (newFragment == null) {
-				throw new RuntimeException("tag structure changed. Fail to retrieve retained fragment after orientation change");
+					finish();
+					return;
 			}
 		}
 		try {
@@ -189,8 +194,8 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// Save the tag of the current fragment before oritation change
-		outState.putString("fragmentTag", getFragmentTag(current_tab));
+		// Save the tag of the current fragment before orientation change
+		outState.putString(FRAGMENT_TAG, viewPager_Adapter.getFragmentTag(current_tab));
 		super.onSaveInstanceState(outState);
 	}
 
@@ -246,7 +251,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	 *
 	 * This is to make sure when Apptentive interaction is
 	 * launched from non-activity context, such as pending intent when application is not running,service
-	 * context, or applciation context, exiting fom Apptentive interaction will land on a  default app
+	 * context, or application context, exiting fom Apptentive interaction will land on a  default app
 	 * activity, instead of desktop.
 	 * */
 	private void startLauncherActivityIfRoot() {
@@ -258,15 +263,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			Intent mainIntent = IntentCompat.makeRestartActivityTask(componentName);
 			startActivity(mainIntent);
 		}
-	}
-
-	/* Get the auto-generated fragment tag in ViewPager. This tag will be used to obtain a reference to the retained fragment
-	 * hosted in ViewPager.
-	 * If Google change the tag structure in the future, it would break the code leaving us unable to
-	 * find the reference. A run time exception will be thrown from {@link #onCreate(Bundle)}
-	 */
-	private String getFragmentTag(int pos) {
-		return "android:switcher:" + viewPager.getId() + ":" + viewPager_Adapter.getItemId(0);
 	}
 
 }
