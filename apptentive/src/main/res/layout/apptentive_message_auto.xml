@@ -33,7 +33,7 @@
                       android:paddingRight="16dp"
                       android:paddingTop="14dp"
                       android:paddingBottom="14dp"
-                      android:background="?attr/apptentiveCardViewBackgroundAlternate">
+                      android:background="?attr/apptentiveAttenuateColor">
             <TextView android:id="@+id/apptentive_message_auto_body"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
