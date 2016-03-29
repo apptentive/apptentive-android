@@ -11,7 +11,6 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.view.ViewGroup;
 
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
@@ -20,6 +19,7 @@ public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {
 
 	private List<ApptentiveBaseFragment> fragments = new ArrayList<>();
 	private List<String> tabTitles = new ArrayList<>();
+	private List<String> tags = new ArrayList<>();
 
 
 	public ApptentiveViewPagerAdapter(FragmentManager fragmentManager) {
@@ -31,6 +31,7 @@ public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {
 		ApptentiveBaseFragment fragment = (ApptentiveBaseFragment) super.instantiateItem(container, position);
 		fragments.set(position, fragment);
 		tabTitles.set(position, fragment.getTitle());
+		tags.set(position, fragment.getTag());
 		return getItem(position);
 	}
 
@@ -49,17 +50,22 @@ public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {
 		return tabTitles.get(position);
 	}
 
+	public String getFragmentTag(int position) {
+		return tags.get(position);
+	}
 
 	public void removeItem(int position) {
 		if (position <= getCount()) {
 			fragments.remove(position);
 			tabTitles.remove(position);
+			tags.remove(position);
 		}
 	}
 
 	public void add(ApptentiveBaseFragment f, String title) {
 		fragments.add(f);
 		tabTitles.add(title);
+		tags.add("");
 	}
 
 

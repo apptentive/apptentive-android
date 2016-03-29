@@ -365,12 +365,12 @@ public class ApptentiveInternal {
 		}
 	}
 
-	public void onAppLaunch(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	public void onAppLaunch(final Context appContext) {
+		EngagementModule.engageInternal(appContext, Event.EventLabel.app__launch.getLabelName());
 	}
 
-	public void onAppExit(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
+	public void onAppExit(final Context appContext) {
+		EngagementModule.engageInternal(appContext, Event.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onActivityStarted(Activity activity) {

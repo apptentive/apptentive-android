@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentHostCallback;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -49,7 +50,14 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	private static final String HAS_LAUNCHED = "has_launched";
 
 	private final String fragmentName = getClass().getSimpleName();
+
+	/* Nested Fragment with ChildFragmentManager lost state in rev20/rev21 of Android support library
+	 * The following are needed to work around this issue
+	 */
 	private FragmentManager retainedChildFragmentManager;
+	private Class fragmentImplClass;
+	private Field hostField;
+
 	private int toolbarLayoutId = 0;
 	private Toolbar toolbar = null;
 	private List fragmentMenuItems = null;
@@ -71,11 +79,31 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		void onConfigurationUpdated(boolean successful);
 	}
 
+	{
+
+		//Prepare the reflections to manage hidden fileds
+		try {
+			fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
+			hostField = fragmentImplClass.getDeclaredField("mHost");
+			hostField.setAccessible(true);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("FragmentManagerImpl is renamed due to the " +
+					"change of Android SDK, this workaround doesn't work any more. " +
+					"See the issue at " +
+					"https://code.google.com/p/android/issues/detail?id=74222", e);
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException("FragmentManagerImpl.mHost is found due to the " +
+					"change of Android SDK, this workaround doesn't work any more. " +
+					"See the issue at " +
+					"https://code.google.com/p/android/issues/detail?id=74222", e);
+		}
+	}
+
+	//use the retained childFragmentManager after the rotation.
 	public FragmentManager getRetainedChildFragmentManager() {
 		if (retainedChildFragmentManager == null) {
 			retainedChildFragmentManager = getChildFragmentManager();
 		}
-
 		return retainedChildFragmentManager;
 	}
 
@@ -106,43 +134,75 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-    // Android bug work-around: https://code.google.com/p/android/issues/detail?id=42601
 		if (retainedChildFragmentManager != null) {
+			//Use the retained child fragment manager after rotation
 			try {
-				Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
-				childFragmentManager.setAccessible(true);
-				childFragmentManager.set(this, this.retainedChildFragmentManager);
-			} catch (NoSuchFieldException nosuchfieldexception) {
-				ApptentiveLog.d("NoSuchFieldException", nosuchfieldexception);
-			} catch (IllegalAccessException illegalaccessexception) {
-				ApptentiveLog.d("IllegalAccessException", illegalaccessexception);
+				//Set the retained ChildFragmentManager to the field
+				Field field = Fragment.class.getDeclaredField("mChildFragmentManager");
+				field.setAccessible(true);
+				field.set(this, retainedChildFragmentManager);
+
+				updateHosts(getFragmentManager(), (FragmentHostCallback) hostField.get(getFragmentManager()));
+			} catch (Exception e) {
+				ApptentiveLog.w(e.getMessage(), e);
 			}
+		} else {
+			//If the child fragment manager has not been retained yet
+			retainedChildFragmentManager = getChildFragmentManager();
 		}
 
-		// not create new fragment (onCreate() won't be called) when configuration changes, i.e. rotation
-		setRetainInstance(true);
+	}
 
+	private void updateHosts(FragmentManager fragmentManager, FragmentHostCallback currentHost) throws IllegalAccessException {
+		if (fragmentManager != null) {
+			replaceFragmentManagerHost(fragmentManager, currentHost);
+		}
+
+		//replace host(activity) of fragments already added
+		List<Fragment> fragments = fragmentManager.getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				if (fragment != null) {
+					try {
+						//Copy the mHost(Activity) to retainedChildFragmentManager
+						Field mHostField = Fragment.class.getDeclaredField("mHost");
+						mHostField.setAccessible(true);
+						mHostField.set(fragment, currentHost);
+					} catch (Exception e) {
+						ApptentiveLog.w(e.getMessage(), e);
+					}
+					if (fragment.getChildFragmentManager() != null) {
+						updateHosts(fragment.getChildFragmentManager(), currentHost);
+					}
+				}
+			}
+		}
+	}
+
+	private void replaceFragmentManagerHost(FragmentManager fragmentManager, FragmentHostCallback currentHost) throws IllegalAccessException {
+		if (currentHost != null) {
+			hostField.set(fragmentManager, currentHost);
+		}
 	}
 
 	@Override
 	public void onDetach() {
 		super.onDetach();
-
 		try {
 			Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
 			childFragmentManager.setAccessible(true);
 			childFragmentManager.set(this, null);
-
 		} catch (NoSuchFieldException e) {
-			ApptentiveLog.d("NoSuchFieldException", e);
+			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
-			ApptentiveLog.d("IllegalAccessException", e);
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 
 		Bundle bundle = getArguments();
 

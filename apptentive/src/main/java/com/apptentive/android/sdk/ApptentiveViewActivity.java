@@ -33,6 +33,7 @@ import com.apptentive.android.sdk.util.Constants;
 
 public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 
+	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
 
 	private Toolbar toolbar;
@@ -43,9 +44,26 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private int current_tab;
 
 	protected void onCreate(Bundle savedInstanceState) {
+		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
+		// Add theme based on the display mode of the interaction: modal or not
+		applyApptentiveTheme(bundle.getBoolean(Constants.FragmentConfigKeys.MODAL));
+
+		super.onCreate(savedInstanceState);
+
 		ApptentiveBaseFragment newFragment = null;
+		if (savedInstanceState != null) {
+			// retrieve the retained fragment after orientation change using saved tag
+			String savedFragmentTag = savedInstanceState.getString(FRAGMENT_TAG);
+			newFragment = (ApptentiveBaseFragment) getSupportFragmentManager().findFragmentByTag(savedFragmentTag);
+			/* Since we always store tags of fragments in the ViewPager upon orientation change,
+			 * failure of retrieval indicate internal error
+			 */
+			if (newFragment == null) {
+					finish();
+					return;
+			}
+		}
 		try {
-			Bundle bundle = getIntent().getExtras();
 			fragmentType = bundle.getInt(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.UNKNOWN);
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
@@ -53,14 +71,14 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
 						fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
-					newFragment = FragmentFactory.createFragmentInstance(bundle);
-					if (newFragment != null) {
-						newFragment.setOnTransitionListener(this);
+					if (newFragment == null) {
+						newFragment = FragmentFactory.createFragmentInstance(bundle);
 						applyApptentiveTheme(newFragment.isShownAsModelDialog());
 					}
+					if (newFragment != null) {
+						newFragment.setOnTransitionListener(this);
+					}
 				}
-
-				super.onCreate(savedInstanceState);
 
 				if (newFragment == null) {
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
@@ -91,7 +109,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 		//current_tab = extra.getInt(SELECTED_TAB_EXTRA_KEY, 0);
 		current_tab = 0;
-
 
 		addFragmentToAdapter(newFragment, newFragment.getTitle());
 
@@ -176,6 +193,13 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// Save the tag of the current fragment before orientation change
+		outState.putString(FRAGMENT_TAG, viewPager_Adapter.getFragmentTag(current_tab));
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void onFragmentTransition(ApptentiveBaseFragment currentFragment) {
 		if (currentFragment != null) {
 			int numberOfPages = viewPager_Adapter.getCount();
@@ -227,7 +251,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	 *
 	 * This is to make sure when Apptentive interaction is
 	 * launched from non-activity context, such as pending intent when application is not running,service
-	 * context, or applciation context, exiting fom Apptentive interaction will land on a  default app
+	 * context, or application context, exiting fom Apptentive interaction will land on a  default app
 	 * activity, instead of desktop.
 	 * */
 	private void startLauncherActivityIfRoot() {

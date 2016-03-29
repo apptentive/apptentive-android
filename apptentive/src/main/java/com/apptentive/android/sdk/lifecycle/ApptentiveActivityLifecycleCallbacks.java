@@ -48,7 +48,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		}
 
 		if (runningActivities.getAndIncrement() == 0) {
-			appLaunched(activity);
+			appLaunched(appContext);
 		}
 
 		ApptentiveLog.e("==> Running Activities:    %d", runningActivities.get());
@@ -73,7 +73,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		}
 
 		if (foregroundActivities.getAndIncrement() == 0 && wasAppBackground) {
-			appEnteredForeground(activity);
+			appEnteredForeground();
 		} else {
 			ApptentiveLog.d("application is still in foreground");
 		}
@@ -107,7 +107,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			public void run() {
 				if (isAppForeground && !running) {
 					isAppForeground = false;
-					appEnteredBackground(activity);
+					appEnteredBackground();
 				} else {
 					ApptentiveLog.d("application is still in foreground");
 				}
@@ -149,7 +149,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			@Override
 			public void run() {
 				if (runningActivities.get() == 0) {
-					appExited(activity);
+					appExited(appContext);
 				} else {
 					ApptentiveLog.d("application is still in foreground");
 				}
@@ -159,23 +159,23 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		ApptentiveLog.e("==> Running Activities:    %d", runningActivities.get());
 	}
 
-	private void appEnteredForeground(Activity activity) {
+	private void appEnteredForeground() {
 		ApptentiveLog.e("App went to foreground.");
 		ApptentiveInternal.getInstance().onAppEnterForeground();
 	}
 
-	private void appEnteredBackground(Activity activity) {
+	private void appEnteredBackground() {
 		ApptentiveLog.e("App went to background.");
 		ApptentiveInternal.getInstance().onAppEnterBackground();
 	}
 
-	private void appLaunched(Activity activity) {
+	private void appLaunched(Context appContext) {
 		ApptentiveLog.e("### App LAUNCH");
-		ApptentiveInternal.getInstance().onAppLaunch(activity);
+		ApptentiveInternal.getInstance().onAppLaunch(appContext);
 	}
 
-	private void appExited(Activity activity) {
+	private void appExited(Context appContext) {
 		ApptentiveLog.e("### App EXIT");
-		ApptentiveInternal.getInstance().onAppExit(activity);
+		ApptentiveInternal.getInstance().onAppExit(appContext);
 	}
 }
