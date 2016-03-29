@@ -52,10 +52,8 @@
     <!-- Chooses whether Apptentive UI starts with a dark or light Theme. Host app can change this to inherit from ApptentiveBaseThemeDark. -->
     <style name="ApptentiveBaseTheme" parent="ApptentiveBaseThemeLight"/>
 
-    <!-- This Theme is applied first before any other styles. Any styles here will be overridden by styles in the host app,
-         then the ApptentiveBaseFrameTheme, then the ApptentiveThemeOverride, in that order -->
-    <style name="ApptentiveTheme" parent="ApptentiveBaseTheme">
-
+    <!-- This Theme contains all attribute values shared by all api versions. Use this theme as the parent to define api specific ApptentiveTheme in values-vxx -->
+    <style name="ApptentiveThemeShared" parent="ApptentiveBaseTheme">
         <!-- Setting appcompat’s color theming attrs -->
         <item name="colorPrimary">@color/apptentive_color_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
@@ -65,7 +63,6 @@
 
         <item name="apptentiveColorSnackbar">@color/apptentive_color_snackbar</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
-        <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
         <item name="apptentiveButtonTintColor">?attr/colorAccent</item>
 
         <item name="apptentiveTextSizeHeadline">@dimen/apptentive_text_size_headline</item>
@@ -117,6 +114,12 @@
         <!-- Requires API 11 -->
         <item name="android:dialogTheme">@style/Apptentive.Style.Dialog</item>
         <item name="alertDialogTheme">@style/Apptentive.Style.AlertDialog</item>
+    </style>
+
+    <!-- This Theme is applied first before any other styles. Any styles here will be overridden by styles in the host app,
+         then the ApptentiveBaseFrameTheme, then the ApptentiveThemeOverride, in that order -->
+    <style name="ApptentiveTheme" parent="ApptentiveThemeShared">
+        <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
     <!-- Default theme used by image preview -->

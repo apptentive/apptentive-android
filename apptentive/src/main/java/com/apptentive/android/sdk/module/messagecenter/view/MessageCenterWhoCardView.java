@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 
+import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.Util;
@@ -41,7 +43,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnListviewItemActionListener listener) {
 		super(activityContext);
 		this.listener = listener;
-		LayoutInflater inflater = LayoutInflater.from(activityContext);
+		final Context contextThemeWrapper = new ContextThemeWrapper(activityContext, ApptentiveInternal.getInstance().getApptentiveTheme());
+		// clone the inflater using the ContextThemeWrapper
+
+		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
 		title = (TextView) parentView.findViewById(R.id.who_title);
 
@@ -118,10 +123,43 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			nameEditText.setText(name);
 		}
 
+		TextWatcher emailTextWatcher = new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence existingContent, int i, int i2, int i3) {
+				// Disable send button when the content hasn't change yet
+				if (Util.isEmailValid(existingContent.toString())) {
+					sendButton.setEnabled(true);
+				} else {
+					sendButton.setEnabled(false);
+				}
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				String emailContent = editable.toString().trim();
+				if (Util.isEmailValid(emailContent)) {
+					// email must be in valid format after the change. If it is, enable send button
+					sendButton.setEnabled(true);
+				} else
+					// Allow user remove email completely when editing prifle of "Email Requested"
+					if (TextUtils.isEmpty(emailContent) && item.getType() >= MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT) {
+						sendButton.setEnabled(true);
+					} else {
+						// email not valid after change, so disable the send button
+						sendButton.setEnabled(false);
+					}
+			}
+		};
+
+		emailEditText.addTextChangedListener(emailTextWatcher);
+
 		if (!TextUtils.isEmpty(email)) {
 			emailEditText.setText(email);
 		}
-
 	}
 
 	public EditText getNameField() {
@@ -143,4 +181,5 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		}
 		return false;
 	}
+
 }
