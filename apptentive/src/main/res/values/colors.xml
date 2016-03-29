@@ -6,17 +6,18 @@
   -->
 
 <resources>
+    <color name="apptentive_color_background_light">#F5F5F5</color>
+    <color name="apptentive_color_background_dark">#616161</color>
     <color name="apptentive_activity_frame_light">#C0757575</color>
     <color name="apptentive_activity_frame_dark">#C0BDBDBD</color>
-    <color name="apptentive_view_background_light">#EEEEEE</color>
-    <color name="apptentive_view_background_dark">#111111</color>
-    <color name="apptentive_card_view_background_light">#FFFFFF</color>
-    <color name="apptentive_card_view_background_dark">#424242</color>
-    <color name="apptentive_card_view_background_alternate_light">#F5F5F5</color>
-    <color name="apptentive_card_view_background_alternate_dark">#616161</color>
+    <color name="apptentive_card_view_background_light">#FAFAFA</color>
+    <color name="apptentive_card_view_background_dark">#202020</color>
     <color name="apptentive_card_border_color_light">#1F000000</color>
     <color name="apptentive_card_border_color_dark">#1FFFFFFF</color>
     <color name="apptentive_color_snackbar">#323232</color>
+
+    <color name="apptentive_attenuate_color_light">#06000000</color>
+    <color name="apptentive_attenuate_color_dark">#06FFFFFF</color>
 
     <color name="apptentive_color_primary">#F44336</color>
     <color name="apptentive_color_primary_dark">#D32F2F</color>

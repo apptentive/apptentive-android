@@ -11,12 +11,13 @@
 
     <style name="ApptentiveBaseThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
+        <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
-        <item name="apptentiveCardViewBackgroundAlternate">@color/apptentive_card_view_background_alternate_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
+        <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
 
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_light</item>
@@ -31,12 +32,13 @@
 
     <style name="ApptentiveBaseThemeDark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
+        <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
-        <item name="apptentiveCardViewBackgroundAlternate">@color/apptentive_card_view_background_alternate_dark</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
+        <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
 
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_dark</item>

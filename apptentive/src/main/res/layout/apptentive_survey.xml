@@ -53,8 +53,10 @@
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
+                          android:layout_marginTop="24dp"
                           android:paddingTop="16dp"
                           android:paddingBottom="40dp"
+                          android:background="?attr/apptentiveAttenuateColor"
                           android:gravity="center">
                 <Button android:id="@+id/send"
                         android:layout_width="wrap_content"
