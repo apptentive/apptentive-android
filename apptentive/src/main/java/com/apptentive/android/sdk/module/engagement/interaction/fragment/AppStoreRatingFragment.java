@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.os.Bundle;
@@ -22,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 //NON UI Fragment
-public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatingInteraction> {
+public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatingInteraction>
+		implements DialogInterface.OnDismissListener {
 
 	public static AppStoreRatingFragment newInstance(Bundle bundle) {
 		AppStoreRatingFragment storeRatingFragment = new AppStoreRatingFragment();
@@ -42,7 +44,6 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 		Activity activity = getActivity();
 		String errorMessage = activity.getResources().getString(R.string.apptentive_rating_error);
-		boolean showingDialog = false;
 		try {
 			IRatingProvider ratingProvider = ApptentiveInternal.getInstance().getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
@@ -65,11 +66,9 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 			ratingProvider.startRating(activity, finalRatingProviderArgs);
 		} catch (ActivityNotFoundException e) {
-			showingDialog = true;
 			displayError(activity, errorMessage);
 		} catch (InsufficientRatingArgumentsException e) {
 			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
-			showingDialog = true;
 			ApptentiveLog.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} finally {
@@ -92,6 +91,12 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 	@Override
 	public boolean onBackPressed() {
 		return false;
+	}
+
+	//called when alert dialog had been dismissed
+	@Override
+	public void onDismiss(final DialogInterface dialog) {
+		transit();
 	}
 
 	private void displayError(final Activity activity, String message) {
