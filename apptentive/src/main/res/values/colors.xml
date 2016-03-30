@@ -37,4 +37,5 @@
     <color name="apptentive_text_color_hint_inverse_dark">#80000000</color>
 
     <color name="apptentive_brand_red">#DC2636</color>
+    <color name="apptentive_material_white">#FFFFFFFF</color>
 </resources>

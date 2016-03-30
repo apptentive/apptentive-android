@@ -68,6 +68,11 @@
         <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>
     </style>
 
+    <!-- Use this contrasting textAppearance when the text will be drawn on a color that is not generally used as a background in the given theme, so the text still shows up. -->
+    <style name="Apptentive.TextAppearance.Headline.Contrast" parent="Apptentive.TextAppearance.Headline">
+        <item name="android:textColor">?attr/apptentiveTextColorHeaderContrast</item>
+    </style>
+
     <style name="Apptentive.TextAppearance.Headline.Inverse">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textColorHint">?android:attr/textColorHintInverse</item>
@@ -89,6 +94,11 @@
     <style name="Apptentive.TextAppearance.Subhead" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:typeface">?attr/apptentiveTypefaceSubhead</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
+    </style>
+
+    <!-- Use this contrasting textAppearance when the text will be drawn on a color that is not generally used as a background in the given theme, so the text still shows up. -->
+    <style name="Apptentive.TextAppearance.Subhead.Contrast" parent="Apptentive.TextAppearance.Subhead">
+        <item name="android:textColor">?attr/apptentiveTextColorHeaderContrast</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Subhead.Inverse" parent="@style/TextAppearance.AppCompat.Subhead.Inverse">
@@ -154,7 +164,7 @@
     </style>
 
     <style name="Apptentive.Style.Widget.AvatarView.Greeting">
-        <item name="apptentive_borderColor">?android:attr/textColorPrimary</item>
+        <item name="apptentive_borderColor">?attr/apptentiveTextColorHeaderContrast</item>
         <item name="apptentive_borderWidth">2dp</item>
         <item name="apptentive_borderSpace">1.5dp</item>
     </style>
@@ -174,7 +184,7 @@
         <item name="android:contentDescription">@string/apptentive_about_title</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:src">@drawable/apptentive_ic_info</item>
-        <item name="android:tint">?attr/apptentiveButtonTintColorDisabled</item>
+        <item name="android:tint">?attr/apptentiveTextColorHeaderContrast</item>
     </style>
 
     <style name="Apptentive.Widget.ImageButton.Composing">

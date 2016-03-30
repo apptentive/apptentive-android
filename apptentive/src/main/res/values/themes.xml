@@ -61,6 +61,8 @@
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
         <item name="colorAccent">@color/apptentive_color_accent</item>
 
+        <item name="apptentiveTextColorHeaderContrast">@color/apptentive_material_white</item>
+
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 
         <item name="apptentiveColorSnackbar">@color/apptentive_color_snackbar</item>
