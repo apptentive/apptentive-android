@@ -14,7 +14,8 @@ public class Constants {
 	public static final String APPTENTIVE_SDK_VERSION = "3.0.0";
 
 
-	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 1000;
+	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 10;
+	public static final int REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION = 20;
 
 	public final static int REQUEST_READ_STORAGE_PERMISSION = 1;
 

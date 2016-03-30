@@ -6,20 +6,15 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.app.Dialog;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +27,9 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 
 import java.lang.ref.WeakReference;
 
@@ -78,14 +75,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 					return;
 				}
 				if (showConfirmation) {
-					CloseConfirmationDialog closeComposingDialog = new CloseConfirmationDialog();
-					closeComposingDialog.setTargetFragment(fragment, 0);
 					Bundle bundle = new Bundle();
-					bundle.putString("STR_2", item.str_2);
-					bundle.putString("STR_3", item.str_3);
-					bundle.putString("STR_4", item.str_4);
-					closeComposingDialog.setArguments(bundle);
-					closeComposingDialog.show(fragment.getFragmentManager(), "CloseConfirmationDialog");
+					bundle.putString("message", item.str_2);
+					bundle.putString("positive", item.str_3);
+					bundle.putString("negative", item.str_4);
+					ApptentiveAlertDialog.show(fragment, bundle, Constants.REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION);
 				} else {
 					locallistener.onCancelComposing();
 				}
@@ -104,10 +98,8 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Drawable d = DrawableCompat.wrap(sendButton.getDrawable());
 			DrawableCompat.setTintList(d, colors);
-			d.applyTheme(theme);
+			//d.applyTheme(theme);
 			sendButton.setImageDrawable(d);
-		} else {
-			sendButton.setColorFilter(Util.getThemeColor(fragment.getContext(), R.attr.apptentiveButtonTintColorDisabled));
 		}
 		if (item.button_1 != null) {
 			sendButton.setContentDescription(item.button_1);
@@ -127,7 +119,6 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Drawable d = DrawableCompat.wrap(attachButton.getDrawable());
 			DrawableCompat.setTintList(d, colors);
-			d.applyTheme(theme);
 			attachButton.setImageDrawable(d);
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -145,42 +136,5 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		}
 	}
 
-	public static class CloseConfirmationDialog extends DialogFragment {
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			final AlertDialog d = new AlertDialog.Builder(getActivity())
-					.setMessage(getArguments().getString("STR_2"))
-					.setPositiveButton(getArguments().getString("STR_3"),
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									Fragment fragment = getTargetFragment();
-									if (fragment instanceof MessageAdapter.OnListviewItemActionListener) {
-										((MessageAdapter.OnListviewItemActionListener) fragment).onCancelComposing();
-									}
-									dialog.dismiss();
-								}
-							})
-					.setNegativeButton(getArguments().getString("STR_4"),
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									dialog.dismiss();
-								}
-							}).create();
-			/*d.setOnShowListener(new DialogInterface.OnShowListener() {
-				@Override
-				public void onShow(DialogInterface dialog) {
-					Button b = d.getButton(DialogInterface.BUTTON_POSITIVE);
-					b.setTextColor(Util.getThemeColorFromAttrOrRes(getActivity(), R.attr.colorAccent, R.color.apptentive_material_accent));
-				}
-			});*/
-			return d;
-		}
-
-	}
 
 }
