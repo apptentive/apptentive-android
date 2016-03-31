@@ -42,6 +42,13 @@ public class ApptentiveAlertDialog extends DialogFragment {
 		return fragment;
 	}
 
+	public interface OnDismissListener {
+		/**
+		 * This method will be invoked when the alert dialog is dismissed.
+		 */
+		public void onDismissAlert();
+	}
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Bundle bundle = getArguments();
@@ -71,8 +78,8 @@ public class ApptentiveAlertDialog extends DialogFragment {
 				positiveButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 						dismiss();
+						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 					}
 				});
 			}
@@ -86,8 +93,8 @@ public class ApptentiveAlertDialog extends DialogFragment {
 				negativeButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, getActivity().getIntent());
 						dismiss();
+						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, getActivity().getIntent());
 					}
 				});
 			}
@@ -105,8 +112,8 @@ public class ApptentiveAlertDialog extends DialogFragment {
 	public void onDismiss(final DialogInterface dialog) {
 		super.onDismiss(dialog);
 		final Fragment hostingFragment = getTargetFragment();
-		if (hostingFragment instanceof DialogInterface.OnDismissListener) {
-			((DialogInterface.OnDismissListener) hostingFragment).onDismiss(dialog);
+		if (hostingFragment instanceof ApptentiveAlertDialog.OnDismissListener) {
+			((ApptentiveAlertDialog.OnDismissListener) hostingFragment).onDismissAlert();
 		}
 	}
 

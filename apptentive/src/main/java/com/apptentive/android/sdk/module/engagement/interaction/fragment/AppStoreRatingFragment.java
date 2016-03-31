@@ -24,7 +24,7 @@ import java.util.Map;
 
 //NON UI Fragment
 public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatingInteraction>
-		implements DialogInterface.OnDismissListener {
+		implements ApptentiveAlertDialog.OnDismissListener {
 
 	public static AppStoreRatingFragment newInstance(Bundle bundle) {
 		AppStoreRatingFragment storeRatingFragment = new AppStoreRatingFragment();
@@ -95,7 +95,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 	//called when alert dialog had been dismissed
 	@Override
-	public void onDismiss(final DialogInterface dialog) {
+	public void onDismissAlert() {
 		transit();
 	}
 
