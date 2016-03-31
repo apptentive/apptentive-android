@@ -9,6 +9,7 @@
     <!-- Define an empty Theme that is applied to our UI last. The host app should place styles in this theme if it wants to guarantee they take precedence. -->
     <style name="ApptentiveThemeOverride"/>
 
+    <!-- Default light theme used by Apptentive -->
     <style name="ApptentiveBaseThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
@@ -30,6 +31,7 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
+    <!-- Default dark theme used by Apptentive -->
     <style name="ApptentiveBaseThemeDark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
@@ -51,7 +53,9 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_dark</item>
     </style>
 
-    <!-- Chooses whether Apptentive UI starts with a dark or light Theme. Host app can change this to inherit from ApptentiveBaseThemeDark. -->
+    <!-- Chooses whether Apptentive UI defaults with a dark or light Theme. By default, Apptentive uses light theme.
+      This theme will be merged with the default app material theme specified in the host app's manifest file.
+     Host app should change this to inherit from ApptentiveBaseThemeDark, if the app default theme is also a dark theme -->
     <style name="ApptentiveBaseTheme" parent="ApptentiveBaseThemeLight"/>
 
     <!-- This Theme contains all attribute values shared by all api versions. Use this theme as the parent to define api specific ApptentiveTheme in values-vxx -->
@@ -114,10 +118,6 @@
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
 
         <item name="apptentiveCardViewElevation">2dp</item>
-
-        <!-- Requires API 11 -->
-        <item name="android:dialogTheme">@style/Apptentive.Style.Dialog</item>
-        <item name="alertDialogTheme">@style/Apptentive.Style.AlertDialog</item>
     </style>
 
     <!-- This Theme is applied first before any other styles. Any styles here will be overridden by styles in the host app,
@@ -136,6 +136,7 @@
         <item name="colorPrimary">@color/apptentive_brand_red</item>
     </style>
 
+    <!-- Default theme values that Apptentive interactions will always use, regardless the app default theme -->
     <style name="ApptentiveBaseFrameTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -148,6 +149,9 @@
         <item name="actionBarPopupTheme">@null</item>
         <item name="actionBarTheme">@null</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <!-- Requires API 11 -->
+        <item name="android:dialogTheme">@style/Apptentive.Style.Dialog</item>
+        <item name="alertDialogTheme">@style/Apptentive.Style.AlertDialog</item>
     </style>
 
     <style name="ApptentiveBaseDialogTheme">

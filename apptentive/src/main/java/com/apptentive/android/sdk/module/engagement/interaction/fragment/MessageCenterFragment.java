@@ -260,9 +260,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		ApptentiveInternal.getInstance().getMessageManager().setMessageCenterInForeground(false);
 	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
+				case Constants.REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION: {
+					onCancelComposing();
+					break;
+				}
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER: {
 					if (data == null) {
 						ApptentiveLog.d("no image is picked");

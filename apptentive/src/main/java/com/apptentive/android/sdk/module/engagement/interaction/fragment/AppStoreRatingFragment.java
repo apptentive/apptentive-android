@@ -1,12 +1,10 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ActivityNotFoundException;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +17,14 @@ import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.interaction.model.AppStoreRatingInteraction;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.InsufficientRatingArgumentsException;
+import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 
 import java.util.HashMap;
 import java.util.Map;
 
 //NON UI Fragment
-public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatingInteraction> {
+public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatingInteraction>
+		implements DialogInterface.OnDismissListener {
 
 	public static AppStoreRatingFragment newInstance(Bundle bundle) {
 		AppStoreRatingFragment storeRatingFragment = new AppStoreRatingFragment();
@@ -44,7 +44,6 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 		Activity activity = getActivity();
 		String errorMessage = activity.getResources().getString(R.string.apptentive_rating_error);
-		boolean showingDialog = false;
 		try {
 			IRatingProvider ratingProvider = ApptentiveInternal.getInstance().getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
@@ -67,14 +66,19 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 			ratingProvider.startRating(activity, finalRatingProviderArgs);
 		} catch (ActivityNotFoundException e) {
-			showingDialog = true;
 			displayError(activity, errorMessage);
 		} catch (InsufficientRatingArgumentsException e) {
 			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
-			showingDialog = true;
 			ApptentiveLog.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} finally {
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			transit();
 		}
 	}
 
@@ -89,23 +93,18 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 		return false;
 	}
 
+	//called when alert dialog had been dismissed
+	@Override
+	public void onDismiss(final DialogInterface dialog) {
+		transit();
+	}
+
 	private void displayError(final Activity activity, String message) {
 		ApptentiveLog.e(message);
-		final Context contextThemeWrapper = new ContextThemeWrapper(activity, ApptentiveInternal.getInstance().getApptentiveTheme());
-		final AlertDialog alertDialog = new AlertDialog.Builder(contextThemeWrapper).create();
-		alertDialog.setTitle(activity.getString(R.string.apptentive_oops));
-		alertDialog.setMessage(message);
-		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.apptentive_ok), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialogInterface, int i) {
-				alertDialog.dismiss();
-			}
-		});
-		alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				transit();
-			}
-		});
-		alertDialog.show();
+		Bundle bundle = new Bundle();
+		bundle.putString("title", activity.getString(R.string.apptentive_oops));
+		bundle.putString("message", message);
+		bundle.putString("positive", activity.getString(R.string.apptentive_ok));
+		ApptentiveAlertDialog.show(this, bundle, 0);
 	}
 }
