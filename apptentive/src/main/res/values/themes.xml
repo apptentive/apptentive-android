@@ -24,9 +24,9 @@
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_light</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
-        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_inverse_light</item>
+        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
         <item name="android:textColorSecondary">@color/apptentive_text_color_secondary_light</item>
-        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse_light</item>
+        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_dark</item>
         <item name="android:textColorHint">@color/apptentive_text_color_hint_light</item>
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
@@ -46,9 +46,9 @@
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_dark</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
-        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_inverse_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
         <item name="android:textColorSecondary">@color/apptentive_text_color_secondary_dark</item>
-        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_inverse_dark</item>
+        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_light</item>
         <item name="android:textColorHint">@color/apptentive_text_color_hint_dark</item>
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_dark</item>
     </style>
@@ -64,6 +64,8 @@
         <item name="colorPrimary">@color/apptentive_color_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
         <item name="colorAccent">@color/apptentive_color_accent</item>
+
+        <item name="apptentiveTextColorHeaderContrast">@color/apptentive_material_white</item>
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 

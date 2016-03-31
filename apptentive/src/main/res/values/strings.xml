@@ -42,4 +42,9 @@
     <string name="apptentive_rating_provider_no_google_play">Google Play was not found. Please install Google Play before rating this app.</string>
     <string name="apptentive_rating_provider_no_amazon_appstore">Amazon Appstore was not found. Please install Amazon Appstore before rating this app.</string>
     <string name="apptentive_rating_provider_no_mikandi">MiKandi Market was not found. Please install MiKandi Market before rating this app.</string>
+
+    <!-- Do not translate below here -->
+
+    <!-- An en dash with a space on each side. Use entity codes for space because otherwise it gets trimmed. -->
+    <string name="apptentive_instruction_text_separater">&#160;&#8211;&#160;</string>
 </resources>

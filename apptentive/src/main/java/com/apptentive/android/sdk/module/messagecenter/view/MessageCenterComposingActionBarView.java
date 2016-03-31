@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -57,17 +58,14 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		}
 
 		Resources.Theme theme = contextThemeWrapper.getTheme();
-		ColorStateList colors = getResources().getColorStateList(Util.getResourceIdFromAttribute(theme, R.attr.apptentiveButtonTintColorStateList));
-
+		ColorStateList colors = ContextCompat.getColorStateList(contextThemeWrapper, Util.getResourceIdFromAttribute(theme, R.attr.apptentiveButtonTintColorStateList));
 
 		ImageButton closeButton = (ImageButton) findViewById(R.id.cancel_composing);
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Drawable d = DrawableCompat.wrap(closeButton.getDrawable());
-			DrawableCompat.setTintList(d, colors);
-			d.applyTheme(theme);
-			closeButton.setImageDrawable(d);
-		}
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable closeButtonDrawable = DrawableCompat.wrap(closeButton.getDrawable());
+		DrawableCompat.setTintList(closeButtonDrawable, colors);
+		closeButton.setImageDrawable(closeButtonDrawable);
+
 		closeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
 				MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
@@ -93,14 +91,14 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		}
 
 		sendButton = (ImageButton) findViewById(R.id.btn_send_message);
-		sendButton.setEnabled(false);
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Drawable d = DrawableCompat.wrap(sendButton.getDrawable());
-			DrawableCompat.setTintList(d, colors);
-			//d.applyTheme(theme);
-			sendButton.setImageDrawable(d);
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable sendButtonDrawable = DrawableCompat.wrap(sendButton.getDrawable());
+		DrawableCompat.setTintList(sendButtonDrawable, colors);
+		sendButton.setImageDrawable(sendButtonDrawable);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			sendButton.setColorFilter(Util.getThemeColor(fragment.getContext(), R.attr.apptentiveButtonTintColorDisabled));
 		}
+		sendButton.setEnabled(false);
 		if (item.button_1 != null) {
 			sendButton.setContentDescription(item.button_1);
 		}
@@ -115,12 +113,11 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		});
 
 		attachButton = (ImageButton) findViewById(R.id.btn_attach_image);
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply color manually.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Drawable d = DrawableCompat.wrap(attachButton.getDrawable());
-			DrawableCompat.setTintList(d, colors);
-			attachButton.setImageDrawable(d);
-		}
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable attachButtonDrawable = DrawableCompat.wrap(attachButton.getDrawable());
+		DrawableCompat.setTintList(attachButtonDrawable, colors);
+		attachButton.setImageDrawable(attachButtonDrawable);
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			attachButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
