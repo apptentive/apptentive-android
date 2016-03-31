@@ -31,6 +31,10 @@ public class InteractionManager {
 	private Targets targets;
 	private Boolean pollForInteractions;
 
+	public interface InteractionUpdateListener {
+		void onInteractionUpdated(boolean successful);
+	}
+
 	public Interactions getInteractions() {
 		if (interactions == null) {
 			interactions = loadInteractions();
@@ -120,7 +124,7 @@ public class InteractionManager {
 		}
 
 
-		ApptentiveInternal.getInstance().notifyConfigurationUpdated(updateSuccessful);
+		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
 
 	}
 

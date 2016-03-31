@@ -36,7 +36,6 @@ import com.apptentive.android.sdk.model.Person;
 import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -99,7 +98,7 @@ public class ApptentiveInternal {
 	Map<String, String> ratingProviderArgs;
 	WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
-	final LinkedBlockingQueue configUpdateListeners = new LinkedBlockingQueue();
+	final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
 
 	ExecutorService cachedExecutor;
 
@@ -744,12 +743,12 @@ public class ApptentiveInternal {
 		return (onSurveyFinishedListener == null) ? null : onSurveyFinishedListener.get();
 	}
 
-	public void addConfigUpdateListener(ApptentiveBaseFragment.ConfigUpdateListener listener) {
-		configUpdateListeners.add(listener);
+	public void addInteractionUpdateListener(InteractionManager.InteractionUpdateListener listener) {
+		interactionUpdateListeners.add(listener);
 	}
 
-	public void removeConfigUpdateListener(ApptentiveBaseFragment.ConfigUpdateListener listener) {
-		configUpdateListeners.remove(listener);
+	public void removeInteractionUpdateListener(InteractionManager.InteractionUpdateListener listener) {
+		interactionUpdateListeners.remove(listener);
 	}
 
 	/**
@@ -900,14 +899,14 @@ public class ApptentiveInternal {
 		database.reset(appContext);
 	}
 
-	public void notifyConfigurationUpdated(boolean successful) {
-		Iterator it = configUpdateListeners.iterator();
+	public void notifyInteractionUpdated(boolean successful) {
+		Iterator it = interactionUpdateListeners.iterator();
 
 		while (it.hasNext()) {
-			ApptentiveBaseFragment.ConfigUpdateListener listener = (ApptentiveBaseFragment.ConfigUpdateListener) it.next();
+			InteractionManager.InteractionUpdateListener listener = (InteractionManager.InteractionUpdateListener) it.next();
 
 			if (listener != null) {
-				listener.onConfigurationUpdated(successful);
+				listener.onInteractionUpdated(successful);
 			}
 		}
 	}

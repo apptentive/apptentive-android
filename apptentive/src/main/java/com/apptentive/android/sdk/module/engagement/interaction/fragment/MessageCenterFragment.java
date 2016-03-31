@@ -210,7 +210,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
-    boolean isInitialViewCreation = (onSavedInstanceState == null);
+		boolean isInitialViewCreation = (onSavedInstanceState == null);
 		/* When isInitialViewCreation is false, the view is being recreated after orientation change.
 		 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
 		 */

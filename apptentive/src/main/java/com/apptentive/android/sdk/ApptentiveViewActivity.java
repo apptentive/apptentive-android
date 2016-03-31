@@ -44,11 +44,12 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private int current_tab;
 
 	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
 		// Add theme based on the display mode of the interaction: modal or not
 		applyApptentiveTheme(bundle.getBoolean(Constants.FragmentConfigKeys.MODAL));
 
-		super.onCreate(savedInstanceState);
 
 		ApptentiveBaseFragment newFragment = null;
 		if (savedInstanceState != null) {

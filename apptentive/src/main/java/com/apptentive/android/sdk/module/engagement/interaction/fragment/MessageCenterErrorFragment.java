@@ -26,7 +26,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
-public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interaction> implements ApptentiveBaseFragment.ConfigUpdateListener {
+public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interaction> {
 
 	private static final String EVENT_NAME_NO_INTERACTION_CLOSE = "no_interaction_close";
 	private static final String EVENT_NAME_NO_INTERACTION_NO_INTERNET = "no_interaction_no_internet";
@@ -57,7 +57,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+													 Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
@@ -70,19 +70,13 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 	@Override
 	public void onResume() {
-		ApptentiveInternal.getInstance().addConfigUpdateListener(this);
 		super.onResume();
 		updateStatus();
 	}
 
-	@Override
-	public void onPause() {
-		ApptentiveInternal.getInstance().removeConfigUpdateListener(this);
-		super.onPause();
-	}
 
 	@Override
-	public void onConfigurationUpdated(boolean successful) {
+	public void onInteractionUpdated(boolean successful) {
 		if (successful && Apptentive.canShowMessageCenter()) {
 			ApptentiveInternal.getInstance().showMessageCenterInternal(getActivity(), null);
 			transit();

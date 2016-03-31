@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -44,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment {
+public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
 
 	private static final String HAS_LAUNCHED = "has_launched";
@@ -73,10 +74,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	public interface OnFragmentTransitionListener {
 		void onFragmentTransition(ApptentiveBaseFragment currentFragment);
-	}
-
-	public interface ConfigUpdateListener {
-		void onConfigurationUpdated(boolean successful);
 	}
 
 	{
@@ -266,10 +263,21 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}
 	}
 
+
 	@Override
 	public void onResume() {
+		ApptentiveInternal.getInstance().addInteractionUpdateListener(this);
 		super.onResume();
-		ApptentiveInternal.getInstance().checkAndUpdateApptentiveConfigurations();
+	}
+
+	@Override
+	public void onPause() {
+		ApptentiveInternal.getInstance().removeInteractionUpdateListener(this);
+		super.onPause();
+	}
+
+	@Override
+	public void onInteractionUpdated(boolean successful) {
 	}
 
 	@Override
@@ -318,7 +326,8 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		return 0;
 	}
 
-	protected void attachFragmentMenuListeners(Menu menu) {}
+	protected void attachFragmentMenuListeners(Menu menu) {
+	}
 
 	protected void updateMenuVisibility() {
 
