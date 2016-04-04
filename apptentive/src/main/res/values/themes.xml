@@ -82,23 +82,26 @@
         <item name="apptentiveTextSizeButtonBorderless">@dimen/apptentive_text_size_button</item>
         <item name="apptentiveTextSizeButtonColored">@dimen/apptentive_text_size_button</item>
 
-        <item name="apptentiveTypefaceHeadline">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceTitle">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceSubhead">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceBody2">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceBody1">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceCaption">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceButtonBorderless">@integer/apptentive_typeface_sans</item>
-        <item name="apptentiveTypefaceButtonColored">@integer/apptentive_typeface_sans</item>
+        <item name="apptentiveTypefaceDefault">@integer/apptentive_typeface_sans</item>
+        <item name="apptentiveTypefaceHeadline">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceTitle">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceSubhead">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceBody2">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceBody1">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceCaption">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceButtonBorderless">?apptentiveTypefaceDefault</item>
+        <item name="apptentiveTypefaceButtonColored">?apptentiveTypefaceDefault</item>
 
-        <item name="apptentiveFontFamilyHeadline">@string/apptentive_font_family_headline_material</item>
-        <item name="apptentiveFontFamilyTitle">@string/apptentive_font_family_title_material</item>
-        <item name="apptentiveFontFamilySubhead">@string/apptentive_font_family_subhead_material</item>
-        <item name="apptentiveFontFamilyBody2">@string/apptentive_font_family_body_2_material</item>
-        <item name="apptentiveFontFamilyBody1">@string/apptentive_font_family_body_1_material</item>
-        <item name="apptentiveFontFamilyCaption">@string/apptentive_font_family_caption_material</item>
-        <item name="apptentiveFontFamilyButtonBorderless">@string/apptentive_font_family_button_material</item>
-        <item name="apptentiveFontFamilyButtonColored">@string/apptentive_font_family_button_material</item>
+        <item name="apptentiveFontFamilyDefault">@string/apptentive_font_family_default_material</item>
+        <item name="apptentiveFontFamilyMediumDefault">@string/apptentive_font_family_default_medium_material</item>
+        <item name="apptentiveFontFamilyHeadline">?apptentiveFontFamilyDefault</item>
+        <item name="apptentiveFontFamilyTitle">?apptentiveFontFamilyMediumDefault</item>
+        <item name="apptentiveFontFamilySubhead">?apptentiveFontFamilyDefault</item>
+        <item name="apptentiveFontFamilyBody2">?apptentiveFontFamilyMediumDefault</item>
+        <item name="apptentiveFontFamilyBody1">?apptentiveFontFamilyDefault</item>
+        <item name="apptentiveFontFamilyCaption">?apptentiveFontFamilyDefault</item>
+        <item name="apptentiveFontFamilyButtonBorderless">?apptentiveFontFamilyMediumDefault</item>
+        <item name="apptentiveFontFamilyButtonColored">?apptentiveFontFamilyMediumDefault</item>
 
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>

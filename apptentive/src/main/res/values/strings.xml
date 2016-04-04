@@ -47,4 +47,9 @@
 
     <!-- An en dash with a space on each side. Use entity codes for space because otherwise it gets trimmed. -->
     <string name="apptentive_instruction_text_separater">&#160;&#8211;&#160;</string>
+    <!-- Font families Apptentive uses on API 16 and later; Pre-16 uses typeFace integers.
+         Additional font families can be found http://developer.android.com/about/versions/android-4.1.html
+         under the section 'Font families'.-->
+    <string name="apptentive_font_family_default_material">sans-serif</string>
+    <string name="apptentive_font_family_default_medium_material">sans-serif-medium</string>
 </resources>
