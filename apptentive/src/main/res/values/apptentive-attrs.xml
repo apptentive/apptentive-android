@@ -35,6 +35,7 @@
         <attr name="apptentiveTextSizeButtonBorderless" format="dimension|reference"/>
         <attr name="apptentiveTextSizeButtonColored" format="dimension|reference"/>
 
+        <attr name="apptentiveTypefaceDefault" format="integer|reference"/>
         <attr name="apptentiveTypefaceHeadline" format="integer|reference"/>
         <attr name="apptentiveTypefaceTitle" format="integer|reference"/>
         <attr name="apptentiveTypefaceSubhead" format="integer|reference"/>
@@ -44,6 +45,8 @@
         <attr name="apptentiveTypefaceButtonBorderless" format="integer|reference"/>
         <attr name="apptentiveTypefaceButtonColored" format="integer|reference"/>
 
+        <attr name="apptentiveFontFamilyDefault" format="string|reference"/>
+        <attr name="apptentiveFontFamilyMediumDefault" format="string|reference"/>
         <attr name="apptentiveFontFamilyHeadline" format="string|reference"/>
         <attr name="apptentiveFontFamilyTitle" format="string|reference"/>
         <attr name="apptentiveFontFamilySubhead" format="string|reference"/>
