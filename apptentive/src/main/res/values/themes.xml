@@ -6,9 +6,7 @@
   -->
 
 <resources>
-    <!-- Define an empty Theme that is applied to our UI last. The host app should place styles in this theme if it wants to guarantee they take precedence. -->
-    <style name="ApptentiveThemeOverride"/>
-
+    <!-- Default Light/Dark Theme -->
     <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
@@ -30,6 +28,7 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
+    <!-- Default Light/Dark Theme -->
     <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
@@ -51,6 +50,7 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
+    <!-- Default Dark/Dark Theme -->
     <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
@@ -178,4 +178,7 @@
     <style name="ApptentiveBaseDialogTheme">
         <item name="android:windowBackground">?attr/apptentiveWindowBackground</item>
     </style>
+
+    <!-- Define an empty Theme that is applied to our UI last. The host app should place styles in this theme if it wants to guarantee they take precedence. -->
+    <style name="ApptentiveThemeOverride"/>
 </resources>
