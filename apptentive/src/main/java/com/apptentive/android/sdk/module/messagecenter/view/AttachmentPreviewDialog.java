@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -31,10 +31,6 @@ import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
 
 
-
-/**
- * @author Barry Li
- */
 public class AttachmentPreviewDialog extends DialogFragment implements DialogInterface.OnDismissListener,
 		PreviewImageView.GestureCallback {
 
@@ -60,7 +56,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	@Override
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
-		setStyle(DialogFragment.STYLE_NO_FRAME, R.style.ApptentiveTheme_TranslucentStatus_FullScreen);
+		setStyle(DialogFragment.STYLE_NO_FRAME, R.style.ApptentiveTheme_Base_Shared_TranslucentStatus_FullScreen);
 	}
 
 	@Override

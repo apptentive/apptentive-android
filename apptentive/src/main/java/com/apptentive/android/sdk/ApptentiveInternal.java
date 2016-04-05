@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -68,8 +68,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
- *
- * @author Sky Kelsey
  */
 public class ApptentiveInternal {
 
@@ -463,7 +461,7 @@ public class ApptentiveInternal {
 			int appDefaultThemeId = ai.theme;
 			boolean appHasTheme = appDefaultThemeId != 0;
 			apptentiveTheme = appContext.getResources().newTheme();
-			apptentiveTheme.applyStyle(R.style.ApptentiveTheme, true);
+			apptentiveTheme.applyStyle(R.style.ApptentiveTheme_Base_Shared, true);
 
 			if (appHasTheme) {
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();

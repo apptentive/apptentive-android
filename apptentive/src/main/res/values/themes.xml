@@ -9,8 +9,7 @@
     <!-- Define an empty Theme that is applied to our UI last. The host app should place styles in this theme if it wants to guarantee they take precedence. -->
     <style name="ApptentiveThemeOverride"/>
 
-    <!-- Default light theme used by Apptentive -->
-    <style name="ApptentiveBaseThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
@@ -31,8 +30,28 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
-    <!-- Default dark theme used by Apptentive -->
-    <style name="ApptentiveBaseThemeDark" parent="Theme.AppCompat.NoActionBar">
+    <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
+        <item name="android:colorBackground">@color/apptentive_color_background_light</item>
+
+        <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
+        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
+        <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
+        <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
+        <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
+
+        <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
+        <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_light</item>
+
+        <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
+        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
+        <item name="android:textColorSecondary">@color/apptentive_text_color_secondary_light</item>
+        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_dark</item>
+        <item name="android:textColorHint">@color/apptentive_text_color_hint_light</item>
+        <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
+    </style>
+
+    <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
@@ -55,11 +74,11 @@
 
     <!-- Chooses whether Apptentive UI defaults with a dark or light Theme. By default, Apptentive uses light theme.
       This theme will be merged with the default app material theme specified in the host app's manifest file.
-     Host app should change this to inherit from ApptentiveBaseThemeDark, if the app default theme is also a dark theme -->
-    <style name="ApptentiveBaseTheme" parent="ApptentiveBaseThemeLight"/>
+     Host app should change this to inherit from ApptentiveDefaultTheme.Dark, if the app default theme is also a dark theme -->
+    <style name="ApptentiveTheme" parent="ApptentiveDefaultTheme.Light.DarkActionBar"/>
 
     <!-- This Theme contains all attribute values shared by all api versions. Use this theme as the parent to define api specific ApptentiveTheme in values-vxx -->
-    <style name="ApptentiveThemeShared" parent="ApptentiveBaseTheme">
+    <style name="ApptentiveTheme.Base">
         <!-- Setting appcompat’s color theming attrs -->
         <item name="colorPrimary">@color/apptentive_color_primary</item>
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
@@ -122,17 +141,17 @@
 
     <!-- This Theme is applied first before any other styles. Any styles here will be overridden by styles in the host app,
          then the ApptentiveBaseFrameTheme, then the ApptentiveThemeOverride, in that order -->
-    <style name="ApptentiveTheme" parent="ApptentiveThemeShared">
+    <style name="ApptentiveTheme.Base.Shared">
         <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
     <!-- Default theme used by image preview -->
-    <style name="ApptentiveTheme.TranslucentStatus.FullScreen" parent="ApptentiveTheme.TranslucentStatus">
+    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus.FullScreen">
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <!-- Default theme used by Apptentive about -->
-    <style name="ApptentiveTheme.About" parent="ApptentiveTheme">
+    <style name="ApptentiveTheme.Base.Shared.About">
         <item name="colorPrimary">@color/apptentive_brand_red</item>
     </style>
 
