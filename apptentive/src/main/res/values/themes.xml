@@ -101,7 +101,7 @@
         <item name="apptentiveTextSizeButtonBorderless">@dimen/apptentive_text_size_button</item>
         <item name="apptentiveTextSizeButtonColored">@dimen/apptentive_text_size_button</item>
 
-        <item name="apptentiveTypefaceDefault">@integer/apptentive_typeface_sans</item>
+        <item name="apptentiveTypefaceDefault">@integer/apptentive_typeface_normal</item>
         <item name="apptentiveTypefaceHeadline">?apptentiveTypefaceDefault</item>
         <item name="apptentiveTypefaceTitle">?apptentiveTypefaceDefault</item>
         <item name="apptentiveTypefaceSubhead">?apptentiveTypefaceDefault</item>
