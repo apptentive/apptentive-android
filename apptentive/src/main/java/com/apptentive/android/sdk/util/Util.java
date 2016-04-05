@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
@@ -39,9 +40,11 @@ import android.widget.ListView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -851,16 +854,75 @@ public class Util {
 	public static Activity castContextToActivity(Context context) {
 		if (context == null) {
 			return null;
-		}
-		else if (context instanceof Activity) {
+		} else if (context instanceof Activity) {
 			return (Activity) context;
-		}
-		else if (context instanceof ContextWrapper) {
+		} else if (context instanceof ContextWrapper) {
 			return castContextToActivity(((ContextWrapper) context).getBaseContext());
 		}
 
 		return null;
 	}
+
+	/* Utility function to override system default font with an font ttf file from asset. The override
+	 * will be applied to the entire application. The ideal place to call this method is from the onCreate()
+	  * of the Application.
+	  *
+	 * Usage: Util.replaceDefaultFont(this, "Tinos-Regular.ttf");
+	 *
+	 * @param context The application context the font override will be applied to
+	 * @param fontFilePath  The file path to the font file in the assets directory
+	*/
+	public static void replaceDefaultFont(Context context, String fontFilePath) {
+		final Typeface newTypeface = Typeface.createFromAsset(context.getAssets(), fontFilePath);
+
+		TypedValue tv = new TypedValue();
+		String staticTypefaceFieldName = null;
+		Map<String, Typeface> newMap = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveFontFamilyDefault, tv, true)) {
+				newMap = new HashMap<String, Typeface>();
+				newMap.put(tv.string.toString(), newTypeface);
+			}
+			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveFontFamilyMediumDefault, tv, true)) {
+				if (newMap == null) {
+					newMap = new HashMap<String, Typeface>();
+				}
+				newMap.put(tv.string.toString(), newTypeface);
+			}
+			if (newMap != null) {
+				try {
+					final Field staticField = Typeface.class.getDeclaredField("sSystemFontMap");
+					staticField.setAccessible(true);
+					staticField.set(null, newMap);
+				} catch (NoSuchFieldException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveTypefaceDefault, tv, true)) {
+				staticTypefaceFieldName = "DEFAULT";
+				if (tv.data == context.getResources().getInteger(R.integer.apptentive_typeface_monospace)) {
+					staticTypefaceFieldName = "MONOSPACE";
+				} else if (tv.data == context.getResources().getInteger(R.integer.apptentive_typeface_serif)) {
+					staticTypefaceFieldName = "SERIF";
+				} else if (tv.data == context.getResources().getInteger(R.integer.apptentive_typeface_sans)) {
+					staticTypefaceFieldName = "SANS_SERIF";
+				}
+				try {
+					final Field staticField = Typeface.class.getDeclaredField(staticTypefaceFieldName);
+					staticField.setAccessible(true);
+					staticField.set(null, newTypeface);
+				} catch (NoSuchFieldException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 
 }
 
