@@ -145,6 +145,8 @@
         <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
+    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus"/>
+
     <!-- Default theme used by image preview -->
     <style name="ApptentiveTheme.Base.Shared.TranslucentStatus.FullScreen">
         <item name="android:windowFullscreen">true</item>
