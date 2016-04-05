@@ -58,7 +58,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.ApptentiveTheme_About);
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.ApptentiveTheme_Base_Shared_About);
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		root = themedInflater.inflate(R.layout.apptentive_about, container, false);
