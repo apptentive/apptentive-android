@@ -895,9 +895,9 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newMap);
 				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
+					ApptentiveLog.e("Exception replacing system font", e);
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					ApptentiveLog.e("Exception replacing system font", e);
 				}
 			}
 		} else {
@@ -915,9 +915,9 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newTypeface);
 				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
+					ApptentiveLog.e("Exception replacing system font", e);
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					ApptentiveLog.e("Exception replacing system font", e);
 				}
 			}
 		}
