@@ -15,6 +15,12 @@
         <attr name="apptentiveCardBorderColor" format="color|reference"/>
         <attr name="apptentiveAttenuateColor" format="color|reference"/>
 
+        <attr name="apptentiveToolbarBackground" format="color|reference"/>
+        <attr name="apptentiveToolbarTheme" format="reference"/>
+        <attr name="apptentiveToolbarPopupTheme" format="reference"/>
+        <attr name="apptentiveToolbarTitleTextAppearance" format="reference"/>
+
+
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
         <attr name="apptentiveColorSnackbar" format="color|reference"/>
 
@@ -24,7 +30,6 @@
         <attr name="apptentiveButtonTintColor" format="color|reference"/>
         <attr name="apptentiveButtonTintColorDisabled" format="color|reference"/>
         <attr name="apptentiveButtonTintColorStateList" format="color|reference"/>
-
 
         <attr name="apptentiveTextSizeHeadline" format="dimension|reference"/>
         <attr name="apptentiveTextSizeTitle" format="dimension|reference"/>
@@ -36,6 +41,7 @@
         <attr name="apptentiveTextSizeButtonColored" format="dimension|reference"/>
 
         <attr name="apptentiveTypefaceDefault" format="integer|reference"/>
+        <attr name="apptentiveTypefaceToolbar" format="integer|reference"/>
         <attr name="apptentiveTypefaceHeadline" format="integer|reference"/>
         <attr name="apptentiveTypefaceTitle" format="integer|reference"/>
         <attr name="apptentiveTypefaceSubhead" format="integer|reference"/>
@@ -47,6 +53,7 @@
 
         <attr name="apptentiveFontFamilyDefault" format="string|reference"/>
         <attr name="apptentiveFontFamilyMediumDefault" format="string|reference"/>
+        <attr name="apptentiveFontFamilyToolbar" format="string|reference"/>
         <attr name="apptentiveFontFamilyHeadline" format="string|reference"/>
         <attr name="apptentiveFontFamilyTitle" format="string|reference"/>
         <attr name="apptentiveFontFamilySubhead" format="string|reference"/>
@@ -62,7 +69,6 @@
 
     <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
     <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
-    <attr name="apptentiveToolbarStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
         <attr name="apptentive_backgroundColor" format="color"/>

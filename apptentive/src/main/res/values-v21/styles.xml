@@ -5,6 +5,11 @@
   -->
 
 <resources>
+
+    <style name="Apptentive.TextAppearance.Toolbar" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:fontFamily">?attr/apptentiveFontFamilyToolbar</item>
+    </style>
+
     <style name="Apptentive.TextAppearance.Headline" parent="@style/TextAppearance.AppCompat.Headline">
         <item name="android:fontFamily">?attr/apptentiveFontFamilyHeadline</item>
         <item name="android:textSize">?attr/apptentiveTextSizeHeadline</item>

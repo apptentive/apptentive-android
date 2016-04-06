@@ -6,9 +6,11 @@
   -->
 
 <resources>
-    <!-- Default Light/Dark Theme -->
+    <!-- Default Light/Dark Actionbar Theme -->
     <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
+        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
@@ -28,9 +30,11 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
-    <!-- Default Light/Dark Theme -->
+    <!-- Default Light/Light Actionbar Theme -->
     <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Light</item>
+        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Light</item>
+
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
@@ -50,9 +54,11 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
-    <!-- Default Dark/Dark Theme -->
+    <!-- Default Dark/Dark Actionbar Theme -->
     <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
-        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
+        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
@@ -84,6 +90,9 @@
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
         <item name="colorAccent">@color/apptentive_color_accent</item>
 
+        <item name="apptentiveToolbarBackground">?attr/colorPrimary</item>
+        <item name="apptentiveToolbarTitleTextAppearance">@style/Apptentive.TextAppearance.Toolbar</item>
+
         <item name="apptentiveTextColorHeaderContrast">@color/apptentive_material_white</item>
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
@@ -102,6 +111,7 @@
         <item name="apptentiveTextSizeButtonColored">@dimen/apptentive_text_size_button</item>
 
         <item name="apptentiveTypefaceDefault">@integer/apptentive_typeface_normal</item>
+        <item name="apptentiveTypefaceToolbar">?apptentiveTypefaceDefault</item>
         <item name="apptentiveTypefaceHeadline">?apptentiveTypefaceDefault</item>
         <item name="apptentiveTypefaceTitle">?apptentiveTypefaceDefault</item>
         <item name="apptentiveTypefaceSubhead">?apptentiveTypefaceDefault</item>
@@ -113,6 +123,7 @@
 
         <item name="apptentiveFontFamilyDefault">@string/apptentive_font_family_default_material</item>
         <item name="apptentiveFontFamilyMediumDefault">@string/apptentive_font_family_default_medium_material</item>
+        <item name="apptentiveFontFamilyToolbar">?apptentiveFontFamilyDefault</item>
         <item name="apptentiveFontFamilyHeadline">?apptentiveFontFamilyDefault</item>
         <item name="apptentiveFontFamilyTitle">?apptentiveFontFamilyMediumDefault</item>
         <item name="apptentiveFontFamilySubhead">?apptentiveFontFamilyDefault</item>
@@ -125,12 +136,8 @@
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
-
         <item name="apptentiveMessageCenterBadgeStyle">@style/Apptentive.Style.Widget.Badge</item>
-
-
         <item name="apptentiveFabStyle">@style/Apptentive.Widget.ImageButton.FloatingActionButton</item>
-        <item name="apptentiveToolbarStyle">@style/Apptentive.Style.Toolbar.Dark</item>
 
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
