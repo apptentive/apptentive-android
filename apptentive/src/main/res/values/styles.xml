@@ -25,16 +25,11 @@
         <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
     </style>
 
-    <style name="Apptentive.Style.Toolbar.Light" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Light</item>
-    </style>
-
-    <style name="Apptentive.Style.Toolbar.Dark" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    <style name="Apptentive.Style.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?apptentiveToolbarBackground</item>
+        <item name="popupTheme">?apptentiveToolbarPopupTheme</item>
+        <item name="theme">?apptentiveToolbarTheme</item>
+        <item name="titleTextAppearance">?apptentiveToolbarTitleTextAppearance</item>
     </style>
 
     <style name="Apptentive.Style.Widget" parent="android:Widget"/>
@@ -61,6 +56,10 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
         <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="Apptentive.TextAppearance.Toolbar" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:typeface">?attr/apptentiveTypefaceToolbar</item>
     </style>
 
     <style name="Apptentive.TextAppearance.Headline" parent="@style/TextAppearance.AppCompat.Headline">

@@ -9,7 +9,7 @@
     <android.support.v7.widget.Toolbar android:id="@+id/apptentive_toolbar"
                                        android:layout_width="match_parent"
                                        android:layout_height="wrap_content"
-                                       style="?attr/apptentiveToolbarStyle"
+                                       style="@style/Apptentive.Style.Toolbar"
                                        android:minHeight="?attr/actionBarSize"/>
     <FrameLayout android:id="@+id/apptentive_vp_container"
                  android:layout_width="match_parent"

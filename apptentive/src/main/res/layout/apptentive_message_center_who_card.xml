@@ -30,7 +30,8 @@
                       android:background="?attr/apptentiveCardViewBackground">
             <TextView android:id="@+id/who_title"
                       android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"/>
+                      android:layout_height="wrap_content"
+                      android:textAppearance="@style/Apptentive.TextAppearance.Body1"/>
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:paddingBottom="16dp"
