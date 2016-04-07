@@ -20,6 +20,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -89,7 +90,7 @@ public class ApptentiveInternal {
 	String androidId;
 	String appPackageName;
 	Resources.Theme apptentiveTheme;
-	int statusBarColorDefault = android.R.color.transparent;
+	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
 
 	IRatingProvider ratingProvider;
@@ -433,14 +434,67 @@ public class ApptentiveInternal {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
+			/*
+			 * Construct the theme used by Apptentive Ui in the following order
+			 *  1. start with Apptentive default theme : ApptentiveTheme.Base.Versioned
+			 *  2. merge with app default theme, if one is specified and it's a AppCompat theme.
+			 *  (merge takes value from app default theme if both define the same attribute)
+			 *  3. apply Apptentive UI specific frame style
+			 *  4. Apply apptentive theme override specified by the app in ApptentiveThemeOverride
+			 */
+			int appDefaultThemeId = ai.theme;
+			boolean appHasTheme = appDefaultThemeId != 0;
+			boolean appThemeIsAppCompatTheme = false;
+			// Step 1
+			apptentiveTheme = appContext.getResources().newTheme();
+			apptentiveTheme.applyStyle(R.style.ApptentiveTheme_Base_Versioned, true);
+
+			int transparentColor = ContextCompat.getColor(appContext, android.R.color.transparent);
+			statusBarColorDefault = transparentColor;
+
+			// Step 2, check if app specifies a default appcompat theme
+			if (appHasTheme) {
+				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
+				appDefaultTheme.applyStyle(appDefaultThemeId, true);
+				// If the app contains colorPrimaryDark, it is using an AppCompat theme. Therefore, we want to use it.
+				// If it's not using an AppCompat theme, we don't want to apply it to our SDK, and use our default theme instead.
+				appThemeIsAppCompatTheme = Util.getThemeColor(appDefaultTheme, R.attr.colorPrimaryDark) != 0;
+				if (appThemeIsAppCompatTheme) {
+					apptentiveTheme.applyStyle(appDefaultThemeId, true);
+				}
+			}
+			// Step 3
+			apptentiveTheme.applyStyle(R.style.ApptentiveBaseFrameTheme, true);
+			// Step 4
+			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
+			if (themeOverrideResId != 0) {
+				apptentiveTheme.applyStyle(themeOverrideResId, true);
+			}
+
+			TypedArray a = apptentiveTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+			try {
+				statusBarColorDefault = a.getColor(0, transparentColor);
+			} finally {
+				a.recycle();
+			}
+
 			Integer currentVersionCode = packageInfo.versionCode;
 			String currentVersionName = packageInfo.versionName;
 			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
+			AppRelease appRelease = new AppRelease();
+			appRelease.setVersion(currentVersionName);
+			appRelease.setIdentifier(appPackageName);
+			appRelease.setBuildNumber(String.valueOf(currentVersionCode));
+			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
+			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
+			appRelease.setInheritStyle(appThemeIsAppCompatTheme);
+			appRelease.setOverrideStyle(themeOverrideResId != 0);
+
 			if (lastVersionEntrySeen == null) {
-				onVersionChanged(null, currentVersionCode, null, currentVersionName);
+				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
 				if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-					onVersionChanged(lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName);
+					onVersionChanged(lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName, appRelease);
 				}
 			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
@@ -455,34 +509,6 @@ public class ApptentiveInternal {
 					}
 				}
 			}
-
-			// Set up Apptentive theme by applying default from Apptentive, app, and custom override
-			int appDefaultThemeId = ai.theme;
-			boolean appHasTheme = appDefaultThemeId != 0;
-			apptentiveTheme = appContext.getResources().newTheme();
-			apptentiveTheme.applyStyle(R.style.ApptentiveTheme_Base_Shared, true);
-
-			if (appHasTheme) {
-				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
-				appDefaultTheme.applyStyle(appDefaultThemeId, true);
-
-				TypedArray a = appDefaultTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
-				try {
-					statusBarColorDefault = a.getColor(0, 0);
-				} finally {
-					a.recycle();
-				}
-
-				// If the app contains colorPrimaryDark, it is using an AppCompat theme. Therefore, we want to use it.
-				// If it's not using an AppCompat theme, we don't want to apply it to our SDK, and use our default theme instead.
-				boolean appThemeIsAppCompatTheme = Util.getThemeColor(appDefaultTheme, R.attr.colorPrimaryDark) != 0;
-				if (appThemeIsAppCompatTheme) {
-					apptentiveTheme.applyStyle(appDefaultThemeId, true);
-				}
-			}
-
-			apptentiveTheme.applyStyle(R.style.ApptentiveBaseFrameTheme, true);
-			apptentiveTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
 
 		} catch (Exception e) {
 			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
@@ -532,10 +558,10 @@ public class ApptentiveInternal {
 		ApptentiveLog.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 	}
 
-	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName) {
+	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff();
+		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(currentAppRelease);
 		if (appRelease != null) {
 			ApptentiveLog.d("App release was updated.");
 			database.addPayload(appRelease);

@@ -19,6 +19,8 @@ public class AppRelease extends Payload {
 	private static final String KEY_IDENTIFIER = "identifier";
 	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
 	private static final String KEY_APP_STORE = "app_store";
+	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
+	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 
 	public AppRelease(String json) throws JSONException {
 		super(json);
@@ -126,4 +128,31 @@ public class AppRelease extends Payload {
 			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_APP_STORE);
 		}
 	}
+
+	// Flag for whether the apptentive is inheriting styles from the host app
+	public boolean getInheritStyle() {
+		return optBoolean(KEY_STYLE_INHERIT);
+	}
+
+	public void setInheritStyle(boolean bval) {
+		try {
+			put(KEY_STYLE_INHERIT, bval);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
+		}
+	}
+
+	// Flag for whether the app is overriding any Apptentive Styles
+	public boolean getOverrideStyle() {
+		return optBoolean(KEY_STYLE_OVERRIDE);
+	}
+
+	public void setOverrideStyle(boolean bval) {
+		try {
+			put(KEY_STYLE_OVERRIDE, bval);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
+		}
+	}
+
 }
