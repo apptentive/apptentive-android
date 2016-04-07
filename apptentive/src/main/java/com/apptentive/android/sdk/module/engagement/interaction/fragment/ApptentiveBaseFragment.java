@@ -465,19 +465,8 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	private void setStatusBarColor(int statusBarDefaultColor) {
 		// Changing status bar color is a post-21 feature
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Resources.Theme newTheme = getResources().newTheme();
-			newTheme.applyStyle(R.style.ApptentiveThemeOverride, true);
-			TypedArray a = newTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
-			int statusBarColorOveride;
-			try {
-				// Use android:statusBarColor specified in ApptentiveThemeOverride
-				statusBarColorOveride = a.getColor(0, statusBarDefaultColor);
-			} finally {
-				a.recycle();
-			}
-
 			int overlayColor = ContextCompat.getColor(getContext(), R.color.apptentive_activity_frame_dark);
-			getActivity().getWindow().setStatusBarColor(Util.alphaMixColors(statusBarColorOveride, overlayColor));
+			getActivity().getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}
 	}
 }

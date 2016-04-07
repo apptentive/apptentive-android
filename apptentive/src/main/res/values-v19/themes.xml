@@ -7,7 +7,7 @@
 
 <resources>
     <!-- DEFAULT (LIGHT) -->
-    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus">
+    <style name="ApptentiveTheme.Base.Versioned.TranslucentStatus">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 </resources>

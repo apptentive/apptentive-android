@@ -7,7 +7,7 @@
 
 <resources>
     <!-- Default (Light) -->
-    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus">
+    <style name="ApptentiveTheme.Base.Versioned.TranslucentStatus">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>

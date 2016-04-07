@@ -24,37 +24,19 @@ import org.json.JSONException;
  */
 public class AppReleaseManager {
 
-	public static AppRelease storeAppReleaseAndReturnDiff() {
+	public static AppRelease storeAppReleaseAndReturnDiff(AppRelease currentAppRelease) {
 		AppRelease stored = getStoredAppRelease();
-		AppRelease current = generateCurrentAppRelease();
 
-		Object diff = JsonDiffer.getDiff(stored, current);
+		Object diff = JsonDiffer.getDiff(stored, currentAppRelease);
 		if(diff != null) {
 			try {
-				storeAppRelease(current);
+				storeAppRelease(currentAppRelease);
 				return new AppRelease(diff.toString());
 			} catch (JSONException e) {
 				ApptentiveLog.e("Error casting to AppRelease.", e);
 			}
 		}
 		return null;
-	}
-
-	private static AppRelease generateCurrentAppRelease() {
-		AppRelease appRelease = new AppRelease();
-
-		try {
-			Context context = ApptentiveInternal.getInstance().getApplicationContext();
-			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-			appRelease.setVersion(packageInfo.versionName);
-			appRelease.setIdentifier(packageInfo.packageName);
-			appRelease.setBuildNumber(String.valueOf(packageInfo.versionCode));
-			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
-			appRelease.setAppStore(Util.getInstallerPackageName(context));
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Can't load PackageInfo.", e);
-		}
-		return appRelease;
 	}
 
 	public static AppRelease getStoredAppRelease() {
