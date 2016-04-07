@@ -153,11 +153,11 @@
          It will be applied first. Any styles here will be then overridden by styles defined in the
          default AppCompat theme of the host app,  then the ApptentiveBaseFrameTheme, then the
          ApptentiveThemeOverride, in that order.
-         Note this theme is the base default theme shared by all Android api versions, thus the name "Shared".
+         Note this theme is the base default theme used by all Android api versions, thus the name "Versioned".
          Any attribute listed will have different values in values-vxx folder
     -->
     <style name="ApptentiveTheme.Base.Versioned">
-        <!-- Use static color by default, and ColorStateList on post-2 -->
+        <!-- Use static color by default, and ColorStateList on post-23 -->
         <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
