@@ -149,25 +149,31 @@
         <item name="apptentiveCardViewElevation">2dp</item>
     </style>
 
-    <!-- This Theme is applied first before any other styles. Any styles here will be overridden by styles in the host app,
-         then the ApptentiveBaseFrameTheme, then the ApptentiveThemeOverride, in that order -->
-    <style name="ApptentiveTheme.Base.Shared">
+    <!-- This is THE apptentive default theme speficied in AndroidManifest.xml of Apptentive SDK.
+         It will be applied first. Any styles here will be then overridden by styles defined in the
+         default AppCompat theme of the host app,  then the ApptentiveBaseFrameTheme, then the
+         ApptentiveThemeOverride, in that order.
+         Note this theme is the base default theme shared by all Android api versions, thus the name "Shared".
+         Any attribute listed will have different values in values-vxx folder
+    -->
+    <style name="ApptentiveTheme.Base.Versioned">
+        <!-- Use static color by default, and ColorStateList on post-2 -->
         <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
-    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus"/>
+    <style name="ApptentiveTheme.Base.Versioned.TranslucentStatus"/>
 
     <!-- Default theme used by image preview -->
-    <style name="ApptentiveTheme.Base.Shared.TranslucentStatus.FullScreen">
+    <style name="ApptentiveTheme.Base.Versioned.TranslucentStatus.FullScreen">
         <item name="android:windowFullscreen">true</item>
     </style>
 
     <!-- Default theme used by Apptentive about -->
-    <style name="ApptentiveTheme.Base.Shared.About">
+    <style name="ApptentiveTheme.Base.Versioned.About">
         <item name="colorPrimary">@color/apptentive_brand_red</item>
     </style>
 
-    <!-- Default theme values that Apptentive interactions will always use, regardless the app default theme -->
+    <!-- Default theme values that Apptentive interactions will always use, It won't be overridden by the app default theme -->
     <style name="ApptentiveBaseFrameTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -188,7 +194,4 @@
     <style name="ApptentiveBaseDialogTheme">
         <item name="android:windowBackground">?attr/apptentiveWindowBackground</item>
     </style>
-
-    <!-- Define an empty Theme that is applied to our UI last. The host app should place styles in this theme if it wants to guarantee they take precedence. -->
-    <style name="ApptentiveThemeOverride"/>
 </resources>

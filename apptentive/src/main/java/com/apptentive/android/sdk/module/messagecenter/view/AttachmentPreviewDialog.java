@@ -56,7 +56,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	@Override
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
-		setStyle(DialogFragment.STYLE_NO_FRAME, R.style.ApptentiveTheme_Base_Shared_TranslucentStatus_FullScreen);
+		setStyle(DialogFragment.STYLE_NO_FRAME, R.style.ApptentiveTheme_Base_Versioned_TranslucentStatus_FullScreen);
 	}
 
 	@Override
