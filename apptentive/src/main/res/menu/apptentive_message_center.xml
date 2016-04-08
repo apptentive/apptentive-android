@@ -4,7 +4,7 @@
       tools:ignore="AlwaysShowAction">
     <item
         android:id="@+id/profile"
-        android:icon="@drawable/apptentive_ic_profile_edit"
+        android:icon="?apptentiveToolbarIconProfile"
         android:title="Profile"
         android:visible="true"
         app:showAsAction="always"/>

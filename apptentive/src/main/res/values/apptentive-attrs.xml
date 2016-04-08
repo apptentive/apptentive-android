@@ -12,6 +12,9 @@
         <attr name="apptentiveViewBackground" format="color|reference"/>
         <attr name="apptentiveCardViewBackground" format="color|reference"/>
         <attr name="apptentiveDialogBackground" format="reference"/>
+        <attr name="apptentiveComposingAreaBackground" format="reference"/>
+        <attr name="apptentiveComposingBarBackground" format="reference"/>
+        <attr name="apptentiveAttachmentItemBackground" format="reference"/>
         <attr name="apptentiveCardBorderColor" format="color|reference"/>
         <attr name="apptentiveAttenuateColor" format="color|reference"/>
 
@@ -19,6 +22,7 @@
         <attr name="apptentiveToolbarTheme" format="reference"/>
         <attr name="apptentiveToolbarPopupTheme" format="reference"/>
         <attr name="apptentiveToolbarTitleTextAppearance" format="reference"/>
+        <attr name="apptentiveToolbarIconProfile" format="reference"/>
 
 
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
