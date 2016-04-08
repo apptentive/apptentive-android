@@ -10,12 +10,17 @@
     <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_white</item>
+        <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
+        <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_light</item>
+        <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_light</item>
+        <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_light</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
 
@@ -32,14 +37,19 @@
 
     <!-- Default Light/Light Actionbar Theme -->
     <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
+        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_black</item>
+        <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_light</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
+        <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_light</item>
+        <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_light</item>
+        <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_light</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
 
@@ -54,16 +64,52 @@
         <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_light</item>
     </style>
 
-    <!-- Default Dark/Dark Actionbar Theme -->
+    <!-- Default Dark/Dark Actionbar Theme
+         Note: Theme.AppCompat is the dark Material theme for older devices -->
     <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_white</item>
+        <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
         <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
+        <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_dark</item>
+        <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_dark</item>
+        <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_dark</item>
+        <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
+        <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
+
+        <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
+        <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button_dark</item>
+
+        <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
+        <item name="android:textColorSecondary">@color/apptentive_text_color_secondary_dark</item>
+        <item name="android:textColorSecondaryInverse">@color/apptentive_text_color_secondary_light</item>
+        <item name="android:textColorHint">@color/apptentive_text_color_hint_dark</item>
+        <item name="android:textColorHintInverse">@color/apptentive_text_color_hint_inverse_dark</item>
+    </style>
+
+    <!-- Default Dark/Light Actionbar Theme
+         Note: Theme.AppCompat is the dark Material theme for older devices -->
+    <style name="ApptentiveDefaultTheme.Dark.LightActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
+        <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_black</item>
+        <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_light</item>
+
+        <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
+
+        <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
+        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
+        <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
+        <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_dark</item>
+        <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_dark</item>
+        <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_dark</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
 
@@ -87,13 +133,13 @@
     <style name="ApptentiveTheme.Base">
         <!-- Setting appcompat’s color theming attrs -->
         <item name="colorPrimary">@color/apptentive_color_primary</item>
+        <!-- colorPrimaryDark is used for the status bar (with the battery, clock, etc). -->
         <item name="colorPrimaryDark">@color/apptentive_color_primary_dark</item>
+        <!-- colorAccent is used as the default value for colorControlActivated used to tint widgets. -->
         <item name="colorAccent">@color/apptentive_color_accent</item>
 
         <item name="apptentiveToolbarBackground">?attr/colorPrimary</item>
         <item name="apptentiveToolbarTitleTextAppearance">@style/Apptentive.TextAppearance.Toolbar</item>
-
-        <item name="apptentiveTextColorHeaderContrast">@color/apptentive_material_white</item>
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 

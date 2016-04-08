@@ -28,7 +28,7 @@
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
         <attr name="apptentiveColorSnackbar" format="color|reference"/>
 
-        <attr name="apptentiveTextColorHeaderContrast" format="color|reference"/>
+        <attr name="apptentiveExtendedHeaderForegroundColor" format="color|reference"/>
 
         <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
         <attr name="apptentiveButtonTintColor" format="color|reference"/>
