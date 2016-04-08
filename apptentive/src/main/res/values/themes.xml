@@ -7,6 +7,8 @@
 
 <resources>
     <!-- Default Light/Dark Actionbar Theme -->
+    <!--Use this theme when: primary text is dark, default window background is light, toolbar icon and text color is light, colorPrimary has good contrast with light text  -->
+    <!-- See https://www.google.com/design/spec/style/color.html#color-color-palette for details-->
     <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
@@ -36,6 +38,8 @@
     </style>
 
     <!-- Default Light/Light Actionbar Theme -->
+    <!--Use this theme when: primary text is dark, default window background is light, toolbar icon and text color is dark, colorPrimary has good contrast with dark text  -->
+    <!-- See https://www.google.com/design/spec/style/color.html#color-color-palette for details-->
     <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
@@ -66,6 +70,8 @@
 
     <!-- Default Dark/Dark Actionbar Theme
          Note: Theme.AppCompat is the dark Material theme for older devices -->
+    <!-- Use this theme when: primary text is light on dark background, toolbar icon and text color is light, colorPrimary has good contrast with light text  -->
+    <!-- See https://www.google.com/design/spec/style/color.html#color-color-palette for details-->
     <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
@@ -96,6 +102,8 @@
 
     <!-- Default Dark/Light Actionbar Theme
          Note: Theme.AppCompat is the dark Material theme for older devices -->
+    <!-- Use this theme when: primary text is light on dark background, toolbar icon and text color is dark, colorPrimary has good contrast with dark text  -->
+    <!-- See https://www.google.com/design/spec/style/color.html#color-color-palette for details-->
     <style name="ApptentiveDefaultTheme.Dark.LightActionBar" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Light</item>
