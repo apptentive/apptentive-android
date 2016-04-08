@@ -34,7 +34,8 @@
                           android:layout_height="wrap_content"
                           android:layout_gravity="start"
                           android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"
-                          android:paddingTop="@dimen/apptentive_dialog_content_spacing"/>
+                          android:paddingTop="@dimen/apptentive_dialog_content_spacing"
+                          android:autoLink="all"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/button_container"
                           android:layout_width="match_parent"

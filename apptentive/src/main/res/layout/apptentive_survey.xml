@@ -35,7 +35,8 @@
                           android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
                           android:paddingRight="16dp"
                           android:paddingEnd="16dp"
-                          android:alpha="0.8"/>
+                          android:alpha="0.8"
+                          android:autoLink="all"/>
                 <ImageButton android:id="@+id/info"
                              android:layout_width="@dimen/apptentive_message_center_icon_dimension"
                              android:layout_height="@dimen/apptentive_message_center_icon_dimension"
