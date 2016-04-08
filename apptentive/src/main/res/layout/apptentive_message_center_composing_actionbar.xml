@@ -17,7 +17,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/apptentive_message_center_composing_bar_min_height"
-                    android:background="@drawable/apptentive_rounded_corner_shape_composing_bar">
+                    android:background="?apptentiveComposingBarBackground">
         <ImageButton android:id="@+id/cancel_composing"
                      android:layout_width="wrap_content"
                      android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"

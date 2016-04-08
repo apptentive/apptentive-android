@@ -20,7 +20,7 @@
                   android:layout_height="match_parent"
                   android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_small"
                   android:orientation="vertical"
-                  android:background="@drawable/apptentive_rounded_corner_shape_composing">
+                  android:background="?apptentiveComposingAreaBackground">
         <EditText android:id="@+id/composing_et"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"

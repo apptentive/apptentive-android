@@ -24,6 +24,7 @@
                             android:paddingStart="60dp"
                             android:paddingRight="12dp"
                             android:paddingEnd="12dp"
+                            android:theme="?apptentiveToolbarTheme"
                             android:background="?attr/colorPrimary">
                 <TextView android:id="@+id/description"
                           android:layout_width="match_parent"
@@ -31,7 +32,7 @@
                           android:layout_alignParentTop="true"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
-                          android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Contrast"
+                          android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
                           android:paddingRight="16dp"
                           android:paddingEnd="16dp"
                           android:alpha="0.8"/>

@@ -18,7 +18,8 @@
                     android:paddingTop="32dp"
                     android:paddingLeft="@dimen/apptentive_message_center_greeting_side_margin"
                     android:paddingRight="@dimen/apptentive_message_center_greeting_side_margin"
-                    android:background="?attr/colorPrimary"
+                    android:theme="?apptentiveToolbarTheme"
+                    android:background="?colorPrimary"
                     android:clipToPadding="false"
                     android:orientation="horizontal">
         <com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView android:id="@+id/avatar"
@@ -41,12 +42,12 @@
             <TextView android:id="@+id/greeting_title"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:textAppearance="@style/Apptentive.TextAppearance.Headline.Contrast"
+                      android:textAppearance="@style/Apptentive.TextAppearance.Headline"
                       android:text="Hello"/>
             <TextView android:id="@+id/greeting_body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Contrast"
+                      android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
                       android:alpha="0.8"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"
