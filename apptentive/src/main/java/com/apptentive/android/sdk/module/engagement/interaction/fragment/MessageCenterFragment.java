@@ -165,7 +165,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected static final int MSG_PAUSE_SENDING = 5;
 	protected static final int MSG_RESUME_SENDING = 6;
 	protected static final int MSG_MESSAGE_ADD_INCOMING = 7;
-	protected static final int MSG_MESSAGE_NOTIFY_UPDATE = 8;
+	protected static final int MSG_MESSAGE_ADD_WHOCARD = 8;
+	protected static final int MSG_MESSAGE_ADD_COMPOSING = 9;
 
 	private MessageCenterFragment.MessagingActionHandler messagingActionHandler;
 
@@ -364,10 +365,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				addComposerItems();
 				hideFab();
-				messageCenterListAdapter.setForceShowKeyboard(true);
-				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+				messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
 			}
 		});
 
@@ -443,14 +442,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					//
 				}
 				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-
-				if (!bWhoCardSet) {
-					addWhoCardItem(WHO_CARD_MODE_INIT);
-				} else {
-					addWhoCardItem(WHO_CARD_MODE_EDIT);
-				}
-				messageCenterListAdapter.setForceShowKeyboard(true);
-				messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+				messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD,
+						(!bWhoCardSet)? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT, 0), DEFAULT_DELAYMILLIS);
 			}
 			return true;
 		} else {
@@ -656,6 +649,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			View v = messageCenterListView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
 			updateMessageSentStates();
+			messageCenterListAdapter.notifyDataSetChanged();
 			// Restore the position of listview to composing view
 			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 					insertIndex, top));
@@ -709,6 +703,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		int top = (v == null) ? 0 : v.getTop();
 		// Only update composing view if image is attached successfully
 		messageCenterListAdapter.addImagestoComposer(uniqueImages);
+		messageCenterListAdapter.notifyDataSetChanged();
 		messageCenterListAdapter.setForceShowKeyboard(false);
 		int firstIndex = messageCenterListView.getFirstVisiblePosition();
 
@@ -727,7 +722,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterListAdapter.addImagestoComposer(images);
 		messageCenterListAdapter.setForceShowKeyboard(false);
 		int firstIndex = messageCenterListView.getFirstVisiblePosition();
-
+		messageCenterListAdapter.notifyDataSetChanged();
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 				firstIndex, top));
 
@@ -741,6 +736,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		int count = imageAttachmentstList.size();
 		// Show keyboard if all attachments have been removed
 		messageCenterListAdapter.setForceShowKeyboard(count == 0);
+		messageCenterListAdapter.notifyDataSetChanged();
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 
 		onComposingBarCreated();
@@ -1133,9 +1129,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						// when there was a contextual message or it was the first message. We need to resume composing
 						// after dismissing Who Card
 						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
-							addComposerItems();
-							messageCenterListAdapter.setForceShowKeyboard(true);
-							messagingActionHandler.sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+							messagingActionHandler.sendEmptyMessageDelayed(MSG_MESSAGE_ADD_COMPOSING, DEFAULT_DELAYMILLIS);
 						} else {
 							showFab();
 							showProfileButton();
@@ -1484,19 +1478,33 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				return;
 			}
 			switch (msg.what) {
-				case MSG_MESSAGE_NOTIFY_UPDATE: {
+				case MSG_MESSAGE_ADD_WHOCARD: {
+					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
+					fragment.addWhoCardItem(msg.arg1);
+					fragment.messageCenterListAdapter.setForceShowKeyboard(true);
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
+					fragment.messageCenterListView.setSelection(fragment.messages.size() - 1);
+					break;
+				}
+				case MSG_MESSAGE_ADD_COMPOSING: {
+					fragment.addComposerItems();
+					fragment.messageCenterListAdapter.setForceShowKeyboard(true);
+					fragment.messageCenterListAdapter.notifyDataSetChanged();
+					fragment.messageCenterListView.setSelection(fragment.messages.size() - 1);
+					break;
+				}
+				case MSG_MESSAGE_ADD_INCOMING: {
+					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
+					fragment.displayNewIncomingMessageItem(apptentiveMessage);
 					break;
 				}
 				case MSG_SCROLL_TO_BOTTOM: {
-					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					fragment.messageCenterListView.setSelection(fragment.messages.size() - 1);
 					break;
 				}
 				case MSG_SCROLL_FROM_TOP: {
 					int index = msg.arg1;
 					int top = msg.arg2;
-					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					fragment.messageCenterListView.setSelectionFromTop(index, top);
 					break;
 				}
@@ -1518,12 +1526,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					fragment.updateMessageSentStates();
 					fragment.addExpectationStatusIfNeeded();
 
-
 					// Update the sent message, make sure it stays in view
 					int firstIndex = fragment.messageCenterListView.getFirstVisiblePosition();
 					View v = fragment.messageCenterListView.getChildAt(0);
 					int top = (v == null) ? 0 : v.getTop();
 					fragment.updateMessageSentStates();
+					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					sendMessage(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
 					break;
 				}
@@ -1554,10 +1562,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							//
 						}
 						EngagementModule.engageInternal(fragment.hostingActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-						fragment.addWhoCardItem(WHO_CARD_MODE_INIT);
-						fragment.messageCenterListAdapter.setForceShowKeyboard(true);
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
-						sendEmptyMessageDelayed(MSG_MESSAGE_NOTIFY_UPDATE, DEFAULT_DELAYMILLIS);
+						sendMessageDelayed(obtainMessage(MSG_MESSAGE_ADD_WHOCARD, WHO_CARD_MODE_INIT, 0), DEFAULT_DELAYMILLIS);
 					}
 					break;
 				}
@@ -1593,12 +1599,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					}
 					break;
 				}
-				case MSG_MESSAGE_ADD_INCOMING: {
-					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
-					fragment.displayNewIncomingMessageItem(apptentiveMessage);
-					break;
-				}
-
 			}
 		}
 	}
