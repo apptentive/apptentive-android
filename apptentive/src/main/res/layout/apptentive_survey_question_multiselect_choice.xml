@@ -9,7 +9,7 @@
 <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:textAppearance="@style/Apptentive.TextAppearance.Body1"
+          style="@style/Apptentive.Widget.CheckBox"
           android:paddingTop="5dp"
           android:paddingBottom="4dp"
           android:minHeight="48dp"
