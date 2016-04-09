@@ -24,6 +24,8 @@
         <attr name="apptentiveToolbarTitleTextAppearance" format="reference"/>
         <attr name="apptentiveToolbarIconProfile" format="reference"/>
 
+        <attr name="apptentiveCheckBoxStyle" format="reference"/>
+        <attr name="apptentiveRadioButtonStyle" format="reference"/>
 
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
         <attr name="apptentiveColorSnackbar" format="color|reference"/>

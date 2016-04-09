@@ -177,6 +177,10 @@
         <item name="apptentiveFontFamilyButtonBorderless">?apptentiveFontFamilyMediumDefault</item>
         <item name="apptentiveFontFamilyButtonColored">?apptentiveFontFamilyMediumDefault</item>
 
+        <!-- Here we set Anadroid widget styles -->
+        <item name="apptentiveCheckBoxStyle">@style/Apptentive.Widget.CheckBox</item>
+        <item name="apptentiveRadioButtonStyle">@style/Apptentive.Widget.RadioButton</item>
+
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>

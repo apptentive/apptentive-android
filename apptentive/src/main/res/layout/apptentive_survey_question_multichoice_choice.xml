@@ -9,7 +9,7 @@
 <RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             style="@style/Apptentive.Widget.RadioButton"
+             style="?attr/apptentiveRadioButtonStyle"
              android:paddingTop="5dp"
              android:minHeight="48dp"
              android:drawablePadding="0dp"
