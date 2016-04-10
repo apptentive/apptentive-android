@@ -60,6 +60,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		// Yes
 		String yesText = interaction.getYesText();
 		Button yesButton = (Button) v.findViewById(R.id.yes);
+		yesButton.setActivated(true);
 		if (yesText != null) {
 			yesButton.setText(yesText);
 		}

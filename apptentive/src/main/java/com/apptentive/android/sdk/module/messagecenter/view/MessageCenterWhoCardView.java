@@ -93,6 +93,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		}
 
 		skipButton.setEnabled(true);
+		skipButton.setActivated(true);
 		if (item.button_1 == null) {
 			skipButton.setVisibility(INVISIBLE);
 		} else {
@@ -107,6 +108,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 		if (item.button_2 != null) {
 			sendButton.setText(item.button_2);
+			sendButton.setActivated(true);
 			sendButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					if (isWhoCardContentValid(item.getType())) {

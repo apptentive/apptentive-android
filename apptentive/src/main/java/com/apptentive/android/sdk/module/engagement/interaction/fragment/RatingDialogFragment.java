@@ -56,6 +56,8 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 		Button rateButton = (Button) v.findViewById(R.id.rate);
 		String rate = interaction.getRateText(getContext());
 		rateButton.setText(rate);
+		// Make Rate button the default activated button with possible highlight color if specified in theme
+		rateButton.setActivated(true);
 		rateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {

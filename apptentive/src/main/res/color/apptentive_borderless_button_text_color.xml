@@ -5,7 +5,30 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
+<!-- Referencing theme attributes in selector XML is not supported till Lollipop(21)
+  See https://code.google.com/p/android/issues/detail?id=78515 for details
+
+  On pre-21 devices, the following selector is not used in default style. Static color
+  value is used, and by default all interaction buttons have no highlight or disabled color.
+
+  However, host app may provide an override Selector style with static values to achieve the desired effects:
+
+   In ApptentiveThemeOverride.xml:
+   <item name="apptentiveInteractionButtonStyle">@style/CutomButtonStyle</item>
+   Define style as:
+   <style name="Apptentive.Widget.Button.Borderless" parent="Apptentive.Widget.Button.Borderless">
+        <item name="android:textColor">@color/custom_button_color_selector</item>
+   </style>
+   Define color as:
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:state_enabled="false" android:color="@color/cutom_disabled_color" />
+        <item android:state_activated="true" android:color="@color/cutom_activated_color" />
+        <item android:color="@color/cutom_default_color"/>
+    </selector>
+
+  -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?android:textColorHint" />
-    <item android:color="?attr/colorAccent"/>
+    <item android:state_enabled="false" android:color="?attr/apptentiveInteractionButtonColorDisabled" />
+    <item android:state_activated="true" android:color="?attr/apptentiveInteractionButtonColorHighlighted" />
+    <item android:color="?attr/apptentiveInteractionButtonColorDefault"/>
 </selector>
