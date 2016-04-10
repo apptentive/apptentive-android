@@ -8,6 +8,5 @@
 <resources>
     <style name="ApptentiveTheme.Base.Versioned">
         <!-- Use ColorStateList for borderless button -->
-        <item name="apptentiveTextColorButtonBorderless">@color/apptentive_borderless_button_text_color</item>
     </style>
 </resources>

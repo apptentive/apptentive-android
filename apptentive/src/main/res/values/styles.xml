@@ -138,7 +138,7 @@
 
     <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:typeface">?attr/apptentiveTypefaceButtonBorderless</item>
-        <item name="android:textColor">?attr/apptentiveTextColorButtonBorderless</item>
+        <item name="android:textColor">?attr/apptentiveInteractionButtonColorDefault</item>
         <item name="android:textSize">?attr/apptentiveTextSizeButtonBorderless</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:minWidth">36dp</item>
