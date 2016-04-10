@@ -5,6 +5,11 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
+<!-- Referencing theme attributes in selector XML is not supported till Lollipop(21)
+  See https://code.google.com/p/android/issues/detail?id=78515 for details
+  On pre-21 devices, the following selector will load but without effect. The tint color has to be
+  set programmatically.
+  -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false"
           android:alpha="0.26"

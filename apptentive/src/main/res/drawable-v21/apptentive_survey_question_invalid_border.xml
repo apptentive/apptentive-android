@@ -6,6 +6,11 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
+<!-- Referencing theme attributes in drawable XML is not supported till Lollipop(21)
+  See https://code.google.com/p/android/issues/detail?id=26251 for details
+  For pre-21 support, a neutral value is specified for stroke color, and host app has to override color.
+  For 21 and after, host app can override stroke color through attr:apptentiveValidationFailedColor
+  -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
     <solid android:color="@android:color/transparent"/>

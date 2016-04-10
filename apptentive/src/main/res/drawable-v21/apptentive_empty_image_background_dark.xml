@@ -4,6 +4,11 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
+<!-- Referencing theme attributes in drawable XML is not supported till Lollipop(21)
+  See https://code.google.com/p/android/issues/detail?id=26251 for details
+  For pre-21 support, a dark and light version of the drawables have to be defined with static values.
+  For 21 and after, both dark/light versions have the same content
+  -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
     <solid android:color="@android:color/transparent"/>
