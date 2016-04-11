@@ -219,8 +219,8 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
-    <!-- Default theme used by Apptentive about -->
-    <style name="ApptentiveTheme.Base.Versioned.About">
+    <!-- Fixed theme used by Apptentive about -->
+    <style name="ApptentiveThemeAbout" parent="ApptentiveDefaultTheme.Light.DarkActionBar">
         <item name="colorPrimary">@color/apptentive_brand_red</item>
     </style>
 
