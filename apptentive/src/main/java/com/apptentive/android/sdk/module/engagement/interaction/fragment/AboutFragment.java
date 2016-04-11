@@ -7,6 +7,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -57,8 +59,11 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.ApptentiveTheme_Base_Versioned_About);
+		// create ContextThemeWrapper from the original Activity Context with overridden theme
+		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
+		// Force apply Apptentive default style to About dialog
+		apptentiveTheme.applyStyle(R.style.ApptentiveThemeAbout, true);
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), apptentiveTheme);
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		root = themedInflater.inflate(R.layout.apptentive_about, container, false);
