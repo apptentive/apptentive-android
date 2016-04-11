@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -22,6 +24,8 @@ import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * @author Sky Kelsey
  */
@@ -30,6 +34,8 @@ public class InteractionManager {
 	private Interactions interactions;
 	private Targets targets;
 	private Boolean pollForInteractions;
+	// boolean to prevent multiple fetching threads
+	private AtomicBoolean isFetchPending = new AtomicBoolean(false);
 
 	public interface InteractionUpdateListener {
 		void onInteractionUpdated(boolean successful);
@@ -71,30 +77,51 @@ public class InteractionManager {
 		}
 
 		boolean force = ApptentiveInternal.getInstance().isApptentiveDebuggable();
+		// Check isFetchPending to only allow one asyncTask at a time when fetching interaction
+		if (isFetchPending.compareAndSet(false, true) && (force || hasCacheExpired())) {
+			AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+				// Hold onto the exception from the AsyncTask instance for later handling in UI thread
+				private Exception e = null;
 
-		if (force || hasCacheExpired()) {
-			ApptentiveLog.i("Fetching new Interactions.");
-			Thread thread = new Thread() {
-				public void run() {
-					fetchAndStoreInteractions();
-				}
-			};
-			Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 				@Override
-				public void uncaughtException(Thread thread, Throwable throwable) {
-					ApptentiveLog.w("UncaughtException in InteractionManager.", throwable);
-					MetricModule.sendError(throwable, null, null);
+				protected Boolean doInBackground(Void... params) {
+					Boolean result = new Boolean(false);
+					try {
+						result = fetchAndStoreInteractions();
+					} catch (Exception e) {
+						this.e = e;
+					}
+					return result;
+				}
+
+				@Override
+				protected void onPostExecute(Boolean v) {
+					isFetchPending.set(false);
+					if (e == null) {
+						ApptentiveLog.i("Fetching new Interactions asyncTask finished. Result:" + v.booleanValue());
+						// Update pending state on UI thread after finishing the task
+						ApptentiveInternal.getInstance().notifyInteractionUpdated(v.booleanValue());
+					} else {
+						ApptentiveLog.w("Unhandled Exception thrown from fetching new Interactions asyncTask", e);
+						MetricModule.sendError(e, null, null);
+					}
 				}
 			};
-			thread.setUncaughtExceptionHandler(handler);
-			thread.setName("Apptentive-FetchInteractions");
-			thread.start();
+
+			ApptentiveLog.i("Fetching new Interactions asyncTask scheduled");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			} else {
+				task.execute();
+			}
 		} else {
 			ApptentiveLog.v("Using cached Interactions.");
 		}
 	}
 
-	private void fetchAndStoreInteractions() {
+	// This method will be run from a worker thread created by asyncTask
+	private boolean fetchAndStoreInteractions() {
+		ApptentiveLog.i("Fetching new Interactions asyncTask started");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
 		// We weren't able to connect to the internet.
@@ -123,9 +150,7 @@ public class InteractionManager {
 			storeInteractionsPayloadString(interactionsPayloadString);
 		}
 
-
-		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-
+		return updateSuccessful;
 	}
 
 	/**
