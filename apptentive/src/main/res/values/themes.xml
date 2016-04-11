@@ -141,7 +141,6 @@
 
         <item name="apptentiveColorSnackbar">@color/apptentive_color_snackbar</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
-        <item name="apptentiveButtonBorderlessStateList">@color/apptentive_borderless_button_text_color</item>
         <item name="apptentiveButtonTintColor">?attr/colorAccent</item>
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button</item>
@@ -182,7 +181,8 @@
         <item name="apptentiveCheckBoxStyle">@style/Apptentive.Widget.CheckBox</item>
         <item name="apptentiveRadioButtonStyle">@style/Apptentive.Widget.RadioButton</item>
         <item name="apptentiveInteractionButtonStyle">@style/Apptentive.Widget.Button.Borderless</item>
-        <item name="apptentiveInteractionButtonColorDefault">?android:textColorHint</item>
+        <item name="apptentiveInteractionButtonColorStateList">@color/apptentive_interaction_button_color_state_list</item>
+        <item name="apptentiveInteractionButtonColorDefault">?attr/colorAccent</item>
         <item name="apptentiveInteractionButtonColorHighlighted">?attr/colorAccent</item>
         <item name="apptentiveInteractionButtonColorDisabled">#FFD6D7D7</item>
 

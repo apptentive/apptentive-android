@@ -8,10 +8,12 @@
 <!-- Referencing theme attributes in selector XML is not supported till Lollipop(21)
   See https://code.google.com/p/android/issues/detail?id=78515 for details
 
-  On pre-21 devices, the following selector is not used in default style. Static color
-  value is used, and by default all interaction buttons have no highlight or disabled color.
+  Due to this compatibility issue, setting apptentiveInteractionButtonColorHighlighted, and  apptentiveInteractionButtonColorDisabled
+  in host app override theme won't give interaction buttons on pre-21 devices desired highlight or disabled colors. Instead, the buttons
+  will always have apptentiveInteractionButtonColorDefault.
 
-  However, host app may provide an override Selector style with static values to achieve the desired effects:
+  However, host app may provide an override color state list style with static values to achieve the desired effects on
+  both pre-21 and post-21:
 
    In ApptentiveThemeOverride.xml:
    <item name="apptentiveInteractionButtonStyle">@style/CutomButtonStyle</item>
