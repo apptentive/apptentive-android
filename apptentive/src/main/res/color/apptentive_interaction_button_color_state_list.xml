@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<!-- Referencing theme attributes in selector XML is not supported till Lollipop(21)
+  See https://code.google.com/p/android/issues/detail?id=78515 for details
+
+  Due to this compatibility issue, setting apptentiveInteractionButtonColorHighlighted, and  apptentiveInteractionButtonColorDisabled
+  in host app override theme won't give interaction buttons on pre-21 devices desired highlight or disabled colors. Instead, the buttons
+  will always have apptentiveInteractionButtonColorDefault.
+
+  However, host app may provide an override color state list style with static values to achieve the desired effects on
+  both pre-21 and post-21:
+
+   In ApptentiveThemeOverride.xml:
+   <item name="apptentiveInteractionButtonStyle">@style/CutomButtonStyle</item>
+   Define style as:
+   <style name="Apptentive.Widget.Button.Borderless" parent="Apptentive.Widget.Button.Borderless">
+        <item name="android:textColor">@color/custom_button_color_selector</item>
+   </style>
+   Define color as:
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:state_enabled="false" android:color="@color/cutom_disabled_color" />
+        <item android:state_activated="true" android:color="@color/cutom_activated_color" />
+        <item android:color="@color/cutom_default_color"/>
+    </selector>
+
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="?attr/apptentiveInteractionButtonColorDisabled" />
+    <item android:state_activated="true" android:color="?attr/apptentiveInteractionButtonColorHighlighted" />
+    <item android:color="?attr/apptentiveInteractionButtonColorDefault"/>
+</selector>

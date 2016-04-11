@@ -177,6 +177,15 @@
         <item name="apptentiveFontFamilyButtonBorderless">?apptentiveFontFamilyMediumDefault</item>
         <item name="apptentiveFontFamilyButtonColored">?apptentiveFontFamilyMediumDefault</item>
 
+        <!-- Here we set Anadroid widget styles -->
+        <item name="apptentiveCheckBoxStyle">@style/Apptentive.Widget.CheckBox</item>
+        <item name="apptentiveRadioButtonStyle">@style/Apptentive.Widget.RadioButton</item>
+        <item name="apptentiveInteractionButtonStyle">@style/Apptentive.Widget.Button.Borderless</item>
+        <item name="apptentiveInteractionButtonColorStateList">@color/apptentive_interaction_button_color_state_list</item>
+        <item name="apptentiveInteractionButtonColorDefault">?attr/colorAccent</item>
+        <item name="apptentiveInteractionButtonColorHighlighted">?attr/colorAccent</item>
+        <item name="apptentiveInteractionButtonColorDisabled">#FFD6D7D7</item>
+
         <!-- Here we set Apptentive widget styles -->
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
@@ -201,8 +210,6 @@
          Any attribute listed will have different values in values-vxx folder
     -->
     <style name="ApptentiveTheme.Base.Versioned">
-        <!-- Use static color by default, and ColorStateList on post-23 -->
-        <item name="apptentiveTextColorButtonBorderless">?attr/colorAccent</item>
     </style>
 
     <style name="ApptentiveTheme.Base.Versioned.TranslucentStatus"/>

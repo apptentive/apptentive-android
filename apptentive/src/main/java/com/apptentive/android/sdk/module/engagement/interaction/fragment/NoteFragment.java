@@ -121,6 +121,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 						});
 						break;
 					case interaction:
+						button.setActivated(true);
 						button.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {

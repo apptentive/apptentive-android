@@ -24,13 +24,19 @@
         <attr name="apptentiveToolbarTitleTextAppearance" format="reference"/>
         <attr name="apptentiveToolbarIconProfile" format="reference"/>
 
+        <attr name="apptentiveCheckBoxStyle" format="reference"/>
+        <attr name="apptentiveRadioButtonStyle" format="reference"/>
+        <attr name="apptentiveInteractionButtonStyle" format="reference"/>
+        <attr name="apptentiveInteractionButtonColorStateList" format="color|reference"/>
+        <attr name="apptentiveInteractionButtonColorDefault" format="color|reference"/>
+        <attr name="apptentiveInteractionButtonColorHighlighted" format="color|reference"/>
+        <attr name="apptentiveInteractionButtonColorDisabled" format="color|reference"/>
 
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
         <attr name="apptentiveColorSnackbar" format="color|reference"/>
 
         <attr name="apptentiveExtendedHeaderForegroundColor" format="color|reference"/>
 
-        <attr name="apptentiveTextColorButtonBorderless" format="color|reference"/>
         <attr name="apptentiveButtonTintColor" format="color|reference"/>
         <attr name="apptentiveButtonTintColorDisabled" format="color|reference"/>
         <attr name="apptentiveButtonTintColorStateList" format="color|reference"/>

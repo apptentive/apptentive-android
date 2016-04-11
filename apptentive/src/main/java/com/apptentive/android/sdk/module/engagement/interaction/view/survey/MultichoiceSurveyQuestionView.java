@@ -74,7 +74,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		radioGroup = (RadioGroup) questionView.findViewById(R.id.radio_group);
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
-			RadioButton choice = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, radioGroup, false);
+			RadioButton choice = (RadioButton) themedInflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, radioGroup, false);
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
 			choice.setText(answerDefinition.getValue());
 			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());

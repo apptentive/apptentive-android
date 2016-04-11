@@ -48,19 +48,19 @@
                         android:layout_height="36dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        style="@style/Apptentive.Widget.Button.Borderless"/>
+                        style="?apptentiveInteractionButtonStyle"/>
                 <Button android:id="@+id/remind"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        style="@style/Apptentive.Widget.Button.Borderless"/>
+                        style="?apptentiveInteractionButtonStyle"/>
                 <Button android:id="@+id/decline"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        style="@style/Apptentive.Widget.Button.Borderless"/>
+                        style="?apptentiveInteractionButtonStyle"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
