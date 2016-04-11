@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNoti
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
+import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.util.Util;
 
@@ -111,15 +112,25 @@ public class MessageManager {
 	 */
 	public void startMessagePreFetchTask() {
 		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
+			private Exception e = null;
+
 			@Override
 			protected Void doInBackground(Object... params) {
 				boolean updateMC = (Boolean) params[0];
-				fetchAndStoreMessages(updateMC, false);
+				try {
+					fetchAndStoreMessages(updateMC, false);
+				} catch (Exception e) {
+					this.e = e;
+				}
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void v) {
+				if (e != null) {
+					ApptentiveLog.w("Unhandled Exception thrown from fetching new message asyncTask", e);
+					MetricModule.sendError(e, null, null);
+				}
 			}
 		};
 
@@ -132,7 +143,7 @@ public class MessageManager {
 
 	/**
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
-	 * Make sure to run this off the UI Thread, as it blocks on IO.
+	 * This method will either be run on MessagePollingThread or as an asyncTask when Push is received.
 	 *
 	 * @return true if messages were returned, else false.
 	 */
@@ -166,21 +177,23 @@ public class MessageManager {
 						}
 					}
 					incomingUnreadMessages++;
+					// for every new message received, notify Message Center
 					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
-					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL);
 					msg.sendToTarget();
 				}
 			}
 			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			Message msg;
 			if (incomingUnreadMessages > 0) {
-				// Show toast notification only if the forground activity is not alreay message center activity
+				// Show toast notification only if the foreground activity is not already message center activity
 				if (!isMessageCenterForeground && showToast) {
 					msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
+					// Only show the latest new message on toast
 					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
 					msg.sendToTarget();
 				}
 			}
+			// Send message to notify host app, such as unread message badge
 			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(), 0);
 			uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
 			msg.sendToTarget();
@@ -217,7 +230,8 @@ public class MessageManager {
 	}
 
 	private List<ApptentiveMessage> fetchMessages(String afterId) {
-		ApptentiveLog.d("Fetching messages newer than: " + afterId);
+		ApptentiveLog.d("Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
+
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
