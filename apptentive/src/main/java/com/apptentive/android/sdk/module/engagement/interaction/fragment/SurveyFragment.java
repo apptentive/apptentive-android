@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,8 +105,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 						toast.setDuration(Toast.LENGTH_SHORT);
 						View toastView = themedInflater.inflate(R.layout.apptentive_survey_sent_toast, (LinearLayout) getView().findViewById(R.id.survey_sent_toast_root));
 						toast.setView(toastView);
-						((TextView) toastView.findViewById(R.id.survey_sent_toast_text)).setText(interaction.getSuccessMessage());
-
+						TextView actionTV = ((TextView) toastView.findViewById(R.id.survey_sent_action_text));
+						actionTV.setText(interaction.getSuccessMessage());
+            int actionColor = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveTheme(), R.attr.apptentiveSurveySentToastActionColor);
+						if (actionColor != 0) {
+							actionTV.setTextColor(actionColor);
+							ImageView actionIcon = (ImageView) toastView.findViewById(R.id.survey_sent_action_icon);
+							actionIcon.setColorFilter(actionColor);
+						}
 						toast.show();
 					}
 					getActivity().finish();

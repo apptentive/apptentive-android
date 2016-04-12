@@ -14,19 +14,17 @@
               android:orientation="vertical">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:minHeight="48dp"
-                  android:maxHeight="80dp"
-                  android:padding="24dp"
-                  android:background="?attr/apptentiveColorSnackbar"
+                  style="?attr/apptentiveSurveySentToastStyle"
                   android:gravity="center"
                   android:orientation="horizontal">
-        <android.support.v7.widget.AppCompatImageView android:layout_width="wrap_content"
+        <android.support.v7.widget.AppCompatImageView android:id="@+id/survey_sent_action_icon"
+                                                      android:layout_width="wrap_content"
                                                       android:layout_height="wrap_content"
                                                       android:src="@drawable/apptentive_checkmark_alt_40dp"/>
-        <TextView android:id="@+id/survey_sent_toast_text"
+        <TextView android:id="@+id/survey_sent_action_text"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Inverse"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
                   android:paddingLeft="24dp"
                   android:paddingStart="24dp"/>
     </LinearLayout>

@@ -26,6 +26,7 @@
 
         <attr name="apptentiveCheckBoxStyle" format="reference"/>
         <attr name="apptentiveRadioButtonStyle" format="reference"/>
+
         <attr name="apptentiveInteractionButtonStyle" format="reference"/>
         <attr name="apptentiveInteractionButtonColorStateList" format="color|reference"/>
         <attr name="apptentiveInteractionButtonColorDefault" format="color|reference"/>
@@ -33,7 +34,7 @@
         <attr name="apptentiveInteractionButtonColorDisabled" format="color|reference"/>
 
         <attr name="apptentiveValidationFailedColor" format="color|reference"/>
-        <attr name="apptentiveColorSnackbar" format="color|reference"/>
+        <attr name="apptentiveSurveySentToastActionColor" format="color|reference"/>
 
         <attr name="apptentiveExtendedHeaderForegroundColor" format="color|reference"/>
 
@@ -74,11 +75,11 @@
         <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
 
         <attr name="apptentiveCardViewElevation" format="dimension|reference"/>
+
+        <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
+        <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
+        <attr name="apptentiveSurveySentToastStyle" format="reference"/>
     </declare-styleable>
-
-
-    <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
-    <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">
         <attr name="apptentive_backgroundColor" format="color"/>

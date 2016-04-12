@@ -139,7 +139,6 @@
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 
-        <item name="apptentiveColorSnackbar">@color/apptentive_color_snackbar</item>
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
         <item name="apptentiveButtonTintColor">?attr/colorAccent</item>
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
@@ -191,6 +190,8 @@
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
         <item name="apptentiveMessageCenterBadgeStyle">@style/Apptentive.Style.Widget.Badge</item>
         <item name="apptentiveFabStyle">@style/Apptentive.Widget.ImageButton.FloatingActionButton</item>
+        <item name="apptentiveSurveySentToastStyle">@style/Apptentive.Style.Widget.SurveySentToast</item>
+
 
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

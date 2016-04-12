@@ -20,11 +20,6 @@
         <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
     </style>
 
-    <style name="Apptentive.TextAppearance.Title.Inverse" parent="@style/TextAppearance.AppCompat.Title.Inverse">
-        <item name="android:fontFamily">?attr/apptentiveFontFamilyTitle</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeTitle</item>
-    </style>
-
     <style name="Apptentive.TextAppearance.Subhead" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:fontFamily">?attr/apptentiveFontFamilySubhead</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
