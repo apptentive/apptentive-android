@@ -18,6 +18,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
@@ -92,6 +94,9 @@ public class ApptentiveInternal {
 	Resources.Theme apptentiveTheme;
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
+  // booleans to prevent starting multiple fetching asyncTasks simultaneously
+	AtomicBoolean isConversationTokenFetchPending = new AtomicBoolean(false);
+	AtomicBoolean isConfigurationFetchPending = new AtomicBoolean(false);
 
 	IRatingProvider ratingProvider;
 	Map<String, String> ratingProviderArgs;
@@ -359,7 +364,7 @@ public class ApptentiveInternal {
 		if (conversationToken == null || personId == null) {
 			asyncFetchConversationToken();
 		} else {
-			fetchSdkState();
+			asyncFetchAppConfigurationAndInteractions();
 		}
 	}
 
@@ -586,25 +591,54 @@ public class ApptentiveInternal {
 	}
 
 	private synchronized void asyncFetchConversationToken() {
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				fetchConversationToken();
+		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
+			AsyncTask<Void, Void, Boolean> fetchConversationTokenTask = new AsyncTask<Void, Void, Boolean>() {
+				private Exception e = null;
+
+				@Override
+				protected Boolean doInBackground(Void... params) {
+					Boolean result = new Boolean(false);
+					try {
+						result = fetchConversationToken();
+					} catch (Exception e) {
+						// Hold onto the unhandled exception from fetchConversationToken() for later handling in UI thread
+						this.e = e;
+					}
+					return result;
+				}
+
+				@Override
+				protected void onPostExecute(Boolean v) {
+					if (e == null) {
+						// Update pending state on UI thread after finishing the task
+						ApptentiveLog.i("Fetching conversation token asyncTask finished. Result:" + v.booleanValue());
+						isConversationTokenFetchPending.set(false);
+						if (v.booleanValue()) {
+							// Once token is fetched successfully, start two asyncTasks to fetch global configuration and interaction simultaneously
+							asyncFetchAppConfigurationAndInteractions();
+						}
+					} else {
+						ApptentiveLog.w("Unhandled Exception thrown from fetching conversation token asyncTask", e);
+						MetricModule.sendError(e, null, null);
+					}
+				}
+
+			};
+
+			ApptentiveLog.i("Fetching conversation token asyncTask scheduled.");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				fetchConversationTokenTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			} else {
+				fetchConversationTokenTask.execute();
 			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				ApptentiveLog.w("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
-				MetricModule.sendError(throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-FetchConversationToken");
-		thread.start();
+		} else {
+			ApptentiveLog.v("Fetching Configuration pending");
+		}
 	}
 
-	private void fetchConversationToken() {
+
+	private boolean fetchConversationToken() {
+		ApptentiveLog.i("Fetching Configuration token task started.");
 		// Try to fetch a new one from the server.
 		ConversationTokenRequest request = new ConversationTokenRequest();
 
@@ -616,7 +650,7 @@ public class ApptentiveInternal {
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
 			ApptentiveLog.w("Got null response fetching ConversationToken.");
-			return;
+			return false;
 		}
 		if (response.isSuccessful()) {
 			try {
@@ -635,60 +669,83 @@ public class ApptentiveInternal {
 				if (personId != null && !personId.equals("")) {
 					setPersonId(personId);
 				}
-				fetchSdkState();
+				return true;
 			} catch (JSONException e) {
 				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
 			}
 		}
+		return false;
 	}
 
 	/**
 	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
 	 */
 	private void fetchAppConfiguration() {
-		boolean force = isAppDebuggable;
-
-		// Don't get the app configuration unless forced, or the cache has expired.
-		if (force || Configuration.load().hasConfigurationCacheExpired()) {
-			ApptentiveLog.i("Fetching new Configuration.");
-			ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
-			try {
-				Map<String, String> headers = response.getHeaders();
-				if (headers != null) {
-					String cacheControl = headers.get("Cache-Control");
-					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-					if (cacheSeconds == null) {
-						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-					}
-					ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
-					Configuration config = new Configuration(response.getContent());
-					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-					config.save();
+		ApptentiveLog.i("Fetching new Configuration task started.");
+		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
+		try {
+			Map<String, String> headers = response.getHeaders();
+			if (headers != null) {
+				String cacheControl = headers.get("Cache-Control");
+				Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+				if (cacheSeconds == null) {
+					cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
 				}
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing app configuration from server.", e);
+				ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
+				Configuration config = new Configuration(response.getContent());
+				config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+				config.save();
 			}
-		} else {
-			ApptentiveLog.v("Using cached Configuration.");
+		} catch (JSONException e) {
+			ApptentiveLog.e("Error parsing app configuration from server.", e);
 		}
 	}
 
-	private void asyncFetchAppConfiguration() {
-		Thread thread = new Thread() {
-			public void run() {
-				fetchAppConfiguration();
+	private void asyncFetchAppConfigurationAndInteractions() {
+		boolean force = isAppDebuggable;
+
+		// Don't get the app configuration unless no pending fetch AND either forced, or the cache has expired.
+		if (isConfigurationFetchPending.compareAndSet(false, true) && (force || Configuration.load().hasConfigurationCacheExpired())) {
+			AsyncTask<Void, Void, Void> fetchConfigurationTask = new AsyncTask<Void, Void, Void>() {
+				// Hold onto the exception from the AsyncTask instance for later handling in UI thread
+				private Exception e = null;
+
+				@Override
+				protected Void doInBackground(Void... params) {
+					try {
+						fetchAppConfiguration();
+					} catch (Exception e) {
+						this.e = e;
+					}
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void v) {
+					// Update pending state on UI thread after finishing the task
+					ApptentiveLog.i("Fetching new Configuration asyncTask finished.");
+					isConfigurationFetchPending.set(false);
+					if (e != null) {
+						ApptentiveLog.w("Unhandled Exception thrown from fetching configuration asyncTask", e);
+						MetricModule.sendError(e, null, null);
+					} else {
+						// Check if need to start another asyncTask to fetch interaction after successfully fetching configuration
+						interactionManager.asyncFetchAndStoreInteractions();
+					}
+				}
+			};
+
+			ApptentiveLog.i("Fetching new Configuration asyncTask scheduled.");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				fetchConfigurationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			} else {
+				fetchConfigurationTask.execute();
 			}
-		};
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				ApptentiveLog.e("Caught UncaughtException in thread \"%s\"", throwable, thread.getName());
-				MetricModule.sendError(throwable, null, null);
-			}
-		};
-		thread.setUncaughtExceptionHandler(handler);
-		thread.setName("Apptentive-FetchAppConfiguration");
-		thread.start();
+		} else {
+			ApptentiveLog.v("Using cached Configuration.");
+			// If configuration hasn't expire, then check if need to start another asyncTask to fetch interaction
+			interactionManager.asyncFetchAndStoreInteractions();
+		}
 	}
 
 	/**
@@ -911,11 +968,6 @@ public class ApptentiveInternal {
 	private void setPersonId(String newPersonId) {
 		personId = newPersonId;
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).apply();
-	}
-
-	private void fetchSdkState() {
-		asyncFetchAppConfiguration();
-		interactionManager.asyncFetchAndStoreInteractions();
 	}
 
 	public void resetSdkState() {
