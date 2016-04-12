@@ -23,8 +23,6 @@
               android:layout_marginTop="@dimen/apptentive_image_file_extension_layout_top"
               android:gravity="center_horizontal"
               android:textSize="@dimen/apptentive_image_file_extension_default_text_size"
-              android:lineSpacingMultiplier="0.8"
-              android:maxLines="2"
               android:ellipsize="end"
               android:textColor="#617D8A"
               tools:text="File"/>

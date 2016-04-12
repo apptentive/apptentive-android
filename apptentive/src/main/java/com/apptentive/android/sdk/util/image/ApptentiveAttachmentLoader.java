@@ -373,7 +373,7 @@ public class ApptentiveAttachmentLoader {
 		}
 
 		private void loadDrawable(Bitmap d, boolean animate) {
-			ApptentiveLog.d("ApptentiveAttachmentLoader loadDrawable");
+			ApptentiveLog.v("ApptentiveAttachmentLoader loadDrawable");
 			ImageView imageView = getImageView();
 			if (imageView != null) {
 				if (loadingTaskCallback != null) {
