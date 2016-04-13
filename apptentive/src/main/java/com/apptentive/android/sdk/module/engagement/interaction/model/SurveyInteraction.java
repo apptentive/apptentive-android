@@ -29,6 +29,9 @@ public class SurveyInteraction extends Interaction {
 	private static final String KEY_SUCCESS_MESSAGE = "success_message";
 	private static final String KEY_QUESTIONS = "questions";
 	private static final String KEY_REQUIRED = "required";
+	private static final String KEY_REQUIRED_TEXT = "required_text";
+	private static final String KEY_SUBMIT_TEXT = "submit_text";
+	private static final String KEY_VALIDATION_ERROR = "validation_error";
 
 	public SurveyInteraction(String json) throws JSONException {
 		super(json);
@@ -120,7 +123,7 @@ public class SurveyInteraction extends Interaction {
 	public Map<String, Question> getQuestionsAsMap() {
 		List<Question> questions = getQuestions();
 		Map<String, Question> ret = new HashMap<>(questions.size());
-		for(Question question : questions) {
+		for (Question question : questions) {
 			ret.put(question.getId(), question);
 		}
 		return ret;
@@ -136,6 +139,42 @@ public class SurveyInteraction extends Interaction {
 			// Ignore
 		}
 		return false;
+	}
+
+	public String getRequiredText() {
+		try {
+			InteractionConfiguration configuration = getConfiguration();
+			if (configuration != null && configuration.has(KEY_REQUIRED_TEXT)) {
+				return configuration.getString(KEY_REQUIRED_TEXT);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return null;
+	}
+
+	public String getSubmitText() {
+		try {
+			InteractionConfiguration configuration = getConfiguration();
+			if (configuration != null && configuration.has(KEY_SUBMIT_TEXT)) {
+				return configuration.getString(KEY_SUBMIT_TEXT);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return null;
+	}
+
+	public String getValidationError() {
+		try {
+			InteractionConfiguration configuration = getConfiguration();
+			if (configuration != null && configuration.has(KEY_VALIDATION_ERROR)) {
+				return configuration.getString(KEY_VALIDATION_ERROR);
+			}
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return null;
 	}
 
 	@Override

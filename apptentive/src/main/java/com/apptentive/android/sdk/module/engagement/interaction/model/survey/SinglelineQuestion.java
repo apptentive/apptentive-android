@@ -14,6 +14,7 @@ import org.json.JSONException;
 public class SinglelineQuestion extends BaseQuestion {
 
 	private static final String KEY_MULTILINE = "multiline";
+	private static final String KEY_FREEFORM_HINT = "freeform_hint";
 
 	public SinglelineQuestion(String json) throws JSONException {
 		super(json);
@@ -26,4 +27,10 @@ public class SinglelineQuestion extends BaseQuestion {
 	public boolean isMultiLine() {
 		return optBoolean(KEY_MULTILINE, false);
 	}
+
+	public String getFreeformHint() {
+		return optString(KEY_FREEFORM_HINT, null);
+	}
+
+
 }
