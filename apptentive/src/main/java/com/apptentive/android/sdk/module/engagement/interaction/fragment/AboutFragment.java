@@ -60,10 +60,11 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// create ContextThemeWrapper from the original Activity Context with overridden theme
-		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
+		Resources.Theme aboutTheme = getResources().newTheme();
+		aboutTheme.setTo(ApptentiveInternal.getInstance().getApptentiveTheme());
 		// Force apply Apptentive default style to About dialog
-		apptentiveTheme.applyStyle(R.style.ApptentiveThemeAbout, true);
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), apptentiveTheme);
+		aboutTheme.applyStyle(R.style.ApptentiveThemeAbout, true);
+		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), aboutTheme);
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
 		root = themedInflater.inflate(R.layout.apptentive_about, container, false);
