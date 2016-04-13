@@ -620,7 +620,9 @@ public class Apptentive {
 	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
-	 * @param context    The context from which to launch the Message Center
+	 * @param context    The context from which to launch the Message Center. This should be an
+	 *                    Activity, except in rare cases where you don't have access to one, in which
+	 *                    case Apptentive Message Center will launch in a new task.
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
 	 *                   If any message is sent by the Person, this data is sent with it, and then
 	 *                   cleared. If no message is sent, this data is discarded.
@@ -850,15 +852,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * This method takes a unique event string, stores a record of that event having been visited, determines
 	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param context The context from which this method is called.
+	 * @param context    The context from which to launch the Interaction. This should be an
+	 *                    Activity, except in rare cases where you don't have access to one, in which
+	 *                    case Apptentive Interactions will launch in a new task.
 	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
 	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 *                call <strong><code>engage(context, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event) {
@@ -866,15 +870,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * This method takes a unique event string, stores a record of that event having been visited, determines
 	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param context    The context from which this method is called.
+	 * @param context    The context from which to launch the Interaction. This should be an
+	 *                    Activity, except in rare cases where you don't have access to one, in which
+	 *                    case Apptentive Interactions will launch in a new task.
 	 * @param event      A unique String representing the line this method is called on. For instance, you may want to have
 	 *                   the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                   call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 *                   call <strong><code>engage(context, "finished_upload");</code></strong>
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
 	 *                   is sent to the server for tracking information in the context of the engaged Event.
 	 * @return true if the an interaction was shown, else false.
@@ -884,15 +890,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, figures out
+	 * This method takes a unique event string, stores a record of that event having been visited, determines
 	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param context      The context from which this method is called.
+	 * @param context    The context from which to launch the Interaction. This should be an
+	 *                    Activity, except in rare cases where you don't have access to one, in which
+	 *                    case Apptentive Interactions will launch in a new task.
 	 * @param event        A unique String representing the line this method is called on. For instance, you may want to have
 	 *                     the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                     call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 *                     call <strong><code>engage(context, "finished_upload");</code></strong>
 	 * @param customData   A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
 	 *                     is sent to the server for tracking information in the context of the engaged Event.
 	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send structured data that has
@@ -908,7 +916,7 @@ public class Apptentive {
 	/**
 	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
 	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
+	 *              call <strong><code>engage(context, "finished_upload");</code></strong>
 	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 * @deprecated Use {@link #canShowInteraction(String)}() instead. The behavior is identical. Only the name has changed.
 	 */
