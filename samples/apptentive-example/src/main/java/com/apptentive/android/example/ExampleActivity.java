@@ -6,9 +6,9 @@
 
 package com.apptentive.android.example;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.apptentive.android.example.push.RegistrationIntentService;
@@ -17,7 +17,7 @@ import com.apptentive.android.sdk.Apptentive;
 /**
  * This is an example integration of Apptentive.
  */
-public class ExampleActivity extends Activity {
+public class ExampleActivity extends AppCompatActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
