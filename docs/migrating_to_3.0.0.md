@@ -11,7 +11,7 @@ Version 3.0 of the Apptentive Android SDK has extensive improvements to ease int
 2. Easier Integration
 
     * We've leveraged `ActivityLifecycleCallbacks`, which means you no longer need to add Apptentive into all of your Activities. Instead, add a single line of code to your `Application.onCreate()`.
-    * We not use the Gradle manifest merger so that you don't need to add XML to your AndroidManifest.xml.
+    * We now use the Gradle manifest merger so that you don't need to add XML to your `AndroidManifest.xml`.
     * Gradle automatically downloads AAR transitive dependencies, so you only need to add a dependency to the Apptentive Android SDK to integrate.
     
 3. Styling
@@ -34,10 +34,10 @@ Our SDK API has changed so you will need to modify your integration. Rest assure
 4. In your `Application.onCreate()`, add a call to `Apptentive.register()`. This is where you will pass in your Apptentive API Key.
 5. Various other Apptentive API method signatures have changed.
     1. Any method that formerly required an `Activity` now requires a `Context`. That means that you can call them in cases where you don't have access to an Activity, such as from a `BroadcastReceiver` or `Service`, and we will still be able to display our UI.
-    2. Any method that formerly required a `Context` not does not require one. Integrating from the Application guarantees we will have access to your Application Context, so we don't need you to pass it in anymore.
+    2. Any method that formerly required a `Context` now does not require one. Integrating from the Application guarantees we will have access to your Application Context, so we don't need you to pass it in anymore.
     
 ## Styling the SDK
-If you are using an AppCompat or Material theme in your Application object, our SDK inherits its look and feel from your theme. If you are using a legacy theme, such as Holo, then our SDK will not inherit your theme, and will retain our default red on white styling by default. In both cases, you can override our styles.
+If you have specified an AppCompat or Material theme in your `AndroidManifest.xml`, our SDK inherits its look and feel from your theme. If you are using a legacy theme, such as Holo, then our SDK will not inherit your theme, and will retain our default red on white styling by default. In both cases, you can override our styles.
 
 Please see our [style guide]() for more information.
 
