@@ -237,20 +237,21 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			if (getMenuResourceId() != 0 && toolbar != null) {
 				Menu parentMenu = toolbar.getMenu();
 				ArrayList parentMenuItems = new ArrayList();
-
+        // Before creating fragment, host activity may already has menu items on toolbar
 				for (int fragmentMenu = 0; fragmentMenu < parentMenu.size(); ++fragmentMenu) {
 					parentMenuItems.add(Integer.valueOf(parentMenu.getItem(fragmentMenu).getItemId()));
 				}
-
+        // Add to toolbar menu items and menu listeners created this fragment
 				toolbar.inflateMenu(getMenuResourceId());
 				attachFragmentMenuListeners(toolbar.getMenu());
-				Menu menu = toolbar.getMenu();
 
+				//
+				Menu combinedMenu = toolbar.getMenu();
 				fragmentMenuItems = new ArrayList();
 
-				for (int i = 0; i < menu.size(); ++i) {
-					int menuItemId = menu.getItem(i).getItemId();
-
+				for (int i = 0; i < combinedMenu.size(); ++i) {
+					int menuItemId = combinedMenu.getItem(i).getItemId();
+          // fragmentMenuItems contains new menu items added by this fragment
 					if (!parentMenuItems.contains(Integer.valueOf(menuItemId))) {
 						fragmentMenuItems.add(Integer.valueOf(menuItemId));
 					}
@@ -295,7 +296,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		if (toolbar != null && fragmentMenuItems != null) {
 			Menu toolbarMenu = toolbar.getMenu();
 			Iterator it = fragmentMenuItems.iterator();
-
+      // Remove menu items added by this fragment
 			while (it.hasNext()) {
 				Integer menuItem = (Integer) it.next();
 
