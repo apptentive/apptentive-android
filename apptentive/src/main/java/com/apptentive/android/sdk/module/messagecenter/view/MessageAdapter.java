@@ -488,6 +488,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
+				composingActionListener.onComposingViewCreated();
 				if (forceShowKeyboard) {
 					Util.showSoftKeyboard(fragment.getActivity(), composingEditText);
 				}
@@ -501,7 +502,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 		}, null);
 		set.start();
-		composingActionListener.onComposingViewCreated();
 	}
 
 	public void clearComposing() {
@@ -559,6 +559,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
+				composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
 				if (forceShowKeyboard) {
 					if (focusOnNameField) {
 						Util.showSoftKeyboard(fragment.getActivity(), nameEditText);
@@ -573,7 +574,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			}
 		}, null);
 		set.start();
-		composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
 	}
 
 	public View getWhoCardView() {
