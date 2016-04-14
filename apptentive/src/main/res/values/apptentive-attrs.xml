@@ -26,6 +26,7 @@
 
         <attr name="apptentiveCheckBoxStyle" format="reference"/>
         <attr name="apptentiveRadioButtonStyle" format="reference"/>
+        <attr name="apptentiveFabStyle" format="reference"/>
 
         <attr name="apptentiveInteractionButtonStyle" format="reference"/>
         <attr name="apptentiveInteractionButtonColorStateList" format="color|reference"/>
@@ -103,24 +104,7 @@
         </attr>
     </declare-styleable>
 
-    <attr name="apptentiveFabStyle" format="reference"/>
     <attr name="apptentiveAvatarStyle" format="reference"/>
-
-    <declare-styleable name="FloatingActionButton">
-        <!-- Background color -->
-        <attr name="apptentive_floatingActionButtonColor" format="color|reference"/>
-        <!-- Size of action button -->
-        <attr name="apptentive_floatingActionButtonSize" format="enum">
-            <!-- 56dp -->
-            <enum name="normal" value="0"/>
-            <!-- 40dp -->
-            <enum name="mini" value="1"/>
-        </attr>
-        <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
-        <attr name="apptentive_floatingActionButtonImplicitElevation" format="boolean"/>
-        <!-- Show shadow or not, default value is true -->
-        <attr name="apptentive_floatingActionButtonShadow" format="boolean"/>
-    </declare-styleable>
 
     <declare-styleable name="ApptentiveAvatarView">
         <attr name="apptentive_borderWidth" format="dimension"/>

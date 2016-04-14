@@ -6,11 +6,10 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/apptentiveViewBackground"
-                android:orientation="vertical">
+                android:background="?attr/apptentiveViewBackground">
     <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView android:id="@+id/message_list"
                                                                                 android:layout_width="match_parent"
                                                                                 android:layout_height="match_parent"
@@ -21,15 +20,9 @@
                                                                                 android:divider="@null"
                                                                                 android:dividerHeight="0dp"
                                                                                 android:scrollbars="vertical"/>
-    <com.apptentive.android.sdk.view.FloatingActionButton android:id="@+id/composing_fab"
+    <android.support.design.widget.FloatingActionButton android:id="@+id/composing_fab"
                                                           android:layout_width="wrap_content"
                                                           android:layout_height="wrap_content"
-                                                          android:layout_alignParentBottom="true"
-                                                          android:layout_alignParentEnd="true"
-                                                          android:layout_alignParentRight="true"
-                                                          android:layout_marginBottom="@dimen/apptentive_message_center_fab_margin_bottom"
-                                                          android:layout_marginRight="@dimen/apptentive_message_center_fab_margin_side"
-                                                          android:layout_marginEnd="@dimen/apptentive_message_center_fab_margin_side"
                                                           style="?attr/apptentiveFabStyle"
-                                                          android:src="@drawable/ic_edit"/>
-</RelativeLayout>
+                                                          android:src="@drawable/apptentive_ic_compose"/>
+</android.support.design.widget.CoordinatorLayout>

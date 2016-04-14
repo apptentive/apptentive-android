@@ -179,27 +179,26 @@
         <item name="android:paddingBottom">@dimen/design_snackbar_padding_vertical</item>
     </style>
 
-    <style name="Apptentive.Widget.ImageButton" parent="Widget.AppCompat.ImageButton"/>
+    <style name="Apptentive.Style.Widget.ImageButton" parent="Widget.AppCompat.ImageButton"/>
 
-    <style name="Apptentive.Widget.ImageButton.Info">
+    <style name="Apptentive.Style.Widget.ImageButton.Info">
         <item name="android:contentDescription">@string/apptentive_about_title</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:src">@drawable/apptentive_ic_info</item>
         <item name="android:tint">?attr/apptentiveExtendedHeaderForegroundColor</item>
     </style>
 
-    <style name="Apptentive.Widget.ImageButton.Composing">
+    <style name="Apptentive.Style.Widget.ImageButton.Composing">
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:tint">?attr/colorAccent</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
 
-    <style name="Apptentive.Widget.ImageButton.FloatingActionButton">
-        <item name="apptentive_floatingActionButtonSize">normal</item>
-    </style>
-
-    <style name="Apptentive.Widget.ImageButton.FloatingActionButton.Mini">
-        <item name="apptentive_floatingActionButtonSize">mini</item>
+    <style name="Apptentive.Style.Widget.FloatingActionButton">
+        <item name="fabSize">normal</item>
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="android:layout_margin">@dimen/apptentive_message_center_fab_margin_side</item>
+        <item name="android:layout_marginBottom">@dimen/apptentive_message_center_fab_margin_bottom</item>
     </style>
 
     <style name="Apptentive.MessageCenterMessageFrame">
