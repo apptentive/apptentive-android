@@ -93,6 +93,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		description.setText(interaction.getDescription());
 
 		final Button send = (Button) v.findViewById(R.id.send);
+
+		String sendText = interaction.getSubmitText();
+		if (!TextUtils.isEmpty(sendText)) {
+			send.setText(sendText);
+		}
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -119,8 +124,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
 
-					// TODO: Extract survey state from views and send it as before.
-
 					ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(new SurveyResponse(interaction, answers));
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
@@ -130,8 +133,10 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					toast.setDuration(Toast.LENGTH_SHORT);
 					View toastView = themedInflater.inflate(R.layout.apptentive_survey_invalid_toast, (LinearLayout) getView().findViewById(R.id.survey_invalid_toast_root));
 					toast.setView(toastView);
-					((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText("Missing Required Question");
-
+					String validationText = interaction.getValidationError();
+					if (!TextUtils.isEmpty(validationText)) {
+						((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText(validationText);
+					}
 					toast.show();
 				}
 			}

@@ -53,12 +53,10 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 			}
 		}
-
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState)  {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
@@ -72,6 +70,10 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		answer = (EditText) view.findViewById(R.id.answer_text);
+		String hint = question.getFreeformHint();
+		if (!TextUtils.isEmpty(hint)) {
+			answer.setHint(hint);
+		}
 		answer.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 			}
