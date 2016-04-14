@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.content.Context;
 
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -34,7 +35,9 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 
 	private MessageAdapter.OnListviewItemActionListener listener;
 	private EditText emailEditText;
+	private TextInputLayout emailLayout;
 	private EditText nameEditText;
+	private TextInputLayout nameLayout;
 	private TextView title;
 	private TextView emailExplanation;
 	private Button skipButton;
@@ -53,8 +56,10 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		sendButton = (Button) parentView.findViewById(R.id.btn_send);
 
 		emailEditText = (EditText) parentView.findViewById(R.id.who_email);
+		emailLayout = (TextInputLayout) parentView.findViewById(R.id.input_layout_who_email);
 
 		nameEditText = (EditText) parentView.findViewById(R.id.who_name);
+		nameLayout = (TextInputLayout) parentView.findViewById(R.id.input_layout_who_name);
 
 		emailExplanation = (TextView) parentView.findViewById(R.id.email_explanation);
 
@@ -76,13 +81,13 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			title.setText(item.str_1);
 		}
 		if (item.str_2 != null) {
-			nameEditText.setVisibility(VISIBLE);
-			nameEditText.setHint(item.str_2);
+			nameLayout.setVisibility(VISIBLE);
+			nameLayout.setHint(item.str_2);
 		} else {
-			nameEditText.setVisibility(GONE);
+			nameLayout.setVisibility(GONE);
 		}
 		if (item.str_3 != null) {
-			emailEditText.setHint(item.str_3);
+			emailLayout.setHint(item.str_3);
 		}
 
 		if (item.str_4 != null) {

@@ -189,7 +189,7 @@
         <item name="apptentiveAvatarViewGreetingStyle">@style/Apptentive.Style.Widget.AvatarView.Greeting</item>
         <item name="apptentiveAvatarViewMessageStyle">@style/Apptentive.Style.Widget.AvatarView.Message</item>
         <item name="apptentiveMessageCenterBadgeStyle">@style/Apptentive.Style.Widget.Badge</item>
-        <item name="apptentiveFabStyle">@style/Apptentive.Widget.ImageButton.FloatingActionButton</item>
+        <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.FloatingActionButton</item>
         <item name="apptentiveSurveySentToastStyle">@style/Apptentive.Style.Widget.SurveySentToast</item>
 
 
