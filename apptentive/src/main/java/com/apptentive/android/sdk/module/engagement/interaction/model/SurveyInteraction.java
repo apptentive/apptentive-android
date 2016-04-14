@@ -16,9 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SurveyInteraction extends Interaction {
 
@@ -27,62 +25,55 @@ public class SurveyInteraction extends Interaction {
 	private static final String KEY_DESCRIPTION = "description";
 	private static final String KEY_SHOW_SUCCESS_MESSAGE = "show_success_message";
 	private static final String KEY_SUCCESS_MESSAGE = "success_message";
-	private static final String KEY_QUESTIONS = "questions";
 	private static final String KEY_REQUIRED = "required";
+	private static final String KEY_REQUIRED_TEXT = "required_text";
+	private static final String KEY_SUBMIT_TEXT = "submit_text";
+	private static final String KEY_VALIDATION_ERROR = "validation_error";
+	private static final String KEY_QUESTIONS = "questions";
 
 	public SurveyInteraction(String json) throws JSONException {
 		super(json);
 	}
 
+	@Override
+	public String getTitle() {
+		return getName();
+	}
+
 	public String getName() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_NAME)) {
-				return configuration.getString(KEY_NAME);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getConfiguration().optString(KEY_NAME, null);
 	}
 
 	public String getDescription() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_DESCRIPTION)) {
-				return configuration.getString(KEY_DESCRIPTION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getConfiguration().optString(KEY_DESCRIPTION, null);
 	}
 
 	public boolean isShowSuccessMessage() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_SHOW_SUCCESS_MESSAGE)) {
-				return configuration.getBoolean(KEY_SHOW_SUCCESS_MESSAGE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return false;
+		return getConfiguration().optBoolean(KEY_SHOW_SUCCESS_MESSAGE);
 	}
 
 	public String getSuccessMessage() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_SUCCESS_MESSAGE)) {
-				return configuration.getString(KEY_SUCCESS_MESSAGE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getConfiguration().optString(KEY_SUCCESS_MESSAGE, null);
+	}
+
+	public boolean isRequired() {
+		return getConfiguration().optBoolean(KEY_REQUIRED);
+	}
+
+	public String getRequiredText() {
+		return getConfiguration().optString(KEY_REQUIRED_TEXT, null);
+	}
+
+	public String getSubmitText() {
+		return getConfiguration().optString(KEY_SUBMIT_TEXT, null);
+	}
+
+	public String getValidationError() {
+		return getConfiguration().optString(KEY_VALIDATION_ERROR, null);
 	}
 
 	public List<Question> getQuestions() {
+		String requiredText = getRequiredText();
 		try {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_QUESTIONS)) {
@@ -106,6 +97,7 @@ public class SurveyInteraction extends Interaction {
 							break;
 					}
 					if (question != null) {
+						question.setRequiredText(requiredText);
 						questions.add(question);
 					}
 				}
@@ -115,31 +107,5 @@ public class SurveyInteraction extends Interaction {
 			// Ignore
 		}
 		return null;
-	}
-
-	public Map<String, Question> getQuestionsAsMap() {
-		List<Question> questions = getQuestions();
-		Map<String, Question> ret = new HashMap<>(questions.size());
-		for(Question question : questions) {
-			ret.put(question.getId(), question);
-		}
-		return ret;
-	}
-
-	public boolean isRequired() {
-		try {
-			InteractionConfiguration configuration = getConfiguration();
-			if (configuration != null && configuration.has(KEY_REQUIRED)) {
-				return configuration.getBoolean(KEY_REQUIRED);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return false;
-	}
-
-	@Override
-	public String getTitle() {
-		return getName();
 	}
 }

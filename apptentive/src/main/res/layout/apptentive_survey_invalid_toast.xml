@@ -17,5 +17,6 @@
               android:paddingLeft="24dp"
               android:paddingRight="24dp"
               android:gravity="center"
-              android:background="?attr/apptentiveValidationFailedColor"/>
+              android:background="?attr/apptentiveValidationFailedColor"
+              android:text="There are issues with your response."/>
 </LinearLayout>
