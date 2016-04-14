@@ -316,13 +316,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onPause() {
 		super.onPause();
-		ApptentiveInternal.getInstance().getMessageManager().onPauseSending(0);
+		ApptentiveInternal.getInstance().getMessageManager().pauseSending(MessageManager.SEND_PAUSE_REASON_ACTIVITY_PAUSE);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApptentiveInternal.getInstance().getMessageManager().onResumeSending();
+		ApptentiveInternal.getInstance().getMessageManager().resumeSending();
 
 		/* imagePickerLaunched was set true when the picker intent was launched. If user had picked an image,
 		 * it woud have been set to false. Otherwise, it indicates the user tried to attach an image but

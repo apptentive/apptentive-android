@@ -32,7 +32,7 @@ public class PayloadSendWorker {
 	private static final int NO_CONNECTION_SLEEP_TIME = 5000;
 	private static final int SERVER_ERROR_SLEEP_TIME = 5000;
 
-	private static final int UI_THREAD_MESSAGE_RETRY = 1;
+	private static final int UI_THREAD_MESSAGE_RETRY_CHECK = 1;
 
 	private PayloadSendRunnable payloadSendRunnable;
 	private Handler uiHandler;
@@ -45,11 +45,15 @@ public class PayloadSendWorker {
 	public PayloadSendWorker() {
 	}
 
-	public synchronized  void runPayloadSendRunnable(boolean expect,
-																																								boolean createNew) {
+	/* expect: true, createNew: true   Check if payloadSendRunnable can be run and create a new one if not exist
+	 * expect: true, createNew: false  Check if payloadSendRunnable can be run only if one already exists
+	 * expect: false                   Nullify payloadSendRunnable and cancel pending check as well
+	 */
+	public synchronized  void checkIfStartSendPayload(boolean expect, boolean createNew) {
 		if (expect && createNew && payloadSendRunnable == null) {
 			payloadSendRunnable = new PayloadSendRunnable();
 		} else if (!expect) {
+			uiHandler.removeMessages(UI_THREAD_MESSAGE_RETRY_CHECK);
 			payloadSendRunnable = null;
 			uiHandler = null;
 		}
@@ -60,17 +64,22 @@ public class PayloadSendWorker {
 					@Override
 					public void handleMessage(android.os.Message msg) {
 						switch (msg.what) {
-							case UI_THREAD_MESSAGE_RETRY:
-								runPayloadSendRunnable(true, true);
+							case UI_THREAD_MESSAGE_RETRY_CHECK:
+								checkIfStartSendPayload(true, true);
 								break;
 							default:
 								super.handleMessage(msg);
 						}
 					}
 				};
+			} else {
+				uiHandler.removeMessages(UI_THREAD_MESSAGE_RETRY_CHECK);
 			}
+
 			if (threadCanRun.get() && !threadRunning.get()) {
+				// Check passed
 				threadRunning.set(true);
+				// Start payload send runnable now
 				ApptentiveInternal.getInstance().runOnWorkerThread(payloadSendRunnable);
 			}
 		}
@@ -96,7 +105,7 @@ public class PayloadSendWorker {
 					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getApptentiveConversationToken())){
 						ApptentiveLog.i("No conversation token yet.");
 						if (mgr != null) {
-							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
 						}
 						retryLater(NO_TOKEN_SLEEP);
 						break;
@@ -104,7 +113,7 @@ public class PayloadSendWorker {
 					if (!Util.isNetworkConnectionPresent()) {
 						ApptentiveLog.d("Can't send payloads. No network connection.");
 						if (mgr != null) {
-							mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
+							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_NETWORK);
 						}
 						retryLater(NO_CONNECTION_SLEEP_TIME);
 						break;
@@ -125,10 +134,11 @@ public class PayloadSendWorker {
 					switch (payload.getBaseType()) {
 						case message:
 							if (mgr != null) {
-								mgr.onResumeSending();
+								mgr.resumeSending();
 							}
 							response = ApptentiveClient.postMessage((ApptentiveMessage) payload);
 							if (mgr != null) {
+								// if message is rejected temporarily, onSentMessage() will pause sending
 								mgr.onSentMessage((ApptentiveMessage) payload, response);
 							}
 							break;
@@ -167,11 +177,11 @@ public class PayloadSendWorker {
 							ApptentiveLog.v("Rejected json:", payload.toString());
 							db.deletePayload(payload);
 						} else if (response.isRejectedTemporarily()) {
+							if (mgr != null) {
+								mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+							}
 							ApptentiveLog.d("Unable to send JSON. Leaving in queue.");
 							if (response.isException()) {
-								if (mgr != null) {
-									mgr.onPauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
-								}
 								retryLater(NO_CONNECTION_SLEEP_TIME);
 								break;
 							} else {
@@ -191,24 +201,26 @@ public class PayloadSendWorker {
 		}
 
 		private void retryLater(int millis) {
-			Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_RETRY);
-			uiHandler.removeMessages(UI_THREAD_MESSAGE_RETRY);
+			Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_RETRY_CHECK);
+			uiHandler.removeMessages(UI_THREAD_MESSAGE_RETRY_CHECK);
 			uiHandler.sendMessageDelayed(msg, millis);
 		}
 	}
 
 	public void appWentToForeground() {
 		appInForeground.set(true);
-		runPayloadSendRunnable(true, true);
+		checkIfStartSendPayload(true, true);
 	}
 
 	public void appWentToBackground() {
 		appInForeground.set(false);
-		runPayloadSendRunnable(true, false);
+		checkIfStartSendPayload(true, false);
 	}
 
 	public void setCanRunPayloadThread(boolean b) {
 		threadCanRun.set(b);
-		runPayloadSendRunnable(true, true);
+		if (uiHandler == null || !uiHandler.hasMessages(UI_THREAD_MESSAGE_RETRY_CHECK)) {
+			checkIfStartSendPayload(true, true);
+		}
 	}
 }
