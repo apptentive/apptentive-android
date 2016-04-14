@@ -24,6 +24,7 @@
                                         cardView:cardElevation="?attr/apptentiveCardViewElevation">
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
+                      android:background="?attr/apptentiveCardViewBackground"
                       android:orientation="vertical">
             <LinearLayout android:id="@+id/apptentive_compound_message_body_container"
                           android:layout_width="match_parent"
@@ -32,7 +33,6 @@
                           android:paddingRight="16dp"
                           android:paddingTop="14dp"
                           android:paddingBottom="14dp"
-                          android:background="?attr/apptentiveCardViewBackground"
                           android:orientation="vertical">
                 <TextView android:id="@+id/apptentive_compound_message_body"
                           android:layout_width="wrap_content"
