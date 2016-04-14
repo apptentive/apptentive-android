@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -9,9 +9,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey.
- */
 abstract public class BaseQuestion extends JSONObject implements Question {
 
 	public static final String KEY_NAME = "question";
@@ -23,6 +20,7 @@ abstract public class BaseQuestion extends JSONObject implements Question {
 	// Internal state that doesn't exist on the server.
 	private static final String KEY_ANSWERS = "answers";
 	private static final String KEY_METRIC_SENT = "metric_sent";
+	private static final String KEY_REQUIRED_TEXT = "required_text";
 
 	public abstract int getType();
 
@@ -40,6 +38,18 @@ abstract public class BaseQuestion extends JSONObject implements Question {
 
 	public boolean isRequired() {
 		return optBoolean(KEY_REQUIRED, false);
+	}
+
+	public String getRequiredText() {
+		return optString(KEY_REQUIRED_TEXT, null);
+	}
+
+	public void setRequiredText(String requiredText) {
+		try {
+			put(KEY_REQUIRED_TEXT, requiredText);
+		} catch (Exception e) {
+			// Do nothing
+		}
 	}
 
 	public String getInstructions() {

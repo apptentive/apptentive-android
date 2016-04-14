@@ -28,57 +28,55 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 	protected Q question;
 	private OnSurveyQuestionAnsweredListener listener;
 
-	protected View requiredView;
+	protected TextView requiredView;
 	protected View dashView;
 	protected TextView instructionsView;
 
 	private View validationFailedBorder;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
-		View v = themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);
-		return v;
+		return themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);
 	}
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		requiredView = view.findViewById(R.id.question_required);
+		requiredView = (TextView) view.findViewById(R.id.question_required);
 		dashView = view.findViewById(R.id.dash_view);
 		instructionsView = (TextView) view.findViewById(R.id.question_instructions);
 
 		TextView title = (TextView) view.findViewById(R.id.question_title);
 		title.setText(question.getValue());
 
-		String instructionsText = question.getInstructions();
-		setInstructions(view, instructionsText);
+		setInstructions(question.getRequiredText(), question.getInstructions());
 
 		validationFailedBorder = view.findViewById(R.id.validation_failed_border);
 	}
 
 
-	protected void setInstructions(final View v, String instructionsText) {
-		boolean hasInstructions = !TextUtils.isEmpty(instructionsText);
+	protected void setInstructions(String requiredText, String instructionsText) {
+		boolean showRequiredText = question.isRequired() && !TextUtils.isEmpty(requiredText);
+		boolean showInstructions = !TextUtils.isEmpty(instructionsText);
 
-		requiredView = v.findViewById(R.id.question_required);
-		if (question.isRequired()) {
+		if (showRequiredText) {
+			requiredView.setText(requiredText);
 			requiredView.setVisibility(View.VISIBLE);
 		} else {
 			requiredView.setVisibility(View.GONE);
 		}
 
-		if (hasInstructions) {
+		if (showInstructions) {
 			instructionsView.setText(instructionsText);
 			instructionsView.setVisibility(View.VISIBLE);
 		} else {
 			instructionsView.setVisibility(View.GONE);
 		}
 
-		if(question.isRequired() && hasInstructions) {
+		if (showRequiredText && showInstructions) {
 			dashView.setVisibility(View.VISIBLE);
 		} else {
 			dashView.setVisibility(View.GONE);

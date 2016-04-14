@@ -53,7 +53,7 @@ public class SurveyInteraction extends Interaction {
 	}
 
 	public String getSuccessMessage() {
-		return getConfiguration().optString(KEY_SHOW_SUCCESS_MESSAGE, null);
+		return getConfiguration().optString(KEY_SUCCESS_MESSAGE, null);
 	}
 
 	public boolean isRequired() {
@@ -73,6 +73,7 @@ public class SurveyInteraction extends Interaction {
 	}
 
 	public List<Question> getQuestions() {
+		String requiredText = getRequiredText();
 		try {
 			InteractionConfiguration configuration = getConfiguration();
 			if (configuration != null && configuration.has(KEY_QUESTIONS)) {
@@ -96,6 +97,7 @@ public class SurveyInteraction extends Interaction {
 							break;
 					}
 					if (question != null) {
+						question.setRequiredText(requiredText);
 						questions.add(question);
 					}
 				}
