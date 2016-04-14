@@ -70,7 +70,10 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		answer = (EditText) view.findViewById(R.id.answer_text);
-		answer.setHint(question.getFreeformHint());
+		String hint = question.getFreeformHint();
+		if (!TextUtils.isEmpty(hint)) {
+			answer.setHint(hint);
+		}
 		answer.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 			}

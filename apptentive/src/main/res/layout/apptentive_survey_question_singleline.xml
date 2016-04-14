@@ -14,4 +14,4 @@
           android:textAppearance="@style/Apptentive.TextAppearance.Body1"
           android:gravity="bottom|start"
           android:inputType="text|textCapSentences"
-          android:hint="Please leave detailed feedback…"/>
+          android:hint="Please leave detailed feedback"/>

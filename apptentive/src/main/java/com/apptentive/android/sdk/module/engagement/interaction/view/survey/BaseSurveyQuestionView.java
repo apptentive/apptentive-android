@@ -59,10 +59,13 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 
 
 	protected void setInstructions(String requiredText, String instructionsText) {
-		boolean showRequiredText = question.isRequired() && !TextUtils.isEmpty(requiredText);
+		boolean showRequiredText = question.isRequired();
 		boolean showInstructions = !TextUtils.isEmpty(instructionsText);
 
 		if (showRequiredText) {
+			if (TextUtils.isEmpty(requiredText)) {
+				requiredText = "Required";
+			}
 			requiredView.setText(requiredText);
 			requiredView.setVisibility(View.VISIBLE);
 		} else {

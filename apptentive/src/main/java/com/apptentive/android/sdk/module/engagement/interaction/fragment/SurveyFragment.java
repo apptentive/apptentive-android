@@ -96,7 +96,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 		String sendText = interaction.getSubmitText();
 		if (!TextUtils.isEmpty(sendText)) {
-			send.setText(interaction.getSubmitText());
+			send.setText(sendText);
 		}
 		send.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -133,8 +133,10 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					toast.setDuration(Toast.LENGTH_SHORT);
 					View toastView = themedInflater.inflate(R.layout.apptentive_survey_invalid_toast, (LinearLayout) getView().findViewById(R.id.survey_invalid_toast_root));
 					toast.setView(toastView);
-					((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText(interaction.getValidationError());
-
+					String validationText = interaction.getValidationError();
+					if (!TextUtils.isEmpty(validationText)) {
+						((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText(validationText);
+					}
 					toast.show();
 				}
 			}
