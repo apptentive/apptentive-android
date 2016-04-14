@@ -44,7 +44,8 @@ import java.util.List;
  */
 public class MessageManager {
 
-	// The reason od message sending errors
+	// The reason of pause message sending
+	public static int SEND_PAUSE_REASON_ACTIVITY_PAUSE = 0;
 	public static int SEND_PAUSE_REASON_NETWORK = 1;
 	public static int SEND_PAUSE_REASON_SERVER = 2;
 
@@ -270,13 +271,13 @@ public class MessageManager {
 		return ret;
 	}
 
-	public void onResumeSending() {
+	public void resumeSending() {
 		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 			afterSendMessageListener.get().onResumeSending();
 		}
 	}
 
-	public void onPauseSending(int reason_code) {
+	public void pauseSending(int reason_code) {
 		if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 			afterSendMessageListener.get().onPauseSending(reason_code);
 		}
@@ -297,7 +298,7 @@ public class MessageManager {
 		}
 
 		if (response.isRejectedTemporarily()) {
-			onPauseSending(SEND_PAUSE_REASON_SERVER);
+			pauseSending(SEND_PAUSE_REASON_SERVER);
 			return;
 		}
 
