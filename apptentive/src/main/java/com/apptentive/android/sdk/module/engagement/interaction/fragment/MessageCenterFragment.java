@@ -179,6 +179,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if (interaction != null) {
+			String contextualMessageBody = interaction.getContextualMessageBody();
+			contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
+		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+													 Bundle savedInstanceState) {
 		listViewSavedTopIndex = (savedInstanceState == null) ? -1 :
 				savedInstanceState.getInt(LIST_TOP_INDEX);
 		listViewSavedTopOffset = (savedInstanceState == null) ? 0 :
@@ -194,15 +203,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		pendingWhoCardMode = (savedInstanceState == null) ? 0 :
 				savedInstanceState.getInt(WHO_CARD_MODE);
 
-		if (interaction != null) {
-			String contextualMessageBody = interaction.getContextualMessageBody();
-			contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
-		}
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
 		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		// clone the inflater using the ContextThemeWrapper
 		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
@@ -559,9 +559,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void addWhoCardItem(int mode) {
-		if (!interaction.getWhoCardRequestEnabled()) {
-			return;
-		}
 		pendingWhoCardMode = mode;
 		clearStatusItem();
 		whoCardItem = (mode == WHO_CARD_MODE_INIT) ? interaction.getWhoCardInit()
@@ -1550,7 +1547,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					// Add new outgoing message with animation
 					fragment.addNewOutGoingMessageItem(message);
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
-					// After the message is sent, check if Who Card need to be shown for the 1st time
+					// After the message is sent, check if Who Card need to be shown for the 1st time(When Who Card is either requested or required)
 					SharedPreferences prefs = fragment.hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 					if (!bWhoCardSet) {
@@ -1563,7 +1560,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						}
 						EngagementModule.engageInternal(fragment.hostingActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
-						sendMessageDelayed(obtainMessage(MSG_MESSAGE_ADD_WHOCARD, WHO_CARD_MODE_INIT, 0), DEFAULT_DELAYMILLIS);
+						if (fragment.interaction.getWhoCardRequestEnabled()) {
+							sendMessageDelayed(obtainMessage(MSG_MESSAGE_ADD_WHOCARD, WHO_CARD_MODE_INIT, 0), DEFAULT_DELAYMILLIS);
+						}
 					}
 					break;
 				}

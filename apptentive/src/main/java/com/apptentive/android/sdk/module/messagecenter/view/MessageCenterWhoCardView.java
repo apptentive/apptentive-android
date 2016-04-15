@@ -125,10 +125,7 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 			});
 		}
 
-
-		if (!TextUtils.isEmpty(name)) {
-			nameEditText.setText(name);
-		}
+		nameEditText.setText(name);
 
 		TextWatcher emailTextWatcher = new TextWatcher() {
 			@Override
@@ -163,10 +160,8 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 		};
 
 		emailEditText.addTextChangedListener(emailTextWatcher);
+		emailEditText.setText(email);
 
-		if (!TextUtils.isEmpty(email)) {
-			emailEditText.setText(email);
-		}
 	}
 
 	public EditText getNameField() {
