@@ -22,6 +22,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
@@ -761,8 +763,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		try {
 
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			Fragment prev = getFragmentManager().findFragmentByTag("imagePreviewDialog");
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			ft.addToBackStack(null);
+
+			// Create and show the dialog.
 			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
-			dialog.show(getRetainedChildFragmentManager(), "preview_dialog");
+			dialog.show(ft, "imagePreviewDialog");
+
 		} catch (Exception e) {
 			ApptentiveLog.e("Error loading attachment preview.", e);
 		}

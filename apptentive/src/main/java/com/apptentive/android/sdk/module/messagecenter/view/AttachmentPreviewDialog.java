@@ -88,23 +88,6 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		previewContainer.setLayoutParams(lp);
 
 
-		getDialog().setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialog) {
-				//Clear the not focusable flag from the window
-				getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-				//Update the WindowManager with the new attributes
-				WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
-				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-				lp.copyFrom(getDialog().getWindow().getAttributes());
-				lp.gravity = Gravity.BOTTOM;
-				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-				lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-				wm.updateViewLayout(getDialog().getWindow().getDecorView(), lp);
-			}
-		});
-
 		ApptentiveAttachmentLoader.getInstance().load(currentImage.originalPath, currentImage.localCachePath, 0, previewImageView, width, height, true,
 				new ApptentiveAttachmentLoader.LoaderCallback() {
 					@Override
@@ -154,6 +137,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 		lp.copyFrom(dialog.getWindow().getAttributes());
 		lp.gravity = Gravity.BOTTOM;
+		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 		lp.height = WindowManager.LayoutParams.MATCH_PARENT;
 		dialog.getWindow().setAttributes(lp);
 		return dialog;
