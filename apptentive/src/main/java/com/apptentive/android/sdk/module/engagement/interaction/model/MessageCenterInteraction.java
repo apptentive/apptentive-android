@@ -166,27 +166,27 @@ public class MessageCenterInteraction extends Interaction {
 			return null;
 		}
 		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profile_init = profile.optJSONObject(KEY_PROFILE_INIT);
+		JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
 		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
 			return new MessageCenterComposingItem(
 					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_INIT,
-					profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
+					profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
 					// Hide name field if profile is required and never set
 					null,
-					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-					profile_init.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
+					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
+					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
 					// Hide Skip button
 					null,
-					profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+					profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 		}
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT,
-				profile_init.optString(KEY_PROFILE_INIT_TITLE, null),
-				profile_init.optString(KEY_PROFILE_INIT_NAME_HINT, null),
-				profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profile_init.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
-				profile_init.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
-				profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+				profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
+				profileInitial.optString(KEY_PROFILE_INIT_NAME_HINT, null),
+				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
+				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
+				profileInitial.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
+				profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 	}
 
 	public MessageCenterComposingItem getWhoCardEdit() {
@@ -195,26 +195,26 @@ public class MessageCenterInteraction extends Interaction {
 			return null;
 		}
 		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profile_edit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
+		JSONObject profileEdit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
 		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
-			JSONObject profile_init = profile.optJSONObject(KEY_PROFILE_INIT);
+			JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
 			return new MessageCenterComposingItem(
 					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT,
-					profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
-					profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null), // Show "Email(required)"
-					profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-					profile_edit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-					profile_edit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
+					profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
+					profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
+					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null), // Show "Email(required)"
+					profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
+					profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
+					profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 		}
 		return new MessageCenterComposingItem(
 				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
-				profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-				profile_edit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
+				profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
+				profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
+				profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
+				profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
+				profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
+				profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
 	}
 
 
