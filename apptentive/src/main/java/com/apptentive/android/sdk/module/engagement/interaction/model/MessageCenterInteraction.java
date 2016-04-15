@@ -175,6 +175,7 @@ public class MessageCenterInteraction extends Interaction {
 					null,
 					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
 					profile_init.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
+					// Hide Skip button
 					null,
 					profile_init.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
 		}
@@ -195,10 +196,19 @@ public class MessageCenterInteraction extends Interaction {
 		}
 		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
 		JSONObject profile_edit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
-		boolean isRequired = profile.optBoolean(KEY_PROFILE_REQUIRE, false);
+		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
+			JSONObject profile_init = profile.optJSONObject(KEY_PROFILE_INIT);
+			return new MessageCenterComposingItem(
+					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT,
+					profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
+					profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
+					profile_init.optString(KEY_PROFILE_INIT_EMAIL_HINT, null), // Show "Email(required)"
+					profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
+					profile_edit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
+					profile_edit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
+		}
 		return new MessageCenterComposingItem(
-				(isRequired) ? MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT :
-						MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
+				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
 				profile_edit.optString(KEY_PROFILE_EDIT_TITLE, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
 				profile_edit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
