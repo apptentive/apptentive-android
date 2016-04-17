@@ -45,8 +45,9 @@
                 </LinearLayout>
             </FrameLayout>
             <LinearLayout android:id="@+id/questions"
-                          android:layout_width="match_parent"
+                          android:layout_width="@dimen/apptentive_interaction_card_list_width"
                           android:layout_height="match_parent"
+                          android:layout_gravity="center_horizontal"
                           android:orientation="vertical">
                 <!-- Questions are added here -->
             </LinearLayout>
