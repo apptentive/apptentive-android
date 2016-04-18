@@ -1574,9 +1574,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					int firstIndex = fragment.messageCenterListView.getFirstVisiblePosition();
 					View v = fragment.messageCenterListView.getChildAt(0);
 					int top = (v == null) ? 0 : v.getTop();
-					fragment.updateMessageSentStates();
+
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
-					sendMessage(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
+					// If Who Card is being shown while a message is sent, make sure Who Card is still in view by scrolling to bottom
+					if (fragment.whoCardItem != null) {
+						sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
+					} else {
+						sendMessage(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
+					}
 					break;
 				}
 				case MSG_START_SENDING: {
