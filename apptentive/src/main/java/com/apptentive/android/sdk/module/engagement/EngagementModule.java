@@ -45,7 +45,7 @@ public class EngagementModule {
 	}
 
 	public static synchronized boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.isApptentiveRegistered() || context == null) {
 			return false;
 		}
 		try {

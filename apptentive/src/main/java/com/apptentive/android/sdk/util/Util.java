@@ -29,6 +29,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -114,16 +115,23 @@ public class Util {
 	}
 
 
-	private static List<PackageInfo> getPermissions(Context context) {
+	private static List<PackageInfo> getPermissions(@NonNull Context context) {
 		return context.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
 	}
 
 	public static boolean packageHasPermission(Context context, String permission) {
+		if (context == null) {
+			return false;
+		}
 		String packageName = context.getApplicationContext().getPackageName();
 		return packageHasPermission(context, packageName, permission);
 	}
 
 	public static boolean packageHasPermission(Context context, String packageName, String permission) {
+		if (context == null) {
+			return false;
+		}
+
 		List<PackageInfo> packageInfos = getPermissions(context);
 		for (PackageInfo packageInfo : packageInfos) {
 			if (packageInfo.packageName.equals(packageName) && packageInfo.requestedPermissions != null) {
@@ -137,16 +145,16 @@ public class Util {
 		return false;
 	}
 
-	public static int pixelsToDips(Context context, int px) {
+	public static int pixelsToDips(@NonNull Context context, int px) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return Math.round(px / scale);
 	}
 
-	public static float dipsToPixels(Context context, float dp) {
+	public static float dipsToPixels(@NonNull Context context, float dp) {
 		return context.getResources().getDisplayMetrics().density * dp;
 	}
 
-	public static float dipsToPixelsFloat(Context context, int dp) {
+	public static float dipsToPixelsFloat(@NonNull Context context, int dp) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return dp * scale;
 	}
@@ -155,7 +163,7 @@ public class Util {
 	 * Internal use only.
 	 */
 	public static void hideSoftKeyboard(Context context, View view) {
-		if (view != null) {
+		if (context != null && view != null) {
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
@@ -163,7 +171,7 @@ public class Util {
 
 
 	public static void showSoftKeyboard(Activity activity, View target) {
-		if (activity.getCurrentFocus() != null) {
+		if (activity != null && activity.getCurrentFocus() != null) {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(target, 0);
 		}
@@ -453,6 +461,9 @@ public class Util {
 	}
 
 	public static int getThemeColor(Context context, int attr) {
+		if (context == null) {
+			return 0;
+		}
 		return getThemeColor(context.getTheme(), attr);
 	}
 
@@ -538,6 +549,10 @@ public class Util {
 
 
 	public static boolean canLaunchIntent(Context context, Intent intent) {
+		if (context == null) {
+			return false;
+		}
+
 		PackageManager pm = context.getPackageManager();
 		ComponentName cn = intent.resolveActivity(pm);
 		if (cn != null) {
@@ -554,8 +569,8 @@ public class Util {
 		}
 	}
 
-	public static String getMimeTypeFromUri(Context appContext, Uri contentUri) {
-		return appContext.getContentResolver().getType(contentUri);
+	public static String getMimeTypeFromUri(Context context, Uri contentUri) {
+		return (context != null) ? context.getContentResolver().getType(contentUri) : null;
 	}
 
 	public static String getRealFilePathFromUri(Context context, Uri contentUri) {
@@ -651,7 +666,7 @@ public class Util {
 			appCacheDir = context.getExternalCacheDir();
 		}
 
-		if (appCacheDir == null) {
+		if (appCacheDir == null && context != null) {
 			appCacheDir = context.getCacheDir();
 		}
 		return appCacheDir;
@@ -665,6 +680,9 @@ public class Util {
 	}
 
 	public static boolean hasPermission(Context context, final String permission) {
+		if (context == null) {
+			return false;
+		}
 		int perm = context.checkCallingOrSelfPermission(permission);
 		return perm == PackageManager.PERMISSION_GRANTED;
 	}
