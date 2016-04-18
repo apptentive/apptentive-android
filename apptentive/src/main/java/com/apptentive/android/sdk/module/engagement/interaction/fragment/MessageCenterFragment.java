@@ -1000,7 +1000,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onCancelComposing() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 
 		JSONObject data = new JSONObject();
 		try {
@@ -1055,7 +1055,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onFinishComposing() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		if (contextualMessage != null) {
 			unsendMessagesCount++;
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(contextualMessage);
@@ -1141,7 +1141,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void cleanupWhoCard() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		clearWhoCardUi(
 				new Animator.AnimatorListener() {
 
@@ -1317,7 +1317,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		savePendingComposingMessage();
 		if (messageEditText != null) {
 			// Hide keyboard if the keyboard was up prior to rotation
-			Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
+			Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 			return messageEditText.onSaveInstanceState();
 		}
 		return null;
