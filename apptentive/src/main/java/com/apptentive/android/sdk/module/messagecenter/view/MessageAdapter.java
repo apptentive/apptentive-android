@@ -119,7 +119,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	private OnListviewItemActionListener composingActionListener;
 
 	public interface OnListviewItemActionListener {
-		void onComposingViewCreated();
+		void onComposingViewCreated(View keyboardFocusedView);
 
 		void onComposingBarCreated();
 
@@ -133,7 +133,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onFinishComposing();
 
-		void onWhoCardViewCreated(EditText nameEt, EditText emailEt);
+		void onWhoCardViewCreated(EditText nameEt, EditText emailEt, View keyboardFocusedView);
 
 		void onSubmitWhoCard(String buttonLabel);
 
@@ -488,10 +488,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				composingActionListener.onComposingViewCreated();
-				if (forceShowKeyboard) {
-					Util.showSoftKeyboard(fragment.getActivity(), composingEditText);
-				}
+				composingActionListener.onComposingViewCreated(forceShowKeyboard ? composingEditText : null);
 				if (updateComposingViewImageBand) {
 					updateComposingViewImageBand = false;
 				}
@@ -559,14 +556,15 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText);
+				View focusedView = null;
 				if (forceShowKeyboard) {
 					if (focusOnNameField) {
-						Util.showSoftKeyboard(fragment.getActivity(), nameEditText);
+						focusedView = nameEditText;
 					} else {
-						Util.showSoftKeyboard(fragment.getActivity(), emailEditText);
+						focusedView = emailEditText;
 					}
 				}
+				composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText, focusedView);
 			}
 
 			@Override
@@ -685,7 +683,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(fragment.getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+			EngagementModule.engageInternal(fragment.getContext(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
 			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 			if (mgr != null) {
@@ -750,7 +748,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		protected Bitmap doInBackground(String... paths) {
 			Bitmap imageBitmap = null;
 			try {
-				Point point = Util.getScreenSize(fragment.getActivity().getApplicationContext());
+				Point point = Util.getScreenSize(fragment.getContext().getApplicationContext());
 				int maxImageWidth = (int) (MAX_IMAGE_SCREEN_PROPORTION_X * point.x);
 				int maxImageHeight = (int) (MAX_IMAGE_SCREEN_PROPORTION_Y * point.x);
 				maxImageWidth = maxImageWidth > MAX_IMAGE_DISPLAY_WIDTH ? MAX_IMAGE_DISPLAY_WIDTH : maxImageWidth;
