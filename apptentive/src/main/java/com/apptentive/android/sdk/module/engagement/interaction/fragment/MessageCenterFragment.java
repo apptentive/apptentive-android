@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -165,6 +166,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
 
+	// FAB y-offset in pixels from the bottom edge
+	private int fabPaddingPixels;
+	private int attachmentsAllowed;
 
 	protected static final int MSG_SCROLL_TO_BOTTOM = 1;
 	protected static final int MSG_SCROLL_FROM_TOP = 2;
@@ -422,7 +426,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 
-		if (composingItem != null) {
+		if (whoCardItem != null) {
+			showKeyboard = true;
+		} else if (composingItem != null) {
 			showKeyboard = true;
 			if (messages.size() == 3 || contextualMessage != null) {
 				showKeyboard = false;
@@ -434,6 +440,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (listViewSavedTopIndex != -1) {
 			messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
 		}
+    // Calculate FAB y-offset
+		fabPaddingPixels = calculateFabPadding(rootView.getContext());
+		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
 	}
 
 	public boolean onMenuItemClick(MenuItem menuItem) {
@@ -864,7 +873,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				barView.showConfirmation = !(messageText.isEmpty());
 			}
 
-			if (attachmentCount == getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+			if (attachmentCount == attachmentsAllowed) {
 				AnimationUtil.fadeOutGone(barView.attachButton);
 			} else {
 				if (barView.attachButton.getVisibility() != View.VISIBLE) {
@@ -1379,10 +1388,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		animatorSet.start();
 	}
 
+	private int calculateFabPadding(Context context) {
+		Resources res = context.getResources();
+		float scale = res.getDisplayMetrics().density;
+		return (int) (res.getDimension(R.dimen.apptentive_message_center_bottom_padding) * scale + 0.5f);
+
+	}
 	private void showFab() {
-		float scale = getResources().getDisplayMetrics().density;
-		int dpAsPixels = (int) (getResources().getDimension(R.dimen.apptentive_message_center_bottom_padding) * scale + 0.5f);
-		messageCenterListView.setPadding(0, 0, 0, dpAsPixels);
+		messageCenterListView.setPadding(0, 0, 0, fabPaddingPixels);
 		AnimationUtil.scaleFadeIn(fab);
 	}
 
