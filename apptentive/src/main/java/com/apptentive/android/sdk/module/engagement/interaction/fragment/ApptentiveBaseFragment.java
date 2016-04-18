@@ -393,14 +393,14 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	@TargetApi(21)
 	private void showToolbarElevationLollipop(boolean visible) {
-		if (toolbar != null) {
+		if (toolbar != null && getActivity() != null) {
 			if (visible) {
 				toolbar.setElevation(Util.dipsToPixels(getContext(), 4.0F));
 			} else {
 				toolbar.setElevation(0.0F);
 			}
 		} else {
-			ActionBar actionBar = ((AppCompatActivity) getActivity(this)).getSupportActionBar();
+			ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
 			if (actionBar != null) {
 				if (visible) {

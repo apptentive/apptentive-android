@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -102,12 +103,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private final static String WHO_CARD_EMAIL = "whocardemail";
 	private final static String WHO_CARD_AVATAR_FILE = "whocardavatar";
 
+	private final static String DIALOG_IMAGE_PREVIEW = "imagePreviewDialog";
+
 	private final static int WHO_CARD_MODE_INIT = 1;
 	private final static int WHO_CARD_MODE_EDIT = 2;
 
 	private final static long DEFAULT_DELAYMILLIS = 200;
 
-	private Activity hostingActivity;
+	/* Fragment.getActivity() may return null if not attached.
+	 * hostingActivityRef is always set in onAttach()
+	 * Keeping a cached weak reference ensures it's save to use
+	 */
+	private WeakReference<Activity> hostingActivityRef;
 
 	private ListView messageCenterListView; // List of apptentive messages
 	private EditText messageEditText; // Composing area
@@ -159,6 +166,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
 
+	// FAB y-offset in pixels from the bottom edge
+	private int fabPaddingPixels;
+	private int attachmentsAllowed;
 
 	protected static final int MSG_SCROLL_TO_BOTTOM = 1;
 	protected static final int MSG_SCROLL_FROM_TOP = 2;
@@ -241,7 +251,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void onAttach(Context context) {
 		super.onAttach(context);
 
-		hostingActivity = (Activity) context;
+		hostingActivityRef = new WeakReference<Activity>((Activity) context);
 		messagingActionHandler = new MessageCenterFragment.MessagingActionHandler(this);
 	}
 
@@ -278,6 +288,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					}
 					imagePickerLaunched = false;
 					Uri uri;
+					Activity hostingActivity = hostingActivityRef.get();
 					//Android SDK less than 19
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
 						uri = data.getData();
@@ -285,8 +296,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						//for Android 4.4
 						uri = data.getData();
 						int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-						hostingActivity.getContentResolver().takePersistableUriPermission(uri, takeFlags);
+						if (hostingActivity != null) {
+							hostingActivity.getContentResolver().takePersistableUriPermission(uri, takeFlags);
+						}
 					}
+
 
 					String originalPath = Util.getRealFilePathFromUri(hostingActivity, uri);
 					if (originalPath != null) {
@@ -331,7 +345,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		 * abandoned the image picker without picking anything
 		 */
 		if (imagePickerLaunched) {
-			EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
+			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
 			imagePickerLaunched = false;
 		}
 	}
@@ -412,7 +426,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterListAdapter = new MessageAdapter<MessageCenterUtil.MessageCenterListItem>(this, messages, interaction);
 
-		if (composingItem != null) {
+		if (whoCardItem != null) {
+			showKeyboard = true;
+		} else if (composingItem != null) {
 			showKeyboard = true;
 			if (messages.size() == 3 || contextualMessage != null) {
 				showKeyboard = false;
@@ -424,6 +440,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (listViewSavedTopIndex != -1) {
 			messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
 		}
+    // Calculate FAB y-offset
+		fabPaddingPixels = calculateFabPadding(rootView.getContext());
+		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
 	}
 
 	public boolean onMenuItemClick(MenuItem menuItem) {
@@ -433,7 +452,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			// Only allow profile editing when not already editing profile or in message composing
 			if (whoCardItem == null && composingItem == null) {
 				//hideProfileButton();
-				final SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+				final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 				boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 
 				JSONObject data = new JSONObject();
@@ -443,7 +462,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				} catch (JSONException e) {
 					//
 				}
-				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+				EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 				messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD,
 						(!bWhoCardSet)? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT, 0), DEFAULT_DELAYMILLIS);
 			}
@@ -472,14 +491,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public boolean onBackPressed() {
-		DialogFragment myFrag = (DialogFragment) (((ApptentiveViewActivity) hostingActivity).getSupportFragmentManager()).findFragmentByTag("preview_dialog");
-		if (myFrag != null) {
-			myFrag.dismiss();
+		ApptentiveViewActivity hostingActivity = (ApptentiveViewActivity) hostingActivityRef.get();
+		if (hostingActivity != null) {
+			DialogFragment myFrag = (DialogFragment) (hostingActivity.getSupportFragmentManager()).findFragmentByTag(DIALOG_IMAGE_PREVIEW);
+			if (myFrag != null) {
+				myFrag.dismiss();
+				myFrag = null;
+			}
+			cleanup();
+			EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 		}
-		cleanup();
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 		return false;
-
 	}
 
 	public boolean cleanup() {
@@ -501,7 +523,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 
 	private void clearPendingMessageCenterPushNotification() {
-		SharedPreferences prefs = hostingActivity.getApplicationContext().getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
 		if (pushData != null) {
 			try {
@@ -543,7 +565,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private boolean checkAddWhoCardIfRequired() {
-		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
 			if (!bWhoCardSet) {
@@ -607,7 +629,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		statusItem = (MessageCenterStatus) item;
 		messages.add(item);
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
 
 	}
 
@@ -694,9 +716,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		imageAttachmentstList.addAll(uniqueImages);
 		// New attachments are added to a composer with no prior attachment
 		if (imageAttachmentstList.size() > 0 && numberOfExistingAttachments == 0) {
-			EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_LIST_SHOWN);
+			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_LIST_SHOWN);
 		}
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_ADD);
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_ADD);
 
 		View v = messageCenterListView.getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
@@ -729,7 +751,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void removeImageFromComposer(final int position) {
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
 		imageAttachmentstList.remove(position);
 		messageCenterListAdapter.removeImageFromComposer(position);
 		int count = imageAttachmentstList.size();
@@ -749,7 +771,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 
 		try {
-			Util.openFileAttachment(hostingActivity, image.originalPath, image.localCachePath, image.mimeType);
+			if (!Util.openFileAttachment(hostingActivityRef.get(), image.originalPath, image.localCachePath, image.mimeType)) {
+				ApptentiveLog.d("Cannot open file attachment");
+			}
 		} catch (Exception e) {
 			ApptentiveLog.e("Error loading attachment", e);
 		}
@@ -764,7 +788,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		try {
 
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			Fragment prev = getFragmentManager().findFragmentByTag("imagePreviewDialog");
+			Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_IMAGE_PREVIEW);
 			if (prev != null) {
 				ft.remove(prev);
 			}
@@ -772,7 +796,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			// Create and show the dialog.
 			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
-			dialog.show(ft, "imagePreviewDialog");
+			dialog.show(ft, DIALOG_IMAGE_PREVIEW);
 
 		} catch (Exception e) {
 			ApptentiveLog.e("Error loading attachment preview.", e);
@@ -849,7 +873,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				barView.showConfirmation = !(messageText.isEmpty());
 			}
 
-			if (attachmentCount == hostingActivity.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+			if (attachmentCount == attachmentsAllowed) {
 				AnimationUtil.fadeOutGone(barView.attachButton);
 			} else {
 				if (barView.attachButton.getVisibility() != View.VISIBLE) {
@@ -860,26 +884,26 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			if (barView.showConfirmation == true) {
 				barView.sendButton.setEnabled(true);
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.apptentiveButtonTintColor));
+					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivityRef.get(), R.attr.apptentiveButtonTintColor));
 				}
 			} else {
 				barView.sendButton.setEnabled(false);
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivity, R.attr.apptentiveButtonTintColorDisabled));
+					barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivityRef.get(), R.attr.apptentiveButtonTintColorDisabled));
 				}
 			}
 		}
 	}
 
 	@Override
-	public void onComposingViewCreated() {
+	public void onComposingViewCreated(View keyboardFocusedOnView) {
 
 		hideProfileButton();
 		hideFab();
 
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 		messageEditText = messageCenterListAdapter.getEditTextInComposing();
-		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			messageEditText.onRestoreInstanceState(composingViewSavedState);
@@ -932,10 +956,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			savedAttachmentstList = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
+
+		if (keyboardFocusedOnView != null) {
+			Util.showSoftKeyboard(hostingActivityRef.get(), keyboardFocusedOnView);
+		}
 	}
 
 	@Override
-	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText) {
+	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText, View viewFocusedWithKeyboard) {
 
 		hideFab();
 		hideProfileButton();
@@ -949,6 +977,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			pendingWhoCardEmail = null;
 		}
 		messageCenterListView.setPadding(0, 0, 0, 0);
+
+		if (viewFocusedWithKeyboard != null) {
+			Util.showSoftKeyboard(hostingActivityRef.get(), viewFocusedWithKeyboard);
+		}
 	}
 
 	@Override
@@ -968,7 +1000,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onCancelComposing() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivity, hostingActivity.findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
 
 		JSONObject data = new JSONObject();
 		try {
@@ -978,7 +1010,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
 
 		clearComposingUi(new Animator.AnimatorListener() {
 
@@ -1023,7 +1055,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onFinishComposing() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivity, hostingActivity.findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
 		if (contextualMessage != null) {
 			unsendMessagesCount++;
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(contextualMessage);
@@ -1088,7 +1120,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
 
 		cleanupWhoCard();
 	}
@@ -1102,14 +1134,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
+		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
 
 		cleanupWhoCard();
 	}
 
 	public void cleanupWhoCard() {
 		messageCenterListAdapter.setForceShowKeyboard(false);
-		Util.hideSoftKeyboard(hostingActivity, hostingActivity.findViewById(android.R.id.content));
+		Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
 		clearWhoCardUi(
 				new Animator.AnimatorListener() {
 
@@ -1231,7 +1263,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void saveWhoCardSetState() {
-		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
 		editor.apply();
@@ -1245,7 +1277,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void savePendingComposingMessage() {
 		Editable content = getPendingComposingContent();
-		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
 		if (content != null) {
 			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, content.toString().trim());
@@ -1274,7 +1306,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * will clear the pending composing message previously saved in shared preference
 	 */
 	public void clearPendingComposingMessage() {
-		SharedPreferences prefs = hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE);
 		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
@@ -1285,7 +1317,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		savePendingComposingMessage();
 		if (messageEditText != null) {
 			// Hide keyboard if the keyboard was up prior to rotation
-			Util.hideSoftKeyboard(hostingActivity, hostingActivity.findViewById(android.R.id.content));
+			Util.hideSoftKeyboard(hostingActivityRef.get(), getView().findViewById(android.R.id.content));
 			return messageEditText.onSaveInstanceState();
 		}
 		return null;
@@ -1356,10 +1388,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		animatorSet.start();
 	}
 
+	private int calculateFabPadding(Context context) {
+		Resources res = context.getResources();
+		float scale = res.getDisplayMetrics().density;
+		return (int) (res.getDimension(R.dimen.apptentive_message_center_bottom_padding) * scale + 0.5f);
+
+	}
 	private void showFab() {
-		float scale = hostingActivity.getResources().getDisplayMetrics().density;
-		int dpAsPixels = (int) (hostingActivity.getResources().getDimension(R.dimen.apptentive_message_center_bottom_padding) * scale + 0.5f);
-		messageCenterListView.setPadding(0, 0, 0, dpAsPixels);
+		messageCenterListView.setPadding(0, 0, 0, fabPaddingPixels);
 		AnimationUtil.scaleFadeIn(fab);
 	}
 
@@ -1559,7 +1595,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					fragment.addNewOutGoingMessageItem(message);
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					// After the message is sent, check if Who Card need to be shown for the 1st time(When Who Card is either requested or required)
-					SharedPreferences prefs = fragment.hostingActivity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 					if (!bWhoCardSet) {
 						JSONObject data = new JSONObject();
@@ -1569,7 +1605,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						} catch (JSONException e) {
 							//
 						}
-						EngagementModule.engageInternal(fragment.hostingActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						if (fragment.interaction.getWhoCardRequestEnabled()) {
 							sendMessageDelayed(obtainMessage(MSG_MESSAGE_ADD_WHOCARD, WHO_CARD_MODE_INIT, 0), DEFAULT_DELAYMILLIS);
@@ -1584,11 +1620,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							fragment.messageCenterListAdapter.setPaused(fragment.isPaused);
 							int reason = msg.arg1;
 							if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
-								EngagementModule.engageInternal(fragment.hostingActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
+								EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
 								MessageCenterStatus newItem = fragment.interaction.getErrorStatusNetwork();
 								fragment.addNewStatusItem(newItem);
 							} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
-								EngagementModule.engageInternal(fragment.hostingActivity, fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
+								EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
 								MessageCenterStatus newItem = fragment.interaction.getErrorStatusServer();
 								fragment.addNewStatusItem(newItem);
 							}
