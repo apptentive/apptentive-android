@@ -1,7 +1,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.os.Bundle;
@@ -89,7 +88,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 	}
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		return false;
 	}
 

@@ -366,7 +366,12 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	}
 
-	public boolean onBackPressed() {
+	/**
+	 * Delegates the hardware or software back button press to the Interaction Fragment.
+	 * @param hardwareButton True if the Hardware back button was pressed. False if the software back button was pressed.
+	 * @return
+	 */
+	public boolean onBackPressed(boolean hardwareButton) {
 		List fragments = getRetainedChildFragmentManager().getFragments();
 
 		if (fragments != null) {

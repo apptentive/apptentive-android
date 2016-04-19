@@ -495,7 +495,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		super.onSaveInstanceState(outState);
 	}
 
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		ApptentiveViewActivity hostingActivity = (ApptentiveViewActivity) hostingActivityRef.get();
 		if (hostingActivity != null) {
 			DialogFragment myFrag = (DialogFragment) (hostingActivity.getSupportFragmentManager()).findFragmentByTag(DIALOG_IMAGE_PREVIEW);
@@ -504,7 +504,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				myFrag = null;
 			}
 			cleanup();
-			EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+			if (hardwareButton) {
+				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+			} else {
+				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE);
+			}
 		}
 		return false;
 	}

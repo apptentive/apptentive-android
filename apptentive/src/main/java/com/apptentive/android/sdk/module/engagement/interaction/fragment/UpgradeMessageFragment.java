@@ -71,7 +71,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 	}
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_DISMISS);
 		return false;
 	}

@@ -172,7 +172,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 	}
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL);
 		return false;
 	}

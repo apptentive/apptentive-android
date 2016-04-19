@@ -75,7 +75,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	}
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL);
 		return false;
 	}
