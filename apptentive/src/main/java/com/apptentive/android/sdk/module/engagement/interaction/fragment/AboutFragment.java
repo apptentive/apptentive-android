@@ -110,8 +110,12 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 		return root;
 	}
 
-	public boolean onBackPressed() {
-		EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
+	public boolean onBackPressed(boolean hardwareButton) {
+		if (hardwareButton) {
+			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
+		} else {
+			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
+		}
 		return false;
 	}
 }

@@ -97,7 +97,7 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 	}
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL);
 		return false;
 	}

@@ -87,7 +87,7 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 
 
 	@Override
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareButton) {
 		return false;
 	}
 

@@ -59,6 +59,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		ApptentiveNestedScrollView.OnScrollChangeListener {
 
 	private static final String EVENT_CANCEL = "cancel";
+	private static final String EVENT_CLOSE = "close";
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
@@ -240,8 +241,12 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	@Override
-	public boolean onBackPressed() {
-		EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
+	public boolean onBackPressed(boolean hardwareButton) {
+		if (hardwareButton) {
+			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
+		} else {
+			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE);
+		}
 		return false;
 	}
 

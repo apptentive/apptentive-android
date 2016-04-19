@@ -161,12 +161,24 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 	}
 
-	@Override
-	public void onBackPressed() {
-		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				exitActivity(false);
+				return true;
 
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Helper to clean up the Activity, whether it is exited through the toolbar back button, or the hardware back button.
+	 */
+	private void exitActivity(boolean hardwareBackButtonWasPressed) {
+		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 		if (currentFragment != null && currentFragment.isVisible()) {
-			if (currentFragment.onBackPressed()) {
+			if (currentFragment.onBackPressed(hardwareBackButtonWasPressed)) {
 				return;
 			}
 
@@ -176,9 +188,12 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 				childFragmentManager.popBackStack();
 			}
 		}
-
 		super.onBackPressed();
 		startLauncherActivityIfRoot();
+	}
+
+	public void onBackPressed() {
+		exitActivity(true);
 	}
 
 	@Override
@@ -217,17 +232,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 					return;
 				}
 			}
-		}
-	}
-
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				onBackPressed();
-				return true;
-
-			default:
-				return super.onOptionsItemSelected(item);
 		}
 	}
 
