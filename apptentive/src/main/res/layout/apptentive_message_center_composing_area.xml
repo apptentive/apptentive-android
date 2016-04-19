@@ -10,7 +10,7 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_marginTop="-1.5dp"
-             android:paddingBottom="2dp"
+             android:paddingBottom="@dimen/apptentive_message_center_card_view_composing_margin_bottom"
              android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:clipToPadding="false"
@@ -18,7 +18,6 @@
              android:background="@android:color/transparent">
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
-                  android:layout_marginBottom="@dimen/apptentive_message_center_default_margin_small"
                   android:orientation="vertical"
                   android:background="?apptentiveComposingAreaBackground">
         <EditText android:id="@+id/composing_et"

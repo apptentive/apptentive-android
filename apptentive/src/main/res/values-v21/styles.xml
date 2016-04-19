@@ -76,4 +76,15 @@
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
         <item name="android:fontFamily">?apptentiveFontFamilyButtonColored</item>
     </style>
+
+    <style name="Apptentive.MessageCenterMessageFrame">
+        <item name="android:paddingTop">@dimen/apptentive_card_view_gap_vertical</item>
+        <item name="android:paddingBottom">@dimen/apptentive_card_view_gap_vertical</item>
+        <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_margin_side</item>
+        <item name="android:paddingRight">@dimen/apptentive_message_center_message_list_margin_side</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
 </resources>
