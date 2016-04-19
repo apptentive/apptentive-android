@@ -69,8 +69,8 @@
     <dimen name="apptentive_message_center_avatar_image_diameter">48dp</dimen>
     <dimen name="apptentive_message_center_default_margin_medium">16dp</dimen>
     <dimen name="apptentive_message_center_default_margin_small">8dp</dimen>
-    <dimen name="apptentive_message_center_card_view_composing_margin_top">2dp</dimen>
-    <dimen name="apptentive_message_center_card_view_composing_margin_bottom">2dp</dimen>
+    <dimen name="apptentive_message_center_card_view_composing_margin_top">4dp</dimen>
+    <dimen name="apptentive_message_center_card_view_composing_margin_bottom">4dp</dimen>
     <dimen name="apptentive_message_center_card_view_composing_margin_side">8dp</dimen>
     <dimen name="apptentive_message_center_card_view_margin_side">16dp</dimen>
     <dimen name="apptentive_message_center_card_control_margin">8dp</dimen>
@@ -107,4 +107,5 @@
     <dimen name="apptentive_image_file_extension_layout_top">24dp</dimen>
 
     <dimen name="apptentive_card_view_gap_vertical">4dp</dimen>
+    <dimen name="apptentive_card_view_gap_horizontal">4dp</dimen>
 </resources>

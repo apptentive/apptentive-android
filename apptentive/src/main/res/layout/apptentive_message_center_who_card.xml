@@ -12,7 +12,7 @@
              android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingTop="@dimen/apptentive_message_center_card_view_composing_margin_top"
-             android:paddingBottom="@dimen/apptentive_message_center_card_view_composing_margin_side"
+             android:paddingBottom="@dimen/apptentive_message_center_card_view_composing_margin_bottom"
              android:background="@android:color/transparent"
              android:clipToPadding="false"
              android:descendantFocusability="afterDescendants">
