@@ -61,11 +61,8 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		selectItem = (savedInstanceState == null) ? -1 :
-				savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
 
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
@@ -81,15 +78,25 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
 			choice.setText(answerDefinition.getValue());
 			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());
-			if (selectItem == i) {
-				choice.setChecked(true);
-			}
 			radioGroup.addView(choice);
 		}
 
-		radioGroup.setOnCheckedChangeListener(this);
+		radioGroup.setOnCheckedChangeListener(null);
 
 		return v;
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		selectItem = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
+		for (int i = 0; i < radioGroup.getChildCount(); i++) {
+			RadioButton choice = (RadioButton) radioGroup.getChildAt(i);
+			if (i == selectItem) {
+				choice.setChecked(true);
+			}
+		}
+		radioGroup.setOnCheckedChangeListener(this);
 	}
 
 	@Override

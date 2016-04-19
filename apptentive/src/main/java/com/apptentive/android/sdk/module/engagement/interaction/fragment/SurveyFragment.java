@@ -168,6 +168,13 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, question.getId()).commit();
 				}
 			}
+		} else {
+			List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+			for (Fragment fragment : fragments) {
+				BaseSurveyQuestionView questionFragment = (BaseSurveyQuestionView) fragment;
+				questionFragment.setOnSurveyQuestionAnsweredListener(this);
+
+			}
 		}
 		return v;
 	}
