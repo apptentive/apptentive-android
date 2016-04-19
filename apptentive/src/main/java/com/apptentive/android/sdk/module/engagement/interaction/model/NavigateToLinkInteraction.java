@@ -1,19 +1,15 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
-import android.app.Activity;
 import org.json.JSONException;
 
 import java.util.Locale;
 
-/**
- * @author Sky Kelsey
- */
 public class NavigateToLinkInteraction extends Interaction {
 
 	public static final String KEY_URL = "url";
@@ -66,10 +62,5 @@ public class NavigateToLinkInteraction extends Interaction {
 			}
 			return New;
 		}
-	}
-
-	@Override
-	public void sendLaunchEvent(Activity activity) {
-		// This Interaction type does not send a launch Event.
 	}
 }
