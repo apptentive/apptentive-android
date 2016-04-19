@@ -161,7 +161,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				}
 				if (surveyQuestionView != null) {
 					surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView).commit();
+					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, question.getId()).commit();
 				}
 			}
 		}

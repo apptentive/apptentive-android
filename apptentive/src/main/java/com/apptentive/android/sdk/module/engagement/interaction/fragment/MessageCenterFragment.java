@@ -190,6 +190,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// Make Message Center frgament retain its instance on orientation change
+		setRetainInstance(true);
 
 		if (interaction != null) {
 			String contextualMessageBody = interaction.getContextualMessageBody();
