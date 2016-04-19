@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -125,8 +124,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			answer.post(new Runnable() {
 				public void run() {
 					answer.requestFocusFromTouch();
-					InputMethodManager lManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-					lManager.showSoftInput(answer, 0);
 				}
 			});
 		}

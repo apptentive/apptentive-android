@@ -62,6 +62,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
+	private static final String SAVED_SCROLL_POSITION = "saved_scroll_position";
+
+	private ApptentiveNestedScrollView scrollView;
 	private LinearLayout questionsContainer;
 
 	private Set<String> questionsWithSentMetrics;
@@ -171,6 +174,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		final int[] savedScrollPosition = (savedInstanceState == null) ? null: savedInstanceState.getIntArray(SAVED_SCROLL_POSITION);
 		ImageButton infoButton = (ImageButton) view.findViewById(R.id.info);
 		infoButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(final View view) {
@@ -192,13 +196,28 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				ApptentiveInternal.getInstance().showAboutInternal(getActivity(), false);
 			}
 		});
-		ApptentiveNestedScrollView scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
+		scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
 		scrollView.setOnScrollChangeListener(this);
+
+		if (savedScrollPosition != null) {
+			scrollView.postDelayed(new Runnable() {
+				public void run() {
+					scrollView.scrollTo(savedScrollPosition[0], savedScrollPosition[1]);
+				}
+			}, 200);
+		}
 	}
 
 	@Override
 	public void onScrollChange(ApptentiveNestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 		showToolbarElevation(v.getTop() != scrollY);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putIntArray(SAVED_SCROLL_POSITION,
+				new int[]{ scrollView.getScrollX(), scrollView.getScrollY()});
 	}
 
 	/**
