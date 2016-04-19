@@ -239,6 +239,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
 		for (Fragment fragment : fragments) {
 			SurveyQuestionView surveyQuestionView = (SurveyQuestionView) fragment;
+			answers.put(surveyQuestionView.getQuestionId(), surveyQuestionView.getAnswer());
 			boolean isValid = surveyQuestionView.isValid();
 			surveyQuestionView.updateValidationState(isValid);
 			if (!isValid) {
