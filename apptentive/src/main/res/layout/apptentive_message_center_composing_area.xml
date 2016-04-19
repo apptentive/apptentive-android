@@ -10,7 +10,7 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_marginTop="-1.5dp"
-             android:paddingBottom="2dp"
+             android:paddingBottom="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:clipToPadding="false"

@@ -40,14 +40,20 @@
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Message">
-        <item name="android:paddingTop">@dimen/apptentive_message_center_fallback_divider_line_width</item>
-        <item name="android:paddingBottom">@dimen/apptentive_message_center_fallback_divider_line_width</item>
+        <item name="cardBackgroundColor">?attr/apptentiveCardViewBackground</item>
         <item name="cardElevation">?attr/apptentiveCardViewElevation</item>
     </style>
 
     <style name="Apptentive.Style.Widget.CardView.Composing">
         <item name="android:layout_margin">0dp</item>
         <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="Apptentive.Style.Widget.CardView.Survey">
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">?attr/apptentiveCardViewBackground</item>
+        <item name="cardCornerRadius">2dp</item>
+        <item name="cardElevation">?attr/apptentiveCardViewElevation</item>
     </style>
 
     <style name="Apptentive.Style.Widget.CardContent"/>
@@ -202,8 +208,7 @@
     </style>
 
     <style name="Apptentive.MessageCenterMessageFrame">
-        <item name="android:paddingTop">4dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">?attr/apptentiveCardViewElevation</item>
         <item name="android:paddingLeft">@dimen/apptentive_message_center_message_list_margin_side</item>
         <item name="android:paddingRight">@dimen/apptentive_message_center_message_list_margin_side</item>
         <item name="android:clipToPadding">false</item>

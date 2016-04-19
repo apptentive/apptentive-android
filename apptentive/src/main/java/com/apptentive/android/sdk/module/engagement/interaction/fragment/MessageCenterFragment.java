@@ -437,8 +437,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 		messageCenterListView.setAdapter(messageCenterListAdapter);
+		// Restore listview scroll offset to where it was before rotation
 		if (listViewSavedTopIndex != -1) {
-			messageCenterListView.setSelectionFromTop(listViewSavedTopIndex, listViewSavedTopOffset);
+			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+					listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
 		}
     // Calculate FAB y-offset
 		fabPaddingPixels = calculateFabPadding(rootView.getContext());
@@ -1553,6 +1555,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_MESSAGE_SENT: {
+					// below is callback handling when receiving of message is acknowledged by server through POST response
 					fragment.unsendMessagesCount--;
 					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
 					for (MessageCenterUtil.MessageCenterListItem message : fragment.messages) {
@@ -1567,10 +1570,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							}
 						}
 					}
+					//Update timestamp display and add status message if needed
 					fragment.updateMessageSentStates();
 					fragment.addExpectationStatusIfNeeded();
 
-					// Update the sent message, make sure it stays in view
+					// Calculate the listview offset to make sure updating sent timestamp does not push the current view port
 					int firstIndex = fragment.messageCenterListView.getFirstVisiblePosition();
 					View v = fragment.messageCenterListView.getChildAt(0);
 					int top = (v == null) ? 0 : v.getTop();

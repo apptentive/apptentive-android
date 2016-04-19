@@ -7,19 +7,15 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:cardView="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:paddingTop="4dp"
-             android:paddingLeft="4dp"
-             android:paddingRight="4dp"
+             android:paddingTop="@dimen/apptentive_card_view_gap_vertical"
+             android:paddingLeft="@dimen/apptentive_card_view_gap_vertical"
+             android:paddingRight="@dimen/apptentive_card_view_gap_vertical"
              android:background="@android:color/transparent">
     <android.support.v7.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        cardView:cardUseCompatPadding="true"
-                                        cardView:cardBackgroundColor="?attr/apptentiveCardViewBackground"
-                                        cardView:cardCornerRadius="2dp"
-                                        cardView:cardElevation="?attr/apptentiveCardViewElevation">
+                                        style="@style/Apptentive.Style.Widget.CardView.Survey">
         <FrameLayout android:layout_width="match_parent"
                      android:layout_height="wrap_content">
             <LinearLayout android:layout_width="match_parent"
