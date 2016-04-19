@@ -82,17 +82,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		if (!TextUtils.isEmpty(hint)) {
 			answer.setHint(hint);
 		}
-		answer.addTextChangedListener(new TextWatcher() {
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-			}
-
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-			}
-
-			public void afterTextChanged(Editable editable) {
-				fireListener();
-			}
-		});
 
 		answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
@@ -127,6 +116,18 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 				}
 			});
 		}
+
+		answer.addTextChangedListener(new TextWatcher() {
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			}
+
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			}
+
+			public void afterTextChanged(Editable editable) {
+				fireListener();
+			}
+		});
 	}
 
 	@Override
