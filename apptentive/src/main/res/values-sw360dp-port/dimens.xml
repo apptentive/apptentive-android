@@ -15,4 +15,7 @@
     <dimen name="apptentive_message_center_header_height">56dp</dimen>
     <dimen name="apptentive_image_file_extension_layout_top">32dp</dimen>
 
+    <dimen name="apptentive_interaction_extended_toolbar_margin_start">60dp</dimen>
+    <dimen name="apptentive_interaction_extended_toolbar_margin_end">8dp</dimen>
+
 </resources>
