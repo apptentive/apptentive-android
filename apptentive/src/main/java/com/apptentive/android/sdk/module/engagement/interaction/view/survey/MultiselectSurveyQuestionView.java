@@ -34,6 +34,7 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 
 	LinearLayout choiceContainer;
 	private ArrayList<Integer> selectedItems;
+	private final static String SELECTED_ITEMS_STATE = "selectedCheckBoxes";
 
 	public static MultiselectSurveyQuestionView newInstance(MultiselectQuestion question) {
 
@@ -65,6 +66,8 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState)  {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
+
+		selectedItems = (savedInstanceState == null) ? null : savedInstanceState.getIntegerArrayList(SELECTED_ITEMS_STATE);
 
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
@@ -107,6 +110,12 @@ public class MultiselectSurveyQuestionView extends BaseSurveyQuestionView<Multis
 			Util.hideSoftKeyboard(getContext(), MultiselectSurveyQuestionView.this.getView());
 		}
 		fireListener();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putIntegerArrayList(SELECTED_ITEMS_STATE, selectedItems);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	RadioGroup radioGroup;
 	boolean buttonChecked;
 	private int selectItem;
+	private final static String SELECTED_RADIO_BUTTON_STATE = "selectedRadioButton";
 
 	public static MultichoiceSurveyQuestionView newInstance(MultichoiceQuestion question) {
 
@@ -63,6 +64,8 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
+		selectItem = (savedInstanceState == null) ? -1 :
+				savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
 
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
@@ -98,6 +101,12 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this.getView());
 		}
 		fireListener();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putInt(SELECTED_RADIO_BUTTON_STATE, selectItem);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
