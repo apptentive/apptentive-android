@@ -44,8 +44,8 @@
                 <Button android:id="@+id/yes"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginStart="24dp"
                         style="?apptentiveInteractionButtonStyle"/>
             </LinearLayout>
         </LinearLayout>

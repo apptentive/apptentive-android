@@ -11,8 +11,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -431,7 +429,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 		if (showAnimation) {
-			fragmentTransaction.setCustomAnimations(R.anim.slide_right_in, R.anim.slide_left_out, R.anim.slide_left_in, R.anim.slide_right_out);
+			fragmentTransaction.setCustomAnimations(R.anim.apptentive_slide_right_in, R.anim.apptentive_slide_left_out, R.anim.apptentive_slide_left_in, R.anim.apptentive_slide_right_out);
 		}
 
 		fragmentTransaction.replace(fragmentContainerId, fragment, tag);
