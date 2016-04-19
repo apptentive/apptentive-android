@@ -197,7 +197,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
 
 		Bundle bundle = getArguments();
 

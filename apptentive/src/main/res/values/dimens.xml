@@ -76,6 +76,7 @@
     <dimen name="apptentive_message_center_card_control_margin">8dp</dimen>
 
     <dimen name="apptentive_interaction_extended_toolbar_margin_start">60dp</dimen>
+    <dimen name="apptentive_interaction_extended_toolbar_margin_end">60dp</dimen>
     <dimen name="apptentive_interaction_card_list_width">@integer/match_parent</dimen>
 
     <dimen name="floating_action_button_size_normal">56dp</dimen>

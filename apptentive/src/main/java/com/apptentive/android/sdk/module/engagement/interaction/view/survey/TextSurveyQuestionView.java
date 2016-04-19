@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -29,6 +30,10 @@ import org.json.JSONException;
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> {
 
 	EditText answer;
+	private final static String SURVEY_ANSWER_STATE = "answerState";
+	private final static String SURVEY_ANSWER_FOCUS = "answerFocus";
+	boolean isFocused;
+	private Parcelable answerSavedState;
 
 	public static TextSurveyQuestionView newInstance(SinglelineQuestion question) {
 
@@ -58,7 +63,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
@@ -69,7 +73,11 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		answerSavedState = (savedInstanceState == null) ? null :
+				savedInstanceState.getParcelable(SURVEY_ANSWER_STATE);
+		isFocused = (savedInstanceState == null) ? false : savedInstanceState.getBoolean(SURVEY_ANSWER_FOCUS, false);
 		answer = (EditText) view.findViewById(R.id.answer_text);
+
 		String hint = question.getFreeformHint();
 		if (!TextUtils.isEmpty(hint)) {
 			answer.setHint(hint);
@@ -86,6 +94,15 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			}
 		});
 
+		answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View arg0, boolean focus) {
+				isFocused = focus;
+			}
+		});
+
+
 		if (question.isMultiLine()) {
 			answer.setGravity(Gravity.TOP | Gravity.START);
 			answer.setSingleLine(false);
@@ -99,6 +116,24 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}
+
+		if (answerSavedState != null) {
+			answer.onRestoreInstanceState(answerSavedState);
+		}
+		if (isFocused) {
+			answer.post(new Runnable() {
+				public void run() {
+					answer.requestFocusFromTouch();
+				}
+			});
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putParcelable(SURVEY_ANSWER_STATE, answer.onSaveInstanceState());
+		outState.putBoolean(SURVEY_ANSWER_FOCUS, isFocused);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
