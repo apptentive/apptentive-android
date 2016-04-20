@@ -27,4 +27,8 @@ public interface SurveyQuestionView {
 	 * @return An Object that could be a JSONArray, or String, depending on the question type and the number of answers.
 	 */
 	Object getAnswer();
+
+	boolean didSendMetric();
+
+	void setSentMetric(boolean sent);
 }

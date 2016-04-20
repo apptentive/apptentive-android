@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.content.ActivityNotFoundException;
@@ -91,4 +92,8 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 		return false;
 	}
 
+	@Override
+	protected void sendLaunchEvent(Activity activity) {
+		// This Interaction type does not send a launch Event.
+	}
 }

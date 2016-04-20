@@ -106,4 +106,9 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 		bundle.putString("positive", activity.getString(R.string.apptentive_ok));
 		ApptentiveAlertDialog.show(this, bundle, 0);
 	}
+
+	@Override
+	protected void sendLaunchEvent(Activity activity) {
+		// This Interaction type does not send a launch Event.
+	}
 }

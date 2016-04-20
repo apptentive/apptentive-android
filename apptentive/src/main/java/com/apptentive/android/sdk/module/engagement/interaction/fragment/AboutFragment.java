@@ -5,6 +5,7 @@
  */
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -29,7 +30,6 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 
 	private static final String INTERACTION_NAME = "About";
 
-	private static final String EVENT_NAME_LAUNCH = "launch";
 	private static final String EVENT_NAME_CLOSE = "close";
 	private static final String EVENT_NAME_CANCEL = "cancel";
 
@@ -49,11 +49,6 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 
 		if (bundle != null) {
 			showBrandingBand = bundle.getBoolean(Constants.FragmentConfigKeys.EXTRA);
-		}
-
-		if (!hasLaunched) {
-			hasLaunched = true;
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 		}
 	}
 
@@ -117,5 +112,11 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
 		}
 		return false;
+	}
+
+
+	@Override
+	protected void sendLaunchEvent(Activity activity) {
+		EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 	}
 }

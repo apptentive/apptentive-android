@@ -33,6 +33,7 @@ import android.widget.FrameLayout;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
@@ -45,7 +46,7 @@ import java.util.List;
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
-
+	protected static final String EVENT_NAME_LAUNCH = "launch";
 	private static final String HAS_LAUNCHED = "has_launched";
 
 	private final String fragmentName = getClass().getSimpleName();
@@ -68,7 +69,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	protected String sectionTitle;
 
 	private OnFragmentTransitionListener onTransitionListener;
-
 
 	public interface OnFragmentTransitionListener {
 		void onFragmentTransition(ApptentiveBaseFragment currentFragment);
@@ -124,6 +124,12 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		if (onTransitionListener != null) {
 			onTransitionListener.onFragmentTransition(this);
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(HAS_LAUNCHED, hasLaunched);
 	}
 
 	@Override
@@ -220,9 +226,20 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		if (savedInstanceState != null) {
 			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
 		}
-		if (!hasLaunched && interaction != null) {
+		if (!hasLaunched) {
 			hasLaunched = true;
-			interaction.sendLaunchEvent(getActivity());
+			sendLaunchEvent(getActivity());
+		}
+	}
+
+	/**
+	 * Override this in cases where the behavior needs to be different. For instance, the About screen doesn't have an interaction.
+	 *
+	 * @param activity The launching Activity
+	 */
+	protected void sendLaunchEvent(Activity activity) {
+		if (interaction != null) {
+			EngagementModule.engageInternal(activity, interaction, EVENT_NAME_LAUNCH);
 		}
 	}
 
