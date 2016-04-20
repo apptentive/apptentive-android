@@ -11,7 +11,6 @@
              android:layout_height="wrap_content"
              android:paddingLeft="@dimen/apptentive_message_center_card_view_composing_margin_side"
              android:paddingRight="@dimen/apptentive_message_center_card_view_composing_margin_side"
-             android:paddingTop="@dimen/apptentive_message_center_card_view_composing_margin_top"
              android:clipToPadding="false"
              android:background="@android:color/transparent">
     <RelativeLayout android:id="@+id/composing_toolbar"
