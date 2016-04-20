@@ -92,6 +92,7 @@ public class ApptentiveInternal {
 	String androidId;
 	String appPackageName;
 	Resources.Theme apptentiveTheme;
+	Resources.Theme apptentiveToolbarTheme;
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
   // booleans to prevent starting multiple fetching asyncTasks simultaneously
@@ -288,6 +289,10 @@ public class ApptentiveInternal {
 		return apptentiveTheme;
 	}
 
+	public Resources.Theme getApptentiveToolbarTheme() {
+		return apptentiveToolbarTheme;
+	}
+
 	public int getDefaultStatusbarColor() {
 		return statusBarColorDefault;
 	}
@@ -482,6 +487,11 @@ public class ApptentiveInternal {
 			} finally {
 				a.recycle();
 			}
+
+			int toolbarThemeId = Util.getResourceIdFromAttribute(ApptentiveInternal.getInstance().getApptentiveTheme(), R.attr.apptentiveToolbarTheme);
+			apptentiveToolbarTheme = appContext.getResources().newTheme();
+			apptentiveToolbarTheme.setTo(apptentiveTheme);
+			apptentiveToolbarTheme.applyStyle(toolbarThemeId, true);
 
 			Integer currentVersionCode = packageInfo.versionCode;
 			String currentVersionName = packageInfo.versionName;

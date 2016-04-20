@@ -11,6 +11,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 
+import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -263,11 +265,17 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 				Menu combinedMenu = toolbar.getMenu();
 				fragmentMenuItems = new ArrayList();
 
+				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
 				for (int i = 0; i < combinedMenu.size(); ++i) {
 					int menuItemId = combinedMenu.getItem(i).getItemId();
           // fragmentMenuItems contains new menu items added by this fragment
 					if (!parentMenuItems.contains(Integer.valueOf(menuItemId))) {
 						fragmentMenuItems.add(Integer.valueOf(menuItemId));
+						Drawable drawable = combinedMenu.getItem(i).getIcon();
+						if(drawable != null) {
+							drawable.mutate();
+							drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+						}
 					}
 				}
 			}
@@ -322,7 +330,17 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(this.getMenuResourceId(), menu);
+		inflater.inflate(getMenuResourceId(), menu);
+		// Make menu icon color same as toolbar up arrow. Both use ?colorControlNormal
+		// By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
+		int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
+		for(int i = 0; i < menu.size(); i++){
+			Drawable drawable = menu.getItem(i).getIcon();
+			if(drawable != null) {
+				drawable.mutate();
+				drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+			}
+		}
 		attachFragmentMenuListeners(menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
@@ -338,6 +356,11 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	protected int getMenuResourceId() {
+		return 0;
+	}
+
+	// If return 0, toolbar use up arrow as default navigation icon
+	public int getToolbarNavigationIconResourceId() {
 		return 0;
 	}
 
