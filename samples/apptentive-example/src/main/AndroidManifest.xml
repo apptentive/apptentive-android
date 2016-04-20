@@ -38,8 +38,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity"/>
-
         <!-- Required for GCM -->
         <receiver android:name="com.google.android.gms.gcm.GcmReceiver"
                   android:exported="true"
