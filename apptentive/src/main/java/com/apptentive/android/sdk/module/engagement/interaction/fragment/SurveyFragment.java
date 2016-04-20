@@ -284,4 +284,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			surveyQuestionView.updateValidationState(true);
 		}
 	}
+
+	@Override
+	public int getToolbarNavigationIconResourceId() {
+		// Survey uses close icon to replace up arrow on toolbar
+		return Util.getResourceIdFromAttribute(ApptentiveInternal.getInstance().getApptentiveTheme(), R.attr.apptentiveToolbarIconClose);
+	}
+
 }

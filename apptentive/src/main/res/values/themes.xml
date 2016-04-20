@@ -12,7 +12,6 @@
     <style name="ApptentiveDefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_white</item>
         <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
@@ -40,7 +39,6 @@
     <style name="ApptentiveDefaultTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
-        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_black</item>
         <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_light</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
@@ -69,7 +67,6 @@
     <style name="ApptentiveDefaultTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_white</item>
         <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
@@ -98,7 +95,6 @@
     <style name="ApptentiveDefaultTheme.Dark.LightActionBar" parent="Theme.AppCompat.NoActionBar">
         <item name="apptentiveToolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <item name="apptentiveToolbarTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit_black</item>
         <item name="apptentiveExtendedHeaderForegroundColor">@color/apptentive_text_color_primary_light</item>
 
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
@@ -136,6 +132,8 @@
 
         <item name="apptentiveToolbarBackground">?attr/colorPrimary</item>
         <item name="apptentiveToolbarTitleTextAppearance">@style/Apptentive.TextAppearance.Toolbar</item>
+        <item name="apptentiveToolbarIconClose">@drawable/apptentive_ic_toolbar_close</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit</item>
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 

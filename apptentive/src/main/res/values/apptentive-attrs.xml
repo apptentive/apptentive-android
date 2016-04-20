@@ -22,6 +22,7 @@
         <attr name="apptentiveToolbarTheme" format="reference"/>
         <attr name="apptentiveToolbarPopupTheme" format="reference"/>
         <attr name="apptentiveToolbarTitleTextAppearance" format="reference"/>
+        <attr name="apptentiveToolbarIconClose" format="reference"/>
         <attr name="apptentiveToolbarIconProfile" format="reference"/>
 
         <attr name="apptentiveCheckBoxStyle" format="reference"/>
