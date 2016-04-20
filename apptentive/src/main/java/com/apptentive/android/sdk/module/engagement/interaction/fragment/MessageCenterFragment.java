@@ -242,10 +242,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-		if (listViewSavedTopIndex == -1) {
+		// Restore listview scroll offset to where it was before rotation
+		if (listViewSavedTopIndex != -1) {
+			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+					listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
+		}
+		else {
 			messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 		}
-
 	}
 
 
@@ -440,11 +444,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterListAdapter.setForceShowKeyboard(showKeyboard);
 		messageCenterListView.setAdapter(messageCenterListAdapter);
-		// Restore listview scroll offset to where it was before rotation
-		if (listViewSavedTopIndex != -1) {
-			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-					listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
-		}
+
 		// Calculate FAB y-offset
 		fabPaddingPixels = calculateFabPadding(rootView.getContext());
 		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
@@ -1270,8 +1270,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					int line = layout.getLineForOffset(pos);
 					int baseline = layout.getLineBaseline(line);
 					int ascent = layout.getLineAscent(line);
-					messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-							lastIndex, Math.max(top - (oldh - h), baseline - ascent)));
+					messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+							lastIndex, top - (oldh - h) - baseline + ascent), DEFAULT_DELAYMILLIS);
 				}
 			}
 		}
@@ -1626,7 +1626,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					if (fragment.whoCardItem != null) {
 						sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 					} else {
-						sendMessage(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
+						sendMessageDelayed(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top), DEFAULT_DELAYMILLIS);
 					}
 					break;
 				}
