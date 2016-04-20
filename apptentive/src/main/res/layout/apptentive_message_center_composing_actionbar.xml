@@ -29,7 +29,7 @@
                      android:paddingStart="16dp"
                      android:paddingRight="10dp"
                      android:paddingEnd="10dp"
-                     android:src="@drawable/apptentive_ic_close"
+                     android:src="@drawable/apptentive_ic_composing_close"
                      android:contentDescription="Close"/>
         <TextView android:id="@+id/composing"
                   android:layout_width="wrap_content"

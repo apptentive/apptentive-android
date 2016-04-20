@@ -32,7 +32,7 @@
                      android:layout_centerVertical="true"
                      android:contentDescription="Close"
                      android:visibility="gone"
-                     android:src="@drawable/apptentive_abc_ic_ab_back_mtrl_am_alpha"
+                     android:src="@drawable/apptentive_ic_back_preview"
                      android:background="?android:attr/selectableItemBackground"
                      android:tint="?android:attr/textColorPrimaryInverse"/>
     </RelativeLayout>

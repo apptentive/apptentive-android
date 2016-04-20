@@ -39,7 +39,7 @@
                                  android:paddingLeft="10dp"
                                  android:paddingRight="10dp"
                                  android:contentDescription="Close"
-                                 android:src="@drawable/apptentive_ic_close"
+                                 android:src="@drawable/apptentive_ic_toolbar_close"
                                  android:background="?android:attr/selectableItemBackground"
                                  android:scaleType="fitCenter"
                                  android:tint="?android:attr/textColorPrimaryInverse"/>
