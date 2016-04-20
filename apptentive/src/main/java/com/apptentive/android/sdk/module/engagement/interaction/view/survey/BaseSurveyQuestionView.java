@@ -34,6 +34,9 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 
 	private View validationFailedBorder;
 
+	private static final String SENT_METRIC = "sent_metric";
+	private boolean sentMetric;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
@@ -55,6 +58,8 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 		setInstructions(question.getRequiredText(), question.getInstructions());
 
 		validationFailedBorder = view.findViewById(R.id.validation_failed_border);
+
+		sentMetric = (savedInstanceState != null) && savedInstanceState.getBoolean(SENT_METRIC, false);
 	}
 
 
@@ -120,4 +125,20 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 	public abstract boolean isValid();
 
 	public abstract Object getAnswer();
+
+	@Override
+	public boolean didSendMetric() {
+		return sentMetric;
+	}
+
+	@Override
+	public void setSentMetric(boolean sent) {
+		sentMetric = sent;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(SENT_METRIC, sentMetric);
+	}
 }

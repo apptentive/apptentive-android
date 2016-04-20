@@ -27,7 +27,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Sin
 import org.json.JSONException;
 
 
-public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> {
+public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
 
 	EditText answer;
 	private final static String SURVEY_ANSWER_STATE = "answerState";
@@ -73,26 +73,16 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		answerSavedState = (savedInstanceState == null) ? null :
-				savedInstanceState.getParcelable(SURVEY_ANSWER_STATE);
+		answerSavedState = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(SURVEY_ANSWER_STATE);
 		isFocused = (savedInstanceState == null) ? false : savedInstanceState.getBoolean(SURVEY_ANSWER_FOCUS, false);
 		answer = (EditText) view.findViewById(R.id.answer_text);
+
+		answer.removeTextChangedListener(this);
 
 		String hint = question.getFreeformHint();
 		if (!TextUtils.isEmpty(hint)) {
 			answer.setHint(hint);
 		}
-		answer.addTextChangedListener(new TextWatcher() {
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-			}
-
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-			}
-
-			public void afterTextChanged(Editable editable) {
-				fireListener();
-			}
-		});
 
 		answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
@@ -101,7 +91,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 				isFocused = focus;
 			}
 		});
-
 
 		if (question.isMultiLine()) {
 			answer.setGravity(Gravity.TOP | Gravity.START);
@@ -127,6 +116,13 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 				}
 			});
 		}
+
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		answer.addTextChangedListener(this);
 	}
 
 	@Override
@@ -149,5 +145,18 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		} else {
 			return value;
 		}
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		fireListener();
 	}
 }
