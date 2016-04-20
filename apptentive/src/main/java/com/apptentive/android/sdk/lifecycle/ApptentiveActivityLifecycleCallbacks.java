@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -17,9 +17,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Sky Kelsey
- */
 public class ApptentiveActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
 	private Context appContext;
@@ -28,7 +25,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	private Runnable checkFgBgRoutine;
 	private Runnable checkAppExitRoutine;
-	private boolean isAppForeground, running;
+	private boolean isAppForeground;
 	private Handler delayedChecker = new Handler();
 
 	private static final long CHECK_DELAY_SHORT = 500;
@@ -63,7 +60,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	@Override
 	public void onActivityResumed(Activity activity) {
 		ApptentiveLog.e("onActivityResumed(%s)", activity.toString());
-		running = true;
+
 		boolean wasAppBackground = !isAppForeground;
 		isAppForeground = true;
 
@@ -87,8 +84,6 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	public void onActivityPaused(final Activity activity) {
 		ApptentiveLog.e("onActivityPaused(%s)", activity.toString());
 
-		running = false;
-
 		if (foregroundActivities.decrementAndGet() < 0) {
 			ApptentiveLog.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
@@ -105,9 +100,9 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		delayedChecker.postDelayed(checkFgBgRoutine = new Runnable() {
 			@Override
 			public void run() {
-				if (isAppForeground && !running) {
-					isAppForeground = false;
+				if (foregroundActivities.get() == 0 && isAppForeground) {
 					appEnteredBackground();
+					isAppForeground = false;
 				} else {
 					ApptentiveLog.d("application is still in foreground");
 				}
