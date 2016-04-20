@@ -48,11 +48,9 @@ import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener,
@@ -68,7 +66,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	private ApptentiveNestedScrollView scrollView;
 	private LinearLayout questionsContainer;
 
-	private Set<String> questionsWithSentMetrics;
 	private Map<String, Object> answers;
 
 	public static SurveyFragment newInstance(Bundle bundle) {
@@ -84,7 +81,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		}
 
 		List<Question> questions = interaction.getQuestions();
-		questionsWithSentMetrics = new HashSet<>(questions.size());
 		answers = new LinkedHashMap<String, Object>(questions.size());
 
 		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
@@ -257,7 +253,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			// Never happens.
 		}
 		EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData.toString());
-		questionsWithSentMetrics.add(questionId);
 	}
 
 	private void callListener(boolean completed) {
@@ -280,7 +275,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	@Override
 	public void onAnswered(SurveyQuestionView surveyQuestionView) {
 		String questionId = surveyQuestionView.getQuestionId();
-		if (!questionsWithSentMetrics.contains(questionId)) {
+		if (!surveyQuestionView.didSendMetric()) {
+			surveyQuestionView.setSentMetric(true);
 			sendMetricForQuestion(getActivity(), questionId);
 		}
 		// Also clear validation state for questions that are no longer invalid.

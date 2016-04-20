@@ -80,15 +80,15 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());
 			radioGroup.addView(choice);
 		}
-
 		radioGroup.setOnCheckedChangeListener(null);
-
 		return v;
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		radioGroup.setOnCheckedChangeListener(this);
 		selectItem = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
 		for (int i = 0; i < radioGroup.getChildCount(); i++) {
 			RadioButton choice = (RadioButton) radioGroup.getChildAt(i);
@@ -96,7 +96,6 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				choice.setChecked(true);
 			}
 		}
-		radioGroup.setOnCheckedChangeListener(this);
 	}
 
 	@Override
