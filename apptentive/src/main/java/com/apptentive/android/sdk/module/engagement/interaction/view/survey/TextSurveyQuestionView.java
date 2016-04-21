@@ -30,10 +30,8 @@ import org.json.JSONException;
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
 
 	EditText answer;
-	private final static String SURVEY_ANSWER_STATE = "answerState";
 	private final static String SURVEY_ANSWER_FOCUS = "answerFocus";
 	boolean isFocused;
-	private Parcelable answerSavedState;
 
 	public static TextSurveyQuestionView newInstance(SinglelineQuestion question) {
 
@@ -73,7 +71,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		answerSavedState = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(SURVEY_ANSWER_STATE);
 		isFocused = (savedInstanceState == null) ? false : savedInstanceState.getBoolean(SURVEY_ANSWER_FOCUS, false);
 		answer = (EditText) view.findViewById(R.id.answer_text);
 
@@ -106,13 +103,10 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			answer.setMaxLines(5);
 		}
 
-		if (answerSavedState != null) {
-			answer.onRestoreInstanceState(answerSavedState);
-		}
 		if (isFocused) {
 			answer.post(new Runnable() {
 				public void run() {
-					answer.requestFocusFromTouch();
+					answer.requestFocus();
 				}
 			});
 		}
@@ -127,7 +121,6 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelable(SURVEY_ANSWER_STATE, answer.onSaveInstanceState());
 		outState.putBoolean(SURVEY_ANSWER_FOCUS, isFocused);
 		super.onSaveInstanceState(outState);
 	}
