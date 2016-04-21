@@ -73,7 +73,7 @@ public class EngagementModule {
 	}
 
 	public static void launchInteraction(Context context, Interaction interaction) {
-		if (interaction != null) {
+		if (interaction != null && context != null) {
 			ApptentiveLog.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(context.getApplicationContext(), ApptentiveViewActivity.class);
@@ -98,11 +98,13 @@ public class EngagementModule {
 	}
 
 	public static void launchMessageCenterErrorActivity(Context context) {
-		Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(context);
-		if (!(context instanceof Activity)) {
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		if (context != null) {
+			Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(context);
+			if (!(context instanceof Activity)) {
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+			}
+			context.startActivity(intent);
 		}
-		context.startActivity(intent);
 	}
 
 	public static boolean canShowInteraction(String vendor, String interaction, String eventName) {
