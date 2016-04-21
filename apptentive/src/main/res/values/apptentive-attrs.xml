@@ -10,7 +10,7 @@
     <declare-styleable name="ApptentiveThemeTemplate">
         <attr name="apptentiveWindowBackground" format="color|reference"/>
         <attr name="apptentiveViewBackground" format="color|reference"/>
-        <attr name="apptentiveCardViewBackground" format="color|reference"/>
+        <attr name="apptentiveCardBackground" format="color|reference"/>
         <attr name="apptentiveDialogBackground" format="reference"/>
         <attr name="apptentiveComposingAreaBackground" format="reference"/>
         <attr name="apptentiveComposingBarBackground" format="reference"/>
@@ -76,7 +76,7 @@
         <attr name="apptentiveFontFamilyButtonBorderless" format="string|reference"/>
         <attr name="apptentiveFontFamilyButtonColored" format="string|reference"/>
 
-        <attr name="apptentiveCardViewElevation" format="dimension|reference"/>
+        <attr name="apptentiveCardElevation" format="dimension|reference"/>
 
         <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
         <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>

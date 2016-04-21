@@ -10,8 +10,8 @@
     <color name="apptentive_color_background_dark">#616161</color>
     <color name="apptentive_activity_frame_light">#42000000</color>
     <color name="apptentive_activity_frame_dark">#42000000</color>
-    <color name="apptentive_card_view_background_light">#FAFAFA</color>
-    <color name="apptentive_card_view_background_dark">#202020</color>
+    <color name="apptentive_card_background_light">#FAFAFA</color>
+    <color name="apptentive_card_background_dark">#202020</color>
     <color name="apptentive_card_border_color_light">#1F000000</color>
     <color name="apptentive_card_border_color_dark">#1FFFFFFF</color>
     <color name="apptentive_color_snackbar">#323232</color>

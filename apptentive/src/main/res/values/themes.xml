@@ -17,7 +17,7 @@
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
-        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
+        <item name="apptentiveCardBackground">@color/apptentive_card_background_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
         <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_light</item>
         <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_light</item>
@@ -44,7 +44,7 @@
         <item name="android:colorBackground">@color/apptentive_color_background_light</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_light</item>
-        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_light</item>
+        <item name="apptentiveCardBackground">@color/apptentive_card_background_light</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_light</item>
         <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_light</item>
         <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_light</item>
@@ -72,7 +72,7 @@
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
-        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
+        <item name="apptentiveCardBackground">@color/apptentive_card_background_dark</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
         <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_dark</item>
         <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_dark</item>
@@ -100,7 +100,7 @@
         <item name="android:colorBackground">@color/apptentive_color_background_dark</item>
 
         <item name="apptentiveWindowBackground">@color/apptentive_activity_frame_dark</item>
-        <item name="apptentiveCardViewBackground">@color/apptentive_card_view_background_dark</item>
+        <item name="apptentiveCardBackground">@color/apptentive_card_background_dark</item>
         <item name="apptentiveDialogBackground">@drawable/apptentive_dialog_background_dark</item>
         <item name="apptentiveComposingAreaBackground">@drawable/apptentive_rounded_corner_shape_composing_dark</item>
         <item name="apptentiveComposingBarBackground">@drawable/apptentive_rounded_corner_shape_composing_bar_dark</item>
@@ -198,7 +198,7 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
 
-        <item name="apptentiveCardViewElevation">2dp</item>
+        <item name="apptentiveCardElevation">2dp</item>
     </style>
 
     <!-- This is THE apptentive default theme speficied in AndroidManifest.xml of Apptentive SDK.
