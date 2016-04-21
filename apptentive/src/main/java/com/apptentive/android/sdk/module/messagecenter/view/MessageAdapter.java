@@ -121,7 +121,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	public interface OnListviewItemActionListener {
 		void onComposingViewCreated(View keyboardFocusedView);
 
-		void onComposingBarCreated();
+		void updateComposingBar();
 
 		void beforeComposingTextChanged(CharSequence str);
 
@@ -145,7 +145,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	public MessageAdapter(Fragment fragment, List<MessageCenterListItem> items, MessageCenterInteraction interaction) {
-		super(fragment.getContext(), 0, (List<T>) items);
+		super(fragment.getContext().getApplicationContext(), 0, (List<T>) items);
 		this.fragment = fragment;
 		this.composingActionListener = (OnListviewItemActionListener) fragment;
 		this.interaction = interaction;
@@ -428,7 +428,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					composingActionListener.onComposingBarCreated();
+					composingActionListener.updateComposingBar();
 				}
 
 				@Override
@@ -511,6 +511,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 			composingView.clearImageAttachmentBand();
 		}
 		composingView = null;
+		composingActionBarView = null;
 		composingViewIndex = INVALID_POSITION;
 		showComposingBarAnimation = true;
 		updateComposingViewImageBand = true;

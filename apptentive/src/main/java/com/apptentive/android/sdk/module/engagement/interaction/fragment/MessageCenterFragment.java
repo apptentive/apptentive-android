@@ -750,7 +750,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 				firstIndex, top));
 
-		onComposingBarCreated();
+		updateComposingBar();
 	}
 
 	public void restoreSavedAttachmentsToComposer(final List<ImageItem> images) {
@@ -767,7 +767,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterListAdapter.notifyDataSetChanged();
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 				firstIndex, top));
-		onComposingBarCreated();
+		updateComposingBar();
 	}
 
 	public void removeImageFromComposer(final int position) {
@@ -782,7 +782,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 
-		onComposingBarCreated();
+		updateComposingBar();
 
 	}
 
@@ -884,8 +884,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	@Override
-	public void onComposingBarCreated() {
-		if (isAdded()) {
+	public void updateComposingBar() {
+		if (!isDetached()) {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 			if (barView != null) {
 				barView.showConfirmation = true;
@@ -1024,7 +1024,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void afterComposingTextChanged(String str) {
-		onComposingBarCreated();
+		// Update display status of composing bar buttons when composing text changes
+		updateComposingBar();
 	}
 
 	@Override
@@ -1270,8 +1271,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					int line = layout.getLineForOffset(pos);
 					int baseline = layout.getLineBaseline(line);
 					int ascent = layout.getLineAscent(line);
-					messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-							lastIndex, top - (oldh - h) - baseline + ascent), DEFAULT_DELAYMILLIS);
+					if ( top + baseline - ascent > oldh - h) {
+						messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+								lastIndex, top - (oldh - h)), DEFAULT_DELAYMILLIS);
+					} else {
+						messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
+								lastIndex, top), DEFAULT_DELAYMILLIS);
+					}
 				}
 			}
 		}
@@ -1561,7 +1567,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		public void handleMessage(Message msg) {
 			MessageCenterFragment fragment = (MessageCenterFragment) messageCenterFragmentWeakReference.get();
-			if (fragment == null || !fragment.isAdded()) {
+			if (fragment == null || fragment.isDetached()) {
 				// Message can be delayed. If so, make sure fragment is still available or still attached to activity
 				return;
 			}
