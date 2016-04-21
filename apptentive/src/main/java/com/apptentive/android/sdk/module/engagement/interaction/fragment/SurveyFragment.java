@@ -15,8 +15,10 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -60,8 +62,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	private static final String EVENT_CLOSE = "close";
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
-
-	private static final String SAVED_SCROLL_POSITION = "saved_scroll_position";
 
 	private ApptentiveNestedScrollView scrollView;
 	private LinearLayout questionsContainer;
@@ -178,7 +178,6 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		final int[] savedScrollPosition = (savedInstanceState == null) ? null: savedInstanceState.getIntArray(SAVED_SCROLL_POSITION);
 		ImageButton infoButton = (ImageButton) view.findViewById(R.id.info);
 		infoButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(final View view) {
@@ -203,25 +202,29 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
 		scrollView.setOnScrollChangeListener(this);
 
-		if (savedScrollPosition != null) {
-			scrollView.postDelayed(new Runnable() {
-				public void run() {
-					scrollView.scrollTo(savedScrollPosition[0], savedScrollPosition[1]);
-				}
-			}, 200);
-		}
+		/* Android's ScrollView (when scrolled or fling'd) by default always set the focus to an EditText when
+		 * it's one of it's children.
+		 * The following is needed to change this behavior such that touching outside EditText would take
+		 * away the focus
+		 */
+		scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+		scrollView.setFocusable(true);
+		scrollView.setFocusableInTouchMode(true);
+		scrollView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				v.requestFocusFromTouch();
+				return false;
+			}
+		});
+
+		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
 	}
 
 	@Override
 	public void onScrollChange(ApptentiveNestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 		showToolbarElevation(v.getTop() != scrollY);
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putIntArray(SAVED_SCROLL_POSITION,
-				new int[]{ scrollView.getScrollX(), scrollView.getScrollY()});
 	}
 
 	/**
