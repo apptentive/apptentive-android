@@ -249,7 +249,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		if (toolbarLayoutId != 0) {
-			toolbar = (Toolbar) this.getActivity().findViewById(toolbarLayoutId);
+			toolbar = (Toolbar) getActivity().findViewById(toolbarLayoutId);
 			if (getMenuResourceId() != 0 && toolbar != null) {
 				Menu parentMenu = toolbar.getMenu();
 				ArrayList parentMenuItems = new ArrayList();
@@ -306,7 +306,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (Build.VERSION.SDK_INT >= 11) {
+		if (Build.VERSION.SDK_INT >= 11 && getActivity() != null) {
 			isChangingConfigurations = getActivity().isChangingConfigurations();
 		}
 
@@ -435,7 +435,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	@TargetApi(21)
 	private void showToolbarElevationLollipop(boolean visible) {
-		if (toolbar != null && getActivity() != null) {
+		if (!isAdded()) {
+			return;
+		}
+		if (toolbar != null) {
 			if (visible) {
 				toolbar.setElevation(Util.dipsToPixels(getContext(), 4.0F));
 			} else {
@@ -456,6 +459,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	private void showToolbarElevationPreLollipop(boolean visible) {
+		if (!isAdded()) {
+			return;
+		}
+
 		FrameLayout pager = (FrameLayout) getActivity().findViewById(R.id.apptentive_vp_container);
 
 		if (pager != null) {

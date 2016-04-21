@@ -56,8 +56,8 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 				finalRatingProviderArgs = new HashMap<String, String>();
 			}
 
-			if (!finalRatingProviderArgs.containsKey("package")) {
-				finalRatingProviderArgs.put("package", getActivity().getPackageName());
+			if (!finalRatingProviderArgs.containsKey("package") && activity != null) {
+				finalRatingProviderArgs.put("package", activity.getPackageName());
 			}
 			if (!finalRatingProviderArgs.containsKey("name")) {
 				finalRatingProviderArgs.put("name", appDisplayName);
