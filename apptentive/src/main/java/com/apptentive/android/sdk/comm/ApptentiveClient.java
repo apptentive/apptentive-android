@@ -35,8 +35,8 @@ public class ApptentiveClient {
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 30000;
-	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 30000;
+	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
+	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
