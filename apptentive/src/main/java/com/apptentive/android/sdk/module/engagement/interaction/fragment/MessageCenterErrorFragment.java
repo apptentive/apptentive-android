@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,16 +43,11 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (!hasLaunched) {
-			hasLaunched = true;
-			if (wasLastAttemptServerError(getContext()) ||
-					Util.isNetworkConnectionPresent()) {
-				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
-			} else {
-				EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
-			}
+	protected void sendLaunchEvent(Activity activity) {
+		if (wasLastAttemptServerError(getContext()) || Util.isNetworkConnectionPresent()) {
+			EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
+		} else {
+			EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
 		}
 	}
 
