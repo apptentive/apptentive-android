@@ -371,6 +371,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	protected void updateMenuVisibility() {
 		profileMenuItem.setVisible(bShowProfileMenuItem);
+		profileMenuItem.setEnabled(bShowProfileMenuItem);
 	}
 
 	private void setup(View rootView, boolean isInitMessages) {
@@ -388,8 +389,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				hideFab();
-				messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
+				addComposingCard();
 			}
 		});
 
@@ -404,23 +404,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			if (contextualMessage != null) {
 				addContextualMessageItem();
 			}
-			/* Add composing
-			** if the user was in composing mode before roatation
-			 */
-			else if (composingViewSavedState != null) {
-				addComposerItems();
-			}
-			/* Add who card
-			** if the user was in composing Who card mode before roatation
+
+			/* Add who card with pending contents
+			** Pending contents would be saved if the user was in composing Who card mode and exitted through back button
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
-				addWhoCardItem(pendingWhoCardMode);
+				addWhoCardAsMessageItem(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
 				if (messages.size() == 1) {
-					addComposerItems();
+					addComposerMessageItems();
 				} else {
 					// Finally check if status message need to be restored
 					addExpectationStatusIfNeeded();
@@ -456,7 +451,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (menuItemId == R.id.profile) {
 			// Only allow profile editing when not already editing profile or in message composing
 			if (whoCardItem == null && composingItem == null) {
-				//hideProfileButton();
 				final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 				boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 
@@ -468,8 +462,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					//
 				}
 				EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-				messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD,
-						(!bWhoCardSet) ? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT, 0), DEFAULT_DELAYMILLIS);
+				addWhoCard((!bWhoCardSet) ? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT);
 			}
 			return true;
 		} else {
@@ -561,13 +554,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		clearPendingComposingMessage();
 		clearStatusItem();
 		messages.add(contextualMessage);
-		// If checkAddWhoCardIfRequired returns true, it will add WhoCard
+		// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
 		if (!checkAddWhoCardIfRequired()) {
-			addComposerItems();
+			addComposingCard();
 		}
 	}
 
-	public void addComposerItems() {
+	public void addComposingCard() {
+		hideFab();
+		hideProfileButton();
+		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
+		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
+		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
+	}
+
+
+	public void addComposerMessageItems() {
 		clearStatusItem();
 		actionBarItem = interaction.getComposerBar();
 		messages.add(actionBarItem);
@@ -580,12 +582,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
 			if (!bWhoCardSet) {
-				addWhoCardItem(WHO_CARD_MODE_INIT);
+				addWhoCard(WHO_CARD_MODE_INIT);
 				return true;
 			} else {
 				String savedEmail = Apptentive.getPersonEmail();
 				if (TextUtils.isEmpty(savedEmail)) {
-					addWhoCardItem(WHO_CARD_MODE_EDIT);
+					addWhoCard(WHO_CARD_MODE_EDIT);
 					return true;
 				}
 			}
@@ -593,7 +595,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		return false;
 	}
 
-	public void addWhoCardItem(int mode) {
+	public void addWhoCard(int mode) {
+		hideFab();
+		hideProfileButton();
+		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
+		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
+		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD,
+				mode, 0));
+	}
+
+	public void addWhoCardAsMessageItem(int mode) {
 		pendingWhoCardMode = mode;
 		clearStatusItem();
 		whoCardItem = (mode == WHO_CARD_MODE_INIT) ? interaction.getWhoCardInit()
@@ -994,10 +1005,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText, View viewFocusedWithKeyboard) {
-
-		hideFab();
-		hideProfileButton();
-
 		if (pendingWhoCardName != null) {
 			nameEditText.onRestoreInstanceState(pendingWhoCardName);
 			pendingWhoCardName = null;
@@ -1212,7 +1219,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						// when there was a contextual message or it was the first message. We need to resume composing
 						// after dismissing Who Card
 						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
-							messagingActionHandler.sendEmptyMessageDelayed(MSG_MESSAGE_ADD_COMPOSING, DEFAULT_DELAYMILLIS);
+							addComposingCard();
 						} else {
 							showFab();
 							showProfileButton();
@@ -1445,10 +1452,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private void showFab() {
 		messageCenterListView.setPadding(0, 0, 0, fabPaddingPixels);
+		// Re-enable Fab at the beginning of the animation
+		fab.setEnabled(true);
 		AnimationUtil.scaleFadeIn(fab);
 	}
 
 	private void hideFab() {
+		// Make sure Fab is not clickable during fade-out animation
+		fab.setEnabled(false);
 		AnimationUtil.scaleFadeOutGone(fab);
 	}
 
@@ -1574,14 +1585,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			switch (msg.what) {
 				case MSG_MESSAGE_ADD_WHOCARD: {
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
-					fragment.addWhoCardItem(msg.arg1);
+					fragment.addWhoCardAsMessageItem(msg.arg1);
 					fragment.messageCenterListAdapter.setForceShowKeyboard(true);
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					fragment.messageCenterListView.setSelection(fragment.messages.size() - 1);
 					break;
 				}
 				case MSG_MESSAGE_ADD_COMPOSING: {
-					fragment.addComposerItems();
+					fragment.addComposerMessageItems();
 					fragment.messageCenterListAdapter.setForceShowKeyboard(true);
 					fragment.messageCenterListAdapter.notifyDataSetChanged();
 					fragment.messageCenterListView.setSelection(fragment.messages.size() - 1);
@@ -1665,7 +1676,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						if (fragment.interaction.getWhoCardRequestEnabled()) {
-							sendMessageDelayed(obtainMessage(MSG_MESSAGE_ADD_WHOCARD, WHO_CARD_MODE_INIT, 0), DEFAULT_DELAYMILLIS);
+							fragment.addWhoCard(WHO_CARD_MODE_INIT);
 						}
 					}
 					break;
