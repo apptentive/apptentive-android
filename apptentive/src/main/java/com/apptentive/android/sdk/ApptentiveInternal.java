@@ -107,7 +107,7 @@ public class ApptentiveInternal {
 
 	ExecutorService cachedExecutor;
 
-	private WeakReference<Activity> currentTaskStackBottomActivity;
+	private WeakReference<Activity> currentTaskStackTopActivity;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
@@ -239,7 +239,7 @@ public class ApptentiveInternal {
 	 */
 	static void setLifeCycleCallback() {
 		if (sApptentiveInternal != null && sApptentiveInternal.appContext instanceof Application) {
-			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
+			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks());
 		}
 	}
 
@@ -252,15 +252,15 @@ public class ApptentiveInternal {
 		return appContext;
 	}
 
-	/* Get the last running activity from the current application, i.e. at the bottom of the task
+	/* Get the last running activity from the current application, i.e. at the top of the task
 	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityDestroyed(Activity)}
 	 *
 	 * If Apptentive interaction is to be launched from a non-activity context, use the last running activity at
-	 * the bottom of the task.
+	 * the top of the task.
 	 */
-	public Activity getCurrentTaskStackBottomActivity() {
-		if (currentTaskStackBottomActivity != null) {
-			return currentTaskStackBottomActivity.get();
+	public Activity getCurrentTaskStackTopActivity() {
+		if (currentTaskStackTopActivity != null) {
+			return currentTaskStackTopActivity.get();
 		}
 		return null;
 	}
@@ -383,7 +383,7 @@ public class ApptentiveInternal {
 
 	public void onActivityStarted(Activity activity) {
 		if (activity != null) {
-			currentTaskStackBottomActivity = new WeakReference<Activity>(activity);
+			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
 		}
 	}
 
@@ -398,10 +398,10 @@ public class ApptentiveInternal {
 	}
 
 	public void onActivityDestroyed(Activity activity) {
-		if (activity != null && currentTaskStackBottomActivity != null) {
-			Activity currentBottomActivity = currentTaskStackBottomActivity.get();
+		if (activity != null && currentTaskStackTopActivity != null) {
+			Activity currentBottomActivity = currentTaskStackTopActivity.get();
 			if (currentBottomActivity != null && currentBottomActivity == activity) {
-				currentTaskStackBottomActivity = null;
+				currentTaskStackTopActivity = null;
 			}
 		}
 	}

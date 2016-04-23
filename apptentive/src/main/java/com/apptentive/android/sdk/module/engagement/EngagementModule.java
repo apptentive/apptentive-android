@@ -86,7 +86,7 @@ public class EngagementModule {
 			 */
 			if (!(context instanceof Activity)) {
 				// check if any activity from the hosting app is running
-				Activity activity = ApptentiveInternal.getInstance().getCurrentTaskStackBottomActivity();
+				Activity activity = ApptentiveInternal.getInstance().getCurrentTaskStackTopActivity();
 				if (activity != null) {
 					context = activity;
 				} else {
