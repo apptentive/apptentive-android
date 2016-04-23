@@ -19,47 +19,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApptentiveActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-	private Context appContext;
 	private AtomicInteger runningActivities = new AtomicInteger(0);
 	private AtomicInteger foregroundActivities = new AtomicInteger(0);
 
 	private Runnable checkFgBgRoutine;
-	private Runnable checkAppExitRoutine;
 	private boolean isAppForeground;
 	private Handler delayedChecker = new Handler();
 
-	private static final long CHECK_DELAY_SHORT = 500;
-	private static final long CHECK_DELAY_LONG = 1000;
+	private static final long CHECK_DELAY_SHORT = 1000;
 
-	public ApptentiveActivityLifecycleCallbacks(Context application) {
-		appContext = application;
+	public ApptentiveActivityLifecycleCallbacks() {
 	}
 
 	@Override
 	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-		ApptentiveLog.e("onActivityCreated(%s)", activity.toString());
-
-		if (checkAppExitRoutine != null) {
-			delayedChecker.removeCallbacks(checkAppExitRoutine);
-			checkAppExitRoutine = null;
-		}
-
-		if (runningActivities.getAndIncrement() == 0) {
-			appLaunched(appContext);
-		}
-
-		ApptentiveLog.e("==> Running Activities:    %d", runningActivities.get());
+		ApptentiveLog.d("onActivityCreated(%s)", activity.toString());
+		ApptentiveLog.d("==> Running Activities:    %d", runningActivities.get());
 	}
 
 	@Override
 	public void onActivityStarted(Activity activity) {
-		ApptentiveLog.e("onActivityStarted(%s)", activity.toString());
+		ApptentiveLog.d("onActivityStarted(%s)", activity.toString());
 		ApptentiveInternal.getInstance().onActivityStarted(activity);
 	}
 
 	@Override
 	public void onActivityResumed(Activity activity) {
-		ApptentiveLog.e("onActivityResumed(%s)", activity.toString());
+		ApptentiveLog.d("onActivityResumed(%s)", activity.toString());
 
 		boolean wasAppBackground = !isAppForeground;
 		isAppForeground = true;
@@ -75,20 +61,20 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			ApptentiveLog.d("application is still in foreground");
 		}
 
-		ApptentiveLog.e("==> Foreground Activities: %d", foregroundActivities.get());
+		ApptentiveLog.d("==> Foreground Activities: %d", foregroundActivities.get());
 
 		ApptentiveInternal.getInstance().onActivityResumed(activity);
 	}
 
 	@Override
 	public void onActivityPaused(final Activity activity) {
-		ApptentiveLog.e("onActivityPaused(%s)", activity.toString());
+		ApptentiveLog.d("onActivityPaused(%s)", activity.toString());
 
 		if (foregroundActivities.decrementAndGet() < 0) {
 			ApptentiveLog.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
 		}
-		ApptentiveLog.e("==> Foreground Activities: %d", foregroundActivities.get());
+		ApptentiveLog.d("==> Foreground Activities: %d", foregroundActivities.get());
 
 		if (checkFgBgRoutine != null) {
 			delayedChecker.removeCallbacks(checkFgBgRoutine);
@@ -116,17 +102,17 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	@Override
 	public void onActivityStopped(Activity activity) {
-		ApptentiveLog.e("onActivityStopped(%s)", activity.toString());
+		ApptentiveLog.d("onActivityStopped(%s)", activity.toString());
 	}
 
 	@Override
 	public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-		ApptentiveLog.e("onActivitySaveInstanceState(%s)", activity.toString());
+		ApptentiveLog.d("onActivitySaveInstanceState(%s)", activity.toString());
 	}
 
 	@Override
 	public void onActivityDestroyed(final Activity activity) {
-		ApptentiveLog.e("onActivityDestroyed(%s)", activity.toString());
+		ApptentiveLog.d("onActivityDestroyed(%s)", activity.toString());
 
 		ApptentiveInternal.getInstance().onActivityDestroyed(activity);
 
@@ -135,42 +121,30 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			runningActivities.set(0);
 		}
 
-		if (checkAppExitRoutine != null) {
-			delayedChecker.removeCallbacks(checkAppExitRoutine);
-			checkAppExitRoutine = null;
-		}
-
-		delayedChecker.postDelayed(checkAppExitRoutine = new Runnable() {
-			@Override
-			public void run() {
-				if (runningActivities.get() == 0) {
-					appExited(appContext);
-				} else {
-					ApptentiveLog.d("application is still in foreground");
-				}
-			}
-		}, CHECK_DELAY_LONG);
-
-		ApptentiveLog.e("==> Running Activities:    %d", runningActivities.get());
+		ApptentiveLog.d("==> Running Activities:    %d", runningActivities.get());
 	}
 
 	private void appEnteredForeground() {
-		ApptentiveLog.e("App went to foreground.");
+		ApptentiveLog.d("App went to foreground.");
 		ApptentiveInternal.getInstance().onAppEnterForeground();
+		// Mark entering foreground as app launch
+		appLaunched(ApptentiveInternal.getInstance().getApplicationContext());
 	}
 
 	private void appEnteredBackground() {
-		ApptentiveLog.e("App went to background.");
+		ApptentiveLog.d("App went to background.");
 		ApptentiveInternal.getInstance().onAppEnterBackground();
+		// Mark entering background as app exit
+		appExited(ApptentiveInternal.getInstance().getApplicationContext());
 	}
 
 	private void appLaunched(Context appContext) {
-		ApptentiveLog.e("### App LAUNCH");
+		ApptentiveLog.i("### App LAUNCH");
 		ApptentiveInternal.getInstance().onAppLaunch(appContext);
 	}
 
 	private void appExited(Context appContext) {
-		ApptentiveLog.e("### App EXIT");
+		ApptentiveLog.i("### App EXIT");
 		ApptentiveInternal.getInstance().onAppExit(appContext);
 	}
 }

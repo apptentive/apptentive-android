@@ -239,7 +239,7 @@ public class ApptentiveInternal {
 	 */
 	static void setLifeCycleCallback() {
 		if (sApptentiveInternal != null && sApptentiveInternal.appContext instanceof Application) {
-			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks(sApptentiveInternal.appContext));
+			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks());
 		}
 	}
 
