@@ -559,7 +559,7 @@ public class ApptentiveInternal {
 			if (isAppDebuggable) {
 				throw new RuntimeException(errorMessage);
 			} else {
-				ApptentiveLog.a(errorMessage);
+				ApptentiveLog.e(errorMessage);
 			}
 		} else {
 			ApptentiveLog.d("Using cached Apptentive API Key");

@@ -57,7 +57,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	public void onActivityPaused(final Activity activity) {
 
 		if (foregroundActivities.decrementAndGet() < 0) {
-			ApptentiveLog.a("Incorrect number of foreground Activities encountered. Resetting to 0.");
+			ApptentiveLog.e("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
 		}
 
@@ -89,7 +89,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		ApptentiveInternal.getInstance().onActivityDestroyed(activity);
 
 		if (runningActivities.decrementAndGet() < 0) {
-			ApptentiveLog.a("Incorrect number of running Activities encountered. Resetting to 0.");
+			ApptentiveLog.e("Incorrect number of running Activities encountered. Resetting to 0.");
 			runningActivities.set(0);
 		}
 	}
