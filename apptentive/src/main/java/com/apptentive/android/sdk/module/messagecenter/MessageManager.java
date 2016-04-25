@@ -226,7 +226,7 @@ public class MessageManager {
 	 * This doesn't need to be run during normal program execution. Testing only.
 	 */
 	public void deleteAllMessages(Context context) {
-		ApptentiveLog.e("Deleting all messages.");
+		ApptentiveLog.d("Deleting all messages.");
 		getMessageStore().deleteAllMessages();
 	}
 
