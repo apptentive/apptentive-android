@@ -624,7 +624,7 @@ public class ApptentiveInternal {
 						ApptentiveLog.i("Fetching conversation token asyncTask finished. Result:" + v.booleanValue());
 						isConversationTokenFetchPending.set(false);
 						if (v.booleanValue()) {
-							// Once token is fetched successfully, start two asyncTasks to fetch global configuration and interaction simultaneously
+							// Once token is fetched successfully, start asyncTasks to fetch global configuration, then interaction
 							asyncFetchAppConfigurationAndInteractions();
 						}
 					} else {

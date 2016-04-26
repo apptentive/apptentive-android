@@ -1,5 +1,27 @@
 This document tracks changes to the API between versions.
 
+# 3.0.0
+
+| Removed Methods |
+| ------------------ |
+| [public static void onStart(android.app.Activity activity)] |
+| [public static void onStop(android.app.Activity activity)] |
+
+
+| Modified Methods |
+| ------------------ |
+| [public static void addCustomDeviceData(String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.String) |
+| [public static void addCustomDeviceData(String key, Number value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.Number) |
+| [public static void addCustomDeviceData(String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.String) |
+| [public static void addCustomDeviceData(String key, Version value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.Version) |
+| [public static void addCustomDeviceData(String key, DateTime value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.DateTime) |
+| [public static void addCustomPersonData(String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-java.lang.String-java.lang.String) |
+| [public static void addCustomPersonData(String key, Number value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-java.lang.String-java.lang.Number) |
+| [public static void addCustomPersonData(String key, Boolean value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-java.lang.String-java.lang.Boolean) |
+| [public static void addCustomPersionData(String key, Version value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.Version) |
+| [public static void addCustomPersionData(String key, DateTime value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.DateTime) |
+
+
 # 2.1.0
 
 * Added a methods for setting custom data of type String, Number, and Boolean on the Device and Person objects.

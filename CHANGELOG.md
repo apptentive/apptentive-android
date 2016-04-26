@@ -1,3 +1,13 @@
+# 2016-04-26 - 3.0.0
+
+#### Improvements
+
+* Integration with SDK has been greatly simplified, with no need to call lifecycle delegates, nor extend Apptentive activity. Manual migration is needed if prior versions of sdk are being used.
+* Out-of-box Apptentive UI will inherit theme from the host application. With very little and easy customization override, all UI components will have the same feel-n-look of your application.
+* Redesigned Survey using Material Design, and optimized behaviors to better engage consumer responses.
+* Other improvements include reducing sdk memory footprint and more accurate application lifecycle management.
+
+
 # 2016-01-22 - 2.1.3
 
 #### Bug Fixed and Improvements
