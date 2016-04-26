@@ -28,7 +28,7 @@ Our SDK API has changed so you will need to modify your integration. Rest assure
     2. make sure that this dependency no longer ends in `@aar`, which will prevent gradle from downloading our transitive dependencies.
     3. You can remove any transitive dependencies that you added to support Apptentive. These will be imported by gradle for you.
 2. Modify your `AndroidManifest.xml`
-    1. Remove everything Apptentive related. This includes permissions, Activity declarations, and the API key `<meta-data.` tag. The new integration doesn't require modifying your manifest by default.
+    1. Remove everything Apptentive related. This includes permissions, Activity declarations, and the API key `<meta-data>.` tag. The new integration doesn't require modifying your manifest by default.
     2. If you added a `<meta-data>` tag for overriding our log level, you can leave this in.
 3. In each Activity in your app, remove references to `ApptentiveActivity`, `Apptentive.onStart()`, and `Apptentive.onStop()`. These are no longer necessary, and have been removed from our API to ensure your integration is correct.
 4. In your `Application.onCreate()`, add a call to `Apptentive.register()`. This is where you will pass in your Apptentive API Key.
