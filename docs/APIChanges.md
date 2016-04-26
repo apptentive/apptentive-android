@@ -7,6 +7,14 @@ This document tracks changes to the API between versions.
 | [public static void onStart(android.app.Activity activity)] |
 | [public static void onStop(android.app.Activity activity)] |
 
+| Removed Class |
+| ------------------ |
+| [ApptentiveActivity] |
+| [ApptentiveListActivity] |
+
+| Added Class |
+| ------------------ |
+| [ApptentiveViewActivity] |
 
 | Modified Methods |
 | ------------------ |
@@ -20,6 +28,28 @@ This document tracks changes to the API between versions.
 | [public static void addCustomPersonData(String key, Boolean value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomPersonData-java.lang.String-java.lang.Boolean) |
 | [public static void addCustomPersionData(String key, Version value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.Version) |
 | [public static void addCustomPersionData(String key, DateTime value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.DateTime) |
+| [public static void canShowMessageCenter()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#canShowMessageCenter) |
+| [public static void canShowInteraction(String interaction)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#canShowInteraction-java.lang.String) |
+| [public static synchronized boolean engage(Context context, String event)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-) |
+| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-) |
+| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-com.apptentive.android.sdk.model.ExtendedData...-) |
+| [public static void getPersonEmail()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonEmail) |
+| [public static void getPersonName()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonName) |
+| [public static void getUnreadMessageCount()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getUnreadMessageCount) |
+| [public static boolean handleOpenedPushNotification(Context context)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#handleOpenedPushNotification) |
+| [public static void removeCustomDeviceData(String key)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#removeCustomDeviceData-java.lang.String) |
+| [public static void removeCustomPersonData(String key)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#removeCustomPersonData-java.lang.String) |
+| [public static void sendAttachmentFile(String uri)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentFile-java.lang.String-) |
+| [public static void sendAttachmentFile(byte\[\] content, String mimeType)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentFile-byte:A-java.lang.String-) |
+| [public static void sendAttachmentFile(InputStream is, String mimeType)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentFile-java.io.InputStream-java.lang.String-) |
+| [public static void sendAttachmentText(String text)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#sendAttachmentText-java.lang.String-) |
+| [public static boolean setPendingPushNotification(Bundle bundle)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification-android.os.Bundle-) |
+| [public static boolean setPendingPushNotification(Intent intent)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#setPendingPushNotification-android.content.Intent-) |
+| [public static void setPersonEmail(String email)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPersonEmail-java.lang.String) |
+| [public static void setPersonName(String name)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPersonName-java.lang.String) |
+| [public static void setPushNotificationIntegration(int pushProvider, String token)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#setPushNotificationIntegration-int-java.lang.String) |
+| [public static void showMessageCenter()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-android.content.Context) |
+| [public static void showMessageCenter(Map<String, Object>)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-java.util.Map) |
 
 
 # 2.1.0
