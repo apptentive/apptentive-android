@@ -4,20 +4,23 @@ This document tracks changes to the API between versions.
 
 | Removed Methods |
 | ------------------ |
-| [public static void onStart(android.app.Activity activity)] |
-| [public static void onStop(android.app.Activity activity)] |
+| public static void onStart(android.app.Activity activity) |
+| public static void onStop(android.app.Activity activity) |
 
 | Removed Class |
 | ------------------ |
-| [ApptentiveActivity] |
-| [ApptentiveListActivity] |
+| ApptentiveActivity.java |
+| ApptentiveListActivity.java |
+| ViewActivity.java |
 
 | Added Class |
 | ------------------ |
-| [ApptentiveViewActivity] |
+| ApptentiveViewActivity.java |
+
+The following methods were modified to no longer take a `Context`.
 
 | Modified Methods |
-| ------------------ |
+| ---------------- |
 | [public static void addCustomDeviceData(String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.String) |
 | [public static void addCustomDeviceData(String key, Number value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.Number) |
 | [public static void addCustomDeviceData(String key, String value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.String) |
@@ -30,9 +33,6 @@ This document tracks changes to the API between versions.
 | [public static void addCustomPersionData(String key, DateTime value)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#addCustomDeviceData-java.lang.String-java.lang.DateTime) |
 | [public static void canShowMessageCenter()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#canShowMessageCenter) |
 | [public static void canShowInteraction(String interaction)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#canShowInteraction-java.lang.String) |
-| [public static synchronized boolean engage(Context context, String event)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-) |
-| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-) |
-| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-com.apptentive.android.sdk.model.ExtendedData...-) |
 | [public static void getPersonEmail()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonEmail) |
 | [public static void getPersonName()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getPersonName) |
 | [public static void getUnreadMessageCount()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#getUnreadMessageCount) |
@@ -51,6 +51,13 @@ This document tracks changes to the API between versions.
 | [public static void showMessageCenter()](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-android.content.Context) |
 | [public static void showMessageCenter(Map<String, Object>)](http://www.apptentive.com/docs/android/api/com/apptentive/android/sdk/Apptentive.html#showMessageCenter-java.util.Map) |
 
+The following methods were modified to take a `Context` instead of an `Activity`.
+
+| Modified Methods |
+| ---------------- |
+| [public static synchronized boolean engage(Context context, String event)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-) |
+| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-) |
+| [public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData)](https://docs.apptentive.com/android/api/com/apptentive/android/sdk/Apptentive.html#engage-android.content.Context-java.lang.String-java.util.Map-com.apptentive.android.sdk.model.ExtendedData...-) |
 
 # 2.1.0
 
