@@ -2,27 +2,36 @@
 
 #### Improvements
 
-* Integration with SDK has been greatly simplified, with no need to call lifecycle delegates, nor extend Apptentive activity. Manual migration is needed if prior versions of sdk are being used.
-* Out-of-box Apptentive UI will inherit theme from the host application. With very little and easy customization override, all UI components will have the same feel-n-look of your application.
-* Redesigned Survey using Material Design, and optimized behaviors to better engage consumer responses.
+* We've made it much easier to integrate the Apptentive Android SDK into your app. Now, just add a single line to your `build.gradle`, and one to your `Application` class. If you are migrating from a prior version, make sure to follow our simple [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/next/docs/migrating_to_3.0.0.md).
+* Our SDK's UI will now inherit all styles from your app, as long as you are using an AppCompat or Material theme. If you want to further customize our UI, or you aren't using an AppCompat or Material theme, you can override our styles. Check out our [UI Customization Guide](https://docs.apptentive.com/android/customization/).
+* Our Surveys have been completely redesigned to use Material design. Your existing surveys will continue to work as before, but will look much better.
+* You can now launch our UI without passing in an Activity. This is useful for recording Events and showing Interactions from a Service or BroadcastReceiver. Interactions launched in this way will launch in a new task, while those launched with an Activity Context will launch on top of the Activity stack as before.
 * Other improvements include reducing sdk memory footprint and more accurate application lifecycle management.
+
+
+# 2016-03-22 - 2.1.4
+
+#### Bug Fixes and Improvements
+
+*   All Apptentive resources now have an "apptentive_" prefix
+*   Apptentive's Log class is renamed to "ApptentiveLog" to avoid confusion
 
 
 # 2016-01-22 - 2.1.3
 
-#### Bug Fixed and Improvements
+#### Bug Fixes and Improvements
 
 *  If apps upgrading from pre-2.0.0 still has now obsolete NetworkStateReceiver defined in their manifest, an immediate run-time assertion error will help app developers detect early. 
 
 # 2016-01-08 - 2.1.2
 
-#### Bug Fixed
+#### Bugs Fixed
 
 * Fixed Message Center bug where non-english messages were either garbled or failed to send to server
 
 # 2015-12-23 - 2.1.1
 
-#### Bug Fixed
+#### Bugs Fixed
 
 * Fixed a bug where multiple SqlLite Connections were made when Parse push is integrated
 
