@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApptentiveActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-	private AtomicInteger runningActivities = new AtomicInteger(0);
 	private AtomicInteger foregroundActivities = new AtomicInteger(0);
 
 	private Runnable checkFgBgRoutine;
@@ -85,13 +84,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	@Override
 	public void onActivityDestroyed(final Activity activity) {
-
 		ApptentiveInternal.getInstance().onActivityDestroyed(activity);
-
-		if (runningActivities.decrementAndGet() < 0) {
-			ApptentiveLog.e("Incorrect number of running Activities encountered. Resetting to 0.");
-			runningActivities.set(0);
-		}
 	}
 
 	@Override
