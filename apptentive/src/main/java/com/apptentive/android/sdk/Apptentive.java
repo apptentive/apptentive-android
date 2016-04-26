@@ -658,7 +658,7 @@ public class Apptentive {
 	 * if the app calls this method to set up a custom listener, the apptentive unread message badge, also an UnreadMessagesListener,
 	 * won't get notification. Please use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate. Pass null to remove existing listener.
+	 * @param listener An UnreadMessagesListener that you instantiate. Pass null to remove existing listener.
 	 *                  Do not pass in an anonymous class, such as setUnreadMessagesListener(new UnreadMessagesListener() {...}).
 	 *                 Instead, create your listener as an instance variable and pass that in. This
 	 *                 allows us to keep a weak reference to avoid memory leaks.
@@ -673,7 +673,7 @@ public class Apptentive {
 	/**
 	 * Add a listener to be notified when the number of unread messages in the Message Center changes.
 	 *
-	 * @param listener An UnreadMessageListener that you instantiate. Do not pass in an anonymous class.
+	 * @param listener An UnreadMessagesListener that you instantiate. Do not pass in an anonymous class.
 	 *                 Instead, create your listener as an instance variable and pass that in. This
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
