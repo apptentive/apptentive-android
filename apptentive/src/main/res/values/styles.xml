@@ -200,6 +200,12 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <style name="Apptentive.Style.Widget.ImageButton.Dialog.Close" parent="Apptentive.Style.Widget.ImageButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:tint">?attr/colorAccent</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
     <style name="Apptentive.Style.Widget.FloatingActionButton">
         <item name="fabSize">normal</item>
         <item name="android:layout_gravity">bottom|end</item>
