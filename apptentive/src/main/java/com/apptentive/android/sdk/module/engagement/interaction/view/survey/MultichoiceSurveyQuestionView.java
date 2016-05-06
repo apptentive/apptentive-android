@@ -35,9 +35,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	private final static String SELECTED_RADIO_BUTTON_STATE = "selectedRadioButton";
 
 	public static MultichoiceSurveyQuestionView newInstance(MultichoiceQuestion question) {
-
 		MultichoiceSurveyQuestionView f = new MultichoiceSurveyQuestionView();
-
 		Bundle b = new Bundle();
 		b.putString("question", question.toString());
 		f.setArguments(b);
@@ -49,15 +47,13 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		super.onCreate(savedInstanceState);
 		selectItem = -1;
 		Bundle bundle = getArguments();
-
 		if (bundle != null) {
 			try {
 				question = new MultichoiceQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
-
+				//
 			}
 		}
-
 	}
 
 	@Override
@@ -101,7 +97,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId) {
 		buttonChecked = true;
-		RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
+		RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
 		selectItem = group.indexOfChild(checkedRadioButton);
 		if (getContext() instanceof Activity) {
 			Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this.getView());
