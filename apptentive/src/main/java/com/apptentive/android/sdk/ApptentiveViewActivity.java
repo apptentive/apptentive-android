@@ -58,9 +58,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
-		boolean isInteractionModel = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
+		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
 		// Add theme based on the display mode of the interaction: modal or not
-		applyApptentiveTheme(isInteractionModel);
+		applyApptentiveTheme(isInteractionModal);
 
 
 		ApptentiveBaseFragment newFragment = null;
@@ -72,8 +72,8 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			 * failure of retrieval indicate internal error
 			 */
 			if (newFragment == null) {
-					finish();
-					return;
+				finish();
+				return;
 			}
 		}
 		try {
@@ -86,8 +86,8 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					if (newFragment == null) {
 						newFragment = FragmentFactory.createFragmentInstance(bundle);
-						isInteractionModel = newFragment.isShownAsModelDialog();
-						applyApptentiveTheme(isInteractionModel);
+						isInteractionModal = newFragment.isShownAsModalDialog();
+						applyApptentiveTheme(isInteractionModal);
 					}
 					if (newFragment != null) {
 						newFragment.setOnTransitionListener(this);
@@ -119,7 +119,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		/* Add top padding by the amount of Status Bar height to avoid toolbar being covered when
 		 * status bar is translucent
 		 */
-		toolbar.setPadding(0, getToolbarHeightAdjustment(!isInteractionModel), 0, 0);
+		toolbar.setPadding(0, getToolbarHeightAdjustment(!isInteractionModal), 0, 0);
 
 		ActionBar actionBar = getSupportActionBar();
 
@@ -157,7 +157,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			@Override
 			public void onPageSelected(int position) {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
-				if (!currentFragment.isShownAsModelDialog()) {
+				if (!currentFragment.isShownAsModalDialog()) {
 
 					final String title = currentFragment.getTitle();
 					toolbar.post(new Runnable() {
@@ -252,7 +252,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	public void onFragmentTransition(ApptentiveBaseFragment currentFragment) {
 		if (currentFragment != null) {
 			int numberOfPages = viewPager_Adapter.getCount();
-			for (int i = 0; i< numberOfPages; ++i) {
+			for (int i = 0; i < numberOfPages; ++i) {
 				ApptentiveBaseFragment fragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(i);
 				if (currentFragment == fragment) {
 					if (numberOfPages == 1) {
@@ -304,10 +304,10 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	/* Android versions starting with API Level 19, setting translucent statusbar would have two implications:
-   * 1. toolbar of non-model interaction would be partially covered
-   * 2. Keyboard launch won't resize window. (Bug: https://code.google.com/p/android/issues/detail?id=63777)
-   * The following method will fix both issues
-   */
+	* 1. toolbar of non-model interaction would be partially covered
+	* 2. Keyboard launch won't resize window. (Bug: https://code.google.com/p/android/issues/detail?id=63777)
+	* The following method will fix both issues
+	*/
 	private int getToolbarHeightAdjustment(boolean bToolbarShown) {
 		int adjustAmount = 0;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -373,5 +373,5 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			}
 		}
 	};
-	
+
 }
