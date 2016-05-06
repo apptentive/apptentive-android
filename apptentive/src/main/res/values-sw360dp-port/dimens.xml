@@ -17,5 +17,6 @@
 
     <dimen name="apptentive_interaction_extended_toolbar_margin_start">60dp</dimen>
     <dimen name="apptentive_interaction_extended_toolbar_margin_end">8dp</dimen>
+    <dimen name="apptentive_interaction_extended_toolbar_width">@integer/match_parent</dimen>
 
 </resources>
