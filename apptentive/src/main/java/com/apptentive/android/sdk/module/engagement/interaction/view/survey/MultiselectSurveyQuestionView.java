@@ -55,6 +55,14 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 
 	@Override
 	public boolean isValid() {
+		// Make sure all questions are valid.
+		for (int i = 0; i < choiceContainer.getChildCount(); i++) {
+			SurveyQuestionChoice surveyQuestionChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
+			if (!surveyQuestionChoice.isValid(question.isRequired())) {
+				return false;
+			}
+		}
+		// Then make sure the number of answers is valid.
 		int checkedBoxes = selectedChoices.size();
 
 		// Cast to specific question type. Yes, this is a bit hacky.

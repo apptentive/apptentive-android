@@ -82,11 +82,22 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	}
 
 	public String getOtherText() {
-		return otherTextInput.getText().toString();
+		return otherTextInput.getText().toString().trim();
 	}
 
 	public void setOtherText(String otherText) {
 		otherTextInput.setText(otherText);
+	}
+
+	/**
+	 * An answer can only be invalid if it's checked, the question is required, and the type is "other", but nothing was typed.
+	 * All answers must be valid to submit, in addition to whatever logic the question applies.
+	 */
+	public boolean isValid(boolean questionIsRequired) {
+		if (questionIsRequired && isChecked() && isOtherType && getOtherText().length() < 1) {
+			return false;
+		}
+		return true;
 	}
 
 	private void updateOtherState(boolean showOther) {

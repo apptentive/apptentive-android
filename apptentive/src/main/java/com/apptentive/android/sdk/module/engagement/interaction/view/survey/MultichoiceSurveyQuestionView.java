@@ -30,7 +30,6 @@ import java.util.*;
 public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements SurveyQuestionChoice.OnCheckedChangeListener, SurveyQuestionChoice.OnOtherTextChangedListener {
 
 	LinearLayout choiceContainer;
-	boolean buttonChecked;
 	protected HashSet<Integer> selectedChoices;
 	// Used to store the text entered in the "other" field. Will be empty for choices of a different type.
 	protected HashMap<Integer, String> otherState;
@@ -97,7 +96,6 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	@Override
 	public void onCheckChanged(SurveyQuestionChoice choice, boolean isChecked) {
-		buttonChecked = true;
 		// Update saved state
 		selectedChoices.clear();
 		if (isChecked) {
@@ -123,6 +121,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		if (index != -1) {
 			otherState.put(index, text);
 		}
+		fireListener();
 	}
 
 	@Override
@@ -134,7 +133,15 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	@Override
 	public boolean isValid() {
-		return !question.isRequired() || buttonChecked;
+		// Make sure all questions are valid.
+		for (int i = 0; i < choiceContainer.getChildCount(); i++) {
+			SurveyQuestionChoice surveyQuestionChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
+			if (!surveyQuestionChoice.isValid(question.isRequired())) {
+				return false;
+			}
+		}
+		// Then make sure the number of answers is valid.
+		return !question.isRequired() || selectedChoices.size() == 1;
 	}
 
 	@Override
