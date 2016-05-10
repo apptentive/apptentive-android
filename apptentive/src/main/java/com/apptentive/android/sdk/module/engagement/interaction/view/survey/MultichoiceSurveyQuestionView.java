@@ -158,7 +158,9 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				if (surveyQuestionChoice.isChecked()) {
 					JSONObject result = new JSONObject();
 					result.put("id", surveyQuestionChoice.getAnswerId());
-					// TODO: Send "Other" text" as well.
+					if (surveyQuestionChoice.isOtherType()) {
+						result.put("value", surveyQuestionChoice.getOtherText());
+					}
 					return result;
 				}
 			}

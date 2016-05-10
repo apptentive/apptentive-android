@@ -27,13 +27,13 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Ans
  */
 public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.OnCheckedChangeListener, TextWatcher {
 
-	protected final int index;
-	protected final String answerId;
-	protected final boolean isOtherType;
+	private final int index;
+	private final String answerId;
+	private final boolean isOtherType;
 
-	protected final CheckBox checkBox;
-	protected final TextInputLayout otherTextInputLayout;
-	protected final EditText otherTextInput;
+	private final CheckBox checkBox;
+	private final TextInputLayout otherTextInputLayout;
+	private final EditText otherTextInput;
 
 	private OnCheckedChangeListener onCheckChangedListener;
 	private OnOtherTextChangedListener onOtherTextChangedListener;
@@ -71,6 +71,14 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 
 	public String getAnswerId() {
 		return answerId;
+	}
+
+	public boolean isOtherType() {
+		return isOtherType;
+	}
+
+	public String getOtherText() {
+		return otherTextInput.getText().toString();
 	}
 
 	public void setOtherText(String otherText) {
