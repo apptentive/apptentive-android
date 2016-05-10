@@ -20,8 +20,11 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
+
+import org.json.JSONObject;
 
 /**
  * Used by both Multichoice and Multiselect survey questions, since they are 99% the same UI.
@@ -110,6 +113,20 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 		if (isOtherType) {
 			updateOtherState(checked);
 		}
+	}
+
+	public Object getAnswer() {
+		try {
+			JSONObject answer = new JSONObject();
+			answer.put("id", answerId);
+			if (isOtherType()) {
+				answer.put("value", getOtherText());
+			}
+			return answer;
+		} catch (Exception e) {
+			ApptentiveLog.e("Error producing survey answer.", e);
+		}
+		return null;
 	}
 
 	public void setOnCheckChangedListener(OnCheckedChangeListener onCheckChangedListener) {

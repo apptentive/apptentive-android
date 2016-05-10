@@ -23,7 +23,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Mul
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -32,9 +31,9 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	LinearLayout choiceContainer;
 	boolean buttonChecked;
-	private ArrayList<Integer> selectedChoices;
+	protected HashSet<Integer> selectedChoices;
 	// Used to store the text entered in the "other" field. Will be empty for choices of a different type.
-	private HashMap<Integer, String> otherState;
+	protected HashMap<Integer, String> otherState;
 
 	private final static String SELECTED_CHOICES = "selectedChoices";
 	private final static String OTHER_STATE = "otherState";
@@ -50,7 +49,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		selectedChoices = new ArrayList<>();
+		selectedChoices = new HashSet<>();
 		otherState = new HashMap<>();
 		Bundle bundle = getArguments();
 		if (bundle != null) {
@@ -76,7 +75,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
 		if (savedInstanceState != null) {
-			selectedChoices = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_CHOICES);
+			selectedChoices = (HashSet<Integer>) savedInstanceState.getSerializable(SELECTED_CHOICES);
 			otherState = (HashMap<Integer, String>) savedInstanceState.getSerializable(OTHER_STATE);
 		}
 
@@ -144,12 +143,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			for (int i = 0; i < choiceContainer.getChildCount(); i++) {
 				SurveyQuestionChoice surveyQuestionChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
 				if (surveyQuestionChoice.isChecked()) {
-					JSONObject result = new JSONObject();
-					result.put("id", surveyQuestionChoice.getAnswerId());
-					if (surveyQuestionChoice.isOtherType()) {
-						result.put("value", surveyQuestionChoice.getOtherText());
-					}
-					return result;
+					return surveyQuestionChoice.getAnswer();
 				}
 			}
 		} catch (Exception e) {
