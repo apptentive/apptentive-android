@@ -32,11 +32,11 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 	LinearLayout choiceContainer;
 	boolean buttonChecked;
-	private int checkedChoice;
+	private ArrayList<Integer> selectedChoices;
 	// Used to store the text entered in the "other" field. Will be empty for choices of a different type.
 	private HashMap<Integer, String> otherState;
 
-	private final static String SELECTED_RADIO_BUTTON_STATE = "selectedRadioButton";
+	private final static String SELECTED_CHOICES = "selectedChoices";
 	private final static String OTHER_STATE = "otherState";
 
 	public static MultichoiceSurveyQuestionView newInstance(MultichoiceQuestion question) {
@@ -50,9 +50,8 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		checkedChoice = -1;
+		selectedChoices = new ArrayList<>();
 		otherState = new HashMap<>();
-		ApptentiveLog.e("Initializing checked Choice: %d from %s", checkedChoice, toString());
 		Bundle bundle = getArguments();
 		if (bundle != null) {
 			try {
@@ -67,8 +66,6 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 
-		ApptentiveLog.e("onCreateView()");
-
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
@@ -79,14 +76,14 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
 		if (savedInstanceState != null) {
-			checkedChoice = savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
+			selectedChoices = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_CHOICES);
 			otherState = (HashMap<Integer, String>) savedInstanceState.getSerializable(OTHER_STATE);
 		}
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
 			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition, i);
-			if (checkedChoice == i) {
+			if (selectedChoices.contains(i)) {
 				choice.setChecked(true);
 			}
 			if (answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER)) {
@@ -103,24 +100,18 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public void onCheckChanged(SurveyQuestionChoice choice, boolean isChecked) {
 		buttonChecked = true;
 		// Update saved state
+		selectedChoices.clear();
 		if (isChecked) {
-			ApptentiveLog.e("Setting checked Choice: %d from %s", checkedChoice, toString());
 			// Clear the other choices
 			for (int i = 0; i < choiceContainer.getChildCount(); i++) {
 				SurveyQuestionChoice currentChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
 				if (currentChoice != choice) {
-					ApptentiveLog.e("Unchecking CheckBox");
 					currentChoice.setChecked(false);
 				}
 			}
 			// Then set this one as the selected choice
-			checkedChoice = choice.getIndex();
-		} else {
-			// Clear selected item.
-			checkedChoice = -1;
-			ApptentiveLog.e("Clearing checked Choice: %d from %s", checkedChoice, toString());
+			selectedChoices.add(choice.getIndex());
 		}
-
 		if (getContext() instanceof Activity) {
 			Util.hideSoftKeyboard(getContext(), MultichoiceSurveyQuestionView.this.getView());
 		}
@@ -131,17 +122,14 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public void onOtherTextChanged(SurveyQuestionChoice choice, String text) {
 		int index = choice.getIndex();
 		if (index != -1) {
-			ApptentiveLog.e("Setting other text: \"%s\"", text);
 			otherState.put(index, text);
 		}
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt(SELECTED_RADIO_BUTTON_STATE, checkedChoice);
+		outState.putSerializable(SELECTED_CHOICES, selectedChoices);
 		outState.putSerializable(OTHER_STATE, otherState);
-		ApptentiveLog.e("Saving checked Choice: %d from %s", checkedChoice, toString());
-
 		super.onSaveInstanceState(outState);
 	}
 
