@@ -9,12 +9,10 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -30,13 +28,16 @@ import org.json.JSONObject;
 import java.util.*;
 
 
-public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements SurveyQuestionChoice.OnCheckedChangeListener {
+public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements SurveyQuestionChoice.OnCheckedChangeListener, SurveyQuestionChoice.OnOtherTextChangedListener {
 
 	LinearLayout choiceContainer;
 	boolean buttonChecked;
 	private int checkedChoice;
+	// Used to store the text entered in the "other" field. Will be empty for choices of a different type.
+	private HashMap<Integer, String> otherState;
 
 	private final static String SELECTED_RADIO_BUTTON_STATE = "selectedRadioButton";
+	private final static String OTHER_STATE = "otherState";
 
 	public static MultichoiceSurveyQuestionView newInstance(MultichoiceQuestion question) {
 		MultichoiceSurveyQuestionView f = new MultichoiceSurveyQuestionView();
@@ -50,6 +51,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		checkedChoice = -1;
+		otherState = new HashMap<>();
 		ApptentiveLog.e("Initializing checked Choice: %d from %s", checkedChoice, toString());
 		Bundle bundle = getArguments();
 		if (bundle != null) {
@@ -76,26 +78,22 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
-		checkedChoice = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
+		if (savedInstanceState != null) {
+			checkedChoice = savedInstanceState.getInt(SELECTED_RADIO_BUTTON_STATE, -1);
+			otherState = (HashMap<Integer, String>) savedInstanceState.getSerializable(OTHER_STATE);
+		}
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
-			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition);
-			choice.setTag(R.id.apptentive_survey_answer_id, answerDefinition.getId());
-			choice.setTag(R.id.apptentive_survey_answer_index, i);
+			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition, i);
 			if (checkedChoice == i) {
 				choice.setChecked(true);
 			}
-			choice.setOnCheckChangedListener(this);
-			if (answerDefinition.getType().equals(AnswerDefinition.TYPE_OPTION)) {
-				// Nothing else to do.
-			} else if (answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER)) {
-				TextInputLayout otherTextInputLayout = (TextInputLayout) choice.findViewById(R.id.other_text_input_layout);
-				otherTextInputLayout.setHint(answerDefinition.getHint());
-				EditText otherEditText = (EditText) choice.findViewById(R.id.other_edit_text);
-				// TODO: Restore state.
-				//choice.setOtherText(null);
+			if (answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER)) {
+				choice.setOtherText(otherState.get(i));
 			}
+			choice.setOnCheckChangedListener(this);
+			choice.setOnOtherTextChangedListener(this);
 			choiceContainer.addView(choice);
 		}
 		return v;
@@ -116,7 +114,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				}
 			}
 			// Then set this one as the selected choice
-			checkedChoice = (int) choice.getTag(R.id.apptentive_survey_answer_index);
+			checkedChoice = choice.getIndex();
 		} else {
 			// Clear selected item.
 			checkedChoice = -1;
@@ -130,9 +128,20 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	}
 
 	@Override
+	public void onOtherTextChanged(SurveyQuestionChoice choice, String text) {
+		int index = choice.getIndex();
+		if (index != -1) {
+			ApptentiveLog.e("Setting other text: \"%s\"", text);
+			otherState.put(index, text);
+		}
+	}
+
+	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putInt(SELECTED_RADIO_BUTTON_STATE, checkedChoice);
+		outState.putSerializable(OTHER_STATE, otherState);
 		ApptentiveLog.e("Saving checked Choice: %d from %s", checkedChoice, toString());
+
 		super.onSaveInstanceState(outState);
 	}
 
@@ -148,7 +157,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				SurveyQuestionChoice surveyQuestionChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
 				if (surveyQuestionChoice.isChecked()) {
 					JSONObject result = new JSONObject();
-					result.put("id", surveyQuestionChoice.getTag(R.id.apptentive_survey_answer_id));
+					result.put("id", surveyQuestionChoice.getAnswerId());
 					// TODO: Send "Other" text" as well.
 					return result;
 				}

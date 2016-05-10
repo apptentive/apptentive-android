@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 import android.content.Context;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -23,18 +25,25 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Ans
 /**
  * Used by both Multichoice and Multiselect survey questions, since they are 99% the same UI.
  */
-public class SurveyQuestionChoice extends FrameLayout {
+public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.OnCheckedChangeListener, TextWatcher {
 
-	protected AnswerDefinition answerDefinition;
-	protected CheckBox checkBox;
-	protected TextInputLayout otherTextInputLayout;
-	protected EditText otherTextInput;
-	protected boolean isOtherType;
+	protected final int index;
+	protected final String answerId;
+	protected final boolean isOtherType;
+
+	protected final CheckBox checkBox;
+	protected final TextInputLayout otherTextInputLayout;
+	protected final EditText otherTextInput;
 
 	private OnCheckedChangeListener onCheckChangedListener;
+	private OnOtherTextChangedListener onOtherTextChangedListener;
 
-	public SurveyQuestionChoice(Context context, AnswerDefinition answerDefinition) {
+	public SurveyQuestionChoice(Context context, AnswerDefinition answerDefinition, int index) {
 		super(context);
+
+		this.index = index;
+		answerId = answerDefinition.getId();
+		isOtherType = answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER);
 
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
@@ -44,28 +53,24 @@ public class SurveyQuestionChoice extends FrameLayout {
 		otherTextInputLayout = (TextInputLayout) findViewById(R.id.other_text_input_layout);
 		otherTextInput = (EditText) findViewById(R.id.other_edit_text);
 
-		checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isOtherType) {
-					updateOtherState(isChecked);
-				}
-				if (onCheckChangedListener != null) {
-					onCheckChangedListener.onCheckChanged(SurveyQuestionChoice.this, isChecked);
-				}
-			}
-		});
-
-		setAnswerDefinition(answerDefinition);
-	}
-
-	public void setAnswerDefinition(AnswerDefinition answerDefinition) {
-		this.answerDefinition = answerDefinition;
-		isOtherType = answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER);
 		checkBox.setText(answerDefinition.getValue());
 		if (isOtherType) {
 			otherTextInputLayout.setHint(answerDefinition.getHint());
 		}
+
+		checkBox.setOnCheckedChangeListener(this);
+
+		if (isOtherType) {
+			otherTextInput.addTextChangedListener(this);
+		}
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getAnswerId() {
+		return answerId;
 	}
 
 	public void setOtherText(String otherText) {
@@ -97,5 +102,38 @@ public class SurveyQuestionChoice extends FrameLayout {
 
 	public interface OnCheckedChangeListener {
 		void onCheckChanged(SurveyQuestionChoice choice, boolean isChecked);
+	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if (isOtherType) {
+			updateOtherState(isChecked);
+		}
+		if (onCheckChangedListener != null) {
+			onCheckChangedListener.onCheckChanged(SurveyQuestionChoice.this, isChecked);
+		}
+	}
+
+	public interface OnOtherTextChangedListener {
+		void onOtherTextChanged(SurveyQuestionChoice choice, String text);
+	}
+
+	public void setOnOtherTextChangedListener(OnOtherTextChangedListener onOtherTextChangedListener) {
+		this.onOtherTextChangedListener = onOtherTextChangedListener;
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		if (onOtherTextChangedListener != null) {
+			onOtherTextChangedListener.onOtherTextChanged(this, s.toString());
+		}
 	}
 }
