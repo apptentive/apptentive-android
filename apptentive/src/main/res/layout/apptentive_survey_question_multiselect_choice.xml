@@ -6,12 +6,32 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          style="?apptentiveCheckBoxStyle"
-          android:paddingTop="5dp"
-          android:paddingBottom="4dp"
-          android:minHeight="48dp"
-          android:drawablePadding="0dp"
-          android:gravity="top|start"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:animateLayoutChanges="true">
+    <CheckBox android:id="@+id/checkbox"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              style="?attr/apptentiveCheckBoxStyle"
+              android:paddingTop="5dp"
+              android:minHeight="48dp"
+              android:drawablePadding="0dp"
+              android:gravity="top|start"
+              android:saveEnabled="false"/>
+    <android.support.design.widget.TextInputLayout android:id="@+id/other_text_input_layout"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:visibility="gone"
+                                                   android:animateLayoutChanges="true">
+        <EditText android:id="@+id/other_edit_text"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Body1"
+                  android:saveEnabled="false"
+                  android:maxLength="100"
+                  android:maxLines="3"
+                  android:inputType="textMultiLine|textCapSentences"/>
+    </android.support.design.widget.TextInputLayout>
+</LinearLayout>

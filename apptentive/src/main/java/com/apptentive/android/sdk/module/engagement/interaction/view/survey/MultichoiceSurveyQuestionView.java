@@ -80,7 +80,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
-			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition, i);
+			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition, question.getType(), i);
 			if (selectedChoices.contains(i)) {
 				choice.setChecked(true);
 			}

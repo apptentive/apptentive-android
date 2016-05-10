@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
 import org.json.JSONObject;
 
@@ -42,7 +43,7 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	private OnCheckedChangeListener onCheckChangedListener;
 	private OnOtherTextChangedListener onOtherTextChangedListener;
 
-	public SurveyQuestionChoice(Context context, AnswerDefinition answerDefinition, int index) {
+	public SurveyQuestionChoice(Context context, AnswerDefinition answerDefinition, int questionType, int index) {
 		super(context);
 
 		this.index = index;
@@ -52,7 +53,15 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
 		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
-		themedInflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
+		switch (questionType) {
+			case Question.QUESTION_TYPE_MULTICHOICE:
+				themedInflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
+				break;
+			case Question.QUESTION_TYPE_MULTISELECT:
+			default:
+				themedInflater.inflate(R.layout.apptentive_survey_question_multiselect_choice, this);
+				break;
+		}
 		checkBox = (CheckBox) findViewById(R.id.checkbox);
 		otherTextInputLayout = (TextInputLayout) findViewById(R.id.other_text_input_layout);
 		otherTextInput = (EditText) findViewById(R.id.other_edit_text);
