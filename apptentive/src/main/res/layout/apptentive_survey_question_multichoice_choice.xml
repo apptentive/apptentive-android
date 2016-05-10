@@ -29,7 +29,9 @@
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:textAppearance="@style/Apptentive.TextAppearance.Body1"
-                  android:inputType="textCapSentences"
-                  android:saveEnabled="false"/>
+                  android:saveEnabled="false"
+                  android:maxLength="100"
+                  android:maxLines="3"
+                  android:inputType="textMultiLine|textCapSentences"/>
     </android.support.design.widget.TextInputLayout>
 </LinearLayout>
