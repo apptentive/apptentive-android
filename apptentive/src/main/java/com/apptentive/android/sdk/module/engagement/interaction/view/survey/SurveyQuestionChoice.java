@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -88,6 +89,13 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	private void updateOtherState(boolean showOther) {
 		if (showOther) {
 			otherTextInputLayout.setVisibility(View.VISIBLE);
+			otherTextInput.post(new Runnable() {
+				@Override
+				public void run() {
+					otherTextInput.requestFocus();
+					((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(otherTextInput, 0);
+				}
+			});
 		} else {
 			otherTextInputLayout.setVisibility(View.GONE);
 		}
