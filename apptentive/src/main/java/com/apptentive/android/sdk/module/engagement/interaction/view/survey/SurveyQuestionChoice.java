@@ -103,9 +103,16 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	 * All answers must be valid to submit, in addition to whatever logic the question applies.
 	 */
 	public boolean isValid(boolean questionIsRequired) {
-		if (questionIsRequired && isChecked() && isOtherType && getOtherText().length() < 1) {
+		// If required and checked, other types must have text
+		if (questionIsRequired && isChecked() && isOtherType && (getOtherText().length() < 1)) {
+			otherTextInputLayout.setError(" ");
 			return false;
 		}
+		// If other type checked, must not be over 100 characters.
+		if (isChecked() && isOtherType && getOtherText().length() > 100) {
+			return false;
+		}
+		otherTextInputLayout.setError(null);
 		return true;
 	}
 
@@ -185,8 +192,9 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 
 	@Override
 	public void afterTextChanged(Editable s) {
+		String result = s.toString().trim();
 		if (onOtherTextChangedListener != null) {
-			onOtherTextChangedListener.onOtherTextChanged(this, s.toString());
+			onOtherTextChangedListener.onOtherTextChanged(this, result);
 		}
 	}
 }
