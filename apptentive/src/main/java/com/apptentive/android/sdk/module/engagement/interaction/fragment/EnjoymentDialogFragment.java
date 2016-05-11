@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -20,8 +21,9 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 
-public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> {
+public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> implements View.OnClickListener {
 
+	private static final String CODE_POINT_DISMISS = "dismiss";
 	private static final String CODE_POINT_CANCEL = "cancel";
 	private static final String CODE_POINT_YES = "yes";
 	private static final String CODE_POINT_NO = "no";
@@ -49,13 +51,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		if (noText != null) {
 			noButton.setText(noText);
 		}
-		noButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_NO);
-				transit();
-			}
-		});
+		noButton.setOnClickListener(this);
 
 		// Yes
 		String yesText = interaction.getYesText();
@@ -64,13 +60,19 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		if (yesText != null) {
 			yesButton.setText(yesText);
 		}
-		yesButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_YES);
-				transit();
+		yesButton.setOnClickListener(this);
+
+		// Dismiss "X" Button
+		boolean showDismissButton = interaction.showDismissButton();
+		String dismissText = interaction.getDismissText();
+		ImageButton dismissButton = (ImageButton) v.findViewById(R.id.dismiss);
+		if (showDismissButton) {
+			if (dismissText != null) {
+				dismissButton.setContentDescription(dismissText);
 			}
-		});
+			dismissButton.setVisibility(View.VISIBLE);
+		}
+		dismissButton.setOnClickListener(this);
 		return v;
 	}
 
@@ -78,5 +80,18 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	public boolean onBackPressed(boolean hardwareButton) {
 		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL);
 		return false;
+	}
+
+	@Override
+	public void onClick(View v) {
+		int id = v.getId();
+		if (id == R.id.yes) {
+			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_YES);
+		} else if (id == R.id.no) {
+			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_NO);
+		} else if (id == R.id.dismiss) {
+			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_DISMISS);
+		}
+		transit();
 	}
 }

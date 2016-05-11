@@ -52,4 +52,6 @@
          The available font families are "sans-serif", "sans-serif-light", "sans-serif-condensed, "sans-serif-thin" and "sans-serif-medium"-->
     <string name="apptentive_font_family_default_material">sans-serif</string>
     <string name="apptentive_font_family_default_medium_material">sans-serif-medium</string>
+
+    <string name="apptentive_dismiss_placeholder">Dismiss</string>
 </resources>
