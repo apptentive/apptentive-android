@@ -214,6 +214,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				v.requestFocusFromTouch();
+				Util.hideSoftKeyboard(getContext(), v);
 				return false;
 			}
 		});

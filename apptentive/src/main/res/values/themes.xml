@@ -130,6 +130,9 @@
         <!-- colorAccent is used as the default value for colorControlActivated used to tint widgets. -->
         <item name="colorAccent">@color/apptentive_color_accent</item>
 
+        <!-- Needed since design support library 23.2.0 -->
+        <item name="textColorError">@color/apptentive_validation_failed_color</item>
+
         <item name="apptentiveToolbarBackground">?attr/colorPrimary</item>
         <item name="apptentiveToolbarTitleTextAppearance">@style/Apptentive.TextAppearance.Toolbar</item>
         <item name="apptentiveToolbarIconClose">@drawable/apptentive_ic_toolbar_close</item>

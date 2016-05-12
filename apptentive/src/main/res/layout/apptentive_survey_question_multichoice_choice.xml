@@ -6,11 +6,35 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             style="?attr/apptentiveRadioButtonStyle"
-             android:paddingTop="5dp"
-             android:minHeight="48dp"
-             android:drawablePadding="0dp"
-             android:gravity="top|start"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:animateLayoutChanges="true">
+    <CheckBox android:id="@+id/checkbox"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              style="?attr/apptentiveRadioButtonStyle"
+              android:paddingTop="5dp"
+              android:minHeight="48dp"
+              android:drawablePadding="0dp"
+              android:gravity="top|start"
+              android:saveEnabled="false"/>
+    <android.support.design.widget.TextInputLayout android:id="@+id/other_text_input_layout"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:visibility="gone"
+                                                   app:errorEnabled="true"
+                                                   app:counterEnabled="true"
+                                                   app:counterMaxLength="100"
+                                                   app:hintAnimationEnabled="true"
+                                                   android:animateLayoutChanges="true">
+        <EditText android:id="@+id/other_edit_text"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Body1"
+                  android:saveEnabled="false"
+                  android:inputType="textMultiLine|textCapSentences"/>
+    </android.support.design.widget.TextInputLayout>
+</LinearLayout>
