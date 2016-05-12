@@ -193,13 +193,14 @@
         <item name="apptentiveFabStyle">@style/Apptentive.Style.Widget.FloatingActionButton</item>
         <item name="apptentiveSurveySentToastStyle">@style/Apptentive.Style.Widget.SurveySentToast</item>
 
-
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <!-- Make contextual ActionBar (such as highlighting text for copy/paste) shown over the toolbar bar instead of pushing it down -->
+        <item name="windowActionModeOverlay">true</item>
 
         <item name="apptentiveCardElevation">2dp</item>
     </style>
@@ -235,7 +236,6 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">false</item>
         <item name="windowActionBarOverlay">false</item>
-        <item name="windowActionModeOverlay">false</item>
         <item name="actionBarPopupTheme">@null</item>
         <item name="actionBarTheme">@null</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
