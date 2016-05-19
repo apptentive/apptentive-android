@@ -2,7 +2,7 @@
 
 #### Improvements
 
-* We've made it much easier to integrate the Apptentive Android SDK into your app. Now, just add a single line to your `build.gradle`, and one to your `Application` class. If you are migrating from a prior version, make sure to follow our simple [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/next/docs/migrating_to_3.0.0.md).
+* We've made it much easier to integrate the Apptentive Android SDK into your app. Now, just add a single line to your `build.gradle`, and one to your `Application` class. If you are migrating from a prior version, make sure to follow our simple [Migration Guide](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_3.0.0.md).
 * Our SDK's UI will now inherit all styles from your app, as long as you are using an AppCompat or Material theme. If you want to further customize our UI, or you aren't using an AppCompat or Material theme, you can override our styles. Check out our [UI Customization Guide](https://docs.apptentive.com/android/customization/).
 * Our Surveys have been completely redesigned to use Material design. Your existing surveys will continue to work as before, but will look much better.
 * You can now launch our UI without passing in an Activity. This is useful for recording Events and showing Interactions from a Service or BroadcastReceiver. Interactions launched in this way will launch in a new task, while those launched with an Activity Context will launch on top of the Activity stack as before.
