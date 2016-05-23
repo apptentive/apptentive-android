@@ -384,26 +384,14 @@ public class ApptentiveInternal {
 	public void onActivityStarted(Activity activity) {
 		if (activity != null) {
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
+			messageManager.setCurrentForgroundActivity(currentTaskStackTopActivity);
 		}
-	}
-
-	public void onActivityResumed(Activity activity) {
-		messageManager.setCurrentForgroundActivity(activity);
 
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice();
 		syncSdk();
 		syncPerson();
-	}
-
-	public void onActivityDestroyed(Activity activity) {
-		if (activity != null && currentTaskStackTopActivity != null) {
-			Activity currentBottomActivity = currentTaskStackTopActivity.get();
-			if (currentBottomActivity != null && currentBottomActivity == activity) {
-				currentTaskStackTopActivity = null;
-			}
-		}
 	}
 
 	public void onAppEnterForeground() {
@@ -414,6 +402,8 @@ public class ApptentiveInternal {
 
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
+		currentTaskStackTopActivity = null;
+		messageManager.setCurrentForgroundActivity(null);
 		payloadWorker.appWentToBackground();
 		messageManager.appWentToBackground();
 	}

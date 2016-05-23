@@ -32,11 +32,6 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	@Override
 	public void onActivityStarted(Activity activity) {
-		ApptentiveInternal.getInstance().onActivityStarted(activity);
-	}
-
-	@Override
-	public void onActivityResumed(Activity activity) {
 		boolean wasAppBackground = !isAppForeground;
 		isAppForeground = true;
 
@@ -49,12 +44,29 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			appEnteredForeground();
 		}
 
-		ApptentiveInternal.getInstance().onActivityResumed(activity);
+		ApptentiveInternal.getInstance().onActivityStarted(activity);
+	}
+
+	@Override
+	public void onActivityResumed(Activity activity) {
 	}
 
 	@Override
 	public void onActivityPaused(final Activity activity) {
 
+	}
+
+	@Override
+	public void onActivityDestroyed(final Activity activity) {
+	}
+
+	@Override
+	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+	}
+
+	@Override
+	public void onActivityStopped(Activity activity) {
 		if (foregroundActivities.decrementAndGet() < 0) {
 			ApptentiveLog.e("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
@@ -63,8 +75,9 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		if (checkFgBgRoutine != null) {
 			delayedChecker.removeCallbacks(checkFgBgRoutine);
 		}
-      /* When one activity transits to another one, there is a brief period during which the former
-      * is paused but the latter has not yet resumed. To prevent false negative, check routine is
+
+		/* When one activity transits to another one, there is a brief period during which the former
+			* is paused but the latter has not yet resumed. To prevent false negative, check routine is
       * delayed
       */
 		delayedChecker.postDelayed(checkFgBgRoutine = new Runnable() {
@@ -76,24 +89,6 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 				}
 			}
 		}, CHECK_DELAY_SHORT);
-
-
-		ApptentiveInternal.getInstance().getMessageManager().setCurrentForgroundActivity(null);
-
-	}
-
-	@Override
-	public void onActivityDestroyed(final Activity activity) {
-		ApptentiveInternal.getInstance().onActivityDestroyed(activity);
-	}
-
-	@Override
-	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-	}
-
-	@Override
-	public void onActivityStopped(Activity activity) {
 
 	}
 
