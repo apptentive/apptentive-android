@@ -107,6 +107,7 @@ public class ApptentiveInternal {
 
 	ExecutorService cachedExecutor;
 
+	// Holds reference to the current foreground activity of the host app
 	private WeakReference<Activity> currentTaskStackTopActivity;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
@@ -252,11 +253,11 @@ public class ApptentiveInternal {
 		return appContext;
 	}
 
-	/* Get the last running activity from the current application, i.e. at the top of the task
-	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityDestroyed(Activity)}
+	/* Get the foreground activity from the current application, i.e. at the top of the task
+	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityStopped(Activity)}
 	 *
-	 * If Apptentive interaction is to be launched from a non-activity context, use the last running activity at
-	 * the top of the task.
+	 * If Apptentive interaction is to be launched from a non-activity context, use the current activity at
+	 * the top of the task stack, i.e. the foreground activity.
 	 */
 	public Activity getCurrentTaskStackTopActivity() {
 		if (currentTaskStackTopActivity != null) {
@@ -383,8 +384,9 @@ public class ApptentiveInternal {
 
 	public void onActivityStarted(Activity activity) {
 		if (activity != null) {
+			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
-			messageManager.setCurrentForgroundActivity(currentTaskStackTopActivity);
+			messageManager.setCurrentForgroundActivity(activity);
 		}
 
 		checkAndUpdateApptentiveConfigurations();
