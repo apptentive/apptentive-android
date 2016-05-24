@@ -39,6 +39,6 @@ Our SDK API has changed so you will need to modify your integration. Rest assure
 ## Styling the SDK
 If you have specified an AppCompat or Material theme in your `AndroidManifest.xml`, our SDK inherits its look and feel from your theme. If you are using a legacy theme, such as Holo, then our SDK will not inherit your theme, and will retain our default red on white styling by default. In both cases, you can override our styles.
 
-Please see our [style guide]() for more information.
+Please see our [style guide](https://docs.apptentive.com/android/customization/) for more information.
 
 
