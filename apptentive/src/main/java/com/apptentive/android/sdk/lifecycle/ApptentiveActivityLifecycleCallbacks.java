@@ -49,6 +49,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	@Override
 	public void onActivityResumed(Activity activity) {
+		ApptentiveInternal.getInstance().onActivityResumed(activity);
 	}
 
 	@Override

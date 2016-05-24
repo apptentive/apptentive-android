@@ -396,6 +396,15 @@ public class ApptentiveInternal {
 		syncPerson();
 	}
 
+	public void onActivityResumed(Activity activity) {
+		if (activity != null) {
+			// Set current foreground activity reference whenever a new activity is started
+			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
+			messageManager.setCurrentForgroundActivity(activity);
+		}
+
+	}
+
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
 		payloadWorker.appWentToForeground();
