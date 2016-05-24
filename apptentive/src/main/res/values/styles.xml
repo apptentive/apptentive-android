@@ -137,6 +137,7 @@
         <item name="android:textSize">?attr/apptentiveTextSizeBody1</item>
     </style>
 
+    <!-- Button style with no border but text, example: buttons on Enjoyment Prompt-->
     <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:typeface">?attr/apptentiveTypefaceButtonBorderless</item>
         <item name="android:textColor">?attr/apptentiveInteractionButtonColorDefault</item>
@@ -147,6 +148,7 @@
         <item name="android:paddingRight">8dp</item>
     </style>
 
+    <!-- Button style with border, example: submit button on Survey-->
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
         <item name="android:typeface">?attr/apptentiveTypefaceButtonColored</item>
         <item name="android:textSize">?attr/apptentiveTextSizeButtonColored</item>

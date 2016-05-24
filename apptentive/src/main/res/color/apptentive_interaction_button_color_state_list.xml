@@ -13,12 +13,12 @@
   will always have apptentiveInteractionButtonColorDefault.
 
   However, host app may provide an override color state list style with static values to achieve the desired effects on
-  both pre-21 and post-21:
+  both pre-23 and post-23:
 
    In ApptentiveThemeOverride.xml:
-   <item name="apptentiveInteractionButtonStyle">@style/CutomButtonStyle</item>
+   <item name="apptentiveInteractionButtonStyle">@style/CustomButtonStyle</item>
    Define style as:
-   <style name="Apptentive.Widget.Button.Borderless" parent="Apptentive.Widget.Button.Borderless">
+   <style name="CustomButtonStyle" parent="Apptentive.Widget.Button.Borderless">
         <item name="android:textColor">@color/custom_button_color_selector</item>
    </style>
    Define color as:
