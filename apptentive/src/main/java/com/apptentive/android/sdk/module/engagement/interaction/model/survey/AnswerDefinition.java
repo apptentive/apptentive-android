@@ -16,6 +16,7 @@ public class AnswerDefinition extends JSONObject {
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_HINT = "hint";
 
+	public static final String TYPE_NONE = "none";
 	public static final String TYPE_OPTION = "select_option";
 	public static final String TYPE_OTHER = "select_other";
 
@@ -32,7 +33,7 @@ public class AnswerDefinition extends JSONObject {
 	}
 
 	public String getType() {
-		return optString(KEY_TYPE, null);
+		return optString(KEY_TYPE, TYPE_NONE);
 	}
 
 	public String getHint() {
