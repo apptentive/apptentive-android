@@ -76,14 +76,14 @@
                         android:layout_height="36dp"
                         android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
                         android:layout_marginEnd="@dimen/apptentive_message_center_card_control_margin"
-                        style="@style/Apptentive.Widget.Button.Borderless"
+                        style="?apptentiveInteractionButtonStyle"
                         android:contentDescription="Skip"/>
                 <Button android:id="@+id/btn_send"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_marginRight="@dimen/apptentive_message_center_card_control_margin"
                         android:layout_marginEnd="@dimen/apptentive_message_center_card_control_margin"
-                        style="@style/Apptentive.Widget.Button.Borderless"
+                        style="?apptentiveInteractionButtonStyle"
                         android:contentDescription="Send"/>
             </LinearLayout>
         </LinearLayout>

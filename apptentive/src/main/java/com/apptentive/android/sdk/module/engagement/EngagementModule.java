@@ -85,11 +85,12 @@ public class EngagementModule {
 			 * ContentProvider, and BroadcastReceiver
 			 */
 			if (!(context instanceof Activity)) {
-				// check if any activity from the hosting app is running
+				// check if any activity from the hosting app is running at foreground
 				Activity activity = ApptentiveInternal.getInstance().getCurrentTaskStackTopActivity();
 				if (activity != null) {
 					context = activity;
 				} else {
+					// If no foreground activity from the host app, launch Apptentive interaction as a new task
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 				}
 			}
