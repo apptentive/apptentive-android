@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -274,6 +275,13 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			apptentiveTheme.applyStyle(R.style.ApptentiveBaseDialogTheme, true);
 		}
 		getTheme().setTo(apptentiveTheme);
+
+		// Change the thumbnail header color in task list
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			int colorPrimary = Util.getThemeColor(apptentiveTheme, R.attr.colorPrimary);
+			ActivityManager.TaskDescription taskDes = new ActivityManager.TaskDescription(null, null, colorPrimary);
+			setTaskDescription(taskDes);
+		}
 	}
 
 	private void addFragmentToAdapter(ApptentiveBaseFragment f, String title) {

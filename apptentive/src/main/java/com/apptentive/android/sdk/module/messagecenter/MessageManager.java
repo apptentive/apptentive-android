@@ -422,12 +422,12 @@ public class MessageManager {
 		}
 	}
 
-	// Set when Activity.onResume() is called
+	// Set when Activity.onStart() and onStop() are called
 	public void setCurrentForgroundActivity(Activity activity) {
 		if (activity != null) {
 			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
-		} else if (currentForgroundApptentiveActivity != null) {
-			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(currentForgroundApptentiveActivity.get(), false);
+		} else {
+			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(null, false);
 			if (manager != null) {
 				manager.cleanUp();
 			}

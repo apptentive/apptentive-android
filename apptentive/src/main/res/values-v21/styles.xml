@@ -63,16 +63,6 @@
         <item name="android:textSize">?attr/apptentiveTextSizeBody1</item>
     </style>
 
-    <style name="Apptentive.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:fontFamily">?apptentiveFontFamilyButtonBorderless</item>
-        <item name="android:textColor">?attr/apptentiveInteractionButtonColorStateList</item>
-        <item name="android:textSize">?attr/apptentiveTextSizeButtonBorderless</item>
-        <item name="android:background">?android:attr/selectableItemBackground</item>
-        <item name="android:minWidth">36dp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
-    </style>
-
     <style name="Apptentive.Style.Widget.Button.Colored" parent="Widget.AppCompat.Button.Colored">
         <item name="android:fontFamily">?apptentiveFontFamilyButtonColored</item>
     </style>
