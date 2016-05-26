@@ -1,14 +1,24 @@
-# ??? - 3.1.0
+ ??? - 3.1.0
 
 #### Improvements
 
 * We've added a new answer type to multiple choice surveys. You can now specify an "Other" type answer. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
 
+# 2016-05-25 - 3.0.1
+
+#### Bugs Fixed
+
+* Thumbnail in Recents Screen was not using host app's theme when the top Activity was an Apptentive Activity.
+* Improve foreground / background detection.
+* Fix borderless button styling before API level 23.
+* Fix our UI to work better when the host app uses a translucent status bar.
+* Fix window panning issue that can result in the keyboard coering part of a survey. 
+
 # 2016-04-26 - 3.0.0
 
 #### Improvements
 
-* We've made it much easier to integrate the Apptentive Android SDK into your app. Now, just add a single line to your `build.gradle`, and one to your `Application` class. If you are migrating from a prior version, make sure to follow our simple [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/next/docs/migrating_to_3.0.0.md).
+* We've made it much easier to integrate the Apptentive Android SDK into your app. Now, just add a single line to your `build.gradle`, and one to your `Application` class. If you are migrating from a prior version, make sure to follow our simple [Migration Guide](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_3.0.0.md).
 * Our SDK's UI will now inherit all styles from your app, as long as you are using an AppCompat or Material theme. If you want to further customize our UI, or you aren't using an AppCompat or Material theme, you can override our styles. Check out our [UI Customization Guide](https://docs.apptentive.com/android/customization/).
 * Our Surveys have been completely redesigned to use Material design. Your existing surveys will continue to work as before, but will look much better.
 * You can now launch our UI without passing in an Activity. This is useful for recording Events and showing Interactions from a Service or BroadcastReceiver. Interactions launched in this way will launch in a new task, while those launched with an Activity Context will launch on top of the Activity stack as before.
