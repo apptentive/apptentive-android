@@ -6,12 +6,17 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<EditText xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@+id/answer_text"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="12dp"
-          android:textAppearance="@style/Apptentive.TextAppearance.Body1"
-          android:gravity="bottom|start"
-          android:inputType="text|textCapSentences"
-          android:hint="Please leave detailed feedback"/>
+<android.support.design.widget.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                               xmlns:app="http://schemas.android.com/apk/res-auto"
+                                               android:id="@+id/answer_text_input_layout"
+                                               android:layout_width="match_parent"
+                                               android:layout_height="wrap_content"
+                                               android:animateLayoutChanges="true"
+                                               app:errorEnabled="true"
+                                               app:hintAnimationEnabled="true">
+    <EditText android:id="@+id/answer_text"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="12dp"
+              android:textAppearance="@style/Apptentive.TextAppearance.Body1"/>
+</android.support.design.widget.TextInputLayout>

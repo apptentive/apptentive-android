@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -29,9 +29,11 @@ import org.json.JSONException;
 
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
 
+	TextInputLayout answerTextInputLayout;
 	EditText answer;
+
 	private final static String SURVEY_ANSWER_FOCUS = "answerFocus";
-	boolean isFocused;
+	private boolean isFocused;
 
 	public static TextSurveyQuestionView newInstance(SinglelineQuestion question) {
 
@@ -72,13 +74,14 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		isFocused = (savedInstanceState == null) ? false : savedInstanceState.getBoolean(SURVEY_ANSWER_FOCUS, false);
+		answerTextInputLayout = (TextInputLayout) view.findViewById(R.id.answer_text_input_layout);
 		answer = (EditText) view.findViewById(R.id.answer_text);
 
 		answer.removeTextChangedListener(this);
 
 		String hint = question.getFreeformHint();
 		if (!TextUtils.isEmpty(hint)) {
-			answer.setHint(hint);
+			answerTextInputLayout.setHint(hint);
 		}
 
 		answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -90,15 +93,16 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		});
 
 		if (question.isMultiLine()) {
+			answerTextInputLayout.setGravity(Gravity.TOP | Gravity.START);
 			answer.setGravity(Gravity.TOP | Gravity.START);
-			answer.setSingleLine(false);
+			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
 			answer.setMinLines(5);
 			answer.setMaxLines(12);
-			answer.setSingleLine(false);
 			answer.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
 		} else {
+			answerTextInputLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
 			answer.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-			answer.setSingleLine(true);
+			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES);
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}
@@ -127,7 +131,14 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 
 	@Override
 	public boolean isValid() {
-		return !question.isRequired() || !TextUtils.isEmpty(answer.getText().toString());
+
+		boolean valid = !question.isRequired() || !TextUtils.isEmpty(answer.getText().toString());
+		if (!valid) {
+			answerTextInputLayout.setError(" ");
+		} else {
+			answerTextInputLayout.setError(null);
+		}
+		return valid;
 	}
 
 	@Override
