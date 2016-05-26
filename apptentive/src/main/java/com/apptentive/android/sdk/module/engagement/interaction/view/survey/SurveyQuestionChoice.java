@@ -108,10 +108,6 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 			otherTextInputLayout.setError(" ");
 			return false;
 		}
-		// If other type checked, must not be over 100 characters.
-		if (isChecked() && isOtherType && getOtherText().length() > 100) {
-			return false;
-		}
 		otherTextInputLayout.setError(null);
 		return true;
 	}

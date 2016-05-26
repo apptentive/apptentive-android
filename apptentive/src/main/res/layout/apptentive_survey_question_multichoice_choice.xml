@@ -26,8 +26,6 @@
                                                    android:layout_height="wrap_content"
                                                    android:visibility="gone"
                                                    app:errorEnabled="true"
-                                                   app:counterEnabled="true"
-                                                   app:counterMaxLength="100"
                                                    app:hintAnimationEnabled="true"
                                                    android:animateLayoutChanges="true">
         <EditText android:id="@+id/other_edit_text"
