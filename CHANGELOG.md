@@ -1,3 +1,13 @@
+# 2016-05-25 - 3.0.1
+
+#### Bugs Fixed
+
+* Thumbnail in Recents Screen was not using host app's theme when the top Activity was an Apptentive Activity.
+* Improve foreground / background detection.
+* Fix borderless button styling before API level 23.
+* Fix our UI to work better when the host app uses a translucent status bar.
+* Fix window panning issue that can result in the keyboard coering part of a survey. 
+
 # 2016-04-26 - 3.0.0
 
 #### Improvements

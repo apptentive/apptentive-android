@@ -19,9 +19,7 @@ import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBa
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Barry Li
- */
+
 public class OutgoingCompoundMessageHolder extends MessageHolder {
 	public ApptentiveMaterialIndeterminateProgressBar progressBar;
 	public TextView messageBodyView;
@@ -31,7 +29,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		super(view);
 		progressBar = (ApptentiveMaterialIndeterminateProgressBar) view.findViewById(R.id.progressBar);
 		messageBodyView = (TextView) view.findViewById(R.id.apptentive_compound_message_body);
-		imageBandView =(ApptentiveImageGridView) view.findViewById(R.id.grid);
+		imageBandView = (ApptentiveImageGridView) view.findViewById(R.id.grid);
 	}
 
 	public void updateMessage(String datestamp, String status, int statusColor,
@@ -62,7 +60,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setVisibility(View.VISIBLE);
 				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
 				List<ImageItem> images = new ArrayList<ImageItem>();
-				for (StoredFile file: imagesToAttach) {
+				for (StoredFile file : imagesToAttach) {
 					images.add(new ImageItem(file.getSourceUriOrPath(), file.getLocalFilePath(), file.getMimeType(), file.getCreationTime()));
 				}
 				imageBandView.setData(images);

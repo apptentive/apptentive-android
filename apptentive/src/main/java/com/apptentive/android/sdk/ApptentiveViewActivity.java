@@ -7,12 +7,16 @@
 package com.apptentive.android.sdk;
 
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
@@ -24,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
@@ -47,12 +52,16 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 	private int current_tab;
 
+	private View decorView;
+	private View contentView;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
+		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
 		// Add theme based on the display mode of the interaction: modal or not
-		applyApptentiveTheme(bundle.getBoolean(Constants.FragmentConfigKeys.MODAL));
+		applyApptentiveTheme(isInteractionModal);
 
 
 		ApptentiveBaseFragment newFragment = null;
@@ -64,8 +73,8 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			 * failure of retrieval indicate internal error
 			 */
 			if (newFragment == null) {
-					finish();
-					return;
+				finish();
+				return;
 			}
 		}
 		try {
@@ -78,7 +87,8 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					if (newFragment == null) {
 						newFragment = FragmentFactory.createFragmentInstance(bundle);
-						applyApptentiveTheme(newFragment.isShownAsModelDialog());
+						isInteractionModal = newFragment.isShownAsModalDialog();
+						applyApptentiveTheme(isInteractionModal);
 					}
 					if (newFragment != null) {
 						newFragment.setOnTransitionListener(this);
@@ -106,6 +116,12 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 		toolbar = (Toolbar) findViewById(R.id.apptentive_toolbar);
 		setSupportActionBar(toolbar);
+
+		/* Add top padding by the amount of Status Bar height to avoid toolbar being covered when
+		 * status bar is translucent
+		 */
+		toolbar.setPadding(0, getToolbarHeightAdjustment(!isInteractionModal), 0, 0);
+
 		ActionBar actionBar = getSupportActionBar();
 
 		if (actionBar != null) {
@@ -142,7 +158,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			@Override
 			public void onPageSelected(int position) {
 				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
-				if (!currentFragment.isShownAsModelDialog()) {
+				if (!currentFragment.isShownAsModalDialog()) {
 
 					final String title = currentFragment.getTitle();
 					toolbar.post(new Runnable() {
@@ -237,7 +253,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	public void onFragmentTransition(ApptentiveBaseFragment currentFragment) {
 		if (currentFragment != null) {
 			int numberOfPages = viewPager_Adapter.getCount();
-			for (int i = 0; i< numberOfPages; ++i) {
+			for (int i = 0; i < numberOfPages; ++i) {
 				ApptentiveBaseFragment fragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(i);
 				if (currentFragment == fragment) {
 					if (numberOfPages == 1) {
@@ -259,6 +275,13 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			apptentiveTheme.applyStyle(R.style.ApptentiveBaseDialogTheme, true);
 		}
 		getTheme().setTo(apptentiveTheme);
+
+		// Change the thumbnail header color in task list
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			int colorPrimary = Util.getThemeColor(apptentiveTheme, R.attr.colorPrimary);
+			ActivityManager.TaskDescription taskDes = new ActivityManager.TaskDescription(null, null, colorPrimary);
+			setTaskDescription(taskDes);
+		}
 	}
 
 	private void addFragmentToAdapter(ApptentiveBaseFragment f, String title) {
@@ -287,5 +310,76 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			startActivity(mainIntent);
 		}
 	}
+
+	/* Android versions starting with API Level 19, setting translucent statusbar would have two implications:
+	* 1. toolbar of non-model interaction would be partially covered
+	* 2. Keyboard launch won't resize window. (Bug: https://code.google.com/p/android/issues/detail?id=63777)
+	* The following method will fix both issues
+	*/
+	private int getToolbarHeightAdjustment(boolean bToolbarShown) {
+		int adjustAmount = 0;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			boolean translucentStatus = false;
+			// check theme attrs to see if translucent statusbar is set explicitly
+			int[] attrs = {android.R.attr.windowTranslucentStatus};
+			TypedArray a = ApptentiveInternal.getInstance().getApptentiveTheme().obtainStyledAttributes(attrs);
+			try {
+				translucentStatus = a.getBoolean(0, false);
+			} finally {
+				a.recycle();
+			}
+
+			// also check window flags in case translucent statusbar is set implicitly
+			WindowManager.LayoutParams winParams = getWindow().getAttributes();
+			int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+			if ((winParams.flags & bits) != 0) {
+				translucentStatus = true;
+			}
+
+			if (translucentStatus) {
+				if (bToolbarShown) {
+					int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+					if (resourceId > 0) {
+						adjustAmount = getResources().getDimensionPixelSize(resourceId);
+					}
+				}
+
+				/* Add layout listener to ensure keyboard launch resize the screen when android:windowTranslucentStatus=true
+				 * Fixing workaround found here:
+				 * http://stackoverflow.com/questions/8398102/androidwindowsoftinputmode-adjustresize-doesnt-make-any-difference
+				 */
+				decorView = getWindow().getDecorView();
+				contentView = decorView.findViewById(android.R.id.content);
+				decorView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardPresencelLayoutListener);
+			}
+		}
+		return adjustAmount;
+	}
+
+	ViewTreeObserver.OnGlobalLayoutListener keyboardPresencelLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+		@Override
+		public void onGlobalLayout() {
+			Rect r = new Rect();
+			decorView.getWindowVisibleDisplayFrame(r);
+
+			int height = decorView.getContext().getResources().getDisplayMetrics().heightPixels;
+			int diff = height - r.bottom;
+
+			// Detect keyboard launch when use-able screen height differs from the total screen height
+			if (diff != 0) {
+				//check if the padding is 0 (if yes set the padding for the keyboard)
+				if (contentView.getPaddingBottom() != diff) {
+					//set the padding of the contentView for the keyboard
+					contentView.setPadding(0, 0, 0, diff);
+				}
+			} else {
+				//check if the padding is != 0 (if yes reset the padding)
+				if (contentView.getPaddingBottom() != 0) {
+					//reset the padding of the contentView
+					contentView.setPadding(0, 0, 0, 0);
+				}
+			}
+		}
+	};
 
 }

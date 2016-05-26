@@ -16,6 +16,7 @@
 
     <dimen name="apptentive_image_file_extension_default_text_size">24sp</dimen>
     <dimen name="apptentive_image_file_extension_layout_top">40dp</dimen>
+    <dimen name="apptentive_interaction_extended_toolbar_width">@integer/wrap_content</dimen>
 
     <dimen name="apptentive_interaction_card_list_width">568dp</dimen>
 </resources>

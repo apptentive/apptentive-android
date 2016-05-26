@@ -1264,8 +1264,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void OnListViewResize(int w, int h, int oldw, int oldh) {
-		// detect keyboard launching
-		if (oldh > h) {
+		// detect keyboard launching. If height difference is more than 100 pixels, probably due to keyboard
+		if (oldh > h && oldh - h > 100) {
 			if (composingItem != null) {
 				// When keyboard is up, adjust the scolling such that the cursor is always visible
 				final int firstIndex = messageCenterListView.getFirstVisiblePosition();

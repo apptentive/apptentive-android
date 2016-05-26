@@ -25,7 +25,7 @@
                          android:paddingRight="@dimen/apptentive_interaction_extended_toolbar_margin_end"
                          android:theme="?apptentiveToolbarTheme"
                          android:background="?attr/colorPrimary">
-                <LinearLayout android:layout_width="wrap_content"
+                <LinearLayout android:layout_width="@dimen/apptentive_interaction_extended_toolbar_width"
                               android:layout_height="wrap_content"
                               android:layout_gravity="center_horizontal"
                               android:orientation="vertical">
