@@ -6,10 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
@@ -39,11 +36,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
-
-		return themedInflater.inflate(R.layout.apptentive_survey_question_base, container, false);
+		return inflater.inflate(R.layout.apptentive_survey_question_base, container, false);
 	}
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {

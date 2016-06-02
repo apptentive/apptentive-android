@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 
 import android.text.Layout;
@@ -45,10 +45,10 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	private ApptentiveImageGridView imageBandView;
 	List<ImageItem> images = new ArrayList<ImageItem>();
 
-	public MessageCenterComposingView(Context activityContext, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
-		super(activityContext);
+	public MessageCenterComposingView(Fragment fragment, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
+		super(fragment.getContext());
 
-		LayoutInflater inflater = LayoutInflater.from(activityContext);
+		LayoutInflater inflater = fragment.getActivity().getLayoutInflater();
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
 		if (item.str_2 != null) {

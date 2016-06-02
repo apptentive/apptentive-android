@@ -6,10 +6,9 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.content.Context;
 
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.view.ContextThemeWrapper;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.util.Util;
@@ -43,13 +41,11 @@ public class MessageCenterWhoCardView extends FrameLayout implements MessageCent
 	private Button skipButton;
 	private Button sendButton;
 
-	public MessageCenterWhoCardView(final Context activityContext, final MessageAdapter.OnListviewItemActionListener listener) {
-		super(activityContext);
+	public MessageCenterWhoCardView(final Fragment fragment, final MessageAdapter.OnListviewItemActionListener listener) {
+		super(fragment.getContext());
 		this.listener = listener;
-		final Context contextThemeWrapper = new ContextThemeWrapper(activityContext, ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
 
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
+		LayoutInflater inflater = fragment.getActivity().getLayoutInflater();
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_who_card, this);
 		title = (TextView) parentView.findViewById(R.id.who_title);
 

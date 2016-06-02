@@ -7,11 +7,10 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -75,7 +74,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		if (interaction == null) {
 			getActivity().finish();
 		}
@@ -83,11 +82,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		List<Question> questions = interaction.getQuestions();
 		answers = new LinkedHashMap<String, Object>(questions.size());
 
-		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-		final LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
-		View v = themedInflater.inflate(R.layout.apptentive_survey, container, false);
+		View v = inflater.inflate(R.layout.apptentive_survey, container, false);
 
 		TextView description = (TextView) v.findViewById(R.id.description);
 		description.setText(interaction.getDescription());
@@ -105,14 +100,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				boolean valid = validateAndUpdateState();
 				if (valid) {
 					if (interaction.isShowSuccessMessage() && !TextUtils.isEmpty(interaction.getSuccessMessage())) {
-						Toast toast = new Toast(contextThemeWrapper);
+						Toast toast = new Toast(getContext());
 						toast.setGravity(Gravity.FILL, 0, 0);
 						toast.setDuration(Toast.LENGTH_SHORT);
-						View toastView = themedInflater.inflate(R.layout.apptentive_survey_sent_toast, (LinearLayout) getView().findViewById(R.id.survey_sent_toast_root));
+						View toastView = inflater.inflate(R.layout.apptentive_survey_sent_toast, (LinearLayout) getView().findViewById(R.id.survey_sent_toast_root));
 						toast.setView(toastView);
 						TextView actionTV = ((TextView) toastView.findViewById(R.id.survey_sent_action_text));
 						actionTV.setText(interaction.getSuccessMessage());
-            int actionColor = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveTheme(), R.attr.apptentiveSurveySentToastActionColor);
+            int actionColor = Util.getThemeColor(getContext(), R.attr.apptentiveSurveySentToastActionColor);
 						if (actionColor != 0) {
 							actionTV.setTextColor(actionColor);
 							ImageView actionIcon = (ImageView) toastView.findViewById(R.id.survey_sent_action_icon);
@@ -128,10 +123,10 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {
-					Toast toast = new Toast(contextThemeWrapper);
+					Toast toast = new Toast(getContext());
 					toast.setGravity(Gravity.FILL_HORIZONTAL | Gravity.BOTTOM, 0, 0);
 					toast.setDuration(Toast.LENGTH_SHORT);
-					View toastView = themedInflater.inflate(R.layout.apptentive_survey_invalid_toast, (LinearLayout) getView().findViewById(R.id.survey_invalid_toast_root));
+					View toastView = inflater.inflate(R.layout.apptentive_survey_invalid_toast, (LinearLayout) getView().findViewById(R.id.survey_invalid_toast_root));
 					toast.setView(toastView);
 					String validationText = interaction.getValidationError();
 					if (!TextUtils.isEmpty(validationText)) {
@@ -290,9 +285,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	@Override
-	public int getToolbarNavigationIconResourceId() {
+	public int getToolbarNavigationIconResourceId(Resources.Theme activityTheme) {
 		// Survey uses close icon to replace up arrow on toolbar
-		return Util.getResourceIdFromAttribute(ApptentiveInternal.getInstance().getApptentiveTheme(), R.attr.apptentiveToolbarIconClose);
+		return Util.getResourceIdFromAttribute(activityTheme, R.attr.apptentiveToolbarIconClose);
 	}
 
 }

@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,11 +53,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 													 Bundle savedInstanceState) {
-		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
-		root = themedInflater.inflate(R.layout.apptentive_message_center_error, container, false);
+		root = inflater.inflate(R.layout.apptentive_message_center_error, container, false);
 		progress = root.findViewById(R.id.config_loading_progress);
 
 		return root;

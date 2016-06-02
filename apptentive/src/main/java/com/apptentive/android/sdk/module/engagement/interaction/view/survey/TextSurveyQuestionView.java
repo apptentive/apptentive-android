@@ -6,10 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
@@ -63,10 +60,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
-
-		themedInflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer(v));
+		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer(v));
 
 		return v;
 	}

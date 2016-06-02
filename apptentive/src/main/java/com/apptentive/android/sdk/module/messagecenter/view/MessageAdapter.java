@@ -227,7 +227,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(fragment.getContext(), (MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(fragment, (MessageCenterComposingItem) listItem, composingActionListener);
 						setupComposingView(position);
 					}
 					view = composingView;
@@ -243,7 +243,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_WHOCARD: {
 					if (whoCardView == null) {
-						whoCardView = new MessageCenterWhoCardView(fragment.getContext(), composingActionListener);
+						whoCardView = new MessageCenterWhoCardView(fragment, composingActionListener);
 						whoCardView.updateUi((MessageCenterComposingItem) listItem, Apptentive.getPersonName(),
 								Apptentive.getPersonEmail());
 						setupWhoCardView(position);
@@ -369,14 +369,32 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		}
 		if (composingEditText != null) {
 			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
-				composingEditText.requestFocus();
+				composingEditText.post(new Runnable()
+				{
+					public void run()
+					{
+						composingEditText.requestFocus();
+					}
+				});
 			}
 		} else if (nameEditText != null) {
 			if (whoCardViewIndex != INVALID_POSITION && whoCardViewIndex == position) {
 				if (focusOnNameField) {
-					nameEditText.requestFocus();
+					nameEditText.post(new Runnable()
+					{
+						public void run()
+						{
+							nameEditText.requestFocus();
+						}
+					});
 				} else {
-					emailEditText.requestFocus();
+					emailEditText.post(new Runnable()
+					{
+						public void run()
+						{
+							emailEditText.requestFocus();
+						}
+					});
 				}
 			}
 		}

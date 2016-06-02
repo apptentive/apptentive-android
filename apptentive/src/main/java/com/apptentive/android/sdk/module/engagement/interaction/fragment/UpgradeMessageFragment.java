@@ -13,14 +13,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
-
-import com.apptentive.android.sdk.ApptentiveInternal;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
@@ -42,11 +39,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
-		// create ContextThemeWrapper from the original Activity Context with the apptentive theme
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
-		View v = themedInflater.inflate(R.layout.apptentive_upgrade_message_interaction, container, false);
+		View v = inflater.inflate(R.layout.apptentive_upgrade_message_interaction, container, false);
 
 		ImageView iconView = (ImageView) v.findViewById(R.id.icon);
 		Drawable icon = getIconDrawableResourceId();

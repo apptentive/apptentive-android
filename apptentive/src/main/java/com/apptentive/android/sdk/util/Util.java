@@ -538,11 +538,11 @@ public class Util {
 		int a = ((int) (ap * 255d)) & 0xff;
 
 		int r = ((int) (((float) (backgroundColor >> RED_CHANNEL & 0xff) * amount1) +
-				((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
+			((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
 		int g = ((int) (((float) (backgroundColor >> GREEN_CHANNEL & 0xff) * amount1) +
-				((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
+			((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
 		int b = ((int) (((float) (backgroundColor & 0xff) * amount1) +
-				((float) (foregroundColor & 0xff) * amount2))) & 0xff;
+			((float) (foregroundColor & 0xff) * amount2))) & 0xff;
 
 		return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
 	}
@@ -584,8 +584,8 @@ public class Util {
 			cursor.close();
 
 			cursor = context.getContentResolver().query(
-					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 			if (cursor != null && cursor.moveToFirst()) {
 				String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 				cursor.close();
@@ -606,8 +606,8 @@ public class Util {
 			cursor.close();
 
 			cursor = context.getContentResolver().query(
-					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 			if (cursor != null && cursor.moveToFirst()) {
 				long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
 				cursor.close();
@@ -661,8 +661,8 @@ public class Util {
 	public static File getDiskCacheDir(Context context) {
 		File appCacheDir = null;
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-				|| !Environment.isExternalStorageRemovable())
-				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+			|| !Environment.isExternalStorageRemovable())
+			&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
 			appCacheDir = context.getExternalCacheDir();
 		}
 
@@ -697,8 +697,8 @@ public class Util {
 	 */
 	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-				|| !Environment.isExternalStorageRemovable())
-				&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			|| !Environment.isExternalStorageRemovable())
+			&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
 			File selectedFile = new File(selectedFilePath);
 			String selectedFileName = null;
@@ -837,7 +837,7 @@ public class Util {
 		FileOutputStream fos = null;
 		try {
 			File localFile = new File(localFilePath);
-	  /* Local cache file name may not be unique, and can be reused, in which case, the previously created
+		/* Local cache file name may not be unique, and can be reused, in which case, the previously created
 	   * cache file need to be deleted before it is being copied over.
        */
 			if (localFile.exists()) {
@@ -881,6 +881,7 @@ public class Util {
 		return null;
 	}
 
+
 	/* Utility function to override system default font with an font ttf file from asset. The override
 	 * will be applied to the entire application. The ideal place to call this method is from the onCreate()
 	  * of the Application.
@@ -896,12 +897,20 @@ public class Util {
 		TypedValue tv = new TypedValue();
 		String staticTypefaceFieldName = null;
 		Map<String, Typeface> newMap = null;
+
+		Resources.Theme apptentiveTheme = context.getResources().newTheme();
+		ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(apptentiveTheme, context);
+
+		if (apptentiveTheme == null) {
+			return;
+		}
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveFontFamilyDefault, tv, true)) {
+			if (apptentiveTheme.resolveAttribute(R.attr.apptentiveFontFamilyDefault, tv, true)) {
 				newMap = new HashMap<String, Typeface>();
 				newMap.put(tv.string.toString(), newTypeface);
 			}
-			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveFontFamilyMediumDefault, tv, true)) {
+			if (apptentiveTheme.resolveAttribute(R.attr.apptentiveFontFamilyMediumDefault, tv, true)) {
 				if (newMap == null) {
 					newMap = new HashMap<String, Typeface>();
 				}
@@ -919,7 +928,7 @@ public class Util {
 				}
 			}
 		} else {
-			if (ApptentiveInternal.getInstance().getApptentiveTheme().resolveAttribute(R.attr.apptentiveTypefaceDefault, tv, true)) {
+			if (apptentiveTheme.resolveAttribute(R.attr.apptentiveTypefaceDefault, tv, true)) {
 				staticTypefaceFieldName = "DEFAULT";
 				if (tv.data == context.getResources().getInteger(R.integer.apptentive_typeface_monospace)) {
 					staticTypefaceFieldName = "MONOSPACE";

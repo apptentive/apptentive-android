@@ -2,21 +2,17 @@ package com.apptentive.android.sdk.view;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 
@@ -52,13 +48,10 @@ public class ApptentiveAlertDialog extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Bundle bundle = getArguments();
-		final Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
 		View view = null;
 		try {
-			view = inflater.inflate(R.layout.apptentive_dialog_alert, null);
 
+			view = getActivity().getLayoutInflater().inflate(R.layout.apptentive_dialog_alert, null);
 			TextView title = (TextView) view.findViewById(R.id.text_title);
 			String titleText = bundle.getString("title");
 			if (!TextUtils.isEmpty(titleText)) {

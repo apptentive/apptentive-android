@@ -7,15 +7,12 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
@@ -64,12 +61,9 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
-
 		List<AnswerDefinition> answerDefinitions = question.getAnswerChoices();
 
-		View questionView = themedInflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer(v));
+		View questionView = inflater.inflate(R.layout.apptentive_survey_question_multichoice, getAnswerContainer(v));
 
 		choiceContainer = (LinearLayout) questionView.findViewById(R.id.choice_container);
 
@@ -80,7 +74,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 
 		for (int i = 0; i < answerDefinitions.size(); i++) {
 			AnswerDefinition answerDefinition = answerDefinitions.get(i);
-			SurveyQuestionChoice choice = new SurveyQuestionChoice(contextThemeWrapper, answerDefinition, question.getType(), i);
+			SurveyQuestionChoice choice = new SurveyQuestionChoice(getContext(), inflater, answerDefinition, question.getType(), i);
 			if (selectedChoices.contains(i)) {
 				choice.setChecked(true);
 			}
