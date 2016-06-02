@@ -21,7 +21,9 @@ import android.widget.EditText;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
@@ -89,14 +91,14 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		if (question.isMultiLine()) {
 			answerTextInputLayout.setGravity(Gravity.TOP | Gravity.START);
 			answer.setGravity(Gravity.TOP | Gravity.START);
-			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+			answer.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
 			answer.setMinLines(5);
 			answer.setMaxLines(12);
 			answer.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
 		} else {
 			answerTextInputLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
 			answer.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES);
+			answer.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES);
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}
@@ -138,11 +140,18 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	@Override
 	public Object getAnswer() {
 		String value = answer.getText().toString().trim();
-		if (TextUtils.isEmpty(value)) {
-			return null;
-		} else {
-			return value;
+		try {
+			if (!TextUtils.isEmpty(value)) {
+				JSONArray jsonArray = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonArray.put(jsonObject);
+				jsonObject.put("value", value);
+				return jsonArray;
+			}
+		} catch (JSONException e) {
+			// Return null;
 		}
+		return null;
 	}
 
 	@Override

@@ -19,7 +19,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Ans
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.util.Util;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -144,7 +146,10 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			for (int i = 0; i < choiceContainer.getChildCount(); i++) {
 				SurveyQuestionChoice surveyQuestionChoice = (SurveyQuestionChoice) choiceContainer.getChildAt(i);
 				if (surveyQuestionChoice.isChecked()) {
-					return surveyQuestionChoice.getAnswer();
+					JSONArray jsonArray = new JSONArray();
+					JSONObject jsonObject = (JSONObject) surveyQuestionChoice.getAnswer();
+					jsonArray.put(jsonObject);
+					return jsonArray;
 				}
 			}
 		} catch (Exception e) {
