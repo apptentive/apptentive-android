@@ -82,6 +82,9 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 				jsonArray.put(surveyQuestionChoice.getAnswer());
 			}
 		}
-		return jsonArray;
+		if (jsonArray.length() > 0) {
+			return jsonArray;
+		}
+		return null;
 	}
 }
