@@ -24,7 +24,9 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
@@ -144,11 +146,18 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	@Override
 	public Object getAnswer() {
 		String value = answer.getText().toString().trim();
-		if (TextUtils.isEmpty(value)) {
-			return null;
-		} else {
-			return value;
+		try {
+			if (!TextUtils.isEmpty(value)) {
+				JSONArray jsonArray = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonArray.put(jsonObject);
+				jsonObject.put("value", value);
+				return jsonArray;
+			}
+		} catch (JSONException e) {
+			// Return null;
 		}
+		return null;
 	}
 
 	@Override
