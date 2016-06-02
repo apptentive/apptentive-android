@@ -281,9 +281,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		}
 
-		if (bShownAsModal) {
-			setStatusBarColor(ApptentiveInternal.getInstance().getDefaultStatusbarColor());
-		}
 	}
 
 
@@ -360,7 +357,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	// If return 0, toolbar use up arrow as default navigation icon
-	public int getToolbarNavigationIconResourceId() {
+	public int getToolbarNavigationIconResourceId(Resources.Theme activityTheme) {
 		return 0;
 	}
 
@@ -507,16 +504,4 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		fragmentManager.beginTransaction().remove(fragment).commit();
 	}
 
-	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
-	 * It is the default status color alpha blended with the Apptentive translucent
-	* color apptentive_activity_frame
-	* @param statusBarDefaultColor the default activity status bar color specified by the app
-	*/
-	private void setStatusBarColor(int statusBarDefaultColor) {
-		// Changing status bar color is a post-21 feature
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			int overlayColor = ContextCompat.getColor(getContext(), R.color.apptentive_activity_frame_dark);
-			getActivity().getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
-		}
-	}
 }

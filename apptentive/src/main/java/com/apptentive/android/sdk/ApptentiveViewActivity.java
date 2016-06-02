@@ -11,7 +11,6 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -20,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
@@ -60,9 +60,6 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
 		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
-		// Add theme based on the display mode of the interaction: modal or not
-		applyApptentiveTheme(isInteractionModal);
-
 
 		ApptentiveBaseFragment newFragment = null;
 		if (savedInstanceState != null) {
@@ -88,9 +85,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 					if (newFragment == null) {
 						newFragment = FragmentFactory.createFragmentInstance(bundle);
 						isInteractionModal = newFragment.isShownAsModalDialog();
-						applyApptentiveTheme(isInteractionModal);
 					}
 					if (newFragment != null) {
+						applyApptentiveTheme(isInteractionModal);
 						newFragment.setOnTransitionListener(this);
 					}
 				}
@@ -126,15 +123,16 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 		if (actionBar != null) {
 			actionBar.setDisplayHomeAsUpEnabled(true);
+			int navIconResId = newFragment.getToolbarNavigationIconResourceId(getTheme());
 			// Check if fragment may show an alternative navigation icon
-			if (newFragment.getToolbarNavigationIconResourceId() != 0) {
+			if ( navIconResId != 0) {
 				/* In order for the alternative icon has the same color used by toolbar icon,
 				 * need to apply the same color in toolbar theme
 				 * By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
 				 */
 				final Drawable alternateUpArrow = ResourcesCompat.getDrawable(getResources(),
-						newFragment.getToolbarNavigationIconResourceId(),
-						ApptentiveInternal.getInstance().getApptentiveTheme());
+					  navIconResId,
+					  getTheme());
 
 				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
 				alternateUpArrow.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
@@ -270,15 +268,17 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	private void applyApptentiveTheme(boolean isModalInteraction) {
-		Resources.Theme apptentiveTheme = ApptentiveInternal.getInstance().getApptentiveTheme();
+    // Update the activity theme to reflect current attributes
+		ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
+
 		if (isModalInteraction) {
-			apptentiveTheme.applyStyle(R.style.ApptentiveBaseDialogTheme, true);
+			getTheme().applyStyle(R.style.ApptentiveBaseDialogTheme, true);
+			setStatusBarColor(ApptentiveInternal.getInstance().getDefaultStatusbarColor());
 		}
-		getTheme().setTo(apptentiveTheme);
 
 		// Change the thumbnail header color in task list
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			int colorPrimary = Util.getThemeColor(apptentiveTheme, R.attr.colorPrimary);
+			int colorPrimary = Util.getThemeColor(getTheme(), R.attr.colorPrimary);
 			ActivityManager.TaskDescription taskDes = new ActivityManager.TaskDescription(null, null, colorPrimary);
 			setTaskDescription(taskDes);
 		}
@@ -322,7 +322,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			boolean translucentStatus = false;
 			// check theme attrs to see if translucent statusbar is set explicitly
 			int[] attrs = {android.R.attr.windowTranslucentStatus};
-			TypedArray a = ApptentiveInternal.getInstance().getApptentiveTheme().obtainStyledAttributes(attrs);
+			TypedArray a = getTheme().obtainStyledAttributes(attrs);
 			try {
 				translucentStatus = a.getBoolean(0, false);
 			} finally {
@@ -382,4 +382,16 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		}
 	};
 
+	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
+	 * It is the default status color alpha blended with the Apptentive translucent
+	* color apptentive_activity_frame
+	* @param statusBarDefaultColor the default activity status bar color specified by the app
+	*/
+	private void setStatusBarColor(int statusBarDefaultColor) {
+		// Changing status bar color is a post-21 feature
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame_dark);
+			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
+		}
+	}
 }
