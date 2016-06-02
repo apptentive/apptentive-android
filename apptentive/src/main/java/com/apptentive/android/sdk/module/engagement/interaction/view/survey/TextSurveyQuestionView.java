@@ -97,14 +97,14 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		if (question.isMultiLine()) {
 			answerTextInputLayout.setGravity(Gravity.TOP | Gravity.START);
 			answer.setGravity(Gravity.TOP | Gravity.START);
-			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+			answer.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
 			answer.setMinLines(5);
 			answer.setMaxLines(12);
 			answer.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
 		} else {
 			answerTextInputLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
 			answer.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-			answer.setInputType(EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES);
+			answer.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES);
 			answer.setMinLines(1);
 			answer.setMaxLines(5);
 		}
