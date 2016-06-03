@@ -6,9 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,15 +14,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
@@ -46,10 +41,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 		super(fragment.getContext());
 		this.listenerRef = new WeakReference<MessageAdapter.OnListviewItemActionListener>(listener);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(fragment.getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-
-		LayoutInflater inflater = LayoutInflater.from(contextThemeWrapper);
+		LayoutInflater inflater = fragment.getActivity().getLayoutInflater();
 
 		try {
 			inflater.inflate(R.layout.apptentive_message_center_composing_actionbar, this);
@@ -57,8 +49,7 @@ public class MessageCenterComposingActionBarView extends FrameLayout implements 
 			ApptentiveLog.e("Error:", e);
 		}
 
-		Resources.Theme theme = contextThemeWrapper.getTheme();
-		ColorStateList colors = ContextCompat.getColorStateList(contextThemeWrapper, Util.getResourceIdFromAttribute(theme, R.attr.apptentiveButtonTintColorStateList));
+		ColorStateList colors = ContextCompat.getColorStateList(getContext(), Util.getResourceIdFromAttribute(getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
 
 		ImageButton closeButton = (ImageButton) findViewById(R.id.cancel_composing);
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.

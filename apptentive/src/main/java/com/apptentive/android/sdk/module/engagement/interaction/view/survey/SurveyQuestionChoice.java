@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.content.Context;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
@@ -43,23 +41,21 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	private OnCheckedChangeListener onCheckChangedListener;
 	private OnOtherTextChangedListener onOtherTextChangedListener;
 
-	public SurveyQuestionChoice(Context context, AnswerDefinition answerDefinition, int questionType, int index) {
+	public SurveyQuestionChoice(Context context, LayoutInflater inflater, AnswerDefinition answerDefinition, int questionType, int index) {
 		super(context);
 
 		this.index = index;
 		answerId = answerDefinition.getId();
 		isOtherType = answerDefinition.getType().equals(AnswerDefinition.TYPE_OTHER);
 
-		Context contextThemeWrapper = new ContextThemeWrapper(getContext(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		LayoutInflater themedInflater = LayoutInflater.from(contextThemeWrapper);
 
 		switch (questionType) {
 			case Question.QUESTION_TYPE_MULTICHOICE:
-				themedInflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
+				inflater.inflate(R.layout.apptentive_survey_question_multichoice_choice, this);
 				break;
 			case Question.QUESTION_TYPE_MULTISELECT:
 			default:
-				themedInflater.inflate(R.layout.apptentive_survey_question_multiselect_choice, this);
+				inflater.inflate(R.layout.apptentive_survey_question_multiselect_choice, this);
 				break;
 		}
 		checkBox = (CheckBox) findViewById(R.id.checkbox);

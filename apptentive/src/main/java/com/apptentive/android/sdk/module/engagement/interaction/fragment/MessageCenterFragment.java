@@ -26,7 +26,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -217,10 +216,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		pendingWhoCardMode = (savedInstanceState == null) ? 0 :
 				savedInstanceState.getInt(WHO_CARD_MODE);
 
-		final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), ApptentiveInternal.getInstance().getApptentiveTheme());
-		// clone the inflater using the ContextThemeWrapper
-		LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
-		return themedInflater.inflate(R.layout.apptentive_message_center, container, false);
+		return inflater.inflate(R.layout.apptentive_message_center, container, false);
 	}
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {

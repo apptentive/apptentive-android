@@ -11,6 +11,7 @@
              android:layout_height="wrap_content"
              android:paddingBottom="8dp"
              android:clipToPadding="false"
+             android:theme="?apptentiveToolbarTheme"
              android:descendantFocusability="blocksDescendants"
              android:background="@android:color/transparent">
     <RelativeLayout android:layout_width="match_parent"
@@ -18,7 +19,6 @@
                     android:paddingTop="32dp"
                     android:paddingLeft="@dimen/apptentive_message_center_greeting_side_margin"
                     android:paddingRight="@dimen/apptentive_message_center_greeting_side_margin"
-                    android:theme="?apptentiveToolbarTheme"
                     android:background="?colorPrimary"
                     android:clipToPadding="false"
                     android:orientation="horizontal">
