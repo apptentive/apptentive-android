@@ -420,31 +420,28 @@ public class ApptentiveInternal {
 		messageManager.appWentToBackground();
 	}
 
-	/* Update themes to be used by interaction to ensure it has Apptentive defaults, and with app/activity theme inherited and
-	 * overrides applied.
+	/* Apply Apptentive styling layers to the theme to be used by interaction. The layers include
+	 * Apptentive defaults, and app/activity theme inheritance and app specific overrides.
 	 *
 	 * When the Apptentive fragments are hosted by ApptentiveViewActivity(by default), the value of theme attributes
-	 * are obtained in the following order: ApptentiveTheme.Base.Versioned specified in Apptentive Androidmanifest.xml ->
+	 * are obtained in the following order: ApptentiveTheme.Base.Versioned specified in Apptentive's AndroidManifest.xml ->
 	 * app default theme specified in app AndroidManifest.xml (force) -> ApptentiveThemeOverride (force)
 	 *
-	 *
+	 * @param interactionTheme The base theme to apply Apptentive styling layers
 	 * @param context The context that will host Apptentive interaction fragment, either ApptentiveViewActivity
 	 *                or application context
 	 */
 	public void updateApptentiveInteractionTheme(Resources.Theme interactionTheme, Context context) {
-		/* Step 1: Apply Apptentive default theme.
-		 * If parent activity is an Apptentive activity, ues its theme as the base theme, and skip Step 1.
-		 * The base theme will have all Apptentive defaults, but no host app theme inherited yet until Step 2 is applied;
-		 * If parent activity is NOT an Apptentive activity, first apply apptentive default theme
-		 * to the activity theme.
+		/* Step 1: Apply Apptentive default theme layer.
+		 * If host activity is an Apptentive activity, the base theme already has Apptentive defaults applied, so skip Step 1.
+		 * If parent activity is NOT an Apptentive activity, first apply Apptentive defaults.
 		 */
 		if (!(context instanceof Activity)) {
 			// If host context is not an activity, i.e. application context, treat it as initial theme setup
 			interactionTheme.applyStyle(R.style.ApptentiveTheme_Base_Versioned, true);
 		}
 
-		// Step 2: Inherit app default theme, skipped for non-ApptentiveViewActivity host activity;
-		// if the parent activity is an apptentive Activity, apply the app default theme forcefully
+		// Step 2: Inherit app default theme if there is one specified in app's AndroidManifest
 		if (appDefaultThemeId != 0) {
 			Resources.Theme appDefaultTheme = context.getResources().newTheme();
 			appDefaultTheme.applyStyle(appDefaultThemeId, true);
@@ -462,7 +459,7 @@ public class ApptentiveInternal {
 		}
 
 		// Step 3: Restore Apptentive UI window properties that may have been overridden in Step 2. This theme
-		// is to ensure Apptentive interaction has a modal feel-n-look. When applied to inlined fragment, it has no effect
+		// is to ensure Apptentive interaction has a modal feel-n-look.
 		interactionTheme.applyStyle(R.style.ApptentiveBaseFrameTheme, true);
 
 		// Step 4: Apply optional theme override specified in host app's style

@@ -382,9 +382,9 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 		}
 	};
 
-	/* Set status bar color when dialog style model interactions, such as Rating prompt, Note .. are shown.
+	/* Set status bar color when dialog style modal interactions, such as Rating prompt, Note .. are shown.
 	 * It is the default status color alpha blended with the Apptentive translucent
-	* color apptentive_activity_frame
+	* color defined by apptentive_activity_frame
 	* @param statusBarDefaultColor the default activity status bar color specified by the app
 	*/
 	private void setStatusBarColor(int statusBarDefaultColor) {
