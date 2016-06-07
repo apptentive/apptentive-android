@@ -79,6 +79,7 @@ public class ApptentiveInternal {
 	PayloadSendWorker payloadWorker;
 	ApptentiveDatabase database;
 	CodePointStore codePointStore;
+	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -241,12 +242,18 @@ public class ApptentiveInternal {
 	}
 
 	/* Called by {@link #Apptentive.register()} to register global lifecycle
-	 * callbacks.
+	 * callbacks, only if the callback hasn't been set yet.
 	 */
 	static void setLifeCycleCallback() {
-		if (sApptentiveInternal != null && sApptentiveInternal.appContext instanceof Application) {
-			((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(new ApptentiveActivityLifecycleCallbacks());
-		}
+		if (sApptentiveInternal != null && sApptentiveInternal.lifecycleCallbacks == null) {
+			synchronized (ApptentiveInternal.class) {
+				if (sApptentiveInternal != null && sApptentiveInternal.lifecycleCallbacks == null &&
+					sApptentiveInternal.appContext instanceof Application) {
+						sApptentiveInternal.lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
+						((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
+					}
+				}
+			}
 	}
 
 	/*
@@ -257,6 +264,11 @@ public class ApptentiveInternal {
 	public Context getApplicationContext() {
 		return appContext;
 	}
+
+	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
+		return lifecycleCallbacks;
+	}
+
 
 	/* Get the foreground activity from the current application, i.e. at the top of the task
 	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityStopped(Activity)}
