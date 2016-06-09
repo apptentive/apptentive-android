@@ -1,8 +1,8 @@
- ??? - 3.1.0
+# 2016-06-08 - 3.1.0
 
 #### Improvements
 
-* We've added a new answer type to multiple choice surveys. You can now specify an "Other" type answer. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
+* We've added a new answer type to multiple choice surveys. You can now specify an "Other" answer type for multiple choice questions. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
 
 # 2016-05-25 - 3.0.1
 
