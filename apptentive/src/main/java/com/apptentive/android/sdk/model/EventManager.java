@@ -15,7 +15,7 @@ import com.apptentive.android.sdk.storage.EventStore;
 public class EventManager {
 
 	private static EventStore getEventStore() {
-		return ApptentiveInternal.getInstance().getApptentiveDatabase();
+		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
 	}
 
 	public static void sendEvent(Event event) {
