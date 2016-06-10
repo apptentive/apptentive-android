@@ -33,19 +33,19 @@ import java.util.List;
  *
  * @author Sky Kelsey
  */
-public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore, EventStore, MessageStore {
+public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// COMMON
 	private static final int DATABASE_VERSION = 2;
-	private static final String DATABASE_NAME = "apptentive";
+	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
 
 	// PAYLOAD
-	private static final String TABLE_PAYLOAD = "payload";
-	private static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
-	private static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
-	private static final String PAYLOAD_KEY_JSON = "json";           // 2
+	public static final String TABLE_PAYLOAD = "payload";
+	public static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
+	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
+	public static final String PAYLOAD_KEY_JSON = "json";           // 2
 
 	private static final String TABLE_CREATE_PAYLOAD =
 			"CREATE TABLE " + TABLE_PAYLOAD +
@@ -55,7 +55,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 					PAYLOAD_KEY_JSON + " TEXT" +
 					");";
 
-	private static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
+	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
 
@@ -156,7 +156,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public ApptentiveDatabase(Context context) {
+	public ApptentiveDatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		fileDir = context.getFilesDir();
 	}
@@ -196,7 +196,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public synchronized void addPayload(Payload... payloads) {
+	public void addPayload(Payload... payloads) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -216,12 +216,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("addPayload EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
-	public synchronized void deletePayload(Payload payload) {
+	public void deletePayload(Payload payload) {
 		if (payload != null) {
 			SQLiteDatabase db = null;
 			try {
@@ -229,25 +227,21 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
 			} catch (SQLException sqe) {
 				ApptentiveLog.e("deletePayload EXCEPTION: " + sqe.getMessage());
-			} finally {
-				ensureClosed(db);
 			}
 		}
 	}
 
-	public synchronized void deleteAllPayloads() {
+	public void deleteAllPayloads() {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.delete(TABLE_PAYLOAD, "", null);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("deleteAllPayloads EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
-	public synchronized Payload getOldestUnsentPayload() {
+	public Payload getOldestUnsentPayload() {
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -270,17 +264,15 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			return null;
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
 		}
 	}
-
 
 	// MessageStore
 
 	/**
 	 * Saves the message into the message table, and also into the payload table so it can be sent to the server.
 	 */
-	public synchronized void addOrUpdateMessages(ApptentiveMessage... apptentiveMessages) {
+	public void addOrUpdateMessages(ApptentiveMessage... apptentiveMessages) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -319,12 +311,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			}
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("addOrUpdateMessages EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
-	public synchronized void updateMessage(ApptentiveMessage apptentiveMessage) {
+	public void updateMessage(ApptentiveMessage apptentiveMessage) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -346,11 +336,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			if (db != null) {
 				db.endTransaction();
 			}
-			ensureClosed(db);
 		}
 	}
 
-	public synchronized List<ApptentiveMessage> getAllMessages() {
+	public List<ApptentiveMessage> getAllMessages() {
 		List<ApptentiveMessage> apptentiveMessages = new ArrayList<ApptentiveMessage>();
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
@@ -375,7 +364,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ApptentiveLog.e("getAllMessages EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
 		}
 		return apptentiveMessages;
 	}
@@ -394,7 +382,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ApptentiveLog.e("getLastReceivedMessageId EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
 		}
 		return ret;
 	}
@@ -411,7 +398,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			return 0;
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
 		}
 	}
 
@@ -422,8 +408,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			db.delete(TABLE_MESSAGE, "", null);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("deleteAllMessages EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
@@ -435,8 +419,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ApptentiveLog.d("Deleted %d messages.", deleted);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("deleteMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
@@ -444,8 +426,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	//
 	// File Store
 	//
-
-	public synchronized void migrateToCompoundMessage(SQLiteDatabase db) {
+	private void migrateToCompoundMessage(SQLiteDatabase db) {
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
 		try {
@@ -577,7 +558,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		}
 	}
 
-	public synchronized void deleteAssociatedFiles(String messageNonce) {
+	public void deleteAssociatedFiles(String messageNonce) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -585,12 +566,10 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ApptentiveLog.d("Deleted %d stored files.", deleted);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(db);
 		}
 	}
 
-	public synchronized List<StoredFile> getAssociatedFiles(String nonce) {
+	public List<StoredFile> getAssociatedFiles(String nonce) {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
@@ -614,7 +593,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 			ApptentiveLog.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
-			ensureClosed(db);
 		}
 		return associatedFiles.size() > 0 ? associatedFiles : null;
 	}
@@ -625,7 +603,7 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 	 * @param associatedFiles list of associated files
 	 * @return true if succeed
 	 */
-	public synchronized boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
+	public boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
 		String messageNonce = associatedFiles.get(0).getId();
 		SQLiteDatabase db = null;
 		long ret = -1;
@@ -651,7 +629,6 @@ public class ApptentiveDatabase extends SQLiteOpenHelper implements PayloadStore
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
-			ensureClosed(db);
 			return ret != -1;
 		}
 	}
