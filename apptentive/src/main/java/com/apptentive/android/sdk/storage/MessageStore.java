@@ -10,23 +10,24 @@ package com.apptentive.android.sdk.storage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @author Sky Kelsey
  */
 public interface MessageStore extends PayloadStore {
 
-	public void addOrUpdateMessages(ApptentiveMessage... apptentiveMessage);
+	void addOrUpdateMessages(ApptentiveMessage... apptentiveMessage);
 
-	public void updateMessage(ApptentiveMessage apptentiveMessage);
+	void updateMessage(ApptentiveMessage apptentiveMessage);
 
-	public List<ApptentiveMessage> getAllMessages();
+	Future<List<ApptentiveMessage>> getAllMessages() throws Exception;
 
-	public String getLastReceivedMessageId();
+	Future<String> getLastReceivedMessageId() throws Exception;
 
-	public int getUnreadMessageCount();
+	Future<Integer> getUnreadMessageCount() throws Exception;
 
-	public void deleteAllMessages();
+	void deleteAllMessages();
 
-	public void deleteMessage(String nonce);
+	void deleteMessage(String nonce);
 }
