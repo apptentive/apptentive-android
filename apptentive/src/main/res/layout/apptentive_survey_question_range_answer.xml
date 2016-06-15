@@ -11,13 +11,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="4dp">
-    <LinearLayout android:id="@+id/range_container"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_alignParentTop="true"
-                  android:orientation="horizontal">
+    <RadioGroup android:id="@+id/range_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal">
         <!-- Buttons go here -->
-    </LinearLayout>
+    </RadioGroup>
     <TextView android:id="@+id/min_label"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"

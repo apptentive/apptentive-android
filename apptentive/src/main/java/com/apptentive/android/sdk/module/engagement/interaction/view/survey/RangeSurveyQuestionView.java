@@ -11,8 +11,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -66,7 +66,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			maxLabelTextView.setText(maxLabel);
 		}
 
-		LinearLayout rangeContainer = (LinearLayout) answer.findViewById(R.id.range_container);
+		RadioGroup radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
 		int min = question.getMin();
 		int max = question.getMax();
 
@@ -74,9 +74,9 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 
 		for (int i = min; i <= max; i++) {
 			try {
-				CompoundButton compoundButton = (CompoundButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, rangeContainer, false);
-				compoundButton.setText(defaultNumberFormat.format(i));
-				rangeContainer.addView(compoundButton);
+				RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
+				radioButton.setText(defaultNumberFormat.format(i));
+				radioGroup.addView(radioButton);
 			} catch (Throwable e) {
 				String message = "Error";
 				while (e != null) {

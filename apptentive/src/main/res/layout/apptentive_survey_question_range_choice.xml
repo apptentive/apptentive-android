@@ -5,11 +5,11 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="0dp"
-          android:layout_height="match_parent"
-          android:layout_weight="1"
-          style="@style/Widget.AppCompat.CompoundButton.RadioButton"
-          android:button="@null"
-          android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
-          android:gravity="center_horizontal|bottom"/>
+<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="1"
+             style="@style/Widget.AppCompat.CompoundButton.RadioButton"
+             android:button="@null"
+             android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
+             android:gravity="center_horizontal|bottom"/>
