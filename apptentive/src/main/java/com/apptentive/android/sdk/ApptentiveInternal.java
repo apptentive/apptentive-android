@@ -96,8 +96,8 @@ public class ApptentiveInternal {
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
 
-	// app default theme res id, if specified in app AndroidManifest
-	int appDefaultThemeId;
+	// app default appcompat theme res id, if specified in app AndroidManifest
+	int appDefaultAppCompatThemeId;
 
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
@@ -136,9 +136,6 @@ public class ApptentiveInternal {
 	}
 
 	private static volatile ApptentiveInternal sApptentiveInternal;
-
-	ApptentiveInternal() {
-	}
 
 
 	public static boolean isApptentiveRegistered() {
@@ -208,7 +205,9 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
 					isApptentiveInitialized.set(true);
-					sApptentiveInternal.init();
+					if (!sApptentiveInternal.init()) {
+						ApptentiveLog.e("Apptentive init() failed");
+					}
 				}
 			}
 		}
@@ -249,11 +248,11 @@ public class ApptentiveInternal {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal != null && sApptentiveInternal.lifecycleCallbacks == null &&
 					sApptentiveInternal.appContext instanceof Application) {
-						sApptentiveInternal.lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
-						((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
-					}
+					sApptentiveInternal.lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
+					((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
 				}
 			}
+		}
 	}
 
 	/*
@@ -453,21 +452,9 @@ public class ApptentiveInternal {
 			interactionTheme.applyStyle(R.style.ApptentiveTheme_Base_Versioned, true);
 		}
 
-		// Step 2: Inherit app default theme if there is one specified in app's AndroidManifest
-		if (appDefaultThemeId != 0) {
-			Resources.Theme appDefaultTheme = context.getResources().newTheme();
-			appDefaultTheme.applyStyle(appDefaultThemeId, true);
-
-			// If the app contains colorPrimaryDark, it is using an AppCompat theme. Therefore, we want to use it.
-			// If it's not using an AppCompat theme, we don't want to apply it to our SDK, and use our default theme instead.
-			TypedArray a = appDefaultTheme.obtainStyledAttributes(android.support.v7.appcompat.R.styleable.AppCompatTheme);
-			try {
-				if (a.hasValue(android.support.v7.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
-					interactionTheme.applyStyle(appDefaultThemeId, true);
-				}
-			} finally {
-				a.recycle();
-			}
+		// Step 2: Inherit app default appcompat theme if there is one specified in app's AndroidManifest
+		if (appDefaultAppCompatThemeId != 0) {
+			interactionTheme.applyStyle(appDefaultAppCompatThemeId, true);
 		}
 
 		// Step 3: Restore Apptentive UI window properties that may have been overridden in Step 2. This theme
@@ -481,26 +468,34 @@ public class ApptentiveInternal {
 			interactionTheme.applyStyle(themeOverrideResId, true);
 		}
 
-		int transparentColor = ContextCompat.getColor(context, android.R.color.transparent);
-		TypedArray a = interactionTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
-		try {
-			statusBarColorDefault = a.getColor(0, transparentColor);
-		} finally {
-			a.recycle();
+		// Step 5: Update statusbar color
+		/* Obtain the default statusbar color. When Apptentive Modal interaction is shown,
+		*  a translucent overlay would be applied on top of statusBarColorDefault
+		*/
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			int transparentColor = ContextCompat.getColor(context, android.R.color.transparent);
+			TypedArray a = interactionTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
+			try {
+				statusBarColorDefault = a.getColor(0, transparentColor);
+			} finally {
+				a.recycle();
+			}
 		}
 
+		// Step 6: Update toolbar overlay theme
 		int toolbarThemeId = Util.getResourceIdFromAttribute(interactionTheme, R.attr.apptentiveToolbarTheme);
 		apptentiveToolbarTheme.setTo(interactionTheme);
 		apptentiveToolbarTheme.applyStyle(toolbarThemeId, true);
 	}
 
-	public void init() {
-
+	public boolean init() {
+		boolean bRet = true;
 		codePointStore.init();
 		messageManager.init();
 		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 		conversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
 		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
+		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
 		boolean apptentiveDebug = false;
 		String logLevelOverride = null;
@@ -519,31 +514,26 @@ public class ApptentiveInternal {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
-			/*
-			 * Construct the theme used by Apptentive Ui in the following order
-			 *  1. start with Apptentive default theme : ApptentiveTheme.Base.Versioned
-			 *  2. merge with app default theme, if one is specified and it's a AppCompat theme.
-			 *  (merge takes value from app default theme if both define the same attribute)
-			 *  3. apply Apptentive UI specific frame style
-			 *  4. Apply apptentive theme override specified by the app in ApptentiveThemeOverride
-			 */
-			appDefaultThemeId = ai.theme;
-			boolean appHasTheme = appDefaultThemeId != 0;
+			// Obtain Apptentive theme inheritance metrics
+			int appDefaultThemeId = ai.theme;
 			boolean appThemeIsAppCompatTheme = false;
 
-			apptentiveToolbarTheme = appContext.getResources().newTheme();
-
-			// Step 2, check if app specifies a default appcompat theme
-			if (appHasTheme) {
+			// check if app specifies a default appcompat theme
+			if (appDefaultThemeId != 0) {
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
 				appDefaultTheme.applyStyle(appDefaultThemeId, true);
 
-				// If the app contains colorPrimaryDark, it is using an AppCompat theme. Therefore, we want to use it.
-				// If it's not using an AppCompat theme, we don't want to apply it to our SDK, and use our default theme instead.
-				appThemeIsAppCompatTheme = Util.getThemeColor(appDefaultTheme, R.attr.colorPrimaryDark) != 0;
-
+				TypedArray a = appDefaultTheme.obtainStyledAttributes(android.support.v7.appcompat.R.styleable.AppCompatTheme);
+				try {
+					if (a.hasValue(android.support.v7.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
+						appThemeIsAppCompatTheme = true;
+						appDefaultAppCompatThemeId = appDefaultThemeId;
+					}
+				} finally {
+					a.recycle();
+				}
 			}
-
+			// check if host app defines an apptentive theme override
 			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
 
 			Integer currentVersionCode = packageInfo.versionCode;
@@ -555,6 +545,7 @@ public class ApptentiveInternal {
 			appRelease.setBuildNumber(String.valueOf(currentVersionCode));
 			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
 			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
+			// Set Apptentive theme inheritance metrics
 			appRelease.setInheritStyle(appThemeIsAppCompatTheme);
 			appRelease.setOverrideStyle(themeOverrideResId != 0);
 
@@ -580,7 +571,9 @@ public class ApptentiveInternal {
 
 		} catch (Exception e) {
 			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
+			bRet = false;
 		}
+
 
 		// Set debuggable and appropriate log level.
 		if (apptentiveDebug) {
@@ -624,6 +617,7 @@ public class ApptentiveInternal {
 		ApptentiveLog.d("Android ID: ", androidId);
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
 		ApptentiveLog.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
+		return bRet;
 	}
 
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
