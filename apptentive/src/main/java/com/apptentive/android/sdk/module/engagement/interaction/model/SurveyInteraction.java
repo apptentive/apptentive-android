@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
 import org.json.JSONArray;
@@ -92,6 +93,9 @@ public class SurveyInteraction extends Interaction {
 							break;
 						case multiselect:
 							question = new MultiselectQuestion(questionJson.toString());
+							break;
+						case range:
+							question = new RangeQuestion(questionJson.toString());
 							break;
 						default:
 							break;

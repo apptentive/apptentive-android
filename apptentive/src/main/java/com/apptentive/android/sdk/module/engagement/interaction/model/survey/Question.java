@@ -10,6 +10,7 @@ public interface Question {
 	int QUESTION_TYPE_SINGLELINE  = 1;
 	int QUESTION_TYPE_MULTICHOICE = 2;
 	int QUESTION_TYPE_MULTISELECT = 3;
+	int QUESTION_TYPE_RANGE = 4;
 
 	int getType();
 
@@ -27,5 +28,6 @@ public interface Question {
 		multichoice,
 		singleline,
 		multiselect,
+		range
 	}
 }
