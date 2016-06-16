@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -26,7 +27,17 @@ import org.json.JSONObject;
 import java.text.NumberFormat;
 
 
-public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestion> {
+public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestion> implements RadioButton.OnCheckedChangeListener {
+
+	private RadioGroup radioGroup;
+	private int min;
+	private int max;
+	private String minLabel;
+	private String maxLabel;
+
+	// TODO: Save these
+	private boolean valueWasSelected;
+	private int selectedValue;
 
 	public static RangeSurveyQuestionView newInstance(RangeQuestion question) {
 		RangeSurveyQuestionView f = new RangeSurveyQuestionView();
@@ -46,6 +57,10 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			} catch (JSONException e) {
 			}
 		}
+		min = question.getMin();
+		max = question.getMax();
+		minLabel = question.getMinLabel();
+		maxLabel = question.getMaxLabel();
 	}
 
 	@Override
@@ -55,20 +70,16 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 		ViewGroup answer = (ViewGroup) inflater.inflate(R.layout.apptentive_survey_question_range_answer, answerContainer, false);
 		answerContainer.addView(answer);
 
-		String minLabel = question.getMinLabel();
 		if (!TextUtils.isEmpty(minLabel)) {
 			TextView minLabelTextView = (TextView) answer.findViewById(R.id.min_label);
 			minLabelTextView.setText(minLabel);
 		}
-		String maxLabel = question.getMaxLabel();
 		if (!TextUtils.isEmpty(maxLabel)) {
 			TextView maxLabelTextView = (TextView) answer.findViewById(R.id.max_label);
 			maxLabelTextView.setText(maxLabel);
 		}
 
-		RadioGroup radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
-		int min = question.getMin();
-		int max = question.getMax();
+		radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
 
 		NumberFormat defaultNumberFormat = NumberFormat.getInstance();
 
@@ -76,6 +87,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			try {
 				RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
 				radioButton.setText(defaultNumberFormat.format(i));
+				radioButton.setTag(i);
 				radioGroup.addView(radioButton);
 			} catch (Throwable e) {
 				String message = "Error";
@@ -97,6 +109,11 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		for (int i = 0; i < radioGroup.getChildCount(); i++) {
+			RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
+			radioButton.setOnCheckedChangeListener(this);
+		}
 	}
 
 	@Override
@@ -113,16 +130,23 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 
 	@Override
 	public Object getAnswer() {
-		int value = 10; // TODO: Get real value
-		try {
-			JSONArray jsonArray = new JSONArray();
-			JSONObject jsonObject = new JSONObject();
-			jsonArray.put(jsonObject);
-			jsonObject.put("value", value);
-			return jsonArray;
-		} catch (JSONException e) {
-			// Return null;
+		if (valueWasSelected) {
+			try {
+				JSONArray jsonArray = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonArray.put(jsonObject);
+				jsonObject.put("value", selectedValue);
+				return jsonArray;
+			} catch (JSONException e) {
+				// Return null;
+			}
 		}
 		return null;
+	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		selectedValue = (int) buttonView.getTag();
+		valueWasSelected = true;
 	}
 }
