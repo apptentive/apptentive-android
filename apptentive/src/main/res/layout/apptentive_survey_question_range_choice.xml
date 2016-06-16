@@ -12,4 +12,5 @@
              style="@style/Widget.AppCompat.CompoundButton.RadioButton"
              android:button="@null"
              android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
-             android:gravity="center_horizontal|bottom"/>
+             android:gravity="center_horizontal|bottom"
+             android:saveEnabled="false"/>

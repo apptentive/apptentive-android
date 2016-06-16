@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,13 +30,17 @@ import java.text.NumberFormat;
 
 public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestion> implements RadioButton.OnCheckedChangeListener {
 
-	private RadioGroup radioGroup;
+	private static final NumberFormat defaultNumberFormat = NumberFormat.getInstance();
+	private static final String KEY_VALUE_WAS_SELECTED = "value_was_selected";
+	private static final String KEY_SELECTED_VALUE = "selected_value";
+
 	private int min;
 	private int max;
 	private String minLabel;
 	private String maxLabel;
 
-	// TODO: Save these
+	private RadioGroup radioGroup;
+
 	private boolean valueWasSelected;
 	private int selectedValue;
 
@@ -55,6 +60,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			try {
 				question = new RangeQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
+				// Nothing
 			}
 		}
 		min = question.getMin();
@@ -81,51 +87,45 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 
 		radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
 
-		NumberFormat defaultNumberFormat = NumberFormat.getInstance();
-
 		for (int i = min; i <= max; i++) {
-			try {
-				RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
-				radioButton.setText(defaultNumberFormat.format(i));
-				radioButton.setTag(i);
-				radioGroup.addView(radioButton);
-			} catch (Throwable e) {
-				String message = "Error";
-				while (e != null) {
-					ApptentiveLog.e(message, e);
-					message = " caused by:";
-					e = e.getCause();
-				}
-				throw new RuntimeException(e);
-			}
+			RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
+			radioButton.setText(defaultNumberFormat.format(i));
+			radioButton.setTag(i);
+			radioButton.setOnCheckedChangeListener(this);
+			radioGroup.addView(radioButton);
 		}
 		return v;
 	}
 
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		for (int i = 0; i < radioGroup.getChildCount(); i++) {
-			RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
-			radioButton.setOnCheckedChangeListener(this);
-		}
-	}
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(KEY_VALUE_WAS_SELECTED, valueWasSelected);
+		outState.putInt(KEY_SELECTED_VALUE, selectedValue);
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
+	public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+		super.onViewStateRestored(savedInstanceState);
+
+		// Restore instance state after the fragment tries to to avoid any UI weirdness.
+		if (savedInstanceState != null) {
+			valueWasSelected = savedInstanceState.getBoolean(KEY_VALUE_WAS_SELECTED, false);
+			selectedValue = savedInstanceState.getInt(KEY_SELECTED_VALUE, 0);
+		}
+
+		for (int i = 0; i < radioGroup.getChildCount(); i++) {
+			RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
+			if (valueWasSelected && (int) radioButton.getTag() == selectedValue) {
+				radioButton.setChecked(true);
+				return;
+			}
+		}
+	}
+
+	@Override
 	public boolean isValid() {
-		// TODO
-		boolean valid = !question.isRequired() || false;
-		return valid;
+		return !question.isRequired() || valueWasSelected;
 	}
 
 	@Override
@@ -146,7 +146,9 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		selectedValue = (int) buttonView.getTag();
-		valueWasSelected = true;
+		if (isChecked) {
+			selectedValue = (int) buttonView.getTag();
+			valueWasSelected = true;
+		}
 	}
 }
