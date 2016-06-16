@@ -17,7 +17,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
 
@@ -149,6 +148,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 		if (isChecked) {
 			selectedValue = (int) buttonView.getTag();
 			valueWasSelected = true;
+			fireListener();
 		}
 	}
 }
