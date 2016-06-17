@@ -1,3 +1,14 @@
+# 2016-06-20 - 3.1.1
+
+#### Improvements
+
+* Defer message polling task until Message Center is opened, UnreadMessagesListener is registered, or a Push is received.
+* Add internal method to set the application theme programmatically from which the Apptentive UI will inherit styles.
+
+#### Bugs Fixed
+
+* statusBarColor attribute was causing run-time exception on pre-21 devices.
+
 # 2016-06-08 - 3.1.0
 
 #### Improvements
