@@ -491,7 +491,16 @@ public class ApptentiveInternal {
 	public boolean init() {
 		boolean bRet = true;
 		codePointStore.init();
-		messageManager.init();
+		/* If Message Center feature has never been used before, don't initialize message polling thread.
+		 * Message Center feature will be seen as used, if one of the following conditions has been met:
+		 * 1. Message Center has been opened for the first time
+		 * 2. The first Push is received which would open Message Center
+		 * 3. An unreadMessageCountListener() is set up
+		 */
+		boolean featureEverUsed = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false);
+		if (featureEverUsed) {
+			messageManager.init();
+		}
 		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 		conversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
 		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
