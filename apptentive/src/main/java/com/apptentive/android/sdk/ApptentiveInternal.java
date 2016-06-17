@@ -255,6 +255,40 @@ public class ApptentiveInternal {
 		}
 	}
 
+
+	/*
+	 * Set default theme whom Apptentive UI will inherit theme attributes from. Apptentive will only
+	 * inherit from an AppCompat theme
+	 * @param themeResId : resource id of the theme style definition, such as R.style.MyAppTheme
+	 * @return true if the theme is set for inheritance successfully.
+	 */
+	public boolean setApplicationDefaultTheme(int themeResId) {
+		try {
+			if (themeResId != 0) {
+				// If passed theme res id does not exist, an exception would be thrown and caught
+				appContext.getResources().getResourceName(themeResId);
+
+				// Check if the theme to be inheritd from is an AppCompat theme.
+				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
+				appDefaultTheme.applyStyle(themeResId, true);
+
+				TypedArray a = appDefaultTheme.obtainStyledAttributes(android.support.v7.appcompat.R.styleable.AppCompatTheme);
+				try {
+					if (a.hasValue(android.support.v7.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
+						// Only set to use if it's an AppCompat theme. See updateApptentiveInteractionTheme() for theme inheritance chain
+						appDefaultAppCompatThemeId = themeResId;
+						return true;
+					}
+				} finally {
+					a.recycle();
+				}
+			}
+		} catch (Resources.NotFoundException e) {
+			ApptentiveLog.e("Theme Res id not found");
+		}
+		return false;
+	}
+
 	/*
 	 * Object getter methods through ApptentiveInternal instance
 	 * Usage: ApptentiveInternal.getInstance().getxxxx()
@@ -444,8 +478,8 @@ public class ApptentiveInternal {
 	 */
 	public void updateApptentiveInteractionTheme(Resources.Theme interactionTheme, Context context) {
 		/* Step 1: Apply Apptentive default theme layer.
-		 * If host activity is an Apptentive activity, the base theme already has Apptentive defaults applied, so skip Step 1.
-		 * If parent activity is NOT an Apptentive activity, first apply Apptentive defaults.
+		 * If host activity is an activity, the base theme already has Apptentive defaults applied, so skip Step 1.
+		 * If parent activity is NOT an activity, first apply Apptentive defaults.
 		 */
 		if (!(context instanceof Activity)) {
 			// If host context is not an activity, i.e. application context, treat it as initial theme setup
@@ -523,25 +557,9 @@ public class ApptentiveInternal {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
-			// Obtain Apptentive theme inheritance metrics
-			int appDefaultThemeId = ai.theme;
-			boolean appThemeIsAppCompatTheme = false;
+			// If the app default theme specified in AndroidManifest is an AppCompat theme, use it for Apptentive theme inheritance.
+			boolean appThemeIsAppCompatTheme = setApplicationDefaultTheme(ai.theme);
 
-			// check if app specifies a default appcompat theme
-			if (appDefaultThemeId != 0) {
-				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
-				appDefaultTheme.applyStyle(appDefaultThemeId, true);
-
-				TypedArray a = appDefaultTheme.obtainStyledAttributes(android.support.v7.appcompat.R.styleable.AppCompatTheme);
-				try {
-					if (a.hasValue(android.support.v7.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
-						appThemeIsAppCompatTheme = true;
-						appDefaultAppCompatThemeId = appDefaultThemeId;
-					}
-				} finally {
-					a.recycle();
-				}
-			}
 			// check if host app defines an apptentive theme override
 			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
 
