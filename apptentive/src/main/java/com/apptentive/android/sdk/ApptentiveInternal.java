@@ -257,9 +257,10 @@ public class ApptentiveInternal {
 
 
 	/*
-	 * Set default theme whom Apptentive UI will inherit theme attributes from
-	 * @param themeResId : resource id of the theme style definition
-	 * @return true if the theme is an AppCompatTheme
+	 * Set default theme whom Apptentive UI will inherit theme attributes from. Apptentive will only
+	 * inherit from an AppCompat theme
+	 * @param themeResId : resource id of the theme style definition, such as R.style.MyAppTheme
+	 * @return true if the theme is set for inheritance successfully.
 	 */
 	public boolean setApplicationDefaultTheme(int themeResId) {
 		try {
