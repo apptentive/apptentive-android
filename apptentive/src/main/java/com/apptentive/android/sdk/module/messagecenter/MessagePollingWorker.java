@@ -22,7 +22,6 @@ public class MessagePollingWorker {
 	private MessagePollingThread sPollingThread;
 
 	// The following booleans will be accessed by both ui thread and worker thread
-	private AtomicBoolean appInForeground = new AtomicBoolean(false);
 	public AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
 	private AtomicBoolean threadRunning = new AtomicBoolean(false);
 
@@ -74,7 +73,7 @@ public class MessagePollingWorker {
 			try {
 				ApptentiveLog.v("Started %s", toString());
 
-				while (appInForeground.get()) {
+				while (manager.appInForeground.get()) {
 					MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
 					if (thread != null && thread != MessagePollingThread.this) {
 						return;
@@ -112,20 +111,12 @@ public class MessagePollingWorker {
 
 	// Called from main UI thread to create a new worker thread
 	public void appWentToForeground() {
-		appInForeground.set(true);
-		if (threadRunning.compareAndSet(false, true)) {
-			/* appInForeground was "false", and set to "true"
-			*  thread was not running, and set to be running
-			*/
-			getAndSetMessagePollingThread(true, true);
-		} else {
-			wakeUp();
-		}
+		startPolling();
 	}
 
 
 	public void appWentToBackground() {
-		appInForeground.set(false);
+		// When app goes to background, polling thread will be waken up, and finish and terminate
 		wakeUp();
 	}
 
@@ -139,8 +130,18 @@ public class MessagePollingWorker {
 	public void setMessageCenterInForeground(boolean bInForeground) {
 		if (!messageCenterInForeground.getAndSet(bInForeground) && bInForeground) {
 			/* bInForeground is "true" && messageCenterInForeground was false
-			*  Thread will wake up, then continue the while loop and proceed with fetching
 			*/
+			startPolling();
+		}
+	}
+
+	private void startPolling() {
+		if (threadRunning.compareAndSet(false, true)) {
+			// If polling thread isn't running (either terminated or hasn't been created it), create a new one and run
+			getAndSetMessagePollingThread(true, true);
+		} else {
+			// If polling thread has been created but in sleep, wake it up, then continue the while loop and proceed
+			// with fetching with shorter interval
 			wakeUp();
 		}
 	}

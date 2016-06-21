@@ -269,18 +269,22 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 	private void applyApptentiveTheme(boolean isModalInteraction) {
     // Update the activity theme to reflect current attributes
-		ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
+		try {
+			ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
 
-		if (isModalInteraction) {
-			getTheme().applyStyle(R.style.ApptentiveBaseDialogTheme, true);
-			setStatusBarColor(ApptentiveInternal.getInstance().getDefaultStatusbarColor());
-		}
+			if (isModalInteraction) {
+				getTheme().applyStyle(R.style.ApptentiveBaseDialogTheme, true);
+				setStatusBarColor();
+			}
 
-		// Change the thumbnail header color in task list
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			int colorPrimary = Util.getThemeColor(getTheme(), R.attr.colorPrimary);
-			ActivityManager.TaskDescription taskDes = new ActivityManager.TaskDescription(null, null, colorPrimary);
-			setTaskDescription(taskDes);
+			// Change the thumbnail header color in task list
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				int colorPrimary = Util.getThemeColor(getTheme(), R.attr.colorPrimary);
+				ActivityManager.TaskDescription taskDes = new ActivityManager.TaskDescription(null, null, colorPrimary);
+				setTaskDescription(taskDes);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Error apply Apptentive Theme.", e);
 		}
 	}
 
@@ -387,9 +391,10 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	* color defined by apptentive_activity_frame
 	* @param statusBarDefaultColor the default activity status bar color specified by the app
 	*/
-	private void setStatusBarColor(int statusBarDefaultColor) {
+	private void setStatusBarColor() {
 		// Changing status bar color is a post-21 feature
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			int statusBarDefaultColor = ApptentiveInternal.getInstance().getDefaultStatusbarColor();
 			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame_dark);
 			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}
