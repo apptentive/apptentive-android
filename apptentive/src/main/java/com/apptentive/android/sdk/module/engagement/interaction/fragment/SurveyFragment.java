@@ -142,8 +142,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			questionsContainer.removeAllViews();
 
 			// Then render all the questions
-			for (final Question question : questions) {
-				final BaseSurveyQuestionView surveyQuestionView;
+			for (int i = 0; i < questions.size(); i++) {
+				Question question = questions.get(i);
+				BaseSurveyQuestionView surveyQuestionView;
 				if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 					surveyQuestionView = TextSurveyQuestionView.newInstance((SinglelineQuestion) question);
 				} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
@@ -156,7 +157,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 				}
 				if (surveyQuestionView != null) {
 					surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, question.getId()).commit();
+					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, Integer.toString(i)).commit();
 				}
 			}
 		} else {

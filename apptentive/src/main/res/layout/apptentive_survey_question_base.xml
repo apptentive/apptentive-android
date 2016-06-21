@@ -7,6 +7,7 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/question_base"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:paddingTop="@dimen/apptentive_card_view_gap_vertical"
