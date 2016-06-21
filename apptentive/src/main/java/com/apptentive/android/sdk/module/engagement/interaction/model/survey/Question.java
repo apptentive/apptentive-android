@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
 public interface Question {
 	int QUESTION_TYPE_SINGLELINE  = 1;
 	int QUESTION_TYPE_MULTICHOICE = 2;
@@ -28,6 +30,16 @@ public interface Question {
 		multichoice,
 		singleline,
 		multiselect,
-		range
+		range,
+		unknown;
+
+		public static Type parse(String type) {
+			try {
+				return Type.valueOf(type);
+			} catch (IllegalArgumentException e) {
+				ApptentiveLog.v("Error parsing unknown Question.Type: " + type);
+			}
+			return unknown;
+		}
 	}
 }
