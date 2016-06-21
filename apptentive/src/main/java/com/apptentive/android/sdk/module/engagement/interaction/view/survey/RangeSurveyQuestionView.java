@@ -75,13 +75,17 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 		ViewGroup answer = (ViewGroup) inflater.inflate(R.layout.apptentive_survey_question_range_answer, answerContainer, false);
 		answerContainer.addView(answer);
 
+		TextView minLabelTextView = (TextView) answer.findViewById(R.id.min_label);
 		if (!TextUtils.isEmpty(minLabel)) {
-			TextView minLabelTextView = (TextView) answer.findViewById(R.id.min_label);
 			minLabelTextView.setText(minLabel);
+		} else {
+			minLabelTextView.setVisibility(View.GONE);
 		}
+		TextView maxLabelTextView = (TextView) answer.findViewById(R.id.max_label);
 		if (!TextUtils.isEmpty(maxLabel)) {
-			TextView maxLabelTextView = (TextView) answer.findViewById(R.id.max_label);
 			maxLabelTextView.setText(maxLabel);
+		} else {
+			maxLabelTextView.setVisibility(View.GONE);
 		}
 
 		radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
