@@ -35,10 +35,12 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInte
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.RangeSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -152,6 +154,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 				} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 					surveyQuestionView = MultiselectSurveyQuestionView.newInstance((MultiselectQuestion) question);
+				} else if (question.getType() == Question.QUESTION_TYPE_RANGE) {
+					surveyQuestionView = RangeSurveyQuestionView.newInstance((RangeQuestion) question);
 				} else {
 					surveyQuestionView = null;
 				}
