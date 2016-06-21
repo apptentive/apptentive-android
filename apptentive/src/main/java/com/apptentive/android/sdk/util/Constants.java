@@ -11,7 +11,7 @@ package com.apptentive.android.sdk.util;
  */
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "3.1.0";
+	public static final String APPTENTIVE_SDK_VERSION = "3.1.1";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 10;
@@ -44,6 +44,7 @@ public class Constants {
 
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 
+	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
