@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.tests.module.engagement;
 
+import android.os.Build;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
@@ -73,6 +75,7 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		resetDevice();
 
 		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstDevice.json");
+		json = json.replace("\"OS_API_LEVEL\"", String.valueOf(Build.VERSION.SDK_INT));
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString( json);
 
 		Interaction interaction;
@@ -95,6 +98,11 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		assertNull(interaction);
 
 		// 3
+		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch.code.point");
+		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init");
+		assertNotNull(interaction);
+
+		// 4
 		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion( "switch.code.point");
 		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "local#app#init");
 		assertNotNull(interaction);

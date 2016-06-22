@@ -7,8 +7,11 @@
 package com.apptentive.android.sdk.tests.module.engagement;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -177,6 +180,44 @@ public class InteractionTest extends ApptentiveInstrumentationTestCase {
 		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction( "app.launch");
 		assertNull(interaction);
 
+		ApptentiveLog.e("Finished test.");
+	}
+
+	public void testCriteriaApplicationVersionCode() {
+		ApptentiveLog.e("Running test: testCriteriaApplicationVersionCode()\n\n");
+		resetDevice();
+
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionCode.json");
+
+		try {
+			PackageInfo packageInfo = getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(), 0);
+			json = json.replace("\"APPLICATION_VERSION_CODE\"", String.valueOf(packageInfo.versionCode));
+
+			InteractionCriteria criteria = new InteractionCriteria(json);
+			assertTrue(criteria.isMet());
+		} catch (Exception e) {
+			ApptentiveLog.e("Error running test.", e);
+			assertNull(e);
+		}
+		ApptentiveLog.e("Finished test.");
+	}
+
+	public void testCriteriaApplicationVersionName() {
+		ApptentiveLog.e("Running test: testCriteriaApplicationVersionName()\n\n");
+		resetDevice();
+
+		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionName.json");
+
+		try {
+			PackageInfo packageInfo = getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(), 0);
+			json = json.replace("APPLICATION_VERSION_NAME", packageInfo.versionName);
+
+			InteractionCriteria criteria = new InteractionCriteria(json);
+			assertTrue(criteria.isMet());
+		} catch (Exception e) {
+			ApptentiveLog.e("Error parsing test JSON.", e);
+			assertNull(e);
+		}
 		ApptentiveLog.e("Finished test.");
 	}
 
