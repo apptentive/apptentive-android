@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,9 +20,6 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
 
-/**
- * @author Sky Kelsey
- */
 public class FieldManager {
 
 	public static boolean exists(String query) {
