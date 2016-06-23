@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,9 +20,6 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
 
-/**
- * @author Sky Kelsey
- */
 public class FieldManager {
 
 	public static boolean exists(String query) {
@@ -43,13 +40,31 @@ public class FieldManager {
 			case application: {
 				QueryPart applicationQuery = QueryPart.parse(tokens[1]);
 				switch (applicationQuery) {
-					case version:
+					case version: {
 						int version = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
 						if (version == -1) {
 							version = 0; // Default
 						}
 						return new Apptentive.Version(version);
+					}
+					case version_code: {
+						int version = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
+						if (version == -1) {
+							version = 0; // Default
+						}
+						return version;
+					}
+					case version_name: {
+						String version = Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext());
+						if (version == null) {
+							version = "0"; // Default
+						}
+						Apptentive.Version ret = new Apptentive.Version();
+						ret.setVersion(version);
+						return ret;
+					}
 				}
+				return null; // Default value
 			}
 			case sdk: {
 				QueryPart sdkQuery = QueryPart.parse(tokens[1]);
@@ -158,6 +173,8 @@ public class FieldManager {
 						Apptentive.Version ret = new Apptentive.Version();
 						ret.setVersion(osVersion);
 						return ret;
+					case os_api_level:
+						return device.optInt(subQuery.name(), 0);
 					case board:
 					case bootloader_version:
 					case brand:
@@ -222,6 +239,7 @@ public class FieldManager {
 		os_name,
 		os_version,
 		os_build,
+		os_api_level,
 		product,
 		radio_version,
 		uuid,
@@ -231,6 +249,8 @@ public class FieldManager {
 		invokes,
 		total,
 		version,
+		version_code,
+		version_name,
 		build,
 		time_ago,
 		other;
