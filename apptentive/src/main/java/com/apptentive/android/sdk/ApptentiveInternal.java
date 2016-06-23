@@ -46,7 +46,7 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
+import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.PersonManager;
@@ -77,12 +77,15 @@ public class ApptentiveInternal {
 	InteractionManager interactionManager;
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
-	ApptentiveDatabase database;
+	ApptentiveTaskManager taskManager;
 	CodePointStore codePointStore;
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
+	Integer currentVersionCode;
+	String currentVersionName;
+
 	boolean appIsInForeground;
 	boolean isAppDebuggable;
 	SharedPreferences prefs;
@@ -167,13 +170,13 @@ public class ApptentiveInternal {
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
-					ApptentiveDatabase db = new ApptentiveDatabase(sApptentiveInternal.appContext);
+					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
 					CodePointStore store = new CodePointStore();
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
-					sApptentiveInternal.database = db;
+					sApptentiveInternal.taskManager = worker;
 					sApptentiveInternal.codePointStore = store;
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
@@ -298,6 +301,14 @@ public class ApptentiveInternal {
 		return appContext;
 	}
 
+	public int getApplicationVersionCode() {
+		return currentVersionCode;
+	}
+
+	public String getApplicationVersionName() {
+		return currentVersionName;
+	}
+
 	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
 		return lifecycleCallbacks;
 	}
@@ -328,8 +339,8 @@ public class ApptentiveInternal {
 		return payloadWorker;
 	}
 
-	public ApptentiveDatabase getApptentiveDatabase() {
-		return database;
+	public ApptentiveTaskManager getApptentiveTaskManager() {
+		return taskManager;
 	}
 
 	public CodePointStore getCodePointStore() {
@@ -563,8 +574,8 @@ public class ApptentiveInternal {
 			// check if host app defines an apptentive theme override
 			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
 
-			Integer currentVersionCode = packageInfo.versionCode;
-			String currentVersionName = packageInfo.versionName;
+			currentVersionCode = packageInfo.versionCode;
+			currentVersionName = packageInfo.versionName;
 			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 			AppRelease appRelease = new AppRelease();
 			appRelease.setVersion(currentVersionName);
@@ -653,7 +664,7 @@ public class ApptentiveInternal {
 		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(currentAppRelease);
 		if (appRelease != null) {
 			ApptentiveLog.d("App release was updated.");
-			database.addPayload(appRelease);
+			taskManager.addPayload(appRelease);
 		}
 		invalidateCaches();
 	}
@@ -840,7 +851,7 @@ public class ApptentiveInternal {
 		if (deviceInfo != null) {
 			ApptentiveLog.d("Device info was updated.");
 			ApptentiveLog.v(deviceInfo.toString());
-			database.addPayload(deviceInfo);
+			taskManager.addPayload(deviceInfo);
 		} else {
 			ApptentiveLog.d("Device info was not updated.");
 		}
@@ -854,7 +865,7 @@ public class ApptentiveInternal {
 		if (sdk != null) {
 			ApptentiveLog.d("Sdk was updated.");
 			ApptentiveLog.v(sdk.toString());
-			database.addPayload(sdk);
+			taskManager.addPayload(sdk);
 		} else {
 			ApptentiveLog.d("Sdk was not updated.");
 		}
@@ -868,7 +879,7 @@ public class ApptentiveInternal {
 		if (person != null) {
 			ApptentiveLog.d("Person was updated.");
 			ApptentiveLog.v(person.toString());
-			database.addPayload(person);
+			taskManager.addPayload(person);
 		} else {
 			ApptentiveLog.d("Person was not updated.");
 		}
@@ -1056,7 +1067,7 @@ public class ApptentiveInternal {
 
 	public void resetSdkState() {
 		prefs.edit().clear().apply();
-		database.reset(appContext);
+		taskManager.reset(appContext);
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {

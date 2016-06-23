@@ -21,6 +21,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -86,7 +87,7 @@ public class PayloadSendWorker {
 	}
 
 	private PayloadStore getPayloadStore() {
-		return ApptentiveInternal.getInstance().getApptentiveDatabase();
+		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
 	}
 
 	private class PayloadSendRunnable implements Runnable {
@@ -101,7 +102,6 @@ public class PayloadSendWorker {
 				while (appInForeground.get()) {
 					MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
-					PayloadStore db = getPayloadStore();
 					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getApptentiveConversationToken())){
 						ApptentiveLog.i("No conversation token yet.");
 						if (mgr != null) {
@@ -119,8 +119,14 @@ public class PayloadSendWorker {
 						break;
 					}
 					ApptentiveLog.v("Checking for payloads to send.");
-					Payload payload;
-					payload = db.getOldestUnsentPayload();
+
+					Payload payload = null;
+					try {
+						Future<Payload> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getOldestUnsentPayload();
+						payload = future.get();
+					} catch (Exception e) {
+						ApptentiveLog.e("Error getting oldest unsent payload in worker thread");
+					}
 					if (payload == null) {
 						// There is no payload in the db. Terminate the thread
 						threadCanRun.set(false);
@@ -163,7 +169,7 @@ public class PayloadSendWorker {
 							break;
 						default:
 							ApptentiveLog.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
-							db.deletePayload(payload);
+							ApptentiveInternal.getInstance().getApptentiveTaskManager().deletePayload(payload);
 							break;
 					}
 
@@ -171,11 +177,11 @@ public class PayloadSendWorker {
 					if (response != null) {
 						if (response.isSuccessful()) {
 							ApptentiveLog.d("Payload submission successful. Removing from send queue.");
-							db.deletePayload(payload);
+							ApptentiveInternal.getInstance().getApptentiveTaskManager().deletePayload(payload);
 						} else if (response.isRejectedPermanently() || response.isBadPayload()) {
 							ApptentiveLog.d("Payload rejected. Removing from send queue.");
 							ApptentiveLog.v("Rejected json:", payload.toString());
-							db.deletePayload(payload);
+							ApptentiveInternal.getInstance().getApptentiveTaskManager().deletePayload(payload);
 						} else if (response.isRejectedTemporarily()) {
 							if (mgr != null) {
 								mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
