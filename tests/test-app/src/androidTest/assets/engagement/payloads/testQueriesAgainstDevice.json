@@ -36,6 +36,10 @@
               "device/custom_data/bar": {
                 "$exists": false
               }
+            },
+            {
+              "code_point/switch.code.point/invokes/total": 4,
+              "device/os_api_level": "OS_API_LEVEL"
             }
           ]
         }

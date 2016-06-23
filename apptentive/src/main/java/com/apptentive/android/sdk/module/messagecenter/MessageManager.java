@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONArray;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Sky Kelsey
@@ -68,6 +71,7 @@ public class MessageManager {
 	 */
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
 
+	AtomicBoolean appInForeground = new AtomicBoolean(false);
 	private Handler uiHandler;
 	private MessagePollingWorker pollingWorker;
 
@@ -76,6 +80,7 @@ public class MessageManager {
 
 	}
 
+	// init() will start polling worker.
 	public void init() {
 		if (uiHandler == null) {
 			uiHandler = new Handler(Looper.getMainLooper()) {
@@ -104,6 +109,14 @@ public class MessageManager {
 		}
 		if (pollingWorker == null) {
 			pollingWorker = new MessagePollingWorker(this);
+			/* Set SharePreference to indicate Message Center feature is desired. It will always be checked
+			 * during Apptentive initialization.
+			 */
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+			boolean featureEverUsed = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false);
+			if (!featureEverUsed) {
+				prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, true).apply();
+			}
 		}
 	}
 
@@ -112,6 +125,8 @@ public class MessageManager {
 	 * when push is received on the device.
 	 */
 	public void startMessagePreFetchTask() {
+		// Defer message polling thread creation, if not created yet and host app receives a new message push
+		init();
 		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
 			private Exception e = null;
 
@@ -375,6 +390,7 @@ public class MessageManager {
 
 	public void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
+			init();
 			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<OnNewIncomingMessagesListener> listenerRef = iterator.next();
 				OnNewIncomingMessagesListener listener = listenerRef.get();
@@ -411,6 +427,8 @@ public class MessageManager {
 
 	public void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
 		if (newlistener != null) {
+			// Defer message polling thread creation, if not created yet, and host app adds an unread message listener
+			init();
 			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
 				UnreadMessagesListener listener = listenerRef.get();
@@ -486,11 +504,17 @@ public class MessageManager {
 
 
 	public void appWentToForeground() {
-		pollingWorker.appWentToForeground();
+		appInForeground.set(true);
+		if (pollingWorker != null) {
+			pollingWorker.appWentToForeground();
+		}
 	}
 
 	public void appWentToBackground() {
-		pollingWorker.appWentToBackground();
+		appInForeground.set(false);
+		if (pollingWorker != null) {
+			pollingWorker.appWentToBackground();
+		}
 	}
 
 }

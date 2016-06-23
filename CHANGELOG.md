@@ -1,8 +1,19 @@
- ??? - 3.1.0
+# 2016-06-20 - 3.1.1
 
 #### Improvements
 
-* We've added a new answer type to multiple choice surveys. You can now specify an "Other" type answer. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
+* Defer message polling task until Message Center is opened, UnreadMessagesListener is registered, or a Push is received.
+* Add internal method to set the application theme programmatically from which the Apptentive UI will inherit styles.
+
+#### Bugs Fixed
+
+* statusBarColor attribute was causing run-time exception on pre-21 devices.
+
+# 2016-06-08 - 3.1.0
+
+#### Improvements
+
+* We've added a new answer type to multiple choice surveys. You can now specify an "Other" answer type for multiple choice questions. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
 
 # 2016-05-25 - 3.0.1
 
