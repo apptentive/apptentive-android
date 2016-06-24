@@ -658,7 +658,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		unsendMessagesCount++;
 
 		isPaused = false;
-		messageCenterListAdapter.setPaused(isPaused);
+		if (messageCenterListAdapter != null) {
+			messageCenterListAdapter.setPaused(isPaused);
+		}
 	}
 
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
@@ -771,7 +773,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messageCenterListAdapter.setForceShowKeyboard(false);
 		}
 		int firstIndex = messageCenterListView.getFirstVisiblePosition();
-		messageCenterListAdapter.notifyDataSetChanged();
+		if (messageCenterListAdapter != null) {
+			messageCenterListAdapter.notifyDataSetChanged();
+		}
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
 				firstIndex, top));
 		updateComposingBar();
@@ -892,7 +896,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void updateComposingBar() {
-		if (!isDetached()) {
+		if (messageCenterListAdapter != null) {
 			MessageCenterComposingActionBarView barView = messageCenterListAdapter.getComposingActionBarView();
 			if (barView != null) {
 				barView.showConfirmation = true;
@@ -1574,7 +1578,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		public void handleMessage(Message msg) {
 			MessageCenterFragment fragment = (MessageCenterFragment) messageCenterFragmentWeakReference.get();
-			if (fragment == null || fragment.isDetached()) {
+			if (fragment == null || !fragment.isAdded() || fragment.messageCenterListAdapter == null) {
 				// Message can be delayed. If so, make sure fragment is still available or still attached to activity
 				return;
 			}
