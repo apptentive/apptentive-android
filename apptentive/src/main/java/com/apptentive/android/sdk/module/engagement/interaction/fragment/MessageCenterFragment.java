@@ -1578,8 +1578,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		public void handleMessage(Message msg) {
 			MessageCenterFragment fragment = (MessageCenterFragment) messageCenterFragmentWeakReference.get();
-			if (fragment == null || !fragment.isAdded() || fragment.messageCenterListAdapter == null) {
-				// Message can be delayed. If so, make sure fragment is still available or still attached to activity
+			/* Message can be delayed. If so, make sure fragment is still available and attached to activity
+			 * messageCenterListAdapter will always be set null in onDetach(). it's a good indication if
+			 * fragment is attached.
+			 */
+			if (fragment == null || fragment.messageCenterListAdapter == null) {
 				return;
 			}
 			switch (msg.what) {
