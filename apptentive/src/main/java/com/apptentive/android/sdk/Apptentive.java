@@ -7,11 +7,13 @@
 package com.apptentive.android.sdk;
 
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -471,7 +473,7 @@ public class Apptentive {
 	 * Determines whether this Bundle came from an Apptentive push notification. This method is used with Urban Airship
 	 * integrations.
 	 *
-	 * @param bundle The Extra data from an opened push notification.
+	 * @param bundle The push payload bundle paseed to GCM onMessageReceived() callback
 	 * @return True if the Intent contains Apptentive push information.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
@@ -479,6 +481,19 @@ public class Apptentive {
 			return false;
 		}
 		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+	}
+
+	/**
+	 * Determines whether push payload data came from an Apptentive push notification.
+	 *
+	 * @param data The push payload data obtained through FCM RemoteMessage::getData() when using FCM
+	 * @return True if the Intent contains Apptentive push information.
+	 */
+	public static boolean isApptentivePushNotification(Map<String, String> data) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return false;
+		}
+		return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
 	}
 
 	/**
@@ -514,6 +529,7 @@ public class Apptentive {
 	 * @param data A Bundle containing the GCM data object from the push notification.
 	 * @return true if the push data came from Apptentive.
 	 */
+	@Deprecated
 	public static boolean setPendingPushNotification(Bundle data) {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return false;
@@ -524,6 +540,56 @@ public class Apptentive {
 			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
 		}
 		return false;
+	}
+
+	/**
+	 * Use this method in your push receiver to build a pending Intent when an Apptentive push notification
+	 * is received. This pending Intent will be launched when the user taps on the push notification, and will
+	 * allow Apptentive to open UIs such as Message Center. This will generally be used with direct Apptentive Push, as
+	 * a replacement of {@link #setPendingPushNotification(Bundle)}. Calling this method for a push that did
+	 * not come from Apptentive will return a null object.
+	 *
+	 * @param data A Bundle containing the Apptentive Push data. Normally bundle parameter passed into onMessageReceived()of gmc
+	 * @return a valid pending intent to launch Message Center if the push data came from Apptentive, or null.
+	 */
+	public static PendingIntent buildPendingPushNotificationIntent(@NonNull Object data) {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return null;
+		}
+
+		String apptentivePushData = null;
+		if (data instanceof Bundle) {
+			apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData((Bundle) data);
+		} else if (data instanceof Map) {
+			apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData((Map) data);
+		}
+		if (!TextUtils.isEmpty(apptentivePushData)) {
+			try {
+				JSONObject pushJson = new JSONObject(apptentivePushData);
+				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
+				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
+					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
+				}
+				switch (action) {
+					case pmc: {
+						// Prefetch message when push for message center is received
+						MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
+						if (mgr != null) {
+							mgr.startMessagePreFetchTask();
+						}
+						// Construct a pending intent to launch message center
+						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext());
+					}
+					default:
+						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
+				}
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error parsing JSON from push notification.", e);
+				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -538,6 +604,7 @@ public class Apptentive {
 	 * @param context The context from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
 	 */
+	@Deprecated
 	public static boolean handleOpenedPushNotification(Context context) {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return false;
@@ -621,8 +688,8 @@ public class Apptentive {
 	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
 	 *
 	 * @param context    The context from which to launch the Message Center. This should be an
-	 *                    Activity, except in rare cases where you don't have access to one, in which
-	 *                    case Apptentive Message Center will launch in a new task.
+	 *                   Activity, except in rare cases where you don't have access to one, in which
+	 *                   case Apptentive Message Center will launch in a new task.
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
 	 *                   If any message is sent by the Person, this data is sent with it, and then
 	 *                   cleared. If no message is sent, this data is discarded.
@@ -659,7 +726,7 @@ public class Apptentive {
 	 * won't get notification. Please use {@link #addUnreadMessagesListener(UnreadMessagesListener)} instead.
 	 *
 	 * @param listener An UnreadMessagesListener that you instantiate. Pass null to remove existing listener.
-	 *                  Do not pass in an anonymous class, such as setUnreadMessagesListener(new UnreadMessagesListener() {...}).
+	 *                 Do not pass in an anonymous class, such as setUnreadMessagesListener(new UnreadMessagesListener() {...}).
 	 *                 Instead, create your listener as an instance variable and pass that in. This
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
@@ -857,9 +924,9 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param context    The context from which to launch the Interaction. This should be an
-	 *                    Activity, except in rare cases where you don't have access to one, in which
-	 *                    case Apptentive Interactions will launch in a new task.
+	 * @param context The context from which to launch the Interaction. This should be an
+	 *                Activity, except in rare cases where you don't have access to one, in which
+	 *                case Apptentive Interactions will launch in a new task.
 	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
 	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                call <strong><code>engage(context, "finished_upload");</code></strong>
@@ -876,8 +943,8 @@ public class Apptentive {
 	 * invocation of this method.
 	 *
 	 * @param context    The context from which to launch the Interaction. This should be an
-	 *                    Activity, except in rare cases where you don't have access to one, in which
-	 *                    case Apptentive Interactions will launch in a new task.
+	 *                   Activity, except in rare cases where you don't have access to one, in which
+	 *                   case Apptentive Interactions will launch in a new task.
 	 * @param event      A unique String representing the line this method is called on. For instance, you may want to have
 	 *                   the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                   call <strong><code>engage(context, "finished_upload");</code></strong>
@@ -895,9 +962,9 @@ public class Apptentive {
 	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
 	 * invocation of this method.
 	 *
-	 * @param context    The context from which to launch the Interaction. This should be an
-	 *                    Activity, except in rare cases where you don't have access to one, in which
-	 *                    case Apptentive Interactions will launch in a new task.
+	 * @param context      The context from which to launch the Interaction. This should be an
+	 *                     Activity, except in rare cases where you don't have access to one, in which
+	 *                     case Apptentive Interactions will launch in a new task.
 	 * @param event        A unique String representing the line this method is called on. For instance, you may want to have
 	 *                     the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *                     call <strong><code>engage(context, "finished_upload");</code></strong>
@@ -951,7 +1018,7 @@ public class Apptentive {
 	 * a weak reference to avoid memory leaks.
 	 *
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener
-	 *                  to call when the survey is finished.
+	 *                 to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
 		ApptentiveInternal internal = ApptentiveInternal.getInstance();
