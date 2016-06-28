@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,12 +26,9 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-/**
- * @author Sky Kelsey
- */
 public class ApptentiveClient {
 
-	public static final int API_VERSION = 5;
+	public static final int API_VERSION = 6;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
