@@ -982,6 +982,13 @@ public class ApptentiveInternal {
 		return null;
 	}
 
+	static String getApptentivePushNotificationData(Map<String, String> pushData) {
+		if (pushData != null) {
+			return pushData.get(APPTENTIVE_PUSH_EXTRA_KEY);
+		}
+		return null;
+	}
+
 	boolean setPendingPushNotification(String apptentivePushData) {
 		if (apptentivePushData != null) {
 			ApptentiveLog.d("Saving Apptentive push notification data.");
