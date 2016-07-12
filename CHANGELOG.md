@@ -1,3 +1,9 @@
+# 2016-06-24 - 3.1.2
+
+#### Bugs Fixed
+
+* Fix Message Center composing bar exception thrown when the animation was in play after the fragment was detached
+
 # 2016-06-20 - 3.1.1
 
 #### Improvements
