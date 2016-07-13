@@ -40,6 +40,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -71,7 +72,6 @@ public class MessageManager {
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
 
 	AtomicBoolean appInForeground = new AtomicBoolean(false);
-
 	private Handler uiHandler;
 	private MessagePollingWorker pollingWorker;
 
@@ -174,8 +174,13 @@ public class MessageManager {
 		}
 
 		// Fetch the messages.
-		String lastId = getMessageStore().getLastReceivedMessageId();
-		List<ApptentiveMessage> messagesToSave = fetchMessages(lastId);
+		List<ApptentiveMessage> messagesToSave = null;
+		try {
+			Future<String> future = getMessageStore().getLastReceivedMessageId();
+			messagesToSave = fetchMessages(future.get());
+		} catch (Exception e) {
+			ApptentiveLog.e("Error retrieving last received message id from worker thread");
+		}
 
 		CompoundMessage messageOnToast = null;
 		if (messagesToSave != null && messagesToSave.size() > 0) {
@@ -221,12 +226,16 @@ public class MessageManager {
 
 	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems() {
 		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
-		List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages();
-		// Do not display hidden messages on Message Center
-		for (ApptentiveMessage message : messagesAll) {
-			if (!message.isHidden()) {
-				messagesToShow.add(message);
+		try {
+			List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages().get();
+			// Do not display hidden messages on Message Center
+			for (ApptentiveMessage message : messagesAll) {
+				if (!message.isHidden()) {
+					messagesToShow.add(message);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Error getting all messages in worker thread");
 		}
 
 		return messagesToShow;
@@ -234,7 +243,7 @@ public class MessageManager {
 
 	public void sendMessage(ApptentiveMessage apptentiveMessage) {
 		getMessageStore().addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(apptentiveMessage);
+		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(apptentiveMessage);
 	}
 
 	/**
@@ -343,11 +352,17 @@ public class MessageManager {
 	}
 
 	private MessageStore getMessageStore() {
-		return ApptentiveInternal.getInstance().getApptentiveDatabase();
+		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
 	}
 
 	public int getUnreadMessageCount() {
-		return getMessageStore().getUnreadMessageCount();
+		int msgCount = 0;
+		try {
+			msgCount = getMessageStore().getUnreadMessageCount().get();
+		} catch (Exception e) {
+			ApptentiveLog.e("Error getting unread messages count in worker thread");
+		}
+		return msgCount;
 	}
 
 
@@ -470,10 +485,10 @@ public class MessageManager {
 					final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
 					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
 					builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
-							.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-							.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
-							.setContentIntent(pendingIntent)
-							.setFullScreenIntent(pendingIntent, false);
+						.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+						.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
+						.setContentIntent(pendingIntent)
+						.setFullScreenIntent(pendingIntent, false);
 					foreground.runOnUiThread(new Runnable() {
 																		 public void run() {
 																			 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();

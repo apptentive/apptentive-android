@@ -1,8 +1,14 @@
-# 2016-06-24 - 3.1.2
+# 2016-07-13 - 3.2.0
+
+#### Improvements
+
+* Added a new "NPS" question type for surveys.
 
 #### Bugs Fixed
 
-* Fix Message Center composing bar exception thrown when the animation was in play after the fragment was detached
+* Fixed Message Center composing bar exception thrown when the animation was in play after the fragment was detached.
+* Fixed Message Center exception caused by requesting focus on a nulled EditText.
+* Moved database calls off the UI thread.
 
 # 2016-06-20 - 3.1.1
 

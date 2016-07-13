@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.storage.ApptentiveDatabase;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
 import org.json.JSONArray;
@@ -19,6 +18,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author Barry Li
@@ -153,8 +154,15 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
-		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
-		return db.addCompoundMessageFiles(attachmentStoredFiles);
+		boolean bRet = false;
+		try {
+			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachmentStoredFiles);
+			bRet = future.get();
+		} catch (Exception e) {
+			ApptentiveLog.e("Unable to set associated images in worker thread");
+		} finally {
+			return bRet;
+		}
 	}
 
 	public boolean setAssociatedFiles(List<StoredFile> attachedFiles) {
@@ -167,8 +175,15 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 		setTextOnly(hasNoAttachments);
 
-		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
-		return db.addCompoundMessageFiles(attachedFiles);
+		boolean bRet = false;
+		try {
+			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachedFiles);
+			bRet = future.get();
+		} catch (Exception e) {
+			ApptentiveLog.e("Unable to set associated files in worker thread");
+		} finally {
+			return bRet;
+		}
 	}
 
 
@@ -176,23 +191,35 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		if (hasNoAttachments) {
 			return null;
 		}
-		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
-		return db.getAssociatedFiles(getNonce());
+		List<StoredFile> associatedFiles = null;
+		try {
+			Future<List<StoredFile>> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getAssociatedFiles(getNonce());
+			associatedFiles = future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			ApptentiveLog.e("Unable to get associated files in worker thread");
+		} finally {
+			return associatedFiles;
+		}
 	}
 
 	public void deleteAssociatedFiles() {
-		ApptentiveDatabase db = ApptentiveInternal.getInstance().getApptentiveDatabase();
-		List<StoredFile> associatedFiles = db.getAssociatedFiles(getNonce());
-		// Delete local cached files
-		if (associatedFiles == null || associatedFiles.size() == 0) {
-			return;
-		}
+		try {
+			Future<List<StoredFile>> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getAssociatedFiles(getNonce());
+			List<StoredFile> associatedFiles = future.get();
+			// Delete local cached files
+			if (associatedFiles == null || associatedFiles.size() == 0) {
+				return;
+			}
 
-		for (StoredFile file : associatedFiles) {
-			File localFile = new File(file.getLocalFilePath());
-			localFile.delete();
+			for (StoredFile file : associatedFiles) {
+				File localFile = new File(file.getLocalFilePath());
+				localFile.delete();
+			}
+			// Delete records from db
+			ApptentiveInternal.getInstance().getApptentiveTaskManager().deleteAssociatedFiles(getNonce());
+		} catch (Exception e) {
+			ApptentiveLog.e("Unable to delete associated files in worker thread");
 		}
-		db.deleteAssociatedFiles(getNonce());
 	}
 
 

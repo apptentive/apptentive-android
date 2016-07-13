@@ -1,0 +1,6 @@
+{
+  "application/version_name": {
+    "_type": "version",
+    "version": "APPLICATION_VERSION_NAME"
+  }
+}

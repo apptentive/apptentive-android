@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,17 +23,18 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Que
 
 abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragment implements SurveyQuestionView {
 
+	private static final String SENT_METRIC = "sent_metric";
+
 	protected Q question;
-	private OnSurveyQuestionAnsweredListener listener;
 
-	protected TextView requiredView;
-	protected View dashView;
-	protected TextView instructionsView;
-
+	private FrameLayout root;
+	private TextView requiredView;
+	private View dashView;
+	private TextView instructionsView;
 	private View validationFailedBorder;
 
-	private static final String SENT_METRIC = "sent_metric";
 	private boolean sentMetric;
+	private OnSurveyQuestionAnsweredListener listener;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,9 +43,13 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		root = (FrameLayout) view.findViewById(R.id.question_base);
 		requiredView = (TextView) view.findViewById(R.id.question_required);
 		dashView = view.findViewById(R.id.dash_view);
 		instructionsView = (TextView) view.findViewById(R.id.question_instructions);
+
+		// Makes UI tests easier. We can potentially obviate this if surveys used a RecyclerView.
+		root.setTag(Integer.parseInt(getTag()));
 
 		TextView title = (TextView) view.findViewById(R.id.question_title);
 		title.setText(question.getValue());

@@ -369,11 +369,11 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		}
 		if (composingEditText != null) {
 			if (composingViewIndex != INVALID_POSITION && composingViewIndex == position) {
-				composingEditText.post(new Runnable()
-				{
-					public void run()
-					{
-						composingEditText.requestFocus();
+				composingEditText.post(new Runnable() {
+					public void run() {
+						if (composingEditText != null) {
+							composingEditText.requestFocus();
+						}
 					}
 				});
 			}
@@ -520,7 +520,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	}
 
 	public void clearComposing() {
-		// Composing view may be recylcled for later usage. Clear the content from previous usage
+		// Composing view may be recycled for later usage. Clear the content from previous usage
 		if (composingEditText != null) {
 			composingEditText.setText("");
 			composingEditText = null;

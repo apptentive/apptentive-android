@@ -101,9 +101,8 @@ public class CodePointStore {
 	}
 
 	private void storeRecordForCurrentAppVersion(boolean isInteraction, String fullCodePoint) {
-		Context context = ApptentiveInternal.getInstance().getApplicationContext();
-		String version = Util.getAppVersionName(context);
-		int build = Util.getAppVersionCode(context);
+		String version = ApptentiveInternal.getInstance().getApplicationVersionName();
+		int build = ApptentiveInternal.getInstance().getApplicationVersionCode();
 		storeRecord(isInteraction, fullCodePoint, version, build);
 	}
 

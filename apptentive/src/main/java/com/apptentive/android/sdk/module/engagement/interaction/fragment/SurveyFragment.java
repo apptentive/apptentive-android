@@ -35,10 +35,12 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInte
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
+import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.BaseSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultichoiceSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.MultiselectSurveyQuestionView;
+import com.apptentive.android.sdk.module.engagement.interaction.view.survey.RangeSurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.SurveyQuestionView;
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
@@ -119,7 +121,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
 
-					ApptentiveInternal.getInstance().getApptentiveDatabase().addPayload(new SurveyResponse(interaction, answers));
+					ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(new SurveyResponse(interaction, answers));
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {
@@ -142,8 +144,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			questionsContainer.removeAllViews();
 
 			// Then render all the questions
-			for (final Question question : questions) {
-				final BaseSurveyQuestionView surveyQuestionView;
+			for (int i = 0; i < questions.size(); i++) {
+				Question question = questions.get(i);
+				BaseSurveyQuestionView surveyQuestionView;
 				if (question.getType() == Question.QUESTION_TYPE_SINGLELINE) {
 					surveyQuestionView = TextSurveyQuestionView.newInstance((SinglelineQuestion) question);
 				} else if (question.getType() == Question.QUESTION_TYPE_MULTICHOICE) {
@@ -151,12 +154,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 				} else if (question.getType() == Question.QUESTION_TYPE_MULTISELECT) {
 					surveyQuestionView = MultiselectSurveyQuestionView.newInstance((MultiselectQuestion) question);
+				} else if (question.getType() == Question.QUESTION_TYPE_RANGE) {
+					surveyQuestionView = RangeSurveyQuestionView.newInstance((RangeQuestion) question);
 				} else {
 					surveyQuestionView = null;
 				}
 				if (surveyQuestionView != null) {
 					surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, question.getId()).commit();
+					getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, Integer.toString(i)).commit();
 				}
 			}
 		} else {
