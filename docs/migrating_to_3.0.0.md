@@ -24,7 +24,7 @@ Version 3.0 of the Apptentive Android SDK has extensive improvements to ease int
 Our SDK API has changed so you will need to modify your integration. Rest assured that this is a straight forward process that shouldn't take more than 20 minutes.
 
 1. Modify your `build.gradle` 
-    1. In your `build.gradle`, add a dependency to Apptentive with `compile 'com.apptentive:apptentive-android:3.0.0'`.
+    1. In your `build.gradle`, add a dependency to Apptentive with `compile 'com.apptentive:apptentive-android:3.1.1'`.
     2. make sure that this dependency no longer ends in `@aar`, which will prevent gradle from downloading our transitive dependencies.
     3. You can remove any transitive dependencies that you added to support Apptentive. These will be imported by gradle for you.
 2. Modify your `AndroidManifest.xml`
