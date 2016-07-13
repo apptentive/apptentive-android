@@ -372,7 +372,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				composingEditText.post(new Runnable() {
 					public void run() {
 						if (composingEditText != null) {
-							composingEditText.requestFocus();
+							// This sometimes prevented the composing EditText from gaining focus on user touch.
+							//composingEditText.requestFocus();
 						}
 					}
 				});
