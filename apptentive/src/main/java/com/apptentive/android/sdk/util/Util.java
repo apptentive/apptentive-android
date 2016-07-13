@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -48,101 +48,14 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * @author Sky Kelsey
- */
 public class Util {
-
-	// These date formats are as close as Java can get to ISO 8601 without royally screwing up.
-	public static final String PSEUDO_ISO8601_DATE_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; // 2011-01-01 11:59:59-0800
-	public static final String PSEUDO_ISO8601_DATE_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSSZ"; // 2011-01-01 11:59:59.123-0800 or 2011-01-01 11:59:59.23-0800
-
-	public static String dateToIso8601String(long millis) {
-		return dateToString(new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS), new Date(millis));
-	}
-
-	public static String dateToString(DateFormat format, Date date) {
-		return format.format(date);
-	}
-
-	public static Date parseIso8601Date(final String iso8601DateString) {
-		// Normalize timezone.
-		String s = iso8601DateString.trim().replace("Z", "+00:00").replace("T", " ");
-		try {
-			// Remove colon in timezone.
-			if (s.charAt(s.length() - 3) == ':') {
-				int lastColonIndex = s.lastIndexOf(":");
-				s = s.substring(0, lastColonIndex) + s.substring(lastColonIndex + 1);
-			}
-			// Right pad millis to 3 places. ISO 8601 supplies fractions of seconds, but Java interprets them as millis.
-			int milliStart = s.lastIndexOf('.');
-			int milliEnd = (s.lastIndexOf('+') != -1) ? s.lastIndexOf('+') : s.lastIndexOf('-');
-			if (milliStart != -1) {
-				String start = s.substring(0, milliStart + 1);
-				String millis = s.substring(milliStart + 1, milliEnd);
-				String end = s.substring(milliEnd);
-				millis = String.format("%-3s", millis).replace(" ", "0");
-				s = start + millis + end;
-			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Error parsing date: " + iso8601DateString, e);
-			return new Date();
-		}
-		// Parse, accounting for millis, if provided.
-		try {
-			if (s.contains(".")) {
-				return new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT_MILLIS).parse(s);
-			} else {
-				return new SimpleDateFormat(PSEUDO_ISO8601_DATE_FORMAT).parse(s);
-			}
-		} catch (ParseException e) {
-			ApptentiveLog.e("Exception parsing date: " + s, e);
-		}
-
-		// Return null as default. Nothing we can do but log it.
-		return null;
-	}
 
 	public static int getStatusBarHeight(Window window) {
 		Rect rectangle = new Rect();
 		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
 		return rectangle.top;
-	}
-
-
-	private static List<PackageInfo> getPermissions(@NonNull Context context) {
-		return context.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
-	}
-
-	public static boolean packageHasPermission(Context context, String permission) {
-		if (context == null) {
-			return false;
-		}
-		String packageName = context.getApplicationContext().getPackageName();
-		return packageHasPermission(context, packageName, permission);
-	}
-
-	public static boolean packageHasPermission(Context context, String packageName, String permission) {
-		if (context == null) {
-			return false;
-		}
-
-		List<PackageInfo> packageInfos = getPermissions(context);
-		for (PackageInfo packageInfo : packageInfos) {
-			if (packageInfo.packageName.equals(packageName) && packageInfo.requestedPermissions != null) {
-				for (String permissionName : packageInfo.requestedPermissions) {
-					if (permissionName.equals(permission)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
 	}
 
 	public static int pixelsToDips(@NonNull Context context, int px) {
@@ -199,15 +112,6 @@ public class Util {
 		// TODO: getWidth(), getHeight(), and getOrientation() are deprecated in API 13 in favor of getSize() and getRotation().
 		ret.set(display.getWidth(), display.getHeight());
 		return ret;
-	}
-
-	public static void printDebugInfo(Context context) {
-		// Print screen dimensions.
-		// Huawei Comet: Port: PX=240x320  DP=320x427, Land: PX=320x240 DP=427x320
-		// Galaxy Nexus: Port: PX=720x1184 DP=360x592, Land: PX=1196x720 DP=598x360
-		// Nexus 7:      Port: PX=800x1205 DP=601x905, Land: PX=1280x736 DP=962x553
-		Point point = Util.getScreenSize(context);
-		ApptentiveLog.d("Screen size: PX=%dx%d DP=%dx%d", point.x, point.y, Util.pixelsToDips(context, point.x), Util.pixelsToDips(context, point.y));
 	}
 
 	public static String trim(String string) {
@@ -949,7 +853,4 @@ public class Util {
 			}
 		}
 	}
-
-
 }
-
