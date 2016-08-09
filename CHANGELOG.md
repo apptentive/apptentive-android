@@ -1,3 +1,11 @@
+# 2016-08-09 - 3.2.1
+
+#### Bugs Fixed
+
+* Add proguard rule to prevent obfuscating `android.support.v4.app.FragmentManagerImpl`, which we load via reflection in a workaround for a bug in the support library.
+* Prevent NPE when animation runs after object is nulled.
+* Fix a bug that sometimes prevented the Message Center Composing view from gaining focus on user touch.
+
 # 2016-07-13 - 3.2.0
 
 #### Improvements

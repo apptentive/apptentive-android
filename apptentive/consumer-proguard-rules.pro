@@ -8,3 +8,4 @@
 -dontwarn com.apptentive.android.sdk.**
 -keepattributes SourceFile,LineNumberTable
 -keep class com.apptentive.android.sdk.** { *; }
+-keep class android.support.v4.app.FragmentManagerImpl { *; }

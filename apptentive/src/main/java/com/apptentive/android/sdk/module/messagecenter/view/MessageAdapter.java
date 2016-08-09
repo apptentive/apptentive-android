@@ -381,21 +381,25 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		} else if (nameEditText != null) {
 			if (whoCardViewIndex != INVALID_POSITION && whoCardViewIndex == position) {
 				if (focusOnNameField) {
-					nameEditText.post(new Runnable()
-					{
-						public void run()
-						{
-							nameEditText.requestFocus();
+					nameEditText.post(
+						new Runnable() {
+							public void run() {
+								if (nameEditText != null) {
+									nameEditText.requestFocus();
+								}
+							}
 						}
-					});
+					);
 				} else {
-					emailEditText.post(new Runnable()
-					{
-						public void run()
-						{
-							emailEditText.requestFocus();
+					emailEditText.post(
+						new Runnable() {
+							public void run() {
+								if (emailEditText != null) {
+									emailEditText.requestFocus();
+								}
+							}
 						}
-					});
+					);
 				}
 			}
 		}
