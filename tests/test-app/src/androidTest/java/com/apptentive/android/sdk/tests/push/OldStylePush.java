@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,20 +8,16 @@ package com.apptentive.android.sdk.tests.push;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
-public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
+public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 	public void testUrbanAirshipPushNotificationIdentification() {
-		ApptentiveLog.e("Running test: testUrbanAirshipPushNotificationIdentification()\n\n");
-
 		// Null bundle push
 		{
 			resetDevice();
@@ -60,8 +56,6 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testParsePushNotificationIdentification() {
-		ApptentiveLog.e("Running test: testParsePushNotificationIdentification()\n\n");
-
 		// Null Intent
 		{
 			resetDevice();
@@ -119,8 +113,6 @@ public class TestPushNotifications extends ApptentiveInstrumentationTestCase {
 	}
 
 	public void testAwsSnsPushNotificationIdentification() {
-		ApptentiveLog.e("Running test: testAwsSnsPushNotificationIdentification()\n\n");
-
 		// Null Intent
 		{
 			resetDevice();
