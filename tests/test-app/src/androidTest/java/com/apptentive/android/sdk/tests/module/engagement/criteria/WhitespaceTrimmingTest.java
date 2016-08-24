@@ -1,39 +1,44 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
-/**
- * @author Sky Kelsey
- */
-public class WhitespaceTrimmingTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class WhitespaceTrimmingTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
-	public void testWhitespaceTrimming() {
-		ApptentiveLog.e("Running test: testWhitespaceTrimming()\n\n");
+	@Test
+	public void whitespaceTrimming() {
 		doTest("testWhitespaceTrimming.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
 	private void doTest(String testFile) {
-		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + testFile);
 		try {
 			Apptentive.addCustomDeviceData(" string_qwerty ", " qwerty ");
-			Apptentive.addCustomDeviceData( " string with spaces ", " string with spaces ");
+			Apptentive.addCustomDeviceData(" string with spaces ", " string with spaces ");
 			DeviceManager.storeDeviceAndReturnIt();
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet());

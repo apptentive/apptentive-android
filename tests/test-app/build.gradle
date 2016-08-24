@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         testApplicationId "com.apptentive.android.sdk.tests"
-        testInstrumentationRunner "com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testHandleProfiling true
         testFunctionalTest true
     }

@@ -1,36 +1,38 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.messagecenter;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.List;
 
-/**
- * @author Sky Kelsey
- */
-public class JsonObjectBindingTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+@RunWith(AndroidJUnit4.class)
+public class JsonObjectBindingTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "model" + File.separator;
 
-	public JsonObjectBindingTest() {
-		super();
-	}
-
-	public void testParsingTextMessageResponse() {
-		String exampleResponse = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testParsingTextMessageResponse.json");
+	@Test
+	public void parsingTextMessageResponse() {
+		String exampleResponse = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testParsingTextMessageResponse.json");
 		List<ApptentiveMessage> apptentiveMessages = null;
 		try {
 			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
@@ -43,8 +45,9 @@ public class JsonObjectBindingTest extends ApptentiveInstrumentationTestCase {
 		assertEquals(apptentiveMessages.size(), 5);
 	}
 
-	public void testTextMessageRoundTrip() {
-		String exampleMessage = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testTextMessageRoundTrip.json");
+	@Test
+	public void textMessageRoundTrip() {
+		String exampleMessage = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testTextMessageRoundTrip.json");
 		CompoundMessage message = null;
 		try {
 			message = new CompoundMessage(exampleMessage, true);

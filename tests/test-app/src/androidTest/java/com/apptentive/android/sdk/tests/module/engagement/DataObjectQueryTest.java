@@ -7,26 +7,33 @@
 package com.apptentive.android.sdk.tests.module.engagement;
 
 import android.os.Build;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
 
-public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+@RunWith(AndroidJUnit4.class)
+public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement/payloads/";
 
-	public void testQueriesAgainstPerson() {
-		ApptentiveLog.e("Running test: testQueriesAgainstPerson()\n\n");
+	@Test
+	public void queriesAgainstPerson() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstPerson.json");
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstPerson.json");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
 
 		PersonManager.storePersonEmail("example@example.com");
@@ -36,44 +43,44 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		Interaction interaction;
 
 		// 0
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 1
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNull(interaction);
 
 		// 2
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 3
 		Apptentive.addCustomPersonData("foo", "bar");
 		PersonManager.storePersonAndReturnIt();
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 4
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNull(interaction);
 
 		// 4
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 	}
 
-	public void testQueriesAgainstDevice() {
-		ApptentiveLog.e("Running test: testQueriesAgainstDevice()\n\n");
+	@Test
+	public void queriesAgainstDevice() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstDevice.json");
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstDevice.json");
 		json = json.replace("\"OS_API_LEVEL\"", String.valueOf(Build.VERSION.SDK_INT));
-		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
+		interactionManager.storeInteractionsPayloadString(json);
 
 		Interaction interaction;
 
@@ -81,53 +88,53 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 		DeviceManager.storeDeviceAndReturnIt();
 
 		// 0
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 1
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 2
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNull(interaction);
 
 		// 3
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 4
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 	}
 
-	public void testQueriesAgainstSdk() {
-		ApptentiveLog.e("Running test: testQueriesAgainstSdk()\n\n");
+	@Test
+	public void queriesAgainstSdk() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testQueriesAgainstSdk.json");
-		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstSdk.json");
+		interactionManager.storeInteractionsPayloadString(json);
 
 		Interaction interaction;
 
 		SdkManager.storeSdkAndReturnDiff();
 
 		// 0
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 1
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNotNull(interaction);
 
 		// 2
-		ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion("switch.code.point");
-		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
+		codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+		interaction = interactionManager.getApplicableInteraction("local#app#init");
 		assertNull(interaction);
 	}
 }

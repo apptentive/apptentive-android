@@ -1,27 +1,31 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.model;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Sky Kelsey
- */
-public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertEquals;
+
+@RunWith(AndroidJUnit4.class)
+public class VersionComparisonTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "model" + File.separator;
 
@@ -34,9 +38,9 @@ public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
 		operatorLookup.put(">", 1);
 	}
 
-	public void testBasicVersionComparison() {
-		ApptentiveLog.e("Running test: testBasicVersionComparison()\n\n");
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testBasicVersionComparison.json");
+	@Test
+	public void basicVersionComparison() {
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testBasicVersionComparison.json");
 
 		try {
 			JSONArray experiments = new JSONArray(json);
@@ -75,6 +79,5 @@ public class VersionComparisonTest extends ApptentiveInstrumentationTestCase {
 		} catch (JSONException e) {
 			ApptentiveLog.e("Error loading experiment results.", e);
 		}
-
 	}
 }

@@ -1,29 +1,34 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement;
 
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
-/**
- * @author Sky Kelsey
- */
-public class SurveyInteractionTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertNotNull;
+
+@RunWith(AndroidJUnit4.class)
+public class SurveyInteractionTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
-	public void testSurveyParsing() {
-		ApptentiveLog.e("Running test: testSurveyParsing()\n\n");
-		String json = FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testSurveyParsing.json");
+	@Test
+	public void surveyParsing() {
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testSurveyParsing.json");
 		Interaction survey = null;
 		try {
 			survey = new SurveyInteraction(json);

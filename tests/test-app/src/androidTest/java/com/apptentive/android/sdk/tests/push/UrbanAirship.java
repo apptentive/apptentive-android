@@ -8,13 +8,25 @@ package com.apptentive.android.sdk.tests.push;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
-public class UrbanAirship extends ApptentiveInstrumentationTestCase {
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-	public void testPushIntentApptentive() {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class UrbanAirship extends ApptentiveTestCaseBase {
+
+	@Test
+	public void apptentiveIntent() {
 		Intent intent = generatePushIntentApptentive();
 		assertNotNull(Apptentive.buildPendingIntentFromPushNotification(intent));
 		assertTrue(Apptentive.isApptentivePushNotification(intent));
@@ -22,7 +34,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(intent), "The body.");
 	}
 
-	public void testPushIntentNonApptentive() {
+	@Test
+	public void nonApptentiveIntent() {
 		Intent intent = generatePushIntentNonApptentive();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
 		assertFalse(Apptentive.isApptentivePushNotification(intent));
@@ -30,7 +43,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(intent), "The body.");
 	}
 
-	public void testPushExtraBundleApptentive() {
+	@Test
+	public void apptentiveBundle() {
 		Bundle bundle = generatePushBundleApptentive();
 		assertNotNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
@@ -38,7 +52,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
 
-	public void testPushExtraBundleNonApptentive() {
+	@Test
+	public void nonApptentiveBundle() {
 		Bundle bundle = generatePushBundleNonApptentive();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
@@ -46,7 +61,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
 
-	public void testPushExtraMessageBundleApptentive() {
+	@Test
+	public void apptentiveExtraMessageBundle() {
 		Bundle bundle = generatePushExtraMessageBundleApptentive();
 		assertNotNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
@@ -54,7 +70,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
 
-	public void testPushExtraMessageBundleNonApptentive() {
+	@Test
+	public void nonApptentiveExtraMessageBundle() {
 		Bundle bundle = generatePushExtraMessageBundleNonApptentive();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
@@ -62,7 +79,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
 
-	public void testNullIntent() {
+	@Test
+	public void nullIntent() {
 		Intent intent = null;
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
 		assertFalse(Apptentive.isApptentivePushNotification(intent));
@@ -70,7 +88,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertNull(Apptentive.getBodyFromApptentivePush(intent));
 	}
 
-	public void testNullBundle() {
+	@Test
+	public void nullBundle() {
 		Bundle bundle = null;
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
@@ -78,7 +97,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertNull(Apptentive.getBodyFromApptentivePush(bundle));
 	}
 
-	public void testIntentWithMissingPushExtraBundle() {
+	@Test
+	public void missingBundle() {
 		Intent intent = new Intent();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
 		assertFalse(Apptentive.isApptentivePushNotification(intent));
@@ -86,7 +106,8 @@ public class UrbanAirship extends ApptentiveInstrumentationTestCase {
 		assertNull(Apptentive.getBodyFromApptentivePush(intent));
 	}
 
-	public void testIntentWithMissingPushExtraMessageBundle() {
+	@Test
+	public void missingExtraMessageBundle() {
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 		intent.putExtras(bundle);

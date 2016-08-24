@@ -1,71 +1,55 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 
-import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/**
- * @author Sky Kelsey
- */
-public class NavigateToLinkInteractionTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class NavigateToLinkInteractionTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement/interactions";
 
-	public void testNavigateToLinkInteractionNew() {
-		ApptentiveLog.e("Running test: testNavigateToLinkInteractionNew()\n\n");
-
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionNew.json");
-
+	@Test
+	public void navigateToLinkInteractionNew() {
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionNew.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
-
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
-
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;
-
 		assertEquals("http://pages.ebay.com/link/?nav=item.view&id=221648890812", link.getUrl());
 		assertTrue(link.getTarget().equals(NavigateToLinkInteraction.Target.New));
 	}
 
-	public void testNavigateToLinkInteractionSelf() {
-		ApptentiveLog.e("Running test: testNavigateToLinkInteractionSelf()\n\n");
-
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionSelf.json");
-
+	@Test
+	public void navigateToLinkInteractionSelf() {
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionSelf.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
-
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
-
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;
-
 		assertEquals("http://pages.ebay.com/link/?nav=item.view&id=221648890812", link.getUrl());
 		assertTrue(link.getTarget().equals(NavigateToLinkInteraction.Target.Self));
 	}
 
-	public void testNavigateToLinkInteractionMissing() {
-		ApptentiveLog.e("Running test: testNavigateToLinkInteractionNew()\n\n");
-
-		ApptentiveInternal.getInstance(getTargetContext()).setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "/testNavigateToLinkInteractionMissing.json");
-
+	@Test
+	public void navigateToLinkInteractionMissing() {
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionMissing.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
-
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
-
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;
-
 		assertEquals("http://pages.ebay.com/link/?nav=item.view&id=221648890812", link.getUrl());
 		assertTrue(link.getTarget().equals(NavigateToLinkInteraction.Target.New));
 	}

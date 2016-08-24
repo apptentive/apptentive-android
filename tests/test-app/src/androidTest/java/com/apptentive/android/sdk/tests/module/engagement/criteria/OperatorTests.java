@@ -1,109 +1,106 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
-/**
- * @author Sky Kelsey
- */
-public class OperatorTests extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class OperatorTests extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
-	public void testOperatorExists() {
-		ApptentiveLog.e("Running test: testOperatorExists()\n\n");
+	@Test
+	public void exists() {
 		doTest("testOperatorExists.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorNot() {
-		ApptentiveLog.e("Running test: testOperatorNot()\n\n");
+	@Test
+	public void not() {
 		doTest("testOperatorNot.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorLessThan() {
-		ApptentiveLog.e("Running test: testOperatorLessThan()\n\n");
+	@Test
+	public void lessThan() {
 		doTest("testOperatorLessThan.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorLessThanOrEqual() {
-		ApptentiveLog.e("Running test: testOperatorLessThanOrEqual()\n\n");
+	@Test
+	public void lessThanOrEqual() {
 		doTest("testOperatorLessThanOrEqual.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorGreaterThanOrEqual() {
-		ApptentiveLog.e("Running test: testOperatorGreaterThanOrEqual()\n\n");
+	@Test
+	public void greaterThanOrEqual() {
 		doTest("testOperatorGreaterThanOrEqual.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorGreaterThan() {
-		ApptentiveLog.e("Running test: testOperatorGreaterThan()\n\n");
+	@Test
+	public void greaterThan() {
 		doTest("testOperatorGreaterThan.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorContains() {
-		ApptentiveLog.e("Running test: testOperatorContains()\n\n");
+	@Test
+	public void contains() {
 		doTest("testOperatorContains.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorStartsWith() {
-		ApptentiveLog.e("Running test: testOperatorStartsWith()\n\n");
+	@Test
+	public void startsWith() {
 		doTest("testOperatorStartsWith.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorEndsWith() {
-		ApptentiveLog.e("Running test: testOperatorEndsWith()\n\n");
+	@Test
+	public void endsWith() {
 		doTest("testOperatorEndsWith.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorBefore() {
-		ApptentiveLog.e("Running test: testOperatorBefore()\n\n");
+	@Test
+	public void before() {
 		doTest("testOperatorBefore.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
-	public void testOperatorAfter() {
-		ApptentiveLog.e("Running test: testOperatorAfter()\n\n");
+	@Test
+	public void after() {
 		doTest("testOperatorAfter.json");
-		ApptentiveLog.e("Finished test.");
 	}
 
 	private void doTest(String testFile) {
-		String json = loadFileAssetAsString(TEST_DATA_DIR + testFile);
+		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + testFile);
+
+		Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
+		Apptentive.Version version = new Apptentive.Version();
+		version.setVersion("1.2.3");
+
 		try {
 			Apptentive.addCustomDeviceData("number_5", 5);
 			Apptentive.addCustomDeviceData("string_qwerty", "qwerty");
 			Apptentive.addCustomDeviceData("boolean_true", true);
-			Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
-			//Apptentive.addCustomDeviceData(getTargetContext(), "datetime_1000", dateTime);
-			ApptentiveInternal.getInstance(getTargetContext()).addCustomDeviceData("datetime_1000", dateTime);
-			Apptentive.Version version = new Apptentive.Version();
-			version.setVersion("1.2.3");
-			//Apptentive.addCustomDeviceData(getTargetContext(), "version_1.2.3", version);
-			ApptentiveInternal.getInstance().addCustomDeviceData("version_1.2.3", version);
 			Apptentive.addCustomDeviceData("key_with_null_value", (String) null);
+
+			// Need to use ApptentiveInternal because we don't expose complex types in our public API yet.
+			ApptentiveInternal.getInstance(targetContext).addCustomDeviceData("datetime_1000", dateTime);
+			ApptentiveInternal.getInstance().addCustomDeviceData("version_1.2.3", version);
 
 			DeviceManager.storeDeviceAndReturnIt();
 			InteractionCriteria criteria = new InteractionCriteria(json);
