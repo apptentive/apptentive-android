@@ -14,7 +14,6 @@ import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.JsonDiffer;
 import com.apptentive.android.sdk.util.Util;
 
@@ -38,7 +37,7 @@ public class EventTests extends ApptentiveTestCaseBase {
 	public void extendedDataEvents() {
 		ApptentiveLog.e("testExtendedDataEvents()");
 		try {
-			Event expected = new Event(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testExtendedDataEvents.json"));
+			Event expected = new Event(loadTextAssetAsString(TEST_DATA_DIR + "testExtendedDataEvents.json"));
 			// Change the expected output to use the same timezone as the test machine.
 			expected.setClientCreatedAtUtcOffset(Util.getUtcOffset());
 

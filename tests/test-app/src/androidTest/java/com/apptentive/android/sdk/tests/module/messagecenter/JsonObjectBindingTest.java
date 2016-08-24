@@ -13,7 +13,6 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class JsonObjectBindingTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void parsingTextMessageResponse() {
-		String exampleResponse = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testParsingTextMessageResponse.json");
+		String exampleResponse = loadTextAssetAsString(TEST_DATA_DIR + "testParsingTextMessageResponse.json");
 		List<ApptentiveMessage> apptentiveMessages = null;
 		try {
 			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
@@ -47,7 +46,7 @@ public class JsonObjectBindingTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void textMessageRoundTrip() {
-		String exampleMessage = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testTextMessageRoundTrip.json");
+		String exampleMessage = loadTextAssetAsString(TEST_DATA_DIR + "testTextMessageRoundTrip.json");
 		CompoundMessage message = null;
 		try {
 			message = new CompoundMessage(exampleMessage, true);

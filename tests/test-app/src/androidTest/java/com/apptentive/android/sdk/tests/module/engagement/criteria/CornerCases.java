@@ -14,7 +14,6 @@ import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class CornerCases extends ApptentiveTestCaseBase {
 	public void ornerCasesThatShouldBeTrue() throws JSONException {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testCornerCasesThatShouldBeTrue.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testCornerCasesThatShouldBeTrue.json");
 		Apptentive.addCustomDeviceData("key_with_null_value", (String) null);
 		DeviceManager.storeDeviceAndReturnIt();
 		try {
@@ -54,7 +53,7 @@ public class CornerCases extends ApptentiveTestCaseBase {
 		ApptentiveLog.e("Running test: testCornerCasesThatShouldBeFalse()\n\n");
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testCornerCasesThatShouldBeFalse.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testCornerCasesThatShouldBeFalse.json");
 		Apptentive.addCustomDeviceData("key_with_null_value", (String) null);
 		DeviceManager.storeDeviceAndReturnIt();
 		try {

@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +32,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 	public void queriesAgainstPerson() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstPerson.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstPerson.json");
 		ApptentiveInternal.getInstance().getInteractionManager().storeInteractionsPayloadString(json);
 
 		PersonManager.storePersonEmail("example@example.com");
@@ -78,7 +77,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 	public void queriesAgainstDevice() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstDevice.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstDevice.json");
 		json = json.replace("\"OS_API_LEVEL\"", String.valueOf(Build.VERSION.SDK_INT));
 		interactionManager.storeInteractionsPayloadString(json);
 
@@ -116,7 +115,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 	public void queriesAgainstSdk() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstSdk.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testQueriesAgainstSdk.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		Interaction interaction;

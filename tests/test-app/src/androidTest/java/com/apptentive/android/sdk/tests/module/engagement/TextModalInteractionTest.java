@@ -12,7 +12,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +28,7 @@ public class TextModalInteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void textModalInteraction() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testTextModalInteraction.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "/testTextModalInteraction.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
 		assertTrue(interaction.getType().equals(Interaction.Type.TextModal));
 		TextModalInteraction textModalInteraction = (TextModalInteraction) interaction;

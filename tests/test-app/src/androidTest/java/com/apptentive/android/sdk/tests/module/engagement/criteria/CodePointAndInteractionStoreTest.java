@@ -11,7 +11,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -32,7 +31,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	 */
 	@Test
 	public void codePointInvokesTotal() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DIR + "testCodePointInvokesTotal.json");
+		String json = loadTextAssetAsString(TEST_DIR + "testCodePointInvokesTotal.json");
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
@@ -145,7 +144,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	 */
 	@Test
 	public void codePointInvokesVersion() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DIR + "testCodePointInvokesVersion.json");
+		String json = loadTextAssetAsString(TEST_DIR + "testCodePointInvokesVersion.json");
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
@@ -270,7 +269,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	 */
 	@Test
 	public void codePointLastInvokedAt() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DIR + "testCodePointLastInvokedAt.json");
+		String json = loadTextAssetAsString(TEST_DIR + "testCodePointLastInvokedAt.json");
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
@@ -350,7 +349,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	public void interactionInvokesTotal() {
 		String appVersionName = Util.getAppVersionName(targetContext);
 		int appVersionCode = Util.getAppVersionCode(targetContext);
-		String json = FileUtil.loadTextAssetAsString(TEST_DIR + "testInteractionInvokesTotal.json");
+		String json = loadTextAssetAsString(TEST_DIR + "testInteractionInvokesTotal.json");
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 

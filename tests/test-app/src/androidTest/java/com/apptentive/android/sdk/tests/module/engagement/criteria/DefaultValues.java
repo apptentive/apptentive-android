@@ -12,7 +12,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class DefaultValues extends ApptentiveTestCaseBase {
 	public void defaultValues() throws JSONException {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testDefaultValues.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testDefaultValues.json");
 
 		try {
 			Clause criteria = ClauseParser.parse(json);

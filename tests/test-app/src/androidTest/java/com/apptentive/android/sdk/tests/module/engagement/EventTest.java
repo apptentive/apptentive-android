@@ -11,7 +11,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class EventTest extends ApptentiveTestCaseBase {
 	public void eventLabelCreation() {
 		BufferedReader reader = null;
 		try {
-			reader = FileUtil.openBufferedReaderFromFileAsset(TEST_DATA_DIR + "testEventLabelCreation.txt");
+			reader = openBufferedReaderFromFileAsset(TEST_DATA_DIR + "testEventLabelCreation.txt");
 
 			// Make sure the test file isn't empty.
 			reader.mark(Integer.MAX_VALUE);

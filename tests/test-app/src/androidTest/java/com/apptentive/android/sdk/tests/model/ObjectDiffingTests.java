@@ -10,7 +10,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.JsonDiffer;
 
 import org.json.JSONException;
@@ -34,9 +33,9 @@ public class ObjectDiffingTests extends ApptentiveTestCaseBase {
 	@Test
 	public void deviceDiffing1() {
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
+			JSONObject original = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
+			JSONObject updated = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
+			JSONObject expected = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 
@@ -55,8 +54,8 @@ public class ObjectDiffingTests extends ApptentiveTestCaseBase {
 	@Test
 	public void deviceDiffing2() {
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
+			JSONObject original = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
+			JSONObject updated = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 

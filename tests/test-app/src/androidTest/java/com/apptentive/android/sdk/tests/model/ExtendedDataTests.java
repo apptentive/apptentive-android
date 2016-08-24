@@ -13,7 +13,6 @@ import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +33,7 @@ public class ExtendedDataTests extends ApptentiveTestCaseBase {
 	public void commerceExtendedData() {
 		ApptentiveLog.e("testCommerceExtendedData()");
 		try {
-			JSONObject expected = new CommerceExtendedData(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testCommerceExtendedData.json"));
+			JSONObject expected = new CommerceExtendedData(loadTextAssetAsString(TEST_DATA_DIR + "testCommerceExtendedData.json"));
 
 			CommerceExtendedData actual = new CommerceExtendedData()
 					.setId("commerce_id")
@@ -56,7 +55,7 @@ public class ExtendedDataTests extends ApptentiveTestCaseBase {
 	public void locationExtendedData() {
 		ApptentiveLog.e("testLocationExtendedData()");
 		try {
-			JSONObject expected = new LocationExtendedData(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testLocationExtendedData.json"));
+			JSONObject expected = new LocationExtendedData(loadTextAssetAsString(TEST_DATA_DIR + "testLocationExtendedData.json"));
 
 			LocationExtendedData actual = new LocationExtendedData(-122.34569190000002d, 47.6288591d);
 
@@ -70,7 +69,7 @@ public class ExtendedDataTests extends ApptentiveTestCaseBase {
 	public void timeExtendedData() {
 		ApptentiveLog.e("testTimeExtendedData()");
 		try {
-			JSONObject expected = new TimeExtendedData(FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testTimeExtendedData.json"));
+			JSONObject expected = new TimeExtendedData(loadTextAssetAsString(TEST_DATA_DIR + "testTimeExtendedData.json"));
 
 			TimeExtendedData millis = new TimeExtendedData(1406251926165l);
 			assertEquals(expected.toString(), millis.toString());

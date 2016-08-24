@@ -11,7 +11,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +39,7 @@ public class DateTimeComparisonTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void dateTimeComparison() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testDateTimeComparison.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testDateTimeComparison.json");
 		try {
 			JSONArray experiments = new JSONArray(json);
 			for (int i = 0; i < experiments.length(); i++) {

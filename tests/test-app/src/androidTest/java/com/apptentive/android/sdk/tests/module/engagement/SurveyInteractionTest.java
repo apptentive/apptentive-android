@@ -12,7 +12,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +27,7 @@ public class SurveyInteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void surveyParsing() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "testSurveyParsing.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testSurveyParsing.json");
 		Interaction survey = null;
 		try {
 			survey = new SurveyInteraction(json);

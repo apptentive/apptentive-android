@@ -13,7 +13,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class WhitespaceTrimmingTest extends ApptentiveTestCaseBase {
 	}
 
 	private void doTest(String testFile) {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + testFile);
+		String json = loadTextAssetAsString(TEST_DATA_DIR + testFile);
 		try {
 			Apptentive.addCustomDeviceData(" string_qwerty ", " qwerty ");
 			Apptentive.addCustomDeviceData(" string with spaces ", " string with spaces ");

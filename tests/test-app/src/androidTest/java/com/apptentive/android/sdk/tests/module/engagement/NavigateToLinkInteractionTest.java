@@ -11,7 +11,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +25,7 @@ public class NavigateToLinkInteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void navigateToLinkInteractionNew() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionNew.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionNew.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;
@@ -36,7 +35,7 @@ public class NavigateToLinkInteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void navigateToLinkInteractionSelf() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionSelf.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionSelf.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;
@@ -46,7 +45,7 @@ public class NavigateToLinkInteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void navigateToLinkInteractionMissing() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionMissing.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "/testNavigateToLinkInteractionMissing.json");
 		Interaction interaction = Interaction.Factory.parseInteraction(json);
 		assertTrue(interaction.getType().equals(Interaction.Type.NavigateToLink));
 		NavigateToLinkInteraction link = (NavigateToLinkInteraction) interaction;

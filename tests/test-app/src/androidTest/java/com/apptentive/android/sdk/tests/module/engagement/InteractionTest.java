@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Test;
@@ -90,7 +89,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void criteriaTimeAtInstall() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCriteriaTimeAtInstall.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCriteriaTimeAtInstall.json");
 		Interaction interaction;
 
 		// 0
@@ -161,7 +160,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void criteriaApplicationVersion() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCriteriaApplicationVersion.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCriteriaApplicationVersion.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		Interaction interaction;
@@ -186,7 +185,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void criteriaApplicationVersionCode() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionCode.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionCode.json");
 
 		try {
 			PackageInfo packageInfo = targetContext.getPackageManager().getPackageInfo(targetContext.getPackageName(), 0);
@@ -204,7 +203,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void criteriaApplicationVersionName() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionName.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionName.json");
 
 		try {
 			PackageInfo packageInfo = targetContext.getPackageManager().getPackageInfo(targetContext.getPackageName(), 0);
@@ -227,7 +226,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext));
@@ -260,7 +259,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		resetDevice();
 		final int iterations = 100;
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext));
@@ -293,7 +292,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		resetDevice();
 		final int iterations = 20;
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testListOfVariousInteractions.json");
 
 		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext));
 		codePointStore.storeCodePointForCurrentAppVersion("app.launch");
@@ -344,7 +343,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void selectionWithInteractionIdUsedInCriteria() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testSelectionWithInteractionIdUsedInCriteria.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testSelectionWithInteractionIdUsedInCriteria.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		Interaction interaction = interactionManager.getApplicableInteraction("code.point.2");
@@ -362,7 +361,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void interactionPriority() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testInteractionPriority.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testInteractionPriority.json");
 
 		interactionManager.storeInteractionsPayloadString(json);
 
@@ -389,7 +388,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void missingNullEmptyCriteria() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testMissingNullEmptyCriteria.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testMissingNullEmptyCriteria.json");
 
 		interactionManager.storeInteractionsPayloadString(json);
 
@@ -407,7 +406,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void corruptedJson() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCorruptedJson.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCorruptedJson.json");
 
 		interactionManager.storeInteractionsPayloadString(json);
 		Interactions interactions = interactionManager.getInteractions();
@@ -416,7 +415,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void actualUpgradeMessage() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
@@ -456,7 +455,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	 */
 	@Test
 	public void testRealRatingInteractions() {
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testRealRatingInteractions.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testRealRatingInteractions.json");
 
 		// Test version targeted UpgradeMessage
 
@@ -588,7 +587,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	public void canShowInteraction() {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCanShowInteraction.json");
 		interactionManager.storeInteractionsPayloadString(json);
 
 		boolean willShow = Apptentive.canShowInteraction("init");
