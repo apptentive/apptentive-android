@@ -19,6 +19,7 @@ public class AppRelease extends Payload {
 	private static final String KEY_APP_STORE = "app_store";
 	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
+	private static final String KEY_DEBUG = "debug";
 
 	public AppRelease(String json) throws JSONException {
 		super(json);
@@ -153,4 +154,15 @@ public class AppRelease extends Payload {
 		}
 	}
 
+	public boolean getDebug() {
+		return optBoolean(KEY_DEBUG);
+	}
+
+	public void setDebug(boolean debug) {
+		try {
+			put(KEY_DEBUG, debug);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_DEBUG);
+		}
+	}
 }

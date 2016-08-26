@@ -588,6 +588,7 @@ public class ApptentiveInternal {
 			// Set Apptentive theme inheritance metrics
 			appRelease.setInheritStyle(appThemeIsAppCompatTheme);
 			appRelease.setOverrideStyle(themeOverrideResId != 0);
+			appRelease.setDebug(isAppDebuggable);
 
 			if (lastVersionEntrySeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);

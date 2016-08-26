@@ -218,6 +218,23 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	}
 
 	@Test
+	public void criteriaApplicationDebug() {
+		resetDevice();
+
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationDebug.json");
+
+		try {
+			json = json.replace("APPLICATION_DEBUG", Boolean.toString(apptentiveInternal.isApptentiveDebuggable()));
+
+			InteractionCriteria criteria = new InteractionCriteria(json);
+			assertTrue(criteria.isMet());
+		} catch (Exception e) {
+			ApptentiveLog.e("Error parsing test JSON.", e);
+			assertNull(e);
+		}
+	}
+
+	@Test
 	public void criteriaProcessingPerformance() {
 		if (isRunningOnEmulator()) {
 			ApptentiveLog.e("Running on emulator. Skipping test.");
