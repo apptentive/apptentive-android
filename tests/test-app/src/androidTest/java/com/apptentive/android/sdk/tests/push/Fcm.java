@@ -6,15 +6,28 @@
 
 package com.apptentive.android.sdk.tests.push;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Fcm extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-	public void testPushDataApptentive() {
+@RunWith(AndroidJUnit4.class)
+public class Fcm extends ApptentiveTestCaseBase {
+
+	@Test
+	public void pushDataApptentive() {
 		Map<String, String> data = new HashMap<>();
 		data.put("apptentive", "{\"action\":\"pmc\"}");
 		data.put("title", "The title.");
@@ -25,7 +38,8 @@ public class Fcm extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(data), "The body.");
 	}
 
-	public void testPushDataNonApptentive() {
+	@Test
+	public void pushDataNonApptentive() {
 		Map<String, String> data = new HashMap<>();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(data));
 		assertFalse(Apptentive.isApptentivePushNotification(data));
@@ -33,7 +47,8 @@ public class Fcm extends ApptentiveInstrumentationTestCase {
 		assertNull(Apptentive.getBodyFromApptentivePush(data));
 	}
 
-	public void testNullPushData() {
+	@Test
+	public void nullPushData() {
 		Map<String, String> data = null;
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(data));
 		assertFalse(Apptentive.isApptentivePushNotification(data));

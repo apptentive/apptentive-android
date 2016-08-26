@@ -7,13 +7,25 @@
 package com.apptentive.android.sdk.tests.push;
 
 import android.os.Bundle;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
-public class Gcm extends ApptentiveInstrumentationTestCase {
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-	public void testPushBundleApptentive() {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class Gcm extends ApptentiveTestCaseBase {
+
+	@Test
+	public void apptentivePush() {
 		Bundle bundle = generateBasePushBundle();
 		bundle.putString("apptentive", "{\"action\":\"pmc\"}");
 		bundle.putString("title", "The title.");
@@ -24,7 +36,8 @@ public class Gcm extends ApptentiveInstrumentationTestCase {
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
 
-	public void testPushBundleNonApptentive() {
+	@Test
+	public void nonApptentivePush() {
 		Bundle bundle = generateBasePushBundle();
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
@@ -32,7 +45,8 @@ public class Gcm extends ApptentiveInstrumentationTestCase {
 		assertNull(Apptentive.getBodyFromApptentivePush(bundle));
 	}
 
-	public void testNullBundle() {
+	@Test
+	public void nullBundle() {
 		Bundle bundle = null;
 		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));

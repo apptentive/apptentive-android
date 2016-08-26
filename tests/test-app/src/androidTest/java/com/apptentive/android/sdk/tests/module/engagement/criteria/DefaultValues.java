@@ -1,32 +1,37 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement.criteria;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
-/**
- * @author Sky Kelsey
- */
-public class DefaultValues extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class DefaultValues extends ApptentiveTestCaseBase {
 	private static final String TEST_DATA_DIR = "engagement" + File.separator + "criteria" + File.separator;
 
-	public void testDefaultValues() throws JSONException {
-		ApptentiveLog.e("Running test: testDefaultValues()\n\n");
+	@Test
+	public void defaultValues() throws JSONException {
 		resetDevice();
 
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testDefaultValues.json");
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testDefaultValues.json");
 
 		try {
 			Clause criteria = ClauseParser.parse(json);
@@ -37,6 +42,5 @@ public class DefaultValues extends ApptentiveInstrumentationTestCase {
 			ApptentiveLog.e("Error parsing test JSON.", e);
 			assertNull(e);
 		}
-		ApptentiveLog.e("Finished test.");
 	}
 }

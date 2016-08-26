@@ -1,22 +1,58 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.tests.util;
+package com.apptentive.android.sdk.tests;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
+import android.support.test.InstrumentationRegistry;
+import android.test.RenamingDelegatingContext;
+
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.*;
+import org.junit.Before;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
- * @author Sky Kelsey
+ * Initializes the Apptentive SDK so tests can work.
  */
-public class FileUtil {
+public abstract class ApptentiveTestCaseBase {
+	protected Context targetContext;
+	protected ApptentiveInternal apptentiveInternal;
+	protected InteractionManager interactionManager;
+	protected CodePointStore codePointStore;
+
+	@Before
+	public void initializeApptentiveSdk() {
+		targetContext = new RenamingDelegatingContext(InstrumentationRegistry.getTargetContext(), "test_");
+		apptentiveInternal = ApptentiveInternal.getInstance(targetContext);
+		apptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
+		interactionManager = apptentiveInternal.getInteractionManager();
+		codePointStore = apptentiveInternal.getCodePointStore();
+	}
+
+	protected void resetDevice() {
+		targetContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
+		apptentiveInternal.getCodePointStore().clear();
+		apptentiveInternal.getInteractionManager().clear();
+
+	}
+
+	protected static boolean isRunningOnEmulator() {
+		return Build.FINGERPRINT.contains("generic");
+	}
+
 	private final static int READ_BUF_LEN = 2048;
 
 	public static String loadRawTextResourceAsString(Context context, int resourceId) {
@@ -39,6 +75,10 @@ public class FileUtil {
 		return null;
 	}
 
+	public static String loadTextAssetAsString(String path) {
+		return loadTextAssetAsString(InstrumentationRegistry.getContext(), path);
+	}
+
 	public static String loadTextAssetAsString(Context context, String path) {
 		AssetManager assetManager = context.getResources().getAssets();
 		BufferedReader reader = null;
@@ -58,6 +98,10 @@ public class FileUtil {
 			Util.ensureClosed(reader);
 		}
 		return null;
+	}
+
+	public static BufferedReader openBufferedReaderFromFileAsset(String path) {
+		return openBufferedReaderFromFileAsset(InstrumentationRegistry.getContext(), path);
 	}
 
 	public static BufferedReader openBufferedReaderFromFileAsset(Context context, String path) {

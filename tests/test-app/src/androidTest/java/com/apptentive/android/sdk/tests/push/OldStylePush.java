@@ -8,19 +8,26 @@ package com.apptentive.android.sdk.tests.push;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class OldStylePush extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(AndroidJUnit4.class)
+public class OldStylePush extends ApptentiveTestCaseBase {
+
+	@Test
 	public void testUrbanAirshipPushNotificationIdentification() {
 		// Null bundle push
 		{
-			resetDevice();
 			Bundle bundle = null;
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
 			assertFalse(Apptentive.setPendingPushNotification(bundle));
@@ -28,7 +35,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Non-Apptentive push.
 		{
-			resetDevice();
 			Bundle bundle = new Bundle();
 			bundle.putString("foo", "bar");
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
@@ -37,7 +43,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
 		{
-			resetDevice();
 			Bundle bundle = new Bundle();
 			bundle.putString("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(bundle));
@@ -46,7 +51,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Valid Apptentive push. Verify this can display in a UI test.
 		{
-			resetDevice();
 			Bundle bundle = new Bundle();
 			bundle.putString("apptentive", "{\"action\": \"pmc\"}");
 			Apptentive.isApptentivePushNotification(bundle);
@@ -55,10 +59,10 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 		}
 	}
 
+	@Test
 	public void testParsePushNotificationIdentification() {
 		// Null Intent
 		{
-			resetDevice();
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
 			assertFalse(Apptentive.setPendingPushNotification(intent));
@@ -66,7 +70,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Not a push
 		{
-			resetDevice();
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
 			assertFalse(Apptentive.setPendingPushNotification(intent));
@@ -74,7 +77,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Non-Apptentive push
 		try {
-			resetDevice();
 			JSONObject parseExtraJson = new JSONObject();
 			parseExtraJson.put("foo", "bar");
 			Intent intent = new Intent();
@@ -87,7 +89,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
 		try {
-			resetDevice();
 			JSONObject parseExtraJson = new JSONObject();
 			parseExtraJson.put("apptentive", "foo");
 			Intent intent = new Intent();
@@ -100,7 +101,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Valid Apptentive push
 		try {
-			resetDevice();
 			JSONObject parseExtraJson = new JSONObject();
 			parseExtraJson.put("apptentive", "{\"action\": \"pmc\"}");
 			Intent intent = new Intent();
@@ -112,10 +112,10 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 		}
 	}
 
+	@Test
 	public void testAwsSnsPushNotificationIdentification() {
 		// Null Intent
 		{
-			resetDevice();
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
 			assertFalse(Apptentive.setPendingPushNotification(intent));
@@ -123,7 +123,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Not a push
 		{
-			resetDevice();
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
 			assertFalse(Apptentive.setPendingPushNotification(intent));
@@ -131,7 +130,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
 		{
-			resetDevice();
 			Intent intent = new Intent();
 			intent.putExtra("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
@@ -140,7 +138,6 @@ public class OldStylePush extends ApptentiveInstrumentationTestCase {
 
 		// Valid Apptentive push
 		{
-			resetDevice();
 			Intent intent = new Intent();
 			intent.putExtra("apptentive", "{\"action\": \"pmc\"}");
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
