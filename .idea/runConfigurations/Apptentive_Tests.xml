@@ -23,17 +23,17 @@
       <option name="WORKING_DIR" value="" />
       <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
     </Auto>
-    <Native>
-      <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
-      <option name="WORKING_DIR" value="" />
-      <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
-    </Native>
-    <Java />
     <Hybrid>
       <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
       <option name="WORKING_DIR" value="" />
       <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
     </Hybrid>
+    <Java />
+    <Native>
+      <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+      <option name="WORKING_DIR" value="" />
+      <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+    </Native>
     <Profilers>
       <option name="ENABLE_ADVANCED_PROFILING" value="false" />
       <option name="GAPID_ENABLED" value="false" />

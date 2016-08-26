@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -39,8 +39,6 @@ import java.util.*;
 
 /**
  * This class contains the complete API for accessing Apptentive features from within your app.
- *
- * @author Sky Kelsey
  */
 public class Apptentive {
 
@@ -395,7 +393,7 @@ public class Apptentive {
 	 * @param token        The push provider token you receive from your push provider. The format is push provider specific.
 	 *                     <dl>
 	 *                     <dt>Apptentive</dt>
-	 *                     <dd>If you are using Apptentive to send pushes directly to GCM, pass in the GCM Registration ID, which you can
+	 *                     <dd>If you are using Apptentive to send pushes directly to GCM or FCM, pass in the GCM/FCM Registration ID, which you can
 	 *                     <a href="https://github.com/googlesamples/google-services/blob/73f8a4fcfc93da08a40b96df3537bb9b6ef1b0fa/android/gcm/app/src/main/java/gcm/play/android/samples/com/gcmquickstart/RegistrationIntentService.java#L51">access like this</a>.
 	 *                     </dd>
 	 *                     <dt>Parse</dt>
@@ -459,11 +457,11 @@ public class Apptentive {
 	/**
 	 * Determines whether this Intent is a push notification sent from Apptentive.
 	 *
-	 * @param intent The opened push notification Intent you received in your BroadcastReceiver.
-	 * @return True if the Intent contains Apptentive push information.
+	 * @param intent The received {@link Intent} you received in your BroadcastReceiver.
+	 * @return True if the Intent came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
 		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
@@ -474,10 +472,10 @@ public class Apptentive {
 	 * integrations.
 	 *
 	 * @param bundle The push payload bundle paseed to GCM onMessageReceived() callback
-	 * @return True if the Intent contains Apptentive push information.
+	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
 		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
@@ -486,14 +484,256 @@ public class Apptentive {
 	/**
 	 * Determines whether push payload data came from an Apptentive push notification.
 	 *
-	 * @param data The push payload data obtained through FCM RemoteMessage::getData() when using FCM
-	 * @return True if the Intent contains Apptentive push information.
+	 * @param data The push payload data obtained through FCM's RemoteMessage.getData(), when using FCM
+	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Map<String, String> data) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
 		return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
+	}
+
+	/**
+	 * <p>
+	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * notification is received. Pass the generated PendingIntent to
+	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * to display Interactions such as Message Center. This method replaces the deprecated
+	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@Intent} that did
+	 * not come from Apptentive will return a null object. If you receive a null object, your app will
+	 * need to handle this notification itself.
+	 * </p>
+	 * <p>
+	 * This is the method you will likely need if you integrated using:
+	 * <ul>
+	 * <li>GCM</li>
+	 * <li>AWS SNS</li>
+	 * <li>Parse</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param intent An {@link Intent} containing the Apptentive Push data. Pass in what you receive
+	 *               in the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 */
+	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Intent intent) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(intent);
+		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+	}
+
+	/**
+	 * <p>
+	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * notification is received. Pass the generated PendingIntent to
+	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * to display Interactions such as Message Center. This method replaces the deprecated
+	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
+	 * did not come from Apptentive will return a null object. If you receive a null object, your app
+	 * will need to handle this notification itself.
+	 * </p>
+	 * <p>
+	 * This is the method you will likely need if you integrated using:
+	 * <ul>
+	 * <li>Urban Airship</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param bundle A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
+	 *               the the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 */
+	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Bundle bundle) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+	}
+
+	/**
+	 * <p>
+	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * notification is received. Pass the generated PendingIntent to
+	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * to display Interactions such as Message Center. This method replaces the deprecated
+	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
+	 * did not come from Apptentive will return a null object. If you receive a null object, your app
+	 * will need to handle this notification itself.
+	 * </p>
+	 * <p>
+	 * This is the method you will likely need if you integrated using:
+	 * <ul>
+	 * <li>Firebase Cloud Messaging (FCM)</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param data A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive Push
+	 *             data. Pass in what you receive in the the Service or BroadcastReceiver that is
+	 *             used by your chosen push provider.
+	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 */
+	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Map<String, String> data) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(data);
+		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification title you can use to construct a
+	 * {@link android.app.Notification} object.
+	 *
+	 * @param intent An {@link Intent} containing the Apptentive Push data. Pass in what you receive
+	 *               in the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getTitleFromApptentivePush(Intent intent) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (intent != null) {
+			return getTitleFromApptentivePush(intent.getExtras());
+		}
+		return null;
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification body text you can use to
+	 * construct a {@link android.app.Notification} object.
+	 *
+	 * @param intent An {@link Intent} containing the Apptentive Push data. Pass in what you receive
+	 *               in the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getBodyFromApptentivePush(Intent intent) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (intent != null) {
+			return getBodyFromApptentivePush(intent.getExtras());
+		}
+		return null;
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification title you can use to construct a
+	 * {@link android.app.Notification} object.
+	 *
+	 * @param bundle A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
+	 *               the the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getTitleFromApptentivePush(Bundle bundle) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (bundle == null) {
+			return null;
+		}
+		if (bundle.containsKey(ApptentiveInternal.TITLE_DEFAULT)) {
+			return bundle.getString(ApptentiveInternal.TITLE_DEFAULT);
+		}
+		if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
+			String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
+			if (parseDataString != null) {
+				try {
+					JSONObject parseJson = new JSONObject(parseDataString);
+					return parseJson.optString(ApptentiveInternal.TITLE_DEFAULT, null);
+				} catch (JSONException e) {
+					return null;
+				}
+			}
+		} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
+			Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
+			if (uaPushBundle == null) {
+				return null;
+			}
+			return uaPushBundle.getString(ApptentiveInternal.TITLE_DEFAULT);
+		}
+		return null;
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification body text you can use to
+	 * construct a {@link android.app.Notification} object.
+	 *
+	 * @param bundle A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
+	 *               the the Service or BroadcastReceiver that is used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getBodyFromApptentivePush(Bundle bundle) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (bundle == null) {
+			return null;
+		}
+		if (bundle.containsKey(ApptentiveInternal.BODY_DEFAULT)) {
+			return bundle.getString(ApptentiveInternal.BODY_DEFAULT);
+		}
+		if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
+			String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
+			if (parseDataString != null) {
+				try {
+					JSONObject parseJson = new JSONObject(parseDataString);
+					return parseJson.optString(ApptentiveInternal.BODY_PARSE, null);
+				} catch (JSONException e) {
+					return null;
+				}
+			}
+		} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
+			Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
+			if (uaPushBundle == null) {
+				return null;
+			}
+			return uaPushBundle.getString(ApptentiveInternal.BODY_UA);
+		} else if (bundle.containsKey(ApptentiveInternal.BODY_UA)) {
+			return bundle.getString(ApptentiveInternal.BODY_UA);
+		}
+		return null;
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification title you can use to construct a
+	 * {@link android.app.Notification} object.
+	 *
+	 * @param data A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive Push
+	 *             data. Pass in what you receive in the the Service or BroadcastReceiver that is
+	 *             used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getTitleFromApptentivePush(Map<String, String> data) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (data == null) {
+			return null;
+		}
+		return data.get(ApptentiveInternal.TITLE_DEFAULT);
+	}
+
+	/**
+	 * Use this method in your push receiver to get the notification body text you can use to
+	 * construct a {@link android.app.Notification} object.
+	 *
+	 * @param data A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive Push
+	 *             data. Pass in what you receive in the the Service or BroadcastReceiver that is
+	 *             used by your chosen push provider.
+	 * @return a String value, or null.
+	 */
+	public static String getBodyFromApptentivePush(Map<String, String> data) {
+		if (!ApptentiveInternal.checkRegistered()) {
+			return null;
+		}
+		if (data == null) {
+			return null;
+		}
+		return data.get(ApptentiveInternal.BODY_DEFAULT);
 	}
 
 	/**
@@ -505,19 +745,19 @@ public class Apptentive {
 	 *
 	 * @param intent The Intent that you received when the user opened a push notification.
 	 * @return true if the push data came from Apptentive.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static boolean setPendingPushNotification(Intent intent) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
-
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
 		if (apptentive != null) {
 			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
 		}
 		return false;
 	}
-
 
 	/**
 	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use
@@ -528,68 +768,18 @@ public class Apptentive {
 	 *
 	 * @param data A Bundle containing the GCM data object from the push notification.
 	 * @return true if the push data came from Apptentive.
+	 * @deprecated
 	 */
 	@Deprecated
 	public static boolean setPendingPushNotification(Bundle data) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
-
 		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
 		if (apptentive != null) {
 			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
 		}
 		return false;
-	}
-
-	/**
-	 * Use this method in your push receiver to build a pending Intent when an Apptentive push notification
-	 * is received. This pending Intent will be launched when the user taps on the push notification, and will
-	 * allow Apptentive to open UIs such as Message Center. This will generally be used with direct Apptentive Push, as
-	 * a replacement of {@link #setPendingPushNotification(Bundle)}. Calling this method for a push that did
-	 * not come from Apptentive will return a null object.
-	 *
-	 * @param data A Bundle containing the Apptentive Push data. Normally bundle parameter passed into onMessageReceived()of gmc
-	 * @return a valid pending intent to launch Message Center if the push data came from Apptentive, or null.
-	 */
-	public static PendingIntent buildPendingPushNotificationIntent(@NonNull Object data) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			return null;
-		}
-
-		String apptentivePushData = null;
-		if (data instanceof Bundle) {
-			apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData((Bundle) data);
-		} else if (data instanceof Map) {
-			apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData((Map) data);
-		}
-		if (!TextUtils.isEmpty(apptentivePushData)) {
-			try {
-				JSONObject pushJson = new JSONObject(apptentivePushData);
-				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
-				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
-					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
-				}
-				switch (action) {
-					case pmc: {
-						// Prefetch message when push for message center is received
-						MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-						if (mgr != null) {
-							mgr.startMessagePreFetchTask();
-						}
-						// Construct a pending intent to launch message center
-						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext());
-					}
-					default:
-						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
-				}
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing JSON from push notification.", e);
-				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -603,10 +793,11 @@ public class Apptentive {
 	 *
 	 * @param context The context from which this method is called.
 	 * @return True if a call to this method resulted in Apptentive displaying a View.
+	 * @deprecated
 	 */
 	@Deprecated
 	public static boolean handleOpenedPushNotification(Context context) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+		if (!ApptentiveInternal.checkRegistered()) {
 			return false;
 		}
 

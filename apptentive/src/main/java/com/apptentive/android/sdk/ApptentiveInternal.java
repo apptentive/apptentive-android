@@ -950,35 +950,63 @@ public class ApptentiveInternal {
 	 */
 	static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
 
-	static final String PARSE_PUSH_EXTRA_KEY = "com.parse.Data";
+	static final String PUSH_EXTRA_KEY_PARSE = "com.parse.Data";
+	static final String PUSH_EXTRA_KEY_UA = "com.urbanairship.push.EXTRA_PUSH_MESSAGE_BUNDLE";
+
+	static final String TITLE_DEFAULT = "title";
+	static final String BODY_DEFAULT = "body";
+	static final String BODY_PARSE = "alert";
+	static final String BODY_UA = "com.urbanairship.push.ALERT";
+
 
 	static String getApptentivePushNotificationData(Intent intent) {
-		String apptentive = null;
 		if (intent != null) {
 			ApptentiveLog.v("Got an Intent.");
-			// Parse
-			if (intent.hasExtra(PARSE_PUSH_EXTRA_KEY)) {
-				String parseStringExtra = intent.getStringExtra(PARSE_PUSH_EXTRA_KEY);
-				ApptentiveLog.v("Got a Parse Push.");
-				try {
-					JSONObject parseJson = new JSONObject(parseStringExtra);
-					apptentive = parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
-				} catch (JSONException e) {
-					ApptentiveLog.e("Corrupt Parse String Extra: %s", parseStringExtra);
-				}
-			} else {
-				// Straight GCM / SNS
-				ApptentiveLog.v("Got a non-Parse push.");
-				apptentive = intent.getStringExtra(APPTENTIVE_PUSH_EXTRA_KEY);
-			}
+			return getApptentivePushNotificationData(intent.getExtras());
 		}
-		return apptentive;
+		return null;
 	}
 
+	/**
+	 * <p>Internal use only.</p>
+	 * This bundle could be any bundle sent to us by a push Intent from any supported platform. For that reason, it needs to be checked in multiple ways.
+	 *
+	 * @param pushBundle a Bundle, or null.
+	 * @return a String, or null.
+	 */
 	static String getApptentivePushNotificationData(Bundle pushBundle) {
 		if (pushBundle != null) {
-			return pushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY);
+			if (pushBundle.containsKey(PUSH_EXTRA_KEY_PARSE)) { // Parse
+				ApptentiveLog.v("Got a Parse Push.");
+				String parseDataString = pushBundle.getString(PUSH_EXTRA_KEY_PARSE);
+				if (parseDataString == null) {
+					ApptentiveLog.e("com.parse.Data is null.");
+					return null;
+				}
+				try {
+					JSONObject parseJson = new JSONObject(parseDataString);
+					return parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
+				} catch (JSONException e) {
+					ApptentiveLog.e("com.parse.Data is corrupt: %s", parseDataString);
+					return null;
+				}
+			} else if (pushBundle.containsKey(PUSH_EXTRA_KEY_UA)) { // Urban Airship
+				ApptentiveLog.v("Got an Urban Airship push.");
+				Bundle uaPushBundle = pushBundle.getBundle(PUSH_EXTRA_KEY_UA);
+				if (uaPushBundle == null) {
+					ApptentiveLog.e("Urban Airship push extras bundle is null");
+					return null;
+				}
+				return uaPushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY);
+			} else if (pushBundle.containsKey(APPTENTIVE_PUSH_EXTRA_KEY)) { // All others
+				// Straight FCM / GCM / SNS, or nested
+				ApptentiveLog.v("Found apptentive push data.");
+				return pushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY);
+			} else {
+				ApptentiveLog.e("Got an unrecognizable push.");
+			}
 		}
+		ApptentiveLog.e("Push bundle was null.");
 		return null;
 	}
 
@@ -999,6 +1027,12 @@ public class ApptentiveInternal {
 		return false;
 	}
 
+	boolean clearPendingPushNotification() {
+		ApptentiveLog.d("Clearing Apptentive push notification data.");
+		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
+		return true;
+	}
+
 	public void showAboutInternal(Context context, boolean showBrandingBand) {
 		Intent intent = new Intent();
 		intent.setClass(context, ApptentiveViewActivity.class);
@@ -1008,6 +1042,36 @@ public class ApptentiveInternal {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 		}
 		context.startActivity(intent);
+	}
+
+	static PendingIntent generatePendingIntentFromApptentivePushData(String apptentivePushData) {
+		ApptentiveLog.d("Generating Apptentive push PendingIntent.");
+		if (!TextUtils.isEmpty(apptentivePushData)) {
+			try {
+				JSONObject pushJson = new JSONObject(apptentivePushData);
+				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
+				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
+					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
+				}
+				switch (action) {
+					case pmc: {
+						// Prefetch message when push for message center is received
+						MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
+						if (mgr != null) {
+							mgr.startMessagePreFetchTask();
+						}
+						// Construct a pending intent to launch message center
+						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext());
+					}
+					default:
+						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
+				}
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error parsing JSON from push notification.", e);
+				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
+			}
+		}
+		return null;
 	}
 
 	public boolean showMessageCenterInternal(Context context, Map<String, Object> customData) {
@@ -1101,5 +1165,17 @@ public class ApptentiveInternal {
 		}
 		return (intent != null) ? PendingIntent.getActivity(context, 0, intent,
 			PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
+	}
+
+	/**
+	 * Checks to see if Apptentive was properly registered, and logs a message if not.
+	 * @return true if properly registered, elss false.
+	 */
+	public static boolean checkRegistered() {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.e("Error: You have failed to call Apptentive.register() in your Application.onCreate()");
+			return false;
+		}
+		return true;
 	}
 }
