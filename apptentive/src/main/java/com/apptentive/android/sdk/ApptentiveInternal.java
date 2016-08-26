@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -138,6 +139,7 @@ public class ApptentiveInternal {
 		}
 	}
 
+	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
 
@@ -692,23 +694,22 @@ public class ApptentiveInternal {
 
 				@Override
 				protected Boolean doInBackground(Void... params) {
-					Boolean result = new Boolean(false);
 					try {
-						result = fetchConversationToken();
+						return fetchConversationToken();
 					} catch (Exception e) {
 						// Hold onto the unhandled exception from fetchConversationToken() for later handling in UI thread
 						this.e = e;
 					}
-					return result;
+					return false;
 				}
 
 				@Override
-				protected void onPostExecute(Boolean v) {
+				protected void onPostExecute(Boolean successful) {
 					if (e == null) {
 						// Update pending state on UI thread after finishing the task
-						ApptentiveLog.i("Fetching conversation token asyncTask finished. Result:" + v.booleanValue());
+						ApptentiveLog.d("Fetching conversation token asyncTask finished. Successful? %b", successful);
 						isConversationTokenFetchPending.set(false);
-						if (v.booleanValue()) {
+						if (successful) {
 							// Once token is fetched successfully, start asyncTasks to fetch global configuration, then interaction
 							asyncFetchAppConfigurationAndInteractions();
 						}
