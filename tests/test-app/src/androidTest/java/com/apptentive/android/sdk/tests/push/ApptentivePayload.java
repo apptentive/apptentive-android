@@ -7,11 +7,13 @@
 package com.apptentive.android.sdk.tests.push;
 
 import android.os.Bundle;
+import android.support.test.rule.UiThreadTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,6 +30,9 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	private static final String wrongKey = "{\"foo\":\"pmc\"}";
 	private static final String corrupt = "{\"foo:pmc";
 
+	@Rule
+	public UiThreadTestRule uiThreadTestRule = new UiThreadTestRule();
+
 	@Test
 	public void missingApptentive() {
 		Bundle bundle = new Bundle();
@@ -36,10 +41,15 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	}
 
 	@Test
-	public void good() {
-		Bundle bundle = new Bundle();
+	public void good() throws Throwable {
+		final Bundle bundle = new Bundle();
 		bundle.putString("apptentive", good);
-		assertNotNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		uiThreadTestRule.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				assertNotNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+			}
+		});
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
 	}
 
