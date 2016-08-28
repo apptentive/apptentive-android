@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.logic;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.BuildConfig;
 import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Person;
@@ -62,6 +63,9 @@ public class FieldManager {
 						Apptentive.Version ret = new Apptentive.Version();
 						ret.setVersion(version);
 						return ret;
+					}
+					case debug: {
+						return BuildConfig.DEBUG;
 					}
 				}
 				return null; // Default value
@@ -251,6 +255,7 @@ public class FieldManager {
 		version,
 		version_code,
 		version_name,
+		debug,
 		build,
 		time_ago,
 		other;
