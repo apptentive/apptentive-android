@@ -716,12 +716,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		@Override
 		protected void onCancelled() {
-			positionsWithPendingUpdateTask.remove(position);
+			positionsWithPendingUpdateTask.remove(Integer.valueOf(position));
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
-			positionsWithPendingUpdateTask.remove(position);
+			positionsWithPendingUpdateTask.remove(Integer.valueOf(position));
 		}
 
 	}
