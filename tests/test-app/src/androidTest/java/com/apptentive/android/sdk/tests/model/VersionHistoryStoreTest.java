@@ -26,7 +26,7 @@ public class VersionHistoryStoreTest extends ApptentiveInstrumentationTestCase {
 	public void testVersionHistoryStoreMigration() {
 		resetDevice();
 		String oldFormat = FileUtil.loadTextAssetAsString(getTestContext(), "model/versionHistoryStoreOld.txt");
-		VersionHistoryStoreMigrator.migrate(oldFormat);
+		VersionHistoryStoreMigrator.migrateV1ToV2(oldFormat);
 		try {
 			JSONArray expected = new JSONArray(FileUtil.loadTextAssetAsString(getTestContext(), "model/versionHistoryStore.json"));
 			JSONArray result = VersionHistoryStore.getBaseArray();

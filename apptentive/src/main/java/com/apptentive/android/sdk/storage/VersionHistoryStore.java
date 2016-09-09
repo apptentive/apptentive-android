@@ -28,8 +28,11 @@ public class VersionHistoryStore {
 
 	private static List<VersionHistoryEntry> versionHistoryEntries;
 
+	static {
+		VersionHistoryStoreMigrator.performMigrationIfNeeded();
+	}
+
 	private VersionHistoryStore() {
-		super();
 	}
 
 	private static void save() {
@@ -46,7 +49,7 @@ public class VersionHistoryStore {
 			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 			try {
 				String json = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY_V2, "[]");
-				JSONArray baseArray = new JSONArray();
+				JSONArray baseArray = new JSONArray(json);
 				for (int i = 0; i < baseArray.length(); i++) {
 					VersionHistoryEntry entry = new VersionHistoryEntry(baseArray.getJSONObject(i));
 					versionHistoryEntries.add(entry);

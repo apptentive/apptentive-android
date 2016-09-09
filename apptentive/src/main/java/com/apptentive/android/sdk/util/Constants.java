@@ -53,6 +53,8 @@ public class Constants {
 
 	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
 	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
+	// Boolean true if migration from v1 to V2 has occurred.
+	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
 
 	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 
