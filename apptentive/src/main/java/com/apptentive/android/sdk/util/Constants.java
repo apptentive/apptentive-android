@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.util;
 
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "3.2.1";
+	public static final String APPTENTIVE_SDK_VERSION = "3.2.2";
 
 
 	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 10;
@@ -52,6 +52,7 @@ public class Constants {
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
 	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
+	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
 
 	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 

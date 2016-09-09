@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,48 +14,79 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * @author Sky Kelsey
+ * Stores version history in JSON, in SharedPreferences.
  */
 public class VersionHistoryStore {
-	public static final String FIELD_SEP = "--";
-	public static final String ENTRY_SEP = "__";
 
+	private static List<VersionHistoryEntry> versionHistoryEntries;
 
-	/**
-	 * Two simple lists of version number and update time. Version number is base64 encoded and followed by a ':" and the
-	 * timestamp. Each entry ends with a ';' to separate it from subsequent entries. A list is stored for both the
-	 * version name and version code.
-	 */
-	public static void updateVersionHistory(Integer newVersionCode, String newVersionName) {
+	private VersionHistoryStore() {
+		super();
+	}
+
+	private static void save() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		JSONArray baseArray = getBaseArray();
+		if (baseArray != null) {
+			prefs.edit().putString(Constants.PREF_KEY_VERSION_HISTORY_V2, baseArray.toString()).apply();
+		}
+	}
+
+	private static void ensureLoaded() {
+		if (versionHistoryEntries == null) {
+			versionHistoryEntries = new ArrayList<VersionHistoryEntry>();
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+			try {
+				String json = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY_V2, "[]");
+				JSONArray baseArray = new JSONArray();
+				for (int i = 0; i < baseArray.length(); i++) {
+					VersionHistoryEntry entry = new VersionHistoryEntry(baseArray.getJSONObject(i));
+					versionHistoryEntries.add(entry);
+				}
+			} catch (Exception e) {
+				ApptentiveLog.w("Error loading VersionHistoryStore.", e);
+			}
+		}
+	}
+
+	public static void clear() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		prefs.edit().remove(Constants.PREF_KEY_VERSION_HISTORY_V2).apply();
+		versionHistoryEntries.clear();
+	}
+
+	public static void updateVersionHistory(int newVersionCode, String newVersionName) {
 		updateVersionHistory(newVersionCode, newVersionName, Util.currentTimeSeconds());
 	}
 
 	public static void updateVersionHistory(Integer newVersionCode, String newVersionName, double date) {
-		ApptentiveLog.d("Updating version info: %d, %s @%f", newVersionCode, newVersionName, date);
-		List<VersionHistoryEntry> versionHistory = getVersionHistory();
-		boolean alreadySawVersionCode = false;
-		boolean alreadySawVersionName = false;
-		for (VersionHistoryEntry entry : versionHistory) {
-			if (newVersionCode.equals(entry.versionCode)) {
-				alreadySawVersionCode = true;
+		ensureLoaded();
+		try {
+			boolean exists = false;
+			for (VersionHistoryEntry entry : versionHistoryEntries) {
+				if (entry.getVersionCode() == newVersionCode && entry.getVersionName().equals(newVersionName)) {
+					exists = true;
+				}
 			}
-			if (newVersionName.equals(entry.versionName)) {
-				alreadySawVersionName = true;
+			// Only modify the store if the version hasn't been seen.
+			if (!exists) {
+				VersionHistoryEntry entry = new VersionHistoryEntry(newVersionCode, newVersionName, date);
+				ApptentiveLog.d("Adding Version History entry: %s", entry);
+				versionHistoryEntries.add(new VersionHistoryEntry(newVersionCode, newVersionName, date));
+				save();
 			}
-		}
-		// If either the versionCode or versionName are new, record a new update.
-		if (!alreadySawVersionCode || !alreadySawVersionName) {
-			versionHistory.add(new VersionHistoryEntry(date, newVersionCode, newVersionName));
-			saveVersionHistory(versionHistory);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error updating VersionHistoryStore.", e);
 		}
 	}
-
 
 	/**
 	 * Returns the number of seconds since the first time we saw this release of the app. Since the version entries are
@@ -65,17 +96,26 @@ public class VersionHistoryStore {
 	 * @return A DateTime representing the number of seconds since we first saw the desired app release entry. A DateTime with current time if never seen.
 	 */
 	public static Apptentive.DateTime getTimeAtInstall(Selector selector) {
-		List<VersionHistoryEntry> entries = getVersionHistory();
-		if (entries != null) {
-			for (VersionHistoryEntry entry : entries) {
-				switch (selector) {
-					case total:
-						return new Apptentive.DateTime(entry.seconds);
-					case build:
-						if (entry.versionCode.equals(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()))) {
-							return new Apptentive.DateTime(entry.seconds);
-						}
-				}
+		ensureLoaded();
+		for (VersionHistoryEntry entry : versionHistoryEntries) {
+			switch (selector) {
+				case total:
+					// Since the list is ordered, this will be the first and oldest entry.
+					return new Apptentive.DateTime(entry.getTimestamp());
+				case version_code:
+					if (entry.getVersionCode() == Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext())) {
+						return new Apptentive.DateTime(entry.getTimestamp());
+					}
+					break;
+				case version_name:
+					Apptentive.Version entryVersionName = new Apptentive.Version();
+					Apptentive.Version currentVersionName = new Apptentive.Version();
+					entryVersionName.setVersion(entry.getVersionName());
+					currentVersionName.setVersion(Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext()));
+					if (entryVersionName.equals(currentVersionName)) {
+						return new Apptentive.DateTime(entry.getTimestamp());
+					}
+					break;
 			}
 		}
 		return new Apptentive.DateTime(Util.currentTimeSeconds());
@@ -89,92 +129,48 @@ public class VersionHistoryStore {
 	 * @return True if there are records with more than one version or build, depending on the value of selector.
 	 */
 	public static boolean isUpdate(Selector selector) {
-		List<VersionHistoryEntry> entries = getVersionHistory();
+		ensureLoaded();
 		Set<String> uniques = new HashSet<String>();
-		if (entries != null) {
-			for (VersionHistoryEntry entry : entries) {
-				switch (selector) {
-					case version:
-						uniques.add(entry.versionName);
-						break;
-					case build:
-						uniques.add(String.valueOf(entry.versionCode));
-						break;
-					default:
-						break;
-				}
+		for (VersionHistoryEntry entry : versionHistoryEntries) {
+			switch (selector) {
+				case version_name:
+					uniques.add(entry.getVersionName());
+					break;
+				case version_code:
+					uniques.add(String.valueOf(entry.getVersionCode()));
+					break;
+				default:
+					break;
 			}
 		}
 		return uniques.size() > 1;
 	}
 
 	public static VersionHistoryEntry getLastVersionSeen() {
-		List<VersionHistoryEntry> entries = getVersionHistory();
-		if (entries != null && !entries.isEmpty()) {
-			return entries.get(entries.size() - 1);
+		ensureLoaded();
+		if (versionHistoryEntries != null && !versionHistoryEntries.isEmpty()) {
+			return versionHistoryEntries.get(versionHistoryEntries.size() - 1);
 		}
 		return null;
 	}
 
 	/**
-	 * Returns a map containing two maps of string to string. The first map is named "versionName" and the second is named
-	 * "versionCode". Each of those maps from a Double timestamp to a String representing the version code of version name.
+	 * Don't use this directly. Used for debugging only.
 	 *
-	 * @return A List of VersionHistoryEntry objects.
+	 * @return the base JSONArray
 	 */
-	public static List<VersionHistoryEntry> getVersionHistory() {
-		List<VersionHistoryEntry> versionHistory = new ArrayList<VersionHistoryEntry>();
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String versionHistoryString = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY, null);
-		if (versionHistoryString != null) {
-			String[] parts = versionHistoryString.split(ENTRY_SEP);
-			for (int i = 0; i < parts.length; i++) {
-				versionHistory.add(new VersionHistoryEntry(parts[i]));
-			}
+	public static JSONArray getBaseArray() {
+		JSONArray baseArray = new JSONArray();
+		for (VersionHistoryEntry entry : versionHistoryEntries) {
+			baseArray.put(entry);
 		}
-		return versionHistory;
-	}
-
-	private static void saveVersionHistory(List<VersionHistoryEntry> versionHistory) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		StringBuilder versionHistoryString = new StringBuilder();
-		for (VersionHistoryEntry entry : versionHistory) {
-			versionHistoryString.append(entry.toString()).append(ENTRY_SEP);
-		}
-		prefs.edit().putString(Constants.PREF_KEY_VERSION_HISTORY, versionHistoryString.toString()).apply();
-	}
-
-	public static class VersionHistoryEntry {
-		public Double seconds;
-		public Integer versionCode;
-		public String versionName;
-
-		public VersionHistoryEntry(String encoded) {
-			if (encoded != null) {
-				// Remove entry separator and split on field separator.
-				String[] parts = encoded.replace(ENTRY_SEP, "").split(FIELD_SEP);
-				seconds = Double.valueOf(parts[0]);
-				versionCode = Integer.parseInt(parts[1]);
-				versionName = parts[2];
-			}
-		}
-
-		public VersionHistoryEntry(Double seconds, Integer versionCode, String versionName) {
-			this.seconds = seconds;
-			this.versionCode = versionCode;
-			this.versionName = versionName;
-		}
-
-		@Override
-		public String toString() {
-			return String.valueOf(seconds) + FIELD_SEP + String.valueOf(versionCode) + FIELD_SEP + versionName;
-		}
+		return baseArray;
 	}
 
 	public enum Selector {
 		total,
-		version,
-		build,
+		version_code,
+		version_name,
 		other;
 
 		public static Selector parse(String name) {
