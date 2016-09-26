@@ -39,7 +39,6 @@
                       android:paddingBottom="@dimen/apptentive_message_center_default_margin_small"
                       android:paddingLeft="10dp"
                       android:paddingRight="10dp"
-                      android:textIsSelectable="true"
                       android:autoLink="all"/>
         </LinearLayout>
     </android.support.v7.widget.CardView>
