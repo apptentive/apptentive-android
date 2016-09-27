@@ -28,7 +28,7 @@ public class VersionHistoryStoreMigrator {
 		try {
 			String[] entriesOld = oldFormat.split(OLD_ENTRY_SEP);
 			for (String entryOld : entriesOld) {
-				String[] entryPartsOld = entryOld.replace(OLD_ENTRY_SEP, "").split(OLD_FIELD_SEP);
+				String[] entryPartsOld = entryOld.split(OLD_FIELD_SEP);
 				try {
 					VersionHistoryStore.updateVersionHistory(
 						Integer.parseInt(entryPartsOld[OLD_POSITION_VERSION_CODE]),
