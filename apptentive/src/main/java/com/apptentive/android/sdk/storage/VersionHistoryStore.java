@@ -60,17 +60,17 @@ public class VersionHistoryStore {
 		}
 	}
 
-	public static void clear() {
+	public static synchronized void clear() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		prefs.edit().remove(Constants.PREF_KEY_VERSION_HISTORY_V2).apply();
 		versionHistoryEntries.clear();
 	}
 
-	public static void updateVersionHistory(int newVersionCode, String newVersionName) {
+	public static synchronized void updateVersionHistory(int newVersionCode, String newVersionName) {
 		updateVersionHistory(newVersionCode, newVersionName, Util.currentTimeSeconds());
 	}
 
-	public static void updateVersionHistory(Integer newVersionCode, String newVersionName, double date) {
+	public static synchronized void updateVersionHistory(Integer newVersionCode, String newVersionName, double date) {
 		ensureLoaded();
 		try {
 			boolean exists = false;
@@ -98,7 +98,7 @@ public class VersionHistoryStore {
 	 * @param selector - The type of version entry we are looking for: total, version, or build.
 	 * @return A DateTime representing the number of seconds since we first saw the desired app release entry. A DateTime with current time if never seen.
 	 */
-	public static Apptentive.DateTime getTimeAtInstall(Selector selector) {
+	public static synchronized Apptentive.DateTime getTimeAtInstall(Selector selector) {
 		ensureLoaded();
 		for (VersionHistoryEntry entry : versionHistoryEntries) {
 			switch (selector) {
@@ -131,7 +131,7 @@ public class VersionHistoryStore {
 	 * @param selector - The type of version entry we are looking for: version, or build.
 	 * @return True if there are records with more than one version or build, depending on the value of selector.
 	 */
-	public static boolean isUpdate(Selector selector) {
+	public static synchronized boolean isUpdate(Selector selector) {
 		ensureLoaded();
 		Set<String> uniques = new HashSet<String>();
 		for (VersionHistoryEntry entry : versionHistoryEntries) {
@@ -149,7 +149,7 @@ public class VersionHistoryStore {
 		return uniques.size() > 1;
 	}
 
-	public static VersionHistoryEntry getLastVersionSeen() {
+	public static synchronized VersionHistoryEntry getLastVersionSeen() {
 		ensureLoaded();
 		if (versionHistoryEntries != null && !versionHistoryEntries.isEmpty()) {
 			return versionHistoryEntries.get(versionHistoryEntries.size() - 1);
