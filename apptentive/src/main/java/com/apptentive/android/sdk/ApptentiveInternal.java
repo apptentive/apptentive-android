@@ -578,9 +578,10 @@ public class ApptentiveInternal {
 			currentVersionName = packageInfo.versionName;
 			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 			AppRelease appRelease = new AppRelease();
-			appRelease.setVersion(currentVersionName);
+			appRelease.setType("android");
+			appRelease.setVersionName(currentVersionName);
 			appRelease.setIdentifier(appPackageName);
-			appRelease.setBuildNumber(String.valueOf(currentVersionCode));
+			appRelease.setVersionCode(currentVersionCode);
 			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
 			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
 			// Set Apptentive theme inheritance metrics

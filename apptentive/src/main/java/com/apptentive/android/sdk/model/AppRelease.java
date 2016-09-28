@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -12,8 +12,9 @@ import org.json.JSONException;
 
 public class AppRelease extends Payload {
 
-	private static final String KEY_VERSION = "version";
-	private static final String KEY_BUILD_NUMBER = "build_number";
+	private static final String KEY_TYPE = "type";
+	private static final String KEY_VERSION_NAME = "version_name";
+	private static final String KEY_VERSION_CODE = "version_code";
 	private static final String KEY_IDENTIFIER = "identifier";
 	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
 	private static final String KEY_APP_STORE = "app_store";
@@ -32,10 +33,25 @@ public class AppRelease extends Payload {
 		setBaseType(BaseType.app_release);
 	}
 
-	public String getVersion() {
+	public String getType() {
+		if (!isNull(KEY_TYPE)) {
+			return optString(KEY_TYPE, null);
+		}
+		return null;
+	}
+
+	public void setType(String type) {
 		try {
-			if (!isNull(KEY_VERSION)) {
-				return getString(KEY_VERSION);
+			put(KEY_TYPE, type);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TYPE);
+		}
+	}
+
+	public String getVersionName() {
+		try {
+			if (!isNull(KEY_VERSION_NAME)) {
+				return getString(KEY_VERSION_NAME);
 			}
 		} catch (JSONException e) {
 			// Ignore
@@ -43,30 +59,30 @@ public class AppRelease extends Payload {
 		return null;
 	}
 
-	public void setVersion(String version) {
+	public void setVersionName(String versionName) {
 		try {
-			put(KEY_VERSION, version);
+			put(KEY_VERSION_NAME, versionName);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_NAME);
 		}
 	}
 
-	public String getBuildNumber() {
+	public int getVersionCode() {
 		try {
-			if (!isNull(KEY_BUILD_NUMBER)) {
-				return getString(KEY_BUILD_NUMBER);
+			if (!isNull(KEY_VERSION_CODE)) {
+				return getInt(KEY_VERSION_CODE);
 			}
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return null;
+		return -1;
 	}
 
-	public void setBuildNumber(String buildNumber) {
+	public void setVersionCode(int versionCode) {
 		try {
-			put(KEY_BUILD_NUMBER, buildNumber);
+			put(KEY_VERSION_CODE, versionCode);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_BUILD_NUMBER);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_CODE);
 		}
 	}
 
