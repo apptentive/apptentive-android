@@ -49,12 +49,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getVersionName() {
-		try {
-			if (!isNull(KEY_VERSION_NAME)) {
-				return getString(KEY_VERSION_NAME);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_VERSION_NAME)) {
+			return optString(KEY_VERSION_NAME, null);
 		}
 		return null;
 	}
@@ -68,12 +64,8 @@ public class AppRelease extends Payload {
 	}
 
 	public int getVersionCode() {
-		try {
-			if (!isNull(KEY_VERSION_CODE)) {
-				return getInt(KEY_VERSION_CODE);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_VERSION_CODE)) {
+			return optInt(KEY_VERSION_CODE, -1);
 		}
 		return -1;
 	}
@@ -87,12 +79,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getIdentifier() {
-		try {
-			if (!isNull(KEY_IDENTIFIER)) {
-				return getString(KEY_IDENTIFIER);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_IDENTIFIER)) {
+			return optString(KEY_IDENTIFIER, null);
 		}
 		return null;
 	}
@@ -106,12 +94,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getTargetSdkVersion() {
-		try {
-			if (!isNull(KEY_TARGET_SDK_VERSION)) {
-				return getString(KEY_TARGET_SDK_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_TARGET_SDK_VERSION)) {
+			return optString(KEY_TARGET_SDK_VERSION);
 		}
 		return null;
 	}
@@ -125,12 +109,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getAppStore() {
-		try {
-			if (!isNull(KEY_APP_STORE)) {
-				return getString(KEY_APP_STORE);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_APP_STORE)) {
+			return optString(KEY_APP_STORE, null);
 		}
 		return null;
 	}
