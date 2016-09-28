@@ -667,11 +667,8 @@ public class ApptentiveInternal {
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(currentAppRelease);
-		if (appRelease != null) {
-			ApptentiveLog.d("App release was updated.");
-			taskManager.addPayload(appRelease);
-		}
+		AppReleaseManager.storeAppRelease(currentAppRelease);
+		taskManager.addPayload(currentAppRelease);
 		invalidateCaches();
 	}
 
