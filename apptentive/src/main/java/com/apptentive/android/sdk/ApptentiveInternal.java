@@ -449,7 +449,6 @@ public class ApptentiveInternal {
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice();
-		syncSdk();
 		syncPerson();
 	}
 
@@ -675,6 +674,7 @@ public class ApptentiveInternal {
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
+		syncSdk();
 		invalidateCaches();
 	}
 
@@ -861,17 +861,13 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Sends current Sdk to the server if it differs from the last time it was sent.
+	 * Sends current SDK to the server.
 	 */
 	private void syncSdk() {
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff();
-		if (sdk != null) {
-			ApptentiveLog.d("Sdk was updated.");
-			ApptentiveLog.v(sdk.toString());
-			taskManager.addPayload(sdk);
-		} else {
-			ApptentiveLog.d("Sdk was not updated.");
-		}
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		SdkManager.storeSdk(sdk);
+		ApptentiveLog.v(sdk.toString());
+		taskManager.addPayload(sdk);
 	}
 
 	/**

@@ -10,6 +10,7 @@ import android.os.Build;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
 import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -114,7 +115,8 @@ public class DataObjectQueryTest extends ApptentiveInstrumentationTestCase {
 
 		Interaction interaction;
 
-		SdkManager.storeSdkAndReturnDiff();
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		SdkManager.storeSdk(sdk);
 
 		// 0
 		interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction("local#app#init");
