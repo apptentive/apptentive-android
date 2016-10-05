@@ -81,7 +81,10 @@ public class FieldManager {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
 					case version:
-						return VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.build);
+					case version_code:
+						return VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.version_code);
+					case version_name:
+						return VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.version_name);
 					default:
 						break;
 				}
@@ -93,7 +96,10 @@ public class FieldManager {
 					case total:
 						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.total);
 					case version:
-						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.build);
+					case version_code:
+						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.version_code);
+					case version_name:
+						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.version_name);
 				}
 				return new Apptentive.DateTime(Util.currentTimeSeconds());
 			}

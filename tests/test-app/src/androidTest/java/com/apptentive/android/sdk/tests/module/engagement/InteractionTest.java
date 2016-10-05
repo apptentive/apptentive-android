@@ -11,13 +11,13 @@ import android.content.pm.PackageInfo;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
+import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.File;

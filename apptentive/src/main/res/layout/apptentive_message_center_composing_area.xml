@@ -32,7 +32,6 @@
                   android:textAppearance="@style/Apptentive.TextAppearance.Body1"
                   android:background="@null"
                   android:gravity="top|start"
-                  android:singleLine="false"
                   android:minLines="5"
                   android:inputType="textCapSentences|textMultiLine"/>
         <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"

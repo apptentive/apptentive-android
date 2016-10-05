@@ -1094,7 +1094,7 @@ public class Apptentive {
 
 			int maxParts = Math.max(thisArray.length, thatArray.length);
 			for (int i = 0; i < maxParts; i++) {
-				// If one SemVer has more parts than another, treat pad out the short one with zeros in each slot.
+				// If one SemVer has more parts than another, pad out the short one with zeros in each slot.
 				long left = 0;
 				if (thisArray.length > i) {
 					left = Long.parseLong(thisArray[i]);
@@ -1110,6 +1110,17 @@ public class Apptentive {
 				}
 			}
 			return 0;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o instanceof Version) {
+				return compareTo((Version) o) == 0;
+			}
+			return false;
 		}
 
 		@Override
