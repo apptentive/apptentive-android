@@ -1,3 +1,11 @@
+# 2016-10-11 - 3.2.2
+
+#### Bugs Fixed
+
+* Fixed a bug where apps with names or versions ending in an underscore weren't tracked properly.
+* Fixed a bug that sometimes prevented the Message Center composing area from gaining focus, even when tapped.
+* Removed unneeded multidex config.
+
 # 2016-08-09 - 3.2.1
 
 #### Bugs Fixed
