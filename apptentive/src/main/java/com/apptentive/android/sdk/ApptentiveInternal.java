@@ -52,6 +52,7 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.storage.VersionHistoryEntry;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -84,7 +85,7 @@ public class ApptentiveInternal {
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
-	Integer currentVersionCode;
+	int currentVersionCode;
 	String currentVersionName;
 
 	boolean appIsInForeground;
@@ -173,13 +174,12 @@ public class ApptentiveInternal {
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
 					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
-					CodePointStore store = new CodePointStore();
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.codePointStore = store;
+					sApptentiveInternal.codePointStore = new CodePointStore();
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
 				}
@@ -578,7 +578,7 @@ public class ApptentiveInternal {
 
 			currentVersionCode = packageInfo.versionCode;
 			currentVersionName = packageInfo.versionName;
-			VersionHistoryStore.VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
+			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 			AppRelease appRelease = new AppRelease();
 			appRelease.setVersion(currentVersionName);
 			appRelease.setIdentifier(appPackageName);
@@ -593,8 +593,13 @@ public class ApptentiveInternal {
 			if (lastVersionEntrySeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
-				if (!currentVersionCode.equals(lastVersionEntrySeen.versionCode) || !currentVersionName.equals(lastVersionEntrySeen.versionName)) {
-					onVersionChanged(lastVersionEntrySeen.versionCode, currentVersionCode, lastVersionEntrySeen.versionName, currentVersionName, appRelease);
+				int lastSeenVersionCode = lastVersionEntrySeen.getVersionCode();
+				Apptentive.Version currentVersionNameVersion = new Apptentive.Version();
+				currentVersionNameVersion.setVersion(currentVersionName);
+				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
+				lastSeenVersionNameVersion.setVersion(lastVersionEntrySeen.getVersionName());
+				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionNameVersion.equals(lastSeenVersionNameVersion)) {
+					onVersionChanged(lastVersionEntrySeen.getVersionCode(), currentVersionCode, lastVersionEntrySeen.getVersionName(), currentVersionName, appRelease);
 				}
 			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
@@ -1141,6 +1146,7 @@ public class ApptentiveInternal {
 	public void resetSdkState() {
 		prefs.edit().clear().apply();
 		taskManager.reset(appContext);
+		VersionHistoryStore.clear();
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {

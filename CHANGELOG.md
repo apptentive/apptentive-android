@@ -1,10 +1,18 @@
-# ????-??-?? - 3.3.0
+# 2016-10-?? - 3.3.0
 
 #### Improvements
 
 * Added new APIs for handling Apptentive push notifications. You can now get a `PendingIntent` from Apptentive if we sent the push. The `PendingIntent` can be used to launch Message Center directly from your Notification object. Old APIs are deprecated. 
 * Send debug status to the server so you can target only debug or non-debug builds with your interactions.
  
+# 2016-10-11 - 3.2.2
+
+#### Bugs Fixed
+
+* Fixed a bug where apps with names or versions ending in an underscore weren't tracked properly.
+* Fixed a bug that sometimes prevented the Message Center composing area from gaining focus, even when tapped.
+* Removed unneeded multidex config.
+
 # 2016-08-09 - 3.2.1
 
 #### Bugs Fixed
