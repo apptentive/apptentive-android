@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Before;
@@ -46,7 +47,7 @@ public abstract class ApptentiveTestCaseBase {
 		targetContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
 		apptentiveInternal.getCodePointStore().clear();
 		apptentiveInternal.getInteractionManager().clear();
-
+		VersionHistoryStore.clear();
 	}
 
 	protected static boolean isRunningOnEmulator() {
