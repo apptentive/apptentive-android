@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,9 +26,6 @@ import org.json.JSONException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Sky Kelsey
- */
 public class InteractionManager {
 
 	private Interactions interactions;
@@ -85,22 +82,21 @@ public class InteractionManager {
 
 				@Override
 				protected Boolean doInBackground(Void... params) {
-					Boolean result = new Boolean(false);
 					try {
-						result = fetchAndStoreInteractions();
+						return fetchAndStoreInteractions();
 					} catch (Exception e) {
 						this.e = e;
 					}
-					return result;
+					return false;
 				}
 
 				@Override
-				protected void onPostExecute(Boolean v) {
+				protected void onPostExecute(Boolean successful) {
 					isFetchPending.set(false);
 					if (e == null) {
-						ApptentiveLog.i("Fetching new Interactions asyncTask finished. Result:" + v.booleanValue());
+						ApptentiveLog.d("Fetching new Interactions asyncTask finished. Successful? %b", successful);
 						// Update pending state on UI thread after finishing the task
-						ApptentiveInternal.getInstance().notifyInteractionUpdated(v.booleanValue());
+						ApptentiveInternal.getInstance().notifyInteractionUpdated(successful);
 					} else {
 						ApptentiveLog.w("Unhandled Exception thrown from fetching new Interactions asyncTask", e);
 						MetricModule.sendError(e, null, null);

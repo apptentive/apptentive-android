@@ -1,27 +1,30 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.model;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Sky Kelsey
- */
-public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertEquals;
+
+@RunWith(AndroidJUnit4.class)
+public class DateTimeComparisonTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "model" + File.separator;
 
@@ -34,10 +37,9 @@ public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
 		operatorLookup.put(">", 1);
 	}
 
-	public void testDateTimeComparison() {
-		ApptentiveLog.e("Running test: testDateTimeComparison()\n\n");
-		String json = FileUtil.loadTextAssetAsString(getTestContext(), TEST_DATA_DIR + "testDateTimeComparison.json");
-
+	@Test
+	public void dateTimeComparison() {
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "testDateTimeComparison.json");
 		try {
 			JSONArray experiments = new JSONArray(json);
 			for (int i = 0; i < experiments.length(); i++) {
@@ -59,6 +61,5 @@ public class DateTimeComparisonTest extends ApptentiveInstrumentationTestCase {
 		} catch (JSONException e) {
 			ApptentiveLog.e("Error loading experiment results.", e);
 		}
-
 	}
 }

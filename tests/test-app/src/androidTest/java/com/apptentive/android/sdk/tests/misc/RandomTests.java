@@ -1,34 +1,35 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.misc;
 
+import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
-import com.apptentive.android.sdk.ApptentiveLog;
+
 import com.apptentive.android.sdk.util.Util;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Sky Kelsey
- */
+@RunWith(AndroidJUnit4.class)
 public class RandomTests extends AndroidTestCase {
 
-	public void testGetMajorOsVersion() {
-		ApptentiveLog.e("Running test: testGetMajorOsVersion()\n\n");
+	@Test
+	public void getMajorOsVersion() {
 		Integer osVersion = Util.getMajorOsVersion();
-		ApptentiveLog.e("OS version: %d", osVersion);
 		assertNotNull(osVersion);
 	}
 
-	public void testParseWebColorAsAndroidColor() {
-		ApptentiveLog.e("testParseWebColorAsAndroidColor()");
-		Map<String, Integer> data = new HashMap<String, Integer>(){{
+	@Test
+	public void parseWebColorAsAndroidColor() {
+		Map<String, Integer> data = new HashMap<String, Integer>() {{
 			put("#AABBCCDD", 0xDDAABBCC);
 			put("#FFFFFFFF", 0xFFFFFFFF);
 			put("#00000000", 0x00000000);
