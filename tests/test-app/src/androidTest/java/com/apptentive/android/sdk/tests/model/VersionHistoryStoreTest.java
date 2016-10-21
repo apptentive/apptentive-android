@@ -6,29 +6,40 @@
 
 package com.apptentive.android.sdk.tests.model;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.storage.VersionHistoryEntry;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.storage.VersionHistoryStoreMigrator;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.util.JsonDiffer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * There will always be a VersionHistoryEntry present due to the SDK initialializing, so call resetDevice() if you don't want that in your test.
+ * There will always be a VersionHistoryEntry present due to the SDK initializing, so call resetDevice() if you don't want that in your test.
  */
-public class VersionHistoryStoreTest extends ApptentiveInstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class VersionHistoryStoreTest extends ApptentiveTestCaseBase {
 
+	@Test
 	public void testVersionHistoryStoreMigration() {
 		resetDevice();
-		String oldFormat = FileUtil.loadTextAssetAsString(getTestContext(), "model/versionHistoryStoreOld.txt");
+		String oldFormat = loadTextAssetAsString("model/versionHistoryStoreOld.txt");
 		VersionHistoryStoreMigrator.migrateV1ToV2(oldFormat);
 		try {
-			JSONArray expected = new JSONArray(FileUtil.loadTextAssetAsString(getTestContext(), "model/versionHistoryStore.json"));
+			JSONArray expected = new JSONArray(loadTextAssetAsString("model/versionHistoryStore.json"));
 			JSONArray result = VersionHistoryStore.getBaseArray();
 			boolean equal = JsonDiffer.areObjectsEqual(result, expected);
 			if (!equal) {
@@ -42,9 +53,10 @@ public class VersionHistoryStoreTest extends ApptentiveInstrumentationTestCase {
 		}
 	}
 
+	@Test
 	public void testVersionHistoryStoreOrdering() {
 		try {
-			JSONArray expected = new JSONArray(FileUtil.loadTextAssetAsString(getTestContext(), "model/versionHistoryStore.json"));
+			JSONArray expected = new JSONArray(loadTextAssetAsString("model/versionHistoryStore.json"));
 			VersionHistoryStore.updateVersionHistory(1, "3.3.0", 1.472853954087E9d);
 			VersionHistoryStore.updateVersionHistory(2, "3.3.1", 1.472854098019E9d);
 			JSONArray result = VersionHistoryStore.getBaseArray();
@@ -60,16 +72,19 @@ public class VersionHistoryStoreTest extends ApptentiveInstrumentationTestCase {
 		}
 	}
 
+	@Test
 	public void testVersionHistoryStoreGetLatestVersion() {
 		VersionHistoryStore.updateVersionHistory(1, "3.3.0", 1.472853954087E9d);
 		VersionHistoryStore.updateVersionHistory(2, "3.3.1", 1.472854098019E9d);
 
 		VersionHistoryEntry latestEntry = VersionHistoryStore.getLastVersionSeen();
-		assertEquals(1.472854098019E9d, latestEntry.getTimestamp());
+		assertNotNull(latestEntry);
+		assertEquals(1.472854098019E9d, latestEntry.getTimestamp(), .000001d);
 		assertEquals(2, latestEntry.getVersionCode());
 		assertEquals("3.3.1", latestEntry.getVersionName());
 	}
 
+	@Test
 	public void testVersionHistoryStoreTimeAtInstall() {
 		resetDevice();
 		VersionHistoryStore.updateVersionHistory(1, "1.0.0", 1.472853951000E9d);
@@ -85,6 +100,7 @@ public class VersionHistoryStoreTest extends ApptentiveInstrumentationTestCase {
 		assertTrue(JsonDiffer.areObjectsEqual(new Apptentive.DateTime(1.472853950005E9d), VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.version_name)));
 	}
 
+	@Test
 	public void testVersionHistoryStoreIsUpdate() {
 		resetDevice();
 		assertFalse(VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.version_code));

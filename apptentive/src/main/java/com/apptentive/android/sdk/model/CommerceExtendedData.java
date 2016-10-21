@@ -84,6 +84,7 @@ public class CommerceExtendedData extends ExtendedData {
 	 *
 	 * @param item A {@link CommerceExtendedData.Item}
 	 * @return This object.
+	 * @throws JSONException if item can't be added.
 	 */
 	public CommerceExtendedData addItem(Item item) throws JSONException {
 		JSONArray items;
@@ -123,6 +124,7 @@ public class CommerceExtendedData extends ExtendedData {
 		 * @param price    The individual item price. Ignored if null.
 		 * @param quantity The number of units purchased. Ignored if null.
 		 * @param currency The currency code for the currency used in this transaction. Ignored if null.
+		 * @throws JSONException if values cannot be set.
 		 */
 		public Item(Object id, Object name, String category, Number price, Number quantity, String currency) throws JSONException {
 			super();

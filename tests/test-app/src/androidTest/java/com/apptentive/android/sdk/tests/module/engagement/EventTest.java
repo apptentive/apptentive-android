@@ -1,34 +1,38 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.module.engagement;
 
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.util.Util;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author Sky Kelsey
- */
-public class EventTest extends ApptentiveInstrumentationTestCase {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class EventTest extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "engagement" + File.separator;
 
-	public void testEventLabelCreation() {
-		ApptentiveLog.e("Running test: testEventLabelCreation()\n\n");
-
+	@Test
+	public void eventLabelCreation() {
 		BufferedReader reader = null;
 		try {
-			reader = FileUtil.openBufferedReaderFromFileAsset(getInstrumentation().getContext(), TEST_DATA_DIR + "testEventLabelCreation.txt");
+			reader = openBufferedReaderFromFileAsset(TEST_DATA_DIR + "testEventLabelCreation.txt");
 
 			// Make sure the test file isn't empty.
 			reader.mark(Integer.MAX_VALUE);

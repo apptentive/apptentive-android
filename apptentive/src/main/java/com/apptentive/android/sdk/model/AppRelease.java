@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,11 +7,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 
-/**
- * @author Sky Kelsey
- */
 public class AppRelease extends Payload {
 
 	private static final String KEY_VERSION = "version";
@@ -21,6 +19,7 @@ public class AppRelease extends Payload {
 	private static final String KEY_APP_STORE = "app_store";
 	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
+	private static final String KEY_DEBUG = "debug";
 
 	public AppRelease(String json) throws JSONException {
 		super(json);
@@ -36,7 +35,7 @@ public class AppRelease extends Payload {
 
 	public String getVersion() {
 		try {
-			if(!isNull(KEY_VERSION)) {
+			if (!isNull(KEY_VERSION)) {
 				return getString(KEY_VERSION);
 			}
 		} catch (JSONException e) {
@@ -55,7 +54,7 @@ public class AppRelease extends Payload {
 
 	public String getBuildNumber() {
 		try {
-			if(!isNull(KEY_BUILD_NUMBER)) {
+			if (!isNull(KEY_BUILD_NUMBER)) {
 				return getString(KEY_BUILD_NUMBER);
 			}
 		} catch (JSONException e) {
@@ -74,7 +73,7 @@ public class AppRelease extends Payload {
 
 	public String getIdentifier() {
 		try {
-			if(!isNull(KEY_IDENTIFIER)) {
+			if (!isNull(KEY_IDENTIFIER)) {
 				return getString(KEY_IDENTIFIER);
 			}
 		} catch (JSONException e) {
@@ -93,7 +92,7 @@ public class AppRelease extends Payload {
 
 	public String getTargetSdkVersion() {
 		try {
-			if(!isNull(KEY_TARGET_SDK_VERSION)) {
+			if (!isNull(KEY_TARGET_SDK_VERSION)) {
 				return getString(KEY_TARGET_SDK_VERSION);
 			}
 		} catch (JSONException e) {
@@ -112,7 +111,7 @@ public class AppRelease extends Payload {
 
 	public String getAppStore() {
 		try {
-			if(!isNull(KEY_APP_STORE)) {
+			if (!isNull(KEY_APP_STORE)) {
 				return getString(KEY_APP_STORE);
 			}
 		} catch (JSONException e) {
@@ -155,4 +154,15 @@ public class AppRelease extends Payload {
 		}
 	}
 
+	public boolean getDebug() {
+		return optBoolean(KEY_DEBUG);
+	}
+
+	public void setDebug(boolean debug) {
+		try {
+			put(KEY_DEBUG, debug);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_DEBUG);
+		}
+	}
 }

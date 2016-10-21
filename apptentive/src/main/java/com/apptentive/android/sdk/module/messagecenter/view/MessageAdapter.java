@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -58,9 +58,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Sky Kelsey
- */
 public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> extends ArrayAdapter<T>
 		implements MessageCenterListView.ApptentiveMessageCenterListAdapter {
 
@@ -720,12 +717,12 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		@Override
 		protected void onCancelled() {
-			positionsWithPendingUpdateTask.remove(new Integer(position));
+			positionsWithPendingUpdateTask.remove(Integer.valueOf(position));
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
-			positionsWithPendingUpdateTask.remove(new Integer(position));
+			positionsWithPendingUpdateTask.remove(Integer.valueOf(position));
 		}
 
 	}

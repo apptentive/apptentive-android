@@ -1,36 +1,41 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.tests.model;
 
-import android.test.InstrumentationTestCase;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.util.JsonDiffer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
-/**
- * @author Sky Kelsey
- */
-public class ObjectDiffingTests extends InstrumentationTestCase {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(AndroidJUnit4.class)
+public class ObjectDiffingTests extends ApptentiveTestCaseBase {
 
 	private static final String TEST_DATA_DIR = "util" + File.separator;
 
 	/**
 	 * Tests to make sure that objects that differ are calculated correctly.
- 	 */
-	public void testDeviceDiffing1() {
-		ApptentiveLog.e("testDeviceDiffing1()");
+	 */
+	@Test
+	public void deviceDiffing1() {
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
-			JSONObject expected = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
+			JSONObject original = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.old.json"));
+			JSONObject updated = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.new.json"));
+			JSONObject expected = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.1.expected.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 
@@ -46,11 +51,11 @@ public class ObjectDiffingTests extends InstrumentationTestCase {
 	/**
 	 * Tests to make sure that objects that are the same return a null diff.
 	 */
-	public void testDeviceDiffing2() {
-		ApptentiveLog.e("testDeviceDiffing2()");
+	@Test
+	public void deviceDiffing2() {
 		try {
-			JSONObject original = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
-			JSONObject updated = new JSONObject(FileUtil.loadTextAssetAsString(getInstrumentation().getContext(), TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
+			JSONObject original = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.old.json"));
+			JSONObject updated = new JSONObject(loadTextAssetAsString(TEST_DATA_DIR + "testJsonDiffing.2.new.json"));
 
 			JSONObject result = JsonDiffer.getDiff(original, updated);
 

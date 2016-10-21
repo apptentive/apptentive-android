@@ -1,16 +1,15 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk;
 
+import android.util.Log;
+
 import java.util.IllegalFormatException;
 
-/**
- * @author Sky Kelsey
- */
 public class ApptentiveLog {
 	private static final String TAG = "Apptentive";
 
@@ -90,13 +89,13 @@ public class ApptentiveLog {
 	}
 
 	public static enum Level {
-		VERBOSE(2),
-		DEBUG(3),
-		INFO(4),
-		WARN(5),
-		ERROR(6),
-		ASSERT(7),
-		DEFAULT(INFO.getLevel());
+		VERBOSE(Log.VERBOSE),
+		DEBUG(Log.DEBUG),
+		INFO(Log.INFO),
+		WARN(Log.WARN),
+		ERROR(Log.ERROR),
+		ASSERT(Log.ASSERT),
+		DEFAULT(Log.INFO);
 
 		private int level;
 
@@ -108,11 +107,11 @@ public class ApptentiveLog {
 			return level;
 		}
 
-		public static Level parse(String state) {
+		public static Level parse(String level) {
 			try {
-				return Level.valueOf(state);
+				return Level.valueOf(level);
 			} catch (IllegalArgumentException e) {
-				android.util.Log.println(4, TAG, "Error parsing unknown ApptentiveLog.Level: " + state);
+				android.util.Log.println(Log.WARN, TAG, "Error parsing unknown ApptentiveLog.Level: " + level);
 			}
 			return DEFAULT;
 		}
