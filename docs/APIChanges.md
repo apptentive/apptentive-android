@@ -1,5 +1,27 @@
 This document tracks changes to the API between versions.
 
+# 3.3.0
+
+Read the [Migrating to 3.3.0](migrating_to_3.3.0.md) guide.
+
+| Deprecated Methods |
+| ------------------ |
+| public static boolean setPendingPushNotification(Intent intent) |
+| public static boolean setPendingPushNotification(Bundle data) |
+| public static boolean handleOpenedPushNotification(Context context) |
+
+| Added Methods|
+| ------------------ |
+| public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Intent intent) |
+| public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Bundle bundle) |
+| public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Map<String, String> data) |
+| public static String getTitleFromApptentivePush(Intent intent) |
+| public static String getTitleFromApptentivePush(Bundle bundle) |
+| public static String getTitleFromApptentivePush(Map<String, String> data) |
+| public static String getBodyFromApptentivePush(Intent intent) |
+| public static String getBodyFromApptentivePush(Bundle bundle) |
+| public static String getBodyFromApptentivePush(Map<String, String> data) |
+
 # 3.0.0
 
 | Removed Methods |

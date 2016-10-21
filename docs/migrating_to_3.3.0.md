@@ -17,6 +17,7 @@ The migration process should take 5-10 minutes to complete.
 
 1. Remove any calls to `Apptentive.setPendingPushNotification()`.
 2. Remove any calls to `Apptentive.handleOpenedPushNotification()`.
-3. Follow the updated [Push Notification](https://learn.apptentive.com/knowledge-base/android-integration/#5-push-notifications) integration instructions for your push provider.
-4. There is no change to the process of setting the push token using `Apptentive.setPushNotificationIntegration()`.
+3. If you were getting the push notification title and body directly from the push `Intent`, `Bundle`, or `Map` (depending on push provider), there are now convenience methods for doing so, as outline in the integration guide.
+4. Follow the updated [Push Notification](https://learn.apptentive.com/knowledge-base/android-integration/#5-push-notifications) integration instructions for your push provider.
+5. There is no change to the process of setting the push token using `Apptentive.setPushNotificationIntegration()`.
 
