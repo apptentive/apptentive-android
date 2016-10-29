@@ -11,9 +11,11 @@ import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONException;
@@ -141,6 +143,22 @@ public class MessageCenterInteraction extends Interaction {
 				null);
 	}
 
+	public Composer getComposer() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return null;
+		}
+		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
+		return new Composer(
+			composer.optString(KEY_COMPOSER_TITLE, null),
+			composer.optString(KEY_COMPOSER_CLOSE_BODY, null),
+			composer.optString(KEY_COMPOSER_CLOSE_DISCARD, null),
+			composer.optString(KEY_COMPOSER_CLOSE_CANCEL, null),
+			composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
+			composer.optString(KEY_COMPOSER_HINT_TEXT, null)
+		);
+	}
+
 	//When enabled, display Who Card to request profile info
 	public boolean getWhoCardRequestEnabled() {
 		InteractionConfiguration configuration = getConfiguration();
@@ -187,6 +205,14 @@ public class MessageCenterInteraction extends Interaction {
 				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
 				profileInitial.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
 				profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+	}
+
+	public JSONObject getProfile() {
+		InteractionConfiguration configuration = getConfiguration();
+		if (configuration == null) {
+			return null;
+		}
+		return configuration.optJSONObject(KEY_PROFILE);
 	}
 
 	public MessageCenterComposingItem getWhoCardEdit() {

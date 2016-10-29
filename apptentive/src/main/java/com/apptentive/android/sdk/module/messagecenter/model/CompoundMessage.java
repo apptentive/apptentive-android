@@ -286,4 +286,15 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 		return false;
 	}
+
+	@Override
+	public int getListItemType() {
+		if (isAutomatedMessage()) {
+			return MESSAGE_AUTO;
+		} else if (isOutgoing) {
+			return MESSAGE_OUTGOING;
+		} else {
+			return MESSAGE_INCOMING;
+		}
+	}
 }

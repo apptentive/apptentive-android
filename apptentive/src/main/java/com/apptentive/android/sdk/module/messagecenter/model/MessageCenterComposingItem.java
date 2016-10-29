@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
 /**
  * @author Sky Kelsey
  */
@@ -35,6 +37,7 @@ public class MessageCenterComposingItem implements MessageCenterUtil.MessageCent
 	public MessageCenterComposingItem(int type, String str_1, String str_2,
 																		String str_3, String str_4,
 																		String button_1, String button_2) {
+		ApptentiveLog.e("HERE");
 		this.type = type;
 		this.str_1 = str_1;
 		this.str_2 = str_2;
@@ -48,4 +51,8 @@ public class MessageCenterComposingItem implements MessageCenterUtil.MessageCent
 		return type;
 	}
 
+	@Override
+	public int getListItemType() {
+		return MESSAGE_COMPOSER;
+	}
 }

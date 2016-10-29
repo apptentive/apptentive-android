@@ -7,22 +7,22 @@
   -->
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/apptentiveViewBackground">
-    <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView android:id="@+id/message_list"
-                                                                                android:layout_width="match_parent"
-                                                                                android:layout_height="match_parent"
-                                                                                android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
-                                                                                android:cacheColorHint="@android:color/transparent"
-                                                                                android:clipToPadding="false"
-                                                                                android:descendantFocusability="afterDescendants"
-                                                                                android:divider="@null"
-                                                                                android:dividerHeight="0dp"
-                                                                                android:scrollbars="vertical"/>
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:background="?attr/apptentiveViewBackground">
+    <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView android:id="@+id/message_center_recycler_view"
+                                                                                    android:layout_width="match_parent"
+                                                                                    android:layout_height="match_parent"
+                                                                                    android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
+                                                                                    android:cacheColorHint="@android:color/transparent"
+                                                                                    android:clipToPadding="false"
+                                                                                    android:descendantFocusability="afterDescendants"
+                                                                                    android:divider="@null"
+                                                                                    android:dividerHeight="0dp"
+                                                                                    android:scrollbars="vertical"/>
     <android.support.design.widget.FloatingActionButton android:id="@+id/composing_fab"
-                                                          android:layout_width="wrap_content"
-                                                          android:layout_height="wrap_content"
-                                                          style="?attr/apptentiveFabStyle"
-                                                          android:src="@drawable/apptentive_ic_compose"/>
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        style="?attr/apptentiveFabStyle"
+                                                        android:src="@drawable/apptentive_ic_compose"/>
 </android.support.design.widget.CoordinatorLayout>

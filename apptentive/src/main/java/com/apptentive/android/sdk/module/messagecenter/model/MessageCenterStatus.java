@@ -21,5 +21,8 @@ public class MessageCenterStatus extends JSONObject implements MessageCenterUtil
 		this.icon = icon;
 	}
 
-
+	@Override
+	public int getListItemType() {
+		return STATUS;
+	}
 }

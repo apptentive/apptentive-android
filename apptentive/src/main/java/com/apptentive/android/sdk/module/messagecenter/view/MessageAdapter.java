@@ -38,7 +38,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
-import com.apptentive.android.sdk.module.messagecenter.view.holder.HolderFactory;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingCompoundMessageHolder;
@@ -224,7 +223,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				}
 				case TYPE_COMPOSING_AREA: {
 					if (composingView == null) {
-						composingView = new MessageCenterComposingView(fragment, (MessageCenterComposingItem) listItem, composingActionListener);
+						composingView = new MessageCenterComposingView(fragment);
 						setupComposingView(position);
 					}
 					view = composingView;
@@ -257,7 +256,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					break;
 			}
 			if (view != null) {
-				holder = HolderFactory.createHolder((MessageCenterListItemView) view);
+//				holder = HolderFactory.createHolder((MessageCenterListItemView) view);
 				view.setTag(holder);
 			}
 		} else {
@@ -296,8 +295,8 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				case TYPE_COMPOUND_INCOMING: {
 					showMessageAnimation = true;
 					if (bLoadAvatar) {
-						ImageUtil.startDownloadAvatarTask(((IncomingCompoundMessageHolder) holder).avatar,
-								((CompoundMessage) listItem).getSenderProfilePhoto());
+//						ImageUtil.startDownloadAvatarTask(((IncomingCompoundMessageHolder) holder).avatar,
+//								((CompoundMessage) listItem).getSenderProfilePhoto());
 					}
 					final CompoundMessage compoundMessage = (CompoundMessage) listItem;
 					String datestamp = ((CompoundMessage) listItem).getDatestamp();
@@ -305,10 +304,10 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
 					view.measure(widthMeasureSpec, 0);
 					int viewWidth = container.getMeasuredWidth();
-					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
-							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
-							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
-							compoundMessage.getRemoteAttachments());
+//					((IncomingCompoundMessageHolder) holder).updateMessage(compoundMessage.getSenderUsername(),
+//							datestamp, compoundMessage.getBody(), viewWidth - container.getPaddingLeft() - container.getPaddingRight(),
+//							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming),
+//							compoundMessage.getRemoteAttachments());
 					if (!compoundMessage.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
 						positionsWithPendingUpdateTask.add(position);
 						startUpdateUnreadMessageTask(compoundMessage, position);
@@ -343,20 +342,20 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 					}
 
 					int statusTextColor = getStatusColor(createdTime);
-					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
-							bShowProgress, messageBody, imagebandWidth,
-							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
+//					((OutgoingCompoundMessageHolder) holder).updateMessage(datestamp, status, statusTextColor,
+//							bShowProgress, messageBody, imagebandWidth,
+//							fragment.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number), files);
 					break;
 				}
 				case TYPE_STATUS: {
 					MessageCenterStatus status = (MessageCenterStatus) listItem;
-					((StatusHolder) holder).updateMessage(status.body, status.icon);
+//					((StatusHolder) holder).updateMessage(status.body, status.icon);
 					break;
 				}
 				case TYPE_AUTO: {
 					CompoundMessage autoMessage = (CompoundMessage) listItem;
 					String dateStamp = autoMessage.getDatestamp();
-					((AutomatedMessageHolder) holder).updateMessage(dateStamp, autoMessage);
+//					((AutomatedMessageHolder) holder).updateMessage(dateStamp, autoMessage);
 					break;
 				}
 				default:
@@ -567,33 +566,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 		} else {
 			focusOnNameField = false;
 		}
-		AnimatorSet set = AnimationUtil.buildListViewRowShowAnimator(whoCardView, new Animator.AnimatorListener() {
-			@Override
-			public void onAnimationStart(Animator animation) {
-			}
-
-			@Override
-			public void onAnimationRepeat(Animator animation) {
-			}
-
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				View focusedView = null;
-				if (forceShowKeyboard) {
-					if (focusOnNameField) {
-						focusedView = nameEditText;
-					} else {
-						focusedView = emailEditText;
-					}
-				}
-				composingActionListener.onWhoCardViewCreated(nameEditText, emailEditText, focusedView);
-			}
-
-			@Override
-			public void onAnimationCancel(Animator animation) {
-			}
-		}, null);
-		set.start();
 	}
 
 	public View getWhoCardView() {
@@ -799,9 +771,11 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 				return;
 			}
 			OutgoingCompoundMessageHolder holder = holderRef.get();
+/*
 			if (holder != null && holder.position == position) {
 				//Todo: load image into imageview
 			}
+*/
 		}
 	}
 

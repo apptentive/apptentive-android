@@ -23,5 +23,8 @@ public class MessageCenterGreeting implements MessageCenterUtil.MessageCenterLis
 		this.avatar = avatar;
 	}
 
-
+	@Override
+	public int getListItemType() {
+		return GREETING;
+	}
 }

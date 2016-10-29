@@ -45,9 +45,10 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 	private ApptentiveImageGridView imageBandView;
 	List<ImageItem> images = new ArrayList<ImageItem>();
 
-	public MessageCenterComposingView(Fragment fragment, final MessageCenterComposingItem item, final MessageAdapter.OnListviewItemActionListener listener) {
+	public MessageCenterComposingView(Fragment fragment) {
 		super(fragment.getContext());
 
+/*
 		LayoutInflater inflater = fragment.getActivity().getLayoutInflater();
 		View parentView = inflater.inflate(R.layout.apptentive_message_center_composing_area, this);
 		et = (EditText) parentView.findViewById(R.id.composing_et);
@@ -56,11 +57,11 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		}
 		et.setLinksClickable(true);
 		et.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
-		/*
+		*//*
 		 * LinkMovementMethod would enable clickable links in EditView, but disables copy/paste through Long Press.
 		 * Use a custom MovementMethod instead
 		 *
-		 */
+		 *//*
 		et.setMovementMethod(ApptentiveMovementMethod.getInstance());
 		//If the edit text contains previous text with potential links
 		Linkify.addLinks(et, Linkify.WEB_URLS);
@@ -98,6 +99,7 @@ public class MessageCenterComposingView extends FrameLayout implements MessageCe
 		imageBandView.setImageIndicatorCallback((ImageGridViewAdapter.Callback) listener);
 		// Initialize image attachments band with empty data
 		clearImageAttachmentBand();
+*/
 	}
 
 	public EditText getEditText() {
