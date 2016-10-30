@@ -10,7 +10,6 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import android.text.Editable;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.ArrowKeyMovementMethod;
 import android.text.method.MovementMethod;
@@ -30,20 +30,19 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingView;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
-import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 
 
 public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
-	public ImageButton cancelButton;
+	public ImageButton closeButton;
 	public TextView title;
 	public ImageButton attachButton;
 	public ImageButton sendButton;
@@ -52,7 +51,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	public MessageComposerHolder(View itemView) {
 		super(itemView);
-		cancelButton = (ImageButton) itemView.findViewById(R.id.cancel_composing);
+		closeButton = (ImageButton) itemView.findViewById(R.id.cancel_composing);
 		title = (TextView) itemView.findViewById(R.id.title);
 		attachButton = (ImageButton) itemView.findViewById(R.id.btn_attach_image);
 		sendButton = (ImageButton) itemView.findViewById(R.id.btn_send_message);
@@ -60,13 +59,11 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
 	}
 
-	public void bindView(final Fragment fragment, final Composer composer) {
+	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
 		title.setText(composer.title);
 
-//////
 		ColorStateList colors = ContextCompat.getColorStateList(itemView.getContext(), Util.getResourceIdFromAttribute(itemView.getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
 
-		ImageButton closeButton = (ImageButton) itemView.findViewById(R.id.cancel_composing);
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
 		Drawable closeButtonDrawable = DrawableCompat.wrap(closeButton.getDrawable());
 		DrawableCompat.setTintList(closeButtonDrawable, colors);
@@ -74,12 +71,16 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				if (message.getText().length() > 0) {
+				if (!TextUtils.isEmpty(message.getText())) {
 					Bundle bundle = new Bundle();
 					bundle.putString("message", composer.closeBody);
 					bundle.putString("positive", composer.closeDiscard);
 					bundle.putString("negative", composer.closeCancel);
 					ApptentiveAlertDialog.show(fragment, bundle, Constants.REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION);
+				} else {
+					if (adapter.getListener() != null) {
+						adapter.getListener().onCancelComposing();
+					}
 				}
 			}
 		});
@@ -88,20 +89,13 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		Drawable sendButtonDrawable = DrawableCompat.wrap(sendButton.getDrawable());
 		DrawableCompat.setTintList(sendButtonDrawable, colors);
 		sendButton.setImageDrawable(sendButtonDrawable);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-			sendButton.setColorFilter(Util.getThemeColor(fragment.getContext(), R.attr.apptentiveButtonTintColorDisabled));
-		}
-		sendButton.setEnabled(false);
+		setSendButtonEnabled(false);
 		sendButton.setContentDescription(composer.sendButton);
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-/* TODO
-				MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
-				if (locallistener == null) {
-					return;
+				if (adapter.getListener() != null) {
+					adapter.getListener().onFinishComposing();
 				}
-				locallistener.onFinishComposing();
-*/
 			}
 		});
 
@@ -112,17 +106,12 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 		attachButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-/* TODO
-				MessageAdapter.OnListviewItemActionListener locallistener = listenerRef.get();
-				if (locallistener == null) {
-					return;
+				if (adapter.getListener() != null) {
+					adapter.getListener().onAttachImage();
 				}
-				locallistener.onAttachImage();
-*/
 			}
 		});
 
-		//////
 		message.setHint(composer.messageHint);
 		message.setLinksClickable(true);
 		message.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
@@ -138,17 +127,24 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		message.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-//				listener.beforeComposingTextChanged(charSequence);
+				if (adapter.getListener() != null) {
+					adapter.getListener().beforeComposingTextChanged(charSequence);
+				}
 			}
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-//				listener.onComposingTextChanged(charSequence);
+				if (adapter.getListener() != null) {
+					adapter.getListener().onComposingTextChanged(charSequence);
+				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-//				listener.afterComposingTextChanged(editable.toString());
+				if (adapter.getListener() != null) {
+					adapter.getListener().afterComposingTextChanged(editable.toString());
+				}
+				setSendButtonEnabled(!TextUtils.isEmpty(message.getText()));
 				Linkify.addLinks(editable, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
 			}
 		});
@@ -160,7 +156,9 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
 			@Override
 			public void onClick(int position, ImageItem image) {
-//				listener.onClickAttachment(position, image);
+				if (adapter.getListener() != null) {
+					adapter.getListener().onClickAttachment(position, image);
+				}
 			}
 		});
 		attachments.setAdapterIndicator(R.drawable.apptentive_ic_remove_attachment);
@@ -209,6 +207,21 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 				}
 			}
 			return super.onTouchEvent(widget, buffer, event);
+		}
+	}
+
+	private void setSendButtonEnabled(boolean enabled) {
+		if (sendButton.isEnabled() ^ enabled) { // No change required
+			sendButton.setEnabled(enabled);
+			if (enabled) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+					sendButton.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColor));
+				}
+			} else {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+					sendButton.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColorDisabled));
+				}
+			}
 		}
 	}
 }

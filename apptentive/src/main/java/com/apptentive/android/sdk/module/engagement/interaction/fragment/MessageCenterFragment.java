@@ -430,7 +430,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		}
 
-		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, interaction, messages);
+		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, messages);
 		messageCenterRecyclerView.setAdapter(messageCenterRecyclerViewAdapter);
 
 /*
@@ -917,8 +917,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-//	@Override
+	@Override
 	public void updateComposingBar() {
+/* TODO: What do we save here?
 		if (messageCenterRecyclerViewAdapter != null) {
 			MessageCenterComposingActionBarView barView = messageCenterRecyclerViewAdapter.getComposingActionBarView();
 			if (barView != null) {
@@ -951,9 +952,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 			}
 		}
+*/
 	}
 
-//	@Override
+	@Override
 	public void onComposingViewCreated(View keyboardFocusedOnView) {
 
 		hideProfileButton();
@@ -1026,7 +1028,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-//	@Override
+	@Override
 	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText, View viewFocusedWithKeyboard) {
 		if (pendingWhoCardName != null) {
 			nameEditText.onRestoreInstanceState(pendingWhoCardName);
@@ -1043,22 +1045,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-//	@Override
+	@Override
 	public void beforeComposingTextChanged(CharSequence str) {
 
 	}
 
-//	@Override
+	@Override
 	public void onComposingTextChanged(CharSequence str) {
 	}
 
-//	@Override
+	@Override
 	public void afterComposingTextChanged(String str) {
 		// Update display status of composing bar buttons when composing text changes
 		updateComposingBar();
 	}
 
-//	@Override
+	@Override
 	public void onCancelComposing() {
 		if (messageCenterRecyclerViewAdapter != null) {
 			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
@@ -1115,7 +1117,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		//clearComposingUi(null, null, 0);
 	}
 
-//	@Override
+	@Override
 	public void onFinishComposing() {
 		if (messageCenterRecyclerViewAdapter != null) {
 			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
@@ -1176,7 +1178,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				DEFAULT_DELAYMILLIS);
 	}
 
-//	@Override
+	@Override
 	public void onSubmitWhoCard(String buttonLabel) {
 		JSONObject data = new JSONObject();
 		try {
@@ -1190,7 +1192,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		cleanupWhoCard();
 	}
 
-//	@Override
+	@Override
 	public void onCloseWhoCard(String buttonLabel) {
 		JSONObject data = new JSONObject();
 		try {
@@ -1312,7 +1314,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	/* Callback when the attach button is clicked
 	 *
 	 */
-//	@Override
+	@Override
 	public void onAttachImage() {
 		try {
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {//prior Api level 19

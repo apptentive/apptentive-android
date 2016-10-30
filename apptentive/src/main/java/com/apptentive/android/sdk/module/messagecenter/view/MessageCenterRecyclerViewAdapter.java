@@ -8,10 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +16,10 @@ import android.widget.EditText;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
@@ -36,9 +32,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingCompo
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.WhoCardHolder;
 import com.apptentive.android.sdk.util.image.ImageItem;
-import com.apptentive.android.sdk.util.image.ImageUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.GREETING;
@@ -51,13 +45,15 @@ import static com.apptentive.android.sdk.module.messagecenter.model.MessageCente
 
 public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
-	Fragment fragment;
+	MessageCenterFragment fragment;
+	MessageAdapter.OnListviewItemActionListener listener;
 	RecyclerView recyclerView;
 	Interaction interaction;
 	List<MessageCenterUtil.MessageCenterListItem> messages;
 
-	public MessageCenterRecyclerViewAdapter(Fragment fragment, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> messages) {
+	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, MessageAdapter.OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> messages) {
 		this.fragment = fragment;
+		this.listener = listener;
 		this.interaction = interaction;
 		this.messages = messages;
 	}
@@ -126,7 +122,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				ApptentiveLog.e("-> Message Composer");
 				Composer composer = (Composer) messages.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
-				composerHolder.bindView(fragment, composer);
+				composerHolder.bindView(fragment, this, composer);
 				break;
 			}
 			case STATUS: {
@@ -179,6 +175,13 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		super.onViewRecycled(holder);
+		ApptentiveLog.e("View recycled: %s", holder.toString());
+		// TODO: Remove listeners, and clean up here?
 	}
 
 	@Override
@@ -264,5 +267,9 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	public EditText getEditTextInComposing() {
 		return new EditText(fragment.getContext()); // TODO
+	}
+
+	public MessageAdapter.OnListviewItemActionListener getListener() {
+		return listener;
 	}
 }
