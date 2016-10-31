@@ -52,13 +52,12 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.AttachmentPreviewDialog;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterComposingActionBarView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
@@ -85,6 +84,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_CONTEXT;
 
 public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements OnMenuItemClickListener, MessageManager.AfterSendMessageListener,
 		MessageAdapter.OnListviewItemActionListener,
@@ -131,14 +132,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	// MesssageCenterView is set to paused when it fails to send message
 	private boolean isPaused = false;
 	// Count how many paused ongoing messages
-	private int unsendMessagesCount = 0;
+	private int unsentMessagesCount = 0;
 
 
 	private MessageCenterStatus statusItem;
 //	private MessageCenterComposingItem composingItem;
 	private Composer composer;
 	private WhoCard whoCardItem;
-	private CompoundMessage contextualMessage;
+//	private CompoundMessage contextualMessage;
 
 	private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
 
@@ -195,11 +196,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		super.onCreate(savedInstanceState);
 		// Make Message Center frgament retain its instance on orientation change
 		setRetainInstance(true);
-
-		if (interaction != null) {
-			String contextualMessageBody = interaction.getContextualMessageBody();
-			contextualMessage = CompoundMessage.createAutoMessage(null, contextualMessageBody);
-		}
 	}
 
 	@Override
@@ -405,8 +401,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				prepareMessages(items);
 			}
 
-			if (contextualMessage != null) {
-				addContextualMessageItem();
+			String contextualMessageBody = interaction.getContextualMessageBody();
+			if (contextualMessageBody != null) {
+				ContextMessage contextMessage = new ContextMessage(contextualMessageBody);
+				// Clear any pending composing message to present an empty composing area
+				clearPendingComposingMessage();
+				clearStatusItem();
+				messages.add(contextMessage);
+				// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
+				if (!checkAddWhoCardIfRequired()) {
+					addComposingCard();
+				}
 			}
 
 			/* Add who card with pending contents
@@ -488,9 +493,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			outState.putString(WHO_CARD_AVATAR_FILE, messageCenterRecyclerViewAdapter.getWhoCardAvatarFileName());
 		}
 		outState.putInt(WHO_CARD_MODE, pendingWhoCardMode);
-		if (contextualMessage == null) {
-			interaction.clearContextualMessage();
-		}
 		super.onSaveInstanceState(outState);
 	}
 
@@ -515,7 +517,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public boolean cleanup() {
 		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
-		clearComposingUi(null, null, 0);
+		clearComposingUi();
 		clearWhoCardUi(null, null, 0);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
@@ -550,17 +552,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				ApptentiveLog.w("Error parsing JSON from push notification.", e);
 				MetricModule.sendError(e, "Parsing Push notification", pushData);
 			}
-		}
-	}
-
-	public void addContextualMessageItem() {
-		// Clear any pending composing message to present an empty composing area
-		clearPendingComposingMessage();
-		clearStatusItem();
-		messages.add(contextualMessage);
-		// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
-		if (!checkAddWhoCardIfRequired()) {
-			addComposingCard();
 		}
 	}
 
@@ -668,7 +659,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		clearStatusItem();
 
 		messages.add(message);
-		unsendMessagesCount++;
+		unsentMessagesCount++;
 
 		isPaused = false;
 		if (messageCenterRecyclerViewAdapter != null) {
@@ -678,21 +669,25 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
 		clearStatusItem();
-
+		// TODO: A simpler way to put the message in the correct place.
 		// Determine where to insert the new incoming message. It will be in front of any eidting
 		// area, i.e. composing, Who Card ...
 		int insertIndex = messages.size();
 		if (composer != null) {
 			// when in composing mode, there are composing action bar and composing area
 			insertIndex -= 2;
+/*
 			if (contextualMessage != null) {
 				insertIndex--;
 			}
+*/
 		} else if (whoCardItem != null) {
 			insertIndex -= 1;
+/*
 			if (contextualMessage != null) {
 				insertIndex--;
 			}
+*/
 		}
 		messages.add(insertIndex, message);
 
@@ -881,12 +876,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-	public void clearComposingUi(Animator.AnimatorListener al, ValueAnimator.AnimatorUpdateListener vl, long delay) {
+	public void clearComposingUi() {
+		clearPendingComposingMessage();
 		if (composer != null && messageCenterRecyclerViewAdapter != null) {
 			int contextMessageIndex = -1;
 			for (int i = 0; i < messages.size(); i++) {
 				MessageCenterUtil.MessageCenterListItem message = messages.get(i);
-				if (message.getListItemType() == MessageCenterUtil.MessageCenterListItem.MESSAGE_CONTEXT) {
+				if (message.getListItemType() == MESSAGE_CONTEXT) {
 					contextMessageIndex = i;
 					break;
 				}
@@ -910,7 +906,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				messages.remove(composerIndex);
 				messageCenterRecyclerViewAdapter.notifyItemRemoved(composerIndex);
 			}
-			showFab();
 		}
 	}
 
@@ -1075,44 +1070,21 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
 
-		clearComposingUi(new Animator.AnimatorListener() {
-
-											 @Override
-											 public void onAnimationStart(Animator animation) {
-											 }
-
-											 @Override
-											 public void onAnimationRepeat(Animator animation) {
-											 }
-
-											 @Override
-											 public void onAnimationEnd(Animator animation) {
-												 if (contextualMessage != null) {
-													 messages.remove(contextualMessage);
-													 contextualMessage = null;
-												 }
-												 messages.remove(composer);
-												 composer = null;
-												 messageEditText = null;
-												 if (messageCenterRecyclerViewAdapter != null) {
-													 messageCenterRecyclerViewAdapter.clearComposing();
-													 addExpectationStatusIfNeeded();
-													 messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-												 }
-												 imageAttachmentstList.clear();
-												 showFab();
-												 showProfileButton();
-												 // messageEditText has been set to null, pending composing message will reset
-												 clearPendingComposingMessage();
-											 }
-
-											 @Override
-											 public void onAnimationCancel(Animator animation) {
-											 }
-										 },
-				null,
-				DEFAULT_DELAYMILLIS);
-		//clearComposingUi(null, null, 0);
+		// TODO: Remove Composer
+		// TODO: Remove context message
+		// TODO: Clear composer
+		// TODO: Clear any saved state like attachments, saved message state.
+		// TODO: Show FAB
+		// TODO: Show Profile Button
+		if (messageCenterRecyclerViewAdapter != null) {
+			messageCenterRecyclerViewAdapter.clearComposing();
+			addExpectationStatusIfNeeded();
+			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+		}
+		imageAttachmentstList.clear();
+		clearComposingUi();
+		showFab();
+		showProfileButton();
 	}
 
 	@Override
@@ -1121,59 +1093,36 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
 		}
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
-		if (contextualMessage != null) {
-			unsendMessagesCount++;
-			ApptentiveInternal.getInstance().getMessageManager().sendMessage(contextualMessage);
-			contextualMessage = null;
+
+		for (MessageCenterUtil.MessageCenterListItem message : messages) {
+			if (message.getListItemType() == MESSAGE_CONTEXT) {
+				unsentMessagesCount++;
+				// TODO: Create a actual AutomatedMessage to send here.
+				//ApptentiveInternal.getInstance().getMessageManager().sendMessage(contextualMessage);
+				break;
+			}
 		}
 		Editable content = getPendingComposingContent();
 		final String messageText = (content != null) ? content.toString().trim() : "";
 		final ArrayList<ImageItem> messageAttachments = new ArrayList<ImageItem>();
 		messageAttachments.addAll(imageAttachmentstList);
+		if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
+			Bundle b = new Bundle();
+			b.putString(COMPOSING_EDITTEXT_STATE, messageText);
+			b.putParcelableArrayList(COMPOSING_ATTACHMENTS, messageAttachments);
+			Message msg = messagingActionHandler.obtainMessage(MSG_START_SENDING, messageText);
+			msg.setData(b);
+			ApptentiveLog.e("Send Send Message Message");
+			messagingActionHandler.sendMessage(msg);
+		}
+
+		// TODO: Remove Composer
+		// TODO: Do something with context message
+		// TODO: Clear composer
+		// TODO: Clear any saved state like attachments, saved message state.
+
 		// Close all composing UI
-		clearComposingUi(new Animator.AnimatorListener() {
-
-											 @Override
-											 public void onAnimationStart(Animator animation) {
-											 }
-
-											 @Override
-											 public void onAnimationRepeat(Animator animation) {
-											 }
-
-											 @Override
-											 public void onAnimationEnd(Animator animation) {
-												 messages.remove(composer);
-												 composer = null;
-												 messageEditText = null;
-												 if (messageCenterRecyclerViewAdapter != null) {
-													 messageCenterRecyclerViewAdapter.clearComposing();
-													 messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-												 }
-												 clearPendingComposingMessage();
-												 // Send out the new message. The delay is added to ensure the CardView showing animation
-												 // is visible after the keyboard is hidden
-												 if (!messageText.isEmpty() || imageAttachmentstList.size() != 0) {
-													 Bundle b = new Bundle();
-													 b.putString(COMPOSING_EDITTEXT_STATE, messageText);
-													 b.putParcelableArrayList(COMPOSING_ATTACHMENTS, messageAttachments);
-													 Message msg = messagingActionHandler.obtainMessage(MSG_START_SENDING,
-															 messageText);
-													 msg.setData(b);
-													 messagingActionHandler.sendMessageDelayed(msg, DEFAULT_DELAYMILLIS);
-												 }
-
-												 imageAttachmentstList.clear();
-												 showFab();
-												 showProfileButton();
-											 }
-
-											 @Override
-											 public void onAnimationCancel(Animator animation) {
-											 }
-										 },
-				null,
-				DEFAULT_DELAYMILLIS);
+		clearComposingUi();
 	}
 
 	@Override
@@ -1237,7 +1186,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						// If Who card is required, it might be displayed before proceeding to composing, for instance
 						// when there was a contextual message or it was the first message. We need to resume composing
 						// after dismissing Who Card
-						if ((messages.size() == 1 || contextualMessage != null) && interaction.getWhoCardRequired()) {
+						if (messages.size() == 1 && interaction.getWhoCardRequired()) {
 							addComposingCard();
 						} else {
 							showFab();
@@ -1499,14 +1448,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 */
 	private void prepareMessages(final List<MessageCenterUtil.MessageCenterListItem> originalItems) {
 		messages.clear();
-		unsendMessagesCount = 0;
+		unsentMessagesCount = 0;
 		// Loop through each message item retrieved from database
 		for (MessageCenterUtil.MessageCenterListItem item : originalItems) {
 			if (item instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
 				Double createdAt = apptentiveMessage.getCreatedAt();
 				if (apptentiveMessage.isOutgoingMessage() && createdAt == null) {
-					unsendMessagesCount++;
+					unsentMessagesCount++;
 				}
 
 				/*
@@ -1637,7 +1586,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_MESSAGE_SENT: {
 					// below is callback handling when receiving of message is acknowledged by server through POST response
-					fragment.unsendMessagesCount--;
+					fragment.unsentMessagesCount--;
 					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
 					for (MessageCenterUtil.MessageCenterListItem message : fragment.messages) {
 						if (message instanceof ApptentiveMessage) {
@@ -1678,6 +1627,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ArrayList<ImageItem> imagesToAttach = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
 					message.setAssociatedImages(imagesToAttach);
 
+					ApptentiveLog.e("Sending message");
 					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 
 
@@ -1706,7 +1656,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_PAUSE_SENDING: {
 					if (!fragment.isPaused) {
 						fragment.isPaused = true;
-						if (fragment.unsendMessagesCount > 0) {
+						if (fragment.unsentMessagesCount > 0) {
 							fragment.messageCenterRecyclerViewAdapter.setPaused(fragment.isPaused);
 							int reason = msg.arg1;
 							if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
@@ -1726,7 +1676,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_RESUME_SENDING: {
 					if (fragment.isPaused) {
 						fragment.isPaused = false;
-						if (fragment.unsendMessagesCount > 0) {
+						if (fragment.unsentMessagesCount > 0) {
 							fragment.clearStatusItem();
 						}
 

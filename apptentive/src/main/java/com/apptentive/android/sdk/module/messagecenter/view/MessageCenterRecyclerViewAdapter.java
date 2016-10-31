@@ -20,11 +20,13 @@ import com.apptentive.android.sdk.module.engagement.interaction.fragment.Message
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.ContextMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.GreetingHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
@@ -38,6 +40,7 @@ import java.util.List;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.GREETING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_AUTO;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_COMPOSER;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_CONTEXT;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_INCOMING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_OUTGOING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.STATUS;
@@ -110,7 +113,14 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				View view = inflater.inflate(R.layout.apptentive_message_center_who_card, parent, false);
 				return new WhoCardHolder(view);
 			}
+			case MESSAGE_CONTEXT: {
+				ApptentiveLog.e("-> Message Context");
+				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+				View view = inflater.inflate(R.layout.apptentive_message_center_context_message, parent, false);
+				return new ContextMessageHolder(view);
+			}
 		}
+		ApptentiveLog.e("onCreateViewHolder(%d) returning null.", viewType);
 		return null;
 	}
 
@@ -172,6 +182,13 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				WhoCard whoCard = (WhoCard) messages.get(position);
 				WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
 				whoCardHolder.bindView(recyclerView, whoCard);
+				break;
+			}
+			case MESSAGE_CONTEXT: {
+				ApptentiveLog.e("-> Message Context");
+				ContextMessage contextMessage = (ContextMessage) messages.get(position);
+				ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
+				contextMessageHolder.bindView(contextMessage);
 				break;
 			}
 		}

@@ -238,21 +238,6 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		return isOutgoing;
 	}
 
-	public static CompoundMessage createAutoMessage(String title, String body) {
-		if (title == null && body == null) {
-			return null;
-		}
-		CompoundMessage message = new CompoundMessage();
-		if (title != null) {
-			message.setTitle(title);
-		}
-		if (body != null) {
-			message.setBody(body);
-		}
-		message.setAutomated(true);
-		return message;
-	}
-
 	public List<StoredFile> getRemoteAttachments() {
 		return remoteAttachmentStoredFiles;
 	}
