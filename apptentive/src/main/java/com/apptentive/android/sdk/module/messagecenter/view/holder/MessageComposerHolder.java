@@ -39,8 +39,13 @@ import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MessageComposerHolder extends RecyclerView.ViewHolder {
+
+	List<ImageItem> images;
 
 	public ImageButton closeButton;
 	public TextView title;
@@ -51,6 +56,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	public MessageComposerHolder(View itemView) {
 		super(itemView);
+		images = new ArrayList<ImageItem>();
 		closeButton = (ImageButton) itemView.findViewById(R.id.cancel_composing);
 		title = (TextView) itemView.findViewById(R.id.title);
 		attachButton = (ImageButton) itemView.findViewById(R.id.btn_attach_image);
@@ -99,19 +105,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 			}
 		});
 
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
-		Drawable attachButtonDrawable = DrawableCompat.wrap(attachButton.getDrawable());
-		DrawableCompat.setTintList(attachButtonDrawable, colors);
-		attachButton.setImageDrawable(attachButtonDrawable);
-
-		attachButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				if (adapter.getListener() != null) {
-					adapter.getListener().onAttachImage();
-				}
-			}
-		});
-
 		message.setHint(composer.messageHint);
 		message.setLinksClickable(true);
 		message.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
@@ -150,7 +143,19 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		});
 
 
-//		attachments = (ApptentiveImageGridView) parentView.findViewById(R.id.grid);
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable attachButtonDrawable = DrawableCompat.wrap(attachButton.getDrawable());
+		DrawableCompat.setTintList(attachButtonDrawable, colors);
+		attachButton.setImageDrawable(attachButtonDrawable);
+
+		attachButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				if (adapter.getListener() != null) {
+					adapter.getListener().onAttachImage();
+				}
+			}
+		});
+
 		attachments.setupUi();
 		attachments.setupLayoutListener();
 		attachments.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
@@ -163,9 +168,60 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		});
 		attachments.setAdapterIndicator(R.drawable.apptentive_ic_remove_attachment);
 
-//		attachments.setImageIndicatorCallback((ImageGridViewAdapter.Callback) listener);
-		// Initialize image attachments band with empty data
-//		clearImageAttachmentBand();
+		attachments.setImageIndicatorCallback(fragment);
+		//Initialize image attachments band with empty data
+		clearImageAttachmentBand();
+	}
+
+	/**
+	 * Remove all images from attchment band.
+	 */
+	public void clearImageAttachmentBand() {
+		attachments.setVisibility(View.GONE);
+		images.clear();
+		attachments.setData(null);
+	}
+
+	/**
+	 * Add new images to attachment band.
+	 *
+	 * @param imagesToAttach an array of new images to add
+	 */
+	public void addImagesToImageAttachmentBand(final List<ImageItem> imagesToAttach) {
+
+		if (imagesToAttach == null || imagesToAttach.size() == 0) {
+			return;
+		}
+
+		attachments.setupLayoutListener();
+		attachments.setVisibility(View.VISIBLE);
+
+		images.addAll(imagesToAttach);
+		addAdditionalAttachItem();
+	}
+
+	/**
+	 * Remove an image from attchment band.
+	 *
+	 * @param position the postion index of the image to be removed
+	 */
+	public void removeImageFromImageAttachmentBand(final int position) {
+		images.remove(position);
+		attachments.setupLayoutListener();
+		if (images.size() == 0) {
+			// Hide attachment band after last attachment is removed
+			attachments.setVisibility(View.GONE);
+			return;
+		}
+		addAdditionalAttachItem();
+	}
+
+	private void addAdditionalAttachItem() {
+		ArrayList<ImageItem> imagesToAdd = new ArrayList<ImageItem>(images);
+		if (imagesToAdd.size() < itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+			imagesToAdd.add(new ImageItem("", "", "Image/*", 0));
+		}
+		attachments.setData(imagesToAdd);
 	}
 
 	/*

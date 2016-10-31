@@ -805,9 +805,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 		}
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
-
-		updateComposingBar();
-
 	}
 
 	public void openNonImageAttachment(final ImageItem image) {
@@ -1057,7 +1054,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void afterComposingTextChanged(String str) {
 		// Update display status of composing bar buttons when composing text changes
-		updateComposingBar();
+		// TODO: Save state here?
+		//updateComposingBar();
 	}
 
 	@Override
