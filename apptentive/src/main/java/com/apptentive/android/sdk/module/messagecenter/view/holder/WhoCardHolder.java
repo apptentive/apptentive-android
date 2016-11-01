@@ -16,11 +16,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
 
 public class WhoCardHolder extends RecyclerView.ViewHolder {
+
+	private MessageCenterRecyclerViewAdapter adapter;
+
 	private TextView title;
 	private TextInputLayout nameLayout;
 	private EditText nameEditText;
@@ -30,8 +36,11 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 	private Button skipButton;
 	private Button saveButton;
 
-	public WhoCardHolder(View itemView) {
+	public WhoCardHolder(MessageCenterRecyclerViewAdapter adapter, View itemView) {
 		super(itemView);
+
+		this.adapter = adapter;
+
 		title = (TextView) itemView.findViewById(R.id.who_title);
 		nameEditText = (EditText) itemView.findViewById(R.id.who_name);
 		nameLayout = (TextInputLayout) itemView.findViewById(R.id.input_layout_who_name);
@@ -85,26 +94,40 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 		emailEditText.addTextChangedListener(emailTextWatcher);
 
 		// TODO: Prepopulate with name and email if we already have them.
-/*
-		emailEditText.setText(email);
-		nameEditText.setText(name);
-*/
-		/* // TODO: Hook up listeners
-			skipButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					listener.onCloseWhoCard(item.button_1);
-				}
-			});
+		nameEditText.setText(Apptentive.getPersonName());
+		emailEditText.setText(Apptentive.getPersonEmail());
 
-			sendButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View view) {
-					if (isWhoCardContentValid(item.getType())) {
-						Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
-						Apptentive.setPersonName(nameEditText.getText().toString().trim());
-						listener.onSubmitWhoCard(item.button_2);
+		// TODO: Hook up listeners
+		skipButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				if (adapter.getListener() != null) {
+					adapter.getListener().onCloseWhoCard(skipButton.getText().toString());
+				}
+			}
+		});
+
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				if (isWhoCardContentValid(whoCard.isRequire())) {
+					Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
+					Apptentive.setPersonName(nameEditText.getText().toString().trim());
+					if (adapter.getListener() != null) {
+						adapter.getListener().onCloseWhoCard(saveButton.getText().toString());
 					}
 				}
-			});
-*/
+			}
+		});
+	}
+
+	private boolean isWhoCardContentValid(boolean required) {
+		String emailContent = emailEditText.getText().toString();
+		if (Util.isEmailValid(emailContent)) {
+			return true;
+		}
+		// Allow user only change name but leave email blank if profile is only requested, not required
+		if (TextUtils.isEmpty(emailContent) && !required) {
+			return true;
+		}
+		return false;
 	}
 }

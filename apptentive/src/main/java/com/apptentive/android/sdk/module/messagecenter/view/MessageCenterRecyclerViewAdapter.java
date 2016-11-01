@@ -111,7 +111,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				ApptentiveLog.e("-> Who Card");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_who_card, parent, false);
-				return new WhoCardHolder(view);
+				return new WhoCardHolder(this, view);
 			}
 			case MESSAGE_CONTEXT: {
 				ApptentiveLog.e("-> Message Context");
