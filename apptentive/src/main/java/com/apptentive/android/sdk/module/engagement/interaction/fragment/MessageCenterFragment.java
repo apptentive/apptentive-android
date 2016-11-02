@@ -437,9 +437,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				 * If Who Card is required, show Who Card first
 				 */
 				if (messages.size() == 1) { // TODO: Don't use these magic numbers everywhere
-					messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-					messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
-
+					addComposingCard();
 				} else {
 					// Finally check if status message need to be restored
 					addExpectationStatusIfNeeded();
