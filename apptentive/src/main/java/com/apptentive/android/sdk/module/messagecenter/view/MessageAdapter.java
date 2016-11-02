@@ -129,7 +129,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 		void onFinishComposing();
 
-		void onWhoCardViewCreated(EditText nameEt, EditText emailEt, View keyboardFocusedView);
+		void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText);
 
 		void onSubmitWhoCard(String buttonLabel);
 

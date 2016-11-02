@@ -93,7 +93,7 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 		};
 		emailEditText.addTextChangedListener(emailTextWatcher);
 
-		// TODO: Prepopulate with name and email if we already have them.
+		// TODO: Restore pending text if view is for instance rotated before being submitted.
 		nameEditText.setText(Apptentive.getPersonName());
 		emailEditText.setText(Apptentive.getPersonEmail());
 
@@ -112,11 +112,14 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 					Apptentive.setPersonEmail(emailEditText.getText().toString().trim());
 					Apptentive.setPersonName(nameEditText.getText().toString().trim());
 					if (adapter.getListener() != null) {
-						adapter.getListener().onCloseWhoCard(saveButton.getText().toString());
+						adapter.getListener().onSubmitWhoCard(saveButton.getText().toString());
 					}
 				}
 			}
 		});
+		if (adapter.getListener() != null) {
+			adapter.getListener().onWhoCardViewCreated(nameEditText, emailEditText);
+		}
 	}
 
 	private boolean isWhoCardContentValid(boolean required) {

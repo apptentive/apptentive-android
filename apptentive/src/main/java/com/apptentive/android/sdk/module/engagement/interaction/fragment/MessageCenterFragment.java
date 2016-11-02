@@ -119,12 +119,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	/* Fragment.getActivity() may return null if not attached.
 	 * hostingActivityRef is always set in onAttach()
-	 * Keeping a cached weak reference ensures it's save to use
+	 * Keeping a cached weak reference ensures it's safe to use
 	 */
 	private WeakReference<Activity> hostingActivityRef;
 
 	private MessageCenterRecyclerView messageCenterRecyclerView;
 	private EditText composerEditText;
+	private EditText whoCardNameEditText;
+	private EditText whoCardEmailEditText;
+
 	private View fab;
 
 
@@ -168,7 +171,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private Parcelable pendingWhoCardName;
 	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
-
 
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
@@ -497,8 +499,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		outState.putInt(LIST_TOP_OFFSET, top);
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
 		if (messageCenterRecyclerViewAdapter != null) {
-			outState.putParcelable(WHO_CARD_NAME, messageCenterRecyclerViewAdapter.getWhoCardNameState());
-			outState.putParcelable(WHO_CARD_EMAIL, messageCenterRecyclerViewAdapter.getWhoCardEmailState());
+			outState.putParcelable(WHO_CARD_NAME, whoCardNameEditText != null ? whoCardNameEditText.onSaveInstanceState() : null);
+			outState.putParcelable(WHO_CARD_EMAIL, whoCardEmailEditText != null ? whoCardEmailEditText.onSaveInstanceState() : null);
 			outState.putString(WHO_CARD_AVATAR_FILE, messageCenterRecyclerViewAdapter.getWhoCardAvatarFileName());
 		}
 		outState.putInt(WHO_CARD_MODE, pendingWhoCardMode);
@@ -940,19 +942,29 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	@Override
-	public void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText, View viewFocusedWithKeyboard) {
+	public void onWhoCardViewCreated(final EditText nameEditText, final EditText emailEditText) {
+		this.whoCardNameEditText = nameEditText;
+		this.whoCardEmailEditText = emailEditText;
 		if (pendingWhoCardName != null) {
 			nameEditText.onRestoreInstanceState(pendingWhoCardName);
-			pendingWhoCardName = null;
+			//pendingWhoCardName = null;
 		}
 		if (pendingWhoCardEmail != null) {
 			emailEditText.onRestoreInstanceState(pendingWhoCardEmail);
-			pendingWhoCardEmail = null;
+			//pendingWhoCardEmail = null;
 		}
 		messageCenterRecyclerView.setPadding(0, 0, 0, 0);
 
-		if (viewFocusedWithKeyboard != null) {
-			Util.showSoftKeyboard(hostingActivityRef.get(), viewFocusedWithKeyboard);
+		// TODO: Track which field has focus and apply correctly
+		if (nameEditText != null) {
+			nameEditText.requestFocus();
+			nameEditText.post(new Runnable() {
+				@Override
+				public void run() {
+					Util.showSoftKeyboard(hostingActivityRef.get(), nameEditText);
+				}
+			});
+
 		}
 	}
 
@@ -1084,6 +1096,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		pendingWhoCardEmail = null;
 		pendingWhoCardAvatarFile = null;
 		pendingWhoCardMode = 0;
+		whoCardNameEditText = null;
+		whoCardEmailEditText = null;
 		addExpectationStatusIfNeeded();
 		showFab();
 		showProfileButton();
