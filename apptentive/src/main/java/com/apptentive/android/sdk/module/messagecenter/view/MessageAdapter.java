@@ -115,7 +115,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	private OnListviewItemActionListener composingActionListener;
 
 	public interface OnListviewItemActionListener {
-		void onComposingViewCreated(View keyboardFocusedView);
+		void onComposingViewCreated(EditText composerEditText);
 
 		void updateComposingBar();
 

@@ -28,7 +28,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,7 +49,6 @@ import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -126,7 +124,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private WeakReference<Activity> hostingActivityRef;
 
 	private MessageCenterRecyclerView messageCenterRecyclerView;
-	private EditText messageEditText; // Composing area
+	private EditText composerEditText;
 	private View fab;
 
 
@@ -139,10 +137,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	// Count how many paused ongoing messages
 	private int unsentMessagesCount = 0;
 
-
-	private MessageCenterStatus statusItem;
+	//private MessageCenterStatus statusItem;
 	//	private MessageCenterComposingItem composingItem;
-	private Composer composer;
+	//private Composer composer;
 	String pendingMessage;
 	private WhoCard whoCardItem;
 	private ContextMessage contextMessage;
@@ -439,8 +436,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
-				if (messages.size() == 1) {
-					addComposerMessageItems();
+				if (messages.size() == 1) { // TODO: Don't use these magic numbers everywhere
+					messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
+					messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
+
 				} else {
 					// Finally check if status message need to be restored
 					addExpectationStatusIfNeeded();
@@ -571,15 +570,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		hideProfileButton();
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
+		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
 		messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-	}
-
-
-	public void addComposerMessageItems() {
-		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-		composer = interaction.getComposer();
-		messages.add(composer);
 	}
 
 	private boolean checkAddWhoCardIfRequired() {
@@ -605,6 +598,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		hideProfileButton();
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
+		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, mode, 0));
 		messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
@@ -629,20 +623,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_OPT_INSERT_REGULAR_STATUS);
 	}
 
-	public void addNewStatusItem(MessageCenterUtil.MessageCenterListItem item) {
-
-		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-
-		if (composer != null) {
-			return;
-		}
-
-		statusItem = (MessageCenterStatus) item;
-		messages.add(item);
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
-
-	}
-
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 
@@ -656,26 +636,26 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
+		// TODO: Use handler for this
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		// TODO: A simpler way to put the message in the correct place.
 		// Determine where to insert the new incoming message. It will be in front of any eidting
 		// area, i.e. composing, Who Card ...
 		int insertIndex = messages.size();
-		if (composer != null) {
-			// when in composing mode, there are composing action bar and composing area
-			insertIndex -= 2;
-/*
-			if (contextualMessage != null) {
-				insertIndex--;
+
+		for (MessageCenterUtil.MessageCenterListItem item : messages) {
+			if (item.getListItemType() == MESSAGE_COMPOSER) {
+				insertIndex -= 1;
+				continue;
 			}
-*/
-		} else if (whoCardItem != null) {
-			insertIndex -= 1;
-/*
-			if (contextualMessage != null) {
-				insertIndex--;
+			if (item.getListItemType() == MESSAGE_CONTEXT) {
+				insertIndex -= 1;
+				continue;
 			}
-*/
+			if (item.getListItemType() == WHO_CARD) {
+				insertIndex -= 1;
+				continue;
+			}
 		}
 		messages.add(insertIndex, message);
 
@@ -739,7 +719,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			// Only update composing view if image is attached successfully
 			messageCenterRecyclerViewAdapter.addImagestoComposer(uniqueImages);
 			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
 		}
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
@@ -756,7 +735,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// Only update composing view if image is attached successfully
 		if (messageCenterRecyclerViewAdapter != null) {
 			messageCenterRecyclerViewAdapter.addImagestoComposer(images);
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
 		}
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
 		if (messageCenterRecyclerViewAdapter != null) {
@@ -774,7 +752,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messageCenterRecyclerViewAdapter.removeImageFromComposer(position);
 			int count = imageAttachmentstList.size();
 			// Show keyboard if all attachments have been removed
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(count == 0);
 			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 		}
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
@@ -891,22 +868,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	@Override
-	public void onComposingViewCreated(View keyboardFocusedOnView) {
-
-		hideProfileButton();
-		hideFab();
+	public void onComposingViewCreated(final EditText composerEditText) {
 
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageEditText = messageCenterRecyclerViewAdapter.getEditTextInComposing();
-		} else {
-			messageEditText = null;
-		}
+
+		this.composerEditText = composerEditText;
+
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
-			if (messageEditText != null) {
-				messageEditText.onRestoreInstanceState(composingViewSavedState);
+			if (this.composerEditText != null) {
+				this.composerEditText.onRestoreInstanceState(composingViewSavedState);
 			}
 			composingViewSavedState = null;
 			SharedPreferences.Editor editor = prefs.edit();
@@ -915,8 +887,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// Restore composing text
 		if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE)) {
 			String messageText = prefs.getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE, null);
-			if (messageText != null && messageEditText != null) {
-				messageEditText.setText(messageText);
+			if (messageText != null && this.composerEditText != null) {
+				this.composerEditText.setText(messageText);
 			}
 			// Stored pending composing text has been restored, remove it from the persistent storage
 			SharedPreferences.Editor editor = prefs.edit();
@@ -958,8 +930,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		messageCenterRecyclerView.setPadding(0, 0, 0, 0);
 
-		if (keyboardFocusedOnView != null) {
-			Util.showSoftKeyboard(hostingActivityRef.get(), keyboardFocusedOnView);
+		if (composerEditText != null) {
+			composerEditText.requestFocus();
+			composerEditText.post(new Runnable() {
+				@Override
+				public void run() {
+					Util.showSoftKeyboard(hostingActivityRef.get(), composerEditText);
+				}
+			});
 		}
 	}
 
@@ -996,9 +974,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onCancelComposing() {
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
-		}
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 
 		JSONObject data = new JSONObject();
@@ -1031,9 +1006,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void onFinishComposing() {
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_COMPOSER);
 
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
-		}
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		if (contextMessage != null) {
 			// TODO: Maybe simply send any context messages in the list when a message is sent?
@@ -1108,9 +1080,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void cleanupWhoCard() {
 		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_REMOVE_WHOCARD);
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.setForceShowKeyboard(false);
-		}
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		whoCardItem = null;
 		pendingWhoCardName = null;
@@ -1152,15 +1121,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void OnListViewResize(int w, int h, int oldw, int oldh) {
 		// detect keyboard launching. If height difference is more than 100 pixels, probably due to keyboard
 		if (oldh > h && oldh - h > 100) {
-			if (composer != null) {
+/* TODO: Replace this?
+			if (messageCenterRecyclerViewAdapter.getComposerEditText() != null) {
 				// When keyboard is up, adjust the scolling such that the cursor is always visible
 				final int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
 				int lastIndex = messageCenterRecyclerView.getLastVisiblePosition();
 				View v = messageCenterRecyclerView.getChildAt(lastIndex - firstIndex);
 				int top = (v == null) ? 0 : v.getTop();
-				if (messageEditText != null) {
-					int pos = messageEditText.getSelectionStart();
-					Layout layout = messageEditText.getLayout();
+				if (composerEditText != null) {
+					int pos = composerEditText.getSelectionStart();
+					Layout layout = composerEditText.getLayout();
 					int line = layout.getLineForOffset(pos);
 					int baseline = layout.getLineBaseline(line);
 					int ascent = layout.getLineAscent(line);
@@ -1173,6 +1143,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					}
 				}
 			}
+*/
 		}
 	}
 
@@ -1212,7 +1183,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	// Retrieve the content from the composing area
 	public Editable getPendingComposingContent() {
-		return (messageEditText == null) ? null : messageEditText.getText();
+		return (composerEditText == null) ? null : composerEditText.getText();
 	}
 
 
@@ -1256,10 +1227,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private Parcelable saveEditTextInstanceState() {
 		savePendingComposingMessage();
-		if (messageEditText != null) {
+		if (composerEditText != null) {
 			// Hide keyboard if the keyboard was up prior to rotation
 			Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
-			return messageEditText.onSaveInstanceState();
+			return composerEditText.onSaveInstanceState();
 		}
 		return null;
 	}
@@ -1435,7 +1406,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 
 	/*
-	 * Called when attachment overlayed "selection" ui is tapped. The "selection" ui could be selection checkbox
+	 * Called when attachment overlaid "selection" ui is tapped. The "selection" ui could be selection checkbox
 	 * or close button
 	 */
 	@Override
@@ -1475,7 +1446,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_MESSAGE_ADD_WHOCARD: {
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
 					fragment.addWhoCardAsMessageItem(msg.arg1);
-					fragment.messageCenterRecyclerViewAdapter.setForceShowKeyboard(true);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
 					break;
@@ -1495,8 +1465,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_MESSAGE_ADD_COMPOSING: {
-					fragment.addComposerMessageItems();
-					fragment.messageCenterRecyclerViewAdapter.setForceShowKeyboard(true);
+					//fragment.addComposerMessageItems();
+					fragment.messages.add(fragment.interaction.getComposer());
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
 					break;

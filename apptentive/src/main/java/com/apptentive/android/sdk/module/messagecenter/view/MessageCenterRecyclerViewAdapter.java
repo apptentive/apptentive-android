@@ -133,6 +133,9 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				Composer composer = (Composer) messages.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
 				composerHolder.bindView(fragment, this, composer);
+				if (listener != null) {
+					listener.onComposingViewCreated(composerHolder.message);
+				}
 				break;
 			}
 			case STATUS: {
@@ -254,10 +257,6 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		return; // TODO
 	}
 
-	public void setForceShowKeyboard(boolean force) {
-		return; // TODO
-	}
-
 	public void removeImageFromComposer(int position) {
 		return; // TODO
 	}
@@ -272,10 +271,6 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	public View getComposingAreaView() {
 		return new View(fragment.getContext()); // TODO
-	}
-
-	public EditText getEditTextInComposing() {
-		return new EditText(fragment.getContext()); // TODO
 	}
 
 	public MessageAdapter.OnListviewItemActionListener getListener() {
