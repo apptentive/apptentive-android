@@ -72,49 +72,49 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		ApptentiveLog.e("onCreateViewHolder()");
 		switch (viewType) {
 			case MESSAGE_COMPOSER: {
-				ApptentiveLog.e("-> Message Composer");
+				ApptentiveLog.w("-> Message Composer");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_composer, parent, false);
 				return new MessageComposerHolder(view);
 			}
 			case STATUS: {
-				ApptentiveLog.e("-> Status");
+				ApptentiveLog.w("-> Status");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_status, parent, false);
 				return new StatusHolder(view);
 			}
 			case GREETING: {
-				ApptentiveLog.e("-> Greeting");
+				ApptentiveLog.w("-> Greeting");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_greeting, parent, false);
 				return new GreetingHolder(view);
 			}
 			case MESSAGE_OUTGOING: {
-				ApptentiveLog.e("-> Message Outgoing");
+				ApptentiveLog.w("-> Message Outgoing");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_outgoing, parent, false);
 				return new OutgoingCompoundMessageHolder(view);
 			}
 			case MESSAGE_INCOMING: {
-				ApptentiveLog.e("-> Message Incoming");
+				ApptentiveLog.w("-> Message Incoming");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_incoming, parent, false);
 				return new IncomingCompoundMessageHolder(view);
 			}
 			case MESSAGE_AUTO: {
-				ApptentiveLog.e("-> Message Auto");
+				ApptentiveLog.w("-> Message Auto");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_auto, parent, false);
 				return new AutomatedMessageHolder(view);
 			}
 			case WHO_CARD: {
-				ApptentiveLog.e("-> Who Card");
+				ApptentiveLog.w("-> Who Card");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_who_card, parent, false);
 				return new WhoCardHolder(this, view);
 			}
 			case MESSAGE_CONTEXT: {
-				ApptentiveLog.e("-> Message Context");
+				ApptentiveLog.w("-> Message Context");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_context_message, parent, false);
 				return new ContextMessageHolder(view);
@@ -129,14 +129,14 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		ApptentiveLog.e("onBindViewHolder()");
 		switch (getItemViewType(position)) {
 			case MESSAGE_COMPOSER: {
-				ApptentiveLog.e("-> Message Composer");
+				ApptentiveLog.w("-> Message Composer");
 				Composer composer = (Composer) messages.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
 				composerHolder.bindView(fragment, this, composer);
 				break;
 			}
 			case STATUS: {
-				ApptentiveLog.e("-> Status");
+				ApptentiveLog.w("-> Status");
 				MessageCenterStatus status = (MessageCenterStatus) messages.get(position);
 				StatusHolder statusHolder = (StatusHolder) holder;
 				statusHolder.body.setText(status.body);
@@ -150,42 +150,42 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				break;
 			}
 			case GREETING: {
-				ApptentiveLog.e("-> Greeting");
+				ApptentiveLog.w("-> Greeting");
 				MessageCenterGreeting greeting = (MessageCenterGreeting) messages.get(position);
 				GreetingHolder greetingHolder = (GreetingHolder) holder;
 				greetingHolder.bindView(greeting);
 				break;
 			}
 			case MESSAGE_INCOMING: {
-				ApptentiveLog.e("-> Message Incoming");
+				ApptentiveLog.w("-> Message Incoming");
 				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
 				compoundHolder.bindView(recyclerView, compoundMessage);
 				break;
 			}
 			case MESSAGE_OUTGOING: {
-				ApptentiveLog.e("-> Message Outgoing");
+				ApptentiveLog.w("-> Message Outgoing");
 				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
 				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
 				compoundHolder.bindView(recyclerView, compoundMessage);
 				break;
 			}
 			case MESSAGE_AUTO: {
-				ApptentiveLog.e("-> Message Auto");
+				ApptentiveLog.w("-> Message Auto");
 				CompoundMessage autoMessage = (CompoundMessage) messages.get(position);
 				AutomatedMessageHolder autoHolder = (AutomatedMessageHolder) holder;
 				autoHolder.bindView(recyclerView, autoMessage);
 				break;
 			}
 			case WHO_CARD: {
-				ApptentiveLog.e("-> Who Card");
+				ApptentiveLog.w("-> Who Card");
 				WhoCard whoCard = (WhoCard) messages.get(position);
 				WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
 				whoCardHolder.bindView(recyclerView, whoCard);
 				break;
 			}
 			case MESSAGE_CONTEXT: {
-				ApptentiveLog.e("-> Message Context");
+				ApptentiveLog.w("-> Message Context");
 				ContextMessage contextMessage = (ContextMessage) messages.get(position);
 				ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
 				contextMessageHolder.bindView(contextMessage);
@@ -266,20 +266,12 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		return new View(fragment.getContext()); // TODO
 	}
 
-	public void clearWhoCard() {
-		return; // TODO
-	}
-
 	public MessageCenterComposingActionBarView getComposingActionBarView() {
 		return new MessageCenterComposingActionBarView(fragment, null, null); // TODO
 	}
 
 	public View getComposingAreaView() {
 		return new View(fragment.getContext()); // TODO
-	}
-
-	public void clearComposing() {
-		return; // TODO
 	}
 
 	public EditText getEditTextInComposing() {

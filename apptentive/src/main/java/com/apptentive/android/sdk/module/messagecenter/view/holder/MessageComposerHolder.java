@@ -137,8 +137,9 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 				if (adapter.getListener() != null) {
 					adapter.getListener().afterComposingTextChanged(editable.toString());
 				}
-				setSendButtonEnabled(!TextUtils.isEmpty(message.getText()));
 				Linkify.addLinks(editable, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
+				// TODO: Call this from the fragment instead?
+				setSendButtonEnabled(!TextUtils.isEmpty(message.getText()));
 			}
 		});
 
@@ -201,7 +202,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	/**
-	 * Remove an image from attchment band.
+	 * Remove an image from attachment band.
 	 *
 	 * @param position the postion index of the image to be removed
 	 */
@@ -267,7 +268,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	private void setSendButtonEnabled(boolean enabled) {
-		if (sendButton.isEnabled() ^ enabled) { // No change required
+		if (sendButton.isEnabled() ^ enabled) { // Only if changing value
 			sendButton.setEnabled(enabled);
 			if (enabled) {
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
