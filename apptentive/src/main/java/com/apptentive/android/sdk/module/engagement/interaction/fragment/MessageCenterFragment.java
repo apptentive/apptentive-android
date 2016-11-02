@@ -869,7 +869,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onComposingViewCreated(final EditText composerEditText) {
-
+		ApptentiveLog.e("onComposingViewCreated()");
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 
 		this.composerEditText = composerEditText;
@@ -939,6 +939,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 			});
 		}
+		hideFab();
 	}
 
 	@Override
@@ -966,6 +967,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			});
 
 		}
+		hideFab();
 	}
 
 	@Override
@@ -1062,6 +1064,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onSubmitWhoCard(String buttonLabel) {
+		ApptentiveLog.e("onSubmitWhoCard()");
 		JSONObject data = new JSONObject();
 		try {
 			data.put("required", interaction.getWhoCardRequired());
@@ -1076,6 +1079,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onCloseWhoCard(String buttonLabel) {
+		ApptentiveLog.e("onCloseWhoCard()");
 		JSONObject data = new JSONObject();
 		try {
 			data.put("required", interaction.getWhoCardRequired());
@@ -1320,16 +1324,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void showFab() {
+		ApptentiveLog.e("showFab()");
 		messageCenterRecyclerView.setPadding(0, 0, 0, fabPaddingPixels);
 		// Re-enable Fab at the beginning of the animation
-		fab.setEnabled(true);
-		AnimationUtil.scaleFadeIn(fab);
+		if (fab.getVisibility() != View.VISIBLE) {
+			fab.setEnabled(true);
+			AnimationUtil.scaleFadeIn(fab);
+		}
 	}
 
 	private void hideFab() {
+		ApptentiveLog.e("hideFab()");
 		// Make sure Fab is not clickable during fade-out animation
-		fab.setEnabled(false);
-		AnimationUtil.scaleFadeOutGone(fab);
+		if (fab.getVisibility() != View.GONE) {
+			fab.setEnabled(false);
+			AnimationUtil.scaleFadeOutGone(fab);
+		}
 	}
 
 	private void showProfileButton() {
