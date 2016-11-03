@@ -128,6 +128,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private WeakReference<Activity> hostingActivityRef;
 
 	private MessageCenterRecyclerView messageCenterRecyclerView;
+
+	// Holder and view references
 	private MessageComposerHolder composer;
 	private EditText composerEditText;
 	private EditText whoCardNameEditText;
@@ -145,11 +147,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	// Count how many paused ongoing messages
 	private int unsentMessagesCount = 0;
 
-	//private MessageCenterStatus statusItem;
-	//	private MessageCenterComposingItem composingItem;
-	//private Composer composer;
-	//String pendingMessage;
-	private WhoCard whoCardItem;
+	// Data Item references
 	private ContextMessage contextMessage;
 
 	//private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
@@ -428,7 +426,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			** Pending contents would be saved if the user was in composing Who card mode and exitted through back button
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
-				addWhoCardAsMessageItem(pendingWhoCardMode);
+				addWhoCard(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
@@ -622,25 +620,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void addWhoCard(int mode) {
 		hideFab();
 		hideProfileButton();
-		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
-		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
-		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, mode, 0));
-		//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
-	}
-
-	public void addWhoCardAsMessageItem(int mode) {
-		pendingWhoCardMode = mode;
-		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		JSONObject profile = interaction.getProfile();
 		if (profile != null) {
-			try {
-				ApptentiveLog.e("Adding Who Card");
-				whoCardItem = new WhoCard(profile.toString());
-				messages.add(whoCardItem);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to instantiate Who Card");
-			}
+			pendingWhoCardMode = mode;
+			messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
+			messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
+			messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
+			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, mode, 0, profile));
+			//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 		}
 	}
 
@@ -1017,7 +1004,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void cleanupWhoCard() {
 		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_REMOVE_WHOCARD);
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
-		whoCardItem = null;
 		pendingWhoCardName = null;
 		pendingWhoCardEmail = null;
 		pendingWhoCardAvatarFile = null;
@@ -1384,8 +1370,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			switch (msg.what) {
 				case MSG_MESSAGE_ADD_WHOCARD: {
+					ApptentiveLog.e("Adding Who Card");
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
-					fragment.addWhoCardAsMessageItem(msg.arg1);
+					int mode = msg.arg1; // TODO: Do something with mode?
+					JSONObject profile = (JSONObject) msg.obj;
+					try {
+						fragment.messages.add(new WhoCard(profile.toString()));
+					} catch (JSONException e) {
+						ApptentiveLog.w("Unable to instantiate Who Card");
+					}
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
 					break;
@@ -1454,7 +1447,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 					fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 					// If Who Card is being shown while a message is sent, make sure Who Card is still in view by scrolling to bottom
-					if (fragment.whoCardItem != null) {
+					if (fragment.recyclerViewContainsItemOfType(WHO_CARD)) {
 						sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 					} else {
 						sendMessageDelayed(obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top), DEFAULT_DELAYMILLIS);
@@ -1624,5 +1617,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 			}
 		}
+	}
+
+	public boolean recyclerViewContainsItemOfType(int type) {
+		for (MessageCenterUtil.MessageCenterListItem item : messages) {
+			if (item.getListItemType() == type) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
