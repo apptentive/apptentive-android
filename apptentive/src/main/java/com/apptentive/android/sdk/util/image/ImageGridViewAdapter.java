@@ -258,6 +258,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 		} else if (type == TYPE_IMAGE) {
 			ViewHolder holder;
 			if (view == null) {
+				ApptentiveLog.e("Inflating attachment image");
 				view = inflater.inflate(R.layout.apptentive_image_grid_view_item, viewGroup, false);
 				holder = new ViewHolder(view, i);
 			} else {

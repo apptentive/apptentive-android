@@ -133,9 +133,6 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				Composer composer = (Composer) messages.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
 				composerHolder.bindView(fragment, this, composer);
-				if (listener != null) {
-					listener.onComposingViewCreated(composerHolder.message);
-				}
 				break;
 			}
 			case STATUS: {
@@ -253,12 +250,15 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		return null; // TODO
 	}
 
-	public void addImagestoComposer(List<ImageItem> images) {
-		return; // TODO
+	public void addImagestoComposer(MessageComposerHolder composer, List<ImageItem> images) {
+		composer.addImagesToImageAttachmentBand(images);
+		//notifyDataSetChanged();
 	}
 
-	public void removeImageFromComposer(int position) {
-		return; // TODO
+	public void removeImageFromComposer(MessageComposerHolder composer, int position) {
+		if (composer != null) {
+			composer.removeImageFromImageAttachmentBand(position);
+		}
 	}
 
 	public View getWhoCardView() {

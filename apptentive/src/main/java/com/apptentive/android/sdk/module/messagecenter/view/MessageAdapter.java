@@ -40,9 +40,11 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.M
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.IncomingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageCenterListItemHolder;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.OutgoingCompoundMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.util.AnimationUtil;
+import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 import com.apptentive.android.sdk.util.Util;
@@ -115,7 +117,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	private OnListviewItemActionListener composingActionListener;
 
 	public interface OnListviewItemActionListener {
-		void onComposingViewCreated(EditText composerEditText);
+		void onComposingViewCreated(MessageComposerHolder composer, EditText composerEditText, ApptentiveImageGridView attachments);
 
 		void updateComposingBar();
 
@@ -508,7 +510,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				composingActionListener.onComposingViewCreated(forceShowKeyboard ? composingEditText : null);
+//				composingActionListener.onComposingViewCreated(forceShowKeyboard ? composingEditText : null);
 				if (updateComposingViewImageBand) {
 					updateComposingViewImageBand = false;
 				}

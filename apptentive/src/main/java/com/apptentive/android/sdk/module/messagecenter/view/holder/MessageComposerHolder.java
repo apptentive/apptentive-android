@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
@@ -66,6 +67,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
+		ApptentiveLog.e("BINDING IMAGE");
 		title.setText(composer.title);
 
 		ColorStateList colors = ContextCompat.getColorStateList(itemView.getContext(), Util.getResourceIdFromAttribute(itemView.getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
@@ -157,6 +159,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 			}
 		});
 
+
 		attachments.setupUi();
 		attachments.setupLayoutListener();
 		attachments.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
@@ -172,12 +175,22 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments.setImageIndicatorCallback(fragment);
 		//Initialize image attachments band with empty data
 		clearImageAttachmentBand();
+		ApptentiveLog.e("HIDING");
+		attachments.setVisibility(View.GONE);
+		attachments.setAdapterIndicator(0);
+		attachments.setData(new ArrayList<ImageItem>());
+
+		if (adapter.getListener() != null) {
+			adapter.getListener().onComposingViewCreated(this, message, attachments);
+		}
 	}
 
 	/**
-	 * Remove all images from attchment band.
+	 * Remove all images from attachment band.
 	 */
 	public void clearImageAttachmentBand() {
+		ApptentiveLog.e("CLEARING ATTACHMENTS");
+		ApptentiveLog.e("HIDING");
 		attachments.setVisibility(View.GONE);
 		images.clear();
 		attachments.setData(null);
@@ -189,12 +202,14 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	 * @param imagesToAttach an array of new images to add
 	 */
 	public void addImagesToImageAttachmentBand(final List<ImageItem> imagesToAttach) {
+		ApptentiveLog.e("ADDING IMAGE");
 
 		if (imagesToAttach == null || imagesToAttach.size() == 0) {
 			return;
 		}
 
 		attachments.setupLayoutListener();
+		ApptentiveLog.e("SHOWING");
 		attachments.setVisibility(View.VISIBLE);
 
 		images.addAll(imagesToAttach);
@@ -207,10 +222,12 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	 * @param position the postion index of the image to be removed
 	 */
 	public void removeImageFromImageAttachmentBand(final int position) {
+		ApptentiveLog.e("REMOVING IMAGE");
 		images.remove(position);
 		attachments.setupLayoutListener();
 		if (images.size() == 0) {
 			// Hide attachment band after last attachment is removed
+			ApptentiveLog.e("HIDING");
 			attachments.setVisibility(View.GONE);
 			return;
 		}
@@ -226,7 +243,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	/*
-	* Extends Android default movement method to enable selecting text and openning the links at the same time
+	* Extends Android default movement method to enable selecting text and opening the links at the same time
 	 */
 	private static class ApptentiveMovementMethod extends ArrowKeyMovementMethod {
 

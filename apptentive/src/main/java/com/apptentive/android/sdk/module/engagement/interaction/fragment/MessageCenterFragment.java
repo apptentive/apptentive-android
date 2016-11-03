@@ -59,11 +59,13 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
+import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
+import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
@@ -124,6 +126,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private WeakReference<Activity> hostingActivityRef;
 
 	private MessageCenterRecyclerView messageCenterRecyclerView;
+	private MessageComposerHolder composer;
 	private EditText composerEditText;
 	private EditText whoCardNameEditText;
 	private EditText whoCardEmailEditText;
@@ -143,18 +146,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	//private MessageCenterStatus statusItem;
 	//	private MessageCenterComposingItem composingItem;
 	//private Composer composer;
-	String pendingMessage;
+	//String pendingMessage;
 	private WhoCard whoCardItem;
 	private ContextMessage contextMessage;
 
-	private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
+	//private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
 
 	/**
 	 * Used to save the state of the message text box if the user closes Message Center for a moment,
 	 * , rotate device, attaches a file, etc.
 	 */
 	private Parcelable composingViewSavedState;
-	private ArrayList<ImageItem> savedAttachmentstList;
+	private ArrayList<ImageItem> pendingAttachments = new ArrayList<ImageItem>();
 
 	/*
 	 * Set to true when user launches image picker, and set to false once an image is picked
@@ -205,28 +208,19 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Make Message Center frgament retain its instance on orientation change
+		// Make Message Center fragment retain its instance on orientation change
 		setRetainInstance(true);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-													 Bundle savedInstanceState) {
-		listViewSavedTopIndex = (savedInstanceState == null) ? -1 :
-			savedInstanceState.getInt(LIST_TOP_INDEX);
-		listViewSavedTopOffset = (savedInstanceState == null) ? 0 :
-			savedInstanceState.getInt(LIST_TOP_OFFSET);
-		composingViewSavedState = (savedInstanceState == null) ? null :
-			savedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
-		pendingWhoCardName = (savedInstanceState == null) ? null :
-			savedInstanceState.getParcelable(WHO_CARD_NAME);
-		pendingWhoCardEmail = (savedInstanceState == null) ? null :
-			savedInstanceState.getParcelable(WHO_CARD_EMAIL);
-		pendingWhoCardAvatarFile = (savedInstanceState == null) ? null :
-			savedInstanceState.getString(WHO_CARD_AVATAR_FILE);
-		pendingWhoCardMode = (savedInstanceState == null) ? 0 :
-			savedInstanceState.getInt(WHO_CARD_MODE);
-
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		listViewSavedTopIndex = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(LIST_TOP_INDEX);
+		listViewSavedTopOffset = (savedInstanceState == null) ? 0 : savedInstanceState.getInt(LIST_TOP_OFFSET);
+		composingViewSavedState = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(COMPOSING_EDITTEXT_STATE);
+		pendingWhoCardName = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(WHO_CARD_NAME);
+		pendingWhoCardEmail = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(WHO_CARD_EMAIL);
+		pendingWhoCardAvatarFile = (savedInstanceState == null) ? null : savedInstanceState.getString(WHO_CARD_AVATAR_FILE);
+		pendingWhoCardMode = (savedInstanceState == null) ? 0 : savedInstanceState.getInt(WHO_CARD_MODE);
 		return inflater.inflate(R.layout.apptentive_message_center, container, false);
 	}
 
@@ -247,8 +241,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 
 		// Needed to prevent the window from being pushed up when a text input area is focused.
-		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED |
-			WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
 		// Restore listview scroll offset to where it was before rotation
 		if (listViewSavedTopIndex != -1) {
@@ -466,6 +459,37 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// Calculate FAB y-offset
 		fabPaddingPixels = calculateFabPadding(rootView.getContext());
 		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
+
+		// Retrieve any saved attachments
+		final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)) {
+			JSONArray savedAttachmentsJsonArray = null;
+			try {
+				savedAttachmentsJsonArray = new JSONArray(prefs.getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, ""));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			if (savedAttachmentsJsonArray != null && savedAttachmentsJsonArray.length() > 0) {
+				if (pendingAttachments == null) {
+					pendingAttachments = new ArrayList<ImageItem>();
+				} else {
+					pendingAttachments.clear();
+				}
+				for (int i = 0; i < savedAttachmentsJsonArray.length(); i++) {
+					try {
+						JSONObject savedAttachmentJson = savedAttachmentsJsonArray.getJSONObject(i);
+						if (savedAttachmentJson != null) {
+							pendingAttachments.add(new ImageItem(savedAttachmentJson));
+						}
+					} catch (JSONException e) {
+						continue;
+					}
+				}
+			}
+			// Stored pending attachemnts have been restored, remove it from the persistent storage
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).apply();
+		}
 	}
 
 	public boolean onMenuItemClick(MenuItem menuItem) {
@@ -492,6 +516,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
+		savePendingComposingMessage();
 		//int index = messageCenterRecyclerView.getFirstVisiblePosition();
 		View v = messageCenterRecyclerView.getChildAt(0);
 		int top = (v == null) ? 0 : (v.getTop() - messageCenterRecyclerView.getPaddingTop());
@@ -508,6 +533,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public boolean onBackPressed(boolean hardwareButton) {
+		savePendingComposingMessage();
 		ApptentiveViewActivity hostingActivity = (ApptentiveViewActivity) hostingActivityRef.get();
 		if (hostingActivity != null) {
 			DialogFragment myFrag = (DialogFragment) (hostingActivity.getSupportFragmentManager()).findFragmentByTag(DIALOG_IMAGE_PREVIEW);
@@ -526,7 +552,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public boolean cleanup() {
-		savePendingComposingMessage();
 		clearPendingMessageCenterPushNotification();
 		clearWhoCardUi(null, null, 0);
 		// Set to null, otherwise they will hold reference to the activity context
@@ -572,7 +597,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
-		messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
 	private boolean checkAddWhoCardIfRequired() {
@@ -600,7 +625,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, mode, 0));
-		messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
 	public void addWhoCardAsMessageItem(int mode) {
@@ -683,14 +708,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 
 	public void addAttachmentsToComposer(final List<ImageItem> images) {
-		int numberOfExistingAttachments = imageAttachmentstList.size();
-		ArrayList<ImageItem> uniqueImages = new ArrayList<ImageItem>();
+		ArrayList<ImageItem> newImages = new ArrayList<ImageItem>();
 		// only add new images, and filter out duplicates
 		if (images != null && images.size() > 0) {
 			for (ImageItem newImage : images) {
 				boolean bDupFound = false;
-				for (ImageItem existingImage : imageAttachmentstList) {
-					if (newImage.originalPath.equals(existingImage.originalPath)) {
+				for (ImageItem pendingAttachment : pendingAttachments) {
+					if (newImage.originalPath.equals(pendingAttachment.originalPath)) {
 						bDupFound = true;
 						break;
 					}
@@ -698,59 +722,48 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				if (bDupFound) {
 					continue;
 				} else {
-					uniqueImages.add(newImage);
+					pendingAttachments.add(newImage);
+					newImages.add(newImage);
 				}
 			}
 		}
-		if (uniqueImages.size() == 0) {
-			return;
-		}
-		imageAttachmentstList.addAll(uniqueImages);
-		// New attachments are added to a composer with no prior attachment
-		if (imageAttachmentstList.size() > 0 && numberOfExistingAttachments == 0) {
-			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_LIST_SHOWN);
-		}
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_ADD);
-
 		View v = messageCenterRecyclerView.getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
 
+
 		if (messageCenterRecyclerViewAdapter != null) {
 			// Only update composing view if image is attached successfully
-			messageCenterRecyclerViewAdapter.addImagestoComposer(uniqueImages);
-			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+			messageCenterRecyclerViewAdapter.addImagestoComposer(composer, newImages);
+			//messageCenterRecyclerViewAdapter.notify();
 		}
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
-		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-			firstIndex, top));
-
-		updateComposingBar();
+		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
 	}
 
-	public void restoreSavedAttachmentsToComposer(final List<ImageItem> images) {
-		imageAttachmentstList.clear();
-		imageAttachmentstList.addAll(images);
+	public void setAttachmentsInComposer(final List<ImageItem> images) {
+		ApptentiveLog.e("setAttachmentsInComposer()");
 		View v = messageCenterRecyclerView.getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
 		// Only update composing view if image is attached successfully
 		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.addImagestoComposer(images);
+			ApptentiveLog.e("Restoring attachments");
+			messageCenterRecyclerViewAdapter.addImagestoComposer(composer, images);
 		}
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
+/*
 		if (messageCenterRecyclerViewAdapter != null) {
 			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 		}
-		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-			firstIndex, top));
-		updateComposingBar();
+*/
+		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
 	}
 
 	public void removeImageFromComposer(final int position) {
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
-		imageAttachmentstList.remove(position);
+		pendingAttachments.remove(position);
 		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.removeImageFromComposer(position);
-			int count = imageAttachmentstList.size();
+			messageCenterRecyclerViewAdapter.removeImageFromComposer(composer, position);
+//			int count = imageAttachmentstList.size();
 			// Show keyboard if all attachments have been removed
 			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 		}
@@ -868,10 +881,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	@Override
-	public void onComposingViewCreated(final EditText composerEditText) {
+	public void onComposingViewCreated(MessageComposerHolder composer, final EditText composerEditText, final ApptentiveImageGridView attachments) {
 		ApptentiveLog.e("onComposingViewCreated()");
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 
+		this.composer = composer;
 		this.composerEditText = composerEditText;
 
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
@@ -895,39 +909,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE).apply();
 		}
 
+		setAttachmentsInComposer(pendingAttachments);
 
-		// Restore composing attachments
-		if (prefs.contains(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)) {
-			JSONArray jArray = null;
-			try {
-				jArray = new JSONArray(prefs.getString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, ""));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			if (jArray != null && jArray.length() > 0) {
-				if (savedAttachmentstList == null) {
-					savedAttachmentstList = new ArrayList<ImageItem>();
-				}
-				for (int i = 0; i < jArray.length(); i++) {
-					try {
-						JSONObject json = jArray.getJSONObject(i);
-						if (json != null) {
-							savedAttachmentstList.add(new ImageItem(json));
-						}
-					} catch (JSONException e) {
-						continue;
-					}
-				}
-			}
-			// Stored pending attachemnts have been restored, remove it from the persistent storage
-			SharedPreferences.Editor editor = prefs.edit();
-			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).apply();
-		}
-
-		if (savedAttachmentstList != null) {
-			restoreSavedAttachmentsToComposer(savedAttachmentstList);
-			savedAttachmentstList = null;
-		}
 		messageCenterRecyclerView.setPadding(0, 0, 0, 0);
 
 		if (composerEditText != null) {
@@ -981,7 +964,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void afterComposingTextChanged(String message) {
-		pendingMessage = message;
+		//pendingMessage = message;
 	}
 
 	@Override
@@ -998,18 +981,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_REMOVE_COMPOSER));
-
-		// TODO: Remove Composer
-		// TODO: Remove context message
-		// TODO: Clear composer
-		// TODO: Clear any saved state like attachments, saved message state.
-		// TODO: Show FAB
-		// TODO: Show Profile Button
 		if (messageCenterRecyclerViewAdapter != null) {
 			addExpectationStatusIfNeeded();
 		}
-		imageAttachmentstList.clear();
-		pendingMessage = null;
+		pendingAttachments.clear();
+		composerEditText.getText().clear();
+		//pendingMessage = null;
+		clearPendingComposingMessage();
 		showFab();
 		showProfileButton();
 	}
@@ -1026,28 +1004,20 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messagingActionHandler.sendMessage(sendContextMessage);
 			contextMessage = null;
 		}
-
-
-		if (!pendingMessage.isEmpty() || imageAttachmentstList.size() != 0) {
-
+		if (!TextUtils.isEmpty(composerEditText.getText()) || pendingAttachments.size() > 0) {
 			Bundle b = new Bundle();
-			b.putString(COMPOSING_EDITTEXT_STATE, pendingMessage);
-			b.putParcelableArrayList(COMPOSING_ATTACHMENTS, imageAttachmentstList);
-			Message msg = messagingActionHandler.obtainMessage(MSG_START_SENDING, pendingMessage);
+			b.putString(COMPOSING_EDITTEXT_STATE, composerEditText.getText().toString());
+			b.putParcelableArrayList(COMPOSING_ATTACHMENTS, new ArrayList<Parcelable>(pendingAttachments));
+			Message msg = messagingActionHandler.obtainMessage(MSG_START_SENDING, composerEditText.getText().toString());
 			msg.setData(b);
 			ApptentiveLog.e("Send Send Message Message");
 			unsentMessagesCount++;
 			messagingActionHandler.sendMessage(msg);
-			pendingMessage = null;
+			//pendingMessage = null;
+			composerEditText.getText().clear();
+			pendingAttachments.clear();
+			clearPendingComposingMessage();
 		}
-
-		// Add status if needed?
-/*
-		if (messageCenterRecyclerViewAdapter != null) {
-			addExpectationStatusIfNeeded();
-		}
-*/
-
 		showFab();
 		showProfileButton();
 	}
@@ -1213,17 +1183,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE);
 		}
 
-		JSONArray jArray = new JSONArray();
+		JSONArray pendingAttachmentsJsonArray = new JSONArray();
 		// Save pending attachment
-		for (ImageItem pendingAttachment : imageAttachmentstList) {
-			JSONObject jobject = pendingAttachment.toJSON();
-			if (jobject != null) {
-				jArray.put(jobject);
-			}
+		for (ImageItem pendingAttachment : pendingAttachments) {
+			pendingAttachmentsJsonArray.put(pendingAttachment.toJSON());
 		}
 
-		if (jArray.length() > 0) {
-			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, jArray.toString());
+		if (pendingAttachmentsJsonArray.length() > 0) {
+			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, pendingAttachmentsJsonArray.toString());
 		} else {
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
 		}
@@ -1235,14 +1202,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 */
 	public void clearPendingComposingMessage() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE);
-		editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
-		editor.apply();
+		prefs.edit()
+			.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE)
+			.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)
+			.apply();
 	}
 
 	private Parcelable saveEditTextInstanceState() {
-		savePendingComposingMessage();
 		if (composerEditText != null) {
 			// Hide keyboard if the keyboard was up prior to rotation
 			Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
