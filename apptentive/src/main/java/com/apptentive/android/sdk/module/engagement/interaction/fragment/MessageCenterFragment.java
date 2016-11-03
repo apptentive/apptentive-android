@@ -997,6 +997,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
+
+		if (shouldOpenComposerAfterClosingWhoCard()) {
+			addComposingCard();
+		} else {
+			showFab();
+			showProfileButton();
+		}
 	}
 
 	@Override
@@ -1013,6 +1020,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
+
+		if (shouldOpenComposerAfterClosingWhoCard()) {
+			addComposingCard();
+		} else {
+			showFab();
+			showProfileButton();
+		}
+	}
+
+	private boolean shouldOpenComposerAfterClosingWhoCard() {
+		return interaction.getWhoCard().isRequire() && (recyclerViewContainsItemOfType(MESSAGE_CONTEXT) || recyclerViewContainsItemOfType(MESSAGE_OUTGOING));
 	}
 
 	public void cleanupWhoCard() {
@@ -1025,8 +1043,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		whoCardNameEditText = null;
 		whoCardEmailEditText = null;
 		addExpectationStatusIfNeeded();
-		showFab();
-		showProfileButton();
 	}
 
 	@Override
