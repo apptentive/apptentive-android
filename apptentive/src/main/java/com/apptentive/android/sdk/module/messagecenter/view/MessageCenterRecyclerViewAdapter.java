@@ -252,7 +252,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	public void addImagestoComposer(MessageComposerHolder composer, List<ImageItem> images) {
 		composer.addImagesToImageAttachmentBand(images);
-		//notifyDataSetChanged();
+		composer.setSendButtonState();
 	}
 
 	public void removeImageFromComposer(MessageComposerHolder composer, int position) {

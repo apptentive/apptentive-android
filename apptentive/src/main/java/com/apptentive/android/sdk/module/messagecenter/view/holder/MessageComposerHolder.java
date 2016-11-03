@@ -97,7 +97,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		Drawable sendButtonDrawable = DrawableCompat.wrap(sendButton.getDrawable());
 		DrawableCompat.setTintList(sendButtonDrawable, colors);
 		sendButton.setImageDrawable(sendButtonDrawable);
-		setSendButtonEnabled(false);
 		sendButton.setContentDescription(composer.sendButton);
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -140,8 +139,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 					adapter.getListener().afterComposingTextChanged(editable.toString());
 				}
 				Linkify.addLinks(editable, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
-				// TODO: Call this from the fragment instead?
-				setSendButtonEnabled(!TextUtils.isEmpty(message.getText()));
 			}
 		});
 
@@ -284,7 +281,8 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		}
 	}
 
-	private void setSendButtonEnabled(boolean enabled) {
+	public void setSendButtonState() {
+		boolean enabled = !TextUtils.isEmpty(message.getText()) || !images.isEmpty();
 		if (sendButton.isEnabled() ^ enabled) { // Only if changing value
 			sendButton.setEnabled(enabled);
 			if (enabled) {

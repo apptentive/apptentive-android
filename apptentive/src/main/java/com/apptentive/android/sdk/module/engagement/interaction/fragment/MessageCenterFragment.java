@@ -730,7 +730,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		View v = messageCenterRecyclerView.getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
 
-
+		if (newImages.isEmpty()) {
+			return;
+		}
 		if (messageCenterRecyclerViewAdapter != null) {
 			// Only update composing view if image is attached successfully
 			messageCenterRecyclerViewAdapter.addImagestoComposer(composer, newImages);
@@ -923,6 +925,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			});
 		}
 		hideFab();
+		composer.setSendButtonState();
 	}
 
 	@Override
@@ -964,7 +967,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void afterComposingTextChanged(String message) {
-		//pendingMessage = message;
+		composer.setSendButtonState();
 	}
 
 	@Override
