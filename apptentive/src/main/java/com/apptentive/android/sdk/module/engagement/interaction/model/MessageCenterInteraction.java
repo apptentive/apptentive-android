@@ -215,6 +215,15 @@ public class MessageCenterInteraction extends Interaction {
 		return configuration.optJSONObject(KEY_PROFILE);
 	}
 
+	public WhoCard getWhoCard() {
+		try {
+			return new WhoCard(getProfile().toString());
+		} catch (JSONException e) {
+			// Never happens.
+		}
+		return null;
+	}
+
 	public MessageCenterComposingItem getWhoCardEdit() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {

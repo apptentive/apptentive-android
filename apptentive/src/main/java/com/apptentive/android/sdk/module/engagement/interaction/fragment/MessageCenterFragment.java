@@ -7,9 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -116,9 +113,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private final static String DIALOG_IMAGE_PREVIEW = "imagePreviewDialog";
 
-	private final static int WHO_CARD_MODE_INIT = 1;
-	private final static int WHO_CARD_MODE_EDIT = 2;
-
 	private final static long DEFAULT_DELAYMILLIS = 200;
 
 	/* Fragment.getActivity() may return null if not attached.
@@ -171,7 +165,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * Used to save the state of the who card if the user closes Message Center for a moment,
 	 * , rotate device, attaches a file, etc.
 	 */
-	private int pendingWhoCardMode;
+	private boolean pendingWhoCardMode;
 	private Parcelable pendingWhoCardName;
 	private Parcelable pendingWhoCardEmail;
 	private String pendingWhoCardAvatarFile;
@@ -221,7 +215,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		pendingWhoCardName = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(WHO_CARD_NAME);
 		pendingWhoCardEmail = (savedInstanceState == null) ? null : savedInstanceState.getParcelable(WHO_CARD_EMAIL);
 		pendingWhoCardAvatarFile = (savedInstanceState == null) ? null : savedInstanceState.getString(WHO_CARD_AVATAR_FILE);
-		pendingWhoCardMode = (savedInstanceState == null) ? 0 : savedInstanceState.getInt(WHO_CARD_MODE);
+		pendingWhoCardMode = savedInstanceState != null && savedInstanceState.getBoolean(WHO_CARD_MODE);
 		return inflater.inflate(R.layout.apptentive_message_center, container, false);
 	}
 
@@ -514,9 +508,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 
 			final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+			boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 			forceShowKeyboard = true;
-			addWhoCard((!bWhoCardSet) ? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT);
+			addWhoCard(!whoCardDisplayedBefore);
 			return true;
 		} else {
 			return false;
@@ -537,7 +531,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			outState.putParcelable(WHO_CARD_EMAIL, whoCardEmailEditText != null ? whoCardEmailEditText.onSaveInstanceState() : null);
 			outState.putString(WHO_CARD_AVATAR_FILE, messageCenterRecyclerViewAdapter.getWhoCardAvatarFileName());
 		}
-		outState.putInt(WHO_CARD_MODE, pendingWhoCardMode);
+		outState.putBoolean(WHO_CARD_MODE, pendingWhoCardMode);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -610,15 +604,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private boolean checkAddWhoCardIfRequired() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+		boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
-			if (!bWhoCardSet) {
-				addWhoCard(WHO_CARD_MODE_INIT);
+			if (!whoCardDisplayedBefore) {
+				addWhoCard(true);
 				return true;
 			} else {
 				String savedEmail = Apptentive.getPersonEmail();
 				if (TextUtils.isEmpty(savedEmail)) {
-					addWhoCard(WHO_CARD_MODE_EDIT);
+					addWhoCard(false);
 					return true;
 				}
 			}
@@ -626,16 +620,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		return false;
 	}
 
-	public void addWhoCard(int mode) {
+	public void addWhoCard(boolean initial) {
 		hideFab();
 		hideProfileButton();
 		JSONObject profile = interaction.getProfile();
 		if (profile != null) {
-			pendingWhoCardMode = mode;
+			pendingWhoCardMode = initial;
 			messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_WHOCARD);
 			messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
 			messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, mode, 0, profile));
+			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, initial ? 0 : 1, 0, profile));
 			//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 		}
 	}
@@ -1001,6 +995,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
 
+		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
 	}
 
@@ -1016,6 +1011,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
 
+		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
 	}
 
@@ -1025,7 +1021,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		pendingWhoCardName = null;
 		pendingWhoCardEmail = null;
 		pendingWhoCardAvatarFile = null;
-		pendingWhoCardMode = 0;
+		pendingWhoCardMode = false;
 		whoCardNameEditText = null;
 		whoCardEmailEditText = null;
 		addExpectationStatusIfNeeded();
@@ -1116,11 +1112,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-	private void saveWhoCardSetState() {
+	private void setWhoCardAsPreviouslyDisplayed() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, true);
+		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, true);
 		editor.apply();
+	}
+
+	private boolean wasWhoCardAsPreviouslyDisplayed() {
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		return prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, false);
 	}
 
 	// Retrieve the content from the composing area
@@ -1225,17 +1226,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			return mediumDateFormat.format(date);
 		}
 		return null;
-	}
-
-
-	private void deleteItemWithAnimation(final View v, final Animator.AnimatorListener al,
-																			 final ValueAnimator.AnimatorUpdateListener vl, long delay) {
-		if (v == null) {
-			return;
-		}
-		AnimatorSet animatorSet = AnimationUtil.buildListViewRowRemoveAnimator(v, al, vl);
-		animatorSet.setStartDelay(delay);
-		animatorSet.start();
 	}
 
 	private int calculateFabPadding(Context context) {
@@ -1390,13 +1380,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_MESSAGE_ADD_WHOCARD: {
 					ApptentiveLog.e("Adding Who Card");
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
-					int mode = msg.arg1; // TODO: Do something with mode?
-					JSONObject profile = (JSONObject) msg.obj;
-					try {
-						fragment.messages.add(new WhoCard(profile.toString()));
-					} catch (JSONException e) {
-						ApptentiveLog.w("Unable to instantiate Who Card");
-					}
+					boolean initial = msg.arg1 == 0; // TODO: Do something with mode?
+					WhoCard whoCard = fragment.interaction.getWhoCard();
+					whoCard.setInitial(initial);
+					fragment.messages.add(whoCard);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
 					break;
@@ -1490,8 +1477,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					// TODO: Move this somewhere else?
 					// After the message is sent, check if Who Card need to be shown for the 1st time(When Who Card is either requested or required)
 					SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-					boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
-					if (!bWhoCardSet) {
+					boolean whoCardDisplayedBefore = fragment.wasWhoCardAsPreviouslyDisplayed();
+					if (!whoCardDisplayedBefore) {
 						JSONObject data = new JSONObject();
 						try {
 							data.put("required", fragment.interaction.getWhoCardRequired());
@@ -1503,7 +1490,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						if (fragment.interaction.getWhoCardRequestEnabled()) {
 							fragment.forceShowKeyboard = true;
-							fragment.addWhoCard(WHO_CARD_MODE_INIT);
+							fragment.addWhoCard(true);
 						}
 					}
 					break;

@@ -17,11 +17,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class WhoCardHolder extends RecyclerView.ViewHolder {
 
@@ -53,12 +55,25 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 
 	public void bindView(RecyclerView recyclerView, final WhoCard whoCard) {
 
-		title.setText(whoCard.getTitle());
-		nameLayout.setHint(whoCard.getNameHint());
-		emailExplanation.setText(whoCard.getEmailExplanation());
+		if (TextUtils.isEmpty(whoCard.getTitle())) {
+			title.setVisibility(GONE);
+		} else {
+			title.setVisibility(VISIBLE);
+			title.setHint(whoCard.getTitle());
+		}
+
+		if (TextUtils.isEmpty(whoCard.getNameHint())) {
+			nameLayout.setVisibility(GONE);
+		} else {
+			nameLayout.setVisibility(VISIBLE);
+			nameLayout.setHint(whoCard.getNameHint());
+		}
+		// TODO: Restore pending text if view is for instance rotated before being submitted.
+		nameEditText.setText(Apptentive.getPersonName());
+
 		emailLayout.setHint(whoCard.getEmailHint());
-		skipButton.setText(whoCard.getSkipButton());
-		saveButton.setText(whoCard.getSaveButton());
+
+		emailEditText.setText(Apptentive.getPersonEmail());
 
 		TextWatcher emailTextWatcher = new TextWatcher() {
 			@Override
@@ -93,18 +108,33 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 		};
 		emailEditText.addTextChangedListener(emailTextWatcher);
 
-		// TODO: Restore pending text if view is for instance rotated before being submitted.
-		nameEditText.setText(Apptentive.getPersonName());
-		emailEditText.setText(Apptentive.getPersonEmail());
+		if (TextUtils.isEmpty(whoCard.getEmailExplanation())) {
+			emailExplanation.setVisibility(GONE);
+		} else {
+			emailExplanation.setVisibility(VISIBLE);
+			emailExplanation.setText(whoCard.getEmailExplanation());
+		}
 
-		// TODO: Hook up listeners
-		skipButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				if (adapter.getListener() != null) {
-					adapter.getListener().onCloseWhoCard(skipButton.getText().toString());
+		if (TextUtils.isEmpty(whoCard.getSkipButton())) {
+			skipButton.setVisibility(GONE);
+		} else {
+			skipButton.setVisibility(VISIBLE);
+			skipButton.setText(whoCard.getSkipButton());
+			skipButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View view) {
+					if (adapter.getListener() != null) {
+						adapter.getListener().onCloseWhoCard(skipButton.getText().toString());
+					}
 				}
-			}
-		});
+			});
+		}
+
+		if (TextUtils.isEmpty(whoCard.getSaveButton())) {
+			saveButton.setVisibility(GONE);
+		} else {
+			saveButton.setVisibility(VISIBLE);
+			saveButton.setText(whoCard.getSaveButton());
+		}
 
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {

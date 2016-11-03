@@ -216,36 +216,6 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		//isInPauseState = bPause; // TODO
 	}
 
-	public Parcelable getWhoCardNameState() {
-		// TODO
-		return new Parcelable() {
-			@Override
-			public int describeContents() {
-				return 0;
-			}
-
-			@Override
-			public void writeToParcel(Parcel dest, int flags) {
-
-			}
-		};
-	}
-
-	public Parcelable getWhoCardEmailState() {
-		// TODO
-		return new Parcelable() {
-			@Override
-			public int describeContents() {
-				return 0;
-			}
-
-			@Override
-			public void writeToParcel(Parcel dest, int flags) {
-
-			}
-		};
-	}
-
 	public String getWhoCardAvatarFileName() {
 		return null; // TODO
 	}

@@ -70,10 +70,19 @@ public class WhoCard extends JSONObject implements MessageCenterUtil.MessageCent
 	}
 
 	public String getNameHint() {
+		if (isRequire() && isInitial()) {
+			// The Who Card will show up right when MC is opened in this scenario. Don't ask for the name at this time.
+			return null;
+		}
 		return getApplicableConfig().optString(KEY_NAME_HINT, null);
 	}
 
 	public String getEmailHint() {
+		if (isRequire() && !isInitial()) {
+			// Email is required when initial, but also if not initial, if the form itself was ever required.
+			return getInitial().optString(KEY_EMAIL_HINT, null);
+
+		}
 		return getApplicableConfig().optString(KEY_EMAIL_HINT, null);
 	}
 
@@ -82,6 +91,10 @@ public class WhoCard extends JSONObject implements MessageCenterUtil.MessageCent
 	}
 
 	public String getSkipButton() {
+		if (isRequire() && isInitial()) {
+			// The Who Card will show up right when MC is opened in this scenario. Don't allow skipping it at this time.
+			return null;
+		}
 		return getApplicableConfig().optString(KEY_SKIP_BUTTON, null);
 	}
 
