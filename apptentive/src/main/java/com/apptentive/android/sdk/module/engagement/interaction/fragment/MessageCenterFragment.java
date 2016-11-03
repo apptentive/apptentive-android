@@ -555,7 +555,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public boolean cleanup() {
 		clearPendingMessageCenterPushNotification();
-		clearWhoCardUi(null, null, 0);
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
@@ -830,20 +829,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public synchronized void onResumeSending() {
 		messagingActionHandler.sendEmptyMessage(MSG_RESUME_SENDING);
-	}
-
-	public void clearWhoCardUi(Animator.AnimatorListener al, ValueAnimator.AnimatorUpdateListener vl, long delay) {
-		if (whoCardItem != null && messageCenterRecyclerViewAdapter != null) {
-			if (al != null) {
-				deleteItemWithAnimation(messageCenterRecyclerViewAdapter.getWhoCardView(), al, vl, delay);
-			} else {
-				whoCardItem = null;
-				pendingWhoCardName = null;
-				pendingWhoCardEmail = null;
-				pendingWhoCardAvatarFile = null;
-				pendingWhoCardMode = 0;
-			}
-		}
 	}
 
 	@Override
