@@ -48,6 +48,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
@@ -55,7 +56,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.AttachmentPreviewDialog;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
@@ -91,9 +91,11 @@ import static com.apptentive.android.sdk.module.messagecenter.model.MessageCente
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.STATUS;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.WHO_CARD;
 
-public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements OnMenuItemClickListener, MessageManager.AfterSendMessageListener,
-	MessageAdapter.OnListviewItemActionListener,
+public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements
+	OnListviewItemActionListener,
+	MessageManager.AfterSendMessageListener,
 	MessageManager.OnNewIncomingMessagesListener,
+	OnMenuItemClickListener,
 	AbsListView.OnScrollListener,
 	MessageCenterListView.OnListviewResizeListener,
 	ImageGridViewAdapter.Callback {
@@ -842,44 +844,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				pendingWhoCardMode = 0;
 			}
 		}
-	}
-
-	@Override
-	public void updateComposingBar() {
-/* TODO: What do we save here?
-		if (messageCenterRecyclerViewAdapter != null) {
-			MessageCenterComposingActionBarView barView = messageCenterRecyclerViewAdapter.getComposingActionBarView();
-			if (barView != null) {
-				barView.showConfirmation = true;
-				int attachmentCount = imageAttachmentstList.size();
-				if (attachmentCount == 0) {
-					Editable content = getPendingComposingContent();
-					final String messageText = (content != null) ? content.toString().trim() : "";
-					barView.showConfirmation = !(messageText.isEmpty());
-				}
-
-				if (attachmentCount == attachmentsAllowed) {
-					AnimationUtil.fadeOutGone(barView.attachButton);
-				} else {
-					if (barView.attachButton.getVisibility() != View.VISIBLE) {
-						AnimationUtil.fadeIn(barView.attachButton, null);
-					}
-				}
-
-				if (barView.showConfirmation == true) {
-					barView.sendButton.setEnabled(true);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-						barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivityRef.get(), R.attr.apptentiveButtonTintColor));
-					}
-				} else {
-					barView.sendButton.setEnabled(false);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-						barView.sendButton.setColorFilter(Util.getThemeColor(hostingActivityRef.get(), R.attr.apptentiveButtonTintColorDisabled));
-					}
-				}
-			}
-		}
-*/
 	}
 
 	@Override

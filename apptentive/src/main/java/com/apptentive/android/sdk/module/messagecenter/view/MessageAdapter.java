@@ -119,8 +119,6 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 	public interface OnListviewItemActionListener {
 		void onComposingViewCreated(MessageComposerHolder composer, EditText composerEditText, ApptentiveImageGridView attachments);
 
-		void updateComposingBar();
-
 		void beforeComposingTextChanged(CharSequence str);
 
 		void onComposingTextChanged(CharSequence str);
@@ -450,7 +448,7 @@ public class MessageAdapter<T extends MessageCenterUtil.MessageCenterListItem> e
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					composingActionListener.updateComposingBar();
+					//composingActionListener.updateComposingBar();
 				}
 
 				@Override
