@@ -137,6 +137,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private View fab;
 
+	private boolean forceShowKeyboard;
 
 	// Data backing of the listview
 	private ArrayList<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
@@ -245,8 +246,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		// Restore listview scroll offset to where it was before rotation
 		if (listViewSavedTopIndex != -1) {
-			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-				listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
+			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
 		} else {
 			messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 		}
@@ -375,6 +375,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setup(View rootView, boolean isInitMessages) {
+		boolean addedAnInteractiveCard = false;
+
 		messageCenterRecyclerView = (MessageCenterRecyclerView) rootView.findViewById(R.id.message_center_recycler_view);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			messageCenterRecyclerView.setNestedScrollingEnabled(true);
@@ -393,6 +395,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				forceShowKeyboard = true;
 				addComposingCard();
 			}
 		});
@@ -410,14 +413,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			String contextualMessageBody = interaction.getContextualMessageBody();
 			if (contextualMessageBody != null) {
 				// Clear any pending composing message to present an empty composing area
-				// TODO: Do we need this?
 				clearPendingComposingMessage();
 				messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-				ApptentiveLog.e("Telling to add Context Message");
-				Message msg = messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, contextualMessageBody);
-				messagingActionHandler.sendMessage(msg);
+				messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, contextualMessageBody));
 				// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
 				if (!checkAddWhoCardIfRequired()) {
+					addedAnInteractiveCard = true;
+					forceShowKeyboard = false;
 					addComposingCard();
 				}
 			}
@@ -426,12 +428,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			** Pending contents would be saved if the user was in composing Who card mode and exitted through back button
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
+				addedAnInteractiveCard = true;
 				addWhoCard(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there is only greeting message, show composing.
 				 * If Who Card is required, show Who Card first
 				 */
 				if (messages.size() == 1) { // TODO: Don't use these magic numbers everywhere
+					addedAnInteractiveCard = true;
 					addComposingCard();
 				} else {
 					// Finally check if status message need to be restored
@@ -459,6 +463,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// Calculate FAB y-offset
 		fabPaddingPixels = calculateFabPadding(rootView.getContext());
 		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
+
+		if (!addedAnInteractiveCard) {
+			showFab();
+		}
 
 		// Retrieve any saved attachments
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
@@ -507,6 +515,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 			boolean bWhoCardSet = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_SET, false);
+			forceShowKeyboard = true;
 			addWhoCard((!bWhoCardSet) ? WHO_CARD_MODE_INIT : WHO_CARD_MODE_EDIT);
 			return true;
 		} else {
@@ -853,12 +862,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		if (composerEditText != null) {
 			composerEditText.requestFocus();
-			composerEditText.post(new Runnable() {
-				@Override
-				public void run() {
-					Util.showSoftKeyboard(hostingActivityRef.get(), composerEditText);
-				}
-			});
+			if (forceShowKeyboard) {
+				composerEditText.post(new Runnable() {
+					@Override
+					public void run() {
+						if (forceShowKeyboard) {
+							forceShowKeyboard = false;
+							Util.showSoftKeyboard(hostingActivityRef.get(), composerEditText);
+						}
+					}
+				});
+			}
 		}
 		hideFab();
 		composer.setSendButtonState();
@@ -881,13 +895,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// TODO: Track which field has focus and apply correctly
 		if (nameEditText != null) {
 			nameEditText.requestFocus();
-			nameEditText.post(new Runnable() {
-				@Override
-				public void run() {
-					Util.showSoftKeyboard(hostingActivityRef.get(), nameEditText);
-				}
-			});
-
+			if (forceShowKeyboard) {
+				nameEditText.post(new Runnable() {
+					@Override
+					public void run() {
+						if (forceShowKeyboard) {
+							forceShowKeyboard = false;
+							Util.showSoftKeyboard(hostingActivityRef.get(), nameEditText);
+						}
+					}
+				});
+			}
 		}
 		hideFab();
 	}
@@ -1484,6 +1502,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
 						if (fragment.interaction.getWhoCardRequestEnabled()) {
+							fragment.forceShowKeyboard = true;
 							fragment.addWhoCard(WHO_CARD_MODE_INIT);
 						}
 					}
