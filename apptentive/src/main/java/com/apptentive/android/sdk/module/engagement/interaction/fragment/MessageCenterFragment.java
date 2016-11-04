@@ -175,7 +175,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	// FAB y-offset in pixels from the bottom edge
 	private int fabPaddingPixels;
-	private int attachmentsAllowed;
 
 	protected static final int MSG_SCROLL_TO_BOTTOM = 1;
 	protected static final int MSG_SCROLL_FROM_TOP = 2;
@@ -444,20 +443,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterRecyclerView.setAdapter(messageCenterRecyclerViewAdapter);
 
-/*
-		if (whoCardItem != null) {
-			showKeyboard = true;
-		} else if (composingItem != null) {
-			showKeyboard = true;
-			if (messages.size() == 3 || contextualMessage != null) {
-				showKeyboard = false;
-			}
-		}
-*/
-
 		// Calculate FAB y-offset
 		fabPaddingPixels = calculateFabPadding(rootView.getContext());
-		attachmentsAllowed = rootView.getContext().getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
 
 		if (!addedAnInteractiveCard) {
 			showFab();
