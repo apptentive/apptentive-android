@@ -640,28 +640,29 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
-		// TODO: Use handler for this
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-		// TODO: A simpler way to put the message in the correct place.
 		// Determine where to insert the new incoming message. It will be in front of any eidting
 		// area, i.e. composing, Who Card ...
-		int insertIndex = messages.size();
+		int insertIndex = messages.size(); // If inserted onto the end, then the list will have grown by one.
 
-		for (MessageCenterUtil.MessageCenterListItem item : messages) {
-			if (item.getListItemType() == MESSAGE_COMPOSER) {
-				insertIndex -= 1;
-				continue;
-			}
-			if (item.getListItemType() == MESSAGE_CONTEXT) {
-				insertIndex -= 1;
-				continue;
-			}
-			if (item.getListItemType() == WHO_CARD) {
-				insertIndex -= 1;
-				continue;
+		outside_loop:
+		// Starting at end of list, go back up the list to find the proper place to insert the incoming message.
+		for (int i = messages.size() - 1; i > 0; i--) {
+			MessageCenterUtil.MessageCenterListItem item = messages.get(i);
+			switch(item.getListItemType()) {
+				case MESSAGE_COMPOSER:
+				case MESSAGE_CONTEXT:
+				case WHO_CARD:
+				case STATUS:
+					insertIndex--;
+					break;
+				default:
+					// Any other type means we are past the temporary items.
+					break outside_loop;
 			}
 		}
 		messages.add(insertIndex, message);
+		messageCenterRecyclerViewAdapter.notifyItemInserted(insertIndex);
 
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
 		int lastIndex = messageCenterRecyclerView.getLastVisiblePosition();
@@ -674,17 +675,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 			}
 			// Restore the position of listview to composing view
-			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-				insertIndex, top));
+			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, insertIndex, top));
 		} else {
 			updateMessageSentStates();
-			if (messageCenterRecyclerViewAdapter != null) {
-				messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-			}
 		}
-
 	}
-
 
 	public void addAttachmentsToComposer(final List<ImageItem> images) {
 		ArrayList<ImageItem> newImages = new ArrayList<ImageItem>();
