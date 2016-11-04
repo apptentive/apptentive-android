@@ -192,6 +192,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected static final int MSG_OPT_INSERT_REGULAR_STATUS = 13;
 	protected static final int MSG_MESSAGE_REMOVE_WHOCARD = 14;
 	protected static final int MSG_ADD_CONTEXT_MESSAGE = 15;
+	protected static final int MSG_ADD_GREETING = 16;
 
 	private MessageCenterFragment.MessagingActionHandler messagingActionHandler;
 
@@ -599,7 +600,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		messagingActionHandler.sendEmptyMessage(MSG_MESSAGE_ADD_COMPOSING);
-		//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
+		messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 	}
 
 	private boolean checkAddWhoCardIfRequired() {
@@ -1325,8 +1326,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 			}
 		}
-		// Finally, add greeting message
-		messages.add(0, interaction.getGreeting());
+		messagingActionHandler.sendEmptyMessage(MSG_ADD_GREETING);
 	}
 
 	//	@Override
@@ -1419,7 +1419,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_MESSAGE_ADD_COMPOSING: {
-					//fragment.addComposerMessageItems();
 					fragment.messages.add(fragment.interaction.getComposer());
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
@@ -1432,7 +1431,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_SCROLL_TO_BOTTOM: {
 					fragment.messageCenterRecyclerView.setSelection(fragment.messages.size() - 1);
-					fragment.messageCenterRecyclerView.smoothScrollToPosition(fragment.messages.size() - 1);
+					fragment.messageCenterRecyclerView.scrollToPosition(fragment.messages.size() - 1);
 					break;
 				}
 				case MSG_SCROLL_FROM_TOP: {
@@ -1635,6 +1634,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ContextMessage contextMessage = new ContextMessage(body);
 					messages.add(contextMessage);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
+					break;
+				}
+				case MSG_ADD_GREETING: {
+					fragment.messages.add(0, fragment.interaction.getGreeting());
+					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(0);
 					break;
 				}
 			}
