@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.util.Util;
 
 public abstract class MessageHolder extends RecyclerView.ViewHolder {
 	public TextView datestamp;

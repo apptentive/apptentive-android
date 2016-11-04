@@ -248,12 +248,33 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		return datestamp;
 	}
 
-	public void setDatestamp(String datestamp) {
-		this.datestamp = datestamp;
+	/**
+	 * Sets the datestamp for this message.
+	 *
+	 * @param datestamp A datestamp
+	 * @return true if the datestamp was added or changed.
+	 */
+	public boolean setDatestamp(String datestamp) {
+		if (this.datestamp == null || !this.datestamp.equals(datestamp)) {
+			this.datestamp = datestamp;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public void clearDatestamp() {
-		this.datestamp = null;
+	/**
+	 * Clears the datestamp from a message
+	 *
+	 * @return true If the datestamp existed and was cleared, false if it was already cleared.
+	 */
+	public boolean clearDatestamp() {
+		if (datestamp != null) {
+			this.datestamp = null;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public abstract boolean isOutgoingMessage();

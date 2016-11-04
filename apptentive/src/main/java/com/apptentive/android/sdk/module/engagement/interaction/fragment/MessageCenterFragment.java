@@ -436,9 +436,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					addExpectationStatusIfNeeded();
 				}
 			}
-
-			updateMessageSentStates(); // Force timestamp recompilation.
-
 		}
 
 		messageCenterRecyclerView.setAdapter(messageCenterRecyclerViewAdapter);
@@ -480,6 +477,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS).apply();
 		}
+		updateMessageSentStates();
 	}
 
 	public boolean onMenuItemClick(MenuItem menuItem) {
@@ -671,9 +669,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			View v = messageCenterRecyclerView.getChildAt(0);
 			int top = (v == null) ? 0 : v.getTop();
 			updateMessageSentStates();
-			if (messageCenterRecyclerViewAdapter != null) {
-				messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-			}
 			// Restore the position of listview to composing view
 			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, insertIndex, top));
 		} else {
@@ -1176,11 +1171,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	Set<String> dateStampsSeen = new HashSet<String>();
 
 	public void updateMessageSentStates() {
+		ApptentiveLog.e("Updating datestamps");
 		dateStampsSeen.clear();
 		MessageCenterUtil.CompoundMessageCommonInterface lastSent = null;
 		Set<String> uniqueNonce = new HashSet<String>();
-		Iterator<MessageCenterUtil.MessageCenterListItem> messageIterator = messages.iterator();
+		int removedItems = 0;
+		ListIterator<MessageCenterUtil.MessageCenterListItem> messageIterator = messages.listIterator();
 		while (messageIterator.hasNext()) {
+			int adapterMessagePosition = messageIterator.nextIndex() - removedItems;
 			MessageCenterUtil.MessageCenterListItem message = messageIterator.next();
 			if (message instanceof ApptentiveMessage) {
 				/* Check if there is any duplicate messages and remove if found.
@@ -1188,17 +1186,24 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				 */
 				if (!uniqueNonce.add(((ApptentiveMessage) message).getNonce())) {
 					messageIterator.remove();
+					messageCenterRecyclerViewAdapter.notifyItemRemoved(adapterMessagePosition);
+					removedItems++;
 					continue;
 				}
 				// Update timestamps
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
 				Double sentOrReceivedAt = apptentiveMessage.getCreatedAt();
 				String dateStamp = createDatestamp(sentOrReceivedAt);
+				ApptentiveLog.e("Looking at datestamp: %s", dateStamp);
 				if (dateStamp != null) {
 					if (dateStampsSeen.add(dateStamp)) {
-						apptentiveMessage.setDatestamp(dateStamp);
+						if (apptentiveMessage.setDatestamp(dateStamp)) {
+							messageCenterRecyclerViewAdapter.notifyItemChanged(adapterMessagePosition);
+						}
 					} else {
-						apptentiveMessage.clearDatestamp();
+						if (apptentiveMessage.clearDatestamp()) {
+							messageCenterRecyclerViewAdapter.notifyItemChanged(adapterMessagePosition);
+						}
 					}
 				}
 
@@ -1426,13 +1431,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					// below is callback handling when receiving of message is acknowledged by server through POST response
 					fragment.unsentMessagesCount--;
 					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
-					for (MessageCenterUtil.MessageCenterListItem message : fragment.messages) {
+
+					for (int i = 0; i < fragment.messages.size(); i++) {
+						MessageCenterUtil.MessageCenterListItem message = fragment.messages.get(i);
 						if (message instanceof ApptentiveMessage) {
 							String nonce = ((ApptentiveMessage) message).getNonce();
 							if (nonce != null) {
 								String sentNonce = apptentiveMessage.getNonce();
 								if (sentNonce != null && nonce.equals(sentNonce)) {
 									((ApptentiveMessage) message).setCreatedAt(apptentiveMessage.getCreatedAt());
+									fragment.messageCenterRecyclerViewAdapter.notifyItemChanged(i);
 									break;
 								}
 							}
@@ -1447,7 +1455,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					View v = fragment.messageCenterRecyclerView.getChildAt(0);
 					int top = (v == null) ? 0 : v.getTop();
 
-					fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 					// If Who Card is being shown while a message is sent, make sure Who Card is still in view by scrolling to bottom
 					if (fragment.recyclerViewContainsItemOfType(WHO_CARD)) {
 						sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
@@ -1567,6 +1574,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_OPT_INSERT_REGULAR_STATUS: {
 					List<MessageCenterUtil.MessageCenterListItem> messages = fragment.messages;
 					MessageCenterStatus status = fragment.interaction.getRegularStatus();
+/*
 					for (int i = 0; i < messages.size(); i++) {
 						MessageCenterUtil.MessageCenterListItem item = messages.get(i);
 						if (item.getListItemType() == MESSAGE_COMPOSER) {
@@ -1575,6 +1583,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
 						}
 					}
+*/
 
 					int numOfMessages = messages.size();
 					if (numOfMessages > 0) {
@@ -1594,7 +1603,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							}
 						}
 					}
-
 					break;
 				}
 				case MSG_REMOVE_STATUS: {
