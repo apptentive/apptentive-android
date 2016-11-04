@@ -45,11 +45,11 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		nameView = (TextView) itemView.findViewById(R.id.sender_name);
 		messageBodyView = (TextView) itemView.findViewById(R.id.apptentive_compound_message_body);
 		imageBandView = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
-		//listener = view.getListener();
 	}
 
 	public void bindView(final RecyclerView parent, final CompoundMessage message) {
 		super.bindView(parent, message);
+		imageBandView.setupUi();
 		if (loadAvatar) {
 			ImageUtil.startDownloadAvatarTask(avatar, message.getSenderProfilePhoto());
 		}
@@ -102,14 +102,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 						}
 					}
 				});
-
 			}
 		}
-/*
-		if (!message.isRead() && !positionsWithPendingUpdateTask.contains(position)) {
-			positionsWithPendingUpdateTask.add(position);
-			startUpdateUnreadMessageTask(compoundMessage, position);
-		}
-*/
 	}
 }

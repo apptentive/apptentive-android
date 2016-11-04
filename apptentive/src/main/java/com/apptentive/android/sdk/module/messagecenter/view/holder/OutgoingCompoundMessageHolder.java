@@ -102,7 +102,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		return (showSent) ? itemView.getResources().getString(R.string.apptentive_sent) : null;
 	}
 
-	protected int getStatusColor(Double seconds, boolean isPaused) {
+	private int getStatusColor(Double seconds, boolean isPaused) {
 		if (seconds == null) {
 			// failed color (red)
 			return isPaused ? Util.getThemeColor(itemView.getContext(), R.attr.apptentiveValidationFailedColor) : 0;
@@ -110,5 +110,4 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		// other status color
 		return Util.getThemeColor(itemView.getContext(), android.R.attr.textColorSecondary);
 	}
-
 }

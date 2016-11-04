@@ -6,18 +6,22 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
+import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
@@ -35,6 +39,10 @@ import com.apptentive.android.sdk.module.messagecenter.view.holder.StatusHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.WhoCardHolder;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.GREETING;
@@ -53,6 +61,8 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 	RecyclerView recyclerView;
 	Interaction interaction;
 	List<MessageCenterUtil.MessageCenterListItem> messages;
+	// maps to prevent redundant asynctasks
+	private ArrayList<ApptentiveMessage> messagesWithPendingReadStatusUpdate = new ArrayList<ApptentiveMessage>();
 
 	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> messages) {
 		this.fragment = fragment;
@@ -161,6 +171,12 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
 				compoundHolder.bindView(recyclerView, compoundMessage);
+				// Mark as read
+				if (!compoundMessage.isRead() && !messagesWithPendingReadStatusUpdate.contains(compoundMessage)) {
+					messagesWithPendingReadStatusUpdate.add(compoundMessage);
+					startUpdateUnreadMessageTask(compoundMessage);
+				}
+
 				break;
 			}
 			case MESSAGE_OUTGOING: {
@@ -231,19 +247,50 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		}
 	}
 
-	public View getWhoCardView() {
-		return new View(fragment.getContext()); // TODO
-	}
-
-	public MessageCenterComposingActionBarView getComposingActionBarView() {
-		return new MessageCenterComposingActionBarView(fragment, null, null); // TODO
-	}
-
-	public View getComposingAreaView() {
-		return new View(fragment.getContext()); // TODO
-	}
-
 	public OnListviewItemActionListener getListener() {
 		return listener;
+	}
+
+	private void startUpdateUnreadMessageTask(CompoundMessage message) {
+		UpdateUnreadMessageTask task = new UpdateUnreadMessageTask(message);
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message);
+	}
+
+	private class UpdateUnreadMessageTask extends AsyncTask<ApptentiveMessage, Void, Void> {
+		private ApptentiveMessage message;
+
+		public UpdateUnreadMessageTask(ApptentiveMessage message) {
+			this.message = message;
+		}
+
+		@Override
+		protected Void doInBackground(ApptentiveMessage... messages) {
+			messages[0].setRead(true);
+			JSONObject data = new JSONObject();
+			try {
+				data.put("message_id", messages[0].getId());
+				data.put("message_type", messages[0].getType().name());
+			} catch (JSONException e) {
+				//
+			}
+			EngagementModule.engageInternal(fragment.getContext(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+
+			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
+			if (mgr != null) {
+				mgr.updateMessage(messages[0]);
+				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount());
+			}
+			return null;
+		}
+
+		@Override
+		protected void onCancelled() {
+			messagesWithPendingReadStatusUpdate.remove(message);
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			messagesWithPendingReadStatusUpdate.remove(message);
+		}
 	}
 }
