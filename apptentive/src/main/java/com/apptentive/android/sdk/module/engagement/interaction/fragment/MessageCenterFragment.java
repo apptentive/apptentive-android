@@ -77,7 +77,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -625,6 +624,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_OPT_INSERT_REGULAR_STATUS);
 	}
 
+	// TODO: What do we do with this?
 	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 
@@ -637,6 +637,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
+	/**
+	 * Call only from handler.
+	 */
 	public void displayNewIncomingMessageItem(ApptentiveMessage message) {
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 		// Determine where to insert the new incoming message. It will be in front of any eidting
@@ -647,7 +650,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		// Starting at end of list, go back up the list to find the proper place to insert the incoming message.
 		for (int i = messages.size() - 1; i > 0; i--) {
 			MessageCenterUtil.MessageCenterListItem item = messages.get(i);
-			switch(item.getListItemType()) {
+			switch (item.getListItemType()) {
 				case MESSAGE_COMPOSER:
 				case MESSAGE_CONTEXT:
 				case WHO_CARD:
@@ -712,23 +715,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void setAttachmentsInComposer(final List<ImageItem> images) {
-		ApptentiveLog.e("setAttachmentsInComposer()");
-		View v = messageCenterRecyclerView.getChildAt(0);
-		int top = (v == null) ? 0 : v.getTop();
-		// Only update composing view if image is attached successfully
-		if (messageCenterRecyclerViewAdapter != null) {
-			ApptentiveLog.e("Restoring attachments");
-			messageCenterRecyclerViewAdapter.addImagestoComposer(composer, images);
-		}
-		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
-/*
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
-		}
-*/
-		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
+		messageCenterRecyclerViewAdapter.addImagestoComposer(composer, images);
+		// The view will resize. Scroll it into view after a short delay to ensure the view has already resized.
+		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, 50);
+
 	}
 
+	// TODO: This needs to be sent through the Handler
 	public void removeImageFromComposer(final int position) {
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
 		pendingAttachments.remove(position);
@@ -1528,6 +1521,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_PAUSE_SENDING: {
+					ApptentiveLog.e("PAUSE");
 					if (!fragment.isPaused) {
 						fragment.isPaused = true;
 						if (fragment.unsentMessagesCount > 0) {
@@ -1542,12 +1536,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 								MessageCenterStatus newItem = fragment.interaction.getErrorStatusServer();
 								// TODO: fragment.addNewStatusItem(newItem);
 							}
+							//TODO: Do this better
 							fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 						}
 					}
 					break;
 				}
 				case MSG_RESUME_SENDING: {
+					ApptentiveLog.e("RESUME");
 					if (fragment.isPaused) {
 						fragment.isPaused = false;
 						if (fragment.unsentMessagesCount > 0) {
@@ -1555,6 +1551,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						}
 
 						fragment.messageCenterRecyclerViewAdapter.setPaused(fragment.isPaused);
+						// TODO: Do this better
 						fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 					}
 					break;

@@ -199,11 +199,10 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	 * @param imagesToAttach an array of new images to add
 	 */
 	public void addImagesToImageAttachmentBand(final List<ImageItem> imagesToAttach) {
-		ApptentiveLog.e("ADDING IMAGE");
-
 		if (imagesToAttach == null || imagesToAttach.size() == 0) {
 			return;
 		}
+		ApptentiveLog.e("ADDING IMAGES");
 
 		attachments.setupLayoutListener();
 		ApptentiveLog.e("SHOWING");
