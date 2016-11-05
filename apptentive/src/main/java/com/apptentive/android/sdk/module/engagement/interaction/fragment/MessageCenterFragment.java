@@ -53,7 +53,6 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.AttachmentPreviewDialog;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterListView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
@@ -93,7 +92,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	MessageManager.OnNewIncomingMessagesListener,
 	OnMenuItemClickListener,
 	AbsListView.OnScrollListener,
-	MessageCenterListView.OnListviewResizeListener,
 	ImageGridViewAdapter.Callback {
 
 	private MenuItem profileMenuItem;
@@ -391,12 +389,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				prepareMessages(items);
 			}
 
-			String contextualMessageBody = interaction.getContextualMessageBody();
-			if (contextualMessageBody != null) {
+			String contextMessageBody = interaction.getContextualMessageBody();
+			if (contextMessageBody != null) {
+				contextMessage = new ContextMessage(contextMessageBody);
 				// Clear any pending composing message to present an empty composing area
 				clearPendingComposingMessage();
 				messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-				messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, contextualMessageBody));
+				messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, contextMessage));
 				// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
 				if (!checkAddWhoCardIfRequired()) {
 					addedAnInteractiveCard = true;
@@ -896,7 +895,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		pendingAttachments.clear();
 		composerEditText.getText().clear();
-		//pendingMessage = null;
+		composingViewSavedState = null;
 		clearPendingComposingMessage();
 		showFab();
 		showProfileButton();
@@ -923,7 +922,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			ApptentiveLog.e("Send Send Message Message");
 			unsentMessagesCount++;
 			messagingActionHandler.sendMessage(msg);
-			//pendingMessage = null;
+			composingViewSavedState = null;
 			composerEditText.getText().clear();
 			pendingAttachments.clear();
 			clearPendingComposingMessage();
@@ -1030,39 +1029,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		showToolbarElevation(bCanScrollUp);
 	}
 
-	@Override
-	public void OnListViewResize(int w, int h, int oldw, int oldh) {
-		// detect keyboard launching. If height difference is more than 100 pixels, probably due to keyboard
-		if (oldh > h && oldh - h > 100) {
-/* TODO: Replace this?
-			if (messageCenterRecyclerViewAdapter.getComposerEditText() != null) {
-				// When keyboard is up, adjust the scolling such that the cursor is always visible
-				final int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
-				int lastIndex = messageCenterRecyclerView.getLastVisiblePosition();
-				View v = messageCenterRecyclerView.getChildAt(lastIndex - firstIndex);
-				int top = (v == null) ? 0 : v.getTop();
-				if (composerEditText != null) {
-					int pos = composerEditText.getSelectionStart();
-					Layout layout = composerEditText.getLayout();
-					int line = layout.getLineForOffset(pos);
-					int baseline = layout.getLineBaseline(line);
-					int ascent = layout.getLineAscent(line);
-					if (top + baseline - ascent > oldh - h) {
-						messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-							lastIndex, top - (oldh - h)), DEFAULT_DELAYMILLIS);
-					} else {
-						messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP,
-							lastIndex, top), DEFAULT_DELAYMILLIS);
-					}
-				}
-			}
-*/
-		}
-	}
-
-	/* Callback when the attach button is clicked
-	 *
-	 */
 	@Override
 	public void onAttachImage() {
 		try {
@@ -1605,8 +1571,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_ADD_CONTEXT_MESSAGE: {
 					ApptentiveLog.e("Adding Context Message");
 					List<MessageCenterUtil.MessageCenterListItem> messages = fragment.messages;
-					String body = (String) msg.obj;
-					ContextMessage contextMessage = new ContextMessage(body);
+					ContextMessage contextMessage = (ContextMessage) msg.obj;
 					messages.add(contextMessage);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
 					break;
