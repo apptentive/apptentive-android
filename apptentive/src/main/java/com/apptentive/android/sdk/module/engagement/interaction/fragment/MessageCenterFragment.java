@@ -120,6 +120,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 */
 	private WeakReference<Activity> hostingActivityRef;
 
+	private View fab;
+
+	private ArrayList<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
+	private MessageCenterRecyclerViewAdapter messageCenterRecyclerViewAdapter;
 	private MessageCenterRecyclerView messageCenterRecyclerView;
 
 	// Holder and view references
@@ -127,47 +131,31 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private EditText composerEditText;
 	private EditText whoCardNameEditText;
 	private EditText whoCardEmailEditText;
+	private Parcelable composingViewSavedState;
+	/*
+	 * Set to true when user launches image picker, and set to false once an image is picked
+	 * This is used to track if the user tried to attach an image but abandoned the image picker
+	 * without picking anything
+	 */
+	private boolean imagePickerStillOpen = false;
+	private ArrayList<ImageItem> pendingAttachments = new ArrayList<ImageItem>();
 
-	private View fab;
+	private boolean pendingWhoCardMode;
+	private String pendingWhoCardAvatarFile;
+	private Parcelable pendingWhoCardName;
+	private Parcelable pendingWhoCardEmail;
 
 	private boolean forceShowKeyboard;
 
-	// Data backing of the listview
-	private ArrayList<MessageCenterUtil.MessageCenterListItem> messages = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
-	private MessageCenterRecyclerViewAdapter messageCenterRecyclerViewAdapter;
 
 	// MesssageCenterView is set to paused when it fails to send message
 	private boolean isPaused = false;
 	// Count how many paused ongoing messages
 	private int unsentMessagesCount = 0;
 
+	// TODO: Remove this?
 	// Data Item references
 	private ContextMessage contextMessage;
-
-	//private ArrayList<ImageItem> imageAttachmentstList = new ArrayList<ImageItem>();
-
-	/**
-	 * Used to save the state of the message text box if the user closes Message Center for a moment,
-	 * , rotate device, attaches a file, etc.
-	 */
-	private Parcelable composingViewSavedState;
-	private ArrayList<ImageItem> pendingAttachments = new ArrayList<ImageItem>();
-
-	/*
-	 * Set to true when user launches image picker, and set to false once an image is picked
-	 * This is used to track if the user tried to attach an image but abandoned the image picker
-	 * without picking anything
-	 */
-	private boolean imagePickerLaunched = false;
-
-	/**
-	 * Used to save the state of the who card if the user closes Message Center for a moment,
-	 * , rotate device, attaches a file, etc.
-	 */
-	private boolean pendingWhoCardMode;
-	private Parcelable pendingWhoCardName;
-	private Parcelable pendingWhoCardEmail;
-	private String pendingWhoCardAvatarFile;
 
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
@@ -286,7 +274,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						ApptentiveLog.d("no image is picked");
 						return;
 					}
-					imagePickerLaunched = false;
+					imagePickerStillOpen = false;
 					Uri uri;
 					Activity hostingActivity = hostingActivityRef.get();
 					//Android SDK less than 19
@@ -340,13 +328,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		super.onResume();
 		ApptentiveInternal.getInstance().getMessageManager().resumeSending();
 
-		/* imagePickerLaunched was set true when the picker intent was launched. If user had picked an image,
+		/* imagePickerStillOpen was set true when the picker intent was launched. If user had picked an image,
 		 * it woud have been set to false. Otherwise, it indicates the user tried to attach an image but
 		 * abandoned the image picker without picking anything
 		 */
-		if (imagePickerLaunched) {
+		if (imagePickerStillOpen) {
 			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
-			imagePickerLaunched = false;
+			imagePickerStillOpen = false;
 		}
 	}
 
@@ -1091,10 +1079,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				Intent chooserIntent = Intent.createChooser(intent, null);
 				startActivityForResult(chooserIntent, Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER);
 			}
-			imagePickerLaunched = true;
+			imagePickerStillOpen = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			imagePickerLaunched = false;
+			imagePickerStillOpen = false;
 			ApptentiveLog.d("can't launch image picker");
 		}
 	}
