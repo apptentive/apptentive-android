@@ -1524,27 +1524,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_OPT_INSERT_REGULAR_STATUS: {
 					List<MessageCenterUtil.MessageCenterListItem> messages = fragment.messages;
-					MessageCenterStatus status = fragment.interaction.getRegularStatus();
-/*
-					for (int i = 0; i < messages.size(); i++) {
-						MessageCenterUtil.MessageCenterListItem item = messages.get(i);
-						if (item.getListItemType() == MESSAGE_COMPOSER) {
-							ApptentiveLog.e("Removing Composer");
-							messages.remove(i);
-							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
-						}
-					}
-*/
-
-					int numOfMessages = messages.size();
-					if (numOfMessages > 0) {
-						// Check if the last message in the view is a sent message
+					// Only add status if the last item in the list is a sent message.
+					if (messages.size() > 0) {
 						MessageCenterUtil.MessageCenterListItem lastItem = messages.get(messages.size() - 1);
 						if (lastItem != null && lastItem.getListItemType() == MESSAGE_OUTGOING) {
 							ApptentiveMessage apptentiveMessage = (ApptentiveMessage) lastItem;
 							if (apptentiveMessage.isOutgoingMessage()) {
 								Double createdTime = apptentiveMessage.getCreatedAt();
 								if (createdTime != null && createdTime > Double.MIN_VALUE) {
+									MessageCenterStatus status = fragment.interaction.getRegularStatus();
 									if (status != null) {
 										// Add expectation status message if the last is a sent
 										messages.add(status);
