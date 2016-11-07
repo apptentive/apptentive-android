@@ -14,16 +14,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Layout;
-import android.text.Selection;
-import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.ArrowKeyMovementMethod;
-import android.text.method.MovementMethod;
-import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -43,17 +36,18 @@ import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
-	List<ImageItem> images;
+	private List<ImageItem> images;
 
-	public ImageButton closeButton;
-	public TextView title;
-	public ImageButton attachButton;
-	public ImageButton sendButton;
+	private ImageButton closeButton;
+	private TextView title;
+	private ImageButton attachButton;
+	private ImageButton sendButton;
 	public EditText message;
-	public ApptentiveImageGridView attachments;
+	private ApptentiveImageGridView attachments;
+
+	private TextWatcher textWatcher;
 
 	public MessageComposerHolder(View itemView) {
 		super(itemView);
@@ -107,18 +101,9 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		});
 
 		message.setHint(composer.messageHint);
-		message.setLinksClickable(true);
-		message.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
-		/*
-		* LinkMovementMethod would enable clickable links in EditView, but disables copy/paste through Long Press.
-		* Use a custom MovementMethod instead
-		*
-		*/
-		message.setMovementMethod(ApptentiveMovementMethod.getInstance());
-		//If the edit text contains previous text with potential links
-		Linkify.addLinks(message, Linkify.WEB_URLS);
 
-		message.addTextChangedListener(new TextWatcher() {
+		message.removeTextChangedListener(textWatcher);
+		textWatcher = new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 				if (adapter.getListener() != null) {
@@ -140,7 +125,8 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 				}
 				Linkify.addLinks(editable, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS | Linkify.EMAIL_ADDRESSES | Linkify.MAP_ADDRESSES);
 			}
-		});
+		};
+		message.addTextChangedListener(textWatcher);
 
 
 		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
@@ -172,7 +158,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments.setImageIndicatorCallback(fragment);
 		//Initialize image attachments band with empty data
 		clearImageAttachmentBand();
-		ApptentiveLog.e("HIDING");
 		attachments.setVisibility(View.GONE);
 		attachments.setAdapterIndicator(0);
 		attachments.setData(new ArrayList<ImageItem>());
@@ -183,11 +168,18 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	/**
+	 * Workaround for this issue: https://code.google.com/p/android/issues/detail?id=208169
+	 */
+	public void onViewAttachedToWindow() {
+		message.setEnabled(false);
+		message.setEnabled(true);
+	}
+
+	/**
 	 * Remove all images from attachment band.
 	 */
 	public void clearImageAttachmentBand() {
 		ApptentiveLog.e("CLEARING ATTACHMENTS");
-		ApptentiveLog.e("HIDING");
 		attachments.setVisibility(View.GONE);
 		images.clear();
 		attachments.setData(null);
@@ -236,48 +228,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 			imagesToAdd.add(new ImageItem("", "", "Image/*", 0));
 		}
 		attachments.setData(imagesToAdd);
-	}
-
-	/*
-	* Extends Android default movement method to enable selecting text and opening the links at the same time
-	 */
-	private static class ApptentiveMovementMethod extends ArrowKeyMovementMethod {
-
-		private static ApptentiveMovementMethod sInstance;
-
-		public static MovementMethod getInstance() {
-			if (sInstance == null) {
-				sInstance = new ApptentiveMovementMethod();
-			}
-			return sInstance;
-		}
-
-		@Override
-		public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
-			int action = event.getAction();
-			if (action == MotionEvent.ACTION_UP ||
-				action == MotionEvent.ACTION_DOWN) {
-				int x = (int) event.getX();
-				int y = (int) event.getY();
-				x -= widget.getTotalPaddingLeft();
-				y -= widget.getTotalPaddingTop();
-				x += widget.getScrollX();
-				y += widget.getScrollY();
-				Layout layout = widget.getLayout();
-				int line = layout.getLineForVertical(y);
-				int off = layout.getOffsetForHorizontal(line, x);
-				ClickableSpan[] link = buffer.getSpans(off, off, ClickableSpan.class);
-				if (link.length != 0) {
-					if (action == MotionEvent.ACTION_UP) {
-						link[0].onClick(widget);
-					} else if (action == MotionEvent.ACTION_DOWN) {
-						Selection.setSelection(buffer, buffer.getSpanStart(link[0]), buffer.getSpanEnd(link[0]));
-					}
-					return true;
-				}
-			}
-			return super.onTouchEvent(widget, buffer, event);
-		}
 	}
 
 	public void setSendButtonState() {

@@ -698,13 +698,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	// TODO: This needs to be sent through the Handler
 	public void removeImageFromComposer(final int position) {
+		ApptentiveLog.e("removeImageFromComposer()");
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
 		pendingAttachments.remove(position);
 		if (messageCenterRecyclerViewAdapter != null) {
 			messageCenterRecyclerViewAdapter.removeImageFromComposer(composer, position);
 //			int count = imageAttachmentstList.size();
 			// Show keyboard if all attachments have been removed
-			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+			messageCenterRecyclerViewAdapter.notifyDataSetChanged(); // TODO: Only invalidate the composer
 		}
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 	}
@@ -1103,7 +1104,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	Set<String> dateStampsSeen = new HashSet<String>();
 
 	public void updateMessageSentStates() {
-		ApptentiveLog.e("Updating datestamps");
 		dateStampsSeen.clear();
 		MessageCenterUtil.CompoundMessageCommonInterface lastSent = null;
 		Set<String> uniqueNonce = new HashSet<String>();
@@ -1126,7 +1126,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) message;
 				Double sentOrReceivedAt = apptentiveMessage.getCreatedAt();
 				String dateStamp = createDatestamp(sentOrReceivedAt);
-				ApptentiveLog.e("Looking at datestamp: %s", dateStamp);
 				if (dateStamp != null) {
 					if (dateStampsSeen.add(dateStamp)) {
 						if (apptentiveMessage.setDatestamp(dateStamp)) {
@@ -1568,7 +1567,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void setPaused(boolean paused) {
 		if (isPaused ^ paused) {
 			// TODO: Do I want to invalidate all the views here?
-			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+			//messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+			// Invalidate any unsent messages, as these will have status and progress bars that need to change.
+			for (int i = 0; i < messages.size(); i++) {
+				MessageCenterUtil.MessageCenterListItem item = messages.get(i);
+				if (item instanceof ApptentiveMessage) {
+					ApptentiveMessage message = (ApptentiveMessage) item;
+					if (message.isOutgoingMessage() && message.getCreatedAt() == null) {
+						messageCenterRecyclerViewAdapter.notifyItemChanged(i);
+						ApptentiveLog.e("Invalidated: %s", message.toString());
+					}
+				}
+			}
 		}
 		isPaused = paused;
 	}
