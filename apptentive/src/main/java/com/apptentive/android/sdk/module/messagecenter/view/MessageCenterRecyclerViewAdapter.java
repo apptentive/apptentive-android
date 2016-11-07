@@ -170,7 +170,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				ApptentiveLog.w("-> Message Incoming");
 				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
-				compoundHolder.bindView(recyclerView, compoundMessage);
+				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
 				// Mark as read
 				if (!compoundMessage.isRead() && !messagesWithPendingReadStatusUpdate.contains(compoundMessage)) {
 					messagesWithPendingReadStatusUpdate.add(compoundMessage);
@@ -183,7 +183,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				ApptentiveLog.w("-> Message Outgoing");
 				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
 				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
-				compoundHolder.bindView(recyclerView, compoundMessage);
+				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
 				break;
 			}
 			case MESSAGE_AUTO: {
@@ -226,10 +226,6 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 	public int getItemViewType(int position) {
 		MessageCenterUtil.MessageCenterListItem message = messages.get(position);
 		return message.getListItemType();
-	}
-
-	public void setPaused(boolean bPause) {
-		//isInPauseState = bPause; // TODO
 	}
 
 	public String getWhoCardAvatarFileName() {

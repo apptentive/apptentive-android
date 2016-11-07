@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 
 public abstract class MessageHolder extends RecyclerView.ViewHolder {
@@ -22,7 +23,7 @@ public abstract class MessageHolder extends RecyclerView.ViewHolder {
 		datestamp = (TextView) itemView.findViewById(R.id.datestamp);
 	}
 
-	public void bindView(RecyclerView recyclerView, CompoundMessage message) { // final String datestampString, final int statusColor, final String statusString) {
+	public void bindView(MessageCenterFragment fragment, RecyclerView recyclerView, CompoundMessage message) {
 		String datestampString = message.getDatestamp();
 		datestamp.setText(datestampString);
 		datestamp.setVisibility(!TextUtils.isEmpty(datestampString) ? View.VISIBLE : View.GONE);

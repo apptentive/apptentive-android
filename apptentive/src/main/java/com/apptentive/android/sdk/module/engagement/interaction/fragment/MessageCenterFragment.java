@@ -177,6 +177,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected static final int MSG_MESSAGE_REMOVE_WHOCARD = 14;
 	protected static final int MSG_ADD_CONTEXT_MESSAGE = 15;
 	protected static final int MSG_ADD_GREETING = 16;
+	protected static final int MSG_ADD_STATUS_ERROR = 17;
 
 	private MessageCenterFragment.MessagingActionHandler messagingActionHandler;
 
@@ -611,19 +612,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_OPT_INSERT_REGULAR_STATUS);
 	}
 
-	// TODO: What do we do with this?
-	public void addNewOutGoingMessageItem(ApptentiveMessage message) {
-		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-
-		messages.add(message);
-		messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
-		unsentMessagesCount++;
-		isPaused = false;
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.setPaused(isPaused);
-		}
-	}
-
 	/**
 	 * Call only from handler.
 	 */
@@ -771,8 +759,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public synchronized void onPauseSending(int reason) {
-		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_PAUSE_SENDING,
-			reason, 0));
+		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_PAUSE_SENDING, reason, 0));
 	}
 
 	public synchronized void onResumeSending() {
@@ -919,8 +906,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
 			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));
 
-			unsentMessagesCount++;
-			isPaused = false;
 			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_START_SENDING, compoundMessage));
 			composingViewSavedState = null;
 			composerEditText.getText().clear();
@@ -1415,17 +1400,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ApptentiveLog.e("Adding Message to list");
 					fragment.messages.add(message);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
-
-/*
-					messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-					messages.add(message);
-					messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
-					unsentMessagesCount++;
-					isPaused = false;
-					if (messageCenterRecyclerViewAdapter != null) {
-						messageCenterRecyclerViewAdapter.setPaused(isPaused);
-					}
-*/
+					fragment.unsentMessagesCount++;
+					fragment.setPaused(false);
 
 					ApptentiveLog.e("Sending message");
 					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
@@ -1481,37 +1457,23 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_PAUSE_SENDING: {
 					ApptentiveLog.e("PAUSE");
-					if (!fragment.isPaused) {
-						fragment.isPaused = true;
+					if (!fragment.isPaused()) {
+						fragment.setPaused(true);
 						if (fragment.unsentMessagesCount > 0) {
-							fragment.messageCenterRecyclerViewAdapter.setPaused(fragment.isPaused);
 							int reason = msg.arg1;
-							if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
-								EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
-								MessageCenterStatus newItem = fragment.interaction.getErrorStatusNetwork();
-								// TODO: fragment.addNewStatusItem(newItem);
-							} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
-								EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
-								MessageCenterStatus newItem = fragment.interaction.getErrorStatusServer();
-								// TODO: fragment.addNewStatusItem(newItem);
-							}
-							//TODO: Do this better
-							fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+							Message handlerMessage = fragment.messagingActionHandler.obtainMessage(MSG_ADD_STATUS_ERROR, reason, 0);
+							fragment.messagingActionHandler.sendMessage(handlerMessage);
 						}
 					}
 					break;
 				}
 				case MSG_RESUME_SENDING: {
 					ApptentiveLog.e("RESUME");
-					if (fragment.isPaused) {
-						fragment.isPaused = false;
+					if (fragment.isPaused()) {
+						fragment.setPaused(false);
 						if (fragment.unsentMessagesCount > 0) {
-							// TODO: fragment.clearStatusItem();
+							fragment.messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 						}
-
-						fragment.messageCenterRecyclerViewAdapter.setPaused(fragment.isPaused);
-						// TODO: Do this better
-						fragment.messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 					}
 					break;
 				}
@@ -1574,6 +1536,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(0);
 					break;
 				}
+				case MSG_ADD_STATUS_ERROR: {
+					int reason = msg.arg1;
+					MessageCenterStatus status = null;
+					if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
+						status = fragment.interaction.getErrorStatusNetwork();
+						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
+					} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
+						status = fragment.interaction.getErrorStatusServer();
+						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
+					}
+					if (status != null) {
+						fragment.messages.add(status);
+						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -1585,5 +1563,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		}
 		return false;
+	}
+
+	public void setPaused(boolean paused) {
+		if (isPaused ^ paused) {
+			// TODO: Do I want to invalidate all the views here?
+			messageCenterRecyclerViewAdapter.notifyDataSetChanged();
+		}
+		isPaused = paused;
+	}
+
+	public boolean isPaused() {
+		return isPaused;
 	}
 }

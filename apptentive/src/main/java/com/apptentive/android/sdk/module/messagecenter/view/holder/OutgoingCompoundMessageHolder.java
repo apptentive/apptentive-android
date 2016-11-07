@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
@@ -41,19 +42,18 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		status = (TextView) itemView.findViewById(R.id.status);
 	}
 
-	public void bindView(final RecyclerView recyclerView, final CompoundMessage message) {
-		super.bindView(recyclerView, message);
+	public void bindView(MessageCenterFragment fragment, final RecyclerView recyclerView, final CompoundMessage message) {
+		super.bindView(fragment, recyclerView, message);
 		imageBandView.setupUi();
 		messageBodyView.setText(message.getBody());
 
-		boolean isPaused = false; //TODO
 		boolean showProgress;
 		Double createdAt = message.getCreatedAt();
 		String statusText;
 		if (createdAt == null || createdAt > Double.MIN_VALUE) {
 			// show progress bar if: 1. no sent time set, and 2. not paused, and 3. have either text or files to sent
-			showProgress = createdAt == null && !isPaused && (message.getAssociatedFiles() != null || !TextUtils.isEmpty(message.getBody()));
-			statusText = createStatus(createdAt, message.isLastSent());
+			showProgress = createdAt == null && !fragment.isPaused() && (message.getAssociatedFiles() != null || !TextUtils.isEmpty(message.getBody()));
+			statusText = createStatus(createdAt, message.isLastSent(), fragment.isPaused());
 		} else {
 			showProgress = false;
 			statusText = itemView.getResources().getString(R.string.apptentive_failed);
@@ -90,14 +90,13 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		}
 
 		status.setText(statusText);
-		status.setTextColor(getStatusColor(createdAt, isPaused));
+		status.setTextColor(getStatusColor(createdAt, fragment.isPaused()));
 		status.setVisibility(!TextUtils.isEmpty(statusText) ? View.VISIBLE : View.GONE);
 	}
 
-	protected String createStatus(Double seconds, boolean showSent) {
+	protected String createStatus(Double seconds, boolean showSent, boolean isPaused) {
 		if (seconds == null) {
-			boolean isInPauseState = false; // TODO
-			return isInPauseState ? itemView.getResources().getString(R.string.apptentive_failed) : null;
+			return isPaused ? itemView.getResources().getString(R.string.apptentive_failed) : null;
 		}
 		return (showSent) ? itemView.getResources().getString(R.string.apptentive_sent) : null;
 	}

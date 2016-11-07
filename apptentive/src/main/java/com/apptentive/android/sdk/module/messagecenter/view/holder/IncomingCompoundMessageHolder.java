@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
@@ -47,13 +48,12 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		imageBandView = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
 	}
 
-	public void bindView(final RecyclerView parent, final CompoundMessage message) {
-		super.bindView(parent, message);
+	public void bindView(MessageCenterFragment fragment, final RecyclerView parent, final CompoundMessage message) {
+		super.bindView(fragment, parent, message);
 		imageBandView.setupUi();
 		if (loadAvatar) {
 			ImageUtil.startDownloadAvatarTask(avatar, message.getSenderProfilePhoto());
 		}
-		String datestamp = message.getDatestamp();
 
 		int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
 		root.measure(widthMeasureSpec, 0);
