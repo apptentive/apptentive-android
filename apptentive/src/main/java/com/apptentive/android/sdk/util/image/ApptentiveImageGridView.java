@@ -36,11 +36,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 		int heightSpec;
 
 		if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
-
 			// The two leftmost bits in the height measure spec have
 			// a special meaning, hence we can't use them to describe height.
-			heightSpec = MeasureSpec.makeMeasureSpec(
-					Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+			heightSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
 		} else {
 			// Any other height should be respected as is.
 			heightSpec = heightMeasureSpec;
@@ -91,7 +89,6 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	public void setAdapterItemSize(int width, int desiredNumCount) {
 		final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
-
 		int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
 		Point point = Util.getScreenSize(getContext().getApplicationContext());
 		imageBandAdapter.setItemSize(columnWidth, (int) (((float) point.y / (float) point.x) * columnWidth));
@@ -107,7 +104,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setImageIndicatorCallback(ImageGridViewAdapter.Callback callback) {
-			imageBandAdapter.setIndicatorCallback(callback);
+		imageBandAdapter.setIndicatorCallback(callback);
 	}
 
 	public void setData(List<ImageItem> images) {
