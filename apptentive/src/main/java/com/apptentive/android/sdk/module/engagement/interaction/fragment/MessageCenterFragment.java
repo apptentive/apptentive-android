@@ -406,16 +406,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 
 			/* Add who card with pending contents
-			** Pending contents would be saved if the user was in composing Who card mode and exitted through back button
+			** Pending contents would be saved if the user was in composing Who card mode and exited through back button
 			 */
 			else if (pendingWhoCardName != null || pendingWhoCardEmail != null || pendingWhoCardAvatarFile != null) {
 				addedAnInteractiveCard = true;
 				addWhoCard(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
-				/* If there is only greeting message, show composing.
-				 * If Who Card is required, show Who Card first
+				/* If there are no items in the list, then it means that the Greeting will be added, but nothing else.
+				 * In that case, show the COmposer, because Message Center hasn't been opened before.
+				 * If Who Card is required, show Who Card first.
 				 */
-				if (messages.size() == 1) { // TODO: Don't use these magic numbers everywhere
+				if (messages.size() == 0) {
 					addedAnInteractiveCard = true;
 					addComposingCard();
 				} else {
