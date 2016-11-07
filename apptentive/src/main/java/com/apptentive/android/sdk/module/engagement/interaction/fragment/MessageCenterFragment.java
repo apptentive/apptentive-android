@@ -364,12 +364,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 		messageCenterRecyclerView.setLayoutManager(layoutManager);
 
-/*
-		((MessageCenterListView) messageCenterListView).setOnListViewResizeListener(this);
-		messageCenterListView.setItemsCanFocus(true);
-*/
-
-
 		fab = rootView.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -381,7 +375,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, messages);
 
-		boolean showKeyboard = false;
 		if (isInitMessages) {
 			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
 			if (items != null) {
@@ -420,6 +413,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				} else {
 					// Finally check if status message need to be restored
 					addExpectationStatusIfNeeded();
+				}
+			}
+		} else {
+			// Need to account for an input view that was added before orientation change, etc.
+			if (messages != null) {
+				for (MessageCenterUtil.MessageCenterListItem item : messages) {
+					if (item.getListItemType() == MESSAGE_COMPOSER || item.getListItemType() == WHO_CARD) {
+						addedAnInteractiveCard = true;
+					}
 				}
 			}
 		}
