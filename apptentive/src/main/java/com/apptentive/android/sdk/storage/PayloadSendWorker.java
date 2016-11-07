@@ -183,9 +183,6 @@ public class PayloadSendWorker {
 							ApptentiveLog.v("Rejected json:", payload.toString());
 							ApptentiveInternal.getInstance().getApptentiveTaskManager().deletePayload(payload);
 						} else if (response.isRejectedTemporarily()) {
-							if (mgr != null) {
-								mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
-							}
 							ApptentiveLog.d("Unable to send JSON. Leaving in queue.");
 							if (response.isException()) {
 								retryLater(NO_CONNECTION_SLEEP_TIME);
