@@ -572,11 +572,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
 			if (!whoCardDisplayedBefore) {
+				forceShowKeyboard = true;
 				addWhoCard(true);
 				return true;
 			} else {
 				String savedEmail = Apptentive.getPersonEmail();
 				if (TextUtils.isEmpty(savedEmail)) {
+					forceShowKeyboard = true;
 					addWhoCard(false);
 					return true;
 				}
@@ -810,7 +812,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	@Override
-	public void onWhoCardViewCreated(final EditText nameEditText, final EditText emailEditText) {
+	public void onWhoCardViewCreated(final EditText nameEditText, final EditText emailEditText, final View viewToFocus) {
 		this.whoCardNameEditText = nameEditText;
 		this.whoCardEmailEditText = emailEditText;
 		if (pendingWhoCardName != null) {
@@ -823,16 +825,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		messageCenterRecyclerView.setPadding(0, 0, 0, 0);
 
-		// TODO: Track which field has focus and apply correctly
-		if (nameEditText != null) {
-			nameEditText.requestFocus();
+		if (viewToFocus != null) {
+			viewToFocus.requestFocus();
 			if (forceShowKeyboard) {
-				nameEditText.post(new Runnable() {
+				viewToFocus.post(new Runnable() {
 					@Override
 					public void run() {
 						if (forceShowKeyboard) {
 							forceShowKeyboard = false;
-							Util.showSoftKeyboard(hostingActivityRef.get(), nameEditText);
+							Util.showSoftKeyboard(hostingActivityRef.get(), viewToFocus);
 						}
 					}
 				});

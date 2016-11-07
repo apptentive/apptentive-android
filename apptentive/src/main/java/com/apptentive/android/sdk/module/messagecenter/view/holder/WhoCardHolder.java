@@ -62,11 +62,14 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			title.setHint(whoCard.getTitle());
 		}
 
+		View viewToFocus;
 		if (TextUtils.isEmpty(whoCard.getNameHint())) {
 			nameLayout.setVisibility(GONE);
+			viewToFocus = emailEditText;
 		} else {
 			nameLayout.setVisibility(VISIBLE);
 			nameLayout.setHint(whoCard.getNameHint());
+			viewToFocus = nameEditText;
 		}
 		// TODO: Restore pending text if view is for instance rotated before being submitted.
 		nameEditText.setText(Apptentive.getPersonName());
@@ -148,7 +151,7 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			}
 		});
 		if (adapter.getListener() != null) {
-			adapter.getListener().onWhoCardViewCreated(nameEditText, emailEditText);
+			adapter.getListener().onWhoCardViewCreated(nameEditText, emailEditText, viewToFocus);
 		}
 	}
 

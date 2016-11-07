@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter;
 
+import android.view.View;
 import android.widget.EditText;
 
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
@@ -25,7 +26,7 @@ public interface OnListviewItemActionListener {
 
 	void onFinishComposing();
 
-	void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText);
+	void onWhoCardViewCreated(EditText nameEditText, EditText emailEditText, View viewToFocus);
 
 	void onSubmitWhoCard(String buttonLabel);
 
