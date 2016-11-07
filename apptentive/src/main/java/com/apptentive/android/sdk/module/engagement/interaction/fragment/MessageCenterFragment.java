@@ -481,7 +481,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 
-			final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 			boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 			forceShowKeyboard = true;
 			addWhoCard(!whoCardDisplayedBefore);
@@ -497,7 +496,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		//int index = messageCenterRecyclerView.getFirstVisiblePosition();
 		View v = messageCenterRecyclerView.getChildAt(0);
 		int top = (v == null) ? 0 : (v.getTop() - messageCenterRecyclerView.getPaddingTop());
-		//outState.putInt(LIST_TOP_INDEX, index);
 		outState.putInt(LIST_TOP_OFFSET, top);
 		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
 		if (messageCenterRecyclerViewAdapter != null) {
@@ -516,7 +514,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			DialogFragment myFrag = (DialogFragment) (hostingActivity.getSupportFragmentManager()).findFragmentByTag(DIALOG_IMAGE_PREVIEW);
 			if (myFrag != null) {
 				myFrag.dismiss();
-				myFrag = null;
 			}
 			cleanup();
 			if (hardwareButton) {
@@ -577,7 +574,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private boolean checkAddWhoCardIfRequired() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 		if (interaction.getWhoCardRequestEnabled() && interaction.getWhoCardRequired()) {
 			if (!whoCardDisplayedBefore) {
@@ -604,7 +600,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messagingActionHandler.removeMessages(MSG_MESSAGE_ADD_COMPOSING);
 			messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
 			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_ADD_WHOCARD, initial ? 0 : 1, 0, profile));
-			//messagingActionHandler.sendEmptyMessage(MSG_SCROLL_TO_BOTTOM);
 		}
 	}
 
@@ -825,11 +820,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		this.whoCardEmailEditText = emailEditText;
 		if (pendingWhoCardName != null) {
 			nameEditText.onRestoreInstanceState(pendingWhoCardName);
-			//pendingWhoCardName = null;
+			pendingWhoCardName = null;
 		}
 		if (pendingWhoCardEmail != null) {
 			emailEditText.onRestoreInstanceState(pendingWhoCardEmail);
-			//pendingWhoCardEmail = null;
+			pendingWhoCardEmail = null;
 		}
 		messageCenterRecyclerView.setPadding(0, 0, 0, 0);
 
@@ -916,16 +911,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 		showFab();
 		showProfileButton();
-	}
-
-	private void removeItemsFromRecyclerView(int type) {
-		for (int i = 0; i < messages.size(); i++) {
-			MessageCenterUtil.MessageCenterListItem item = messages.get(i);
-			if (item.getListItemType() == type) {
-				messages.remove(i);
-				messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
-			}
-		}
 	}
 
 	@Override
@@ -1248,7 +1233,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_ADD_GREETING);
 	}
 
-	//	@Override
+	// TODO: Fix this.
+	@Override
 	public void onClickAttachment(final int position, final ImageItem image) {
 		if (Util.isMimeTypeImage(image.mimeType)) {
 			// "+" placeholder is clicked
@@ -1567,8 +1553,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void setPaused(boolean paused) {
 		if (isPaused ^ paused) {
-			// TODO: Do I want to invalidate all the views here?
-			//messageCenterRecyclerViewAdapter.notifyDataSetChanged();
 			// Invalidate any unsent messages, as these will have status and progress bars that need to change.
 			for (int i = 0; i < messages.size(); i++) {
 				MessageCenterUtil.MessageCenterListItem item = messages.get(i);
