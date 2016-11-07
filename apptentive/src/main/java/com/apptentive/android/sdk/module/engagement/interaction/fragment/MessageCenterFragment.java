@@ -907,21 +907,21 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		if (contextMessage != null) {
-			// TODO: Maybe simply send any context messages in the list when a message is sent?
 			Message sendContextMessage = messagingActionHandler.obtainMessage(MSG_SEND_CONTEXT_MESSAGE, contextMessage.getBody());
 			unsentMessagesCount++;
 			messagingActionHandler.sendMessage(sendContextMessage);
 			contextMessage = null;
 		}
 		if (!TextUtils.isEmpty(composerEditText.getText()) || pendingAttachments.size() > 0) {
-			Bundle b = new Bundle();
-			b.putString(COMPOSING_EDITTEXT_STATE, composerEditText.getText().toString());
-			b.putParcelableArrayList(COMPOSING_ATTACHMENTS, new ArrayList<Parcelable>(pendingAttachments));
-			Message msg = messagingActionHandler.obtainMessage(MSG_START_SENDING, composerEditText.getText().toString());
-			msg.setData(b);
-			ApptentiveLog.e("Send Send Message Message");
+			CompoundMessage compoundMessage = new CompoundMessage();
+			compoundMessage.setBody(composerEditText.getText().toString());
+			compoundMessage.setRead(true);
+			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
+			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));
+
 			unsentMessagesCount++;
-			messagingActionHandler.sendMessage(msg);
+			isPaused = false;
+			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_START_SENDING, compoundMessage));
 			composingViewSavedState = null;
 			composerEditText.getText().clear();
 			pendingAttachments.clear();
@@ -1411,16 +1411,21 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_START_SENDING: {
-					Bundle b = msg.getData();
-					CompoundMessage message = new CompoundMessage();
-					message.setBody(b.getString(COMPOSING_EDITTEXT_STATE));
-					message.setRead(true);
-					message.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
-					ArrayList<ImageItem> imagesToAttach = b.getParcelableArrayList(COMPOSING_ATTACHMENTS);
-					message.setAssociatedImages(imagesToAttach);
-
+					CompoundMessage message = (CompoundMessage) msg.obj;
 					ApptentiveLog.e("Adding Message to list");
 					fragment.messages.add(message);
+					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
+
+/*
+					messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
+					messages.add(message);
+					messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
+					unsentMessagesCount++;
+					isPaused = false;
+					if (messageCenterRecyclerViewAdapter != null) {
+						messageCenterRecyclerViewAdapter.setPaused(isPaused);
+					}
+*/
 
 					ApptentiveLog.e("Sending message");
 					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
