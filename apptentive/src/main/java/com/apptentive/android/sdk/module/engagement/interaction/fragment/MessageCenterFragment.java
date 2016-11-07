@@ -151,10 +151,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	// Count how many paused ongoing messages
 	private int unsentMessagesCount = 0;
 
-	// TODO: Remove this?
-	// Data Item references
-	private ContextMessage contextMessage;
-
 	private int listViewSavedTopIndex = -1;
 	private int listViewSavedTopOffset;
 
@@ -170,7 +166,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected static final int MSG_MESSAGE_ADD_INCOMING = 7;
 	protected static final int MSG_MESSAGE_ADD_WHOCARD = 8;
 	protected static final int MSG_MESSAGE_ADD_COMPOSING = 9;
-	protected static final int MSG_SEND_CONTEXT_MESSAGE = 10;
+	protected static final int MSG_SEND_PENDING_CONTEXT_MESSAGE = 10;
 	protected static final int MSG_REMOVE_COMPOSER = 11;
 	protected static final int MSG_REMOVE_STATUS = 12;
 	protected static final int MSG_OPT_INSERT_REGULAR_STATUS = 13;
@@ -392,11 +388,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 			String contextMessageBody = interaction.getContextualMessageBody();
 			if (contextMessageBody != null) {
-				contextMessage = new ContextMessage(contextMessageBody);
 				// Clear any pending composing message to present an empty composing area
 				clearPendingComposingMessage();
 				messagingActionHandler.sendEmptyMessage(MSG_REMOVE_STATUS);
-				messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, contextMessage));
+				messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_ADD_CONTEXT_MESSAGE, new ContextMessage(contextMessageBody)));
 				// If checkAddWhoCardIfRequired returns true, it will add WhoCard, otherwise add composing card
 				if (!checkAddWhoCardIfRequired()) {
 					addedAnInteractiveCard = true;
@@ -890,12 +885,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_COMPOSER);
 
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
-		if (contextMessage != null) {
-			Message sendContextMessage = messagingActionHandler.obtainMessage(MSG_SEND_CONTEXT_MESSAGE, contextMessage.getBody());
-			unsentMessagesCount++;
-			messagingActionHandler.sendMessage(sendContextMessage);
-			contextMessage = null;
-		}
+		messagingActionHandler.sendEmptyMessage(MSG_SEND_PENDING_CONTEXT_MESSAGE);
 		if (!TextUtils.isEmpty(composerEditText.getText()) || pendingAttachments.size() > 0) {
 			CompoundMessage compoundMessage = new CompoundMessage();
 			compoundMessage.setBody(composerEditText.getText().toString());
@@ -1413,32 +1403,38 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					}
 					break;
 				}
-				case MSG_SEND_CONTEXT_MESSAGE: {
-					List<MessageCenterUtil.MessageCenterListItem> messages = fragment.messages;
-					// Remove fake ContextMessage from the RecyclerView
-					for (int i = 0; i < messages.size(); i++) {
-						MessageCenterUtil.MessageCenterListItem item = messages.get(i);
+				case MSG_SEND_PENDING_CONTEXT_MESSAGE: {
+					ContextMessage contextMessage = null;
+					// If the list has a context message, get it, remove it from the list, and notify the RecyclerView to update.
+					ListIterator<MessageCenterUtil.MessageCenterListItem> iterator = fragment.messages.listIterator();
+					while (iterator.hasNext()) {
+						int index = iterator.nextIndex();
+						MessageCenterUtil.MessageCenterListItem item = iterator.next();
 						if (item.getListItemType() == MESSAGE_CONTEXT) {
-							ApptentiveLog.e("Removing Fake Context Message");
-							messages.remove(i);
-							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
+							contextMessage = (ContextMessage) item;
+							iterator.remove();
+							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(index);
+							break;
 						}
 					}
-					// Create a CompoundMessage for sending and final display
-					String body = (String) msg.obj;
-					CompoundMessage message = new CompoundMessage();
-					message.setBody(body);
-					message.setAutomated(true);
-					message.setRead(true);
 
-					// Add it to the RecyclerView
-					ApptentiveLog.e("Adding Real Context Message");
-					messages.add(message);
-					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(messages.size() - 1);
+					if (contextMessage != null) {
+						// Create a CompoundMessage for sending and final display
+						CompoundMessage message = new CompoundMessage();
+						message.setBody(contextMessage.getBody());
+						message.setAutomated(true);
+						message.setRead(true);
 
-					// Send it to the server
-					ApptentiveLog.e("Sending Real Context Message");
-					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
+						// Add it to the RecyclerView
+						ApptentiveLog.e("Adding Real Context Message");
+						fragment.unsentMessagesCount++;
+						fragment.messages.add(message);
+						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.messages.size() - 1);
+
+						// Send it to the server
+						ApptentiveLog.e("Sending Real Context Message");
+						ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
+					}
 					break;
 				}
 				case MSG_PAUSE_SENDING: {
