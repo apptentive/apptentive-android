@@ -228,7 +228,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
@@ -240,9 +239,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		// messageCenterRecyclerViewAdapter holds a reference to fragment context through Cstor. Need to set it to null to prevent leak
+		// messageCenterRecyclerViewAdapter holds a reference to fragment context. Need to set it to null in this and other Views to prevent a memory leak.
 		messageCenterRecyclerViewAdapter = null;
 		messageCenterRecyclerView.setAdapter(null);
+		composer = null;
+		composerEditText = null;
+		whoCardNameEditText = null;
+		whoCardEmailEditText = null;
 	}
 
 	public void onStart() {
@@ -408,7 +411,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				addWhoCard(pendingWhoCardMode);
 			} else if (!checkAddWhoCardIfRequired()) {
 				/* If there are no items in the list, then it means that the Greeting will be added, but nothing else.
-				 * In that case, show the COmposer, because Message Center hasn't been opened before.
+				 * In that case, show the Composer, because Message Center hasn't been opened before.
 				 * If Who Card is required, show Who Card first.
 				 */
 				if (messages.size() == 0) {
@@ -527,7 +530,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		mgr.clearInternalOnMessagesUpdatedListeners();
 		mgr.setAfterSendMessageListener(null);
-
 
 		ApptentiveInternal.getInstance().getAndClearCustomData();
 		ApptentiveAttachmentLoader.getInstance().clearMemoryCache();

@@ -26,12 +26,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	private ImageItemClickedListener listener;
 
-	private Context context;
-
 	public ApptentiveImageGridView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setOnItemClickListener(this);
-		this.context = context;
 	}
 
 	@Override
@@ -63,7 +60,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setupUi() {
-		imageBandAdapter = new ImageGridViewAdapter(context, false);
+		imageBandAdapter = new ImageGridViewAdapter(getContext(), false);
 		setAdapter(imageBandAdapter);
 	}
 
