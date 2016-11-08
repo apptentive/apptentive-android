@@ -79,78 +79,65 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//		ApptentiveLog.e("onCreateViewHolder()");
 		switch (viewType) {
 			case MESSAGE_COMPOSER: {
-//				ApptentiveLog.w("-> Message Composer");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_composer, parent, false);
 				return new MessageComposerHolder(view);
 			}
 			case STATUS: {
-//				ApptentiveLog.w("-> Status");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_status, parent, false);
 				return new StatusHolder(view);
 			}
 			case GREETING: {
-//				ApptentiveLog.w("-> Greeting");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_greeting, parent, false);
 				return new GreetingHolder(view);
 			}
 			case MESSAGE_OUTGOING: {
-//				ApptentiveLog.w("-> Message Outgoing");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_outgoing, parent, false);
 				return new OutgoingCompoundMessageHolder(view);
 			}
 			case MESSAGE_INCOMING: {
-//				ApptentiveLog.w("-> Message Incoming");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_incoming, parent, false);
 				return new IncomingCompoundMessageHolder(view);
 			}
 			case MESSAGE_AUTO: {
-//				ApptentiveLog.w("-> Message Auto");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_auto, parent, false);
 				return new AutomatedMessageHolder(view);
 			}
 			case WHO_CARD: {
-//				ApptentiveLog.w("-> Who Card");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_who_card, parent, false);
 				return new WhoCardHolder(this, view);
 			}
 			case MESSAGE_CONTEXT: {
-//				ApptentiveLog.w("-> Message Context");
 				LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 				View view = inflater.inflate(R.layout.apptentive_message_center_context_message, parent, false);
 				return new ContextMessageHolder(view);
 			}
 		}
-		ApptentiveLog.e("onCreateViewHolder(%d) returning null.", viewType);
+		ApptentiveLog.w("onCreateViewHolder(%d) returning null.", viewType);
 		return null;
 	}
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-		ApptentiveLog.e("onBindViewHolder()");
 		switch (getItemViewType(position)) {
 			case MESSAGE_COMPOSER: {
-				ApptentiveLog.w("-> Message Composer");
 				Composer composer = (Composer) listItems.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
 				composerHolder.bindView(fragment, this, composer);
 				break;
 			}
 			case STATUS: {
-				ApptentiveLog.w("-> Status");
 				MessageCenterStatus status = (MessageCenterStatus) listItems.get(position);
 				StatusHolder statusHolder = (StatusHolder) holder;
 				statusHolder.body.setText(status.body);
-
 				if (status.icon != null) {
 					statusHolder.icon.setImageResource(status.icon);
 					statusHolder.icon.setVisibility(View.VISIBLE);
@@ -160,14 +147,12 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				break;
 			}
 			case GREETING: {
-				ApptentiveLog.w("-> Greeting");
 				MessageCenterGreeting greeting = (MessageCenterGreeting) listItems.get(position);
 				GreetingHolder greetingHolder = (GreetingHolder) holder;
 				greetingHolder.bindView(greeting);
 				break;
 			}
 			case MESSAGE_INCOMING: {
-				ApptentiveLog.w("-> Message Incoming");
 				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
 				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
@@ -179,28 +164,24 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				break;
 			}
 			case MESSAGE_OUTGOING: {
-				ApptentiveLog.w("-> Message Outgoing");
 				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
 				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
 				break;
 			}
 			case MESSAGE_AUTO: {
-				ApptentiveLog.w("-> Message Auto");
 				CompoundMessage autoMessage = (CompoundMessage) listItems.get(position);
 				AutomatedMessageHolder autoHolder = (AutomatedMessageHolder) holder;
 				autoHolder.bindView(recyclerView, autoMessage);
 				break;
 			}
 			case WHO_CARD: {
-				ApptentiveLog.w("-> Who Card");
 				WhoCard whoCard = (WhoCard) listItems.get(position);
 				WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
 				whoCardHolder.bindView(recyclerView, whoCard);
 				break;
 			}
 			case MESSAGE_CONTEXT: {
-				ApptentiveLog.w("-> Message Context");
 				ContextMessage contextMessage = (ContextMessage) listItems.get(position);
 				ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
 				contextMessageHolder.bindView(contextMessage);

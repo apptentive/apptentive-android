@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
@@ -61,7 +60,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
-		ApptentiveLog.e("BINDING IMAGE");
 		title.setText(composer.title);
 
 		ColorStateList colors = ContextCompat.getColorStateList(itemView.getContext(), Util.getResourceIdFromAttribute(itemView.getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
@@ -178,7 +176,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	 * Remove all images from attachment band.
 	 */
 	public void clearImageAttachmentBand() {
-		ApptentiveLog.e("CLEARING ATTACHMENTS");
 		attachments.setVisibility(View.GONE);
 		images.clear();
 		attachments.setData(null);
@@ -193,12 +190,8 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		if (imagesToAttach == null || imagesToAttach.size() == 0) {
 			return;
 		}
-		ApptentiveLog.e("ADDING IMAGES");
-
 		attachments.setupLayoutListener();
-		ApptentiveLog.e("SHOWING");
 		attachments.setVisibility(View.VISIBLE);
-
 		images.addAll(imagesToAttach);
 		addAdditionalAttachItem();
 		attachments.notifyDataSetChanged();
@@ -210,12 +203,10 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	 * @param position the postion index of the image to be removed
 	 */
 	public void removeImageFromImageAttachmentBand(final int position) {
-		ApptentiveLog.e("REMOVING IMAGE");
 		images.remove(position);
 		attachments.setupLayoutListener();
 		if (images.size() == 0) {
 			// Hide attachment band after last attachment is removed
-			ApptentiveLog.e("HIDING");
 			attachments.setVisibility(View.GONE);
 			return;
 		}

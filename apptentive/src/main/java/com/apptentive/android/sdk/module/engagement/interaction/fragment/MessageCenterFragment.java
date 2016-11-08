@@ -200,7 +200,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
-		ApptentiveLog.e("onViewCreated()");
 		super.onViewCreated(view, onSavedInstanceState);
 		boolean isInitialViewCreation = (onSavedInstanceState == null);
 		/* When isInitialViewCreation is false, the view is being recreated after orientation change.
@@ -756,7 +755,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onComposingViewCreated(MessageComposerHolder composer, final EditText composerEditText, final ApptentiveImageGridView attachments) {
-		ApptentiveLog.e("onComposingViewCreated()");
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 
 		this.composer = composer;
@@ -900,7 +898,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onSubmitWhoCard(String buttonLabel) {
-		ApptentiveLog.e("onSubmitWhoCard()");
 		JSONObject data = new JSONObject();
 		try {
 			data.put("required", interaction.getWhoCardRequired());
@@ -923,7 +920,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onCloseWhoCard(String buttonLabel) {
-		ApptentiveLog.e("onCloseWhoCard()");
 		JSONObject data = new JSONObject();
 		try {
 			data.put("required", interaction.getWhoCardRequired());
@@ -1061,6 +1057,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		prefs.edit()
 			.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE)
 			.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)
+			.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS)
 			.apply();
 	}
 
@@ -1143,7 +1140,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void showFab() {
-		ApptentiveLog.e("showFab()");
 		messageCenterRecyclerView.setPadding(0, 0, 0, fabPaddingPixels);
 		// Re-enable Fab at the beginning of the animation
 		if (fab.getVisibility() != View.VISIBLE) {
@@ -1153,7 +1149,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void hideFab() {
-		ApptentiveLog.e("hideFab()");
 		// Make sure Fab is not clickable during fade-out animation
 		if (fab.getVisibility() != View.GONE) {
 			fab.setEnabled(false);
@@ -1284,7 +1279,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			switch (msg.what) {
 				case MSG_MESSAGE_ADD_WHOCARD: {
-					ApptentiveLog.e("Adding Who Card");
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
 					boolean initial = msg.arg1 == 0;
 					WhoCard whoCard = fragment.interaction.getWhoCard();
@@ -1300,7 +1294,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						int i = messageIterator.nextIndex();
 						MessageCenterUtil.MessageCenterListItem next = messageIterator.next();
 						if (next.getListItemType() == WHO_CARD) {
-							ApptentiveLog.e("Removing Who Card");
 							messageIterator.remove();
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
 						}
@@ -1367,13 +1360,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_START_SENDING: {
 					CompoundMessage message = (CompoundMessage) msg.obj;
-					ApptentiveLog.e("Adding Message to list");
 					fragment.listItems.add(message);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 					fragment.unsentMessagesCount++;
 					fragment.setPaused(false);
 
-					ApptentiveLog.e("Sending message");
 					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 
 					// After the message is sent, show the Who Card if it has never been seen before, and the configuration specifies it should be requested.
@@ -1414,19 +1405,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						message.setRead(true);
 
 						// Add it to the RecyclerView
-						ApptentiveLog.e("Adding Real Context Message");
 						fragment.unsentMessagesCount++;
 						fragment.listItems.add(message);
 						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 
 						// Send it to the server
-						ApptentiveLog.e("Sending Real Context Message");
 						ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 					}
 					break;
 				}
 				case MSG_PAUSE_SENDING: {
-					ApptentiveLog.e("PAUSE");
 					if (!fragment.isPaused()) {
 						fragment.setPaused(true);
 						if (fragment.unsentMessagesCount > 0) {
@@ -1438,7 +1426,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_RESUME_SENDING: {
-					ApptentiveLog.e("RESUME");
 					if (fragment.isPaused()) {
 						fragment.setPaused(false);
 						if (fragment.unsentMessagesCount > 0) {
@@ -1451,7 +1438,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					for (int i = 0; i < fragment.listItems.size(); i++) {
 						MessageCenterUtil.MessageCenterListItem item = fragment.listItems.get(i);
 						if (item.getListItemType() == MESSAGE_COMPOSER) {
-							ApptentiveLog.e("Removing Composer");
 							fragment.listItems.remove(i);
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
 						}
@@ -1485,7 +1471,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					for (int i = 0; i < listItems.size(); i++) {
 						MessageCenterUtil.MessageCenterListItem item = listItems.get(i);
 						if (item.getListItemType() == STATUS) {
-							ApptentiveLog.e("Removing Status");
 							listItems.remove(i);
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
 						}
@@ -1493,7 +1478,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_ADD_CONTEXT_MESSAGE: {
-					ApptentiveLog.e("Adding Context Message");
 					ContextMessage contextMessage = (ContextMessage) msg.obj;
 					fragment.listItems.add(contextMessage);
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
