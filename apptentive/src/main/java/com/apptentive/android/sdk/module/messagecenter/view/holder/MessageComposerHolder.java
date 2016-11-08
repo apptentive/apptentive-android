@@ -159,7 +159,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		//Initialize image attachments band with empty data
 		clearImageAttachmentBand();
 		attachments.setVisibility(View.GONE);
-		attachments.setAdapterIndicator(0);
 		attachments.setData(new ArrayList<ImageItem>());
 
 		if (adapter.getListener() != null) {
@@ -202,6 +201,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 		images.addAll(imagesToAttach);
 		addAdditionalAttachItem();
+		attachments.notifyDataSetChanged();
 	}
 
 	/**

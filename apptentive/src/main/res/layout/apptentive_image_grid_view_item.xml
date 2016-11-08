@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -34,9 +34,17 @@
     <ImageView android:id="@+id/indicator"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:layout_gravity="top|right"
+               android:layout_gravity="top|end"
                android:layout_marginTop="-2dp"
+               android:layout_marginLeft="0dp"
+               android:layout_marginStart="0dp"
                android:layout_marginRight="-2dp"
+               android:layout_marginEnd="-2dp"
+               android:paddingBottom="8dp"
+               android:paddingLeft="8dp"
+               android:paddingStart="8dp"
+               android:paddingRight="0dp"
+               android:paddingEnd="0dp"
                android:src="@drawable/apptentive_ic_image_picker_unselected"/>
     <ProgressBar android:id="@+id/thumbnail_progress"
                  android:layout_width="wrap_content"

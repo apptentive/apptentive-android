@@ -73,7 +73,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -172,6 +171,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	protected static final int MSG_ADD_CONTEXT_MESSAGE = 15;
 	protected static final int MSG_ADD_GREETING = 16;
 	protected static final int MSG_ADD_STATUS_ERROR = 17;
+	protected static final int MSG_REMOVE_ATTACHMENT = 18;
 
 	private MessageCenterFragment.MessagingActionHandler messagingActionHandler;
 
@@ -294,15 +294,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						long creation_time = Util.getContentCreationTime(hostingActivity, uri);
 						Uri fileUri = Uri.fromFile(new File(originalPath));
 						File cacheDir = Util.getDiskCacheDir(hostingActivity);
-						addAttachmentsToComposer(Arrays.asList(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time),
-							Util.getMimeTypeFromUri(hostingActivity, uri), creation_time)));
+						addAttachmentsToComposer(
+							new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time), Util.getMimeTypeFromUri(hostingActivity, uri), creation_time)
+						);
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
 						 * cache name will be generated from md5 of uri string
 						 */
 						File cacheDir = Util.getDiskCacheDir(hostingActivity);
 						String cachedFileName = Util.generateCacheFileFullPath(uri, cacheDir, 0);
-						addAttachmentsToComposer(Arrays.asList(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(hostingActivity, uri), 0)));
+						addAttachmentsToComposer(
+							new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(hostingActivity, uri), 0)
+						);
 					}
 
 					break;
@@ -649,10 +652,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 	}
 
-	public void addAttachmentsToComposer(final List<ImageItem> images) {
+	public void addAttachmentsToComposer(ImageItem... images) {
 		ArrayList<ImageItem> newImages = new ArrayList<ImageItem>();
 		// only add new images, and filter out duplicates
-		if (images != null && images.size() > 0) {
+		if (images != null && images.length > 0) {
 			for (ImageItem newImage : images) {
 				boolean bDupFound = false;
 				for (ImageItem pendingAttachment : pendingAttachments) {
@@ -675,11 +678,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (newImages.isEmpty()) {
 			return;
 		}
-		if (messageCenterRecyclerViewAdapter != null) {
-			// Only update composing view if image is attached successfully
-			messageCenterRecyclerViewAdapter.addImagestoComposer(composer, newImages);
-			//messageCenterRecyclerViewAdapter.notify();
-		}
+		messageCenterRecyclerViewAdapter.addImagestoComposer(composer, newImages);
+		messageCenterRecyclerViewAdapter.notifyItemChanged(listItems.size() - 1);
 		int firstIndex = messageCenterRecyclerView.getFirstVisiblePosition();
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, firstIndex, top));
 	}
@@ -691,17 +691,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	}
 
-	// TODO: This needs to be sent through the Handler
 	public void removeImageFromComposer(final int position) {
-		ApptentiveLog.e("removeImageFromComposer()");
 		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
-		pendingAttachments.remove(position);
-		if (messageCenterRecyclerViewAdapter != null) {
-			messageCenterRecyclerViewAdapter.removeImageFromComposer(composer, position);
-//			int count = imageAttachmentstList.size();
-			// Show keyboard if all attachments have been removed
-			messageCenterRecyclerViewAdapter.notifyDataSetChanged(); // TODO: Only invalidate the composer
-		}
+		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_REMOVE_ATTACHMENT, position, 0));
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 	}
 
@@ -1055,6 +1047,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (pendingAttachmentsJsonArray.length() > 0) {
 			editor.putString(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS, pendingAttachmentsJsonArray.toString());
 		} else {
+			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
 			editor.remove(Constants.PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS);
 		}
 		editor.apply();
@@ -1525,6 +1518,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						fragment.listItems.add(status);
 						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 					}
+					break;
+				}
+				case MSG_REMOVE_ATTACHMENT: {
+					int position = msg.arg1;
+					fragment.pendingAttachments.remove(position);
+					fragment.messageCenterRecyclerViewAdapter.removeImageFromComposer(fragment.composer, position);
+					fragment.messageCenterRecyclerViewAdapter.notifyItemChanged(fragment.listItems.size() - 1);
 					break;
 				}
 			}
