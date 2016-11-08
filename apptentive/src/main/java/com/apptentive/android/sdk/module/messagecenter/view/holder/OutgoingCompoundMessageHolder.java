@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -42,7 +43,7 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		status = (TextView) itemView.findViewById(R.id.status);
 	}
 
-	public void bindView(MessageCenterFragment fragment, final RecyclerView recyclerView, final CompoundMessage message) {
+	public void bindView(MessageCenterFragment fragment, final RecyclerView recyclerView, final MessageCenterRecyclerViewAdapter adapter, final CompoundMessage message) {
 		super.bindView(fragment, recyclerView, message);
 		imageBandView.setupUi();
 		messageBodyView.setText(message.getBody());
@@ -87,8 +88,15 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 				images.add(new ImageItem(file.getSourceUriOrPath(), file.getLocalFilePath(), file.getMimeType(), file.getCreationTime()));
 			}
 			imageBandView.setData(images);
+			imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
+				@Override
+				public void onClick(int position, ImageItem image) {
+					if (adapter.getListener() != null) {
+						adapter.getListener().onClickAttachment(position, image);
+					}
+				}
+			});
 		}
-
 		status.setText(statusText);
 		status.setTextColor(getStatusColor(createdAt, fragment.isPaused()));
 		status.setVisibility(!TextUtils.isEmpty(statusText) ? View.VISIBLE : View.GONE);

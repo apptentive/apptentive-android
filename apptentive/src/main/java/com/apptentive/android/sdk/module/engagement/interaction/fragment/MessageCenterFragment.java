@@ -98,15 +98,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private boolean bShowProfileMenuItem = true;
 
 	// keys used to save instance in the event of rotation
-	private final static String LIST_TOP_INDEX = "list_top_index";
-	private final static String LIST_TOP_OFFSET = "list_top_offset";
-	private final static String COMPOSING_EDITTEXT_STATE = "edittext";
-	private final static String CONTEXT_MESSAGE = "context_message";
-	private final static String COMPOSING_ATTACHMENTS = "attachments";
-	private final static String WHO_CARD_MODE = "whocardmode";
-	private final static String WHO_CARD_NAME = "whocardname";
-	private final static String WHO_CARD_EMAIL = "whocardemail";
-	private final static String WHO_CARD_AVATAR_FILE = "whocardavatar";
+	private final static String LIST_TOP_INDEX = "key_list_top_index_state";
+	private final static String LIST_TOP_OFFSET = "key_list_top_offset_state";
+	private final static String COMPOSING_EDITTEXT_STATE = "key_edit_text_state";
+	private final static String WHO_CARD_MODE = "key_who_card_mode_state";
+	private final static String WHO_CARD_NAME = "key_who_card_name_state";
+	private final static String WHO_CARD_EMAIL = "key_who_card_email_state";
+	private final static String WHO_CARD_AVATAR_FILE = "key_who_card_avatar_state";
 
 	private final static String DIALOG_IMAGE_PREVIEW = "imagePreviewDialog";
 
@@ -1228,12 +1226,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_ADD_GREETING);
 	}
 
-	// TODO: Fix this.
 	@Override
 	public void onClickAttachment(final int position, final ImageItem image) {
 		if (Util.isMimeTypeImage(image.mimeType)) {
-			// "+" placeholder is clicked
 			if (TextUtils.isEmpty(image.originalPath)) {
+				// "+" placeholder is clicked
 				onAttachImage();
 			} else {
 				// an image thumbnail is clicked

@@ -170,20 +170,19 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				ApptentiveLog.w("-> Message Incoming");
 				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
-				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
+				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
 				// Mark as read
 				if (!compoundMessage.isRead() && !messagesWithPendingReadStatusUpdate.contains(compoundMessage)) {
 					messagesWithPendingReadStatusUpdate.add(compoundMessage);
 					startUpdateUnreadMessageTask(compoundMessage);
 				}
-
 				break;
 			}
 			case MESSAGE_OUTGOING: {
 				ApptentiveLog.w("-> Message Outgoing");
 				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
-				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
+				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
 				break;
 			}
 			case MESSAGE_AUTO: {

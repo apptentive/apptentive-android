@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.fragment.Message
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -48,7 +49,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		imageBandView = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
 	}
 
-	public void bindView(MessageCenterFragment fragment, final RecyclerView parent, final CompoundMessage message) {
+	public void bindView(MessageCenterFragment fragment, final RecyclerView parent, final MessageCenterRecyclerViewAdapter adapter, final CompoundMessage message) {
 		super.bindView(fragment, parent, message);
 		imageBandView.setupUi();
 		if (loadAvatar) {
@@ -97,8 +98,8 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 						StoredFile file = files.get(position);
 						String remoteUrl = file.getApptentiveUri();
 						String localFilePath = Util.generateCacheFileFullPath(remoteUrl, cacheDir);
-						if (listener != null) {
-							listener.onClickAttachment(position, new ImageItem(remoteUrl, localFilePath, file.getMimeType(), file.getCreationTime()));
+						if (adapter.getListener() != null) {
+							adapter.getListener().onClickAttachment(position, new ImageItem(remoteUrl, localFilePath, file.getMimeType(), file.getCreationTime()));
 						}
 					}
 				});
