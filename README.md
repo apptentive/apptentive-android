@@ -26,5 +26,5 @@ We appreciate contributions to make this SDK better. If you have an improvement 
 
 #### Notes
 
-* Make sure you have latest version or our SDK. We're always adding new features!
+* Make sure you have latest version of our SDK. We're always adding new features!
 * Make sure to follow the repo to get updates about features and bug fixes.
