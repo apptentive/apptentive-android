@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
@@ -35,7 +34,6 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 	private TextView messageBodyView;
 	private TextView nameView;
 	private ApptentiveImageGridView imageBandView;
-	private MessageAdapter.OnListviewItemActionListener listener;
 
 	private static final boolean loadAvatar = false;
 
