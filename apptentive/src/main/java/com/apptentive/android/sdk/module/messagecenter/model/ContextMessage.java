@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-public class ContextMessage implements MessageCenterUtil.MessageCenterListItem {
+public class ContextMessage implements MessageCenterListItem {
 
 	private String body;
 

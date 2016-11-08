@@ -26,8 +26,8 @@ import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.AutomatedMessageHolder;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.ContextMessageHolder;
@@ -45,14 +45,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.GREETING;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_AUTO;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_COMPOSER;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_CONTEXT;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_INCOMING;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_OUTGOING;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.STATUS;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.WHO_CARD;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.GREETING;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_AUTO;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_INCOMING;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.STATUS;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.WHO_CARD;
 
 public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
@@ -60,11 +60,11 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 	OnListviewItemActionListener listener;
 	RecyclerView recyclerView;
 	Interaction interaction;
-	List<MessageCenterUtil.MessageCenterListItem> listItems;
+	List<MessageCenterListItem> listItems;
 	// maps to prevent redundant asynctasks
 	private ArrayList<ApptentiveMessage> messagesWithPendingReadStatusUpdate = new ArrayList<ApptentiveMessage>();
 
-	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> listItems) {
+	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterListItem> listItems) {
 		this.fragment = fragment;
 		this.listener = listener;
 		this.interaction = interaction;
@@ -206,7 +206,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public int getItemViewType(int position) {
-		MessageCenterUtil.MessageCenterListItem message = listItems.get(position);
+		MessageCenterListItem message = listItems.get(position);
 		return message.getListItemType();
 	}
 

@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 
 import org.json.JSONObject;
 
-public class MessageCenterStatus extends JSONObject implements MessageCenterUtil.MessageCenterListItem {
+public class MessageCenterStatus extends JSONObject implements MessageCenterListItem {
 
 	public final String body;
 	public final Integer icon;

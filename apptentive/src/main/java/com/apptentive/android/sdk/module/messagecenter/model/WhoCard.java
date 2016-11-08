@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class WhoCard extends JSONObject implements MessageCenterUtil.MessageCenterListItem {
+public class WhoCard extends JSONObject implements MessageCenterListItem {
 
 	private static final String KEY_REQUEST = "request";
 	private static final String KEY_REQUIRE = "require";

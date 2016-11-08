@@ -25,7 +25,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -224,8 +224,8 @@ public class MessageManager {
 		return false;
 	}
 
-	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems() {
-		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
+	public List<MessageCenterListItem> getMessageCenterListItems() {
+		List<MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterListItem>();
 		try {
 			List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages().get();
 			// Do not display hidden messages on Message Center

@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-public class Composer implements MessageCenterUtil.MessageCenterListItem {
+public class Composer implements MessageCenterListItem {
 
 	public String title;
 	public String closeBody;

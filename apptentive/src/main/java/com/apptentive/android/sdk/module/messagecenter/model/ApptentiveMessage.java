@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterUtil.MessageCenterListItem {
+public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
 
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";

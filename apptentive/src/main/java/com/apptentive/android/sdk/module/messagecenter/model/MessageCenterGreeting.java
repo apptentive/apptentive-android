@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-public class MessageCenterGreeting implements MessageCenterUtil.MessageCenterListItem {
+public class MessageCenterGreeting implements MessageCenterListItem {
 	public final String title;
 	public final String body;
 	public final String avatar;

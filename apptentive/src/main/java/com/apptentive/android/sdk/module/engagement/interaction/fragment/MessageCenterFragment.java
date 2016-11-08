@@ -49,6 +49,7 @@ import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListe
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
@@ -79,11 +80,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_COMPOSER;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_CONTEXT;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.MESSAGE_OUTGOING;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.STATUS;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil.MessageCenterListItem.WHO_CARD;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.STATUS;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.WHO_CARD;
 
 public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements
 	OnListviewItemActionListener,
@@ -117,7 +118,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private View fab;
 
-	private ArrayList<MessageCenterUtil.MessageCenterListItem> listItems = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
+	private ArrayList<MessageCenterListItem> listItems = new ArrayList<MessageCenterListItem>();
 	private MessageCenterRecyclerViewAdapter messageCenterRecyclerViewAdapter;
 	private MessageCenterRecyclerView messageCenterRecyclerView;
 
@@ -373,7 +374,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, listItems);
 
 		if (isInitialViewCreation) {
-			List<MessageCenterUtil.MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
+			List<MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
 			if (items != null) {
 				// Get message list from DB, and use this as the starting point for the listItems array.
 				prepareMessages(items);
@@ -415,7 +416,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} else {
 			// Need to account for an input view that was added before orientation change, etc.
 			if (listItems != null) {
-				for (MessageCenterUtil.MessageCenterListItem item : listItems) {
+				for (MessageCenterListItem item : listItems) {
 					if (item.getListItemType() == MESSAGE_COMPOSER || item.getListItemType() == WHO_CARD) {
 						addedAnInteractiveCard = true;
 					}
@@ -630,7 +631,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		outside_loop:
 		// Starting at end of list, go back up the list to find the proper place to insert the incoming message.
 		for (int i = listItems.size() - 1; i > 0; i--) {
-			MessageCenterUtil.MessageCenterListItem item = listItems.get(i);
+			MessageCenterListItem item = listItems.get(i);
 			switch (item.getListItemType()) {
 				case MESSAGE_COMPOSER:
 				case MESSAGE_CONTEXT:
@@ -1084,10 +1085,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		MessageCenterUtil.CompoundMessageCommonInterface lastSent = null;
 		Set<String> uniqueNonce = new HashSet<String>();
 		int removedItems = 0;
-		ListIterator<MessageCenterUtil.MessageCenterListItem> listItemIterator = listItems.listIterator();
+		ListIterator<MessageCenterListItem> listItemIterator = listItems.listIterator();
 		while (listItemIterator.hasNext()) {
 			int adapterMessagePosition = listItemIterator.nextIndex() - removedItems;
-			MessageCenterUtil.MessageCenterListItem message = listItemIterator.next();
+			MessageCenterListItem message = listItemIterator.next();
 			if (message instanceof ApptentiveMessage) {
 				/* Check if there is any duplicate messages and remove if found.
 				* add() of a Set returns false if the element already exists.
@@ -1178,11 +1179,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * with seconds resolution. If messages were received by server within a second, messages may be out of order
 	 * This method uses insertion sort to re-sort the messages retrieved from the database
 	 */
-	private void prepareMessages(final List<MessageCenterUtil.MessageCenterListItem> originalItems) {
+	private void prepareMessages(final List<MessageCenterListItem> originalItems) {
 		listItems.clear();
 		unsentMessagesCount = 0;
 		// Loop through each message item retrieved from database
-		for (MessageCenterUtil.MessageCenterListItem item : originalItems) {
+		for (MessageCenterListItem item : originalItems) {
 			if (item instanceof ApptentiveMessage) {
 				ApptentiveMessage apptentiveMessage = (ApptentiveMessage) item;
 				Double createdAt = apptentiveMessage.getCreatedAt();
@@ -1193,7 +1194,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				/*
 				 * Find proper location to insert into the listItems list of the listview.
 				 */
-				ListIterator<MessageCenterUtil.MessageCenterListItem> listIterator = listItems.listIterator();
+				ListIterator<MessageCenterListItem> listIterator = listItems.listIterator();
 				ApptentiveMessage next = null;
 				while (listIterator.hasNext()) {
 					next = (ApptentiveMessage) listIterator.next();
@@ -1296,10 +1297,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_MESSAGE_REMOVE_WHOCARD: {
-					ListIterator<MessageCenterUtil.MessageCenterListItem> messageIterator = fragment.listItems.listIterator();
+					ListIterator<MessageCenterListItem> messageIterator = fragment.listItems.listIterator();
 					while (messageIterator.hasNext()) {
 						int i = messageIterator.nextIndex();
-						MessageCenterUtil.MessageCenterListItem next = messageIterator.next();
+						MessageCenterListItem next = messageIterator.next();
 						if (next.getListItemType() == WHO_CARD) {
 							messageIterator.remove();
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
@@ -1336,7 +1337,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ApptentiveMessage apptentiveMessage = (ApptentiveMessage) msg.obj;
 
 					for (int i = 0; i < fragment.listItems.size(); i++) {
-						MessageCenterUtil.MessageCenterListItem message = fragment.listItems.get(i);
+						MessageCenterListItem message = fragment.listItems.get(i);
 						if (message instanceof ApptentiveMessage) {
 							String nonce = ((ApptentiveMessage) message).getNonce();
 							if (nonce != null) {
@@ -1393,10 +1394,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_SEND_PENDING_CONTEXT_MESSAGE: {
 					ContextMessage contextMessage = null;
 					// If the list has a context message, get it, remove it from the list, and notify the RecyclerView to update.
-					ListIterator<MessageCenterUtil.MessageCenterListItem> iterator = fragment.listItems.listIterator();
+					ListIterator<MessageCenterListItem> iterator = fragment.listItems.listIterator();
 					while (iterator.hasNext()) {
 						int index = iterator.nextIndex();
-						MessageCenterUtil.MessageCenterListItem item = iterator.next();
+						MessageCenterListItem item = iterator.next();
 						if (item.getListItemType() == MESSAGE_CONTEXT) {
 							contextMessage = (ContextMessage) item;
 							iterator.remove();
@@ -1444,7 +1445,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case MSG_REMOVE_COMPOSER: {
 					for (int i = 0; i < fragment.listItems.size(); i++) {
-						MessageCenterUtil.MessageCenterListItem item = fragment.listItems.get(i);
+						MessageCenterListItem item = fragment.listItems.get(i);
 						if (item.getListItemType() == MESSAGE_COMPOSER) {
 							fragment.listItems.remove(i);
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
@@ -1453,10 +1454,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_OPT_INSERT_REGULAR_STATUS: {
-					List<MessageCenterUtil.MessageCenterListItem> listItems = fragment.listItems;
+					List<MessageCenterListItem> listItems = fragment.listItems;
 					// Only add status if the last item in the list is a sent message.
 					if (listItems.size() > 0) {
-						MessageCenterUtil.MessageCenterListItem lastItem = listItems.get(listItems.size() - 1);
+						MessageCenterListItem lastItem = listItems.get(listItems.size() - 1);
 						if (lastItem != null && lastItem.getListItemType() == MESSAGE_OUTGOING) {
 							ApptentiveMessage apptentiveMessage = (ApptentiveMessage) lastItem;
 							if (apptentiveMessage.isOutgoingMessage()) {
@@ -1476,9 +1477,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_REMOVE_STATUS: {
-					List<MessageCenterUtil.MessageCenterListItem> listItems = fragment.listItems;
+					List<MessageCenterListItem> listItems = fragment.listItems;
 					for (int i = 0; i < listItems.size(); i++) {
-						MessageCenterUtil.MessageCenterListItem item = listItems.get(i);
+						MessageCenterListItem item = listItems.get(i);
 						if (item.getListItemType() == STATUS) {
 							listItems.remove(i);
 							fragment.messageCenterRecyclerViewAdapter.notifyItemRemoved(i);
@@ -1526,7 +1527,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public boolean recyclerViewContainsItemOfType(int type) {
-		for (MessageCenterUtil.MessageCenterListItem item : listItems) {
+		for (MessageCenterListItem item : listItems) {
 			if (item.getListItemType() == type) {
 				return true;
 			}
@@ -1538,7 +1539,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (isPaused ^ paused) {
 			// Invalidate any unsent messages, as these will have status and progress bars that need to change.
 			for (int i = 0; i < listItems.size(); i++) {
-				MessageCenterUtil.MessageCenterListItem item = listItems.get(i);
+				MessageCenterListItem item = listItems.get(i);
 				if (item instanceof ApptentiveMessage) {
 					ApptentiveMessage message = (ApptentiveMessage) item;
 					if (message.isOutgoingMessage() && message.getCreatedAt() == null) {
