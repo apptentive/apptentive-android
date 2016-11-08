@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
@@ -40,8 +41,15 @@ public class GreetingHolder extends RecyclerView.ViewHolder {
 		body.setText(greeting.body);
 		ImageUtil.startDownloadAvatarTask(avatar, greeting.avatar);
 		infoButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
+			public void onClick(final View view) {
+				// Don't let the info button open multiple copies of the About page.
 				view.setClickable(false);
+				view.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						view.setClickable(true);
+					}
+				}, 300);
 				ApptentiveInternal.getInstance().showAboutInternal(Util.castContextToActivity(itemView.getContext()), false);
 			}
 		});
