@@ -13,7 +13,7 @@ use your app, to talk to them at the right time, and in the right way.
 
 ##### Version history is tracked [here](CHANGELOG.md)
 
-##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|3.3.0|aar)
+##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|3.4.0|aar)
 
 #### Reporting Bugs
 
