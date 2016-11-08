@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,9 +14,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * @author Sky Kelsey
- */
 public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterUtil.MessageCenterListItem {
 
 	public static final String KEY_ID = "id";

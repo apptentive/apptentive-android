@@ -12,7 +12,6 @@ import android.content.Intent;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
@@ -109,38 +108,6 @@ public class MessageCenterInteraction extends Interaction {
 		return null;
 	}
 
-	public MessageCenterComposingItem getComposerArea() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
-		}
-		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
-		return new MessageCenterComposingItem(
-			MessageCenterComposingItem.COMPOSING_ITEM_AREA,
-			null,
-			composer.optString(KEY_COMPOSER_HINT_TEXT, null),
-			null,
-			null,
-			null,
-			null);
-	}
-
-	public MessageCenterComposingItem getComposerBar() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
-		}
-		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
-		return new MessageCenterComposingItem(
-			MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR,
-			composer.optString(KEY_COMPOSER_TITLE, null),
-			composer.optString(KEY_COMPOSER_CLOSE_BODY, null),
-			composer.optString(KEY_COMPOSER_CLOSE_DISCARD, null),
-			composer.optString(KEY_COMPOSER_CLOSE_CANCEL, null),
-			composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
-			null);
-	}
-
 	public Composer getComposer() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
@@ -176,35 +143,6 @@ public class MessageCenterInteraction extends Interaction {
 		return profile.optBoolean(KEY_PROFILE_REQUIRE, false);
 	}
 
-	public MessageCenterComposingItem getWhoCardInit() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
-		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
-		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
-			return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_INIT,
-				profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
-				// Hide name field if profile is required and never set
-				null,
-				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
-				// Hide Skip button
-				null,
-				profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
-		}
-		return new MessageCenterComposingItem(
-			MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT,
-			profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
-			profileInitial.optString(KEY_PROFILE_INIT_NAME_HINT, null),
-			profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-			profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
-			profileInitial.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
-			profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
-	}
-
 	public JSONObject getProfile() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
@@ -221,35 +159,6 @@ public class MessageCenterInteraction extends Interaction {
 		}
 		return null;
 	}
-
-	public MessageCenterComposingItem getWhoCardEdit() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
-		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profileEdit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
-		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
-			JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
-			return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT,
-				profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null), // Show "Email(required)"
-				profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
-		}
-		return new MessageCenterComposingItem(
-			MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
-			profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
-			profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-			profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-			profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-			profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-			profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
-	}
-
 
 	public MessageCenterGreeting getGreeting() {
 		InteractionConfiguration configuration = getConfiguration();
