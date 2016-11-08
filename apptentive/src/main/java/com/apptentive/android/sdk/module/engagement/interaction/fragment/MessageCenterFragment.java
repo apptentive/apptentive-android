@@ -284,6 +284,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						}
 					}
 
+					EngagementModule.engageInternal(getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACH);
 
 					String originalPath = Util.getRealFilePathFromUri(hostingActivity, uri);
 					if (originalPath != null) {
@@ -293,18 +294,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						long creation_time = Util.getContentCreationTime(hostingActivity, uri);
 						Uri fileUri = Uri.fromFile(new File(originalPath));
 						File cacheDir = Util.getDiskCacheDir(hostingActivity);
-						addAttachmentsToComposer(
-							new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time), Util.getMimeTypeFromUri(hostingActivity, uri), creation_time)
-						);
+						addAttachmentsToComposer(new ImageItem(originalPath, Util.generateCacheFileFullPath(fileUri, cacheDir, creation_time), Util.getMimeTypeFromUri(hostingActivity, uri), creation_time));
 					} else {
 						/* If not able to get image file path due to not having READ_EXTERNAL_STORAGE permission,
 						 * cache name will be generated from md5 of uri string
 						 */
 						File cacheDir = Util.getDiskCacheDir(hostingActivity);
 						String cachedFileName = Util.generateCacheFileFullPath(uri, cacheDir, 0);
-						addAttachmentsToComposer(
-							new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(hostingActivity, uri), 0)
-						);
+						addAttachmentsToComposer(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(hostingActivity, uri), 0));
 					}
 
 					break;
