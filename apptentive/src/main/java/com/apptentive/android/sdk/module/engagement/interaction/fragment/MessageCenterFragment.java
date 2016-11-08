@@ -1296,7 +1296,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				case MSG_MESSAGE_ADD_WHOCARD: {
 					ApptentiveLog.e("Adding Who Card");
 					// msg.arg1 is either WHO_CARD_MODE_INIT or WHO_CARD_MODE_EDIT
-					boolean initial = msg.arg1 == 0; // TODO: Do something with mode?
+					boolean initial = msg.arg1 == 0;
 					WhoCard whoCard = fragment.interaction.getWhoCard();
 					whoCard.setInitial(initial);
 					fragment.listItems.add(whoCard);
@@ -1386,11 +1386,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					ApptentiveLog.e("Sending message");
 					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 
-					// TODO: Move this somewhere else?
-					// After the message is sent, check if Who Card need to be shown for the 1st time(When Who Card is either requested or required)
-					SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-					boolean whoCardDisplayedBefore = fragment.wasWhoCardAsPreviouslyDisplayed();
-					if (!whoCardDisplayedBefore) {
+					// After the message is sent, show the Who Card if it has never been seen before, and the configuration specifies it should be requested.
+					if (!fragment.wasWhoCardAsPreviouslyDisplayed() && fragment.interaction.getWhoCardRequestEnabled()) {
 						JSONObject data = new JSONObject();
 						try {
 							data.put("required", fragment.interaction.getWhoCardRequired());
@@ -1399,11 +1396,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							//
 						}
 						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
-						// The delay is to ensure the animation of adding Who Card play after the animation of new outgoing message
-						if (fragment.interaction.getWhoCardRequestEnabled()) {
-							fragment.forceShowKeyboard = true;
-							fragment.addWhoCard(true);
-						}
+						fragment.forceShowKeyboard = true;
+						fragment.addWhoCard(true);
 					}
 					break;
 				}
