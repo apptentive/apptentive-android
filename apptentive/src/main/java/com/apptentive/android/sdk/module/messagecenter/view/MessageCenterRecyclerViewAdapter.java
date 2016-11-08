@@ -60,15 +60,15 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 	OnListviewItemActionListener listener;
 	RecyclerView recyclerView;
 	Interaction interaction;
-	List<MessageCenterUtil.MessageCenterListItem> messages;
+	List<MessageCenterUtil.MessageCenterListItem> listItems;
 	// maps to prevent redundant asynctasks
 	private ArrayList<ApptentiveMessage> messagesWithPendingReadStatusUpdate = new ArrayList<ApptentiveMessage>();
 
-	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> messages) {
+	public MessageCenterRecyclerViewAdapter(MessageCenterFragment fragment, OnListviewItemActionListener listener, Interaction interaction, List<MessageCenterUtil.MessageCenterListItem> listItems) {
 		this.fragment = fragment;
 		this.listener = listener;
 		this.interaction = interaction;
-		this.messages = messages;
+		this.listItems = listItems;
 	}
 
 	@Override
@@ -140,14 +140,14 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		switch (getItemViewType(position)) {
 			case MESSAGE_COMPOSER: {
 				ApptentiveLog.w("-> Message Composer");
-				Composer composer = (Composer) messages.get(position);
+				Composer composer = (Composer) listItems.get(position);
 				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
 				composerHolder.bindView(fragment, this, composer);
 				break;
 			}
 			case STATUS: {
 				ApptentiveLog.w("-> Status");
-				MessageCenterStatus status = (MessageCenterStatus) messages.get(position);
+				MessageCenterStatus status = (MessageCenterStatus) listItems.get(position);
 				StatusHolder statusHolder = (StatusHolder) holder;
 				statusHolder.body.setText(status.body);
 
@@ -161,14 +161,14 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			}
 			case GREETING: {
 				ApptentiveLog.w("-> Greeting");
-				MessageCenterGreeting greeting = (MessageCenterGreeting) messages.get(position);
+				MessageCenterGreeting greeting = (MessageCenterGreeting) listItems.get(position);
 				GreetingHolder greetingHolder = (GreetingHolder) holder;
 				greetingHolder.bindView(greeting);
 				break;
 			}
 			case MESSAGE_INCOMING: {
 				ApptentiveLog.w("-> Message Incoming");
-				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
+				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
 				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
 				// Mark as read
@@ -181,28 +181,28 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			}
 			case MESSAGE_OUTGOING: {
 				ApptentiveLog.w("-> Message Outgoing");
-				CompoundMessage compoundMessage = (CompoundMessage) messages.get(position);
+				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
 				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
 				compoundHolder.bindView(fragment, recyclerView, compoundMessage);
 				break;
 			}
 			case MESSAGE_AUTO: {
 				ApptentiveLog.w("-> Message Auto");
-				CompoundMessage autoMessage = (CompoundMessage) messages.get(position);
+				CompoundMessage autoMessage = (CompoundMessage) listItems.get(position);
 				AutomatedMessageHolder autoHolder = (AutomatedMessageHolder) holder;
 				autoHolder.bindView(recyclerView, autoMessage);
 				break;
 			}
 			case WHO_CARD: {
 				ApptentiveLog.w("-> Who Card");
-				WhoCard whoCard = (WhoCard) messages.get(position);
+				WhoCard whoCard = (WhoCard) listItems.get(position);
 				WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
 				whoCardHolder.bindView(recyclerView, whoCard);
 				break;
 			}
 			case MESSAGE_CONTEXT: {
 				ApptentiveLog.w("-> Message Context");
-				ContextMessage contextMessage = (ContextMessage) messages.get(position);
+				ContextMessage contextMessage = (ContextMessage) listItems.get(position);
 				ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
 				contextMessageHolder.bindView(contextMessage);
 				break;
@@ -221,12 +221,12 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public int getItemCount() {
-		return messages.size();
+		return listItems.size();
 	}
 
 	@Override
 	public int getItemViewType(int position) {
-		MessageCenterUtil.MessageCenterListItem message = messages.get(position);
+		MessageCenterUtil.MessageCenterListItem message = listItems.get(position);
 		return message.getListItemType();
 	}
 
