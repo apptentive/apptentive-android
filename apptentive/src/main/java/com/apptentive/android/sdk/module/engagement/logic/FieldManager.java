@@ -121,7 +121,7 @@ public class FieldManager {
 								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getTotalInvokes(isInteraction, name));
 							case version:
 								String appVersion = String.valueOf(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()));
-								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getBuildInvokes(isInteraction, name, appVersion));
+								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getVersionCodeInvokes(isInteraction, name, appVersion));
 							default:
 								break;
 						}

@@ -61,26 +61,26 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		value = codePointStore.getTotalInvokes(true, testInteraction);
 		assertEquals(value, 14);
 
-		value = codePointStore.getVersionInvokes(true, testInteraction, "1.0");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "1.0");
 		assertEquals(value, 1);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "1.1");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "1.1");
 		assertEquals(value, 4);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "2.0");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "2.0");
 		assertEquals(value, 6);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "2.1");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "2.1");
 		assertEquals(value, 3);
 
-		value = codePointStore.getBuildInvokes(true, testInteraction, "1");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "1");
 		assertEquals(value, 1);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "2");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "2");
 		assertEquals(value, 1);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "3");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "3");
 		assertEquals(value, 3);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "4");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "4");
 		assertEquals(value, 4);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "5");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "5");
 		assertEquals(value, 2);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "6");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "6");
 		assertEquals(value, 3);
 
 		Double lastInvoke = codePointStore.getLastInvoke(true, testInteraction);
