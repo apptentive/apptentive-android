@@ -273,7 +273,7 @@ public class ApptentiveInternal {
 				// If passed theme res id does not exist, an exception would be thrown and caught
 				appContext.getResources().getResourceName(themeResId);
 
-				// Check if the theme to be inheritd from is an AppCompat theme.
+				// Check if the theme to be inherited from is an AppCompat theme.
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
 				appDefaultTheme.applyStyle(themeResId, true);
 
@@ -294,10 +294,7 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	/*
-	 * Object getter methods through ApptentiveInternal instance
-	 * Usage: ApptentiveInternal.getInstance().getxxxx()
-	 */
+	// Object getter methods reqiure an instance. Get an instance with ApptentiveInternal.getInstance()
 
 	public Context getApplicationContext() {
 		return appContext;
@@ -353,7 +350,7 @@ public class ApptentiveInternal {
 		return apptentiveToolbarTheme;
 	}
 
-	public int getDefaultStatusbarColor() {
+	public int getDefaultStatusBarColor() {
 		return statusBarColorDefault;
 	}
 
@@ -445,7 +442,7 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
-			messageManager.setCurrentForgroundActivity(activity);
+			messageManager.setCurrentForegroundActivity(activity);
 		}
 
 		checkAndUpdateApptentiveConfigurations();
@@ -459,7 +456,7 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
-			messageManager.setCurrentForgroundActivity(activity);
+			messageManager.setCurrentForegroundActivity(activity);
 		}
 
 	}
@@ -473,7 +470,7 @@ public class ApptentiveInternal {
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
 		currentTaskStackTopActivity = null;
-		messageManager.setCurrentForgroundActivity(null);
+		messageManager.setCurrentForegroundActivity(null);
 		payloadWorker.appWentToBackground();
 		messageManager.appWentToBackground();
 	}
@@ -515,8 +512,8 @@ public class ApptentiveInternal {
 			interactionTheme.applyStyle(themeOverrideResId, true);
 		}
 
-		// Step 5: Update statusbar color
-		/* Obtain the default statusbar color. When Apptentive Modal interaction is shown,
+		// Step 5: Update status bar color
+		/* Obtain the default status bar color. When an Apptentive Modal interaction is shown,
 		*  a translucent overlay would be applied on top of statusBarColorDefault
 		*/
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1177,7 +1174,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
-	 * @return true if properly registered, elss false.
+	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {

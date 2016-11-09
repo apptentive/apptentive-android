@@ -56,7 +56,7 @@ public class MessageManager {
 	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
 	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
 
-	private WeakReference<Activity> currentForgroundApptentiveActivity;
+	private WeakReference<Activity> currentForegroundApptentiveActivity;
 
 	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
@@ -118,7 +118,7 @@ public class MessageManager {
 	}
 
 	/*
-	 * Starts an asynctask to pre-fetch messages. This is to be called as part of Push notification action
+	 * Starts an AsyncTask to pre-fetch messages. This is to be called as part of Push notification action
 	 * when push is received on the device.
 	 */
 	public void startMessagePreFetchTask() {
@@ -415,27 +415,27 @@ public class MessageManager {
 	}
 
 	@Deprecated
-	public void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+	public void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
 		clearHostUnreadMessagesListeners();
-		if (newlistener != null) {
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
+		if (listener != null) {
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(listener));
 		}
 	}
 
-	public void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
-		if (newlistener != null) {
+	public void addHostUnreadMessagesListener(UnreadMessagesListener newListener) {
+		if (newListener != null) {
 			// Defer message polling thread creation, if not created yet, and host app adds an unread message listener
 			init();
 			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
 				UnreadMessagesListener listener = listenerRef.get();
-				if (listener != null && listener == newlistener) {
+				if (listener != null && listener == newListener) {
 					return;
 				} else if (listener == null) {
 					iterator.remove();
 				}
 			}
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newListener));
 		}
 	}
 
@@ -453,15 +453,15 @@ public class MessageManager {
 	}
 
 	// Set when Activity.onStart() and onStop() are called
-	public void setCurrentForgroundActivity(Activity activity) {
+	public void setCurrentForegroundActivity(Activity activity) {
 		if (activity != null) {
-			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
+			currentForegroundApptentiveActivity = new WeakReference<Activity>(activity);
 		} else {
 			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(null, false);
 			if (manager != null) {
 				manager.cleanUp();
 			}
-			currentForgroundApptentiveActivity = null;
+			currentForegroundApptentiveActivity = null;
 		}
 	}
 
@@ -474,8 +474,8 @@ public class MessageManager {
 	}
 
 	private void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
-		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
-			Activity foreground = currentForgroundApptentiveActivity.get();
+		if (currentForegroundApptentiveActivity != null && currentForegroundApptentiveActivity.get() != null) {
+			Activity foreground = currentForegroundApptentiveActivity.get();
 			if (foreground != null) {
 				PendingIntent pendingIntent = ApptentiveInternal.prepareMessageCenterPendingIntent(foreground.getApplicationContext());
 				if (pendingIntent != null) {

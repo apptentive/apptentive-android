@@ -27,7 +27,7 @@ public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 	int backgroundColor;
 	int progressBarColor;
 
-	int pendindProgress = -1;
+	int pendingProgress = -1;
 	int progress = 0;
 	View bar;
 	View background;
@@ -57,8 +57,8 @@ public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if (pendindProgress != -1) {
-			setProgress(pendindProgress);
+		if (pendingProgress != -1) {
+			setProgress(pendingProgress);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 
 	public void setProgress(int progress) {
 		if (getWidth() == 0) {
-			pendindProgress = progress;
+			pendingProgress = progress;
 		} else {
 			this.progress = progress;
 			progress = Math.min(progress, MAX);
@@ -90,7 +90,7 @@ public class ApptentiveMaterialDeterminateProgressBar extends FrameLayout {
 			params.width = progressWidth;
 			params.height = LayoutParams.MATCH_PARENT;
 			bar.setLayoutParams(params);
-			pendindProgress = -1;
+			pendingProgress = -1;
 		}
 	}
 
