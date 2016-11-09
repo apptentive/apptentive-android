@@ -53,12 +53,12 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	public MessageComposerHolder(View itemView) {
 		super(itemView);
 		images = new ArrayList<ImageItem>();
-		closeButton = (ImageButton) itemView.findViewById(R.id.cancel_composing);
+		closeButton = (ImageButton) itemView.findViewById(R.id.close_button);
 		title = (TextView) itemView.findViewById(R.id.title);
-		attachButton = (ImageButton) itemView.findViewById(R.id.btn_attach_image);
-		sendButton = (ImageButton) itemView.findViewById(R.id.btn_send_message);
-		message = (EditText) itemView.findViewById(R.id.composing_et);
-		attachments = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
+		attachButton = (ImageButton) itemView.findViewById(R.id.attach_button);
+		sendButton = (ImageButton) itemView.findViewById(R.id.send_button);
+		message = (EditText) itemView.findViewById(R.id.message);
+		attachments = (ApptentiveImageGridView) itemView.findViewById(R.id.attachments);
 
 		maxAllowedAttachments = itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
 	}

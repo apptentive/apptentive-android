@@ -20,7 +20,7 @@
                         android:layout_height="wrap_content"
                         android:minHeight="@dimen/apptentive_message_center_composing_bar_min_height"
                         android:background="?apptentiveComposingBarBackground">
-            <ImageButton android:id="@+id/cancel_composing"
+            <ImageButton android:id="@+id/close_button"
                          android:layout_width="wrap_content"
                          android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"
                          android:layout_centerVertical="true"
@@ -37,10 +37,10 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_centerVertical="true"
-                      android:layout_toRightOf="@id/cancel_composing"
-                      android:layout_toEndOf="@id/cancel_composing"
+                      android:layout_toRightOf="@id/close_button"
+                      android:layout_toEndOf="@id/close_button"
                       android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"/>
-            <ImageButton android:id="@+id/btn_send_message"
+            <ImageButton android:id="@+id/send_button"
                          android:layout_width="wrap_content"
                          android:layout_height="@dimen/apptentive_message_center_composing_bar_min_height"
                          android:layout_centerVertical="true"
@@ -51,12 +51,12 @@
                          android:paddingRight="16dp"
                          android:src="@drawable/apptentive_ic_action_send"
                          android:contentDescription="Send"/>
-            <ImageButton android:id="@+id/btn_attach_image"
+            <ImageButton android:id="@+id/attach_button"
                          android:layout_width="wrap_content"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
                          android:layout_centerVertical="true"
-                         android:layout_toLeftOf="@id/btn_send_message"
-                         android:layout_toStartOf="@id/btn_send_message"
+                         android:layout_toLeftOf="@id/send_button"
+                         android:layout_toStartOf="@id/send_button"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:src="@drawable/apptentive_ic_action_attach"
                          android:contentDescription="Attach"/>
@@ -66,7 +66,7 @@
                       android:orientation="vertical"
                       android:layout_marginTop="-1.5dp"
                       android:background="?apptentiveComposingAreaBackground">
-            <EditText android:id="@+id/composing_et"
+            <EditText android:id="@+id/message"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginTop="16dp"
@@ -80,7 +80,7 @@
                       android:gravity="top|start"
                       android:minLines="5"
                       android:inputType="textCapSentences|textMultiLine"/>
-            <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
+            <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/attachments"
                                                                            android:layout_width="match_parent"
                                                                            android:layout_height="wrap_content"
                                                                            android:layout_marginBottom="16dp"
