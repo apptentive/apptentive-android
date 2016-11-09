@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -32,9 +32,6 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
-/**
- * @author Sky Kelsey
- */
 public class ImageUtil {
 
 	private static final int MAX_SENT_IMAGE_EDGE = 1024;
@@ -115,7 +112,9 @@ public class ImageUtil {
 		int width, height;
 
 		if (orientation == 90 || orientation == 270) {
+			//noinspection SuspiciousNameCombination
 			width = decodeBoundsOptions.outHeight;
+			//noinspection SuspiciousNameCombination
 			height = decodeBoundsOptions.outWidth;
 		} else {
 			width = decodeBoundsOptions.outWidth;

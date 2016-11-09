@@ -196,7 +196,7 @@ public class MessageManager {
 					}
 					incomingUnreadMessages++;
 					// for every new message received, notify Message Center
-					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
+					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, apptentiveMessage);
 					msg.sendToTarget();
 				}
 			}
