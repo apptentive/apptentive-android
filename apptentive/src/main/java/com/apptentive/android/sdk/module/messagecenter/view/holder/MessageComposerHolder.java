@@ -75,7 +75,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				if (!TextUtils.isEmpty(message.getText())) {
+				if (!TextUtils.isEmpty(message.getText()) || !images.isEmpty()) {
 					Bundle bundle = new Bundle();
 					bundle.putString("message", composer.closeBody);
 					bundle.putString("positive", composer.closeDiscard);
