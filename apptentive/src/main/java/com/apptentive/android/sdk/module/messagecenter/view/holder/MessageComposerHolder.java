@@ -48,6 +48,8 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	private TextWatcher textWatcher;
 
+	private int maxAllowedAttachments;
+
 	public MessageComposerHolder(View itemView) {
 		super(itemView);
 		images = new ArrayList<ImageItem>();
@@ -57,6 +59,8 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		sendButton = (ImageButton) itemView.findViewById(R.id.btn_send_message);
 		message = (EditText) itemView.findViewById(R.id.composing_et);
 		attachments = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
+
+		maxAllowedAttachments = itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
 	}
 
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
@@ -193,6 +197,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments.setupLayoutListener();
 		attachments.setVisibility(View.VISIBLE);
 		images.addAll(imagesToAttach);
+		setAttachButtonState();
 		addAdditionalAttachItem();
 		attachments.notifyDataSetChanged();
 	}
@@ -205,6 +210,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	public void removeImageFromImageAttachmentBand(final int position) {
 		images.remove(position);
 		attachments.setupLayoutListener();
+		setAttachButtonState();
 		if (images.size() == 0) {
 			// Hide attachment band after last attachment is removed
 			attachments.setVisibility(View.GONE);
@@ -215,23 +221,32 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	private void addAdditionalAttachItem() {
 		ArrayList<ImageItem> imagesToAdd = new ArrayList<ImageItem>(images);
-		if (imagesToAdd.size() < itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total)) {
+		if (imagesToAdd.size() < maxAllowedAttachments) {
 			imagesToAdd.add(new ImageItem("", "", "Image/*", 0));
 		}
 		attachments.setData(imagesToAdd);
 	}
 
+	public void setAttachButtonState() {
+		boolean enabled = images.size() < maxAllowedAttachments;
+		setButtonState(attachButton, enabled);
+	}
+
 	public void setSendButtonState() {
 		boolean enabled = !TextUtils.isEmpty(message.getText()) || !images.isEmpty();
-		if (sendButton.isEnabled() ^ enabled) { // Only if changing value
-			sendButton.setEnabled(enabled);
+		setButtonState(sendButton, enabled);
+	}
+
+	public void setButtonState(ImageButton button, boolean enabled) {
+		if (button.isEnabled() ^ enabled) { // Only if changing value
+			button.setEnabled(enabled);
 			if (enabled) {
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					sendButton.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColor));
+					button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColor));
 				}
 			} else {
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					sendButton.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColorDisabled));
+					button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColorDisabled));
 				}
 			}
 		}
