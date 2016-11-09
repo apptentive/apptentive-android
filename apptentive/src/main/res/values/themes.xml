@@ -177,7 +177,7 @@
         <item name="apptentiveFontFamilyButtonBorderless">?apptentiveFontFamilyMediumDefault</item>
         <item name="apptentiveFontFamilyButtonColored">?apptentiveFontFamilyMediumDefault</item>
 
-        <!-- Here we set Anadroid widget styles -->
+        <!-- Here we set Android widget styles -->
         <item name="apptentiveCheckBoxStyle">@style/Apptentive.Widget.CheckBox</item>
         <item name="apptentiveRadioButtonStyle">@style/Apptentive.Widget.RadioButton</item>
         <item name="apptentiveInteractionButtonStyle">@style/Apptentive.Widget.Button.Borderless</item>
@@ -205,7 +205,7 @@
         <item name="apptentiveCardElevation">2dp</item>
     </style>
 
-    <!-- This is THE apptentive default theme speficied in AndroidManifest.xml of Apptentive SDK.
+    <!-- This is THE apptentive default theme specified in AndroidManifest.xml of Apptentive SDK.
          It will be applied first. Any styles here will be then overridden by styles defined in the
          default AppCompat theme of the host app,  then the ApptentiveBaseFrameTheme, then the
          ApptentiveThemeOverride, in that order.

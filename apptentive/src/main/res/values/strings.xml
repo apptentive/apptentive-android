@@ -46,7 +46,7 @@
     <!-- Do not translate below here -->
 
     <!-- An en dash with a space on each side. Use entity codes for space because otherwise it gets trimmed. -->
-    <string name="apptentive_instruction_text_separater">&#160;&#8211;&#160;</string>
+    <string name="apptentive_instruction_text_separator">&#160;&#8211;&#160;</string>
     <!-- Default Android Roboto font family names used by Apptentive on api 21 and later. To override, host app
          will assign different font family name strings to ?apptentiveFontFamilyDefault and ?apptentiveFontFamilyMediumDefault.
          The available font families are "sans-serif", "sans-serif-light", "sans-serif-condensed, "sans-serif-thin" and "sans-serif-medium"-->
