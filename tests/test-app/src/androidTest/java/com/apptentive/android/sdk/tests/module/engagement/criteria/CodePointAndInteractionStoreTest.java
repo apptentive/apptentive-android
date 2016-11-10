@@ -143,8 +143,133 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	 * Tests for a specific code point running. Tests all condition types.
 	 */
 	@Test
-	public void codePointInvokesVersion() {
-		String json = loadTextAssetAsString(TEST_DIR + "testCodePointInvokesVersion.json");
+	public void codePointInvokesVersionCode() {
+		String json = loadTextAssetAsString(TEST_DIR + "testCodePointInvokesVersionCode.json");
+		try {
+			InteractionCriteria criteria = new InteractionCriteria(json);
+
+			// 0 - $gt
+			resetDevice();
+			ApptentiveLog.e("Test $gt");
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+
+			// 1 - $gte
+			resetDevice();
+			ApptentiveLog.e("Test $gte");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+
+			// 2 - $ne
+			resetDevice();
+			ApptentiveLog.e("Test $ne");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+
+			// 3 - $eq
+			resetDevice();
+			ApptentiveLog.e("Test $eq");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+
+			// 4 - :
+			resetDevice();
+			interactionManager.storeInteractionsPayloadString(json);
+			ApptentiveLog.e("Test :");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+
+			// 5 - $lte
+			resetDevice();
+			interactionManager.storeInteractionsPayloadString(json);
+			ApptentiveLog.e("Test $lte");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+
+			// 6 - $lt
+			resetDevice();
+			interactionManager.storeInteractionsPayloadString(json);
+			ApptentiveLog.e("Test $lt");
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertTrue(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet());
+
+		} catch (JSONException e) {
+			ApptentiveLog.e("Error parsing test JSON.", e);
+			assertNull(e);
+		}
+		ApptentiveLog.e("Finished test.");
+	}
+
+	/**
+	 * Tests for a specific code point running. Tests all condition types.
+	 */
+	@Test
+	public void codePointInvokesVersionName() {
+		String json = loadTextAssetAsString(TEST_DIR + "testCodePointInvokesVersionName.json");
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
