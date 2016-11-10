@@ -41,13 +41,6 @@ public class FieldManager {
 			case application: {
 				QueryPart applicationQuery = QueryPart.parse(tokens[1]);
 				switch (applicationQuery) {
-					case version: {
-						int version = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
-						if (version == -1) {
-							version = 0; // Default
-						}
-						return new Apptentive.Version(version);
-					}
 					case version_code: {
 						int version = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
 						if (version == -1) {
@@ -84,7 +77,6 @@ public class FieldManager {
 			case is_update: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
-					case version:
 					case version_code:
 						return VersionHistoryStore.isUpdate(VersionHistoryStore.Selector.version_code);
 					case version_name:
@@ -99,7 +91,6 @@ public class FieldManager {
 				switch (subQuery) {
 					case total:
 						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.total);
-					case version:
 					case version_code:
 						return VersionHistoryStore.getTimeAtInstall(VersionHistoryStore.Selector.version_code);
 					case version_name:
@@ -119,9 +110,12 @@ public class FieldManager {
 						switch (queryPart2) {
 							case total: // Get total for all versions of the app.
 								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getTotalInvokes(isInteraction, name));
-							case version:
-								String appVersion = String.valueOf(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()));
-								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getVersionCodeInvokes(isInteraction, name, appVersion));
+							case version_code:
+								String appVersionCode = String.valueOf(Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext()));
+								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getVersionCodeInvokes(isInteraction, name, appVersionCode));
+							case version_name:
+								String appVersionName = Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext());
+								return new BigDecimal(ApptentiveInternal.getInstance().getCodePointStore().getVersionNameInvokes(isInteraction, name, appVersionName));
 							default:
 								break;
 						}
