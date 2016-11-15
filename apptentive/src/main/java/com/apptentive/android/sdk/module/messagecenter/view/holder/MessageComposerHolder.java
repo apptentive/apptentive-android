@@ -61,17 +61,25 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachments = (ApptentiveImageGridView) itemView.findViewById(R.id.attachments);
 
 		maxAllowedAttachments = itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_attachments_total);
+
+		ColorStateList colors = ContextCompat.getColorStateList(itemView.getContext(), Util.getResourceIdFromAttribute(itemView.getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable closeButtonDrawable = DrawableCompat.wrap(closeButton.getDrawable());
+		DrawableCompat.setTintList(closeButtonDrawable, colors);
+		closeButton.setImageDrawable(closeButtonDrawable);
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable sendButtonDrawable = DrawableCompat.wrap(sendButton.getDrawable());
+		DrawableCompat.setTintList(sendButtonDrawable, colors);
+		sendButton.setImageDrawable(sendButtonDrawable);
+		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
+		Drawable attachButtonDrawable = DrawableCompat.wrap(attachButton.getDrawable());
+		DrawableCompat.setTintList(attachButtonDrawable, colors);
+		attachButton.setImageDrawable(attachButtonDrawable);
 	}
 
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
 		title.setText(composer.title);
 
-		ColorStateList colors = ContextCompat.getColorStateList(itemView.getContext(), Util.getResourceIdFromAttribute(itemView.getContext().getTheme(), R.attr.apptentiveButtonTintColorStateList));
-
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
-		Drawable closeButtonDrawable = DrawableCompat.wrap(closeButton.getDrawable());
-		DrawableCompat.setTintList(closeButtonDrawable, colors);
-		closeButton.setImageDrawable(closeButtonDrawable);
 
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -89,10 +97,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 			}
 		});
 
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
-		Drawable sendButtonDrawable = DrawableCompat.wrap(sendButton.getDrawable());
-		DrawableCompat.setTintList(sendButtonDrawable, colors);
-		sendButton.setImageDrawable(sendButtonDrawable);
 		sendButton.setContentDescription(composer.sendButton);
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
@@ -129,12 +133,6 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 			}
 		};
 		message.addTextChangedListener(textWatcher);
-
-
-		// Use a color state list for button tint state on Lollipop. On prior platforms, need to apply state color manually.
-		Drawable attachButtonDrawable = DrawableCompat.wrap(attachButton.getDrawable());
-		DrawableCompat.setTintList(attachButtonDrawable, colors);
-		attachButton.setImageDrawable(attachButtonDrawable);
 
 		attachButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
