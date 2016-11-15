@@ -160,6 +160,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		clearImageAttachmentBand();
 		attachments.setVisibility(View.GONE);
 		attachments.setData(new ArrayList<ImageItem>());
+		setAttachButtonState();
 
 		if (adapter.getListener() != null) {
 			adapter.getListener().onComposingViewCreated(this, message, attachments);
