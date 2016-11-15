@@ -887,9 +887,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		Util.hideSoftKeyboard(hostingActivityRef.get(), getView());
 		messagingActionHandler.sendEmptyMessage(MSG_SEND_PENDING_CONTEXT_MESSAGE);
-		if (!TextUtils.isEmpty(composerEditText.getText()) || pendingAttachments.size() > 0) {
+		if (!TextUtils.isEmpty(composerEditText.getText().toString().trim()) || pendingAttachments.size() > 0) {
 			CompoundMessage compoundMessage = new CompoundMessage();
-			compoundMessage.setBody(composerEditText.getText().toString());
+			compoundMessage.setBody(composerEditText.getText().toString().trim());
 			compoundMessage.setRead(true);
 			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
 			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));

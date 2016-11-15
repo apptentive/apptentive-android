@@ -83,7 +83,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 		closeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				if (!TextUtils.isEmpty(message.getText()) || !images.isEmpty()) {
+				if (!TextUtils.isEmpty(message.getText().toString().trim()) || !images.isEmpty()) {
 					Bundle bundle = new Bundle();
 					bundle.putString("message", composer.closeBody);
 					bundle.putString("positive", composer.closeDiscard);
@@ -231,21 +231,19 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 	}
 
 	public void setSendButtonState() {
-		boolean enabled = !TextUtils.isEmpty(message.getText()) || !images.isEmpty();
+		boolean enabled = !TextUtils.isEmpty(message.getText().toString().trim()) || !images.isEmpty();
 		setButtonState(sendButton, enabled);
 	}
 
 	public void setButtonState(ImageButton button, boolean enabled) {
-		if (button.isEnabled() ^ enabled) { // Only if changing value
-			button.setEnabled(enabled);
-			if (enabled) {
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColor));
-				}
-			} else {
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColorDisabled));
-				}
+		button.setEnabled(enabled);
+		if (enabled) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+				button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColor));
+			}
+		} else {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+				button.setColorFilter(Util.getThemeColor(itemView.getContext(), R.attr.apptentiveButtonTintColorDisabled));
 			}
 		}
 	}
