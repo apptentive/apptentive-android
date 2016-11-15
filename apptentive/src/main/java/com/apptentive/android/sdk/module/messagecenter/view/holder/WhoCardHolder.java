@@ -71,18 +71,21 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			nameLayout.setHint(whoCard.getNameHint());
 			viewToFocus = nameEditText;
 		}
-		// TODO: Restore pending text if view is for instance rotated before being submitted.
 		nameEditText.setText(Apptentive.getPersonName());
 
 		emailLayout.setHint(whoCard.getEmailHint());
-
 		emailEditText.setText(Apptentive.getPersonEmail());
+		if (Util.isEmailValid(emailEditText.getText().toString().trim())) {
+			saveButton.setEnabled(true);
+		} else {
+			saveButton.setEnabled(false);
+		}
 
 		TextWatcher emailTextWatcher = new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence existingContent, int i, int i2, int i3) {
 				// Disable send button when the content hasn't change yet
-				if (Util.isEmailValid(existingContent.toString())) {
+				if (Util.isEmailValid(existingContent.toString().trim())) {
 					saveButton.setEnabled(true);
 				} else {
 					saveButton.setEnabled(false);
@@ -100,7 +103,7 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 					// email must be in valid format after the change. If it is, enable send button
 					saveButton.setEnabled(true);
 				} else
-					// Allow user remove email completely when editing profile of "Email Requested"
+					// Allow user remove email completely when editing profile of that doesn't have "Email Required"
 					if (TextUtils.isEmpty(emailContent) && !whoCard.isRequire()) {
 						saveButton.setEnabled(true);
 					} else {
@@ -156,7 +159,7 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 	}
 
 	private boolean isWhoCardContentValid(boolean required) {
-		String emailContent = emailEditText.getText().toString();
+		String emailContent = emailEditText.getText().toString().trim();
 		if (Util.isEmailValid(emailContent)) {
 			return true;
 		}
