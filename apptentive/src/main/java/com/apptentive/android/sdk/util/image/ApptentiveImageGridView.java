@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,12 +26,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	private ImageItemClickedListener listener;
 
-	private Context context;
-
 	public ApptentiveImageGridView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setOnItemClickListener(this);
-		this.context = context;
 	}
 
 	@Override
@@ -39,11 +36,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 		int heightSpec;
 
 		if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
-
 			// The two leftmost bits in the height measure spec have
 			// a special meaning, hence we can't use them to describe height.
-			heightSpec = MeasureSpec.makeMeasureSpec(
-					Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+			heightSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
 		} else {
 			// Any other height should be respected as is.
 			heightSpec = heightMeasureSpec;
@@ -63,7 +58,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setupUi() {
-		imageBandAdapter = new ImageGridViewAdapter(context, false);
+		imageBandAdapter = new ImageGridViewAdapter(getContext(), false);
 		setAdapter(imageBandAdapter);
 	}
 
@@ -86,15 +81,12 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 				} else {
 					getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
-
-
 			}
 		});
 	}
 
 	public void setAdapterItemSize(int width, int desiredNumCount) {
 		final int columnSpace = getResources().getDimensionPixelOffset(R.dimen.apptentive_image_grid_space_size);
-
 		int columnWidth = (width - columnSpace * (desiredNumCount - 1)) / desiredNumCount;
 		Point point = Util.getScreenSize(getContext().getApplicationContext());
 		imageBandAdapter.setItemSize(columnWidth, (int) (((float) point.y / (float) point.x) * columnWidth));
@@ -110,7 +102,7 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setImageIndicatorCallback(ImageGridViewAdapter.Callback callback) {
-			imageBandAdapter.setIndicatorCallback(callback);
+		imageBandAdapter.setIndicatorCallback(callback);
 	}
 
 	public void setData(List<ImageItem> images) {
@@ -119,5 +111,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 
 	public interface ImageItemClickedListener {
 		void onClick(int position, ImageItem image);
+	}
+
+	public void notifyDataSetChanged() {
+		imageBandAdapter.notifyDataSetChanged();
 	}
 }

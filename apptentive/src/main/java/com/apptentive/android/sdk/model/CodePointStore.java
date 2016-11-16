@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,8 +51,6 @@ import org.json.JSONObject;
  *   }
  * }
  * </pre>
- *
- * @author Sky Kelsey
  */
 public class CodePointStore {
 
@@ -207,7 +205,7 @@ public class CodePointStore {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return 0l;
+		return 0L;
 	}
 
 	public Double getLastInvoke(boolean interaction, String name) {
@@ -234,7 +232,7 @@ public class CodePointStore {
 		} catch (JSONException e) {
 			// Ignore
 		}
-		return 0l;
+		return 0L;
 	}
 
 	public Long getBuildInvokes(boolean interaction, String name, String build) {
@@ -261,5 +259,4 @@ public class CodePointStore {
 		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).apply();
 		store = new JSONObject();
 	}
-
 }

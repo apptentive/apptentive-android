@@ -1,4 +1,14 @@
-# 2016-10-?? - 3.3.0
+# 2016-11-?? - 3.4.0
+
+#### Improvements
+
+* Rebuilt Message Center to use modern RecyclerView for better performance and stability.
+
+#### Bugs Fixed
+
+* Fixed a bug where the Profile Card in Message Center wouldn't let a user focus the email field. 
+ 
+# 2016-10-21 - 3.3.0
 
 #### Improvements
 

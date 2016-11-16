@@ -6,16 +6,20 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-public class MessageCenterUtil {
+public class ContextMessage implements MessageCenterListItem {
 
-	// Combine both incoming and outgoing interfaces into one
-	public interface CompoundMessageCommonInterface {
-		void setBody(String body);
+	private String body;
 
-		String getBody();
+	public ContextMessage(String body) {
+		this.body = body;
+	}
 
-		void setLastSent(boolean bVal);
+	@Override
+	public int getListItemType() {
+		return MESSAGE_CONTEXT;
+	}
 
-		boolean isLastSent();
+	public String getBody() {
+		return body;
 	}
 }

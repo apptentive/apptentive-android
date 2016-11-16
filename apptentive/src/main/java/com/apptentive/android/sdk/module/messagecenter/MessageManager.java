@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -25,7 +25,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -43,9 +43,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Sky Kelsey
- */
 public class MessageManager {
 
 	// The reason of pause message sending
@@ -59,7 +56,7 @@ public class MessageManager {
 	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
 	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
 
-	private WeakReference<Activity> currentForgroundApptentiveActivity;
+	private WeakReference<Activity> currentForegroundApptentiveActivity;
 
 	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
@@ -121,7 +118,7 @@ public class MessageManager {
 	}
 
 	/*
-	 * Starts an asynctask to pre-fetch messages. This is to be called as part of Push notification action
+	 * Starts an AsyncTask to pre-fetch messages. This is to be called as part of Push notification action
 	 * when push is received on the device.
 	 */
 	public void startMessagePreFetchTask() {
@@ -199,7 +196,7 @@ public class MessageManager {
 					}
 					incomingUnreadMessages++;
 					// for every new message received, notify Message Center
-					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, (CompoundMessage) apptentiveMessage);
+					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, apptentiveMessage);
 					msg.sendToTarget();
 				}
 			}
@@ -224,8 +221,8 @@ public class MessageManager {
 		return false;
 	}
 
-	public List<MessageCenterUtil.MessageCenterListItem> getMessageCenterListItems() {
-		List<MessageCenterUtil.MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterUtil.MessageCenterListItem>();
+	public List<MessageCenterListItem> getMessageCenterListItems() {
+		List<MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterListItem>();
 		try {
 			List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages().get();
 			// Do not display hidden messages on Message Center
@@ -418,27 +415,27 @@ public class MessageManager {
 	}
 
 	@Deprecated
-	public void setHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
+	public void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
 		clearHostUnreadMessagesListeners();
-		if (newlistener != null) {
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
+		if (listener != null) {
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(listener));
 		}
 	}
 
-	public void addHostUnreadMessagesListener(UnreadMessagesListener newlistener) {
-		if (newlistener != null) {
+	public void addHostUnreadMessagesListener(UnreadMessagesListener newListener) {
+		if (newListener != null) {
 			// Defer message polling thread creation, if not created yet, and host app adds an unread message listener
 			init();
 			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
 				UnreadMessagesListener listener = listenerRef.get();
-				if (listener != null && listener == newlistener) {
+				if (listener != null && listener == newListener) {
 					return;
 				} else if (listener == null) {
 					iterator.remove();
 				}
 			}
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newlistener));
+			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newListener));
 		}
 	}
 
@@ -456,15 +453,15 @@ public class MessageManager {
 	}
 
 	// Set when Activity.onStart() and onStop() are called
-	public void setCurrentForgroundActivity(Activity activity) {
+	public void setCurrentForegroundActivity(Activity activity) {
 		if (activity != null) {
-			currentForgroundApptentiveActivity = new WeakReference<Activity>(activity);
+			currentForegroundApptentiveActivity = new WeakReference<Activity>(activity);
 		} else {
 			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(null, false);
 			if (manager != null) {
 				manager.cleanUp();
 			}
-			currentForgroundApptentiveActivity = null;
+			currentForegroundApptentiveActivity = null;
 		}
 	}
 
@@ -477,8 +474,8 @@ public class MessageManager {
 	}
 
 	private void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
-		if (currentForgroundApptentiveActivity != null && currentForgroundApptentiveActivity.get() != null) {
-			Activity foreground = currentForgroundApptentiveActivity.get();
+		if (currentForegroundApptentiveActivity != null && currentForegroundApptentiveActivity.get() != null) {
+			Activity foreground = currentForegroundApptentiveActivity.get();
 			if (foreground != null) {
 				PendingIntent pendingIntent = ApptentiveInternal.prepareMessageCenterPendingIntent(foreground.getApplicationContext());
 				if (pendingIntent != null) {
@@ -502,7 +499,6 @@ public class MessageManager {
 		}
 	}
 
-
 	public void appWentToForeground() {
 		appInForeground.set(true);
 		if (pollingWorker != null) {
@@ -516,5 +512,4 @@ public class MessageManager {
 			pollingWorker.appWentToBackground();
 		}
 	}
-
 }

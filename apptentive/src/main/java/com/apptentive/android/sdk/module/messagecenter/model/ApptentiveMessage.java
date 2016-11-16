@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,10 +14,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * @author Sky Kelsey
- */
-public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterUtil.MessageCenterListItem {
+public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
 
 	public static final String KEY_ID = "id";
 	public static final String KEY_CREATED_AT = "created_at";
@@ -248,12 +245,33 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		return datestamp;
 	}
 
-	public void setDatestamp(String datestamp) {
-		this.datestamp = datestamp;
+	/**
+	 * Sets the datestamp for this message.
+	 *
+	 * @param datestamp A datestamp
+	 * @return true if the datestamp was added or changed.
+	 */
+	public boolean setDatestamp(String datestamp) {
+		if (this.datestamp == null || !this.datestamp.equals(datestamp)) {
+			this.datestamp = datestamp;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public void clearDatestamp() {
-		this.datestamp = null;
+	/**
+	 * Clears the datestamp from a message
+	 *
+	 * @return true If the datestamp existed and was cleared, false if it was already cleared.
+	 */
+	public boolean clearDatestamp() {
+		if (datestamp != null) {
+			this.datestamp = null;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public abstract boolean isOutgoingMessage();

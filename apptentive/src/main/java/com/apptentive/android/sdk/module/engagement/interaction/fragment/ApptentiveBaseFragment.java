@@ -78,7 +78,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	{
 
-		//Prepare the reflections to manage hidden fileds
+		// Prepare the reflections to manage hidden fields
 		try {
 			fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
 			hostField = fragmentImplClass.getDeclaredField("mHost");

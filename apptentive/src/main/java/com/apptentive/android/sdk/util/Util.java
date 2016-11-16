@@ -295,27 +295,6 @@ public class Util {
 		return null;
 	}
 
-	public static void calculateListViewHeightBasedOnChildren(ListView listView) {
-		ListAdapter listAdapter = listView.getAdapter();
-		if (listAdapter == null) {
-
-			return;
-		}
-
-		int totalHeight = 0;
-		for (int i = 0; i < listAdapter.getCount(); i++) {
-			View listItem = listAdapter.getView(i, null, listView);
-			listItem.measure(0, 0);
-			totalHeight += listItem.getMeasuredHeight();
-		}
-
-		ViewGroup.LayoutParams params = listView.getLayoutParams();
-		int newHeight = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-		int HeightDifference = params.height - newHeight;
-
-		//listView.setLayoutParams(params);
-	}
-
 	/**
 	 * helper method to set the background depending on the android version
 	 *
@@ -442,11 +421,11 @@ public class Util {
 		int a = ((int) (ap * 255d)) & 0xff;
 
 		int r = ((int) (((float) (backgroundColor >> RED_CHANNEL & 0xff) * amount1) +
-			((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
+				((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
 		int g = ((int) (((float) (backgroundColor >> GREEN_CHANNEL & 0xff) * amount1) +
-			((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
+				((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
 		int b = ((int) (((float) (backgroundColor & 0xff) * amount1) +
-			((float) (foregroundColor & 0xff) * amount2))) & 0xff;
+				((float) (foregroundColor & 0xff) * amount2))) & 0xff;
 
 		return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
 	}
@@ -488,8 +467,8 @@ public class Util {
 			cursor.close();
 
 			cursor = context.getContentResolver().query(
-				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 			if (cursor != null && cursor.moveToFirst()) {
 				String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 				cursor.close();
@@ -510,8 +489,8 @@ public class Util {
 			cursor.close();
 
 			cursor = context.getContentResolver().query(
-				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-				null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
 			if (cursor != null && cursor.moveToFirst()) {
 				long time = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
 				cursor.close();
@@ -565,8 +544,8 @@ public class Util {
 	public static File getDiskCacheDir(Context context) {
 		File appCacheDir = null;
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-			|| !Environment.isExternalStorageRemovable())
-			&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, "android.permission.WRITE_EXTERNAL_STORAGE")) {
 			appCacheDir = context.getExternalCacheDir();
 		}
 
@@ -601,8 +580,8 @@ public class Util {
 	 */
 	public static boolean openFileAttachment(final Context context, final String sourcePath, final String selectedFilePath, final String mimeTypeString) {
 		if ((Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-			|| !Environment.isExternalStorageRemovable())
-			&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+				|| !Environment.isExternalStorageRemovable())
+				&& hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
 			File selectedFile = new File(selectedFilePath);
 			String selectedFileName = null;
@@ -742,7 +721,7 @@ public class Util {
 		try {
 			File localFile = new File(localFilePath);
 		/* Local cache file name may not be unique, and can be reused, in which case, the previously created
-	   * cache file need to be deleted before it is being copied over.
+		 * cache file need to be deleted before it is being copied over.
        */
 			if (localFile.exists()) {
 				localFile.delete();

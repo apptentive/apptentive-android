@@ -13,7 +13,7 @@ use your app, to talk to them at the right time, and in the right way.
 
 ##### Version history is tracked [here](CHANGELOG.md)
 
-##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|3.3.0|aar)
+##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|3.4.0|aar)
 
 #### Reporting Bugs
 
@@ -26,5 +26,5 @@ We appreciate contributions to make this SDK better. If you have an improvement 
 
 #### Notes
 
-* Make sure you have latest version or our SDK. We're always adding new features!
+* Make sure you have latest version of our SDK. We're always adding new features!
 * Make sure to follow the repo to get updates about features and bug fixes.

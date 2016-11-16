@@ -8,18 +8,21 @@ package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 
-public class StatusHolder extends RecyclerView.ViewHolder {
-	public TextView body;
-	public ImageView icon;
+public class ContextMessageHolder extends RecyclerView.ViewHolder {
 
-	public StatusHolder(View itemView) {
+	private TextView bodyTextView;
+
+	public ContextMessageHolder(View itemView) {
 		super(itemView);
-		body = (TextView) itemView.findViewById(R.id.status_body);
-		icon = (ImageView) itemView.findViewById(R.id.icon);
+		bodyTextView = (TextView) itemView.findViewById(R.id.body);
+	}
+
+	public void bindView(ContextMessage contextMessage) {
+		bodyTextView.setText(contextMessage.getBody());
 	}
 }

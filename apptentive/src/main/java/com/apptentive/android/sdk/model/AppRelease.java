@@ -133,9 +133,9 @@ public class AppRelease extends Payload {
 		return optBoolean(KEY_STYLE_INHERIT);
 	}
 
-	public void setInheritStyle(boolean bval) {
+	public void setInheritStyle(boolean inheritStyle) {
 		try {
-			put(KEY_STYLE_INHERIT, bval);
+			put(KEY_STYLE_INHERIT, inheritStyle);
 		} catch (JSONException e) {
 			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
 		}
@@ -146,9 +146,9 @@ public class AppRelease extends Payload {
 		return optBoolean(KEY_STYLE_OVERRIDE);
 	}
 
-	public void setOverrideStyle(boolean bval) {
+	public void setOverrideStyle(boolean overrideStyle) {
 		try {
-			put(KEY_STYLE_OVERRIDE, bval);
+			put(KEY_STYLE_OVERRIDE, overrideStyle);
 		} catch (JSONException e) {
 			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
 		}

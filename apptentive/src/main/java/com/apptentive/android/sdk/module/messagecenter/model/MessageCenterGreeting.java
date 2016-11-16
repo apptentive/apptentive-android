@@ -1,18 +1,12 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-/**
- * @author Sky Kelsey
- */
-public class MessageCenterGreeting implements MessageCenterUtil.MessageCenterListItem {
+public class MessageCenterGreeting implements MessageCenterListItem {
 	public final String title;
 	public final String body;
 	public final String avatar;
@@ -23,5 +17,8 @@ public class MessageCenterGreeting implements MessageCenterUtil.MessageCenterLis
 		this.avatar = avatar;
 	}
 
-
+	@Override
+	public int getListItemType() {
+		return GREETING;
+	}
 }

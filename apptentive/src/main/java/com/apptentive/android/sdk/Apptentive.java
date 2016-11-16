@@ -471,7 +471,7 @@ public class Apptentive {
 	 * Determines whether this Bundle came from an Apptentive push notification. This method is used with Urban Airship
 	 * integrations.
 	 *
-	 * @param bundle The push payload bundle paseed to GCM onMessageReceived() callback
+	 * @param bundle The push payload bundle passed to GCM onMessageReceived() callback
 	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {

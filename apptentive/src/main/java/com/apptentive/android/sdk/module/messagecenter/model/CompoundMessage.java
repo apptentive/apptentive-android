@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
- * @author Barry Li
- */
 public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
@@ -238,21 +235,6 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		return isOutgoing;
 	}
 
-	public static CompoundMessage createAutoMessage(String title, String body) {
-		if (title == null && body == null) {
-			return null;
-		}
-		CompoundMessage message = new CompoundMessage();
-		if (title != null) {
-			message.setTitle(title);
-		}
-		if (body != null) {
-			message.setBody(body);
-		}
-		message.setAutomated(true);
-		return message;
-	}
-
 	public List<StoredFile> getRemoteAttachments() {
 		return remoteAttachmentStoredFiles;
 	}
@@ -285,5 +267,16 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public int getListItemType() {
+		if (isAutomatedMessage()) {
+			return MESSAGE_AUTO;
+		} else if (isOutgoing) {
+			return MESSAGE_OUTGOING;
+		} else {
+			return MESSAGE_INCOMING;
+		}
 	}
 }

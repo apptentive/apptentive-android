@@ -114,7 +114,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 	/**
 	 * This function download the large file from the server
 	 */
-	private ApptentiveHttpResponse downloadBitmap(String urlstr, String destFilePath, String conversationToken) {
+	private ApptentiveHttpResponse downloadBitmap(String urlString, String destFilePath, String conversationToken) {
 		if (isCancelled()) {
 			return null;
 		}
@@ -129,7 +129,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		URL httpUrl;
 		try {
 			while (true) {
-				httpUrl = new URL(urlstr);
+				httpUrl = new URL(urlString);
 				connection = (HttpURLConnection) httpUrl.openConnection();
 				if (bRequestRedirectThroughApptentive) {
 					connection.setRequestProperty("User-Agent", ApptentiveClient.getUserAgentString());
@@ -153,9 +153,9 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 					case HttpURLConnection.HTTP_SEE_OTHER: {
 						bRequestRedirectThroughApptentive = false;
 						String location = connection.getHeaderField("Location");
-						URL base = new URL(urlstr);
+						URL base = new URL(urlString);
 						URL next = new URL(base, location);  // Deal with relative URLs
-						urlstr = next.toExternalForm();
+						urlString = next.toExternalForm();
 						// get the cookie if need, for login
 						cookies = connection.getHeaderField("Set-Cookie");
 						// Follow redirection
@@ -213,8 +213,8 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 					// flushing output
 					output.flush();
 					if (!this.download) {
-						File fileTodelete = new File(destFilePath);
-						fileTodelete.delete();
+						File fileToDelete = new File(destFilePath);
+						fileToDelete.delete();
 						publishProgress(-1);
 					} else {
 						publishProgress(100);

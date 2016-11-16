@@ -60,7 +60,7 @@ public class ApptentiveClient {
 	}
 
 	/**
-	 * Gets all messages since the message specified by guid was sent.
+	 * Gets all messages since the message specified by GUID was sent.
 	 *
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
@@ -118,7 +118,7 @@ public class ApptentiveClient {
 	 * @param uri        server url.
 	 * @param method     Get/Post/Put
 	 * @param body       Data to be POSTed/Put, not used for GET
-	 * @return ApptentiveHttpResponse containg content and response returned from the server.
+	 * @return ApptentiveHttpResponse containing content and response returned from the server.
 	 */
 	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
@@ -347,20 +347,20 @@ public class ApptentiveClient {
 			ret.setReason(connection.getResponseMessage());
 
 			// Read the normal response.
-			InputStream nis = null;
-			ByteArrayOutputStream nbaos = null;
+			InputStream responseInputStream = null;
+			ByteArrayOutputStream byteArrayOutputStream = null;
 			try {
-				nis = connection.getInputStream();
-				nbaos = new ByteArrayOutputStream();
+				responseInputStream = connection.getInputStream();
+				byteArrayOutputStream = new ByteArrayOutputStream();
 				byte[] eBuf = new byte[1024];
 				int eRead;
-				while (nis != null && (eRead = nis.read(eBuf, 0, 1024)) > 0) {
-					nbaos.write(eBuf, 0, eRead);
+				while (responseInputStream != null && (eRead = responseInputStream.read(eBuf, 0, 1024)) > 0) {
+					byteArrayOutputStream.write(eBuf, 0, eRead);
 				}
-				ret.setContent(nbaos.toString());
+				ret.setContent(byteArrayOutputStream.toString());
 			} finally {
-				Util.ensureClosed(nis);
-				Util.ensureClosed(nbaos);
+				Util.ensureClosed(responseInputStream);
+				Util.ensureClosed(byteArrayOutputStream);
 			}
 
 			ApptentiveLog.d("HTTP %d: %s", connection.getResponseCode(), connection.getResponseMessage());
