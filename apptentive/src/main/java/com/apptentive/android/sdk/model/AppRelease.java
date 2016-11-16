@@ -12,8 +12,9 @@ import org.json.JSONException;
 
 public class AppRelease extends Payload {
 
-	private static final String KEY_VERSION = "version";
-	private static final String KEY_BUILD_NUMBER = "build_number";
+	private static final String KEY_TYPE = "type";
+	private static final String KEY_VERSION_NAME = "version_name";
+	private static final String KEY_VERSION_CODE = "version_code";
 	private static final String KEY_IDENTIFIER = "identifier";
 	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
 	private static final String KEY_APP_STORE = "app_store";
@@ -33,51 +34,54 @@ public class AppRelease extends Payload {
 		setBaseType(BaseType.app_release);
 	}
 
-	public String getVersion() {
-		try {
-			if (!isNull(KEY_VERSION)) {
-				return getString(KEY_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+	public String getType() {
+		if (!isNull(KEY_TYPE)) {
+			return optString(KEY_TYPE, null);
 		}
 		return null;
 	}
 
-	public void setVersion(String version) {
+	public void setType(String type) {
 		try {
-			put(KEY_VERSION, version);
+			put(KEY_TYPE, type);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TYPE);
 		}
 	}
 
-	public String getBuildNumber() {
-		try {
-			if (!isNull(KEY_BUILD_NUMBER)) {
-				return getString(KEY_BUILD_NUMBER);
-			}
-		} catch (JSONException e) {
-			// Ignore
+	public String getVersionName() {
+		if (!isNull(KEY_VERSION_NAME)) {
+			return optString(KEY_VERSION_NAME, null);
 		}
 		return null;
 	}
 
-	public void setBuildNumber(String buildNumber) {
+	public void setVersionName(String versionName) {
 		try {
-			put(KEY_BUILD_NUMBER, buildNumber);
+			put(KEY_VERSION_NAME, versionName);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_BUILD_NUMBER);
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_NAME);
+		}
+	}
+
+	public int getVersionCode() {
+		if (!isNull(KEY_VERSION_CODE)) {
+			return optInt(KEY_VERSION_CODE, -1);
+		}
+		return -1;
+	}
+
+	public void setVersionCode(int versionCode) {
+		try {
+			put(KEY_VERSION_CODE, versionCode);
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_CODE);
 		}
 	}
 
 	public String getIdentifier() {
-		try {
-			if (!isNull(KEY_IDENTIFIER)) {
-				return getString(KEY_IDENTIFIER);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_IDENTIFIER)) {
+			return optString(KEY_IDENTIFIER, null);
 		}
 		return null;
 	}
@@ -91,12 +95,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getTargetSdkVersion() {
-		try {
-			if (!isNull(KEY_TARGET_SDK_VERSION)) {
-				return getString(KEY_TARGET_SDK_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_TARGET_SDK_VERSION)) {
+			return optString(KEY_TARGET_SDK_VERSION);
 		}
 		return null;
 	}
@@ -110,12 +110,8 @@ public class AppRelease extends Payload {
 	}
 
 	public String getAppStore() {
-		try {
-			if (!isNull(KEY_APP_STORE)) {
-				return getString(KEY_APP_STORE);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_APP_STORE)) {
+			return optString(KEY_APP_STORE, null);
 		}
 		return null;
 	}
