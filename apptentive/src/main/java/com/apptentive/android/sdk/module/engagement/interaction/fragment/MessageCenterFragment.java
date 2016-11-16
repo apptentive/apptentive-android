@@ -1519,7 +1519,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					int position = msg.arg1;
 					fragment.pendingAttachments.remove(position);
 					fragment.messageCenterRecyclerViewAdapter.removeImageFromComposer(fragment.composer, position);
-					fragment.messageCenterRecyclerViewAdapter.notifyItemChanged(fragment.listItems.size() - 1);
 					break;
 				}
 			}
