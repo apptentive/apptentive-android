@@ -17,7 +17,12 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.model.CommerceExtendedData;
+import com.apptentive.android.sdk.model.CustomData;
+import com.apptentive.android.sdk.model.ExtendedData;
+import com.apptentive.android.sdk.model.LocationExtendedData;
+import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -25,7 +30,8 @@ import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.*;
+import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -33,9 +39,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class contains the complete API for accessing Apptentive features from within your app.
@@ -1074,8 +1080,7 @@ public class Apptentive {
 			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
-			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(),
-					message.getNonce(), null);
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
 
 			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
 			if (!TextUtils.isEmpty(extension)) {
