@@ -448,7 +448,6 @@ public class ApptentiveInternal {
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice();
-		syncSdk();
 		syncPerson();
 	}
 
@@ -577,9 +576,10 @@ public class ApptentiveInternal {
 			currentVersionName = packageInfo.versionName;
 			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 			AppRelease appRelease = new AppRelease();
-			appRelease.setVersion(currentVersionName);
+			appRelease.setType("android");
+			appRelease.setVersionName(currentVersionName);
 			appRelease.setIdentifier(appPackageName);
-			appRelease.setBuildNumber(String.valueOf(currentVersionCode));
+			appRelease.setVersionCode(currentVersionCode);
 			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
 			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
 			// Set Apptentive theme inheritance metrics
@@ -666,17 +666,15 @@ public class ApptentiveInternal {
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(currentAppRelease);
-		if (appRelease != null) {
-			ApptentiveLog.d("App release was updated.");
-			taskManager.addPayload(appRelease);
-		}
+		AppReleaseManager.storeAppRelease(currentAppRelease);
+		taskManager.addPayload(currentAppRelease);
 		invalidateCaches();
 	}
 
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
+		syncSdk();
 		invalidateCaches();
 	}
 
@@ -862,17 +860,13 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Sends current Sdk to the server if it differs from the last time it was sent.
+	 * Sends current SDK to the server.
 	 */
 	private void syncSdk() {
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff();
-		if (sdk != null) {
-			ApptentiveLog.d("Sdk was updated.");
-			ApptentiveLog.v(sdk.toString());
-			taskManager.addPayload(sdk);
-		} else {
-			ApptentiveLog.d("Sdk was not updated.");
-		}
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		SdkManager.storeSdk(sdk);
+		ApptentiveLog.v(sdk.toString());
+		taskManager.addPayload(sdk);
 	}
 
 	/**

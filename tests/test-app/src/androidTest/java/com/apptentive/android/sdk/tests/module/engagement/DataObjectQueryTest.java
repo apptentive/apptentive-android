@@ -11,6 +11,10 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.model.Sdk;
+import com.apptentive.android.sdk.tests.ApptentiveInstrumentationTestCase;
+import com.apptentive.android.sdk.tests.util.FileUtil;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
@@ -120,7 +124,8 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 
 		Interaction interaction;
 
-		SdkManager.storeSdkAndReturnDiff();
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		SdkManager.storeSdk(sdk);
 
 		// 0
 		interaction = interactionManager.getApplicableInteraction("local#app#init");
