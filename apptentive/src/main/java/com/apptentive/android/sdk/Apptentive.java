@@ -505,7 +505,7 @@ public class Apptentive {
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. This method replaces the deprecated
-	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@Intent} that did
+	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@link Intent} that did
 	 * not come from Apptentive will return a null object. If you receive a null object, your app will
 	 * need to handle this notification itself.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
