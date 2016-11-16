@@ -61,26 +61,26 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		value = codePointStore.getTotalInvokes(true, testInteraction);
 		assertEquals(value, 14);
 
-		value = codePointStore.getVersionInvokes(true, testInteraction, "1.0");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "1.0");
 		assertEquals(value, 1);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "1.1");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "1.1");
 		assertEquals(value, 4);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "2.0");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "2.0");
 		assertEquals(value, 6);
-		value = codePointStore.getVersionInvokes(true, testInteraction, "2.1");
+		value = codePointStore.getVersionNameInvokes(true, testInteraction, "2.1");
 		assertEquals(value, 3);
 
-		value = codePointStore.getBuildInvokes(true, testInteraction, "1");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "1");
 		assertEquals(value, 1);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "2");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "2");
 		assertEquals(value, 1);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "3");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "3");
 		assertEquals(value, 3);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "4");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "4");
 		assertEquals(value, 4);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "5");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "5");
 		assertEquals(value, 2);
-		value = codePointStore.getBuildInvokes(true, testInteraction, "6");
+		value = codePointStore.getVersionCodeInvokes(true, testInteraction, "6");
 		assertEquals(value, 3);
 
 		Double lastInvoke = codePointStore.getLastInvoke(true, testInteraction);
@@ -154,31 +154,6 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		VersionHistoryStore.updateVersionHistory(3, "1.1", Util.currentTimeSeconds() - 5);
 		interaction = interactionManager.getApplicableInteraction("app.launch");
 		assertNotNull(interaction);
-	}
-
-	@Test
-	public void criteriaApplicationVersion() {
-		resetDevice();
-
-		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testCriteriaApplicationVersion.json");
-		interactionManager.storeInteractionsPayloadString(json);
-
-		Interaction interaction;
-
-		interaction = interactionManager.getApplicableInteraction("app.launch");
-		assertNull(interaction);
-
-		codePointStore.storeCodePointForCurrentAppVersion("switch");
-		interaction = interactionManager.getApplicableInteraction("app.launch");
-		assertNotNull(interaction);
-
-		codePointStore.storeCodePointForCurrentAppVersion("switch");
-		interaction = interactionManager.getApplicableInteraction("app.launch");
-		assertNotNull(interaction);
-
-		codePointStore.storeCodePointForCurrentAppVersion("switch");
-		interaction = interactionManager.getApplicableInteraction("app.launch");
-		assertNull(interaction);
 	}
 
 	@Test
@@ -431,8 +406,9 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 	}
 
 	@Test
-	public void actualUpgradeMessage() {
-		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/testActualUpgradeMessage.json");
+	public void upgradeMessageOnVersionCode() {
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/upgradeMessageOnVersionCode.json")
+				.replace("\"APPLICATION_VERSION_CODE\"", "4");
 		Interaction interaction;
 
 		// Test version targeted UpgradeMessage
@@ -442,14 +418,14 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		resetDevice();
 		interactionManager.storeInteractionsPayloadString(json);
 		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 1000000);
-		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext), Util.currentTimeSeconds() - 600000);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 600000);
 		assertNull(interactionManager.getApplicableInteraction("event_label"));
 
 		// Haven't upgraded
 		ApptentiveLog.e("TWO");
 		resetDevice();
 		interactionManager.storeInteractionsPayloadString(json);
-		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext), Util.currentTimeSeconds() - 499500);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 499500);
 		assertNull(interactionManager.getApplicableInteraction("event_label"));
 
 		// Just right
@@ -457,7 +433,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		resetDevice();
 		interactionManager.storeInteractionsPayloadString(json);
 		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 1000000);
-		VersionHistoryStore.updateVersionHistory(Util.getAppVersionCode(targetContext), Util.getAppVersionName(targetContext), Util.currentTimeSeconds() - 499500);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 499500);
 		assertNotNull(interactionManager.getApplicableInteraction("event_label"));
 
 		// Already shown
@@ -467,6 +443,43 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		assertNull(interactionManager.getApplicableInteraction("event_label"));
 	}
 
+	@Test
+	public void upgradeMessageOnVersionName() {
+		String json = loadTextAssetAsString(TEST_DATA_DIR + "payloads/upgradeMessageOnVersionName.json")
+				.replace("APPLICATION_VERSION_NAME", "2.0.0");
+		Interaction interaction;
+
+		// Test version targeted UpgradeMessage
+
+		// Saw this build too long ago.
+		ApptentiveLog.e("ONE");
+		resetDevice();
+		interactionManager.storeInteractionsPayloadString(json);
+		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 1000000);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 600000);
+		assertNull(interactionManager.getApplicableInteraction("event_label"));
+
+		// Haven't upgraded
+		ApptentiveLog.e("TWO");
+		resetDevice();
+		interactionManager.storeInteractionsPayloadString(json);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 499500);
+		assertNull(interactionManager.getApplicableInteraction("event_label"));
+
+		// Just right
+		ApptentiveLog.e("THREE");
+		resetDevice();
+		interactionManager.storeInteractionsPayloadString(json);
+		VersionHistoryStore.updateVersionHistory(3, "1.0", Util.currentTimeSeconds() - 1000000);
+		VersionHistoryStore.updateVersionHistory(4, "2.0.0", Util.currentTimeSeconds() - 499500);
+		assertNotNull(interactionManager.getApplicableInteraction("event_label"));
+
+		// Already shown
+		ApptentiveLog.e("FOUR");
+		interaction = interactionManager.getApplicableInteraction("event_label");
+		codePointStore.storeInteractionForCurrentAppVersion(interaction.getId());
+		assertNull(interactionManager.getApplicableInteraction("event_label"));
+	}
 	/**
 	 * Update this when the Rating Flow group of interactions changes, or with different permutations of that flow.
 	 */

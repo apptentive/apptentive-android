@@ -60,8 +60,8 @@ public class CodePointStore {
 	public static final String KEY_INTERACTIONS = "interactions";
 	public static final String KEY_LAST = "last"; // The last time this codepoint was seen.
 	public static final String KEY_TOTAL = "total"; // The total times this code point was seen.
-	public static final String KEY_VERSION = "version";
-	public static final String KEY_BUILD = "build";
+	public static final String KEY_VERSION_NAME = "version";
+	public static final String KEY_VERSION_CODE = "build";
 
 	public CodePointStore() {
 
@@ -99,18 +99,18 @@ public class CodePointStore {
 	}
 
 	private void storeRecordForCurrentAppVersion(boolean isInteraction, String fullCodePoint) {
-		String version = ApptentiveInternal.getInstance().getApplicationVersionName();
-		int build = ApptentiveInternal.getInstance().getApplicationVersionCode();
-		storeRecord(isInteraction, fullCodePoint, version, build);
+		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+		storeRecord(isInteraction, fullCodePoint, versionName, versionCode);
 	}
 
-	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String version, int build) {
-		storeRecord(isInteraction, fullCodePoint, version, build, Util.currentTimeSeconds());
+	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String versionName, int versionCode) {
+		storeRecord(isInteraction, fullCodePoint, versionName, versionCode, Util.currentTimeSeconds());
 	}
 
-	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String version, int build, double currentTimeSeconds) {
-		String buildString = String.valueOf(build);
-		if (fullCodePoint != null && version != null) {
+	public synchronized void storeRecord(boolean isInteraction, String fullCodePoint, String versionName, int versionCode, double currentTimeSeconds) {
+		String versionCodeString = String.valueOf(versionCode);
+		if (fullCodePoint != null && versionName != null) {
 			try {
 				String recordTypeKey = isInteraction ? CodePointStore.KEY_INTERACTIONS : CodePointStore.KEY_CODE_POINT;
 				JSONObject recordType;
@@ -140,37 +140,37 @@ public class CodePointStore {
 				}
 				codePointJson.put(KEY_TOTAL, total + 1);
 
-				// Get or create version object.
-				JSONObject versionJson;
-				if (!codePointJson.isNull(KEY_VERSION)) {
-					versionJson = codePointJson.getJSONObject(KEY_VERSION);
+				// Get or create versionName object.
+				JSONObject versionNameJson;
+				if (!codePointJson.isNull(KEY_VERSION_NAME)) {
+					versionNameJson = codePointJson.getJSONObject(KEY_VERSION_NAME);
 				} else {
-					versionJson = new JSONObject();
-					codePointJson.put(KEY_VERSION, versionJson);
+					versionNameJson = new JSONObject();
+					codePointJson.put(KEY_VERSION_NAME, versionNameJson);
 				}
 
-				// Set count for current version.
-				int existingVersionCount = 0;
-				if (!versionJson.isNull(version)) {
-					existingVersionCount = versionJson.getInt(version);
+				// Set count for current versionName.
+				int existingVersionNameCount = 0;
+				if (!versionNameJson.isNull(versionName)) {
+					existingVersionNameCount = versionNameJson.getInt(versionName);
 				}
-				versionJson.put(version, existingVersionCount + 1);
+				versionNameJson.put(versionName, existingVersionNameCount + 1);
 
-				// Get or create build object.
-				JSONObject buildJson;
-				if (!codePointJson.isNull(KEY_BUILD)) {
-					buildJson = codePointJson.getJSONObject(KEY_BUILD);
+				// Get or create versionCode object.
+				JSONObject versionCodeJson;
+				if (!codePointJson.isNull(KEY_VERSION_CODE)) {
+					versionCodeJson = codePointJson.getJSONObject(KEY_VERSION_CODE);
 				} else {
-					buildJson = new JSONObject();
-					codePointJson.put(KEY_BUILD, buildJson);
+					versionCodeJson = new JSONObject();
+					codePointJson.put(KEY_VERSION_CODE, versionCodeJson);
 				}
 
-				// Set count for the current build
-				int existingBuildCount = 0;
-				if (!buildJson.isNull(buildString)) {
-					existingBuildCount = buildJson.getInt(buildString);
+				// Set count for the current versionCode
+				int existingVersionCodeCount = 0;
+				if (!versionCodeJson.isNull(versionCodeString)) {
+					existingVersionCodeCount = versionCodeJson.getInt(versionCodeString);
 				}
-				buildJson.put(buildString, existingBuildCount + 1);
+				versionCodeJson.put(versionCodeString, existingVersionCodeCount + 1);
 
 				saveToPreference();
 			} catch (JSONException e) {
@@ -220,13 +220,13 @@ public class CodePointStore {
 		return null;
 	}
 
-	public Long getVersionInvokes(boolean interaction, String name, String version) {
+	public Long getVersionNameInvokes(boolean interaction, String name, String versionName) {
 		try {
 			JSONObject record = getRecord(interaction, name);
-			if (record != null && record.has(KEY_VERSION)) {
-				JSONObject versionJson = record.getJSONObject(KEY_VERSION);
-				if (versionJson.has(version)) {
-					return versionJson.getLong(version);
+			if (record != null && record.has(KEY_VERSION_NAME)) {
+				JSONObject versionNameJson = record.getJSONObject(KEY_VERSION_NAME);
+				if (versionNameJson.has(versionName)) {
+					return versionNameJson.getLong(versionName);
 				}
 			}
 		} catch (JSONException e) {
@@ -235,13 +235,13 @@ public class CodePointStore {
 		return 0L;
 	}
 
-	public Long getBuildInvokes(boolean interaction, String name, String build) {
+	public Long getVersionCodeInvokes(boolean interaction, String name, String versionCode) {
 		try {
 			JSONObject record = getRecord(interaction, name);
-			if (record != null && record.has(KEY_BUILD)) {
-				JSONObject buildJson = record.getJSONObject(KEY_BUILD);
-				if (buildJson.has(build)) {
-					return buildJson.getLong(build);
+			if (record != null && record.has(KEY_VERSION_CODE)) {
+				JSONObject versionCodeJson = record.getJSONObject(KEY_VERSION_CODE);
+				if (versionCodeJson.has(versionCode)) {
+					return versionCodeJson.getLong(versionCode);
 				}
 			}
 		} catch (JSONException e) {

@@ -33,19 +33,19 @@
       {
         "interaction_id": "526fe2836dd8bf546a00000a",
         "criteria": {
-          "interactions/526fe2836dd8bf546a00000a/invokes/version": 0
+          "interactions/526fe2836dd8bf546a00000a/invokes/version_code": 0
         }
       },
       {
         "interaction_id": "526fe2836dd8bf546a00000b",
         "criteria": {
-          "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
+          "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
         }
       },
       {
         "interaction_id": "526fe2836dd8bf546a00000c",
         "criteria": {
-          "interactions/526fe2836dd8bf546a00000c/invokes/version": 0
+          "interactions/526fe2836dd8bf546a00000c/invokes/version_code": 0
         }
       }
     ]

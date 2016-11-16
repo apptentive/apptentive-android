@@ -53,7 +53,7 @@
             "$after": -259200
           },
           "code_point/app.launch/invokes/total": 2,
-          "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
+          "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
         }
       }
     ],
@@ -77,7 +77,7 @@
               "code_point/app.launch/invokes/total": 2
             },
             {
-              "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
+              "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
             }
           ]
         }
@@ -89,7 +89,7 @@
         "criteria": {
           "$or": [
             {
-              "time_at_install/version": {
+              "time_at_install/version_code": {
                 "$after": -259200
               }
             },
@@ -99,7 +99,7 @@
                   "code_point/app.launch/invokes/total": 2
                 },
                 {
-                  "interactions/526fe2836dd8bf546a00000b/invokes/version": 0
+                  "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
                 },
                 {
                   "$or": [

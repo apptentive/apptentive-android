@@ -2,41 +2,41 @@
   "$or": [
     {
       "code_point/switch.code.point/invokes/total": 0,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$gt": 2
       }
     },
     {
       "code_point/switch.code.point/invokes/total": 1,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$gte": 2
       }
     },
     {
       "code_point/switch.code.point/invokes/total": 2,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$ne": 2
       }
     },
     {
       "code_point/switch.code.point/invokes/total": 3,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$eq": 2
       }
     },
     {
       "code_point/switch.code.point/invokes/total": 4,
-      "code_point/test.code.point/invokes/version": 2
+      "code_point/test.code.point/invokes/version_name": 2
     },
     {
       "code_point/switch.code.point/invokes/total": 5,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$lte": 2
       }
     },
     {
       "code_point/switch.code.point/invokes/total": 6,
-      "code_point/test.code.point/invokes/version": {
+      "code_point/test.code.point/invokes/version_name": {
         "$lt": 2
       }
     }
