@@ -6,9 +6,11 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -23,6 +25,8 @@ import com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBa
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.ACCESSIBILITY_SERVICE;
 
 public class OutgoingCompoundMessageHolder extends MessageHolder {
 
@@ -46,7 +50,14 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 	public void bindView(MessageCenterFragment fragment, final RecyclerView recyclerView, final MessageCenterRecyclerViewAdapter adapter, final CompoundMessage message) {
 		super.bindView(fragment, recyclerView, message);
 		imageBandView.setupUi();
+
 		messageBodyView.setText(message.getBody());
+		// We have to disable text selection, or the Google TalkBack won't read this unless it's selected. It's too tiny to select by itself easily.
+		AccessibilityManager accessibilityManager = (AccessibilityManager) fragment.getContext().getSystemService(ACCESSIBILITY_SERVICE);
+		if (accessibilityManager != null) {
+			boolean talkbackNotEnabled = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty();
+			messageBodyView.setTextIsSelectable(talkbackNotEnabled);
+		}
 
 		boolean showProgress;
 		Double createdAt = message.getCreatedAt();

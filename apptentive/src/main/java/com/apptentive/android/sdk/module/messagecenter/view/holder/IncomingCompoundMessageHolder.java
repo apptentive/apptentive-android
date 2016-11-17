@@ -6,9 +6,11 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
@@ -25,6 +27,8 @@ import com.apptentive.android.sdk.util.image.ImageUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.ACCESSIBILITY_SERVICE;
 
 public class IncomingCompoundMessageHolder extends MessageHolder {
 
@@ -59,7 +63,12 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 		int viewWidth = container.getMeasuredWidth();
 
 		messageBodyView.setText(message.getBody());
-
+		// We have to disable text selection, or the Google TalkBack won't read this unless it's selected. It's too tiny to select by itself easily.
+		AccessibilityManager accessibilityManager = (AccessibilityManager) fragment.getContext().getSystemService(ACCESSIBILITY_SERVICE);
+		if (accessibilityManager != null) {
+			boolean talkbackNotEnabled = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty();
+			messageBodyView.setTextIsSelectable(talkbackNotEnabled);
+		}
 		String name = message.getSenderUsername();
 		if (name != null && !name.isEmpty()) {
 			nameView.setVisibility(View.VISIBLE);
