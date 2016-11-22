@@ -17,6 +17,7 @@
     <EditText android:id="@+id/answer_text"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:minHeight="48dp"
               android:layout_marginBottom="12dp"
               android:textAppearance="@style/Apptentive.TextAppearance.Body1"/>
 </android.support.design.widget.TextInputLayout>
