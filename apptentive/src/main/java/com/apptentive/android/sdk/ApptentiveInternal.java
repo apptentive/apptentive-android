@@ -591,11 +591,9 @@ public class ApptentiveInternal {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
 				int lastSeenVersionCode = lastVersionEntrySeen.getVersionCode();
-				Apptentive.Version currentVersionNameVersion = new Apptentive.Version();
-				currentVersionNameVersion.setVersion(currentVersionName);
 				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
 				lastSeenVersionNameVersion.setVersion(lastVersionEntrySeen.getVersionName());
-				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionNameVersion.equals(lastSeenVersionNameVersion)) {
+				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
 					onVersionChanged(lastVersionEntrySeen.getVersionCode(), currentVersionCode, lastVersionEntrySeen.getVersionName(), currentVersionName, appRelease);
 				}
 			}
