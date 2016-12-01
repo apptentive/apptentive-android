@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,12 +7,10 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
 public class ConversationTokenRequest extends JSONObject {
 
 
@@ -43,5 +41,11 @@ public class ConversationTokenRequest extends JSONObject {
 		}
 	}
 
-	//TODO: Handle client info as well.
+	public void setAppRelease(AppRelease appRelease) {
+		try {
+			put(appRelease.getBaseType().name(), appRelease);
+		} catch (JSONException e) {
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getBaseType().name());
+		}
+	}
 }
