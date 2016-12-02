@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -12,9 +12,6 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
 
-/**
- * @author Sky Kelsey
- */
 public enum ConditionalOperator {
 	$exists {
 		@Override
@@ -39,6 +36,9 @@ public enum ConditionalOperator {
 			if (first.getClass() != second.getClass()) {
 				return false;
 			}
+			if (first instanceof String && second instanceof String) {
+				return !((String) first).toLowerCase().equals(((String) second).toLowerCase());
+			}
 			return first.compareTo(second) != 0;
 		}
 	},
@@ -53,6 +53,9 @@ public enum ConditionalOperator {
 			}
 			if (first.getClass() != second.getClass()) {
 				return false;
+			}
+			if (first instanceof String && second instanceof String) {
+				return ((String) first).toLowerCase().equals(((String) second).toLowerCase());
 			}
 			return first.compareTo(second) == 0;
 		}
