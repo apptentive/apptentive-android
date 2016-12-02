@@ -294,6 +294,14 @@ public class ApptentiveInternal {
 		return false;
 	}
 
+	/**
+	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 * @return true it the app is using an AppCompat theme
+	 */
+	public boolean isAppUsingAppCompatTheme() {
+		return appDefaultAppCompatThemeId != 0;
+	}
+
 	// Object getter methods reqiure an instance. Get an instance with ApptentiveInternal.getInstance()
 
 	public Context getApplicationContext() {
@@ -563,29 +571,18 @@ public class ApptentiveInternal {
 				manifestApiKey = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY));
 				logLevelOverride = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL));
 				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
-			// If the app default theme specified in AndroidManifest is an AppCompat theme, use it for Apptentive theme inheritance.
-			boolean appThemeIsAppCompatTheme = setApplicationDefaultTheme(ai.theme);
+			// Used for application theme inheritance if the theme is an AppCompat theme.
+			setApplicationDefaultTheme(ai.theme);
 
-			// check if host app defines an apptentive theme override
-			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
+			AppRelease appRelease = AppRelease.generateCurrentAppRelease(appContext);
 
-			currentVersionCode = packageInfo.versionCode;
-			currentVersionName = packageInfo.versionName;
+			isAppDebuggable = appRelease.getDebug();
+			currentVersionCode = appRelease.getVersionCode();
+			currentVersionName = appRelease.getVersionName();
+
 			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
-			AppRelease appRelease = new AppRelease();
-			appRelease.setType("android");
-			appRelease.setVersionName(currentVersionName);
-			appRelease.setIdentifier(appPackageName);
-			appRelease.setVersionCode(currentVersionCode);
-			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
-			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
-			// Set Apptentive theme inheritance metrics
-			appRelease.setInheritStyle(appThemeIsAppCompatTheme);
-			appRelease.setOverrideStyle(themeOverrideResId != 0);
-			appRelease.setDebug(isAppDebuggable);
 
 			if (lastVersionEntrySeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
@@ -664,8 +661,10 @@ public class ApptentiveInternal {
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
-		AppReleaseManager.storeAppRelease(currentAppRelease);
-		taskManager.addPayload(currentAppRelease);
+		if (previousVersionCode != null) {
+			AppReleaseManager.storeAppRelease(currentAppRelease);
+			taskManager.addPayload(currentAppRelease);
+		}
 		invalidateCaches();
 	}
 
@@ -741,6 +740,9 @@ public class ApptentiveInternal {
 		request.setDevice(DeviceManager.storeDeviceAndReturnIt());
 		request.setSdk(SdkManager.storeSdkAndReturnIt());
 		request.setPerson(PersonManager.storePersonAndReturnIt());
+		AppRelease currentAppRelease = AppRelease.generateCurrentAppRelease(appContext);
+		AppReleaseManager.storeAppRelease(currentAppRelease);
+		request.setAppRelease(currentAppRelease);
 
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
