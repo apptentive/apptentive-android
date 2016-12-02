@@ -42,6 +42,7 @@
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:padding="8dp"
+                          android:clipToPadding="false"
                           android:gravity="center_vertical|end"
                           android:orientation="horizontal"/>
         </LinearLayout>

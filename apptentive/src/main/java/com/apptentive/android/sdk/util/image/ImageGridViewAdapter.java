@@ -347,10 +347,15 @@ public class ImageGridViewAdapter extends BaseAdapter {
 				}
 			}
 
+			// Always reset contentDescription to original state.
+			image.setContentDescription(image.getContext().getResources().getString(R.string.apptentive_message_center_content_description_attachment));
+
 			if (Util.isMimeTypeImage(data.mimeType)) {
 				if (TextUtils.isEmpty(data.originalPath)) {
+					// This is the "Add Attachment" image
 					image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 					placeholderResId = R.drawable.apptentive_ic_add;
+					image.setContentDescription(image.getContext().getResources().getString(R.string.apptentive_message_center_content_description_attachment_add));
 					indicator.setVisibility(View.GONE);
 					bLoadThumbnail = false;
 					progressBarLoading.setVisibility(View.GONE);

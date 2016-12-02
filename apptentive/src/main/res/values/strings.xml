@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -17,6 +17,18 @@
     <string name="apptentive_failed">Failed</string>
     <string name="apptentive_sent">Sent</string>
     <string name="apptentive_version">Apptentive Version %s</string>
+    <string name="apptentive_email">Email</string>
+    <string name="apptentive_name">Name</string>
+
+    <string name="apptentive_message_center_fab_content_description">Write a message</string>
+    <string name="apptentive_message_center_attachments_list">Attachments list</string>
+    <string name="apptentive_message_center_content_description_attachments_list">Attachments list</string>
+    <string name="apptentive_message_center_content_description_attach_button">Attach</string>
+    <string name="apptentive_message_center_content_description_send_button">Send</string>
+    <string name="apptentive_message_center_content_description_close_button">Close</string>
+    <string name="apptentive_message_center_content_description_attachment">Attachment</string>
+    <string name="apptentive_message_center_content_description_attachment_add">Add attachment</string>
+    <string name="apptentive_message_center_content_description_attachment_delete">Delete attachment</string>
 
     <string name="apptentive_powered_by_apptentive">Powered by</string>
     <string name="apptentive_about_title">About Apptentive</string>
