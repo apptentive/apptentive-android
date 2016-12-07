@@ -24,7 +24,7 @@
         <TextView android:id="@+id/survey_sent_action_text"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
+                  android:textAppearance="@style/Apptentive.TextAppearance.Subhead.SnackBar"
                   android:paddingLeft="24dp"
                   android:paddingStart="24dp"/>
     </LinearLayout>
