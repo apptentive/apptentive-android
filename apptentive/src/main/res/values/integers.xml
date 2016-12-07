@@ -26,7 +26,7 @@
     <integer name="wrap_content">-2</integer>
 
     <integer name="apptentive_layout_width_for_weight">@integer/match_parent</integer>
-    <integer name="apptentive_layout_height_for_weight">0</integer>
+    <integer name="apptentive_layout_height_for_weight">@integer/wrap_content</integer>
 
     <!-- These are the built-in android:typeface attributes for pre-api 21 support, See
     http://developer.android.com/reference/android/widget/TextView.html#attr_android%3atypeface -->

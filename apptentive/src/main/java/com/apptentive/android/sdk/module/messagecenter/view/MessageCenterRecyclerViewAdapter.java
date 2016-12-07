@@ -222,6 +222,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 	public void removeImageFromComposer(MessageComposerHolder composer, int position) {
 		if (composer != null) {
 			composer.removeImageFromImageAttachmentBand(position);
+			composer.setSendButtonState();
 		}
 	}
 
