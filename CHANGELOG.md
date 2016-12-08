@@ -1,4 +1,17 @@
-# 2016-10-?? - 3.3.0
+# 2016-12-07 - 3.4.0
+
+#### Improvements
+
+* Rebuilt Message Center to use modern `RecyclerView` for better performance and stability.
+* Improved accessibility of our UI, including TalkBack support and fixing hit target sizes.
+* Improved version targeting
+
+#### Bugs Fixed
+
+* Fixed a bug where the Profile Card in Message Center wouldn't let a user focus the email field.
+* Fixed a bug where the Survey "thank you" message text was the wrong color.
+ 
+# 2016-10-21 - 3.3.0
 
 #### Improvements
 

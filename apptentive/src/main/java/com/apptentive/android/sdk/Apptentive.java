@@ -17,7 +17,12 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.model.CommerceExtendedData;
+import com.apptentive.android.sdk.model.CustomData;
+import com.apptentive.android.sdk.model.ExtendedData;
+import com.apptentive.android.sdk.model.LocationExtendedData;
+import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
@@ -25,7 +30,8 @@ import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.*;
+import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -33,9 +39,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class contains the complete API for accessing Apptentive features from within your app.
@@ -471,7 +477,7 @@ public class Apptentive {
 	 * Determines whether this Bundle came from an Apptentive push notification. This method is used with Urban Airship
 	 * integrations.
 	 *
-	 * @param bundle The push payload bundle paseed to GCM onMessageReceived() callback
+	 * @param bundle The push payload bundle passed to GCM onMessageReceived() callback
 	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
@@ -495,23 +501,19 @@ public class Apptentive {
 	}
 
 	/**
-	 * <p>
-	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. This method replaces the deprecated
-	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@Intent} that did
+	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@link Intent} that did
 	 * not come from Apptentive will return a null object. If you receive a null object, your app will
-	 * need to handle this notification itself.
-	 * </p>
-	 * <p>
-	 * This is the method you will likely need if you integrated using:
+	 * need to handle this notification itself.</p>
+	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>GCM</li>
 	 * <li>AWS SNS</li>
 	 * <li>Parse</li>
 	 * </ul>
-	 * </p>
 	 *
 	 * @param intent An {@link Intent} containing the Apptentive Push data. Pass in what you receive
 	 *               in the Service or BroadcastReceiver that is used by your chosen push provider.
@@ -526,21 +528,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * <p>
-	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. This method replaces the deprecated
 	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
-	 * will need to handle this notification itself.
-	 * </p>
-	 * <p>
-	 * This is the method you will likely need if you integrated using:
+	 * will need to handle this notification itself.</p>
+	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>Urban Airship</li>
 	 * </ul>
-	 * </p>
 	 *
 	 * @param bundle A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
 	 *               the the Service or BroadcastReceiver that is used by your chosen push provider.
@@ -555,21 +553,17 @@ public class Apptentive {
 	}
 
 	/**
-	 * <p>
-	 * Use this method in your push receiver to build a pending Intent when an Apptentive push
+	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. This method replaces the deprecated
 	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
-	 * will need to handle this notification itself.
-	 * </p>
-	 * <p>
-	 * This is the method you will likely need if you integrated using:
+	 * will need to handle this notification itself.</p>
+	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>Firebase Cloud Messaging (FCM)</li>
 	 * </ul>
-	 * </p>
 	 *
 	 * @param data A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive Push
 	 *             data. Pass in what you receive in the the Service or BroadcastReceiver that is
@@ -1086,8 +1080,7 @@ public class Apptentive {
 			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
-			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(),
-					message.getNonce(), null);
+			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
 
 			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
 			if (!TextUtils.isEmpty(extension)) {

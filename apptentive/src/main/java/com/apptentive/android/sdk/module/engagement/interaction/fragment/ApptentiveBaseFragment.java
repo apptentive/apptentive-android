@@ -78,7 +78,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	{
 
-		//Prepare the reflections to manage hidden fileds
+		// Prepare the reflections to manage hidden fields
 		try {
 			fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
 			hostField = fragmentImplClass.getDeclaredField("mHost");
@@ -217,8 +217,13 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		}
 
-		if (!bShownAsModal && interaction != null) {
-			sectionTitle = interaction.getTitle();
+		if (interaction != null) {
+			// Set the title for modal Interactions for TalkBack support here. Fullscreen Interactions will set title in the ViewPager when they page into view.
+			if (bShownAsModal) {
+				getActivity().setTitle(interaction.getTitle());
+			} else {
+				sectionTitle = interaction.getTitle();
+			}
 		}
 
 		if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {

@@ -91,6 +91,10 @@
         <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>
     </style>
 
+    <style name="Apptentive.TextAppearance.Subhead.SnackBar" parent="@style/Apptentive.TextAppearance.Subhead">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
     <style name="Apptentive.TextAppearance.Subhead.Inverse" parent="@style/TextAppearance.AppCompat.Subhead.Inverse">
         <item name="android:typeface">?attr/apptentiveTypefaceSubhead</item>
         <item name="android:textSize">?attr/apptentiveTextSizeSubhead</item>

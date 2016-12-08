@@ -72,6 +72,7 @@ public class ApptentiveAlertDialog extends DialogFragment {
 					@Override
 					public void onClick(View v) {
 						dismiss();
+						// TODO
 						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 					}
 				});

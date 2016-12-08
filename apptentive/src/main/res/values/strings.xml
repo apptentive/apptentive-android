@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -17,6 +17,18 @@
     <string name="apptentive_failed">Failed</string>
     <string name="apptentive_sent">Sent</string>
     <string name="apptentive_version">Apptentive Version %s</string>
+    <string name="apptentive_email">Email</string>
+    <string name="apptentive_name">Name</string>
+
+    <string name="apptentive_message_center_fab_content_description">Write a message</string>
+    <string name="apptentive_message_center_attachments_list">Attachments list</string>
+    <string name="apptentive_message_center_content_description_attachments_list">Attachments list</string>
+    <string name="apptentive_message_center_content_description_attach_button">Attach</string>
+    <string name="apptentive_message_center_content_description_send_button">Send</string>
+    <string name="apptentive_message_center_content_description_close_button">Close</string>
+    <string name="apptentive_message_center_content_description_attachment">Attachment</string>
+    <string name="apptentive_message_center_content_description_attachment_add">Add attachment</string>
+    <string name="apptentive_message_center_content_description_attachment_delete">Delete attachment</string>
 
     <string name="apptentive_powered_by_apptentive">Powered by</string>
     <string name="apptentive_about_title">About Apptentive</string>
@@ -46,7 +58,7 @@
     <!-- Do not translate below here -->
 
     <!-- An en dash with a space on each side. Use entity codes for space because otherwise it gets trimmed. -->
-    <string name="apptentive_instruction_text_separater">&#160;&#8211;&#160;</string>
+    <string name="apptentive_instruction_text_separator">&#160;&#8211;&#160;</string>
     <!-- Default Android Roboto font family names used by Apptentive on api 21 and later. To override, host app
          will assign different font family name strings to ?apptentiveFontFamilyDefault and ?apptentiveFontFamilyMediumDefault.
          The available font families are "sans-serif", "sans-serif-light", "sans-serif-condensed, "sans-serif-thin" and "sans-serif-medium"-->

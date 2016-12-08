@@ -155,10 +155,13 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 
 			@Override
 			public void onPageSelected(int position) {
-				ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
+				final ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
+				// Set the Activity title for TalkBack support
+				final String title = currentFragment.getTitle();
+				if (currentFragment != null && currentFragment.getActivity() != null) {
+					currentFragment.getActivity().setTitle(title);
+				}
 				if (!currentFragment.isShownAsModalDialog()) {
-
-					final String title = currentFragment.getTitle();
 					toolbar.post(new Runnable() {
 						@Override
 						public void run() {
@@ -394,7 +397,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private void setStatusBarColor() {
 		// Changing status bar color is a post-21 feature
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			int statusBarDefaultColor = ApptentiveInternal.getInstance().getDefaultStatusbarColor();
+			int statusBarDefaultColor = ApptentiveInternal.getInstance().getDefaultStatusBarColor();
 			int overlayColor = ContextCompat.getColor(this, R.color.apptentive_activity_frame_dark);
 			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}

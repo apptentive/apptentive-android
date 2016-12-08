@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<manifest
-    package="com.apptentive.android.sdk"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.apptentive.android.sdk">
     <!-- Required for Apptentive -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Optional for Apptentive -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application>
-        <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity" android:theme="@style/ApptentiveTheme.Base.Versioned"/>
+        <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity"
+                  android:theme="@style/ApptentiveTheme.Base.Versioned"/>
     </application>
 </manifest>

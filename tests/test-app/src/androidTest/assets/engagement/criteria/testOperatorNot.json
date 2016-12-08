@@ -1,13 +1,13 @@
 {
   "$and": [
     {
-      "application/version": {
+      "application/version_code": {
         "$exists": true
       }
     },
     {
       "$not": {
-        "application/version": {
+        "application/version_code": {
           "$exists": false
         }
       }
@@ -15,7 +15,7 @@
     {
       "$not": {
         "$not": {
-          "application/version": {
+          "application/version_code": {
             "$exists": true
           }
         }
@@ -25,7 +25,7 @@
       "$not": {
         "$not": {
           "$not": {
-            "application/version": {
+            "application/version_code": {
               "$exists": false
             }
           }
@@ -37,7 +37,7 @@
         "$not": {
           "$not": {
             "$not": {
-              "application/version": {
+              "application/version_code": {
                 "$exists": true
               }
             }
@@ -51,7 +51,7 @@
           "$not": {
             "$not": {
               "$not": {
-                "application/version": {
+                "application/version_code": {
                   "$exists": false
                 }
               }
@@ -67,7 +67,7 @@
             "$not": {
               "$not": {
                 "$not": {
-                  "application/version": {
+                  "application/version_code": {
                     "$exists": true
                   }
                 }

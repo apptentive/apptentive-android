@@ -143,8 +143,7 @@ public class JsonDiffer {
 	private static Set<String> getKeys(JSONObject jsonObject) {
 		Set<String> keys = new HashSet<String>();
 		if (jsonObject != null) {
-			@SuppressWarnings("unchecked")
-			Iterator<String> it = (Iterator<String>) jsonObject.keys();
+			Iterator<String> it = jsonObject.keys();
 			while (it.hasNext()) {
 				keys.add(it.next());
 			}

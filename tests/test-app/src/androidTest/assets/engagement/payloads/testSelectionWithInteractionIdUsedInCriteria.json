@@ -30,7 +30,7 @@
       {
         "interaction_id": "526fe2836dd8bf546a00000c",
         "criteria": {
-          "interactions/526fe2836dd8bf546a00000d/invokes/version": {
+          "interactions/526fe2836dd8bf546a00000d/invokes/version_code": {
             "$gt": 0
           }
         }

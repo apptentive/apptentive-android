@@ -273,7 +273,7 @@ public class ApptentiveInternal {
 				// If passed theme res id does not exist, an exception would be thrown and caught
 				appContext.getResources().getResourceName(themeResId);
 
-				// Check if the theme to be inheritd from is an AppCompat theme.
+				// Check if the theme to be inherited from is an AppCompat theme.
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
 				appDefaultTheme.applyStyle(themeResId, true);
 
@@ -294,10 +294,15 @@ public class ApptentiveInternal {
 		return false;
 	}
 
-	/*
-	 * Object getter methods through ApptentiveInternal instance
-	 * Usage: ApptentiveInternal.getInstance().getxxxx()
+	/**
+	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 * @return true it the app is using an AppCompat theme
 	 */
+	public boolean isAppUsingAppCompatTheme() {
+		return appDefaultAppCompatThemeId != 0;
+	}
+
+	// Object getter methods reqiure an instance. Get an instance with ApptentiveInternal.getInstance()
 
 	public Context getApplicationContext() {
 		return appContext;
@@ -353,7 +358,7 @@ public class ApptentiveInternal {
 		return apptentiveToolbarTheme;
 	}
 
-	public int getDefaultStatusbarColor() {
+	public int getDefaultStatusBarColor() {
 		return statusBarColorDefault;
 	}
 
@@ -445,13 +450,12 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
-			messageManager.setCurrentForgroundActivity(activity);
+			messageManager.setCurrentForegroundActivity(activity);
 		}
 
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice();
-		syncSdk();
 		syncPerson();
 	}
 
@@ -459,7 +463,7 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
-			messageManager.setCurrentForgroundActivity(activity);
+			messageManager.setCurrentForegroundActivity(activity);
 		}
 
 	}
@@ -473,7 +477,7 @@ public class ApptentiveInternal {
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
 		currentTaskStackTopActivity = null;
-		messageManager.setCurrentForgroundActivity(null);
+		messageManager.setCurrentForegroundActivity(null);
 		payloadWorker.appWentToBackground();
 		messageManager.appWentToBackground();
 	}
@@ -515,8 +519,8 @@ public class ApptentiveInternal {
 			interactionTheme.applyStyle(themeOverrideResId, true);
 		}
 
-		// Step 5: Update statusbar color
-		/* Obtain the default statusbar color. When Apptentive Modal interaction is shown,
+		// Step 5: Update status bar color
+		/* Obtain the default status bar color. When an Apptentive Modal interaction is shown,
 		*  a translucent overlay would be applied on top of statusBarColorDefault
 		*/
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -567,38 +571,26 @@ public class ApptentiveInternal {
 				manifestApiKey = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY));
 				logLevelOverride = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL));
 				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 
-			// If the app default theme specified in AndroidManifest is an AppCompat theme, use it for Apptentive theme inheritance.
-			boolean appThemeIsAppCompatTheme = setApplicationDefaultTheme(ai.theme);
+			// Used for application theme inheritance if the theme is an AppCompat theme.
+			setApplicationDefaultTheme(ai.theme);
 
-			// check if host app defines an apptentive theme override
-			int themeOverrideResId = appContext.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
+			AppRelease appRelease = AppRelease.generateCurrentAppRelease(appContext);
 
-			currentVersionCode = packageInfo.versionCode;
-			currentVersionName = packageInfo.versionName;
+			isAppDebuggable = appRelease.getDebug();
+			currentVersionCode = appRelease.getVersionCode();
+			currentVersionName = appRelease.getVersionName();
+
 			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
-			AppRelease appRelease = new AppRelease();
-			appRelease.setVersion(currentVersionName);
-			appRelease.setIdentifier(appPackageName);
-			appRelease.setBuildNumber(String.valueOf(currentVersionCode));
-			appRelease.setTargetSdkVersion(String.valueOf(packageInfo.applicationInfo.targetSdkVersion));
-			appRelease.setAppStore(Util.getInstallerPackageName(appContext));
-			// Set Apptentive theme inheritance metrics
-			appRelease.setInheritStyle(appThemeIsAppCompatTheme);
-			appRelease.setOverrideStyle(themeOverrideResId != 0);
-			appRelease.setDebug(isAppDebuggable);
 
 			if (lastVersionEntrySeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
 				int lastSeenVersionCode = lastVersionEntrySeen.getVersionCode();
-				Apptentive.Version currentVersionNameVersion = new Apptentive.Version();
-				currentVersionNameVersion.setVersion(currentVersionName);
 				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
 				lastSeenVersionNameVersion.setVersion(lastVersionEntrySeen.getVersionName());
-				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionNameVersion.equals(lastSeenVersionNameVersion)) {
+				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
 					onVersionChanged(lastVersionEntrySeen.getVersionCode(), currentVersionCode, lastVersionEntrySeen.getVersionName(), currentVersionName, appRelease);
 				}
 			}
@@ -669,10 +661,9 @@ public class ApptentiveInternal {
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
-		AppRelease appRelease = AppReleaseManager.storeAppReleaseAndReturnDiff(currentAppRelease);
-		if (appRelease != null) {
-			ApptentiveLog.d("App release was updated.");
-			taskManager.addPayload(appRelease);
+		if (previousVersionCode != null) {
+			AppReleaseManager.storeAppRelease(currentAppRelease);
+			taskManager.addPayload(currentAppRelease);
 		}
 		invalidateCaches();
 	}
@@ -680,6 +671,7 @@ public class ApptentiveInternal {
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
+		syncSdk();
 		invalidateCaches();
 	}
 
@@ -748,6 +740,9 @@ public class ApptentiveInternal {
 		request.setDevice(DeviceManager.storeDeviceAndReturnIt());
 		request.setSdk(SdkManager.storeSdkAndReturnIt());
 		request.setPerson(PersonManager.storePersonAndReturnIt());
+		AppRelease currentAppRelease = AppRelease.generateCurrentAppRelease(appContext);
+		AppReleaseManager.storeAppRelease(currentAppRelease);
+		request.setAppRelease(currentAppRelease);
 
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
@@ -865,17 +860,13 @@ public class ApptentiveInternal {
 	}
 
 	/**
-	 * Sends current Sdk to the server if it differs from the last time it was sent.
+	 * Sends current SDK to the server.
 	 */
 	private void syncSdk() {
-		Sdk sdk = SdkManager.storeSdkAndReturnDiff();
-		if (sdk != null) {
-			ApptentiveLog.d("Sdk was updated.");
-			ApptentiveLog.v(sdk.toString());
-			taskManager.addPayload(sdk);
-		} else {
-			ApptentiveLog.d("Sdk was not updated.");
-		}
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		SdkManager.storeSdk(sdk);
+		ApptentiveLog.v(sdk.toString());
+		taskManager.addPayload(sdk);
 	}
 
 	/**
@@ -1177,7 +1168,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
-	 * @return true if properly registered, elss false.
+	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {

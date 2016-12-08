@@ -105,11 +105,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
 					");";
 
-	/* Compund Message FileStore:
-	 * For compound message stored in TABLE_MESSAGE, each associated file will add a row to this table
-	 * uing the message's "nonce" key
+	/* Compound Message FileStore:
+	 * For Compound Messages stored in TABLE_MESSAGE, each associated file will add a row to this table
+	 * using the message's "nonce" key
 	 */
-	private static final String TABLE_COMPOUND_MESSSAGE_FILESTORE = "compound_message_file_store"; // table filePath
+	private static final String TABLE_COMPOUND_MESSAGE_FILESTORE = "compound_message_file_store"; // table filePath
 	private static final String COMPOUND_FILESTORE_KEY_DB_ID = "_id";                         // 0
 	private static final String COMPOUND_FILESTORE_KEY_MESSAGE_NONCE = "nonce"; // message nonce of the compound message
 	private static final String COMPOUND_FILESTORE_KEY_MIME_TYPE = "mime_type"; // mine type of the file
@@ -119,7 +119,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final String COMPOUND_FILESTORE_KEY_CREATION_TIME = "creation_time"; // creation time of the original file
 	// Create the initial table. Use nonce and local cache path as primary key because both sent/received files will have a local cached copy
 	private static final String TABLE_CREATE_COMPOUND_FILESTORE =
-			"CREATE TABLE " + TABLE_COMPOUND_MESSSAGE_FILESTORE +
+			"CREATE TABLE " + TABLE_COMPOUND_MESSAGE_FILESTORE +
 					" (" +
 					COMPOUND_FILESTORE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
 					COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " TEXT, " +
@@ -131,7 +131,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					");";
 
 	// Query all files associated with a given compound message nonce id
-	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_COMPOUND_MESSSAGE_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
+	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_COMPOUND_MESSAGE_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
 
 	private File fileDir; // data dir of the application
 
@@ -451,7 +451,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, originalFileName);
 					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
 					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
-					db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
+					db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
 
 				} while (cursor.moveToNext());
 			}
@@ -562,7 +562,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
-			int deleted = db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+			int deleted = db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
 			ApptentiveLog.d("Deleted %d stored files.", deleted);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
@@ -612,7 +612,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.beginTransaction();
 			// Always delete existing rows with the same nonce to ensure add/update both work
-			db.delete(TABLE_COMPOUND_MESSSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+			db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
 
 			for (StoredFile file : associatedFiles) {
 				ContentValues values = new ContentValues();
@@ -622,7 +622,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getSourceUriOrPath());
 				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
 				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
-				ret = db.insert(TABLE_COMPOUND_MESSSAGE_FILESTORE, null, values);
+				ret = db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();

@@ -60,6 +60,16 @@ public class OperatorTests extends ApptentiveTestCaseBase {
 	}
 
 	@Test
+	public void stringEquals() {
+		doTest("testOperatorStringEquals.json");
+	}
+
+	@Test
+	public void stringNotEquals() {
+		doTest("testOperatorStringNotEquals.json");
+	}
+
+	@Test
 	public void contains() {
 		doTest("testOperatorContains.json");
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
 /**
  * A map of "interaction_id" => {Interaction}
- * @author Sky Kelsey
+ *
  */
 public class Interactions extends JSONObject {
 	public static final String KEY_NAME = "interactions";
@@ -42,7 +43,7 @@ public class Interactions extends JSONObject {
 
 	public List<Interaction> getInteractionList() {
 		List<Interaction> ret = new ArrayList<Interaction>();
-		Iterator<String> keys = (Iterator<String>) keys();
+		Iterator<String> keys = keys();
 		while (keys.hasNext()) {
 			String key = keys.next();
 			JSONObject interactionObject = optJSONObject(key);

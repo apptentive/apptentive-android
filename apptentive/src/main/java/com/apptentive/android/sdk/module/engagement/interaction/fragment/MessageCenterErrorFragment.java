@@ -82,7 +82,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	}
 
 
-	public boolean onBackPressed() {
+	public boolean onBackPressed(boolean hardwareBackButtonWasPressed) {
 		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, null, null, (ExtendedData[]) null);
 		return false;
 	}

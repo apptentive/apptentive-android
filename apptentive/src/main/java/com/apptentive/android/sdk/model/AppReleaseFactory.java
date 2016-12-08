@@ -7,11 +7,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 
-/**
- * @author Sky Kelsey
- */
 public class AppReleaseFactory {
 	public static AppRelease fromJson(String json) {
 		try {

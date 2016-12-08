@@ -24,6 +24,7 @@
         <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_light</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
+        <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
@@ -51,6 +52,7 @@
         <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_light</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
+        <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
@@ -79,6 +81,7 @@
         <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_dark</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
+        <item name="apptentiveButtonTintColorDisabled">#FF5A595B</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
@@ -107,6 +110,7 @@
         <item name="apptentiveAttachmentItemBackground">@drawable/apptentive_empty_image_background_dark</item>
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
+        <item name="apptentiveButtonTintColorDisabled">#FF5A595B</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
@@ -142,7 +146,6 @@
 
         <item name="apptentiveValidationFailedColor">@color/apptentive_validation_failed_color</item>
         <item name="apptentiveButtonTintColor">?attr/colorAccent</item>
-        <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
         <item name="apptentiveButtonTintColorStateList">@color/apptentive_tinted_button</item>
 
         <item name="apptentiveTextSizeHeadline">@dimen/apptentive_text_size_headline</item>
@@ -177,7 +180,7 @@
         <item name="apptentiveFontFamilyButtonBorderless">?apptentiveFontFamilyMediumDefault</item>
         <item name="apptentiveFontFamilyButtonColored">?apptentiveFontFamilyMediumDefault</item>
 
-        <!-- Here we set Anadroid widget styles -->
+        <!-- Here we set Android widget styles -->
         <item name="apptentiveCheckBoxStyle">@style/Apptentive.Widget.CheckBox</item>
         <item name="apptentiveRadioButtonStyle">@style/Apptentive.Widget.RadioButton</item>
         <item name="apptentiveInteractionButtonStyle">@style/Apptentive.Widget.Button.Borderless</item>
@@ -205,7 +208,7 @@
         <item name="apptentiveCardElevation">2dp</item>
     </style>
 
-    <!-- This is THE apptentive default theme speficied in AndroidManifest.xml of Apptentive SDK.
+    <!-- This is THE apptentive default theme specified in AndroidManifest.xml of Apptentive SDK.
          It will be applied first. Any styles here will be then overridden by styles defined in the
          default AppCompat theme of the host app,  then the ApptentiveBaseFrameTheme, then the
          ApptentiveThemeOverride, in that order.

@@ -45,7 +45,7 @@
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                                  android:text="@string/apptentive_instruction_text_separater"/>
+                                  android:text="@string/apptentive_instruction_text_separator"/>
                         <TextView android:id="@+id/question_instructions"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"

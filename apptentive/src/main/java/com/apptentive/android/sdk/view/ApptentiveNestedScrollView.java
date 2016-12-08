@@ -669,7 +669,7 @@ public class ApptentiveNestedScrollView extends FrameLayout implements NestedScr
 
 			case MotionEvent.ACTION_DOWN: {
 				final int y = (int) ev.getY();
-				if (!inChild((int) ev.getX(), (int) y)) {
+				if (!inChild((int) ev.getX(), y)) {
 					mIsBeingDragged = false;
 					recycleVelocityTracker();
 					break;

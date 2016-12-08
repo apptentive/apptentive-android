@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;

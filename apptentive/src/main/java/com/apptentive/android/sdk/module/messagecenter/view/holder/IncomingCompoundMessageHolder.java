@@ -1,90 +1,92 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
+import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
-import com.apptentive.android.sdk.module.messagecenter.view.CompoundMessageView;
-import com.apptentive.android.sdk.module.messagecenter.view.MessageAdapter;
+import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageItem;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Barry Li
- */
+import static android.content.Context.ACCESSIBILITY_SERVICE;
+
 public class IncomingCompoundMessageHolder extends MessageHolder {
 
 	public ApptentiveAvatarView avatar;
+	private View root;
+	private View container;
 	private TextView messageBodyView;
 	private TextView nameView;
 	private ApptentiveImageGridView imageBandView;
-	private MessageAdapter.OnListviewItemActionListener listener;
 
-	public IncomingCompoundMessageHolder(CompoundMessageView view) {
-		super(view);
-		avatar = (ApptentiveAvatarView) view.findViewById(R.id.avatar);
-		nameView = (TextView) view.findViewById(R.id.sender_name);
-		messageBodyView = (TextView) view.findViewById(R.id.apptentive_compound_message_body);
-		imageBandView =(ApptentiveImageGridView) view.findViewById(R.id.grid);
-		listener = view.getListener();
+	private static final boolean loadAvatar = false;
+
+	public IncomingCompoundMessageHolder(View itemView) {
+		super(itemView);
+		root = itemView.findViewById(R.id.message_root);
+		container = itemView.findViewById(R.id.apptentive_compound_message_body_container);
+		avatar = (ApptentiveAvatarView) itemView.findViewById(R.id.avatar);
+		nameView = (TextView) itemView.findViewById(R.id.sender_name);
+		messageBodyView = (TextView) itemView.findViewById(R.id.apptentive_compound_message_body);
+		imageBandView = (ApptentiveImageGridView) itemView.findViewById(R.id.grid);
 	}
 
-	public void updateMessage(final String name, final String datestamp, final String text, final int viewWidth, final int desiredColumn, final List<StoredFile> imagesToAttach) {
-		super.updateMessage(datestamp, 0, null);
-
-		if (messageBodyView != null) {
-			messageBodyView.post(new Runnable() {
-				@Override
-				public void run() {
-					messageBodyView.setText(text);
-				}
-			});
+	public void bindView(MessageCenterFragment fragment, final RecyclerView parent, final MessageCenterRecyclerViewAdapter adapter, final CompoundMessage message) {
+		super.bindView(fragment, parent, message);
+		imageBandView.setupUi();
+		if (loadAvatar) {
+			ImageUtil.startDownloadAvatarTask(avatar, message.getSenderProfilePhoto());
 		}
 
-		if (nameView != null) {
-			if (name != null && !name.isEmpty()) {
-				nameView.post(new Runnable() {
-					@Override
-					public void run() {
-						nameView.setVisibility(View.VISIBLE);
-						nameView.setText(name);
-					}
-				});
-			} else {
-				nameView.post(new Runnable() {
-					@Override
-					public void run() {
-						nameView.setVisibility(View.GONE);
-					}
-				});
-			}
+		int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
+		root.measure(widthMeasureSpec, 0);
+		int viewWidth = container.getMeasuredWidth();
+
+		messageBodyView.setText(message.getBody());
+		// We have to disable text selection, or the Google TalkBack won't read this unless it's selected. It's too tiny to select by itself easily.
+		AccessibilityManager accessibilityManager = (AccessibilityManager) fragment.getContext().getSystemService(ACCESSIBILITY_SERVICE);
+		if (accessibilityManager != null) {
+			boolean talkbackNotEnabled = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty();
+			messageBodyView.setTextIsSelectable(talkbackNotEnabled);
+		}
+		String name = message.getSenderUsername();
+		if (name != null && !name.isEmpty()) {
+			nameView.setVisibility(View.VISIBLE);
+			nameView.setText(name);
+		} else {
+			nameView.setVisibility(View.GONE);
 		}
 
-		// Set up attahments view
+		final List<StoredFile> files = message.getRemoteAttachments();
 		if (imageBandView != null) {
-			if (imagesToAttach == null || imagesToAttach.size() == 0) {
+			if (files == null || files.size() == 0) {
 				imageBandView.setVisibility(View.GONE);
 			} else {
 				imageBandView.setVisibility(View.VISIBLE);
-				imageBandView.setAdapterItemSize(viewWidth, desiredColumn);
+				imageBandView.setAdapterItemSize(viewWidth, itemView.getResources().getInteger(R.integer.apptentive_image_grid_default_column_number_incoming));
 				List<ImageItem> images = new ArrayList<ImageItem>();
 				final File cacheDir = Util.getDiskCacheDir(imageBandView.getContext());
-				for (StoredFile file: imagesToAttach) {
+				for (StoredFile file : files) {
 					String thumbnailUrl = file.getSourceUriOrPath();
 					String remoteUrl = file.getApptentiveUri();
 					String thumbnailStorageFilePath;
@@ -100,15 +102,14 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 				imageBandView.setListener(new ApptentiveImageGridView.ImageItemClickedListener() {
 					@Override
 					public void onClick(int position, ImageItem image) {
-						StoredFile file = imagesToAttach.get(position);
+						StoredFile file = files.get(position);
 						String remoteUrl = file.getApptentiveUri();
 						String localFilePath = Util.generateCacheFileFullPath(remoteUrl, cacheDir);
-						if (listener != null) {
-							listener.onClickAttachment(position, new ImageItem(remoteUrl, localFilePath, file.getMimeType(), file.getCreationTime()));
+						if (adapter.getListener() != null) {
+							adapter.getListener().onClickAttachment(position, new ImageItem(remoteUrl, localFilePath, file.getMimeType(), file.getCreationTime()));
 						}
 					}
 				});
-
 			}
 		}
 	}

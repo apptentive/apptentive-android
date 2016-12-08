@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,17 +11,15 @@ import android.content.Intent;
 
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterComposingItem;
+import com.apptentive.android.sdk.module.messagecenter.model.Composer;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
+import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
 public class MessageCenterInteraction extends Interaction {
 
 	public static final String KEY_TITLE = "title";
@@ -63,31 +61,32 @@ public class MessageCenterInteraction extends Interaction {
 	public static final String KEY_PROFILE_EDIT_SAVE_BUTTON = "save_button";
 
 
-	// The server guarantees that an instance of this Interaction will be targetted to the following internal event name.
+	// The server guarantees that an instance of this Interaction will be targeted to the following internal event name.
 	public static final String DEFAULT_INTERNAL_EVENT_NAME = "show_message_center";
 
 	// Events
 	public static final String EVENT_NAME_CLOSE = "close";
 	public static final String EVENT_NAME_CANCEL = "cancel";
-	public static final String EVENT_NAME_ATTACH = "attach";
 	public static final String EVENT_NAME_READ = "read";
-	public static final String EVENT_NAME_GREETING_MESSAGE = "greeting_message";
 	public static final String EVENT_NAME_COMPOSE_OPEN = "compose_open";
 	public static final String EVENT_NAME_COMPOSE_CLOSE = "compose_close";
-	public static final String EVENT_NAME_KEYBOARD_OPEN = "keyboard_open";
-	public static final String EVENT_NAME_KEYBOARD_CLOSE = "keyboard_close";
 	public static final String EVENT_NAME_STATUS = "status";
 	public static final String EVENT_NAME_MESSAGE_HTTP_ERROR = "message_http_error";
 	public static final String EVENT_NAME_MESSAGE_NETWORK_ERROR = "message_network_error";
 	public static final String EVENT_NAME_PROFILE_OPEN = "profile_open";
 	public static final String EVENT_NAME_PROFILE_CLOSE = "profile_close";
-	public static final String EVENT_NAME_PROFILE_NAME = "profile_name";
-	public static final String EVENT_NAME_PROFILE_EMAIL = "profile_email";
 	public static final String EVENT_NAME_PROFILE_SUBMIT = "profile_submit";
-	public static final String EVENT_NAME_ATTACHMENT_LIST_SHOWN = "attachment_list_open";
-	public static final String EVENT_NAME_ATTACHMENT_ADD = "attachment_add";
+	public static final String EVENT_NAME_ATTACH = "attach";
 	public static final String EVENT_NAME_ATTACHMENT_DELETE = "attachment_delete";
 	public static final String EVENT_NAME_ATTACHMENT_CANCEL = "attachment_cancel";
+/*
+	// Not implemented on Android
+	public static final String EVENT_NAME_GREETING_MESSAGE = "greeting_message";
+	public static final String EVENT_NAME_KEYBOARD_OPEN = "keyboard_open";
+	public static final String EVENT_NAME_KEYBOARD_CLOSE = "keyboard_close";
+	public static final String EVENT_NAME_PROFILE_NAME = "profile_name";
+	public static final String EVENT_NAME_PROFILE_EMAIL = "profile_email";
+*/
 
 	public MessageCenterInteraction(String json) throws JSONException {
 		super(json);
@@ -109,36 +108,20 @@ public class MessageCenterInteraction extends Interaction {
 		return null;
 	}
 
-	public MessageCenterComposingItem getComposerArea() {
+	public Composer getComposer() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
 		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
-		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_AREA,
-				null,
-				composer.optString(KEY_COMPOSER_HINT_TEXT, null),
-				null,
-				null,
-				null,
-				null);
-	}
-
-	public MessageCenterComposingItem getComposerBar() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
-		}
-		JSONObject composer = configuration.optJSONObject(KEY_COMPOSER);
-		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_ACTIONBAR,
-				composer.optString(KEY_COMPOSER_TITLE, null),
-				composer.optString(KEY_COMPOSER_CLOSE_BODY, null),
-				composer.optString(KEY_COMPOSER_CLOSE_DISCARD, null),
-				composer.optString(KEY_COMPOSER_CLOSE_CANCEL, null),
-				composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
-				null);
+		return new Composer(
+			composer.optString(KEY_COMPOSER_TITLE, null),
+			composer.optString(KEY_COMPOSER_CLOSE_BODY, null),
+			composer.optString(KEY_COMPOSER_CLOSE_DISCARD, null),
+			composer.optString(KEY_COMPOSER_CLOSE_CANCEL, null),
+			composer.optString(KEY_COMPOSER_SEND_BUTTON, null),
+			composer.optString(KEY_COMPOSER_HINT_TEXT, null)
+		);
 	}
 
 	//When enabled, display Who Card to request profile info
@@ -160,63 +143,22 @@ public class MessageCenterInteraction extends Interaction {
 		return profile.optBoolean(KEY_PROFILE_REQUIRE, false);
 	}
 
-	public MessageCenterComposingItem getWhoCardInit() {
+	public JSONObject getProfile() {
 		InteractionConfiguration configuration = getConfiguration();
 		if (configuration == null) {
 			return null;
 		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
-		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
-			return new MessageCenterComposingItem(
-					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_INIT,
-					profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
-					// Hide name field if profile is required and never set
-					null,
-					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
-					// Hide Skip button
-					null,
-					profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
-		}
-		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_INIT,
-				profileInitial.optString(KEY_PROFILE_INIT_TITLE, null),
-				profileInitial.optString(KEY_PROFILE_INIT_NAME_HINT, null),
-				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null),
-				profileInitial.optString(KEY_PROFILE_INIT_EMAIL_EXPLANATION, null),
-				profileInitial.optString(KEY_PROFILE_INIT_SKIP_BUTTON, null),
-				profileInitial.optString(KEY_PROFILE_INIT_SAVE_BUTTON, null));
+		return configuration.optJSONObject(KEY_PROFILE);
 	}
 
-	public MessageCenterComposingItem getWhoCardEdit() {
-		InteractionConfiguration configuration = getConfiguration();
-		if (configuration == null) {
-			return null;
+	public WhoCard getWhoCard() {
+		try {
+			return new WhoCard(getProfile().toString());
+		} catch (JSONException e) {
+			// Never happens.
 		}
-		JSONObject profile = configuration.optJSONObject(KEY_PROFILE);
-		JSONObject profileEdit = configuration.optJSONObject(KEY_PROFILE).optJSONObject(KEY_PROFILE_EDIT);
-		if (profile.optBoolean(KEY_PROFILE_REQUIRE, false)) {
-			JSONObject profileInitial = profile.optJSONObject(KEY_PROFILE_INIT);
-			return new MessageCenterComposingItem(
-					MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUIRED_EDIT,
-					profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
-					profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-					profileInitial.optString(KEY_PROFILE_INIT_EMAIL_HINT, null), // Show "Email(required)"
-					profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-					profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-					profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
-		}
-		return new MessageCenterComposingItem(
-				MessageCenterComposingItem.COMPOSING_ITEM_WHOCARD_REQUESTED_EDIT,
-				profileEdit.optString(KEY_PROFILE_EDIT_TITLE, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_NAME_HINT, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_HINT, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_EMAIL_EXPLANATION, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_SKIP_BUTTON, null),
-				profileEdit.optString(KEY_PROFILE_EDIT_SAVE_BUTTON, null));
+		return null;
 	}
-
 
 	public MessageCenterGreeting getGreeting() {
 		InteractionConfiguration configuration = getConfiguration();
@@ -228,7 +170,7 @@ public class MessageCenterInteraction extends Interaction {
 			return null;
 		}
 		return new MessageCenterGreeting(greeting.optString(KEY_GREETING_TITLE, null),
-				greeting.optString(KEY_GREETING_BODY, null), greeting.optString(KEY_GREETING_IMAGE, null));
+			greeting.optString(KEY_GREETING_BODY, null), greeting.optString(KEY_GREETING_IMAGE, null));
 	}
 
 	public JSONObject getContextualMessage() {

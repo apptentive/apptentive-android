@@ -129,6 +129,7 @@ task androidJavadocs(type: Javadoc) {
     include 'com/apptentive/android/sdk/module/rating/IRatingProvider.java'
     include 'com/apptentive/android/sdk/module/messagecenter/UnreadMessagesListener.java'
     include 'com/apptentive/android/sdk/module/survey/OnSurveyFinishedListener.java'
+    include 'com/apptentive/android/sdk/model/CustomData.java'
     include 'com/apptentive/android/sdk/model/ExtendedData.java'
     include 'com/apptentive/android/sdk/model/CommerceExtendedData.java'
     include 'com/apptentive/android/sdk/model/LocationExtendedData.java'
