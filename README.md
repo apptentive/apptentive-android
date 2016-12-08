@@ -3,15 +3,16 @@
 The Apptentive Android SDK is the best way to engage your mobile customers. Use it to learn about how your customers
 use your app, to talk to them at the right time, and in the right way.
 
-#### To get started, read our [Integration Guide](http://www.apptentive.com/docs/android/integration/)
+#### To get started, read our [Integration Guide](https://learn.apptentive.com/knowledge-base/android-integration/)
 
 #### Learn about SDK Features [Features](http://www.apptentive.com/docs/android/features/)
 
-#### Browse the [Client API](http://www.apptentive.com/docs/android/api)
+#### [Android Interface Customization](https://learn.apptentive.com/knowledge-base/interface-customization-android/)
+#### [Apptentive SDK API Javadoc](http://www.apptentive.com/docs/android/api)
 
-##### API Changes are tracked [here](docs/APIChanges.md)
+##### [API Changes here](docs/APIChanges.md)
 
-##### Version history is tracked [here](CHANGELOG.md)
+##### [Release Notes](https://learn.apptentive.com/knowledge-base/android-sdk-releases-notes/)
 
 ##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|3.4.0|aar)
 
