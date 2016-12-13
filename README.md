@@ -5,9 +5,8 @@ use your app, to talk to them at the right time, and in the right way.
 
 #### To get started, read our [Integration Guide](https://learn.apptentive.com/knowledge-base/android-integration/)
 
-#### Learn about SDK Features [Features](http://www.apptentive.com/docs/android/features/)
-
 #### [Android Interface Customization](https://learn.apptentive.com/knowledge-base/interface-customization-android/)
+
 #### [Apptentive SDK API Javadoc](http://www.apptentive.com/docs/android/api)
 
 ##### [API Changes here](docs/APIChanges.md)
