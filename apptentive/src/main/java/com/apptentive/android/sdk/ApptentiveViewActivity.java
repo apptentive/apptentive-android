@@ -24,7 +24,6 @@ import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +39,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
-public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
+public class ApptentiveViewActivity extends ApptentiveComponentActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 
 	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
