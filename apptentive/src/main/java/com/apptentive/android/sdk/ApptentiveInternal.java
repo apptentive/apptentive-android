@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
+import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
@@ -70,6 +71,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
@@ -1183,5 +1186,16 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
+	}
+
+	/** Ends current user session */
+	public static void logout() {
+		getInstance().getComponentRegistry()
+			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {
+				@Override
+				public void onComponentNotify(OnUserLogOutListener component) {
+					component.onUserLogOut();
+				}
+			});
 	}
 }

@@ -65,13 +65,13 @@ public class ApptentiveComponentRegistry {
 
 	//region Notifications
 
-	public <T extends ApptentiveComponent> void notifyComponents(ComponentNotifierOperation<T> operation) {
+	public <T> void notifyComponents(ComponentNotifier<T> notifier) {
 
-		List<T> notifyees = new ArrayList<>(componentReferences.size());
+		List<T> components = new ArrayList<>(componentReferences.size());
 		boolean hasLostReferences = false;
 
 		// we put all the qualified components into a separate list to avoid ConcurrentModificationException
-		Class<T> notifyeeType = operation.getType();
+		Class<T> targetType = notifier.getType();
 		for (ApptentiveComponentReference reference : componentReferences) {
 			ApptentiveComponent component = reference.get();
 			if (component == null) {
@@ -79,18 +79,18 @@ public class ApptentiveComponentRegistry {
 				continue;
 			}
 
-			T notifyee = as(component, notifyeeType);
-			if (notifyee != null) {
-				notifyees.add(notifyee);
+			T target = as(component, targetType);
+			if (target != null) {
+				components.add(target);
 			}
 		}
 
 		// notify each object safely
-		for (T object : notifyees) {
+		for (T component : components) {
 			try {
-				operation.onComponentNotify(object);
+				notifier.onComponentNotify(component);
 			} catch (Exception e) {
-				ApptentiveLog.e(e, "Exception while notifying object: %s", object);
+				ApptentiveLog.e(e, "Exception while notifying object: %s", component);
 			}
 		}
 
@@ -106,12 +106,12 @@ public class ApptentiveComponentRegistry {
 
 	//endregion
 
-	//region ComponentNotifierOperation helper class
+	//region Component notifier helper class
 
-	public static abstract class ComponentNotifierOperation<T> {
+	public static abstract class ComponentNotifier<T> {
 		private final Class<T> type;
 
-		public ComponentNotifierOperation(Class<T> type) {
+		public ComponentNotifier(Class<T> type) {
 			this.type = type;
 		}
 

@@ -31,6 +31,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
+import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
 import com.apptentive.android.sdk.model.FragmentFactory;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
@@ -39,7 +40,8 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
-public class ApptentiveViewActivity extends ApptentiveComponentActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
+public class ApptentiveViewActivity extends ApptentiveComponentActivity
+		implements ApptentiveBaseFragment.OnFragmentTransitionListener, OnUserLogOutListener {
 
 	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
@@ -401,4 +403,11 @@ public class ApptentiveViewActivity extends ApptentiveComponentActivity implemen
 			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}
 	}
+
+	//region User log out listener
+	@Override
+	public void onUserLogOut() {
+		finish();
+	}
+	//endregion
 }
