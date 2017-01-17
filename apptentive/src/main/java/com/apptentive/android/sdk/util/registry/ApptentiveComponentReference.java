@@ -14,4 +14,8 @@ class ApptentiveComponentReference extends WeakReference<ApptentiveComponent> {
 	public ApptentiveComponentReference(ApptentiveComponent referent, ReferenceQueue<? super ApptentiveComponent> q) {
 		super(referent, q);
 	}
+
+	public boolean isReferenceLost() {
+		return get() == null;
+	}
 }

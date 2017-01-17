@@ -14,6 +14,48 @@ import java.util.Collection;
 public class Assert {
 
 	/**
+	 * Asserts that condition is <code>true</code>
+	 */
+	public static void assertTrue(boolean condition) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that condition is <code>true</code>
+	 */
+	public static void assertTrue(boolean condition, String message) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that condition is <code>true</code>
+	 */
+	public static void assertTrue(boolean condition, String format, Object... args) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition, String message) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition, String format, Object... args) {
+		// FIXME: implement me
+	}
+
+	/**
 	 * Asserts that an object isn't null
 	 */
 	public static void assertNotNull(Object object) {
@@ -34,22 +76,37 @@ public class Assert {
 		// FIXME: implement me
 	}
 
+	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
+	public static void assertNotEquals(int expected, int actual) {
+		// FIXME: implement me
+	}
+
+	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
+	public static void assertNotEquals(int expected, int actual, String message) {
+		// FIXME: implement me
+	}
+
+	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
+	public static void assertNotEquals(int expected, int actual, String format, Object... args) {
+		// FIXME: implement me
+	}
+
 	/**
-	 * Asserts that collection contains an object
+	 * Asserts that collection isRegistered an object
 	 */
 	public static void assertContains(Collection<?> collection, Object object) {
 		// FIXME: implement me
 	}
 
 	/**
-	 * Asserts that collection contains an object
+	 * Asserts that collection isRegistered an object
 	 */
 	public static void assertContains(Collection<?> collection, Object object, String message) {
 		// FIXME: implement me
 	}
 
 	/**
-	 * Asserts that collection contains an object
+	 * Asserts that collection isRegistered an object
 	 */
 	public static void assertContains(Collection<?> collection, Object object, String format, Object... args) {
 		// FIXME: implement me

@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk;
 
+import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
@@ -10,17 +12,17 @@ import static com.apptentive.android.sdk.util.ObjectUtils.*;
 /** A base class for any SDK activity */
 public class ApptentiveComponentActivity extends AppCompatActivity implements ApptentiveComponent {
 
-	//region Life cycle
+	//region Activity life cycle
 
 	@Override
-	protected void onStart() {
-		super.onStart();
+	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+		super.onCreate(savedInstanceState, persistentState);
 		registerComponent();
 	}
 
 	@Override
-	protected void onStop() {
-		super.onStop();
+	protected void onDestroy() {
+		super.onDestroy();
 		unregisterComponent();
 	}
 
