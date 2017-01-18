@@ -15,7 +15,7 @@ public final class StringUtils {
 			try {
 				return String.format(format, args);
 			} catch (Exception e) {
-				android.util.Log.e("Lunar", "Error while formatting String: " + e.getMessage()); // FIXME: better system loggingb
+				android.util.Log.e("Apptentive", "Error while formatting String: " + e.getMessage()); // FIXME: better system logging
 			}
 		}
 

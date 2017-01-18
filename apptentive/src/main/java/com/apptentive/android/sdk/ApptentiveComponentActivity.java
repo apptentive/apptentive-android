@@ -15,7 +15,6 @@ public class ApptentiveComponentActivity extends AppCompatActivity implements Ap
 
 	//region Activity life cycle
 
-
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
