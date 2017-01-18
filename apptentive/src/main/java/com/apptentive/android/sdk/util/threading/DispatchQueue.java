@@ -24,8 +24,20 @@ public abstract class DispatchQueue {
 		return Holder.INSTANCE;
 	}
 
-	/** Thread safe singleton trick */
+	/**
+	 * Thread safe singleton trick
+	 */
 	private static class Holder {
-		private static final DispatchQueue INSTANCE = new HandlerDispatchQueue(Looper.getMainLooper());
+		private static final DispatchQueue INSTANCE = createMainQueue();
+
+		private static DispatchQueue createMainQueue() {
+			try {
+				// this call will fail when running a unit test
+				// we would allow that and make test responsible for setting the implementation
+				return new HandlerDispatchQueue(Looper.getMainLooper());
+			} catch (Exception e) {
+				return null;
+			}
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.util.registry;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +105,20 @@ public class ApptentiveComponentRegistry {
 
 	//region Notifications
 
-	public synchronized <T> void notifyComponents(ComponentNotifier<T> notifier) {
+	/**
+	 * Notify all the listeners of type <code>T</code> about event
+	 */
+	public synchronized <T> void notifyComponents(final ComponentNotifier<T> notifier) {
+		// in order to avoid UI-related issues - we dispatch all the notification on main thread
+		DispatchQueue.mainQueue().dispatchAsync(new Runnable() {
+			@Override
+			public void run() {
+				notifyComponentsSafe(notifier);
+			}
+		});
+	}
 
+	private synchronized <T> void notifyComponentsSafe(final ComponentNotifier<T> notifier) {
 		List<T> components = new ArrayList<>(componentReferences.size());
 		boolean hasLostReferences = false;
 

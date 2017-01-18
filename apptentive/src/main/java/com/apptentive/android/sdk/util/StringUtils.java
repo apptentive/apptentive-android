@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.util;
 
+import java.util.List;
+
 /**
  * A collection of useful string-related functions
  */
@@ -25,6 +27,45 @@ public final class StringUtils {
 	 */
 	public static String toString(Object value) {
 		return value != null ? value.toString() : "null";
+	}
+
+	/**
+	 * Constructs and returns a string object that is the result of interposing a separator between the elements of the array
+	 */
+	public static <T> String join(T[] array) {
+		return join(array, ",");
+	}
+
+	/**
+	 * Constructs and returns a string object that is the result of interposing a separator between the elements of the array
+	 */
+	public static <T> String join(T[] array, String separator) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < array.length; ++i) {
+			builder.append(array[i]);
+			if (i < array.length - 1) builder.append(separator);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * Constructs and returns a string object that is the result of interposing a separator between the elements of the list
+	 */
+	public static <T> String join(List<T> list) {
+		return join(list, ",");
+	}
+
+	/**
+	 * Constructs and returns a string object that is the result of interposing a separator between the elements of the list
+	 */
+	public static <T> String join(List<T> list, String separator) {
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+		for (T t : list) {
+			builder.append(t);
+			if (++i < list.size()) builder.append(separator);
+		}
+		return builder.toString();
 	}
 
 	/**
