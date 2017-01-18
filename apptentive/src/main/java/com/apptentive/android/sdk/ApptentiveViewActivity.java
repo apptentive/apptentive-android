@@ -408,7 +408,9 @@ public class ApptentiveViewActivity extends ApptentiveComponentActivity
 	//region User log out listener
 	@Override
 	public void onUserLogOut() {
-		finish();
+		if (isFinishing()) {
+			finish();
+		}
 	}
 	//endregion
 }
