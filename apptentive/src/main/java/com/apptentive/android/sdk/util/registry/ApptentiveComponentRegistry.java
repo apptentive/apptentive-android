@@ -8,6 +8,35 @@ import java.util.List;
 import static com.apptentive.android.sdk.debug.Assert.*;
 import static com.apptentive.android.sdk.util.ObjectUtils.*;
 
+/**
+ * A registry that holds a list of weak references to <code>{@link ApptentiveComponent}</code> and
+ * provides an easy mechanism for broadcasting information within a program.
+ * Each registered component would receive notifications based on types of the interfaces it
+ * implements.
+ * <p>
+ * Component example:
+ * <code>
+ * public class MyActivity extends Activity implements ApptentiveComponent, OnUserLogOutListener {
+ * ...
+ * 	public void onUserLogOut() {
+ * 		finish();
+ * 	}
+ * ...
+ * }
+ * </code>
+ * <p>
+ * Notification example:
+ * <code>
+ * 	public void logout() {
+ * 		getComponentRegistry()
+ * 		.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {
+ *			public void onComponentNotify(OnUserLogOutListener component) {
+ *				component.onUserLogOut();
+ *			}
+ *	  });
+ *  }
+ *  </code>
+ */
 public class ApptentiveComponentRegistry {
 	/**
 	 * List of references for currently registered components
@@ -20,8 +49,10 @@ public class ApptentiveComponentRegistry {
 
 	//region Object registration
 
-	/** Register < */
-	public void register(ApptentiveComponent component) {
+	/**
+	 * Registers <code>component</code>
+	 */
+	public synchronized void register(ApptentiveComponent component) {
 		assertNotNull(component, "Attempted to register a null component");
 		if (component != null) {
 			boolean alreadyRegistered = isRegistered(component);
@@ -32,7 +63,10 @@ public class ApptentiveComponentRegistry {
 		}
 	}
 
-	public void unregister(ApptentiveComponent component) {
+	/**
+	 * Unregisters <code>component</code>
+	 */
+	public synchronized void unregister(ApptentiveComponent component) {
 		assertNotNull(component, "Attempted to unregister a null component");
 		if (component != null) {
 			int index = indexOf(component);
@@ -43,13 +77,18 @@ public class ApptentiveComponentRegistry {
 		}
 	}
 
-	/** Returns true if <code>component</code> is already registered */
-	public boolean isRegistered(ApptentiveComponent component) {
+	/**
+	 * Returns true if <code>component</code> is already registered
+	 */
+	public synchronized boolean isRegistered(ApptentiveComponent component) {
 		assertNotNull(component);
 		return component != null && indexOf(component) != -1;
 	}
 
-	private int indexOf(ApptentiveComponent component) {
+	/**
+	 * Return the index of <code>component</code> or <code>-1</code> if component is not registered
+	 */
+	private synchronized int indexOf(ApptentiveComponent component) {
 		int index = 0;
 		for (ApptentiveComponentReference componentReference : componentReferences) {
 			if (componentReference.get() == component) {
@@ -65,7 +104,7 @@ public class ApptentiveComponentRegistry {
 
 	//region Notifications
 
-	public <T> void notifyComponents(ComponentNotifier<T> notifier) {
+	public synchronized <T> void notifyComponents(ComponentNotifier<T> notifier) {
 
 		List<T> components = new ArrayList<>(componentReferences.size());
 		boolean hasLostReferences = false;
