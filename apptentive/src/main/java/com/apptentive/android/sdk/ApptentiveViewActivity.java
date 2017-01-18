@@ -56,6 +56,7 @@ public class ApptentiveViewActivity extends ApptentiveComponentActivity
 	private View decorView;
 	private View contentView;
 
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
