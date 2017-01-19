@@ -571,7 +571,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		if (sessionData != null) {
 			ApptentiveLog.d("Restored existing SessionData");
 		}
-		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
 		boolean apptentiveDebug = false;
@@ -671,7 +670,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 		ApptentiveLog.d("Android ID: ", androidId);
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
-		ApptentiveLog.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 		return bRet;
 	}
 
@@ -782,9 +780,7 @@ public class ApptentiveInternal implements Handler.Callback {
 				}
 				String personId = root.getString("person_id");
 				ApptentiveLog.d("PersonId: " + personId);
-				if (personId != null && !personId.equals("")) {
-					setPersonId(personId);
-				}
+				sessionData.setPersonId(personId);
 				return true;
 			} catch (JSONException e) {
 				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
@@ -1136,11 +1132,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		Map<String, Object> customData = this.customData;
 		this.customData = null;
 		return customData;
-	}
-
-	private void setPersonId(String newPersonId) {
-		personId = newPersonId;
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).apply();
 	}
 
 	public void resetSdkState() {

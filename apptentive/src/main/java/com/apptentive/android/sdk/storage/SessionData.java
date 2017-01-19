@@ -13,8 +13,8 @@ public class SessionData implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String conversationToken;
-
 	private String conversationId;
+	private String personId;
 
 	public String getConversationToken() {
 		return conversationToken;
@@ -31,7 +31,16 @@ public class SessionData implements Serializable {
 	public void setConversationId(String conversationId) {
 		this.conversationId = conversationId;
 	}
-// version history
+
+	public String getPersonId() {
+		return personId;
+	}
+
+	public void setPersonId(String personId) {
+		this.personId = personId;
+	}
+
+	// version history
 	// code point store
 	// Various prefs
 	// Messages
