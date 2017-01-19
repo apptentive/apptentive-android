@@ -46,7 +46,6 @@ public class Constants {
 	// Boolean true if migration from v1 to V2 has occurred.
 	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
 
-	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 
 	// Engagement
 	public static final String PREF_KEY_INTERACTIONS = "interactions";
@@ -100,6 +99,7 @@ public class Constants {
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
+	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 
 	// FIXME: We will need to migrate this data.
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";

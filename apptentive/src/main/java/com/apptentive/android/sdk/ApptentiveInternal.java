@@ -1030,22 +1030,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		return null;
 	}
 
-	boolean setPendingPushNotification(String apptentivePushData) {
-		if (apptentivePushData != null) {
-			ApptentiveLog.d("Saving Apptentive push notification data.");
-			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
-			messageManager.startMessagePreFetchTask();
-			return true;
-		}
-		return false;
-	}
-
-	boolean clearPendingPushNotification() {
-		ApptentiveLog.d("Clearing Apptentive push notification data.");
-		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
-		return true;
-	}
-
 	public void showAboutInternal(Context context, boolean showBrandingBand) {
 		Intent intent = new Intent();
 		intent.setClass(context, ApptentiveViewActivity.class);

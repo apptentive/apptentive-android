@@ -253,7 +253,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onStop() {
 		super.onStop();
-		clearPendingMessageCenterPushNotification();
 		ApptentiveInternal.getInstance().getMessageManager().setMessageCenterInForeground(false);
 	}
 
@@ -524,7 +523,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public boolean cleanup() {
-		clearPendingMessageCenterPushNotification();
 		// Set to null, otherwise they will hold reference to the activity context
 		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
@@ -534,30 +532,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		ApptentiveInternal.getInstance().getAndClearCustomData();
 		ApptentiveAttachmentLoader.getInstance().clearMemoryCache();
 		return true;
-	}
-
-
-	private void clearPendingMessageCenterPushNotification() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
-		if (pushData != null) {
-			try {
-				JSONObject pushJson = new JSONObject(pushData);
-				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
-				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
-					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
-				}
-				switch (action) {
-					case pmc:
-						ApptentiveLog.i("Clearing pending Message Center push notification.");
-						prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
-						break;
-				}
-			} catch (JSONException e) {
-				ApptentiveLog.w("Error parsing JSON from push notification.", e);
-				MetricModule.sendError(e, "Parsing Push notification", pushData);
-			}
-		}
 	}
 
 	public void addComposingCard() {
