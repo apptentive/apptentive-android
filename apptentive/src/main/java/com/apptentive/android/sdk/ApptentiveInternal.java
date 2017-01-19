@@ -1166,7 +1166,7 @@ public class ApptentiveInternal implements Handler.Callback {
 
 	// Multi-tenancy work
 
-	private void saveSessionData() {
+	public void saveSessionData() {
 		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
 			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
 		}

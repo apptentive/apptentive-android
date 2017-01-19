@@ -17,9 +17,6 @@ import com.apptentive.android.sdk.util.JsonDiffer;
 
 import org.json.JSONException;
 
-/**
- * @author Sky Kelsey
- */
 public class PersonManager {
 
 	public static Person storePersonAndReturnDiff() {
@@ -29,11 +26,11 @@ public class PersonManager {
 		CustomData customData = loadCustomPersonData();
 		current.setCustomData(customData);
 
-		String email = loadPersonEmail();
-		current.setEmail(email);
-
-		String name = loadPersonName();
-		current.setName(name);
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData != null) {
+			current.setEmail(sessionData.getPersonEmail());
+			current.setName(sessionData.getPersonName());
+		}
 
 		Object diff = JsonDiffer.getDiff(stored, current);
 		if (diff != null) {
@@ -58,12 +55,11 @@ public class PersonManager {
 		CustomData customData = loadCustomPersonData();
 		current.setCustomData(customData);
 
-		String email = loadPersonEmail();
-		current.setEmail(email);
-
-		String name = loadPersonName();
-		current.setName(name);
-
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData != null) {
+			current.setEmail(sessionData.getPersonEmail());
+			current.setName(sessionData.getPersonName());
+		}
 		storePerson(current);
 		return current;
 	}
@@ -92,26 +88,6 @@ public class PersonManager {
 
 	private static Person generateCurrentPerson() {
 		return new Person();
-	}
-
-	public static String loadPersonEmail() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		return prefs.getString(Constants.PREF_KEY_PERSON_EMAIL, null);
-	}
-
-	public static void storePersonEmail(String email) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_EMAIL, email).apply();
-	}
-
-	public static String loadPersonName() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		return prefs.getString(Constants.PREF_KEY_PERSON_NAME, null);
-	}
-
-	public static void storePersonName(String name) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, name).apply();
 	}
 
 	public static Person getStoredPerson() {

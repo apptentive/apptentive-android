@@ -10,7 +10,6 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,7 +31,8 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PersonManager;
-import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.storage.SessionData;
+
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -79,7 +79,10 @@ public class Apptentive {
 	 */
 	public static void setPersonEmail(String email) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			PersonManager.storePersonEmail(email);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.setPersonEmail(email);
+			}
 		}
 	}
 
@@ -91,7 +94,10 @@ public class Apptentive {
 	 */
 	public static String getPersonEmail() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return PersonManager.loadPersonEmail();
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				return sessionData.getPersonEmail();
+			}
 		}
 		return null;
 	}
@@ -107,7 +113,10 @@ public class Apptentive {
 	 */
 	public static void setPersonName(String name) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			PersonManager.storePersonName(name);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.setPersonName(name);
+			}
 		}
 	}
 
@@ -119,7 +128,10 @@ public class Apptentive {
 	 */
 	public static String getPersonName() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return PersonManager.loadPersonName();
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				return sessionData.getPersonName();
+			}
 		}
 		return null;
 	}
