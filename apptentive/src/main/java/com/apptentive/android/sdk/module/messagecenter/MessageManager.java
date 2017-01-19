@@ -161,7 +161,7 @@ public class MessageManager {
 	 * @return true if messages were returned, else false.
 	 */
 	public synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
-		if (ApptentiveInternal.getInstance().getApptentiveConversationToken() == null) {
+		if (ApptentiveInternal.getInstance().getSessionData().getConversationToken() == null) {
 			ApptentiveLog.d("Can't fetch messages because the conversation has not yet been initialized.");
 			return false;
 		}

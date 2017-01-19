@@ -102,7 +102,16 @@ public class PayloadSendWorker {
 				while (appInForeground.get()) {
 					MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
-					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getApptentiveConversationToken())){
+					if (ApptentiveInternal.getInstance().getSessionData() == null){
+						ApptentiveLog.i("SessionData is null.");
+						if (mgr != null) {
+							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+						}
+						retryLater(NO_TOKEN_SLEEP);
+						break;
+					}
+
+					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getSessionData().getConversationToken())){
 						ApptentiveLog.i("No conversation token yet.");
 						if (mgr != null) {
 							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);

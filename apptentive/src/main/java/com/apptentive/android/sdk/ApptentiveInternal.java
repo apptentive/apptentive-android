@@ -22,6 +22,9 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -49,9 +52,11 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.storage.VersionHistoryEntry;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
@@ -60,6 +65,7 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +79,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal {
+public class ApptentiveInternal implements Handler.Callback {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
@@ -92,11 +98,12 @@ public class ApptentiveInternal {
 	boolean isAppDebuggable;
 	SharedPreferences prefs;
 	String apiKey;
-	String conversationToken;
-	String conversationId;
 	String personId;
 	String androidId;
 	String appPackageName;
+	SessionData sessionData;
+
+	Handler backgroundHandler;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
@@ -182,6 +189,12 @@ public class ApptentiveInternal {
 					sApptentiveInternal.codePointStore = new CodePointStore();
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
+
+
+					HandlerThread handlerThread = new HandlerThread("ApptentiveInternalHandlerThread");
+					handlerThread.start();
+					sApptentiveInternal.backgroundHandler = new Handler(handlerThread.getLooper(), sApptentiveInternal);
+
 				}
 			}
 		}
@@ -362,8 +375,8 @@ public class ApptentiveInternal {
 		return statusBarColorDefault;
 	}
 
-	public String getApptentiveConversationToken() {
-		return conversationToken;
+	public SessionData getSessionData() {
+		return sessionData;
 	}
 
 	public String getApptentiveApiKey() {
@@ -431,7 +444,7 @@ public class ApptentiveInternal {
 
 	public void checkAndUpdateApptentiveConfigurations() {
 		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (conversationToken == null || personId == null) {
+		if (sessionData == null) {
 			asyncFetchConversationToken();
 		} else {
 			asyncFetchAppConfigurationAndInteractions();
@@ -453,6 +466,7 @@ public class ApptentiveInternal {
 			messageManager.setCurrentForegroundActivity(activity);
 		}
 
+		//FIXME: Kick this off on Application initialization instead.
 		checkAndUpdateApptentiveConfigurations();
 
 		syncDevice();
@@ -552,8 +566,11 @@ public class ApptentiveInternal {
 		if (featureEverUsed) {
 			messageManager.init();
 		}
-		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-		conversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
+		FileSerializer fileSerializer = new FileSerializer(new File(appContext.getFilesDir(), "apptentive/SessionData.ser"));
+		sessionData = (SessionData) fileSerializer.deserialize();
+		if (sessionData != null) {
+			ApptentiveLog.d("Restored existing SessionData");
+		}
 		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
@@ -757,9 +774,11 @@ public class ApptentiveInternal {
 				String conversationId = root.getString("id");
 				ApptentiveLog.d("New Conversation id: %s", conversationId);
 
+				sessionData = new SessionData();
 				if (conversationToken != null && !conversationToken.equals("")) {
-					setConversationToken(conversationToken);
-					setConversationId(conversationId);
+					sessionData.setConversationToken(conversationToken);
+					sessionData.setConversationId(conversationId);
+					saveSessionData();
 				}
 				String personId = root.getString("person_id");
 				ApptentiveLog.d("PersonId: " + personId);
@@ -1119,16 +1138,6 @@ public class ApptentiveInternal {
 		return customData;
 	}
 
-	private void setConversationToken(String newConversationToken) {
-		conversationToken = newConversationToken;
-		prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).apply();
-	}
-
-	private void setConversationId(String newConversationId) {
-		conversationId = newConversationId;
-		prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_ID, conversationId).apply();
-	}
-
 	private void setPersonId(String newPersonId) {
 		personId = newPersonId;
 		prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).apply();
@@ -1168,6 +1177,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
+	 *
 	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
@@ -1176,5 +1186,39 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
+	}
+
+
+	// Multi-tenancy work
+
+	private void saveSessionData() {
+		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
+			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
+		}
+	}
+
+	private static final int MESSAGE_SAVE_SESSION_DATA = 0;
+	private static final int MESSAGE_CREATE_CONVERSATION = 1;
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		switch (msg.what) {
+			case MESSAGE_SAVE_SESSION_DATA:
+				ApptentiveLog.e("Saing SessionData");
+				File internalStorage = appContext.getFilesDir();
+				File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
+				try {
+					sessionDataFile.getParentFile().mkdirs();
+				} catch (SecurityException e) {
+					ApptentiveLog.e("Security Error creating DataSession file.", e);
+				}
+				FileSerializer fileSerializer = new FileSerializer(sessionDataFile);
+				fileSerializer.serialize(sApptentiveInternal.sessionData);
+				break;
+			case MESSAGE_CREATE_CONVERSATION:
+				// TODO: This.
+				break;
+		}
+		return false;
 	}
 }
