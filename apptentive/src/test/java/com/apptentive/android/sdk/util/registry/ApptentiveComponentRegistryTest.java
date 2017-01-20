@@ -26,9 +26,9 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 			}
 		});
 
-		final CompA c1 = new CompA("A-1");
-		final CompA c2 = new CompA("A-2");
-		final CompA c3 = new CompA("A-3");
+		final ComponentA c1 = new ComponentA("ComponentA-1");
+		final ComponentA c2 = new ComponentA("ComponentA-2");
+		final ComponentA c3 = new ComponentA("ComponentA-3");
 
 		registry.register(c1);
 		registry.register(c2);
@@ -40,7 +40,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventA();
 			}
 		});
-		assertResult("A-A-1", "A-A-2", "A-A-3");
+		assertResult("ListenerA-ComponentA-1", "ListenerA-ComponentA-2", "ListenerA-ComponentA-3");
 
 		registry.unregister(c2);
 		registry.notifyComponents(new ComponentNotifier<ListenerA>(ListenerA.class) {
@@ -49,7 +49,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventA();
 			}
 		});
-		assertResult("A-A-1", "A-A-3");
+		assertResult("ListenerA-ComponentA-1", "ListenerA-ComponentA-3");
 
 		registry.unregister(c1);
 		registry.notifyComponents(new ComponentNotifier<ListenerA>(ListenerA.class) {
@@ -58,7 +58,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventA();
 			}
 		});
-		assertResult("A-A-3");
+		assertResult("ListenerA-ComponentA-3");
 
 		registry.unregister(c3);
 		registry.notifyComponents(new ComponentNotifier<ListenerA>(ListenerA.class) {
@@ -74,12 +74,12 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 	public void testComponentNotification() {
 
 		ApptentiveComponentRegistry registry = new ApptentiveComponentRegistry();
-		registry.register(new CompA("A-1"));
-		registry.register(new CompA("A-2"));
-		registry.register(new CompAB("AB-1"));
-		registry.register(new CompAB("AB-2"));
-		registry.register(new CompC("C-1"));
-		registry.register(new CompC("C-2"));
+		registry.register(new ComponentA("ComponentA-1"));
+		registry.register(new ComponentA("ComponentA-2"));
+		registry.register(new ComponentAB("ComponentAB-1"));
+		registry.register(new ComponentAB("ComponentAB-2"));
+		registry.register(new ComponentC("ComponentC-1"));
+		registry.register(new ComponentC("ComponentC-2"));
 
 		registry.notifyComponents(new ComponentNotifier<ListenerA>(ListenerA.class) {
 			@Override
@@ -87,7 +87,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventA();
 			}
 		});
-		assertResult("A-A-1", "A-A-2", "A-AB-1", "A-AB-2");
+		assertResult("ListenerA-ComponentA-1", "ListenerA-ComponentA-2", "ListenerA-ComponentAB-1", "ListenerA-ComponentAB-2");
 
 		registry.notifyComponents(new ComponentNotifier<ListenerB>(ListenerB.class) {
 			@Override
@@ -95,7 +95,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventB();
 			}
 		});
-		assertResult("B-AB-1", "B-AB-2");
+		assertResult("ListenerB-ComponentAB-1", "ListenerB-ComponentAB-2");
 
 		registry.notifyComponents(new ComponentNotifier<ListenerC>(ListenerC.class) {
 			@Override
@@ -103,7 +103,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventC();
 			}
 		});
-		assertResult("C-C-1", "C-C-2");
+		assertResult("ListenerC-ComponentC-1", "ListenerC-ComponentC-2");
 	}
 
 	//endregion
@@ -131,44 +131,44 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 		}
 	}
 
-	class CompA extends BaseComponent implements ListenerA {
+	class ComponentA extends BaseComponent implements ListenerA {
 
-		CompA(String name) {
+		ComponentA(String name) {
 			super(name);
 		}
 
 		@Override
 		public void OnTestEventA() {
-			addResult("A-" + name);
+			addResult("ListenerA-" + name);
 		}
 	}
 
-	class CompAB extends BaseComponent implements ListenerA, ListenerB {
+	class ComponentAB extends BaseComponent implements ListenerA, ListenerB {
 
-		CompAB(String name) {
+		ComponentAB(String name) {
 			super(name);
 		}
 
 		@Override
 		public void OnTestEventA() {
-			addResult("A-" + name);
+			addResult("ListenerA-" + name);
 		}
 
 		@Override
 		public void OnTestEventB() {
-			addResult("B-" + name);
+			addResult("ListenerB-" + name);
 		}
 	}
 
-	class CompC extends BaseComponent implements ListenerC {
+	class ComponentC extends BaseComponent implements ListenerC {
 
-		CompC(String name) {
+		ComponentC(String name) {
 			super(name);
 		}
 
 		@Override
 		public void OnTestEventC() {
-			addResult("C-" + name);
+			addResult("ListenerC-" + name);
 		}
 	}
 
