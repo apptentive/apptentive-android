@@ -67,11 +67,4 @@ public final class StringUtils {
 		}
 		return builder.toString();
 	}
-
-	/**
-	 * Returns <code>true</code> is string is null or empty
-	 */
-	public static boolean isNullOrEmpty(String str) {
-		return str == null || str.length() == 0;
-	}
 }
