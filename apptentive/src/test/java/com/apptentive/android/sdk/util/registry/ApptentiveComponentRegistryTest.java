@@ -25,6 +25,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 				listener.OnTestEventA();
 			}
 		});
+		assertResult();
 
 		final ComponentA c1 = new ComponentA("ComponentA-1");
 		final ComponentA c2 = new ComponentA("ComponentA-2");
