@@ -19,6 +19,15 @@ public class SessionData implements Serializable {
 	private String personId;
 	private String personEmail;
 	private String personName;
+	private Device device;
+	private Device lastSentDevice;
+	private Person person;
+	private Person lastSentPerson;
+
+	public SessionData() {
+		this.device = new Device();
+		this.person = new Person();
+	}
 
 	//region Getters & Setters
 
@@ -67,9 +76,47 @@ public class SessionData implements Serializable {
 		save();
 	}
 
-	//endregion
+	public Device getDevice() {
+		return device;
+	}
 
-	private void save() {
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public Device getLastSentDevice() {
+		return lastSentDevice;
+	}
+
+	public void setLastSentDevice(Device lastSentDevice) {
+		this.lastSentDevice = lastSentDevice;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public Person getLastSentPerson() {
+		return lastSentPerson;
+	}
+
+	public void setLastSentPerson(Person lastSentPerson) {
+		this.lastSentPerson = lastSentPerson;
+	}
+
+//endregion
+
+	public com.apptentive.android.sdk.model.Device getDeviceDiffPayload() {
+		com.apptentive.android.sdk.model.Device ret = new com.apptentive.android.sdk.model.Device();
+
+		return ret;
+	}
+
+	public void save() {
 		ApptentiveInternal.getInstance().saveSessionData();
 	}
 

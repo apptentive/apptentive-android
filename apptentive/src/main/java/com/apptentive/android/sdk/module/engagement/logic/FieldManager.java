@@ -10,11 +10,9 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.BuildConfig;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Device;
-import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.PersonManager;
+import com.apptentive.android.sdk.storage.CustomData;
+import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -137,7 +135,7 @@ public class FieldManager {
 			}
 			case person: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Person person = PersonManager.getStoredPerson();
+				Person person = ApptentiveInternal.getInstance().getSessionData().getPerson();
 				if (person == null) {
 					return null;
 				}
@@ -146,7 +144,7 @@ public class FieldManager {
 						String customDataKey = tokens[2].trim();
 						CustomData customData = person.getCustomData();
 						if (customData != null) {
-							return customData.opt(customDataKey);
+							return customData.get(customDataKey);
 						}
 						break;
 					case name:
@@ -154,13 +152,16 @@ public class FieldManager {
 					case email:
 						return person.getEmail();
 					case other:
+/*
+FIXME: Choose the correct Getter for each query
 						String key = tokens[1];
-						return person.opt(key);
+						return person.get(key);
+*/
 				}
 			}
 			case device: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Device device = DeviceManager.getStoredDevice();
+				Device device = ApptentiveInternal.getInstance().getSessionData().getDevice();
 				if (device == null) {
 					return null;
 				}
@@ -169,16 +170,19 @@ public class FieldManager {
 						String customDataKey = tokens[2].trim();
 						CustomData customData = device.getCustomData();
 						if (customData != null) {
-							return customData.opt(customDataKey);
+							return customData.get(customDataKey);
 						}
 						break;
 					case os_version:
-						String osVersion = device.optString(subQuery.name(), "0");
+						String osVersion = device.getOsVersion();
+						if (osVersion == null) {
+							osVersion = "0";
+						}
 						Apptentive.Version ret = new Apptentive.Version();
 						ret.setVersion(osVersion);
 						return ret;
 					case os_api_level:
-						return device.optInt(subQuery.name(), 0);
+						return device.getOsApiLevel();
 					case board:
 					case bootloader_version:
 					case brand:
@@ -201,7 +205,9 @@ public class FieldManager {
 					case radio_version:
 					case uuid:
 					case other:
-						return device.opt(subQuery.name());
+						// FIXME: Choose the correct Getter for each query
+						//return device.opt(subQuery.name());
+						return null;
 				}
 			}
 			default:

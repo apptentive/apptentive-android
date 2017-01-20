@@ -36,11 +36,7 @@ import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -51,10 +47,10 @@ import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
+import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
-import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.storage.VersionHistoryEntry;
@@ -403,37 +399,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		return prefs;
 	}
 
-	public void addCustomDeviceData(String key, Object value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		key = key.trim();
-		CustomData customData = DeviceManager.loadCustomDeviceData();
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				DeviceManager.storeCustomDeviceData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to add custom device data.", e);
-			}
-		}
-	}
-
-	public void addCustomPersonData(String key, Object value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		CustomData customData = PersonManager.loadCustomPersonData();
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				PersonManager.storeCustomPersonData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to add custom person data.", e);
-			}
-		}
-	}
-
 	public void runOnWorkerThread(Runnable r) {
 		cachedExecutor.execute(r);
 	}
@@ -468,9 +433,6 @@ public class ApptentiveInternal implements Handler.Callback {
 
 		//FIXME: Kick this off on Application initialization instead.
 		checkAndUpdateApptentiveConfigurations();
-
-		syncDevice();
-		syncPerson();
 	}
 
 	public void onActivityResumed(Activity activity) {
@@ -686,7 +648,7 @@ public class ApptentiveInternal implements Handler.Callback {
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
-		syncSdk();
+		// FIXME: Save to SessionData instead;
 		invalidateCaches();
 	}
 
@@ -752,9 +714,11 @@ public class ApptentiveInternal implements Handler.Callback {
 		ConversationTokenRequest request = new ConversationTokenRequest();
 
 		// Send the Device and Sdk now, so they are available on the server from the start.
-		request.setDevice(DeviceManager.storeDeviceAndReturnIt());
+		Device device = DeviceManager.generateNewDevice();
+		request.setDevice(DeviceManager.getDiffPayload(null, device));
 		request.setSdk(SdkManager.storeSdkAndReturnIt());
-		request.setPerson(PersonManager.storePersonAndReturnIt());
+		// FIXME: Set up initial person sending here.
+		//request.setPerson(PersonManager.storePersonAndReturnIt());
 		AppRelease currentAppRelease = AppRelease.generateCurrentAppRelease(appContext);
 		AppReleaseManager.storeAppRelease(currentAppRelease);
 		request.setAppRelease(currentAppRelease);
@@ -776,6 +740,7 @@ public class ApptentiveInternal implements Handler.Callback {
 				if (conversationToken != null && !conversationToken.equals("")) {
 					sessionData.setConversationToken(conversationToken);
 					sessionData.setConversationId(conversationId);
+					sessionData.setDevice(device);
 					saveSessionData();
 				}
 				String personId = root.getString("person_id");
@@ -857,44 +822,6 @@ public class ApptentiveInternal implements Handler.Callback {
 			ApptentiveLog.v("Using cached Configuration.");
 			// If configuration hasn't expire, then check if need to start another asyncTask to fetch interaction
 			interactionManager.asyncFetchAndStoreInteractions();
-		}
-	}
-
-	/**
-	 * Sends current Device to the server if it differs from the last time it was sent.
-	 */
-	void syncDevice() {
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff();
-		if (deviceInfo != null) {
-			ApptentiveLog.d("Device info was updated.");
-			ApptentiveLog.v(deviceInfo.toString());
-			taskManager.addPayload(deviceInfo);
-		} else {
-			ApptentiveLog.d("Device info was not updated.");
-		}
-	}
-
-	/**
-	 * Sends current SDK to the server.
-	 */
-	private void syncSdk() {
-		Sdk sdk = SdkManager.generateCurrentSdk();
-		SdkManager.storeSdk(sdk);
-		ApptentiveLog.v(sdk.toString());
-		taskManager.addPayload(sdk);
-	}
-
-	/**
-	 * Sends current Person to the server if it differs from the last time it was sent.
-	 */
-	private void syncPerson() {
-		Person person = PersonManager.storePersonAndReturnDiff();
-		if (person != null) {
-			ApptentiveLog.d("Person was updated.");
-			ApptentiveLog.v(person.toString());
-			taskManager.addPayload(person);
-		} else {
-			ApptentiveLog.d("Person was not updated.");
 		}
 	}
 
@@ -1179,7 +1106,7 @@ public class ApptentiveInternal implements Handler.Callback {
 	public boolean handleMessage(Message msg) {
 		switch (msg.what) {
 			case MESSAGE_SAVE_SESSION_DATA:
-				ApptentiveLog.e("Saing SessionData");
+				ApptentiveLog.d("Saving SessionData");
 				File internalStorage = appContext.getFilesDir();
 				File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
 				try {
@@ -1189,6 +1116,7 @@ public class ApptentiveInternal implements Handler.Callback {
 				}
 				FileSerializer fileSerializer = new FileSerializer(sessionDataFile);
 				fileSerializer.serialize(sApptentiveInternal.sessionData);
+				ApptentiveLog.d("Session data written to file of length: %s", Util.humanReadableByteCount(sessionDataFile.length(), false));
 				break;
 			case MESSAGE_CREATE_CONVERSATION:
 				// TODO: This.

@@ -7,122 +7,28 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.JsonDiffer;
-import org.json.JSONException;
 
 import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * A helper class with static methods for getting, storing, retrieving, and diffing information about the current device.
- *
- * @author Sky Kelsey
+ * A helper class with static methods for and diffing information about the current device.
  */
 public class DeviceManager {
 
-	/**
-	 * If any device setting has changed, return only the changed fields in a new Device object. If a field's value was
-	 * cleared, set that value to null in the Device. The first time this is called, all Device will be returned.
-	 *
-	 * @return A Device containing diff data which, when added to the last sent Device, yields the new Device.
-	 */
-	public static Device storeDeviceAndReturnDiff() {
-
-		Device stored = getStoredDevice();
-
-		Device current = generateNewDevice();
-		CustomData customData = loadCustomDeviceData();
-		current.setCustomData(customData);
-		CustomData integrationConfig = loadIntegrationConfig();
-		current.setIntegrationConfig(integrationConfig);
-
-		Object diff = JsonDiffer.getDiff(stored, current);
-		if (diff != null) {
-			try {
-				storeDevice(current);
-				return new Device(diff.toString());
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error casting to Device.", e);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Provided so we can be sure that the device we send during conversation creation is 100% accurate. Since we do not
-	 * queue this device up in the payload queue, it could otherwise be lost.
-	 */
-	public static Device storeDeviceAndReturnIt() {
-		Device current = generateNewDevice();
-		CustomData customData = loadCustomDeviceData();
-		current.setCustomData(customData);
-		CustomData integrationConfig = loadIntegrationConfig();
-		current.setIntegrationConfig(integrationConfig);
-		storeDevice(current);
-		return current;
-	}
-
-	public static CustomData loadCustomDeviceData() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
-		try {
-			return new CustomData(deviceDataString);
-		} catch (Exception e) {
-			// Ignore
-		}
-		try {
-			return new CustomData();
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null; // This should never happen.
-	}
-
-	public static void storeCustomDeviceData(CustomData deviceData) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String deviceDataString = deviceData.toString();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE_DATA, deviceDataString).apply();
-	}
-
-	public static CustomData loadIntegrationConfig() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String integrationConfigString = prefs.getString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, null);
-		try {
-			return new CustomData(integrationConfigString);
-		} catch (Exception e) {
-			// Ignore
-		}
-		try {
-			return new CustomData();
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null; // This should never happen.
-	}
-
-	public static void storeIntegrationConfig(CustomData integrationConfig) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String integrationConfigString = integrationConfig.toString();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, integrationConfigString).apply();
-	}
-
-	private static Device generateNewDevice() {
+	public static Device generateNewDevice() {
 		Device device = new Device();
 
 		// First, get all the information we can load from static resources.
 		device.setOsName("Android");
 		device.setOsVersion(Build.VERSION.RELEASE);
 		device.setOsBuild(Build.VERSION.INCREMENTAL);
-		device.setOsApiLevel(String.valueOf(Build.VERSION.SDK_INT));
+		device.setOsApiLevel(Build.VERSION.SDK_INT);
 		device.setManufacturer(Build.MANUFACTURER);
 		device.setModel(Build.MODEL);
 		device.setBoard(Build.BOARD);
@@ -156,22 +62,115 @@ public class DeviceManager {
 		return device;
 	}
 
-	public static Device getStoredDevice() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE, null);
-		try {
-			return new Device(deviceString);
-		} catch (Exception e) {
-			// Ignore
-		}
-		return null;
-	}
-
-	private static void storeDevice(Device device) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_DEVICE, device.toString()).apply();
-	}
-
 	public static void onSentDeviceInfo() {
+	}
+
+	public static com.apptentive.android.sdk.model.Device getDiffPayload(com.apptentive.android.sdk.storage.Device oldDevice, com.apptentive.android.sdk.storage.Device newDevice) {
+		if (newDevice == null) {
+			return null;
+		}
+
+		com.apptentive.android.sdk.model.Device ret = new com.apptentive.android.sdk.model.Device();
+
+		if (oldDevice == null || !oldDevice.getUuid().equals(newDevice.getUuid())) {
+			ret.setUuid(newDevice.getUuid());
+		}
+
+		if (oldDevice == null || !oldDevice.getOsName().equals(newDevice.getOsName())) {
+			ret.setOsName(newDevice.getOsName());
+		}
+
+		if (oldDevice == null || !oldDevice.getOsVersion().equals(newDevice.getOsVersion())) {
+			ret.setOsVersion(newDevice.getOsVersion());
+		}
+
+		if (oldDevice == null || !oldDevice.getOsBuild().equals(newDevice.getOsBuild())) {
+			ret.setOsBuild(newDevice.getOsBuild());
+		}
+
+		if (oldDevice == null || oldDevice.getOsApiLevel() != newDevice.getOsApiLevel()) {
+			ret.setOsApiLevel(String.valueOf(newDevice.getOsApiLevel()));
+		}
+
+		if (oldDevice == null || !oldDevice.getManufacturer().equals(newDevice.getManufacturer())) {
+			ret.setManufacturer(newDevice.getManufacturer());
+		}
+
+		if (oldDevice == null || !oldDevice.getModel().equals(newDevice.getModel())) {
+			ret.setModel(newDevice.getModel());
+		}
+
+		if (oldDevice == null || !oldDevice.getBoard().equals(newDevice.getBoard())) {
+			ret.setBoard(newDevice.getBoard());
+		}
+
+		if (oldDevice == null || !oldDevice.getProduct().equals(newDevice.getProduct())) {
+			ret.setProduct(newDevice.getProduct());
+		}
+
+		if (oldDevice == null || !oldDevice.getBrand().equals(newDevice.getBrand())) {
+			ret.setBrand(newDevice.getBrand());
+		}
+
+		if (oldDevice == null || !oldDevice.getCpu().equals(newDevice.getCpu())) {
+			ret.setCpu(newDevice.getCpu());
+		}
+
+		if (oldDevice == null || !oldDevice.getDevice().equals(newDevice.getDevice())) {
+			ret.setDevice(newDevice.getDevice());
+		}
+
+		if (oldDevice == null || !oldDevice.getCarrier().equals(newDevice.getCarrier())) {
+			ret.setCarrier(newDevice.getCarrier());
+		}
+
+		if (oldDevice == null || !oldDevice.getCurrentCarrier().equals(newDevice.getCurrentCarrier())) {
+			ret.setCurrentCarrier(newDevice.getCurrentCarrier());
+		}
+
+		if (oldDevice == null || !oldDevice.getNetworkType().equals(newDevice.getNetworkType())) {
+			ret.setNetworkType(newDevice.getNetworkType());
+		}
+
+		if (oldDevice == null || !oldDevice.getBuildType().equals(newDevice.getBuildType())) {
+			ret.setBuildType(newDevice.getBuildType());
+		}
+
+		if (oldDevice == null || !oldDevice.getBuildId().equals(newDevice.getBuildId())) {
+			ret.setBuildId(newDevice.getBuildId());
+		}
+
+		if (oldDevice == null || !oldDevice.getBootloaderVersion().equals(newDevice.getBootloaderVersion())) {
+			ret.setBootloaderVersion(newDevice.getBootloaderVersion());
+		}
+
+		if (oldDevice == null || !oldDevice.getRadioVersion().equals(newDevice.getRadioVersion())) {
+			ret.setRadioVersion(newDevice.getRadioVersion());
+		}
+
+		if (oldDevice == null || !oldDevice.getCustomData().equals(newDevice.getCustomData())) {
+			ret.setCustomData(newDevice.getCustomData().toJson());
+		}
+
+		if (oldDevice == null || !oldDevice.getLocaleCountryCode().equals(newDevice.getLocaleCountryCode())) {
+			ret.setLocaleCountryCode(newDevice.getLocaleCountryCode());
+		}
+
+		if (oldDevice == null || !oldDevice.getLocaleLanguageCode().equals(newDevice.getLocaleLanguageCode())) {
+			ret.setLocaleLanguageCode(newDevice.getLocaleLanguageCode());
+		}
+
+		if (oldDevice == null || !oldDevice.getLocaleRaw().equals(newDevice.getLocaleRaw())) {
+			ret.setLocaleRaw(newDevice.getLocaleRaw());
+		}
+
+		if (oldDevice == null || !oldDevice.getUtcOffset().equals(newDevice.getUtcOffset())) {
+			ret.setUtcOffset(newDevice.getUtcOffset());
+		}
+
+		if (oldDevice == null || !oldDevice.getIntegrationConfig().equals(newDevice.getIntegrationConfig())) {
+			ret.setIntegrationConfig(newDevice.getIntegrationConfig().toJson());
+		}
+		return ret;
 	}
 }
