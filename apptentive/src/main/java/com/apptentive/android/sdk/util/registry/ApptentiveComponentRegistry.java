@@ -83,7 +83,14 @@ public class ApptentiveComponentRegistry {
 	 */
 	public synchronized boolean isRegistered(ApptentiveComponent component) {
 		assertNotNull(component);
-		return component != null && indexOf(component) != -1;
+		return component != null && contains(component);
+	}
+
+	/**
+	 * Return <code>true</code> if component is registered
+	 */
+	private synchronized boolean contains(ApptentiveComponent component) {
+		return indexOf(component) != -1;
 	}
 
 	/**
