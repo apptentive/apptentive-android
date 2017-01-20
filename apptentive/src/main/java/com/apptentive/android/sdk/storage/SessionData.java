@@ -23,6 +23,8 @@ public class SessionData implements Serializable {
 	private Device lastSentDevice;
 	private Person person;
 	private Person lastSentPerson;
+	private Sdk sdk;
+	private AppRelease appRelease;
 
 	public SessionData() {
 		this.device = new Device();
@@ -82,6 +84,7 @@ public class SessionData implements Serializable {
 
 	public void setDevice(Device device) {
 		this.device = device;
+		save();
 	}
 
 	public Device getLastSentDevice() {
@@ -90,6 +93,7 @@ public class SessionData implements Serializable {
 
 	public void setLastSentDevice(Device lastSentDevice) {
 		this.lastSentDevice = lastSentDevice;
+		save();
 	}
 
 	public Person getPerson() {
@@ -98,6 +102,7 @@ public class SessionData implements Serializable {
 
 	public void setPerson(Person person) {
 		this.person = person;
+		save();
 	}
 
 	public Person getLastSentPerson() {
@@ -106,20 +111,32 @@ public class SessionData implements Serializable {
 
 	public void setLastSentPerson(Person lastSentPerson) {
 		this.lastSentPerson = lastSentPerson;
+		save();
 	}
 
-//endregion
-
-	public com.apptentive.android.sdk.model.Device getDeviceDiffPayload() {
-		com.apptentive.android.sdk.model.Device ret = new com.apptentive.android.sdk.model.Device();
-
-		return ret;
+	public Sdk getSdk() {
+		return sdk;
 	}
+
+	public void setSdk(Sdk sdk) {
+		this.sdk = sdk;
+		save();
+	}
+
+	public AppRelease getAppRelease() {
+		return appRelease;
+	}
+
+	public void setAppRelease(AppRelease appRelease) {
+		this.appRelease = appRelease;
+		save();
+	}
+
+	//endregion
 
 	public void save() {
 		ApptentiveInternal.getInstance().saveSessionData();
 	}
-
 
 	// version history
 	// code point store

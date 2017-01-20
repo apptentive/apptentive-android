@@ -32,7 +32,6 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
-import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
@@ -45,12 +44,14 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
+import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.storage.VersionHistoryEntry;
@@ -554,9 +555,9 @@ public class ApptentiveInternal implements Handler.Callback {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			AppRelease appRelease = AppRelease.generateCurrentAppRelease(appContext);
+			AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
 
-			isAppDebuggable = appRelease.getDebug();
+			isAppDebuggable = appRelease.isDebug();
 			currentVersionCode = appRelease.getVersionCode();
 			currentVersionName = appRelease.getVersionName();
 
@@ -635,20 +636,30 @@ public class ApptentiveInternal implements Handler.Callback {
 		return bRet;
 	}
 
+	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
 		if (previousVersionCode != null) {
-			AppReleaseManager.storeAppRelease(currentAppRelease);
-			taskManager.addPayload(currentAppRelease);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
+			if (sessionData != null) {
+				sessionData.setAppRelease(currentAppRelease);
+			}
 		}
 		invalidateCaches();
 	}
 
+	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
 		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
-		// FIXME: Save to SessionData instead;
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		taskManager.addPayload(SdkManager.getPayload(sdk));
+		if (sessionData != null) {
+			sessionData.setSdk(sdk);
+		}
 		invalidateCaches();
 	}
 
@@ -715,13 +726,12 @@ public class ApptentiveInternal implements Handler.Callback {
 
 		// Send the Device and Sdk now, so they are available on the server from the start.
 		Device device = DeviceManager.generateNewDevice();
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
+
 		request.setDevice(DeviceManager.getDiffPayload(null, device));
-		request.setSdk(SdkManager.storeSdkAndReturnIt());
-		// FIXME: Set up initial person sending here.
-		//request.setPerson(PersonManager.storePersonAndReturnIt());
-		AppRelease currentAppRelease = AppRelease.generateCurrentAppRelease(appContext);
-		AppReleaseManager.storeAppRelease(currentAppRelease);
-		request.setAppRelease(currentAppRelease);
+		request.setSdk(SdkManager.getPayload(sdk));
+		request.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
 		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
 		if (response == null) {
@@ -741,6 +751,8 @@ public class ApptentiveInternal implements Handler.Callback {
 					sessionData.setConversationToken(conversationToken);
 					sessionData.setConversationId(conversationId);
 					sessionData.setDevice(device);
+					sessionData.setSdk(sdk);
+					sessionData.setAppRelease(appRelease);
 					saveSessionData();
 				}
 				String personId = root.getString("person_id");
