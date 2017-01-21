@@ -25,10 +25,12 @@ public class SessionData implements Serializable {
 	private Person lastSentPerson;
 	private Sdk sdk;
 	private AppRelease appRelease;
+	private EventData eventData;
 
 	public SessionData() {
 		this.device = new Device();
 		this.person = new Person();
+		this.eventData = new EventData();
 	}
 
 	//region Getters & Setters
@@ -130,6 +132,14 @@ public class SessionData implements Serializable {
 	public void setAppRelease(AppRelease appRelease) {
 		this.appRelease = appRelease;
 		save();
+	}
+
+	public EventData getEventData() {
+		return eventData;
+	}
+
+	public void setEventData(EventData eventData) {
+		this.eventData = eventData;
 	}
 
 	//endregion

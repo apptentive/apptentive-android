@@ -32,7 +32,6 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
-import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Event;
@@ -83,7 +82,7 @@ public class ApptentiveInternal implements Handler.Callback {
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
 	ApptentiveTaskManager taskManager;
-	CodePointStore codePointStore;
+
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
@@ -183,7 +182,6 @@ public class ApptentiveInternal implements Handler.Callback {
 					sApptentiveInternal.payloadWorker = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.codePointStore = new CodePointStore();
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
 
@@ -360,10 +358,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		return taskManager;
 	}
 
-	public CodePointStore getCodePointStore() {
-		return codePointStore;
-	}
-
 	public Resources.Theme getApptentiveToolbarTheme() {
 		return apptentiveToolbarTheme;
 	}
@@ -518,7 +512,6 @@ public class ApptentiveInternal implements Handler.Callback {
 
 	public boolean init() {
 		boolean bRet = true;
-		codePointStore.init();
 		/* If Message Center feature has never been used before, don't initialize message polling thread.
 		 * Message Center feature will be seen as used, if one of the following conditions has been met:
 		 * 1. Message Center has been opened for the first time
@@ -533,6 +526,7 @@ public class ApptentiveInternal implements Handler.Callback {
 		sessionData = (SessionData) fileSerializer.deserialize();
 		if (sessionData != null) {
 			ApptentiveLog.d("Restored existing SessionData");
+			ApptentiveLog.v("Restored EventData: %s", sessionData.getEventData());
 		}
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
@@ -1119,6 +1113,8 @@ public class ApptentiveInternal implements Handler.Callback {
 		switch (msg.what) {
 			case MESSAGE_SAVE_SESSION_DATA:
 				ApptentiveLog.d("Saving SessionData");
+				ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
+
 				File internalStorage = appContext.getFilesDir();
 				File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
 				try {
