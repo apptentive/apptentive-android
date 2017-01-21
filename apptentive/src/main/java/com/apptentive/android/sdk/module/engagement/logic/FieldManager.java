@@ -148,15 +148,11 @@ public class FieldManager {
 						}
 						break;
 					case name:
-						return person.getEmail();
+						return person.getName();
 					case email:
 						return person.getEmail();
 					case other:
-/*
-FIXME: Choose the correct Getter for each query
-						String key = tokens[1];
-						return person.get(key);
-*/
+						return null;
 				}
 			}
 			case device: {
@@ -184,29 +180,48 @@ FIXME: Choose the correct Getter for each query
 					case os_api_level:
 						return device.getOsApiLevel();
 					case board:
+						return device.getBoard();
 					case bootloader_version:
+						return device.getBootloaderVersion();
 					case brand:
+						return device.getBrand();
 					case build_id:
+						return device.getBuildId();
 					case build_type:
+						return device.getBuildType();
 					case carrier:
+						return device.getCarrier();
 					case cpu:
+						return device.getCpu();
 					case current_carrier:
+						return device.getCurrentCarrier();
 					case device:
+						return device.getDevice();
 					case hardware:
+						return null; // What is this key?
 					case locale_country_code:
+						return device.getLocaleCountryCode();
 					case locale_language_code:
+						return device.getLocaleLanguageCode();
 					case locale_raw:
+						return device.getLocaleRaw();
 					case manufacturer:
+						return device.getManufacturer();
 					case model:
+						return device.getModel();
 					case network_type:
+						return device.getNetworkType();
 					case os_name:
+						return device.getOsName();
 					case os_build:
+						return device.getOsBuild();
 					case product:
+						return device.getProduct();
 					case radio_version:
+						return device.getRadioVersion();
 					case uuid:
+						return device.getUuid();
 					case other:
-						// FIXME: Choose the correct Getter for each query
-						//return device.opt(subQuery.name());
 						return null;
 				}
 			}
