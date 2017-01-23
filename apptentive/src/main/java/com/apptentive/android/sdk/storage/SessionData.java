@@ -27,6 +27,7 @@ public class SessionData implements Serializable {
 	private AppRelease appRelease;
 	private EventData eventData;
 	private String lastSeenSdkVersion;
+	private boolean messageCenterFeatureUsed;
 
 	public SessionData() {
 		this.device = new Device();
@@ -151,8 +152,18 @@ public class SessionData implements Serializable {
 		this.lastSeenSdkVersion = lastSeenSdkVersion;
 	}
 
+	public boolean isMessageCenterFeatureUsed() {
+		return messageCenterFeatureUsed;
+	}
+
+	public void setMessageCenterFeatureUsed(boolean messageCenterFeatureUsed) {
+		this.messageCenterFeatureUsed = messageCenterFeatureUsed;
+		save();
+	}
+
 	//endregion
 
+	// TODO: Only save when a value has changed.
 	public void save() {
 		ApptentiveInternal.getInstance().saveSessionData();
 	}

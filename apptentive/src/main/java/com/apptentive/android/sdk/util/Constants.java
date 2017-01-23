@@ -24,7 +24,6 @@ public class Constants {
 	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
 
 	// Session Data
-	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
@@ -106,6 +105,7 @@ public class Constants {
 	public static final String PREF_KEY_PERSON = "person";
 	public static final String PREF_KEY_PERSON_DATA = "personData";
 	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
+	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
 
 
 

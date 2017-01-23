@@ -518,16 +518,19 @@ public class ApptentiveInternal implements Handler.Callback {
 		 * 2. The first Push is received which would open Message Center
 		 * 3. An unreadMessageCountListener() is set up
 		 */
-		boolean featureEverUsed = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false);
-		if (featureEverUsed) {
-			messageManager.init();
-		}
+
 		FileSerializer fileSerializer = new FileSerializer(new File(appContext.getFilesDir(), "apptentive/SessionData.ser"));
 		sessionData = (SessionData) fileSerializer.deserialize();
 		if (sessionData != null) {
 			ApptentiveLog.d("Restored existing SessionData");
 			ApptentiveLog.v("Restored EventData: %s", sessionData.getEventData());
+			// FIXME: Move this to whereever the sessions first comes online?
+			boolean featureEverUsed = sessionData != null && sessionData.isMessageCenterFeatureUsed();
+			if (featureEverUsed) {
+				messageManager.init();
+			}
 		}
+
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
 		boolean apptentiveDebug = false;
