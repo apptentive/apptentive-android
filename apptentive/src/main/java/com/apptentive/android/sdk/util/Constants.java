@@ -36,7 +36,6 @@ public class Constants {
 	public static final String PREF_KEY_INTERACTIONS = "interactions";
 	public static final String PREF_KEY_TARGETS = "targets";
 	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
-	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
 	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
@@ -102,6 +101,7 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_DATA = "personData";
 	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
+	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
 	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
 	// Boolean true if migration from v1 to V2 has occurred.

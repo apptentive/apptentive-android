@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.storage.legacy;
 
 import android.content.SharedPreferences;
 
