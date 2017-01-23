@@ -28,6 +28,7 @@ public class SessionData implements Serializable {
 	private EventData eventData;
 	private String lastSeenSdkVersion;
 	private boolean messageCenterFeatureUsed;
+	private VersionHistory versionHistory;
 
 	public SessionData() {
 		this.device = new Device();
@@ -159,6 +160,14 @@ public class SessionData implements Serializable {
 	public void setMessageCenterFeatureUsed(boolean messageCenterFeatureUsed) {
 		this.messageCenterFeatureUsed = messageCenterFeatureUsed;
 		save();
+	}
+
+	public VersionHistory getVersionHistory() {
+		return versionHistory;
+	}
+
+	public void setVersionHistory(VersionHistory versionHistory) {
+		this.versionHistory = versionHistory;
 	}
 
 	//endregion

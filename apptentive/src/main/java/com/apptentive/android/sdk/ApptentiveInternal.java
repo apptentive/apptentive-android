@@ -53,8 +53,7 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
-import com.apptentive.android.sdk.storage.legacy.VersionHistoryEntry;
-import com.apptentive.android.sdk.storage.legacy.VersionHistoryStore;
+import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -519,6 +518,9 @@ public class ApptentiveInternal implements Handler.Callback {
 		 * 3. An unreadMessageCountListener() is set up
 		 */
 
+		VersionHistoryItem lastVersionItemSeen = null;
+		String lastSeenSdkVersion = null;
+
 		FileSerializer fileSerializer = new FileSerializer(new File(appContext.getFilesDir(), "apptentive/SessionData.ser"));
 		sessionData = (SessionData) fileSerializer.deserialize();
 		if (sessionData != null) {
@@ -529,6 +531,8 @@ public class ApptentiveInternal implements Handler.Callback {
 			if (featureEverUsed) {
 				messageManager.init();
 			}
+			lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
+			lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
@@ -558,16 +562,16 @@ public class ApptentiveInternal implements Handler.Callback {
 			currentVersionCode = appRelease.getVersionCode();
 			currentVersionName = appRelease.getVersionName();
 
-			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 
-			if (lastVersionEntrySeen == null) {
+
+			if (lastVersionItemSeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
-				int lastSeenVersionCode = lastVersionEntrySeen.getVersionCode();
+				int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
 				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
-				lastSeenVersionNameVersion.setVersion(lastVersionEntrySeen.getVersionName());
+				lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
 				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
-					onVersionChanged(lastVersionEntrySeen.getVersionCode(), currentVersionCode, lastVersionEntrySeen.getVersionName(), currentVersionName, appRelease);
+					onVersionChanged(lastVersionItemSeen.getVersionCode(), currentVersionCode, lastVersionItemSeen.getVersionName(), currentVersionName, appRelease);
 				}
 			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
@@ -603,7 +607,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		}
 		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
 
-		String lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
 		if (!TextUtils.equals(lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION)) {
 			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 		}
@@ -636,9 +639,12 @@ public class ApptentiveInternal implements Handler.Callback {
 	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData != null) {
+			sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
+			sessionData.save();
+		}
 		if (previousVersionCode != null) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
 			if (sessionData != null) {
 				sessionData.setAppRelease(currentAppRelease);
@@ -1056,7 +1062,6 @@ public class ApptentiveInternal implements Handler.Callback {
 	public void resetSdkState() {
 		prefs.edit().clear().apply();
 		taskManager.reset(appContext);
-		VersionHistoryStore.clear();
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {
