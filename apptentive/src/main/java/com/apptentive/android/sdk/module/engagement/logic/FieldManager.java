@@ -14,7 +14,7 @@ import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.SessionData;
-import com.apptentive.android.sdk.storage.VersionHistoryStore;
+import com.apptentive.android.sdk.storage.legacy.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 

@@ -53,8 +53,8 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
-import com.apptentive.android.sdk.storage.VersionHistoryEntry;
-import com.apptentive.android.sdk.storage.VersionHistoryStore;
+import com.apptentive.android.sdk.storage.legacy.VersionHistoryEntry;
+import com.apptentive.android.sdk.storage.legacy.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 

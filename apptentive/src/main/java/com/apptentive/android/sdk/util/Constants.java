@@ -30,10 +30,6 @@ public class Constants {
 	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
-	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
-	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
-	// Boolean true if migration from v1 to V2 has occurred.
-	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
 
 
 	// Engagement
@@ -106,6 +102,10 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_DATA = "personData";
 	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
+	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
+	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
+	// Boolean true if migration from v1 to V2 has occurred.
+	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
 
 
 
