@@ -26,6 +26,7 @@ public class SessionData implements Serializable {
 	private Sdk sdk;
 	private AppRelease appRelease;
 	private EventData eventData;
+	private String lastSeenSdkVersion;
 
 	public SessionData() {
 		this.device = new Device();
@@ -140,6 +141,14 @@ public class SessionData implements Serializable {
 
 	public void setEventData(EventData eventData) {
 		this.eventData = eventData;
+	}
+
+	public String getLastSeenSdkVersion() {
+		return lastSeenSdkVersion;
+	}
+
+	public void setLastSeenSdkVersion(String lastSeenSdkVersion) {
+		this.lastSeenSdkVersion = lastSeenSdkVersion;
 	}
 
 	//endregion

@@ -24,14 +24,6 @@ public class Constants {
 	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
 
 	// Session Data
-	public static final String PREF_KEY_DEVICE = "device";
-	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
-	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
-	public static final String PREF_KEY_SDK = "sdk";
-	public static final String PREF_KEY_APP_RELEASE = "app_release";
-	public static final String PREF_KEY_PERSON = "person";
-	public static final String PREF_KEY_PERSON_DATA = "personData";
-	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
@@ -106,6 +98,14 @@ public class Constants {
 	public static final String PREF_KEY_PERSON_ID = "personId";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
 	public static final String PREF_KEY_PERSON_NAME = "personName";
+	public static final String PREF_KEY_DEVICE = "device";
+	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
+	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
+	public static final String PREF_KEY_SDK = "sdk";
+	public static final String PREF_KEY_APP_RELEASE = "app_release";
+	public static final String PREF_KEY_PERSON = "person";
+	public static final String PREF_KEY_PERSON_DATA = "personData";
+	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
 
 
 

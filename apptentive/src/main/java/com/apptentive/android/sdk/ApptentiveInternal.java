@@ -600,8 +600,8 @@ public class ApptentiveInternal implements Handler.Callback {
 		}
 		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
 
-		String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
-		if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
+		String lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
+		if (!TextUtils.equals(lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION)) {
 			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
 		}
 
@@ -647,11 +647,10 @@ public class ApptentiveInternal implements Handler.Callback {
 	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
 	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
 		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
-		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 		Sdk sdk = SdkManager.generateCurrentSdk();
 		taskManager.addPayload(SdkManager.getPayload(sdk));
 		if (sessionData != null) {
+			sessionData.setLastSeenSdkVersion(currentSdkVersion);
 			sessionData.setSdk(sdk);
 		}
 		invalidateCaches();
