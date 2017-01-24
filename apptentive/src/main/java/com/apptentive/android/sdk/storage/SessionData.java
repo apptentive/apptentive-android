@@ -36,6 +36,7 @@ public class SessionData implements Serializable {
 		this.device = new Device();
 		this.person = new Person();
 		this.eventData = new EventData();
+		this.versionHistory = new VersionHistory();
 	}
 
 	//region Getters & Setters
