@@ -12,12 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
-public class InteractionsPayload extends JSONObject {
+public class InteractionManifest extends JSONObject {
 
-	public InteractionsPayload(String json) throws JSONException {
+	public InteractionManifest(String json) throws JSONException {
 		super(json);
 	}
 
@@ -45,7 +42,7 @@ public class InteractionsPayload extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Unable to load Interactions from InteractionsPayload.", e);
+			ApptentiveLog.w("Unable to load Interactions from InteractionManifest.", e);
 		}
 		return null;
 	}
@@ -57,7 +54,7 @@ public class InteractionsPayload extends JSONObject {
 				return new Targets(targets.toString());
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Unable to load Targets from InteractionsPayload.", e);
+			ApptentiveLog.w("Unable to load Targets from InteractionManifest.", e);
 		}
 		return null;
 	}

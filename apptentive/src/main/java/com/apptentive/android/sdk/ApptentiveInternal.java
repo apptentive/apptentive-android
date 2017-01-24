@@ -669,7 +669,10 @@ public class ApptentiveInternal implements Handler.Callback {
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches() {
-		interactionManager.updateCacheExpiration(0);
+		SessionData sessionData = getSessionData();
+		if (sessionData != null) {
+			sessionData.setInteractionExpiration(0L);
+		}
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();

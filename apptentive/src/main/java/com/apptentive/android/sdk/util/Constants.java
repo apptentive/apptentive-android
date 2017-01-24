@@ -30,11 +30,7 @@ public class Constants {
 
 
 	// Engagement
-	public static final String PREF_KEY_INTERACTIONS = "interactions";
-	public static final String PREF_KEY_TARGETS = "targets";
-	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
-	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 	// Config Defaults
 	public static final String CONFIG_DEFAULT_SERVER_URL = "https://api.apptentive.com";
@@ -105,9 +101,13 @@ public class Constants {
 	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
+	public static final String PREF_KEY_INTERACTIONS = "interactions";
+	public static final String PREF_KEY_TARGETS = "targets";
+	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
 
 	// FIXME: Migrate into global data.
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
+	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 
 	public interface FragmentConfigKeys {

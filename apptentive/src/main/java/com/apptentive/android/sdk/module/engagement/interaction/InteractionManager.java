@@ -14,11 +14,12 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
-import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionsPayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -28,8 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InteractionManager {
 
-	private Interactions interactions;
-	private Targets targets;
 	private Boolean pollForInteractions;
 	// boolean to prevent multiple fetching threads
 	private AtomicBoolean isFetchPending = new AtomicBoolean(false);
@@ -38,44 +37,45 @@ public class InteractionManager {
 		void onInteractionUpdated(boolean successful);
 	}
 
-	public Interactions getInteractions() {
-		if (interactions == null) {
-			interactions = loadInteractions();
-		}
-		return interactions;
-	}
-
-	public Targets getTargets() {
-		if (targets == null) {
-			targets = loadTargets();
-		}
-		return targets;
-	}
-
 	public Interaction getApplicableInteraction(String eventLabel) {
 
-		Targets targets = getTargets();
-
-		if (targets != null) {
-			String interactionId = targets.getApplicableInteraction(eventLabel);
-			if (interactionId != null) {
-				Interactions interactions = getInteractions();
-				return interactions.getInteraction(interactionId);
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return null;
+		}
+		String targetsString = sessionData.getTargets();
+		if (targetsString != null) {
+			try {
+				Targets targets = new Targets(sessionData.getTargets());
+				String interactionId = targets.getApplicableInteraction(eventLabel);
+				if (interactionId != null) {
+					String interactionsString = sessionData.getInteractions();
+					if (interactionsString != null) {
+						Interactions interactions = new Interactions(interactionsString);
+						return interactions.getInteraction(interactionId);
+					}
+				}
+			} catch (JSONException e) {
+				ApptentiveLog.e("");
 			}
 		}
 		return null;
 	}
 
 	public void asyncFetchAndStoreInteractions() {
-
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return;
+		}
 		if (!isPollForInteractions()) {
 			ApptentiveLog.v("Interaction polling is disabled.");
 			return;
 		}
 
+		boolean cacheExpired = sessionData.isMessageCenterFeatureUsed();
 		boolean force = ApptentiveInternal.getInstance().isApptentiveDebuggable();
 		// Check isFetchPending to only allow one asyncTask at a time when fetching interaction
-		if (isFetchPending.compareAndSet(false, true) && (force || hasCacheExpired())) {
+		if (isFetchPending.compareAndSet(false, true) && (force || cacheExpired)) {
 			AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
 				// Hold onto the exception from the AsyncTask instance for later handling in UI thread
 				private Exception e = null;
@@ -117,6 +117,10 @@ public class InteractionManager {
 
 	// This method will be run from a worker thread created by asyncTask
 	private boolean fetchAndStoreInteractions() {
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return false;
+		}
 		ApptentiveLog.i("Fetching new Interactions asyncTask started");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
@@ -142,8 +146,8 @@ public class InteractionManager {
 			if (cacheSeconds == null) {
 				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
 			}
-			updateCacheExpiration(cacheSeconds);
-			storeInteractionsPayloadString(interactionsPayloadString);
+			sessionData.setInteractionExpiration(System.currentTimeMillis() + (cacheSeconds * 1000));
+			storeInteractionManifest(interactionsPayloadString);
 		}
 
 		return updateSuccessful;
@@ -152,78 +156,25 @@ public class InteractionManager {
 	/**
 	 * Made public for testing. There is no other reason to use this method directly.
 	 */
-	public void storeInteractionsPayloadString(String interactionsPayloadString) {
+	public void storeInteractionManifest(String interactionManifest) {
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return;
+		}
 		try {
-			InteractionsPayload payload = new InteractionsPayload(interactionsPayloadString);
+			InteractionManifest payload = new InteractionManifest(interactionManifest);
 			Interactions interactions = payload.getInteractions();
 			Targets targets = payload.getTargets();
 			if (interactions != null && targets != null) {
-				this.interactions = interactions;
-				this.targets = targets;
-				saveInteractions();
-				saveTargets();
+				sessionData.setTargets(targets.toString());
+				sessionData.setInteractions(interactions.toString());
 			} else {
-				ApptentiveLog.e("Unable to save payloads.");
+				ApptentiveLog.e("Unable to save interactionManifest.");
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Invalid InteractionsPayload received.");
+			ApptentiveLog.w("Invalid InteractionManifest received.");
 		}
-	}
 
-	public void clear() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).apply();
-		prefs.edit().remove(Constants.PREF_KEY_TARGETS).apply();
-		interactions = null;
-		targets = null;
-	}
-
-	private void saveInteractions() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).apply();
-	}
-
-	private Interactions loadInteractions() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		String interactionsString = prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
-		if (interactionsString != null) {
-			try {
-				return new Interactions(interactionsString);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Exception creating Interactions object.", e);
-			}
-		}
-		return null;
-	}
-
-	private void saveTargets() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).apply();
-	}
-
-	private Targets loadTargets() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		String targetsString = prefs.getString(Constants.PREF_KEY_TARGETS, null);
-		if (targetsString != null) {
-			try {
-				return new Targets(targetsString);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Exception creating Targets object.", e);
-			}
-		}
-		return null;
-	}
-
-	private boolean hasCacheExpired() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		long expiration = prefs.getLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, 0);
-		return expiration < System.currentTimeMillis();
-	}
-
-	public void updateCacheExpiration(long duration) {
-		long expiration = System.currentTimeMillis() + (duration * 1000);
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).apply();
 	}
 
 	public boolean isPollForInteractions() {

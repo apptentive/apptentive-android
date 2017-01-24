@@ -31,6 +31,9 @@ public class SessionData implements Serializable {
 	private VersionHistory versionHistory;
 	private String messageCenterPendingMessage;
 	private String messageCenterPendingAttachments;
+	private String targets;
+	private String interactions;
+	private long interactionExpiration;
 
 	public SessionData() {
 		this.device = new Device();
@@ -191,7 +194,31 @@ public class SessionData implements Serializable {
 		save();
 	}
 
-//endregion
+	public String getTargets() {
+		return targets;
+	}
+
+	public void setTargets(String targets) {
+		this.targets = targets;
+	}
+
+	public String getInteractions() {
+		return interactions;
+	}
+
+	public void setInteractions(String interactions) {
+		this.interactions = interactions;
+	}
+
+	public long getInteractionExpiration() {
+		return interactionExpiration;
+	}
+
+	public void setInteractionExpiration(long interactionExpiration) {
+		this.interactionExpiration = interactionExpiration;
+	}
+
+	//endregion
 
 	// TODO: Only save when a value has changed.
 	public void save() {
