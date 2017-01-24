@@ -36,7 +36,7 @@ public class VersionHistoryStore {
 	}
 
 	private static void save() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		JSONArray baseArray = getBaseArray();
 		if (baseArray != null) {
 			prefs.edit().putString(Constants.PREF_KEY_VERSION_HISTORY_V2, baseArray.toString()).apply();
@@ -46,7 +46,7 @@ public class VersionHistoryStore {
 	private static void ensureLoaded() {
 		if (versionHistoryEntries == null) {
 			versionHistoryEntries = new ArrayList<VersionHistoryEntry>();
-			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 			try {
 				String json = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY_V2, "[]");
 				JSONArray baseArray = new JSONArray(json);
@@ -61,7 +61,7 @@ public class VersionHistoryStore {
 	}
 
 	public static synchronized void clear() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().remove(Constants.PREF_KEY_VERSION_HISTORY_V2).apply();
 		versionHistoryEntries.clear();
 	}

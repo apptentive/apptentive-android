@@ -433,7 +433,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 
 		// Retrieve any saved attachments
-		final SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 		if (sessionData != null && sessionData.getMessageCenterPendingAttachments() != null) {
 			String pendingAttachmentsString = sessionData.getMessageCenterPendingAttachments();
@@ -744,7 +744,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		this.composerEditText = composerEditText;
 
 		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			if (this.composerEditText != null) {
@@ -992,14 +991,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setWhoCardAsPreviouslyDisplayed() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, true);
 		editor.apply();
 	}
 
 	private boolean wasWhoCardAsPreviouslyDisplayed() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		return prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, false);
 	}
 
@@ -1011,7 +1010,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void savePendingComposingMessage() {
 		Editable content = getPendingComposingContent();
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
 		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 		if (sessionData == null) {

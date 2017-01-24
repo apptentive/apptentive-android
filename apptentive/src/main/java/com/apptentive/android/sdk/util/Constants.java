@@ -24,7 +24,6 @@ public class Constants {
 	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
 
 	// Session Data
-	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
@@ -83,7 +82,7 @@ public class Constants {
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
 	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 
-	// FIXME: We will need to migrate this data.
+	// FIXME: Migrate into session data
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
 	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
@@ -107,6 +106,8 @@ public class Constants {
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
 	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
 
+	// FIXME: Migrate into global data.
+	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 
 
 	public interface FragmentConfigKeys {

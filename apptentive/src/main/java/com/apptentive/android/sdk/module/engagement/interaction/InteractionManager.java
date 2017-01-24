@@ -121,7 +121,7 @@ public class InteractionManager {
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
 		// We weren't able to connect to the internet.
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		boolean updateSuccessful = true;
 		if (response.isException()) {
 			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
@@ -171,7 +171,7 @@ public class InteractionManager {
 	}
 
 	public void clear() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().remove(Constants.PREF_KEY_INTERACTIONS).apply();
 		prefs.edit().remove(Constants.PREF_KEY_TARGETS).apply();
 		interactions = null;
@@ -179,12 +179,12 @@ public class InteractionManager {
 	}
 
 	private void saveInteractions() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_INTERACTIONS, interactions.toString()).apply();
 	}
 
 	private Interactions loadInteractions() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String interactionsString = prefs.getString(Constants.PREF_KEY_INTERACTIONS, null);
 		if (interactionsString != null) {
 			try {
@@ -197,12 +197,12 @@ public class InteractionManager {
 	}
 
 	private void saveTargets() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_TARGETS, targets.toString()).apply();
 	}
 
 	private Targets loadTargets() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String targetsString = prefs.getString(Constants.PREF_KEY_TARGETS, null);
 		if (targetsString != null) {
 			try {
@@ -215,20 +215,20 @@ public class InteractionManager {
 	}
 
 	private boolean hasCacheExpired() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		long expiration = prefs.getLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, 0);
 		return expiration < System.currentTimeMillis();
 	}
 
 	public void updateCacheExpiration(long duration) {
 		long expiration = System.currentTimeMillis() + (duration * 1000);
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putLong(Constants.PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION, expiration).apply();
 	}
 
 	public boolean isPollForInteractions() {
 		if (pollForInteractions == null) {
-			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 			pollForInteractions = prefs.getBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, true);
 		}
 		return pollForInteractions;
@@ -236,7 +236,7 @@ public class InteractionManager {
 
 	public void setPollForInteractions(boolean pollForInteractions) {
 		this.pollForInteractions = pollForInteractions;
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).apply();
 	}
 }

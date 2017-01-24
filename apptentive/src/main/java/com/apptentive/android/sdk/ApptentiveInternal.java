@@ -91,7 +91,7 @@ public class ApptentiveInternal implements Handler.Callback {
 
 	boolean appIsInForeground;
 	boolean isAppDebuggable;
-	SharedPreferences prefs;
+	SharedPreferences globalSharedPrefs;
 	String apiKey;
 	String personId;
 	String androidId;
@@ -170,7 +170,7 @@ public class ApptentiveInternal implements Handler.Callback {
 					sApptentiveInternal = new ApptentiveInternal();
 					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.prefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
@@ -389,8 +389,8 @@ public class ApptentiveInternal implements Handler.Callback {
 		return androidId;
 	}
 
-	public SharedPreferences getSharedPrefs() {
-		return prefs;
+	public SharedPreferences getGlobalSharedPrefs() {
+		return globalSharedPrefs;
 	}
 
 	public void runOnWorkerThread(Runnable r) {
@@ -1060,7 +1060,7 @@ public class ApptentiveInternal implements Handler.Callback {
 	}
 
 	public void resetSdkState() {
-		prefs.edit().clear().apply();
+		globalSharedPrefs.edit().clear().apply();
 		taskManager.reset(appContext);
 	}
 

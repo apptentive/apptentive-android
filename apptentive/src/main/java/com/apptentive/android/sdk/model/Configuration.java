@@ -46,12 +46,12 @@ public class Configuration extends JSONObject {
 	}
 
 	public void save() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).apply();
 	}
 
 	public static Configuration load() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		return Configuration.load(prefs);
 	}
 

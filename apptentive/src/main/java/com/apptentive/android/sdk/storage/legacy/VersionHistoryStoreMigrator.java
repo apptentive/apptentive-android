@@ -53,7 +53,7 @@ public class VersionHistoryStoreMigrator {
 		if (migrated_to_v2) {
 			return;
 		}
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		if (prefs != null) {
 			migrated_to_v2 = prefs.getBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, false);
 			if (migrated_to_v2) {

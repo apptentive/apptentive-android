@@ -395,7 +395,7 @@ public class ApptentiveClient {
 	}
 
 	private static String getEndpointBase() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
 		if (url == null) {
 			url = Constants.CONFIG_DEFAULT_SERVER_URL;
