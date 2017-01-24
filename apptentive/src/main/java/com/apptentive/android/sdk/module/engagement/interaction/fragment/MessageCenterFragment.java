@@ -991,15 +991,19 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setWhoCardAsPreviouslyDisplayed() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, true);
-		editor.apply();
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return;
+		}
+		sessionData.setMessageCenterWhoCardPreviouslyDisplayed(true);
 	}
 
 	private boolean wasWhoCardAsPreviouslyDisplayed() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		return prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, false);
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData == null) {
+			return false;
+		}
+		return sessionData.isMessageCenterWhoCardPreviouslyDisplayed();
 	}
 
 	// Retrieve the content from the composing area

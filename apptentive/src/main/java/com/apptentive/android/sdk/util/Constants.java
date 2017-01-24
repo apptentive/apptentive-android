@@ -24,7 +24,6 @@ public class Constants {
 	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
 
 	// Session Data
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
@@ -104,6 +103,7 @@ public class Constants {
 	public static final String PREF_KEY_INTERACTIONS = "interactions";
 	public static final String PREF_KEY_TARGETS = "targets";
 	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
 
 	// FIXME: Migrate into global data.
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";

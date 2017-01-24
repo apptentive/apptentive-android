@@ -27,8 +27,9 @@ public class SessionData implements Serializable {
 	private AppRelease appRelease;
 	private EventData eventData;
 	private String lastSeenSdkVersion;
-	private boolean messageCenterFeatureUsed;
 	private VersionHistory versionHistory;
+	private boolean messageCenterFeatureUsed;
+	private boolean messageCenterWhoCardPreviouslyDisplayed;
 	private String messageCenterPendingMessage;
 	private String messageCenterPendingAttachments;
 	private String targets;
@@ -159,6 +160,14 @@ public class SessionData implements Serializable {
 		this.lastSeenSdkVersion = lastSeenSdkVersion;
 	}
 
+	public VersionHistory getVersionHistory() {
+		return versionHistory;
+	}
+
+	public void setVersionHistory(VersionHistory versionHistory) {
+		this.versionHistory = versionHistory;
+	}
+
 	public boolean isMessageCenterFeatureUsed() {
 		return messageCenterFeatureUsed;
 	}
@@ -168,12 +177,13 @@ public class SessionData implements Serializable {
 		save();
 	}
 
-	public VersionHistory getVersionHistory() {
-		return versionHistory;
+	public boolean isMessageCenterWhoCardPreviouslyDisplayed() {
+		return messageCenterWhoCardPreviouslyDisplayed;
 	}
 
-	public void setVersionHistory(VersionHistory versionHistory) {
-		this.versionHistory = versionHistory;
+	public void setMessageCenterWhoCardPreviouslyDisplayed(boolean messageCenterWhoCardPreviouslyDisplayed) {
+		this.messageCenterWhoCardPreviouslyDisplayed = messageCenterWhoCardPreviouslyDisplayed;
+		save();
 	}
 
 	public String getMessageCenterPendingMessage() {
