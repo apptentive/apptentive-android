@@ -29,6 +29,8 @@ public class SessionData implements Serializable {
 	private String lastSeenSdkVersion;
 	private boolean messageCenterFeatureUsed;
 	private VersionHistory versionHistory;
+	private String messageCenterPendingMessage;
+	private String messageCenterPendingAttachments;
 
 	public SessionData() {
 		this.device = new Device();
@@ -170,7 +172,25 @@ public class SessionData implements Serializable {
 		this.versionHistory = versionHistory;
 	}
 
-	//endregion
+	public String getMessageCenterPendingMessage() {
+		return messageCenterPendingMessage;
+	}
+
+	public void setMessageCenterPendingMessage(String messageCenterPendingMessage) {
+		this.messageCenterPendingMessage = messageCenterPendingMessage;
+		save();
+	}
+
+	public String getMessageCenterPendingAttachments() {
+		return messageCenterPendingAttachments;
+	}
+
+	public void setMessageCenterPendingAttachments(String messageCenterPendingAttachments) {
+		this.messageCenterPendingAttachments = messageCenterPendingAttachments;
+		save();
+	}
+
+//endregion
 
 	// TODO: Only save when a value has changed.
 	public void save() {
