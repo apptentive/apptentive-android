@@ -148,7 +148,10 @@ public class Constants {
 		"EVDO_B",  // 12
 		"LTE",     // 13
 		"EHRPD",   // 14
-		"HSPAP"    // 15
+		"HSPAP",   // 15
+		"GSM",     // 16
+		"TD_SCDMA",// 17
+		"IWLAN"    // 18
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {
