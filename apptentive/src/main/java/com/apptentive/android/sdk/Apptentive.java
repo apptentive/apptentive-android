@@ -79,6 +79,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
+				// FIXME: Make sure Person object diff is sent.
 				sessionData.setPersonEmail(email);
 			}
 		}
@@ -113,6 +114,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
+				// FIXME: Make sure Person object diff is sent.
 				sessionData.setPersonName(name);
 			}
 		}
@@ -150,7 +152,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -168,7 +169,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -186,7 +186,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -196,7 +195,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().put(key, version);
-				sessionData.save();
 			}
 		}
 	}
@@ -206,7 +204,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().put(key, dateTime);
-				sessionData.save();
 			}
 		}
 	}
@@ -221,7 +218,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getDevice().getCustomData().remove(key);
-				sessionData.save();
 			}
 		}
 	}
@@ -242,7 +238,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -260,7 +255,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -278,7 +272,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().put(key, value);
-				sessionData.save();
 			}
 		}
 	}
@@ -288,7 +281,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().put(key, version);
-				sessionData.save();
 			}
 		}
 	}
@@ -298,7 +290,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().remove(key);
-				sessionData.save();
 			}
 		}
 	}
@@ -313,7 +304,6 @@ public class Apptentive {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
 				sessionData.getPerson().getCustomData().remove(key);
-				sessionData.save();
 			}
 		}
 	}
@@ -407,7 +397,6 @@ public class Apptentive {
 					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 					return;
 			}
-			sessionData.save();
 		}
 	}
 

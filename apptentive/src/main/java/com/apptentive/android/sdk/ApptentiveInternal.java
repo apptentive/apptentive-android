@@ -53,6 +53,7 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -74,7 +75,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal implements Handler.Callback {
+public class ApptentiveInternal implements Handler.Callback, DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
@@ -97,6 +98,8 @@ public class ApptentiveInternal implements Handler.Callback {
 	String androidId;
 	String appPackageName;
 	SessionData sessionData;
+	private FileSerializer fileSerializer;
+
 
 	Handler backgroundHandler;
 
@@ -303,6 +306,7 @@ public class ApptentiveInternal implements Handler.Callback {
 
 	/**
 	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 *
 	 * @return true it the app is using an AppCompat theme
 	 */
 	public boolean isAppUsingAppCompatTheme() {
@@ -521,9 +525,13 @@ public class ApptentiveInternal implements Handler.Callback {
 		VersionHistoryItem lastVersionItemSeen = null;
 		String lastSeenSdkVersion = null;
 
-		FileSerializer fileSerializer = new FileSerializer(new File(appContext.getFilesDir(), "apptentive/SessionData.ser"));
+		File internalStorage = appContext.getFilesDir();
+		File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
+		sessionDataFile.getParentFile().mkdirs();
+		fileSerializer = new FileSerializer(sessionDataFile);
 		sessionData = (SessionData) fileSerializer.deserialize();
 		if (sessionData != null) {
+			sessionData.setDataChangedListener(this);
 			ApptentiveLog.d("Restored existing SessionData");
 			ApptentiveLog.v("Restored EventData: %s", sessionData.getEventData());
 			// FIXME: Move this to whereever the sessions first comes online?
@@ -561,7 +569,6 @@ public class ApptentiveInternal implements Handler.Callback {
 			isAppDebuggable = appRelease.isDebug();
 			currentVersionCode = appRelease.getVersionCode();
 			currentVersionName = appRelease.getVersionName();
-
 
 
 			if (lastVersionItemSeen == null) {
@@ -642,7 +649,6 @@ public class ApptentiveInternal implements Handler.Callback {
 		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 		if (sessionData != null) {
 			sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
-			sessionData.save();
 		}
 		if (previousVersionCode != null) {
 			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
@@ -752,13 +758,13 @@ public class ApptentiveInternal implements Handler.Callback {
 				ApptentiveLog.d("New Conversation id: %s", conversationId);
 
 				sessionData = new SessionData();
+				sessionData.setDataChangedListener(this);
 				if (conversationToken != null && !conversationToken.equals("")) {
 					sessionData.setConversationToken(conversationToken);
 					sessionData.setConversationId(conversationId);
 					sessionData.setDevice(device);
 					sessionData.setSdk(sdk);
 					sessionData.setAppRelease(appRelease);
-					saveSessionData();
 				}
 				String personId = root.getString("person_id");
 				ApptentiveLog.d("PersonId: " + personId);
@@ -1109,9 +1115,13 @@ public class ApptentiveInternal implements Handler.Callback {
 
 	// Multi-tenancy work
 
-	public void saveSessionData() {
+	public void scheduleSessionDataSave() {
+		ApptentiveLog.e("Schedule SessionData save?");
 		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
+			ApptentiveLog.e("Scheduling SessionData save.");
 			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
+		} else {
+			ApptentiveLog.e("SessionData save already scheduled.");
 		}
 	}
 
@@ -1122,19 +1132,11 @@ public class ApptentiveInternal implements Handler.Callback {
 	public boolean handleMessage(Message msg) {
 		switch (msg.what) {
 			case MESSAGE_SAVE_SESSION_DATA:
-				ApptentiveLog.d("Saving SessionData");
+				ApptentiveLog.e("Saving SessionData");
 				ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
-
-				File internalStorage = appContext.getFilesDir();
-				File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
-				try {
-					sessionDataFile.getParentFile().mkdirs();
-				} catch (SecurityException e) {
-					ApptentiveLog.e("Security Error creating DataSession file.", e);
+				if (fileSerializer != null) {
+					fileSerializer.serialize(sessionData);
 				}
-				FileSerializer fileSerializer = new FileSerializer(sessionDataFile);
-				fileSerializer.serialize(sApptentiveInternal.sessionData);
-				ApptentiveLog.d("Session data written to file of length: %s", Util.humanReadableByteCount(sessionDataFile.length(), false));
 				break;
 			case MESSAGE_CREATE_CONVERSATION:
 				// TODO: This.
@@ -1142,4 +1144,12 @@ public class ApptentiveInternal implements Handler.Callback {
 		}
 		return false;
 	}
+
+	//region Listeners
+
+	@Override
+	public void onDataChanged() {
+		scheduleSessionDataSave();
+	}
+	//endregion
 }

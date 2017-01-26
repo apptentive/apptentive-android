@@ -6,9 +6,9 @@
 
 package com.apptentive.android.sdk.storage;
 
-import java.io.Serializable;
+import android.text.TextUtils;
 
-public class Device implements Serializable {
+public class Device implements Saveable, DataChangedListener {
 
 	private String uuid;
 	private String osName;
@@ -36,19 +36,43 @@ public class Device implements Serializable {
 	private String utcOffset;
 	private IntegrationConfig integrationConfig;
 
+	private transient DataChangedListener listener;
+
 	public Device() {
-		this.customData = new CustomData();
-		this.integrationConfig = new IntegrationConfig();
+		customData = new CustomData();
+		integrationConfig = new IntegrationConfig();
 	}
 
-//region Getters & Setters
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+		customData.setDataChangedListener(this);
+		integrationConfig.setDataChangedListener(this);
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+
+	@Override
+	public void onDataChanged() {
+		notifyDataChanged();
+	}
+
+	//region Getters & Setters
 
 	public String getUuid() {
 		return uuid;
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid = uuid;
+		if (!TextUtils.equals(this.uuid, uuid)) {
+			this.uuid = uuid;
+			notifyDataChanged();
+		}
 	}
 
 	public String getOsName() {
@@ -56,7 +80,10 @@ public class Device implements Serializable {
 	}
 
 	public void setOsName(String osName) {
-		this.osName = osName;
+		if (!TextUtils.equals(this.osName, osName)) {
+			this.osName = osName;
+			notifyDataChanged();
+		}
 	}
 
 	public String getOsVersion() {
@@ -64,7 +91,10 @@ public class Device implements Serializable {
 	}
 
 	public void setOsVersion(String osVersion) {
-		this.osVersion = osVersion;
+		if (!TextUtils.equals(this.osVersion, osVersion)) {
+			this.osVersion = osVersion;
+			notifyDataChanged();
+		}
 	}
 
 	public String getOsBuild() {
@@ -72,7 +102,10 @@ public class Device implements Serializable {
 	}
 
 	public void setOsBuild(String osBuild) {
-		this.osBuild = osBuild;
+		if (!TextUtils.equals(this.osBuild, osBuild)) {
+			this.osBuild = osBuild;
+			notifyDataChanged();
+		}
 	}
 
 	public int getOsApiLevel() {
@@ -80,7 +113,10 @@ public class Device implements Serializable {
 	}
 
 	public void setOsApiLevel(int osApiLevel) {
-		this.osApiLevel = osApiLevel;
+		if (this.osApiLevel != osApiLevel) {
+			this.osApiLevel = osApiLevel;
+			notifyDataChanged();
+		}
 	}
 
 	public String getManufacturer() {
@@ -88,7 +124,10 @@ public class Device implements Serializable {
 	}
 
 	public void setManufacturer(String manufacturer) {
-		this.manufacturer = manufacturer;
+		if (!TextUtils.equals(this.manufacturer, manufacturer)) {
+			this.manufacturer = manufacturer;
+			notifyDataChanged();
+		}
 	}
 
 	public String getModel() {
@@ -96,7 +135,10 @@ public class Device implements Serializable {
 	}
 
 	public void setModel(String model) {
-		this.model = model;
+		if (!TextUtils.equals(this.model, model)) {
+			this.model = model;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBoard() {
@@ -104,7 +146,10 @@ public class Device implements Serializable {
 	}
 
 	public void setBoard(String board) {
-		this.board = board;
+		if (!TextUtils.equals(this.board, board)) {
+			this.board = board;
+			notifyDataChanged();
+		}
 	}
 
 	public String getProduct() {
@@ -112,7 +157,10 @@ public class Device implements Serializable {
 	}
 
 	public void setProduct(String product) {
-		this.product = product;
+		if (!TextUtils.equals(this.product, product)) {
+			this.product = product;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBrand() {
@@ -120,7 +168,10 @@ public class Device implements Serializable {
 	}
 
 	public void setBrand(String brand) {
-		this.brand = brand;
+		if (!TextUtils.equals(this.brand, brand)) {
+			this.brand = brand;
+			notifyDataChanged();
+		}
 	}
 
 	public String getCpu() {
@@ -128,7 +179,10 @@ public class Device implements Serializable {
 	}
 
 	public void setCpu(String cpu) {
-		this.cpu = cpu;
+		if (!TextUtils.equals(this.cpu, cpu)) {
+			this.cpu = cpu;
+			notifyDataChanged();
+		}
 	}
 
 	public String getDevice() {
@@ -136,7 +190,10 @@ public class Device implements Serializable {
 	}
 
 	public void setDevice(String device) {
-		this.device = device;
+		if (!TextUtils.equals(this.device, device)) {
+			this.device = device;
+			notifyDataChanged();
+		}
 	}
 
 	public String getCarrier() {
@@ -144,7 +201,10 @@ public class Device implements Serializable {
 	}
 
 	public void setCarrier(String carrier) {
-		this.carrier = carrier;
+		if (!TextUtils.equals(this.carrier, carrier)) {
+			this.carrier = carrier;
+			notifyDataChanged();
+		}
 	}
 
 	public String getCurrentCarrier() {
@@ -152,7 +212,10 @@ public class Device implements Serializable {
 	}
 
 	public void setCurrentCarrier(String currentCarrier) {
-		this.currentCarrier = currentCarrier;
+		if (!TextUtils.equals(this.currentCarrier, currentCarrier)) {
+			this.currentCarrier = currentCarrier;
+			notifyDataChanged();
+		}
 	}
 
 	public String getNetworkType() {
@@ -160,7 +223,10 @@ public class Device implements Serializable {
 	}
 
 	public void setNetworkType(String networkType) {
-		this.networkType = networkType;
+		if (!TextUtils.equals(this.networkType, networkType)) {
+			this.networkType = networkType;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBuildType() {
@@ -168,7 +234,10 @@ public class Device implements Serializable {
 	}
 
 	public void setBuildType(String buildType) {
-		this.buildType = buildType;
+		if (!TextUtils.equals(this.buildType, buildType)) {
+			this.buildType = buildType;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBuildId() {
@@ -176,7 +245,10 @@ public class Device implements Serializable {
 	}
 
 	public void setBuildId(String buildId) {
-		this.buildId = buildId;
+		if (!TextUtils.equals(this.buildId, buildId)) {
+			this.buildId = buildId;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBootloaderVersion() {
@@ -184,7 +256,10 @@ public class Device implements Serializable {
 	}
 
 	public void setBootloaderVersion(String bootloaderVersion) {
-		this.bootloaderVersion = bootloaderVersion;
+		if (!TextUtils.equals(this.bootloaderVersion, bootloaderVersion)) {
+			this.bootloaderVersion = bootloaderVersion;
+			notifyDataChanged();
+		}
 	}
 
 	public String getRadioVersion() {
@@ -192,7 +267,10 @@ public class Device implements Serializable {
 	}
 
 	public void setRadioVersion(String radioVersion) {
-		this.radioVersion = radioVersion;
+		if (!TextUtils.equals(this.radioVersion, radioVersion)) {
+			this.radioVersion = radioVersion;
+			notifyDataChanged();
+		}
 	}
 
 	public CustomData getCustomData() {
@@ -201,6 +279,8 @@ public class Device implements Serializable {
 
 	public void setCustomData(CustomData customData) {
 		this.customData = customData;
+		this.customData.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	public String getLocaleCountryCode() {
@@ -208,7 +288,10 @@ public class Device implements Serializable {
 	}
 
 	public void setLocaleCountryCode(String localeCountryCode) {
-		this.localeCountryCode = localeCountryCode;
+		if (!TextUtils.equals(this.localeCountryCode, localeCountryCode)) {
+			this.localeCountryCode = localeCountryCode;
+			notifyDataChanged();
+		}
 	}
 
 	public String getLocaleLanguageCode() {
@@ -216,7 +299,10 @@ public class Device implements Serializable {
 	}
 
 	public void setLocaleLanguageCode(String localeLanguageCode) {
-		this.localeLanguageCode = localeLanguageCode;
+		if (!TextUtils.equals(this.localeLanguageCode, localeLanguageCode)) {
+			this.localeLanguageCode = localeLanguageCode;
+			notifyDataChanged();
+		}
 	}
 
 	public String getLocaleRaw() {
@@ -224,7 +310,10 @@ public class Device implements Serializable {
 	}
 
 	public void setLocaleRaw(String localeRaw) {
-		this.localeRaw = localeRaw;
+		if (!TextUtils.equals(this.localeRaw, localeRaw)) {
+			this.localeRaw = localeRaw;
+			notifyDataChanged();
+		}
 	}
 
 	public String getUtcOffset() {
@@ -232,7 +321,10 @@ public class Device implements Serializable {
 	}
 
 	public void setUtcOffset(String utcOffset) {
-		this.utcOffset = utcOffset;
+		if (!TextUtils.equals(this.utcOffset, utcOffset)) {
+			this.utcOffset = utcOffset;
+			notifyDataChanged();
+		}
 	}
 
 	public IntegrationConfig getIntegrationConfig() {
@@ -241,6 +333,8 @@ public class Device implements Serializable {
 
 	public void setIntegrationConfig(IntegrationConfig integrationConfig) {
 		this.integrationConfig = integrationConfig;
+		this.integrationConfig.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 //endregion

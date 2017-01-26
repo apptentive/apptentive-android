@@ -6,11 +6,9 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
+import android.text.TextUtils;
 
-import java.io.Serializable;
-
-public class SessionData implements Serializable {
+public class SessionData implements Saveable, DataChangedListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,6 +41,31 @@ public class SessionData implements Serializable {
 		this.versionHistory = new VersionHistory();
 	}
 
+	//region Listeners
+	private transient DataChangedListener listener;
+
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+		device.setDataChangedListener(this);
+		person.setDataChangedListener(this);
+		eventData.setDataChangedListener(this);
+		versionHistory.setDataChangedListener(this);
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+
+	@Override
+	public void onDataChanged() {
+		notifyDataChanged();
+	}
+	//endregion
+
 	//region Getters & Setters
 
 	public String getConversationToken() {
@@ -50,8 +73,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setConversationToken(String conversationToken) {
-		this.conversationToken = conversationToken;
-		save();
+		if (!TextUtils.equals(this.conversationToken, conversationToken)) {
+			this.conversationToken = conversationToken;
+			notifyDataChanged();
+		}
 	}
 
 	public String getConversationId() {
@@ -59,8 +84,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setConversationId(String conversationId) {
-		this.conversationId = conversationId;
-		save();
+		if (!TextUtils.equals(this.conversationId, conversationId)) {
+			this.conversationId = conversationId;
+			notifyDataChanged();
+		}
 	}
 
 	public String getPersonId() {
@@ -68,8 +95,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setPersonId(String personId) {
-		this.personId = personId;
-		save();
+		if (!TextUtils.equals(this.personId, personId)) {
+			this.personId = personId;
+			notifyDataChanged();
+		}
 	}
 
 	public String getPersonEmail() {
@@ -77,8 +106,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setPersonEmail(String personEmail) {
-		this.personEmail = personEmail;
-		save();
+		if (!TextUtils.equals(this.personEmail, personEmail)) {
+			this.personEmail = personEmail;
+			notifyDataChanged();
+		}
 	}
 
 	public String getPersonName() {
@@ -86,8 +117,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setPersonName(String personName) {
-		this.personName = personName;
-		save();
+		if (!TextUtils.equals(this.personName, personName)) {
+			this.personName = personName;
+			notifyDataChanged();
+		}
 	}
 
 	public Device getDevice() {
@@ -96,7 +129,8 @@ public class SessionData implements Serializable {
 
 	public void setDevice(Device device) {
 		this.device = device;
-		save();
+		device.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	public Device getLastSentDevice() {
@@ -105,7 +139,7 @@ public class SessionData implements Serializable {
 
 	public void setLastSentDevice(Device lastSentDevice) {
 		this.lastSentDevice = lastSentDevice;
-		save();
+		notifyDataChanged();
 	}
 
 	public Person getPerson() {
@@ -114,7 +148,8 @@ public class SessionData implements Serializable {
 
 	public void setPerson(Person person) {
 		this.person = person;
-		save();
+		this.person.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	public Person getLastSentPerson() {
@@ -123,7 +158,7 @@ public class SessionData implements Serializable {
 
 	public void setLastSentPerson(Person lastSentPerson) {
 		this.lastSentPerson = lastSentPerson;
-		save();
+		notifyDataChanged();
 	}
 
 	public Sdk getSdk() {
@@ -132,7 +167,7 @@ public class SessionData implements Serializable {
 
 	public void setSdk(Sdk sdk) {
 		this.sdk = sdk;
-		save();
+		notifyDataChanged();
 	}
 
 	public AppRelease getAppRelease() {
@@ -141,7 +176,7 @@ public class SessionData implements Serializable {
 
 	public void setAppRelease(AppRelease appRelease) {
 		this.appRelease = appRelease;
-		save();
+		notifyDataChanged();
 	}
 
 	public EventData getEventData() {
@@ -150,6 +185,8 @@ public class SessionData implements Serializable {
 
 	public void setEventData(EventData eventData) {
 		this.eventData = eventData;
+		this.eventData.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	public String getLastSeenSdkVersion() {
@@ -158,6 +195,7 @@ public class SessionData implements Serializable {
 
 	public void setLastSeenSdkVersion(String lastSeenSdkVersion) {
 		this.lastSeenSdkVersion = lastSeenSdkVersion;
+		notifyDataChanged();
 	}
 
 	public VersionHistory getVersionHistory() {
@@ -166,6 +204,8 @@ public class SessionData implements Serializable {
 
 	public void setVersionHistory(VersionHistory versionHistory) {
 		this.versionHistory = versionHistory;
+		this.versionHistory.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	public boolean isMessageCenterFeatureUsed() {
@@ -173,8 +213,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setMessageCenterFeatureUsed(boolean messageCenterFeatureUsed) {
-		this.messageCenterFeatureUsed = messageCenterFeatureUsed;
-		save();
+		if (this.messageCenterFeatureUsed != messageCenterFeatureUsed) {
+			this.messageCenterFeatureUsed = messageCenterFeatureUsed;
+			notifyDataChanged();
+		}
 	}
 
 	public boolean isMessageCenterWhoCardPreviouslyDisplayed() {
@@ -182,8 +224,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setMessageCenterWhoCardPreviouslyDisplayed(boolean messageCenterWhoCardPreviouslyDisplayed) {
-		this.messageCenterWhoCardPreviouslyDisplayed = messageCenterWhoCardPreviouslyDisplayed;
-		save();
+		if (this.messageCenterWhoCardPreviouslyDisplayed != messageCenterWhoCardPreviouslyDisplayed) {
+			this.messageCenterWhoCardPreviouslyDisplayed = messageCenterWhoCardPreviouslyDisplayed;
+			notifyDataChanged();
+		}
 	}
 
 	public String getMessageCenterPendingMessage() {
@@ -191,8 +235,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setMessageCenterPendingMessage(String messageCenterPendingMessage) {
-		this.messageCenterPendingMessage = messageCenterPendingMessage;
-		save();
+		if (!TextUtils.equals(this.messageCenterPendingMessage, messageCenterPendingMessage)) {
+			this.messageCenterPendingMessage = messageCenterPendingMessage;
+			notifyDataChanged();
+		}
 	}
 
 	public String getMessageCenterPendingAttachments() {
@@ -200,8 +246,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setMessageCenterPendingAttachments(String messageCenterPendingAttachments) {
-		this.messageCenterPendingAttachments = messageCenterPendingAttachments;
-		save();
+		if (!TextUtils.equals(this.messageCenterPendingAttachments, messageCenterPendingAttachments)) {
+			this.messageCenterPendingAttachments = messageCenterPendingAttachments;
+			notifyDataChanged();
+		}
 	}
 
 	public String getTargets() {
@@ -209,7 +257,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setTargets(String targets) {
-		this.targets = targets;
+		if (!TextUtils.equals(this.targets, targets)) {
+			this.targets = targets;
+			notifyDataChanged();
+		}
 	}
 
 	public String getInteractions() {
@@ -217,7 +268,10 @@ public class SessionData implements Serializable {
 	}
 
 	public void setInteractions(String interactions) {
-		this.interactions = interactions;
+		if (!TextUtils.equals(this.interactions, interactions)) {
+			this.interactions = interactions;
+			notifyDataChanged();
+		}
 	}
 
 	public long getInteractionExpiration() {
@@ -225,19 +279,11 @@ public class SessionData implements Serializable {
 	}
 
 	public void setInteractionExpiration(long interactionExpiration) {
-		this.interactionExpiration = interactionExpiration;
+		if (this.interactionExpiration != interactionExpiration) {
+			this.interactionExpiration = interactionExpiration;
+			notifyDataChanged();
+		}
 	}
 
 	//endregion
-
-	// TODO: Only save when a value has changed.
-	public void save() {
-		ApptentiveInternal.getInstance().saveSessionData();
-	}
-
-	// version history
-	// code point store
-	// Various prefs
-	// Messages
-	// Interactions
 }

@@ -56,7 +56,8 @@ public class PersonManager {
 		}
 
 		if (oldPerson == null || !oldPerson.getCustomData().equals(newPerson.getCustomData())) {
-			ret.setCustomData(newPerson.getCustomData().toJson());
+			CustomData customData = newPerson.getCustomData();
+			ret.setCustomData(customData != null ? customData.toJson() : null);
 		}
 
 		return ret;

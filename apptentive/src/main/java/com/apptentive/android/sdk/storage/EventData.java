@@ -8,14 +8,13 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Stores a record of when events and interactions were triggered, as well as the number of times per versionName or versionCode.
  */
-public class EventData implements Serializable {
+public class EventData implements Saveable {
 
 	private Map<String, EventRecord> events;
 	private Map<String, EventRecord> interactions;
@@ -24,6 +23,24 @@ public class EventData implements Serializable {
 		events = new HashMap<String, EventRecord>();
 		interactions = new HashMap<String, EventRecord>();
 	}
+
+	//region Listeners
+	private transient DataChangedListener listener;
+
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+
+	//endregion
+
 
 	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
 	public synchronized void storeEventForCurrentAppVersion(double timestamp, String eventLabel) {
@@ -35,6 +52,7 @@ public class EventData implements Serializable {
 		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 		eventRecord.update(timestamp, versionName, versionCode);
+		notifyDataChanged();
 	}
 
 	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
@@ -47,6 +65,7 @@ public class EventData implements Serializable {
 		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 		eventRecord.update(timestamp, versionName, versionCode);
+		notifyDataChanged();
 	}
 
 	public Long getEventCountTotal(String eventLabel) {

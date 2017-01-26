@@ -6,9 +6,9 @@
 
 package com.apptentive.android.sdk.storage;
 
-import java.io.Serializable;
+import android.text.TextUtils;
 
-public class Person implements Serializable {
+public class Person implements Saveable, DataChangedListener {
 
 	private String id;
 	private String email;
@@ -22,6 +22,32 @@ public class Person implements Serializable {
 	private String birthday;
 	private CustomData customData;
 
+	public Person() {
+		customData = new CustomData();
+	}
+
+	//region Listeners
+	private transient DataChangedListener listener;
+
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+		customData.setDataChangedListener(this);
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+
+	@Override
+	public void onDataChanged() {
+		notifyDataChanged();
+	}
+	//endregion
+
 	//region Getters & Setters
 
 	public String getId() {
@@ -29,7 +55,10 @@ public class Person implements Serializable {
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		if (!TextUtils.equals(this.id, id)) {
+			this.id = id;
+			notifyDataChanged();
+		}
 	}
 
 	public String getEmail() {
@@ -37,7 +66,10 @@ public class Person implements Serializable {
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		if (!TextUtils.equals(this.email, email)) {
+			this.email = email;
+			notifyDataChanged();
+		}
 	}
 
 	public String getName() {
@@ -45,7 +77,10 @@ public class Person implements Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		if (!TextUtils.equals(this.name, name)) {
+			this.name = name;
+			notifyDataChanged();
+		}
 	}
 
 	public String getFacebookId() {
@@ -53,7 +88,10 @@ public class Person implements Serializable {
 	}
 
 	public void setFacebookId(String facebookId) {
-		this.facebookId = facebookId;
+		if (!TextUtils.equals(this.facebookId, facebookId)) {
+			this.facebookId = facebookId;
+			notifyDataChanged();
+		}
 	}
 
 	public String getPhoneNumber() {
@@ -61,7 +99,10 @@ public class Person implements Serializable {
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
+		if (!TextUtils.equals(this.phoneNumber, phoneNumber)) {
+			this.phoneNumber = phoneNumber;
+			notifyDataChanged();
+		}
 	}
 
 	public String getStreet() {
@@ -69,7 +110,10 @@ public class Person implements Serializable {
 	}
 
 	public void setStreet(String street) {
-		this.street = street;
+		if (!TextUtils.equals(this.street, street)) {
+			this.street = street;
+			notifyDataChanged();
+		}
 	}
 
 	public String getCity() {
@@ -77,7 +121,10 @@ public class Person implements Serializable {
 	}
 
 	public void setCity(String city) {
-		this.city = city;
+		if (!TextUtils.equals(this.city, city)) {
+			this.city = city;
+			notifyDataChanged();
+		}
 	}
 
 	public String getZip() {
@@ -85,7 +132,10 @@ public class Person implements Serializable {
 	}
 
 	public void setZip(String zip) {
-		this.zip = zip;
+		if (!TextUtils.equals(this.zip, zip)) {
+			this.zip = zip;
+			notifyDataChanged();
+		}
 	}
 
 	public String getCountry() {
@@ -93,7 +143,10 @@ public class Person implements Serializable {
 	}
 
 	public void setCountry(String country) {
-		this.country = country;
+		if (!TextUtils.equals(this.country, country)) {
+			this.country = country;
+			notifyDataChanged();
+		}
 	}
 
 	public String getBirthday() {
@@ -101,7 +154,10 @@ public class Person implements Serializable {
 	}
 
 	public void setBirthday(String birthday) {
-		this.birthday = birthday;
+		if (!TextUtils.equals(this.birthday, birthday)) {
+			this.birthday = birthday;
+			notifyDataChanged();
+		}
 	}
 
 	public CustomData getCustomData() {
@@ -110,13 +166,8 @@ public class Person implements Serializable {
 
 	public void setCustomData(CustomData customData) {
 		this.customData = customData;
+		this.customData.setDataChangedListener(this);
 	}
 
 	//endregion
-
-	public void addCustomData(String key, Object value) {
-		customData.put(key, value);
-	}
-
-
 }

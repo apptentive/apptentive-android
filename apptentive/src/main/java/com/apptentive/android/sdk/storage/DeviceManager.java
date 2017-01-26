@@ -149,7 +149,8 @@ public class DeviceManager {
 		}
 
 		if (oldDevice == null || !oldDevice.getCustomData().equals(newDevice.getCustomData())) {
-			ret.setCustomData(newDevice.getCustomData().toJson());
+			CustomData customData = newDevice.getCustomData();
+			ret.setCustomData(customData != null ? customData.toJson() : null);
 		}
 
 		if (oldDevice == null || !oldDevice.getLocaleCountryCode().equals(newDevice.getLocaleCountryCode())) {
@@ -169,7 +170,8 @@ public class DeviceManager {
 		}
 
 		if (oldDevice == null || !oldDevice.getIntegrationConfig().equals(newDevice.getIntegrationConfig())) {
-			ret.setIntegrationConfig(newDevice.getIntegrationConfig().toJson());
+			IntegrationConfig integrationConfig = newDevice.getIntegrationConfig();
+			ret.setIntegrationConfig(integrationConfig != null ? integrationConfig.toJson() : null);
 		}
 		return ret;
 	}

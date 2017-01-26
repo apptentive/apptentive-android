@@ -30,9 +30,11 @@ public class FileSerializer implements Serializer {
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 		try {
+			file.getParentFile().mkdirs();
 			fos = new FileOutputStream(file);
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(object);
+			ApptentiveLog.v("Session data written to file of length: %s",Util.humanReadableByteCount(file.length(),false));
 		} catch (IOException e) {
 			ApptentiveLog.e("Error", e);
 		} finally {

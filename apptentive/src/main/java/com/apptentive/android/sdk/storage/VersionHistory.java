@@ -10,13 +10,12 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.util.Util;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class VersionHistory implements Serializable {
+public class VersionHistory implements Saveable {
 
 	/**
 	 * An ordered list of version history. Older versions are first, new versions are added to the end.
@@ -24,8 +23,24 @@ public class VersionHistory implements Serializable {
 	private List<VersionHistoryItem> versionHistoryItems;
 
 	public VersionHistory() {
-		this.versionHistoryItems = new ArrayList<>();
+		versionHistoryItems = new ArrayList<>();
 	}
+
+	//region Listeners
+	private transient DataChangedListener listener;
+
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+	//endregion
 
 	public void updateVersionHistory(double timestamp, Integer newVersionCode, String newVersionName) {
 		boolean exists = false;
@@ -38,6 +53,7 @@ public class VersionHistory implements Serializable {
 		if (!exists) {
 			VersionHistoryItem newVersionHistoryItem = new VersionHistoryItem(timestamp, newVersionCode, newVersionName);
 			versionHistoryItems.add(newVersionHistoryItem);
+			notifyDataChanged();
 		}
 	}
 

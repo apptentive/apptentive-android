@@ -8,10 +8,8 @@ package com.apptentive.android.sdk.storage;
 
 import org.json.JSONException;
 
-import java.io.Serializable;
 
-
-public class IntegrationConfig implements Serializable {
+public class IntegrationConfig implements Saveable {
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
 	private static final String INTEGRATION_AWS_SNS = "aws_sns";
@@ -23,12 +21,31 @@ public class IntegrationConfig implements Serializable {
 	private IntegrationConfigItem urbanAirship;
 	private IntegrationConfigItem parse;
 
+	private DataChangedListener listener;
+
+
+	//region Listeners
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void notifyDataChanged() {
+		if (listener != null) {
+			listener.onDataChanged();
+		}
+	}
+	//endregion
+
+	//region Getters & Setters
 	public IntegrationConfigItem getApptentive() {
 		return apptentive;
 	}
 
 	public void setApptentive(IntegrationConfigItem apptentive) {
 		this.apptentive = apptentive;
+		notifyDataChanged();
 	}
 
 	public IntegrationConfigItem getAmazonAwsSns() {
@@ -37,6 +54,7 @@ public class IntegrationConfig implements Serializable {
 
 	public void setAmazonAwsSns(IntegrationConfigItem amazonAwsSns) {
 		this.amazonAwsSns = amazonAwsSns;
+		notifyDataChanged();
 	}
 
 	public IntegrationConfigItem getUrbanAirship() {
@@ -45,6 +63,7 @@ public class IntegrationConfig implements Serializable {
 
 	public void setUrbanAirship(IntegrationConfigItem urbanAirship) {
 		this.urbanAirship = urbanAirship;
+		notifyDataChanged();
 	}
 
 	public IntegrationConfigItem getParse() {
@@ -53,7 +72,9 @@ public class IntegrationConfig implements Serializable {
 
 	public void setParse(IntegrationConfigItem parse) {
 		this.parse = parse;
+		notifyDataChanged();
 	}
+	//endregion
 
 	public com.apptentive.android.sdk.model.CustomData toJson() {
 		try {
