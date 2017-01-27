@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
+import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
 import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
@@ -56,6 +57,7 @@ import com.apptentive.android.sdk.storage.VersionHistoryEntry;
 import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +72,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
+
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
@@ -82,6 +86,7 @@ public class ApptentiveInternal {
 	ApptentiveTaskManager taskManager;
 	CodePointStore codePointStore;
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
+	ApptentiveComponentRegistry componentRegistry;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
@@ -174,6 +179,7 @@ public class ApptentiveInternal {
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
 					InteractionManager interactionMgr = new InteractionManager();
 					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
+					ApptentiveComponentRegistry componentRegistry = new ApptentiveComponentRegistry();
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
@@ -181,6 +187,7 @@ public class ApptentiveInternal {
 					sApptentiveInternal.taskManager = worker;
 					sApptentiveInternal.codePointStore = new CodePointStore();
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
+					sApptentiveInternal.componentRegistry = componentRegistry;
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
 				}
 			}
@@ -320,6 +327,9 @@ public class ApptentiveInternal {
 		return lifecycleCallbacks;
 	}
 
+	public ApptentiveComponentRegistry getComponentRegistry() {
+		return componentRegistry;
+	}
 
 	/* Get the foreground activity from the current application, i.e. at the top of the task
 	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityStopped(Activity)}
@@ -1176,5 +1186,16 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
+	}
+
+	/** Ends current user session */
+	public static void logout() {
+		getInstance().getComponentRegistry()
+			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {
+				@Override
+				public void onComponentNotify(OnUserLogOutListener component) {
+					component.onUserLogOut();
+				}
+			});
 	}
 }
