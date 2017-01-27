@@ -12,6 +12,7 @@ import android.telephony.TelephonyManager;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -21,7 +22,7 @@ import java.util.TimeZone;
  */
 public class DeviceManager {
 
-	public static Device generateNewDevice() {
+	public static Device generateNewDevice(Context context) {
 		Device device = new Device();
 
 		// First, get all the information we can load from static resources.
@@ -36,7 +37,7 @@ public class DeviceManager {
 		device.setBrand(Build.BRAND);
 		device.setCpu(Build.CPU_ABI);
 		device.setDevice(Build.DEVICE);
-		device.setUuid(ApptentiveInternal.getInstance().getAndroidId());
+		device.setUuid(Util.getAndroidId(context));
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
 

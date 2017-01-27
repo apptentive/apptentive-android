@@ -405,15 +405,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		cachedExecutor.submit(r);
 	}
 
-	public void checkAndUpdateApptentiveConfigurations() {
-		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (sessionData == null) {
-			asyncFetchConversationToken();
-		} else {
-			asyncFetchAppConfigurationAndInteractions();
-		}
-	}
-
 	public void onAppLaunch(final Context appContext) {
 		EngagementModule.engageInternal(appContext, Event.EventLabel.app__launch.getLabelName());
 	}
@@ -428,9 +419,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
 			messageManager.setCurrentForegroundActivity(activity);
 		}
-
-		//FIXME: Kick this off on Application initialization instead.
-		checkAndUpdateApptentiveConfigurations();
 	}
 
 	public void onActivityResumed(Activity activity) {
@@ -523,7 +511,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		 */
 
 		VersionHistoryItem lastVersionItemSeen = null;
-		String lastSeenSdkVersion = null;
 
 		File internalStorage = appContext.getFilesDir();
 		File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
@@ -540,7 +527,8 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 				messageManager.init();
 			}
 			lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
-			lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
+		} else {
+			scheduleConversationCreation();
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
@@ -614,8 +602,11 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		}
 		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
 
-		if (!TextUtils.equals(lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION)) {
-			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
+		// TODO: Move this into a session became active handler.
+		if (sessionData != null) {
+			if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
+				onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
+			}
 		}
 
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
@@ -637,8 +628,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		ApptentiveLog.d("Apptentive API Key: %s", apiKey);
 
 		// Grab app info we need to access later on.
-		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		ApptentiveLog.d("Android ID: ", androidId);
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
 		return bRet;
 	}
@@ -660,8 +649,8 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	}
 
 	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
-	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
-		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
+	private void onSdkVersionChanged(String lastSeenSdkVersion, String currentSdkVersion) {
+		ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 		Sdk sdk = SdkManager.generateCurrentSdk();
 		taskManager.addPayload(SdkManager.getPayload(sdk));
 		if (sessionData != null) {
@@ -684,95 +673,58 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		config.save();
 	}
 
-	private synchronized void asyncFetchConversationToken() {
-		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-			AsyncTask<Void, Void, Boolean> fetchConversationTokenTask = new AsyncTask<Void, Void, Boolean>() {
-				private Exception e = null;
+	private boolean fetchConversationToken() {
+		try {
+			if (isConversationTokenFetchPending.compareAndSet(false, true)) {
+				ApptentiveLog.i("Fetching Configuration token task started.");
 
-				@Override
-				protected Boolean doInBackground(Void... params) {
-					try {
-						return fetchConversationToken();
-					} catch (Exception e) {
-						// Hold onto the unhandled exception from fetchConversationToken() for later handling in UI thread
-						this.e = e;
-					}
+				// Try to fetch a new one from the server.
+				ConversationTokenRequest request = new ConversationTokenRequest();
+
+				// Send the Device and Sdk now, so they are available on the server from the start.
+				Device device = DeviceManager.generateNewDevice(appContext);
+				Sdk sdk = SdkManager.generateCurrentSdk();
+				AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
+
+				request.setDevice(DeviceManager.getDiffPayload(null, device));
+				request.setSdk(SdkManager.getPayload(sdk));
+				request.setAppRelease(AppReleaseManager.getPayload(appRelease));
+
+				ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
+				if (response == null) {
+					ApptentiveLog.w("Got null response fetching ConversationToken.");
 					return false;
 				}
+				if (response.isSuccessful()) {
+					try {
+						JSONObject root = new JSONObject(response.getContent());
+						String conversationToken = root.getString("token");
+						ApptentiveLog.d("ConversationToken: " + conversationToken);
+						String conversationId = root.getString("id");
+						ApptentiveLog.d("New Conversation id: %s", conversationId);
 
-				@Override
-				protected void onPostExecute(Boolean successful) {
-					if (e == null) {
-						// Update pending state on UI thread after finishing the task
-						ApptentiveLog.d("Fetching conversation token asyncTask finished. Successful? %b", successful);
-						isConversationTokenFetchPending.set(false);
-						if (successful) {
-							// Once token is fetched successfully, start asyncTasks to fetch global configuration, then interaction
-							asyncFetchAppConfigurationAndInteractions();
+						sessionData = new SessionData();
+						sessionData.setDataChangedListener(this);
+						if (conversationToken != null && !conversationToken.equals("")) {
+							sessionData.setConversationToken(conversationToken);
+							sessionData.setConversationId(conversationId);
+							sessionData.setDevice(device);
+							sessionData.setSdk(sdk);
+							sessionData.setAppRelease(appRelease);
 						}
-					} else {
-						ApptentiveLog.w("Unhandled Exception thrown from fetching conversation token asyncTask", e);
-						MetricModule.sendError(e, null, null);
+						String personId = root.getString("person_id");
+						ApptentiveLog.d("PersonId: " + personId);
+						sessionData.setPersonId(personId);
+						return true;
+					} catch (JSONException e) {
+						ApptentiveLog.e("Error parsing ConversationToken response json.", e);
 					}
 				}
-
-			};
-
-			ApptentiveLog.i("Fetching conversation token asyncTask scheduled.");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				fetchConversationTokenTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} else {
-				fetchConversationTokenTask.execute();
+				ApptentiveLog.v("Fetching Configuration pending");
 			}
-		} else {
-			ApptentiveLog.v("Fetching Configuration pending");
-		}
-	}
-
-
-	private boolean fetchConversationToken() {
-		ApptentiveLog.i("Fetching Configuration token task started.");
-		// Try to fetch a new one from the server.
-		ConversationTokenRequest request = new ConversationTokenRequest();
-
-		// Send the Device and Sdk now, so they are available on the server from the start.
-		Device device = DeviceManager.generateNewDevice();
-		Sdk sdk = SdkManager.generateCurrentSdk();
-		AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
-
-		request.setDevice(DeviceManager.getDiffPayload(null, device));
-		request.setSdk(SdkManager.getPayload(sdk));
-		request.setAppRelease(AppReleaseManager.getPayload(appRelease));
-
-		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
-		if (response == null) {
-			ApptentiveLog.w("Got null response fetching ConversationToken.");
-			return false;
-		}
-		if (response.isSuccessful()) {
-			try {
-				JSONObject root = new JSONObject(response.getContent());
-				String conversationToken = root.getString("token");
-				ApptentiveLog.d("ConversationToken: " + conversationToken);
-				String conversationId = root.getString("id");
-				ApptentiveLog.d("New Conversation id: %s", conversationId);
-
-				sessionData = new SessionData();
-				sessionData.setDataChangedListener(this);
-				if (conversationToken != null && !conversationToken.equals("")) {
-					sessionData.setConversationToken(conversationToken);
-					sessionData.setConversationId(conversationId);
-					sessionData.setDevice(device);
-					sessionData.setSdk(sdk);
-					sessionData.setAppRelease(appRelease);
-				}
-				String personId = root.getString("person_id");
-				ApptentiveLog.d("PersonId: " + personId);
-				sessionData.setPersonId(personId);
-				return true;
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
-			}
+		} finally {
+			isConversationTokenFetchPending.set(false);
 		}
 		return false;
 	}
@@ -1115,8 +1067,7 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 
 	// Multi-tenancy work
 
-	public void scheduleSessionDataSave() {
-		ApptentiveLog.e("Schedule SessionData save?");
+	private synchronized void scheduleSessionDataSave() {
 		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
 			ApptentiveLog.e("Scheduling SessionData save.");
 			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
@@ -1125,8 +1076,15 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		}
 	}
 
+	private synchronized void scheduleConversationCreation() {
+		if (!backgroundHandler.hasMessages(MESSAGE_CREATE_CONVERSATION)) {
+			backgroundHandler.sendEmptyMessage(MESSAGE_CREATE_CONVERSATION);
+		}
+	}
+
 	private static final int MESSAGE_SAVE_SESSION_DATA = 0;
 	private static final int MESSAGE_CREATE_CONVERSATION = 1;
+	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
 
 	@Override
 	public boolean handleMessage(Message msg) {
@@ -1139,7 +1097,10 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 				}
 				break;
 			case MESSAGE_CREATE_CONVERSATION:
-				// TODO: This.
+				fetchConversationToken();
+				break;
+			case MESSAGE_FETCH_CONFIGURATION:
+				// TODO
 				break;
 		}
 		return false;
