@@ -19,7 +19,9 @@ import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.Map;
 
@@ -52,9 +54,14 @@ public class EngagementModule {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			ApptentiveLog.d("engage(%s)", eventLabel);
 
-			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion(eventLabel);
-			EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
-			return doEngage(context, eventLabel);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+				sessionData.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
+				EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
+				return doEngage(context, eventLabel);
+			}
 		} catch (Exception e) {
 			MetricModule.sendError(e, null, null);
 		}
@@ -64,7 +71,12 @@ public class EngagementModule {
 	public static boolean doEngage(Context context, String eventLabel) {
 		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
-			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(interaction.getId());
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+				sessionData.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
+			}
 			launchInteraction(context, interaction);
 			return true;
 		}

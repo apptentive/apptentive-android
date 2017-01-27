@@ -18,53 +18,18 @@ public class Constants {
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
+	// Globals
 	public static final String PREF_KEY_SERVER_URL = "serverUrl";
 	// Just in case a customer copies the example text verbatim.
 	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
-	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
-	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
-	public static final String PREF_KEY_PERSON_ID = "personId";
 
-	public static final String PREF_KEY_DEVICE = "device";
-	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
-
-	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
-
-	public static final String PREF_KEY_SDK = "sdk";
-	public static final String PREF_KEY_APP_RELEASE = "app_release";
-	public static final String PREF_KEY_PERSON = "person";
-	public static final String PREF_KEY_PERSON_DATA = "personData";
-	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
-	public static final String PREF_KEY_PERSON_NAME = "personName";
-
-	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
-
-	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
-
-	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
-	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
-	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
-	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
-
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
-
+	// Session Data
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
-	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
-	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
-	// Boolean true if migration from v1 to V2 has occurred.
-	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
-
-	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
 
 	// Engagement
-	public static final String PREF_KEY_INTERACTIONS = "interactions";
-	public static final String PREF_KEY_TARGETS = "targets";
-	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
-	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
-	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 	// Config Defaults
 	public static final String CONFIG_DEFAULT_SERVER_URL = "https://api.apptentive.com";
@@ -110,6 +75,39 @@ public class Constants {
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
+	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
+
+	// FIXME: Migrate into session data
+	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
+	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
+	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
+	public static final String PREF_KEY_PERSON_ID = "personId";
+	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
+	public static final String PREF_KEY_PERSON_NAME = "personName";
+	public static final String PREF_KEY_DEVICE = "device";
+	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
+	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
+	public static final String PREF_KEY_SDK = "sdk";
+	public static final String PREF_KEY_APP_RELEASE = "app_release";
+	public static final String PREF_KEY_PERSON = "person";
+	public static final String PREF_KEY_PERSON_DATA = "personData";
+	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
+	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
+	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
+	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
+	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
+	// Boolean true if migration from v1 to V2 has occurred.
+	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
+	public static final String PREF_KEY_INTERACTIONS = "interactions";
+	public static final String PREF_KEY_TARGETS = "targets";
+	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
+
+	// FIXME: Migrate into global data.
+	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
+	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 
 	public interface FragmentConfigKeys {
@@ -150,7 +148,10 @@ public class Constants {
 		"EVDO_B",  // 12
 		"LTE",     // 13
 		"EHRPD",   // 14
-		"HSPAP"    // 15
+		"HSPAP",   // 15
+		"GSM",     // 16
+		"TD_SCDMA",// 17
+		"IWLAN"    // 18
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {

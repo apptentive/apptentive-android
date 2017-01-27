@@ -10,7 +10,6 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +17,6 @@ import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.model.CommerceExtendedData;
-import com.apptentive.android.sdk.model.CustomData;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -30,9 +28,9 @@ import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.PersonManager;
-import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.storage.IntegrationConfig;
+import com.apptentive.android.sdk.storage.IntegrationConfigItem;
+import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -79,7 +77,11 @@ public class Apptentive {
 	 */
 	public static void setPersonEmail(String email) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			PersonManager.storePersonEmail(email);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				// FIXME: Make sure Person object diff is sent.
+				sessionData.setPersonEmail(email);
+			}
 		}
 	}
 
@@ -91,7 +93,10 @@ public class Apptentive {
 	 */
 	public static String getPersonEmail() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return PersonManager.loadPersonEmail();
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				return sessionData.getPersonEmail();
+			}
 		}
 		return null;
 	}
@@ -107,7 +112,11 @@ public class Apptentive {
 	 */
 	public static void setPersonName(String name) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			PersonManager.storePersonName(name);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				// FIXME: Make sure Person object diff is sent.
+				sessionData.setPersonName(name);
+			}
 		}
 	}
 
@@ -119,33 +128,12 @@ public class Apptentive {
 	 */
 	public static String getPersonName() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return PersonManager.loadPersonName();
-		}
-		return null;
-	}
-
-
-	/**
-	 * <p>Allows you to pass arbitrary string data to the server along with this device's info. This method will replace all
-	 * custom device data that you have set for this app. Calls to this method are idempotent.</p>
-	 * <p>To add a single piece of custom device data, use {@link #addCustomDeviceData}</p>
-	 * <p>To remove a single piece of custom device data, use {@link #removeCustomDeviceData}</p>
-	 *
-	 * @param customDeviceData A Map of key/value pairs to send to the server.
-	 * @deprecated
-	 */
-	public static void setCustomDeviceData(Map<String, String> customDeviceData) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			try {
-				CustomData customData = new CustomData();
-				for (String key : customDeviceData.keySet()) {
-					customData.put(key, customDeviceData.get(key));
-				}
-				DeviceManager.storeCustomDeviceData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to set custom device data.", e);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				return sessionData.getPersonName();
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -161,7 +149,10 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			ApptentiveInternal.getInstance().addCustomDeviceData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().put(key, value);
+			}
 		}
 	}
 
@@ -175,7 +166,10 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomDeviceData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().put(key, value);
+			}
 		}
 	}
 
@@ -189,19 +183,28 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomDeviceData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().put(key, value);
+			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomDeviceData(key, version);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().put(key, version);
+			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomDeviceData(key, dateTime);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().put(key, dateTime);
+			}
 		}
 	}
 
@@ -212,34 +215,9 @@ public class Apptentive {
 	 */
 	public static void removeCustomDeviceData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			CustomData customData = DeviceManager.loadCustomDeviceData();
-			if (customData != null) {
-				customData.remove(key);
-				DeviceManager.storeCustomDeviceData(customData);
-			}
-		}
-	}
-
-	/**
-	 * <p>Allows you to pass arbitrary string data to the server along with this person's info. This method will replace all
-	 * custom person data that you have set for this app. Calls to this method are idempotent.</p>
-	 * <p>To add a single piece of custom person data, use {@link #addCustomPersonData}</p>
-	 * <p>To remove a single piece of custom person data, use {@link #removeCustomPersonData}</p>
-	 *
-	 * @param customPersonData A Map of key/value pairs to send to the server.
-	 * @deprecated
-	 */
-	public static void setCustomPersonData(Map<String, String> customPersonData) {
-		ApptentiveLog.w("Setting custom person data: %s", customPersonData.toString());
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			try {
-				CustomData customData = new CustomData();
-				for (String key : customPersonData.keySet()) {
-					customData.put(key, customPersonData.get(key));
-				}
-				PersonManager.storeCustomPersonData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.e("Unable to set custom person data.", e);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getDevice().getCustomData().remove(key);
 			}
 		}
 	}
@@ -257,7 +235,10 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			ApptentiveInternal.getInstance().addCustomPersonData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().put(key, value);
+			}
 		}
 	}
 
@@ -271,7 +252,10 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomPersonData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().put(key, value);
+			}
 		}
 	}
 
@@ -285,19 +269,28 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomPersonData(key, value);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().put(key, value);
+			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomPersonData(key, version);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().put(key, version);
+			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().addCustomPersonData(key, dateTime);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().remove(key);
+			}
 		}
 	}
 
@@ -308,10 +301,9 @@ public class Apptentive {
 	 */
 	public static void removeCustomPersonData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			CustomData customData = PersonManager.loadCustomPersonData();
-			if (customData != null) {
-				customData.remove(key);
-				PersonManager.storeCustomPersonData(customData);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getPerson().getCustomData().remove(key);
 			}
 		}
 	}
@@ -321,40 +313,7 @@ public class Apptentive {
 	// THIRD PARTY INTEGRATIONS
 	// ****************************************************************************************
 
-	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
-	private static final String INTEGRATION_PARSE = "parse";
-	private static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";
-	private static final String INTEGRATION_AWS_SNS = "aws_sns";
-
 	private static final String INTEGRATION_PUSH_TOKEN = "token";
-
-	private static void addIntegration(String integration, Map<String, String> config) {
-		if (integration == null || config == null) {
-			return;
-		}
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			return;
-		}
-
-		CustomData integrationConfig = DeviceManager.loadIntegrationConfig();
-		try {
-			JSONObject configJson = null;
-			if (!integrationConfig.isNull(integration)) {
-				configJson = integrationConfig.getJSONObject(integration);
-			} else {
-				configJson = new JSONObject();
-				integrationConfig.put(integration, configJson);
-			}
-			for (String key : config.keySet()) {
-				configJson.put(key, config.get(key));
-			}
-			ApptentiveLog.d("Adding integration config: %s", config.toString());
-			DeviceManager.storeIntegrationConfig(integrationConfig);
-			ApptentiveInternal.getInstance().syncDevice();
-		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding integration: %s, %s", e, integration, config.toString());
-		}
-	}
 
 	/**
 	 * Call {@link #setPushNotificationIntegration(int, String)} with this value to allow Apptentive to send pushes
@@ -413,47 +372,32 @@ public class Apptentive {
 	 *                     </dl>
 	 */
 	public static void setPushNotificationIntegration(int pushProvider, String token) {
-		try {
-			if (!ApptentiveInternal.isApptentiveRegistered()) {
-				return;
-			}
-			CustomData integrationConfig = getIntegrationConfigurationWithoutPushProviders();
-			JSONObject pushObject = new JSONObject();
-			pushObject.put(INTEGRATION_PUSH_TOKEN, token);
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			return;
+		}
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData != null) {
+			IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getSessionData().getDevice().getIntegrationConfig();
+			IntegrationConfigItem item = new IntegrationConfigItem();
+			item.put(INTEGRATION_PUSH_TOKEN, token);
 			switch (pushProvider) {
 				case PUSH_PROVIDER_APPTENTIVE:
-					integrationConfig.put(INTEGRATION_APPTENTIVE_PUSH, pushObject);
+					integrationConfig.setApptentive(item);
 					break;
 				case PUSH_PROVIDER_PARSE:
-					integrationConfig.put(INTEGRATION_PARSE, pushObject);
+					integrationConfig.setParse(item);
 					break;
 				case PUSH_PROVIDER_URBAN_AIRSHIP:
-					integrationConfig.put(INTEGRATION_URBAN_AIRSHIP, pushObject);
+					integrationConfig.setUrbanAirship(item);
 					break;
 				case PUSH_PROVIDER_AMAZON_AWS_SNS:
-					integrationConfig.put(INTEGRATION_AWS_SNS, pushObject);
+					integrationConfig.setAmazonAwsSns(item);
 					break;
 				default:
 					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 					return;
 			}
-			DeviceManager.storeIntegrationConfig(integrationConfig);
-			ApptentiveInternal.getInstance().syncDevice();
-		} catch (JSONException e) {
-			ApptentiveLog.e("Error setting push integration.", e);
-			return;
 		}
-	}
-
-	private static CustomData getIntegrationConfigurationWithoutPushProviders() {
-		CustomData integrationConfig = DeviceManager.loadIntegrationConfig();
-		if (integrationConfig != null) {
-			integrationConfig.remove(INTEGRATION_APPTENTIVE_PUSH);
-			integrationConfig.remove(INTEGRATION_PARSE);
-			integrationConfig.remove(INTEGRATION_URBAN_AIRSHIP);
-			integrationConfig.remove(INTEGRATION_AWS_SNS);
-		}
-		return integrationConfig;
 	}
 
 	// ****************************************************************************************
@@ -504,8 +448,7 @@ public class Apptentive {
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
-	 * to display Interactions such as Message Center. This method replaces the deprecated
-	 * {@link #setPendingPushNotification(Intent)}. Calling this method for a push {@link Intent} that did
+	 * to display Interactions such as Message Center. Calling this method for a push {@link Intent} that did
 	 * not come from Apptentive will return a null object. If you receive a null object, your app will
 	 * need to handle this notification itself.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
@@ -531,8 +474,7 @@ public class Apptentive {
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
-	 * to display Interactions such as Message Center. This method replaces the deprecated
-	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
+	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
@@ -556,8 +498,7 @@ public class Apptentive {
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
 	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
-	 * to display Interactions such as Message Center. This method replaces the deprecated
-	 * {@link #setPendingPushNotification(Bundle)}. Calling this method for a push {@link Bundle} that
+	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
@@ -729,98 +670,6 @@ public class Apptentive {
 		}
 		return data.get(ApptentiveInternal.BODY_DEFAULT);
 	}
-
-	/**
-	 * <p>Saves Apptentive specific data from a push notification Intent. In your BroadcastReceiver, if the push notification
-	 * came from Apptentive, it will have data that needs to be saved before you launch your Activity. You must call this
-	 * method <strong>every time</strong> you get a push opened Intent, and before you launch your Activity. If the push
-	 * notification did not come from Apptentive, this method has no effect.</p>
-	 * <p>Use this method when using Parse and Amazon SNS as push providers.</p>
-	 *
-	 * @param intent The Intent that you received when the user opened a push notification.
-	 * @return true if the push data came from Apptentive.
-	 * @deprecated
-	 */
-	@Deprecated
-	public static boolean setPendingPushNotification(Intent intent) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
-		}
-		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(intent);
-		if (apptentive != null) {
-			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
-		}
-		return false;
-	}
-
-	/**
-	 * Saves off the data contained in a push notification sent to this device from Apptentive. Use
-	 * this method when a push notification is opened, and you only have access to a push data
-	 * Bundle containing an "apptentive" key. This will generally be used with direct Apptentive Push
-	 * notifications, or when using Urban Airship as a push provider. Calling this method for a push
-	 * that did not come from Apptentive has no effect.
-	 *
-	 * @param data A Bundle containing the GCM data object from the push notification.
-	 * @return true if the push data came from Apptentive.
-	 * @deprecated
-	 */
-	@Deprecated
-	public static boolean setPendingPushNotification(Bundle data) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
-		}
-		String apptentive = ApptentiveInternal.getApptentivePushNotificationData(data);
-		if (apptentive != null) {
-			return ApptentiveInternal.getInstance().setPendingPushNotification(apptentive);
-		}
-		return false;
-	}
-
-	/**
-	 * Launches Apptentive features based on a push notification Intent. Before you call this, you
-	 * must call {@link #setPendingPushNotification(Intent)} or
-	 * {@link #setPendingPushNotification(Bundle)} in your Broadcast receiver when
-	 * a push notification is opened by the user. This method must be called from the Activity that
-	 * you launched from the BroadcastReceiver. This method will only handle Apptentive originated
-	 * push notifications, so you can and should call it any time your push notification launches an
-	 * Activity.
-	 *
-	 * @param context The context from which this method is called.
-	 * @return True if a call to this method resulted in Apptentive displaying a View.
-	 * @deprecated
-	 */
-	@Deprecated
-	public static boolean handleOpenedPushNotification(Context context) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
-		}
-
-		SharedPreferences prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		String pushData = prefs.getString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, null);
-		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply(); // Remove our data so this won't run twice.
-		if (pushData != null) {
-			ApptentiveLog.i("Handling opened Apptentive push notification.");
-			try {
-				JSONObject pushJson = new JSONObject(pushData);
-				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
-				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
-					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
-				}
-				switch (action) {
-					case pmc:
-						Apptentive.showMessageCenter(context);
-						return true;
-					default:
-						ApptentiveLog.v("Unknown Apptentive push notification action: \"%s\"", action.name());
-				}
-			} catch (JSONException e) {
-				ApptentiveLog.w("Error parsing JSON from push notification.", e);
-				MetricModule.sendError(e, "Parsing Push notification", pushData);
-			}
-		}
-		return false;
-	}
-
 
 	// ****************************************************************************************
 	// RATINGS

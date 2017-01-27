@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.model;
+package com.apptentive.android.sdk.storage.legacy;
 
 import android.content.SharedPreferences;
 
@@ -72,12 +72,12 @@ public class CodePointStore {
 	}
 
 	private void saveToPreference() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_CODE_POINT_STORE, store.toString()).apply();
 	}
 
 	private JSONObject loadFromPreference() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String json = prefs.getString(Constants.PREF_KEY_CODE_POINT_STORE, null);
 		try {
 			if (json != null) {
@@ -255,7 +255,7 @@ public class CodePointStore {
 	}
 
 	public void clear() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().remove(Constants.PREF_KEY_CODE_POINT_STORE).apply();
 		store = new JSONObject();
 	}

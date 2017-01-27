@@ -22,6 +22,9 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -34,11 +37,7 @@ import com.apptentive.android.sdk.model.AppRelease;
 import com.apptentive.android.sdk.model.CodePointStore;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Device;
 import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -47,14 +46,18 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
+import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
-import com.apptentive.android.sdk.storage.PersonManager;
+import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
-import com.apptentive.android.sdk.storage.VersionHistoryEntry;
-import com.apptentive.android.sdk.storage.VersionHistoryStore;
+import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.storage.DataChangedListener;
+import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
@@ -62,6 +65,7 @@ import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,14 +81,14 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal {
+public class ApptentiveInternal implements Handler.Callback, DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
 	ApptentiveTaskManager taskManager;
-	CodePointStore codePointStore;
+
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 	ApptentiveComponentRegistry componentRegistry;
 
@@ -95,13 +99,16 @@ public class ApptentiveInternal {
 
 	boolean appIsInForeground;
 	boolean isAppDebuggable;
-	SharedPreferences prefs;
+	SharedPreferences globalSharedPrefs;
 	String apiKey;
-	String conversationToken;
-	String conversationId;
 	String personId;
 	String androidId;
 	String appPackageName;
+	SessionData sessionData;
+	private FileSerializer fileSerializer;
+
+
+	Handler backgroundHandler;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
@@ -173,7 +180,7 @@ public class ApptentiveInternal {
 					sApptentiveInternal = new ApptentiveInternal();
 					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.prefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
@@ -185,10 +192,15 @@ public class ApptentiveInternal {
 					sApptentiveInternal.payloadWorker = payloadWorker;
 					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.codePointStore = new CodePointStore();
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.componentRegistry = componentRegistry;
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
+
+
+					HandlerThread handlerThread = new HandlerThread("ApptentiveInternalHandlerThread");
+					handlerThread.start();
+					sApptentiveInternal.backgroundHandler = new Handler(handlerThread.getLooper(), sApptentiveInternal);
+
 				}
 			}
 		}
@@ -303,6 +315,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 *
 	 * @return true it the app is using an AppCompat theme
 	 */
 	public boolean isAppUsingAppCompatTheme() {
@@ -360,10 +373,6 @@ public class ApptentiveInternal {
 		return taskManager;
 	}
 
-	public CodePointStore getCodePointStore() {
-		return codePointStore;
-	}
-
 	public Resources.Theme getApptentiveToolbarTheme() {
 		return apptentiveToolbarTheme;
 	}
@@ -372,8 +381,8 @@ public class ApptentiveInternal {
 		return statusBarColorDefault;
 	}
 
-	public String getApptentiveConversationToken() {
-		return conversationToken;
+	public SessionData getSessionData() {
+		return sessionData;
 	}
 
 	public String getApptentiveApiKey() {
@@ -396,39 +405,8 @@ public class ApptentiveInternal {
 		return androidId;
 	}
 
-	public SharedPreferences getSharedPrefs() {
-		return prefs;
-	}
-
-	public void addCustomDeviceData(String key, Object value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		key = key.trim();
-		CustomData customData = DeviceManager.loadCustomDeviceData();
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				DeviceManager.storeCustomDeviceData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to add custom device data.", e);
-			}
-		}
-	}
-
-	public void addCustomPersonData(String key, Object value) {
-		if (key == null || key.trim().length() == 0) {
-			return;
-		}
-		CustomData customData = PersonManager.loadCustomPersonData();
-		if (customData != null) {
-			try {
-				customData.put(key, value);
-				PersonManager.storeCustomPersonData(customData);
-			} catch (JSONException e) {
-				ApptentiveLog.w("Unable to add custom person data.", e);
-			}
-		}
+	public SharedPreferences getGlobalSharedPrefs() {
+		return globalSharedPrefs;
 	}
 
 	public void runOnWorkerThread(Runnable r) {
@@ -437,15 +415,6 @@ public class ApptentiveInternal {
 
 	public void scheduleOnWorkerThread(Runnable r) {
 		cachedExecutor.submit(r);
-	}
-
-	public void checkAndUpdateApptentiveConfigurations() {
-		// Initialize the Conversation Token, or fetch if needed. Fetch config it the token is available.
-		if (conversationToken == null || personId == null) {
-			asyncFetchConversationToken();
-		} else {
-			asyncFetchAppConfigurationAndInteractions();
-		}
 	}
 
 	public void onAppLaunch(final Context appContext) {
@@ -462,11 +431,6 @@ public class ApptentiveInternal {
 			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
 			messageManager.setCurrentForegroundActivity(activity);
 		}
-
-		checkAndUpdateApptentiveConfigurations();
-
-		syncDevice();
-		syncPerson();
 	}
 
 	public void onActivityResumed(Activity activity) {
@@ -551,20 +515,34 @@ public class ApptentiveInternal {
 
 	public boolean init() {
 		boolean bRet = true;
-		codePointStore.init();
 		/* If Message Center feature has never been used before, don't initialize message polling thread.
 		 * Message Center feature will be seen as used, if one of the following conditions has been met:
 		 * 1. Message Center has been opened for the first time
 		 * 2. The first Push is received which would open Message Center
 		 * 3. An unreadMessageCountListener() is set up
 		 */
-		boolean featureEverUsed = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false);
-		if (featureEverUsed) {
-			messageManager.init();
+
+		VersionHistoryItem lastVersionItemSeen = null;
+
+		File internalStorage = appContext.getFilesDir();
+		File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
+		sessionDataFile.getParentFile().mkdirs();
+		fileSerializer = new FileSerializer(sessionDataFile);
+		sessionData = (SessionData) fileSerializer.deserialize();
+		if (sessionData != null) {
+			sessionData.setDataChangedListener(this);
+			ApptentiveLog.d("Restored existing SessionData");
+			ApptentiveLog.v("Restored EventData: %s", sessionData.getEventData());
+			// FIXME: Move this to whereever the sessions first comes online?
+			boolean featureEverUsed = sessionData != null && sessionData.isMessageCenterFeatureUsed();
+			if (featureEverUsed) {
+				messageManager.init();
+			}
+			lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
+		} else {
+			scheduleConversationCreation();
 		}
-		conversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-		conversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
-		personId = prefs.getString(Constants.PREF_KEY_PERSON_ID, null);
+
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
 		boolean apptentiveDebug = false;
@@ -586,22 +564,21 @@ public class ApptentiveInternal {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			AppRelease appRelease = AppRelease.generateCurrentAppRelease(appContext);
+			AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
 
-			isAppDebuggable = appRelease.getDebug();
+			isAppDebuggable = appRelease.isDebug();
 			currentVersionCode = appRelease.getVersionCode();
 			currentVersionName = appRelease.getVersionName();
 
-			VersionHistoryEntry lastVersionEntrySeen = VersionHistoryStore.getLastVersionSeen();
 
-			if (lastVersionEntrySeen == null) {
+			if (lastVersionItemSeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
-				int lastSeenVersionCode = lastVersionEntrySeen.getVersionCode();
+				int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
 				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
-				lastSeenVersionNameVersion.setVersion(lastVersionEntrySeen.getVersionName());
+				lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
 				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
-					onVersionChanged(lastVersionEntrySeen.getVersionCode(), currentVersionCode, lastVersionEntrySeen.getVersionName(), currentVersionName, appRelease);
+					onVersionChanged(lastVersionItemSeen.getVersionCode(), currentVersionCode, lastVersionItemSeen.getVersionName(), currentVersionName, appRelease);
 				}
 			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
@@ -637,9 +614,11 @@ public class ApptentiveInternal {
 		}
 		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
 
-		String lastSeenSdkVersion = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, "");
-		if (!lastSeenSdkVersion.equals(Constants.APPTENTIVE_SDK_VERSION)) {
-			onSdkVersionChanged(appContext, lastSeenSdkVersion, Constants.APPTENTIVE_SDK_VERSION);
+		// TODO: Move this into a session became active handler.
+		if (sessionData != null) {
+			if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
+				onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
+			}
 		}
 
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
@@ -661,27 +640,35 @@ public class ApptentiveInternal {
 		ApptentiveLog.d("Apptentive API Key: %s", apiKey);
 
 		// Grab app info we need to access later on.
-		androidId = Settings.Secure.getString(appContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-		ApptentiveLog.d("Android ID: ", androidId);
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
-		ApptentiveLog.d("Conversation id: %s", prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, "null"));
 		return bRet;
 	}
 
+	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
 	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
 		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		VersionHistoryStore.updateVersionHistory(currentVersionCode, currentVersionName);
+		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		if (sessionData != null) {
+			sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
+		}
 		if (previousVersionCode != null) {
-			AppReleaseManager.storeAppRelease(currentAppRelease);
-			taskManager.addPayload(currentAppRelease);
+			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
+			if (sessionData != null) {
+				sessionData.setAppRelease(currentAppRelease);
+			}
 		}
 		invalidateCaches();
 	}
 
-	private void onSdkVersionChanged(Context context, String previousSdkVersion, String currentSdkVersion) {
-		ApptentiveLog.i("SDK version changed: %s => %s", previousSdkVersion, currentSdkVersion);
-		context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit().putString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, currentSdkVersion).apply();
-		syncSdk();
+	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
+	private void onSdkVersionChanged(String lastSeenSdkVersion, String currentSdkVersion) {
+		ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
+		Sdk sdk = SdkManager.generateCurrentSdk();
+		taskManager.addPayload(SdkManager.getPayload(sdk));
+		if (sessionData != null) {
+			sessionData.setLastSeenSdkVersion(currentSdkVersion);
+			sessionData.setSdk(sdk);
+		}
 		invalidateCaches();
 	}
 
@@ -689,97 +676,67 @@ public class ApptentiveInternal {
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches() {
-		interactionManager.updateCacheExpiration(0);
+		SessionData sessionData = getSessionData();
+		if (sessionData != null) {
+			sessionData.setInteractionExpiration(0L);
+		}
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();
 	}
 
-	private synchronized void asyncFetchConversationToken() {
-		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-			AsyncTask<Void, Void, Boolean> fetchConversationTokenTask = new AsyncTask<Void, Void, Boolean>() {
-				private Exception e = null;
+	private boolean fetchConversationToken() {
+		try {
+			if (isConversationTokenFetchPending.compareAndSet(false, true)) {
+				ApptentiveLog.i("Fetching Configuration token task started.");
 
-				@Override
-				protected Boolean doInBackground(Void... params) {
-					try {
-						return fetchConversationToken();
-					} catch (Exception e) {
-						// Hold onto the unhandled exception from fetchConversationToken() for later handling in UI thread
-						this.e = e;
-					}
+				// Try to fetch a new one from the server.
+				ConversationTokenRequest request = new ConversationTokenRequest();
+
+				// Send the Device and Sdk now, so they are available on the server from the start.
+				Device device = DeviceManager.generateNewDevice(appContext);
+				Sdk sdk = SdkManager.generateCurrentSdk();
+				AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
+
+				request.setDevice(DeviceManager.getDiffPayload(null, device));
+				request.setSdk(SdkManager.getPayload(sdk));
+				request.setAppRelease(AppReleaseManager.getPayload(appRelease));
+
+				ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
+				if (response == null) {
+					ApptentiveLog.w("Got null response fetching ConversationToken.");
 					return false;
 				}
+				if (response.isSuccessful()) {
+					try {
+						JSONObject root = new JSONObject(response.getContent());
+						String conversationToken = root.getString("token");
+						ApptentiveLog.d("ConversationToken: " + conversationToken);
+						String conversationId = root.getString("id");
+						ApptentiveLog.d("New Conversation id: %s", conversationId);
 
-				@Override
-				protected void onPostExecute(Boolean successful) {
-					if (e == null) {
-						// Update pending state on UI thread after finishing the task
-						ApptentiveLog.d("Fetching conversation token asyncTask finished. Successful? %b", successful);
-						isConversationTokenFetchPending.set(false);
-						if (successful) {
-							// Once token is fetched successfully, start asyncTasks to fetch global configuration, then interaction
-							asyncFetchAppConfigurationAndInteractions();
+						sessionData = new SessionData();
+						sessionData.setDataChangedListener(this);
+						if (conversationToken != null && !conversationToken.equals("")) {
+							sessionData.setConversationToken(conversationToken);
+							sessionData.setConversationId(conversationId);
+							sessionData.setDevice(device);
+							sessionData.setSdk(sdk);
+							sessionData.setAppRelease(appRelease);
 						}
-					} else {
-						ApptentiveLog.w("Unhandled Exception thrown from fetching conversation token asyncTask", e);
-						MetricModule.sendError(e, null, null);
+						String personId = root.getString("person_id");
+						ApptentiveLog.d("PersonId: " + personId);
+						sessionData.setPersonId(personId);
+						return true;
+					} catch (JSONException e) {
+						ApptentiveLog.e("Error parsing ConversationToken response json.", e);
 					}
 				}
-
-			};
-
-			ApptentiveLog.i("Fetching conversation token asyncTask scheduled.");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				fetchConversationTokenTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} else {
-				fetchConversationTokenTask.execute();
+				ApptentiveLog.v("Fetching Configuration pending");
 			}
-		} else {
-			ApptentiveLog.v("Fetching Configuration pending");
-		}
-	}
-
-
-	private boolean fetchConversationToken() {
-		ApptentiveLog.i("Fetching Configuration token task started.");
-		// Try to fetch a new one from the server.
-		ConversationTokenRequest request = new ConversationTokenRequest();
-
-		// Send the Device and Sdk now, so they are available on the server from the start.
-		request.setDevice(DeviceManager.storeDeviceAndReturnIt());
-		request.setSdk(SdkManager.storeSdkAndReturnIt());
-		request.setPerson(PersonManager.storePersonAndReturnIt());
-		AppRelease currentAppRelease = AppRelease.generateCurrentAppRelease(appContext);
-		AppReleaseManager.storeAppRelease(currentAppRelease);
-		request.setAppRelease(currentAppRelease);
-
-		ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
-		if (response == null) {
-			ApptentiveLog.w("Got null response fetching ConversationToken.");
-			return false;
-		}
-		if (response.isSuccessful()) {
-			try {
-				JSONObject root = new JSONObject(response.getContent());
-				String conversationToken = root.getString("token");
-				ApptentiveLog.d("ConversationToken: " + conversationToken);
-				String conversationId = root.getString("id");
-				ApptentiveLog.d("New Conversation id: %s", conversationId);
-
-				if (conversationToken != null && !conversationToken.equals("")) {
-					setConversationToken(conversationToken);
-					setConversationId(conversationId);
-				}
-				String personId = root.getString("person_id");
-				ApptentiveLog.d("PersonId: " + personId);
-				if (personId != null && !personId.equals("")) {
-					setPersonId(personId);
-				}
-				return true;
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing ConversationToken response json.", e);
-			}
+		} finally {
+			isConversationTokenFetchPending.set(false);
 		}
 		return false;
 	}
@@ -852,44 +809,6 @@ public class ApptentiveInternal {
 			ApptentiveLog.v("Using cached Configuration.");
 			// If configuration hasn't expire, then check if need to start another asyncTask to fetch interaction
 			interactionManager.asyncFetchAndStoreInteractions();
-		}
-	}
-
-	/**
-	 * Sends current Device to the server if it differs from the last time it was sent.
-	 */
-	void syncDevice() {
-		Device deviceInfo = DeviceManager.storeDeviceAndReturnDiff();
-		if (deviceInfo != null) {
-			ApptentiveLog.d("Device info was updated.");
-			ApptentiveLog.v(deviceInfo.toString());
-			taskManager.addPayload(deviceInfo);
-		} else {
-			ApptentiveLog.d("Device info was not updated.");
-		}
-	}
-
-	/**
-	 * Sends current SDK to the server.
-	 */
-	private void syncSdk() {
-		Sdk sdk = SdkManager.generateCurrentSdk();
-		SdkManager.storeSdk(sdk);
-		ApptentiveLog.v(sdk.toString());
-		taskManager.addPayload(sdk);
-	}
-
-	/**
-	 * Sends current Person to the server if it differs from the last time it was sent.
-	 */
-	private void syncPerson() {
-		Person person = PersonManager.storePersonAndReturnDiff();
-		if (person != null) {
-			ApptentiveLog.d("Person was updated.");
-			ApptentiveLog.v(person.toString());
-			taskManager.addPayload(person);
-		} else {
-			ApptentiveLog.d("Person was not updated.");
 		}
 	}
 
@@ -1025,22 +944,6 @@ public class ApptentiveInternal {
 		return null;
 	}
 
-	boolean setPendingPushNotification(String apptentivePushData) {
-		if (apptentivePushData != null) {
-			ApptentiveLog.d("Saving Apptentive push notification data.");
-			prefs.edit().putString(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION, apptentivePushData).apply();
-			messageManager.startMessagePreFetchTask();
-			return true;
-		}
-		return false;
-	}
-
-	boolean clearPendingPushNotification() {
-		ApptentiveLog.d("Clearing Apptentive push notification data.");
-		prefs.edit().remove(Constants.PREF_KEY_PENDING_PUSH_NOTIFICATION).apply();
-		return true;
-	}
-
 	public void showAboutInternal(Context context, boolean showBrandingBand) {
 		Intent intent = new Intent();
 		intent.setClass(context, ApptentiveViewActivity.class);
@@ -1129,25 +1032,9 @@ public class ApptentiveInternal {
 		return customData;
 	}
 
-	private void setConversationToken(String newConversationToken) {
-		conversationToken = newConversationToken;
-		prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_TOKEN, conversationToken).apply();
-	}
-
-	private void setConversationId(String newConversationId) {
-		conversationId = newConversationId;
-		prefs.edit().putString(Constants.PREF_KEY_CONVERSATION_ID, conversationId).apply();
-	}
-
-	private void setPersonId(String newPersonId) {
-		personId = newPersonId;
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_ID, personId).apply();
-	}
-
 	public void resetSdkState() {
-		prefs.edit().clear().apply();
+		globalSharedPrefs.edit().clear().apply();
 		taskManager.reset(appContext);
-		VersionHistoryStore.clear();
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {
@@ -1178,6 +1065,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
+	 *
 	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
@@ -1188,7 +1076,56 @@ public class ApptentiveInternal {
 		return true;
 	}
 
-	/** Ends current user session */
+	// Multi-tenancy work
+
+	private synchronized void scheduleSessionDataSave() {
+		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
+			ApptentiveLog.e("Scheduling SessionData save.");
+			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
+		} else {
+			ApptentiveLog.e("SessionData save already scheduled.");
+		}
+	}
+
+	private synchronized void scheduleConversationCreation() {
+		if (!backgroundHandler.hasMessages(MESSAGE_CREATE_CONVERSATION)) {
+			backgroundHandler.sendEmptyMessage(MESSAGE_CREATE_CONVERSATION);
+		}
+	}
+
+	private static final int MESSAGE_SAVE_SESSION_DATA = 0;
+	private static final int MESSAGE_CREATE_CONVERSATION = 1;
+	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		switch (msg.what) {
+			case MESSAGE_SAVE_SESSION_DATA:
+				ApptentiveLog.e("Saving SessionData");
+				ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
+				if (fileSerializer != null) {
+					fileSerializer.serialize(sessionData);
+				}
+				break;
+			case MESSAGE_CREATE_CONVERSATION:
+				fetchConversationToken();
+				break;
+			case MESSAGE_FETCH_CONFIGURATION:
+				// TODO
+				break;
+		}
+		return false;
+	}
+
+	//region Listeners
+
+	@Override
+	public void onDataChanged() {
+		scheduleSessionDataSave();
+	}
+	//endregion
+
+  /** Ends current user session */
 	public static void logout() {
 		getInstance().getComponentRegistry()
 			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {

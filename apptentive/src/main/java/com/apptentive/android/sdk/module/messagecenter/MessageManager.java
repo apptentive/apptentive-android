@@ -29,7 +29,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListIt
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.storage.SessionData;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONArray;
@@ -109,10 +109,9 @@ public class MessageManager {
 			/* Set SharePreference to indicate Message Center feature is desired. It will always be checked
 			 * during Apptentive initialization.
 			 */
-			SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-			boolean featureEverUsed = prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false);
-			if (!featureEverUsed) {
-				prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, true).apply();
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.setMessageCenterFeatureUsed(true);
 			}
 		}
 	}
@@ -161,7 +160,7 @@ public class MessageManager {
 	 * @return true if messages were returned, else false.
 	 */
 	public synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
-		if (ApptentiveInternal.getInstance().getApptentiveConversationToken() == null) {
+		if (ApptentiveInternal.getInstance().getSessionData().getConversationToken() == null) {
 			ApptentiveLog.d("Can't fetch messages because the conversation has not yet been initialized.");
 			return false;
 		}

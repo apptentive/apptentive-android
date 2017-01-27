@@ -102,7 +102,16 @@ public class PayloadSendWorker {
 				while (appInForeground.get()) {
 					MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 
-					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getApptentiveConversationToken())){
+					if (ApptentiveInternal.getInstance().getSessionData() == null){
+						ApptentiveLog.i("SessionData is null.");
+						if (mgr != null) {
+							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
+						}
+						retryLater(NO_TOKEN_SLEEP);
+						break;
+					}
+
+					if (TextUtils.isEmpty(ApptentiveInternal.getInstance().getSessionData().getConversationToken())){
 						ApptentiveLog.i("No conversation token yet.");
 						if (mgr != null) {
 							mgr.pauseSending(MessageManager.SEND_PAUSE_REASON_SERVER);
@@ -152,17 +161,17 @@ public class PayloadSendWorker {
 							response = ApptentiveClient.postEvent((Event) payload);
 							break;
 						case device:
-							response = ApptentiveClient.putDevice((Device) payload);
+							response = ApptentiveClient.putDevice((com.apptentive.android.sdk.model.Device) payload);
 							DeviceManager.onSentDeviceInfo();
 							break;
 						case sdk:
-							response = ApptentiveClient.putSdk((Sdk) payload);
+							response = ApptentiveClient.putSdk((com.apptentive.android.sdk.model.Sdk) payload);
 							break;
 						case app_release:
-							response = ApptentiveClient.putAppRelease((AppRelease) payload);
+							response = ApptentiveClient.putAppRelease((com.apptentive.android.sdk.model.AppRelease) payload);
 							break;
 						case person:
-							response = ApptentiveClient.putPerson((Person) payload);
+							response = ApptentiveClient.putPerson((com.apptentive.android.sdk.model.Person) payload);
 							break;
 						case survey:
 							response = ApptentiveClient.postSurvey((SurveyResponse) payload);

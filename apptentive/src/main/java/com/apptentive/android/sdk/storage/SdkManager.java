@@ -6,20 +6,11 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.SharedPreferences;
-
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.model.Sdk;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 public class SdkManager {
-
-	public static Sdk storeSdkAndReturnIt() {
-		Sdk current = generateCurrentSdk();
-		storeSdk(current);
-		return current;
-	}
 
 	public static Sdk generateCurrentSdk() {
 		Sdk sdk = new Sdk();
@@ -40,8 +31,19 @@ public class SdkManager {
 		return sdk;
 	}
 
-	public static void storeSdk(Sdk sdk) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_SDK, sdk.toString()).apply();
+	public static com.apptentive.android.sdk.model.Sdk getPayload(Sdk sdk) {
+		com.apptentive.android.sdk.model.Sdk ret = new com.apptentive.android.sdk.model.Sdk();
+		if (sdk == null) {
+			return ret;
+		}
+
+		ret.setAuthorEmail(sdk.getAuthorEmail());
+		ret.setAuthorName(sdk.getAuthorName());
+		ret.setDistribution(sdk.getDistribution());
+		ret.setDistributionVersion(sdk.getDistributionVersion());
+		ret.setPlatform(sdk.getPlatform());
+		ret.setProgrammingLanguage(sdk.getProgrammingLanguage());
+		ret.setVersion(sdk.getVersion());
+		return ret;
 	}
 }
