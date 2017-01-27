@@ -11,6 +11,8 @@ import org.json.JSONException;
 
 public class IntegrationConfig implements Saveable {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
 	private static final String INTEGRATION_AWS_SNS = "aws_sns";
 	private static final String INTEGRATION_URBAN_AIRSHIP = "urban_airship";

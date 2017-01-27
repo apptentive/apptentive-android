@@ -14,6 +14,8 @@ import java.util.Set;
 
 public class CustomData extends HashMap<String, Object> implements Saveable {
 
+	private static final long serialVersionUID = 1L;
+
 	//region Listeners
 	private transient DataChangedListener listener;
 

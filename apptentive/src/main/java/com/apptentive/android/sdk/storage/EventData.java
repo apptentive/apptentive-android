@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public class EventData implements Saveable {
 
+	private static final long serialVersionUID = 1L;
+
 	private Map<String, EventRecord> events;
 	private Map<String, EventRecord> interactions;
 

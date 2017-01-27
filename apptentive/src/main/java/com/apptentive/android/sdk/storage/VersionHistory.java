@@ -17,6 +17,8 @@ import java.util.Set;
 
 public class VersionHistory implements Saveable {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * An ordered list of version history. Older versions are first, new versions are added to the end.
 	 */

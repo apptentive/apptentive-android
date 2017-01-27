@@ -10,6 +10,8 @@ import android.text.TextUtils;
 
 public class Person implements Saveable, DataChangedListener {
 
+	private static final long serialVersionUID = 1L;
+
 	private String id;
 	private String email;
 	private String name;
