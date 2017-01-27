@@ -56,7 +56,9 @@ public class EngagementModule {
 
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
-				sessionData.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), eventLabel);
+				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+				sessionData.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
 				EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
 				return doEngage(context, eventLabel);
 			}
@@ -71,7 +73,9 @@ public class EngagementModule {
 		if (interaction != null) {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
-				sessionData.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), interaction.getId());
+				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+				sessionData.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
 			}
 			launchInteraction(context, interaction);
 			return true;

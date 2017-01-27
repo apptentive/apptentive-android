@@ -45,27 +45,23 @@ public class EventData implements Saveable {
 
 
 	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
-	public synchronized void storeEventForCurrentAppVersion(double timestamp, String eventLabel) {
+	public synchronized void storeEventForCurrentAppVersion(double timestamp, int versionCode, String versionName, String eventLabel) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord == null) {
 			eventRecord = new EventRecord();
 			events.put(eventLabel, eventRecord);
 		}
-		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
-		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 		eventRecord.update(timestamp, versionName, versionCode);
 		notifyDataChanged();
 	}
 
 	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
-	public synchronized void storeInteractionForCurrentAppVersion(double timestamp, String interactionId) {
+	public synchronized void storeInteractionForCurrentAppVersion(double timestamp, int versionCode, String versionName, String interactionId) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord == null) {
 			eventRecord = new EventRecord();
 			interactions.put(interactionId, eventRecord);
 		}
-		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
-		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 		eventRecord.update(timestamp, versionName, versionCode);
 		notifyDataChanged();
 	}
