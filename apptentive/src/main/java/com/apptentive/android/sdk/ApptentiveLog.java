@@ -80,6 +80,9 @@ public class ApptentiveLog {
 	public static void e(String message, Throwable throwable, Object... args){
 		doLog(Level.ERROR, throwable, message, args);
 	}
+	public static void e(Throwable throwable, String message, Object... args){
+		doLog(Level.ERROR, throwable, message, args);
+	}
 
 	public static void a(String message, Object... args){
 		doLog(Level.ASSERT, null, message, args);
@@ -88,7 +91,7 @@ public class ApptentiveLog {
 		doLog(Level.ASSERT, throwable, message, args);
 	}
 
-	public static enum Level {
+	public enum Level {
 		VERBOSE(Log.VERBOSE),
 		DEBUG(Log.DEBUG),
 		INFO(Log.INFO),
