@@ -169,6 +169,7 @@ public class Person implements Saveable, DataChangedListener {
 	public void setCustomData(CustomData customData) {
 		this.customData = customData;
 		this.customData.setDataChangedListener(this);
+		notifyDataChanged();
 	}
 
 	//endregion

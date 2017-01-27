@@ -37,6 +37,8 @@ public class SessionData implements Saveable, DataChangedListener {
 	public SessionData() {
 		this.device = new Device();
 		this.person = new Person();
+		this.sdk = new Sdk();
+		this.appRelease = new AppRelease();
 		this.eventData = new EventData();
 		this.versionHistory = new VersionHistory();
 	}
@@ -139,6 +141,7 @@ public class SessionData implements Saveable, DataChangedListener {
 
 	public void setLastSentDevice(Device lastSentDevice) {
 		this.lastSentDevice = lastSentDevice;
+		this.lastSentDevice.setDataChangedListener(this);
 		notifyDataChanged();
 	}
 
@@ -158,6 +161,7 @@ public class SessionData implements Saveable, DataChangedListener {
 
 	public void setLastSentPerson(Person lastSentPerson) {
 		this.lastSentPerson = lastSentPerson;
+		this.lastSentPerson.setDataChangedListener(this);
 		notifyDataChanged();
 	}
 
