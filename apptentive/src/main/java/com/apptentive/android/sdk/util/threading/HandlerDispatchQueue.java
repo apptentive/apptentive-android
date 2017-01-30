@@ -22,20 +22,54 @@
 package com.apptentive.android.sdk.util.threading;
 
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 
-public class HandlerDispatchQueue extends DispatchQueue {
-	private final Handler handler;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
+/**
+ * {@link DispatchQueue} implementation using {@link Handler}
+ */
+class HandlerDispatchQueue extends DispatchQueue {
+	private final Handler handler;
+	private final HandlerThread handlerThread;
+
+	/**
+	 * Creates a private queue with specified <code>name</code>
+	 */
+	public HandlerDispatchQueue(String name) {
+		handlerThread = new HandlerThread(name);
+		handlerThread.start();
+		handler = new Handler(handlerThread.getLooper());
+	}
+
+	/**
+	 * Creates a queue with specified <code>looper</code>
+	 */
 	public HandlerDispatchQueue(Looper looper) {
 		if (looper == null) {
 			throw new NullPointerException("Looper is null");
 		}
 		handler = new Handler(looper);
+		handlerThread = null; // non-private queue (no explicit thread)
 	}
 
 	@Override
 	public void dispatchAsync(Runnable runnable) {
 		handler.post(runnable);
+	}
+
+	@Override
+	public void dispatchAfter(Runnable runnable, long delay) {
+		handler.postDelayed(runnable, delay);
+	}
+
+	@Override
+	public void stop() {
+		assertNotNull(handlerThread, "Attempted to stop a non-private queue '%s'", handler.getLooper().getThread());
+		if (handlerThread != null) {
+			handler.removeCallbacks(null);
+			handlerThread.quit();
+		}
 	}
 }

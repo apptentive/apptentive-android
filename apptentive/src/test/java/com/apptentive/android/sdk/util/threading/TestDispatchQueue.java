@@ -15,6 +15,16 @@ public class TestDispatchQueue extends DispatchQueue {
 		runnable.run();
 	}
 
+	@Override
+	public void dispatchAfter(Runnable runnable, long delay) {
+		runnable.run(); // TODO: figure out a good way of testing this case
+	}
+
+	@Override
+	public void stop() {
+		// do nothing
+	}
+
 	public static void overrideMainQueue() {
 		overrideMainQueue(new TestDispatchQueue());
 	}

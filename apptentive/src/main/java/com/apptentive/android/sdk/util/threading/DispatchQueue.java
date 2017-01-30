@@ -33,10 +33,25 @@ public abstract class DispatchQueue {
 	public abstract void dispatchAsync(Runnable runnable);
 
 	/**
+	 * Add <code>{@link Runnable}</code> task to the queue after <code>delay</code> milliseconds
+	 */
+	public abstract void dispatchAfter(Runnable runnable, long delay);
+
+	/** Stops queue execution and cancels all tasks (cleanup function for private queues) */
+	public abstract void stop();
+
+	/**
 	 * A global dispatch queue associated with main thread
 	 */
 	public static DispatchQueue mainQueue() {
 		return Holder.INSTANCE;
+	}
+
+	/**
+	 * Creates a private serial queue with specified <code>name</code> on a background thread
+	 */
+	public static DispatchQueue createBackgroundQueue(String name) {
+		return new HandlerDispatchQueue(name);
 	}
 
 	/**
