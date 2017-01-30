@@ -11,13 +11,8 @@ import java.lang.reflect.Modifier;
 
 public class TestDispatchQueue extends DispatchQueue {
 	@Override
-	public void dispatchAsync(Runnable runnable) {
+	protected void dispatch(DispatchTask runnable) {
 		runnable.run();
-	}
-
-	@Override
-	public void dispatchAfter(Runnable runnable, long delay) {
-		runnable.run(); // TODO: figure out a good way of testing this case
 	}
 
 	@Override

@@ -24,20 +24,35 @@ package com.apptentive.android.sdk.util.threading;
 import android.os.Looper;
 
 /**
- * A class representing dispatch queue where <code>{@link Runnable}</code> tasks can be executed serially
+ * A class representing dispatch queue where <code>{@link DispatchTask}</code> tasks can be executed
+ * serially
  */
 public abstract class DispatchQueue {
-	/**
-	 * Add <code>{@link Runnable}</code> task to the queue
-	 */
-	public abstract void dispatchAsync(Runnable runnable);
+
+	protected abstract void dispatch(DispatchTask task);
 
 	/**
-	 * Add <code>{@link Runnable}</code> task to the queue after <code>delay</code> milliseconds
+	 * Add <code>{@link DispatchTask}</code> to the queue
 	 */
-	public abstract void dispatchAfter(Runnable runnable, long delay);
+	public void dispatchAsync(DispatchTask task) {
+		task.setScheduled(true);
+		dispatch(task);
+	}
 
-	/** Stops queue execution and cancels all tasks (cleanup function for private queues) */
+	/**
+	 * Add <code>{@link DispatchTask}</code> to the queue if it's not already on the queue (this
+	 * way you can ensure only one instance of the task is scheduled at a time). After the task is
+	 * executed you can schedule it again.
+	 */
+	public void dispatchAsyncOnce(DispatchTask task) {
+		if (!task.isScheduled()) {
+			dispatchAsync(task);
+		}
+	}
+
+	/**
+	 * Stops queue execution and cancels all tasks (cleanup function for private queues)
+	 */
 	public abstract void stop();
 
 	/**

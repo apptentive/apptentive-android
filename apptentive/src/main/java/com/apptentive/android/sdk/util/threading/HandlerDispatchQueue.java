@@ -55,13 +55,8 @@ class HandlerDispatchQueue extends DispatchQueue {
 	}
 
 	@Override
-	public void dispatchAsync(Runnable runnable) {
-		handler.post(runnable);
-	}
-
-	@Override
-	public void dispatchAfter(Runnable runnable, long delay) {
-		handler.postDelayed(runnable, delay);
+	protected void dispatch(DispatchTask task) {
+		handler.post(task);
 	}
 
 	@Override
