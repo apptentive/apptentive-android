@@ -7,11 +7,23 @@
 package com.apptentive.android.sdk.util.registry;
 
 import com.apptentive.android.sdk.TestCaseBase;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 public class ApptentiveComponentRegistryTest extends TestCaseBase {
+
+	//region Setup
+
+	@Before
+	public void setUp()
+	{
+		overrideMainQueue(false);
+	}
+
+	//endregion
 
 	//region Testing
 

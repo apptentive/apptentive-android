@@ -17,10 +17,9 @@ import static org.junit.Assert.*;
 public class TestCaseBase {
 
 	private List<String> result = new ArrayList<>();
+	private TestDispatchQueue dispatchQueue;
 
-	static {
-		TestDispatchQueue.overrideMainQueue();
-	}
+	//region Results
 
 	protected void addResult(String str) {
 		result.add(str);
@@ -38,4 +37,17 @@ public class TestCaseBase {
 
 		result.clear();
 	}
+	//endregion
+
+	//region Dispatch Queue
+
+	protected void overrideMainQueue(boolean dispatchTasksManually) {
+		dispatchQueue = TestDispatchQueue.overrideMainQueue(dispatchTasksManually);
+	}
+
+	protected void dispatchTasks() {
+		dispatchQueue.dispatchTasks();
+	}
+
+	//endregion
 }

@@ -8,20 +8,43 @@ package com.apptentive.android.sdk.util.threading;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class TestDispatchQueue extends DispatchQueue {
+	private final boolean dispatchManually;
+	private Queue<DispatchTask> tasks;
+
+	public TestDispatchQueue(boolean dispatchManually) {
+		this.dispatchManually = dispatchManually;
+		this.tasks = new LinkedList<>();
+	}
+
 	@Override
-	protected void dispatch(DispatchTask runnable) {
-		runnable.run();
+	protected void dispatch(DispatchTask task) {
+		if (dispatchManually) {
+			tasks.add(task);
+		} else {
+			task.run();
+		}
 	}
 
 	@Override
 	public void stop() {
-		// do nothing
+		tasks.clear();
 	}
 
-	public static void overrideMainQueue() {
-		overrideMainQueue(new TestDispatchQueue());
+	public void dispatchTasks() {
+		for (DispatchTask task : tasks) {
+			task.run();
+		}
+		tasks.clear();
+	}
+
+	public static TestDispatchQueue overrideMainQueue(boolean dispatchTasksManually) {
+		TestDispatchQueue queue = new TestDispatchQueue(dispatchTasksManually);
+		overrideMainQueue(queue);
+		return queue;
 	}
 
 	private static void overrideMainQueue(DispatchQueue queue) {
