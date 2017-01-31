@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util.threading;
 import com.apptentive.android.sdk.ApptentiveLog;
 
 /**
- * A basic class for any dispatch runnable task
+ * A basic class for any dispatch runnable task. Tracks its "schedule" state
  */
 public abstract class DispatchTask implements Runnable {
 
@@ -26,11 +26,10 @@ public abstract class DispatchTask implements Runnable {
 	@Override
 	public void run() {
 		try {
+			setScheduled(false);
 			execute();
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while executing task");
-		} finally {
-			setScheduled(false);
 		}
 	}
 
