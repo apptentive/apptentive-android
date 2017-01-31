@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.IllegalFormatException;
@@ -28,6 +29,10 @@ public class ApptentiveLog {
 					message = "Error formatting log message [level="+level+"]: "+message;
 					level = Level.ERROR;
 				}
+			}
+			// add thread name if logging of the UI-thread
+			if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+				message = String.format("[%s] %s", Thread.currentThread().getName(), message);
 			}
 			android.util.Log.println(level.getLevel(), TAG, message);
 			if(throwable != null){
