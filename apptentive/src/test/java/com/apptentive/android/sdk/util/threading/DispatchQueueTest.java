@@ -13,9 +13,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by alementuev on 1/30/17.
- */
 public class DispatchQueueTest extends TestCaseBase {
 
 	@Before
@@ -49,14 +46,16 @@ public class DispatchQueueTest extends TestCaseBase {
 			}
 		};
 
-		DispatchQueue.mainQueue().dispatchAsyncOnce(task);
-		DispatchQueue.mainQueue().dispatchAsyncOnce(task);
+		assertTrue(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
+		assertFalse(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
+		assertFalse(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
 		dispatchTasks();
 
 		assertResult("executed");
 
-		DispatchQueue.mainQueue().dispatchAsyncOnce(task);
-		DispatchQueue.mainQueue().dispatchAsyncOnce(task);
+		assertTrue(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
+		assertFalse(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
+		assertFalse(DispatchQueue.mainQueue().dispatchAsyncOnce(task));
 		dispatchTasks();
 
 		assertResult("executed");

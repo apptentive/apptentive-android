@@ -29,25 +29,50 @@ import android.os.Looper;
  */
 public abstract class DispatchQueue {
 
-	protected abstract void dispatch(DispatchTask task);
+	/**
+	 * Dispatch task implementation
+	 */
+	protected abstract void dispatch(DispatchTask task, long delayMillis);
 
 	/**
 	 * Add <code>{@link DispatchTask}</code> to the queue
 	 */
 	public void dispatchAsync(DispatchTask task) {
+		dispatchAsync(task, 0L);
+	}
+
+	/**
+	 * Add <code>{@link DispatchTask}</code> to the queue
+	 */
+	public void dispatchAsync(DispatchTask task, long delayMillis) {
 		task.setScheduled(true);
-		dispatch(task);
+		dispatch(task, delayMillis);
 	}
 
 	/**
 	 * Add <code>{@link DispatchTask}</code> to the queue if it's not already on the queue (this
 	 * way you can ensure only one instance of the task is scheduled at a time). After the task is
 	 * executed you can schedule it again.
+	 *
+	 * @return true if task was scheduled
 	 */
-	public void dispatchAsyncOnce(DispatchTask task) {
+	public boolean dispatchAsyncOnce(DispatchTask task) {
+		return dispatchAsyncOnce(task, 0L);
+	}
+
+	/**
+	 * Add <code>{@link DispatchTask}</code> to the queue if it's not already on the queue (this
+	 * way you can ensure only one instance of the task is scheduled at a time). After the task is
+	 * executed you can schedule it again.
+	 *
+	 * @return true if task was scheduled
+	 */
+	public boolean dispatchAsyncOnce(DispatchTask task, long delayMillis) {
 		if (!task.isScheduled()) {
-			dispatchAsync(task);
+			dispatchAsync(task, delayMillis);
+			return true;
 		}
+		return false;
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class TestDispatchQueue extends DispatchQueue {
 	}
 
 	@Override
-	protected void dispatch(DispatchTask task) {
+	protected void dispatch(DispatchTask task, long delayMillis) {
 		if (dispatchManually) {
 			tasks.add(task);
 		} else {
