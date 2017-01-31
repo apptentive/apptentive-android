@@ -1077,9 +1077,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	private synchronized void scheduleSessionDataSave() {
 		boolean scheduled = backgroundQueue.dispatchAsyncOnce(saveSessionTask, 100L);
 		if (scheduled) {
-			ApptentiveLog.e("Scheduling SessionData save.");
+			ApptentiveLog.d("Scheduling SessionData save.");
 		} else {
-			ApptentiveLog.e("SessionData save already scheduled.");
+			ApptentiveLog.d("SessionData save already scheduled.");
 		}
 	}
 
@@ -1090,7 +1090,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	private final DispatchTask saveSessionTask = new DispatchTask() {
 		@Override
 		protected void execute() {
-			ApptentiveLog.e("Saving SessionData");
+			ApptentiveLog.d("Saving SessionData");
 			ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
 			if (fileSerializer != null) {
 				fileSerializer.serialize(sessionData);
