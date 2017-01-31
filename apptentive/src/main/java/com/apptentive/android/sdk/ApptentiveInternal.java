@@ -80,7 +80,7 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal implements Handler.Callback, DataChangedListener {
+public class ApptentiveInternal implements DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
@@ -106,8 +106,7 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	SessionData sessionData;
 	private FileSerializer fileSerializer;
 
-
-	Handler backgroundHandler; // TODO: get rid of the handler
+	// private background serial dispatch queue for internal SDK tasks
 	private final DispatchQueue backgroundQueue;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
@@ -198,12 +197,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.componentRegistry = componentRegistry;
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
-
-
-					HandlerThread handlerThread = new HandlerThread("ApptentiveInternalHandlerThread");
-					handlerThread.start();
-					sApptentiveInternal.backgroundHandler = new Handler(handlerThread.getLooper(), sApptentiveInternal);
-
 				}
 			}
 		}
@@ -1094,8 +1087,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		backgroundQueue.dispatchAsyncOnce(createConversationTask);
 	}
 
-	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
-
 	private final DispatchTask saveSessionTask = new DispatchTask() {
 		@Override
 		protected void execute() {
@@ -1113,16 +1104,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 			fetchConversationToken();
 		}
 	};
-
-	@Override
-	public boolean handleMessage(Message msg) {
-		switch (msg.what) {
-			case MESSAGE_FETCH_CONFIGURATION:
-				// TODO
-				break;
-		}
-		return false;
-	}
 
 	//region Listeners
 
