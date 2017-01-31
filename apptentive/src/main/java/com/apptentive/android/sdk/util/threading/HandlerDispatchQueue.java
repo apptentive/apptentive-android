@@ -56,7 +56,11 @@ class HandlerDispatchQueue extends DispatchQueue {
 
 	@Override
 	protected void dispatch(DispatchTask task, long delayMillis) {
-		handler.post(task);
+		if (delayMillis > 0) {
+			handler.postDelayed(task, delayMillis);
+		} else {
+			handler.post(task);
+		}
 	}
 
 	@Override
