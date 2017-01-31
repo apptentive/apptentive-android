@@ -58,6 +58,8 @@ import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,7 +107,8 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	private FileSerializer fileSerializer;
 
 
-	Handler backgroundHandler;
+	Handler backgroundHandler; // TODO: get rid of the handler
+	private final DispatchQueue backgroundQueue;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
@@ -152,6 +155,9 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
+	private ApptentiveInternal() {
+		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Background Queue");
+	}
 
 	public static boolean isApptentiveRegistered() {
 		return (sApptentiveInternal != null);
@@ -1076,9 +1082,9 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	// Multi-tenancy work
 
 	private synchronized void scheduleSessionDataSave() {
-		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
+		boolean scheduled = backgroundQueue.dispatchAsyncOnce(saveSessionTask, 100L);
+		if (scheduled) {
 			ApptentiveLog.e("Scheduling SessionData save.");
-			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
 		} else {
 			ApptentiveLog.e("SessionData save already scheduled.");
 		}
@@ -1090,20 +1096,23 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		}
 	}
 
-	private static final int MESSAGE_SAVE_SESSION_DATA = 0;
 	private static final int MESSAGE_CREATE_CONVERSATION = 1;
 	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
+
+	private final DispatchTask saveSessionTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			ApptentiveLog.e("Saving SessionData");
+			ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
+			if (fileSerializer != null) {
+				fileSerializer.serialize(sessionData);
+			}
+		}
+	};
 
 	@Override
 	public boolean handleMessage(Message msg) {
 		switch (msg.what) {
-			case MESSAGE_SAVE_SESSION_DATA:
-				ApptentiveLog.e("Saving SessionData");
-				ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
-				if (fileSerializer != null) {
-					fileSerializer.serialize(sessionData);
-				}
-				break;
 			case MESSAGE_CREATE_CONVERSATION:
 				fetchConversationToken();
 				break;
