@@ -1091,12 +1091,9 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	}
 
 	private synchronized void scheduleConversationCreation() {
-		if (!backgroundHandler.hasMessages(MESSAGE_CREATE_CONVERSATION)) {
-			backgroundHandler.sendEmptyMessage(MESSAGE_CREATE_CONVERSATION);
-		}
+		backgroundQueue.dispatchAsyncOnce(createConversationTask);
 	}
 
-	private static final int MESSAGE_CREATE_CONVERSATION = 1;
 	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
 
 	private final DispatchTask saveSessionTask = new DispatchTask() {
@@ -1110,12 +1107,16 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 		}
 	};
 
+	private final DispatchTask createConversationTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			fetchConversationToken();
+		}
+	};
+
 	@Override
 	public boolean handleMessage(Message msg) {
 		switch (msg.what) {
-			case MESSAGE_CREATE_CONVERSATION:
-				fetchConversationToken();
-				break;
 			case MESSAGE_FETCH_CONFIGURATION:
 				// TODO
 				break;
