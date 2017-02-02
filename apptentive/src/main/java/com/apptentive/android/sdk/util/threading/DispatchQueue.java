@@ -88,10 +88,17 @@ public abstract class DispatchQueue {
 	}
 
 	/**
-	 * Creates a private serial queue with specified <code>name</code> on a background thread
+	 * Creates a background queue with specified <code>name</code> and dispatch type.
 	 */
-	public static DispatchQueue createBackgroundQueue(String name) {
-		return new HandlerDispatchQueue(name);
+	public static DispatchQueue createBackgroundQueue(String name, DispatchQueueType type) {
+		if (type == DispatchQueueType.Serial) {
+			return new HandlerDispatchQueue(name);
+		}
+		if (type == DispatchQueueType.Concurrent) {
+			return new ConcurrentDispatchQueue(name);
+		}
+
+		throw new IllegalArgumentException("Unexpected queue type: " + type);
 	}
 
 	/**

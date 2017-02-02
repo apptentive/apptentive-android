@@ -22,9 +22,6 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
@@ -59,6 +56,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
@@ -155,7 +153,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
 	private ApptentiveInternal() {
-		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Background Queue");
+		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 	}
 
 	public static boolean isApptentiveRegistered() {
