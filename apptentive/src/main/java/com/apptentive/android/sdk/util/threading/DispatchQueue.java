@@ -92,7 +92,7 @@ public abstract class DispatchQueue {
 	 */
 	public static DispatchQueue createBackgroundQueue(String name, DispatchQueueType type) {
 		if (type == DispatchQueueType.Serial) {
-			return new HandlerDispatchQueue(name);
+			return new SerialDispatchQueue(name);
 		}
 		if (type == DispatchQueueType.Concurrent) {
 			return new ConcurrentDispatchQueue(name);
@@ -111,7 +111,7 @@ public abstract class DispatchQueue {
 			try {
 				// this call will fail when running a unit test
 				// we would allow that and make test responsible for setting the implementation
-				return new HandlerDispatchQueue(Looper.getMainLooper());
+				return new SerialDispatchQueue(Looper.getMainLooper());
 			} catch (Exception e) {
 				return null;
 			}

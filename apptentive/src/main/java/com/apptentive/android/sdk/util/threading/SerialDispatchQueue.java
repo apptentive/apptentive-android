@@ -28,16 +28,16 @@ import android.os.Looper;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 /**
- * {@link DispatchQueue} implementation using {@link Handler}
+ * Serial dispatch queue implementation based on {@link Handler}
  */
-class HandlerDispatchQueue extends DispatchQueue {
+class SerialDispatchQueue extends DispatchQueue {
 	private final Handler handler;
 	private final HandlerThread handlerThread;
 
 	/**
 	 * Creates a private queue with specified <code>name</code>
 	 */
-	public HandlerDispatchQueue(String name) {
+	public SerialDispatchQueue(String name) {
 		handlerThread = new HandlerThread(name);
 		handlerThread.start();
 		handler = new Handler(handlerThread.getLooper());
@@ -46,7 +46,7 @@ class HandlerDispatchQueue extends DispatchQueue {
 	/**
 	 * Creates a queue with specified <code>looper</code>
 	 */
-	public HandlerDispatchQueue(Looper looper) {
+	public SerialDispatchQueue(Looper looper) {
 		if (looper == null) {
 			throw new NullPointerException("Looper is null");
 		}
