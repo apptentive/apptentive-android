@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk;
 
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.threading.TestDispatchQueue;
+import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class TestCaseBase {
 
 	private List<String> result = new ArrayList<>();
-	private TestDispatchQueue dispatchQueue;
+	private MockDispatchQueue dispatchQueue;
 
 	//region Results
 
@@ -42,7 +42,7 @@ public class TestCaseBase {
 	//region Dispatch Queue
 
 	protected void overrideMainQueue(boolean dispatchTasksManually) {
-		dispatchQueue = TestDispatchQueue.overrideMainQueue(dispatchTasksManually);
+		dispatchQueue = MockDispatchQueue.overrideMainQueue(dispatchTasksManually);
 	}
 
 	protected void dispatchTasks() {

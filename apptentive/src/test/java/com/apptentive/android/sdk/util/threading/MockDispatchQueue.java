@@ -11,11 +11,11 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class TestDispatchQueue extends DispatchQueue {
+public class MockDispatchQueue extends DispatchQueue {
 	private final boolean dispatchManually;
 	private Queue<DispatchTask> tasks;
 
-	public TestDispatchQueue(boolean dispatchManually) {
+	public MockDispatchQueue(boolean dispatchManually) {
 		this.dispatchManually = dispatchManually;
 		this.tasks = new LinkedList<>();
 	}
@@ -41,8 +41,8 @@ public class TestDispatchQueue extends DispatchQueue {
 		tasks.clear();
 	}
 
-	public static TestDispatchQueue overrideMainQueue(boolean dispatchTasksManually) {
-		TestDispatchQueue queue = new TestDispatchQueue(dispatchTasksManually);
+	public static MockDispatchQueue overrideMainQueue(boolean dispatchTasksManually) {
+		MockDispatchQueue queue = new MockDispatchQueue(dispatchTasksManually);
 		overrideMainQueue(queue);
 		return queue;
 	}
