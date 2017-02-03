@@ -94,8 +94,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	int currentVersionCode;
 	String currentVersionName;
 
+	private final AppRelease appRelease;
+
 	boolean appIsInForeground;
-	boolean isAppDebuggable;
 	SharedPreferences globalSharedPrefs;
 	String apiKey;
 	String personId;
@@ -152,8 +153,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
-	private ApptentiveInternal() {
+	private ApptentiveInternal(Context context) {
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
+		appRelease = AppReleaseManager.generateCurrentAppRelease(context);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -177,7 +179,7 @@ public class ApptentiveInternal implements DataChangedListener {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
-					sApptentiveInternal = new ApptentiveInternal();
+					sApptentiveInternal = new ApptentiveInternal(context);
 					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -388,7 +390,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	public boolean isApptentiveDebuggable() {
-		return isAppDebuggable;
+		return appRelease.isDebug();
 	}
 
 	public String getPersonId() {
@@ -516,8 +518,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		 * 3. An unreadMessageCountListener() is set up
 		 */
 
-		VersionHistoryItem lastVersionItemSeen = null;
-
 		File internalStorage = appContext.getFilesDir();
 		File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
 		sessionDataFile.getParentFile().mkdirs();
@@ -532,7 +532,6 @@ public class ApptentiveInternal implements DataChangedListener {
 			if (featureEverUsed) {
 				messageManager.init();
 			}
-			lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
 		} else {
 			scheduleConversationCreation();
 		}
@@ -558,13 +557,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
-
-			isAppDebuggable = appRelease.isDebug();
 			currentVersionCode = appRelease.getVersionCode();
 			currentVersionName = appRelease.getVersionName();
 
 
+			VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
 			if (lastVersionItemSeen == null) {
 				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
 			} else {
@@ -602,11 +599,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			ApptentiveLog.i("Overriding log level: %s", logLevelOverride);
 			setMinimumLogLevel(ApptentiveLog.Level.parse(logLevelOverride));
 		} else {
-			if (isAppDebuggable) {
+			if (appRelease.isDebug()) {
 				setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 			}
 		}
-		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
+		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
 
 		// TODO: Move this into a session became active handler.
 		if (sessionData != null) {
@@ -623,7 +620,7 @@ public class ApptentiveInternal implements DataChangedListener {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 				"<meta-data android:name=\"apptentive_api_key\"\n" +
 				"           android:value=\"@string/your_apptentive_api_key\"/>";
-			if (isAppDebuggable) {
+			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
 				ApptentiveLog.e(errorMessage);
@@ -690,7 +687,6 @@ public class ApptentiveInternal implements DataChangedListener {
 				// Send the Device and Sdk now, so they are available on the server from the start.
 				Device device = DeviceManager.generateNewDevice(appContext);
 				Sdk sdk = SdkManager.generateCurrentSdk();
-				AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
 
 				request.setDevice(DeviceManager.getDiffPayload(null, device));
 				request.setSdk(SdkManager.getPayload(sdk));
@@ -760,7 +756,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	private void asyncFetchAppConfigurationAndInteractions() {
-		boolean force = isAppDebuggable;
+		boolean force = appRelease.isDebug();
 
 		// Don't get the app configuration unless no pending fetch AND either forced, or the cache has expired.
 		if (isConfigurationFetchPending.compareAndSet(false, true) && (force || Configuration.load().hasConfigurationCacheExpired())) {
