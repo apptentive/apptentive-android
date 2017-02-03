@@ -49,7 +49,7 @@ class ConcurrentDispatchQueue extends DispatchQueue implements ThreadFactory {
 
 	@Override
 	public void stop() {
-		threadPoolExecutor.shutdown();
+		threadPoolExecutor.shutdownNow();
 	}
 
 	//region Thread factory

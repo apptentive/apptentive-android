@@ -76,7 +76,7 @@ public abstract class DispatchQueue {
 	}
 
 	/**
-	 * Stops queue execution and cancels all tasks (cleanup function for private queues)
+	 * Stops queue execution and cancels all scheduled tasks
 	 */
 	public abstract void stop();
 
