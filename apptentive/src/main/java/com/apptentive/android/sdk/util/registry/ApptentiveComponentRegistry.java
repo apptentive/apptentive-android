@@ -2,6 +2,7 @@ package com.apptentive.android.sdk.util.registry;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,9 +118,9 @@ public class ApptentiveComponentRegistry {
 	 */
 	public synchronized <T> void notifyComponents(final ComponentNotifier<T> notifier) {
 		// in order to avoid UI-related issues - we dispatch all the notification on main thread
-		DispatchQueue.mainQueue().dispatchAsync(new Runnable() {
+		DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 			@Override
-			public void run() {
+			protected void execute() {
 				notifyComponentsSafe(notifier);
 			}
 		});

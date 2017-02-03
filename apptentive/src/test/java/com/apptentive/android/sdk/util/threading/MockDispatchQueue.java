@@ -8,15 +8,43 @@ package com.apptentive.android.sdk.util.threading;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class TestDispatchQueue extends DispatchQueue {
-	@Override
-	public void dispatchAsync(Runnable runnable) {
-		runnable.run();
+public class MockDispatchQueue extends DispatchQueue {
+	private final boolean runImmediately;
+	private Queue<DispatchTask> tasks;
+
+	public MockDispatchQueue(boolean runImmediately) {
+		this.runImmediately = runImmediately;
+		this.tasks = new LinkedList<>();
 	}
 
-	public static void overrideMainQueue() {
-		overrideMainQueue(new TestDispatchQueue());
+	@Override
+	protected void dispatch(DispatchTask task, long delayMillis) {
+		if (runImmediately) {
+			task.run();
+		} else {
+			tasks.add(task);
+		}
+	}
+
+	@Override
+	public void stop() {
+		tasks.clear();
+	}
+
+	public void dispatchTasks() {
+		for (DispatchTask task : tasks) {
+			task.run();
+		}
+		tasks.clear();
+	}
+
+	public static MockDispatchQueue overrideMainQueue(boolean runImmediately) {
+		MockDispatchQueue queue = new MockDispatchQueue(runImmediately);
+		overrideMainQueue(queue);
+		return queue;
 	}
 
 	private static void overrideMainQueue(DispatchQueue queue) {

@@ -22,9 +22,6 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
@@ -58,6 +55,9 @@ import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchQueueType;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +78,7 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal implements Handler.Callback, DataChangedListener {
+public class ApptentiveInternal implements DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
@@ -104,8 +104,8 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	SessionData sessionData;
 	private FileSerializer fileSerializer;
 
-
-	Handler backgroundHandler;
+	// private background serial dispatch queue for internal SDK tasks
+	private final DispatchQueue backgroundQueue;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
@@ -152,6 +152,9 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
+	private ApptentiveInternal() {
+		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
+	}
 
 	public static boolean isApptentiveRegistered() {
 		return (sApptentiveInternal != null);
@@ -192,12 +195,6 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.componentRegistry = componentRegistry;
 					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
-
-
-					HandlerThread handlerThread = new HandlerThread("ApptentiveInternalHandlerThread");
-					handlerThread.start();
-					sApptentiveInternal.backgroundHandler = new Handler(handlerThread.getLooper(), sApptentiveInternal);
-
 				}
 			}
 		}
@@ -1076,43 +1073,35 @@ public class ApptentiveInternal implements Handler.Callback, DataChangedListener
 	// Multi-tenancy work
 
 	private synchronized void scheduleSessionDataSave() {
-		if (!backgroundHandler.hasMessages(MESSAGE_SAVE_SESSION_DATA)) {
-			ApptentiveLog.e("Scheduling SessionData save.");
-			backgroundHandler.sendEmptyMessageDelayed(MESSAGE_SAVE_SESSION_DATA, 100);
+		boolean scheduled = backgroundQueue.dispatchAsyncOnce(saveSessionTask, 100L);
+		if (scheduled) {
+			ApptentiveLog.d("Scheduling SessionData save.");
 		} else {
-			ApptentiveLog.e("SessionData save already scheduled.");
+			ApptentiveLog.d("SessionData save already scheduled.");
 		}
 	}
 
 	private synchronized void scheduleConversationCreation() {
-		if (!backgroundHandler.hasMessages(MESSAGE_CREATE_CONVERSATION)) {
-			backgroundHandler.sendEmptyMessage(MESSAGE_CREATE_CONVERSATION);
-		}
+		backgroundQueue.dispatchAsyncOnce(createConversationTask);
 	}
 
-	private static final int MESSAGE_SAVE_SESSION_DATA = 0;
-	private static final int MESSAGE_CREATE_CONVERSATION = 1;
-	private static final int MESSAGE_FETCH_CONFIGURATION = 2;
-
-	@Override
-	public boolean handleMessage(Message msg) {
-		switch (msg.what) {
-			case MESSAGE_SAVE_SESSION_DATA:
-				ApptentiveLog.e("Saving SessionData");
-				ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
-				if (fileSerializer != null) {
-					fileSerializer.serialize(sessionData);
-				}
-				break;
-			case MESSAGE_CREATE_CONVERSATION:
-				fetchConversationToken();
-				break;
-			case MESSAGE_FETCH_CONFIGURATION:
-				// TODO
-				break;
+	private final DispatchTask saveSessionTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			ApptentiveLog.d("Saving SessionData");
+			ApptentiveLog.v("EventData: %s", sessionData.getEventData().toString());
+			if (fileSerializer != null) {
+				fileSerializer.serialize(sessionData);
+			}
 		}
-		return false;
-	}
+	};
+
+	private final DispatchTask createConversationTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			fetchConversationToken();
+		}
+	};
 
 	//region Listeners
 
