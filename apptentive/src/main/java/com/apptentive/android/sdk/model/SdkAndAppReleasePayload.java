@@ -49,6 +49,17 @@ public class SdkAndAppReleasePayload extends Payload {
 	private static final String KEY_DEBUG = "debug";
 	//endregion
 
+	public static SdkAndAppReleasePayload fromJson(String json) {
+		try {
+			return new SdkAndAppReleasePayload(json);
+		} catch (JSONException e) {
+			ApptentiveLog.v("Error parsing json as SdkAndAppReleasePayload: %s", e, json);
+		} catch (IllegalArgumentException e) {
+			// Unknown unknown #rumsfeld
+		}
+		return null;
+	}
+
 	public SdkAndAppReleasePayload(String json) throws JSONException {
 		super(json);
 	}
