@@ -583,13 +583,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		}
 		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
 
-		// TODO: Move this into a session became active handler.
-		if (sessionData != null) {
-			if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
-				onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
-			}
-		}
-
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
 		if (TextUtils.isEmpty(apiKey) && !TextUtils.isEmpty(manifestApiKey)) {
 			apiKey = manifestApiKey;
@@ -614,6 +607,11 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	private void checkSendVersionChanges() {
+		if (sessionData == null) {
+			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
+			return;
+		}
+
 		final VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
 		final int versionCode = appRelease.getVersionCode();
 		final String versionName = appRelease.getVersionName();
@@ -627,6 +625,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			if (!(versionCode == lastSeenVersionCode) || !versionName.equals(lastSeenVersionNameVersion.getVersion())) {
 				onVersionChanged(lastVersionItemSeen.getVersionCode(), versionCode, lastVersionItemSeen.getVersionName(), versionName, appRelease);
 			}
+		}
+
+		// TODO: Move this into a session became active handler.
+		if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
+			onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
 		}
 	}
 
