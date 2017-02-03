@@ -91,9 +91,8 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
-	int currentVersionCode;
-	String currentVersionName;
 
+	// We keep a readonly reference to AppRelease object since it won't change at runtime
 	private final AppRelease appRelease;
 
 	boolean appIsInForeground;
@@ -325,11 +324,11 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	public int getApplicationVersionCode() {
-		return currentVersionCode;
+		return appRelease.getVersionCode();
 	}
 
 	public String getApplicationVersionName() {
-		return currentVersionName;
+		return appRelease.getVersionName();
 	}
 
 	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
@@ -557,9 +556,8 @@ public class ApptentiveInternal implements DataChangedListener {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			currentVersionCode = appRelease.getVersionCode();
-			currentVersionName = appRelease.getVersionName();
-
+			int currentVersionCode = appRelease.getVersionCode();
+			String currentVersionName = appRelease.getVersionName();
 
 			VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
 			if (lastVersionItemSeen == null) {
