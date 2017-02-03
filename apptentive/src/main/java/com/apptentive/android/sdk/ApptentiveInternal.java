@@ -396,20 +396,12 @@ public class ApptentiveInternal implements DataChangedListener {
 		return personId;
 	}
 
-	public String getAndroidId() {
-		return androidId;
-	}
-
 	public SharedPreferences getGlobalSharedPrefs() {
 		return globalSharedPrefs;
 	}
 
 	public void runOnWorkerThread(Runnable r) {
 		cachedExecutor.execute(r);
-	}
-
-	public void scheduleOnWorkerThread(Runnable r) {
-		cachedExecutor.submit(r);
 	}
 
 	public void onAppLaunch(final Context appContext) {
