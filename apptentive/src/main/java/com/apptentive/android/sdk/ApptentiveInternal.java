@@ -612,53 +612,56 @@ public class ApptentiveInternal implements DataChangedListener {
 			return;
 		}
 
+		boolean appReleaseChanged = false;
+		boolean sdkChanged = false;
+
 		final VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
-		final int versionCode = appRelease.getVersionCode();
-		final String versionName = appRelease.getVersionName();
+		final int currentVersionCode = appRelease.getVersionCode();
+		final String currentVersionName = appRelease.getVersionName();
+
+		Integer previousVersionCode = null;
+		String previousVersionName = null;
 
 		if (lastVersionItemSeen == null) {
-			onVersionChanged(null, versionCode, null, versionName, appRelease);
-		} else {
-			int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
+			appReleaseChanged = true;
+		}
+		else {
+			previousVersionCode = lastVersionItemSeen.getVersionCode();
 			Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
-			lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
-			if (!(versionCode == lastSeenVersionCode) || !versionName.equals(lastSeenVersionNameVersion.getVersion())) {
-				onVersionChanged(lastVersionItemSeen.getVersionCode(), versionCode, lastVersionItemSeen.getVersionName(), versionName, appRelease);
+
+			previousVersionName = lastVersionItemSeen.getVersionName();
+			lastSeenVersionNameVersion.setVersion(previousVersionName);
+			if (!(currentVersionCode == previousVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
+				appReleaseChanged = true;
 			}
 		}
 
 		// TODO: Move this into a session became active handler.
-		if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
-			onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
+		final String lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
+		final String currentSdkVersion = Constants.APPTENTIVE_SDK_VERSION;
+		if (!TextUtils.equals(lastSeenSdkVersion, currentSdkVersion)) {
+			sdkChanged = true;
 		}
-	}
 
-	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
-	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
-		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null) {
-			sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
-		}
-		if (previousVersionCode != null) {
-			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
+		if (appReleaseChanged) {
+			ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
-				sessionData.setAppRelease(currentAppRelease);
+				sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
 			}
 		}
-		invalidateCaches();
-	}
 
-	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
-	private void onSdkVersionChanged(String lastSeenSdkVersion, String currentSdkVersion) {
-		ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 		Sdk sdk = SdkManager.generateCurrentSdk();
-		taskManager.addPayload(SdkManager.getPayload(sdk));
-		if (sessionData != null) {
+		if (sdkChanged) {
+			ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 			sessionData.setLastSeenSdkVersion(currentSdkVersion);
 			sessionData.setSdk(sdk);
 		}
-		invalidateCaches();
+
+		if (appReleaseChanged || sdkChanged) {
+			taskManager.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
+			invalidateCaches();
+		}
 	}
 
 	/**
