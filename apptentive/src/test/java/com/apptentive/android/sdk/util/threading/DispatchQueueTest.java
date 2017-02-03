@@ -17,7 +17,7 @@ public class DispatchQueueTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
-		overrideMainQueue(true);
+		overrideMainQueue(false);
 	}
 
 	@Test

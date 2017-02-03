@@ -12,20 +12,20 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MockDispatchQueue extends DispatchQueue {
-	private final boolean dispatchManually;
+	private final boolean runImmediately;
 	private Queue<DispatchTask> tasks;
 
-	public MockDispatchQueue(boolean dispatchManually) {
-		this.dispatchManually = dispatchManually;
+	public MockDispatchQueue(boolean runImmediately) {
+		this.runImmediately = runImmediately;
 		this.tasks = new LinkedList<>();
 	}
 
 	@Override
 	protected void dispatch(DispatchTask task, long delayMillis) {
-		if (dispatchManually) {
-			tasks.add(task);
-		} else {
+		if (runImmediately) {
 			task.run();
+		} else {
+			tasks.add(task);
 		}
 	}
 
@@ -41,8 +41,8 @@ public class MockDispatchQueue extends DispatchQueue {
 		tasks.clear();
 	}
 
-	public static MockDispatchQueue overrideMainQueue(boolean dispatchTasksManually) {
-		MockDispatchQueue queue = new MockDispatchQueue(dispatchTasksManually);
+	public static MockDispatchQueue overrideMainQueue(boolean runImmediately) {
+		MockDispatchQueue queue = new MockDispatchQueue(runImmediately);
 		overrideMainQueue(queue);
 		return queue;
 	}

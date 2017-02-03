@@ -41,8 +41,8 @@ public class TestCaseBase {
 
 	//region Dispatch Queue
 
-	protected void overrideMainQueue(boolean dispatchTasksManually) {
-		dispatchQueue = MockDispatchQueue.overrideMainQueue(dispatchTasksManually);
+	protected void overrideMainQueue(boolean runImmediately) {
+		dispatchQueue = MockDispatchQueue.overrideMainQueue(runImmediately);
 	}
 
 	protected void dispatchTasks() {

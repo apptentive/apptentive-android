@@ -20,7 +20,7 @@ public class ApptentiveComponentRegistryTest extends TestCaseBase {
 	@Before
 	public void setUp()
 	{
-		overrideMainQueue(false);
+		overrideMainQueue(true);
 	}
 
 	//endregion
