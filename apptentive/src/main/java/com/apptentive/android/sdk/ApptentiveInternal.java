@@ -548,20 +548,8 @@ public class ApptentiveInternal implements DataChangedListener {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			int currentVersionCode = appRelease.getVersionCode();
-			String currentVersionName = appRelease.getVersionName();
+			checkSendVersionChanges();
 
-			VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
-			if (lastVersionItemSeen == null) {
-				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
-			} else {
-				int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
-				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
-				lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
-				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
-					onVersionChanged(lastVersionItemSeen.getVersionCode(), currentVersionCode, lastVersionItemSeen.getVersionName(), currentVersionName, appRelease);
-				}
-			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 
 			// Prevent delayed run-time exception if the app upgrades from pre-2.0 and doesn't remove NetworkStateReceiver from manifest
@@ -623,6 +611,23 @@ public class ApptentiveInternal implements DataChangedListener {
 		// Grab app info we need to access later on.
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
 		return bRet;
+	}
+
+	private void checkSendVersionChanges() {
+		final VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
+		final int versionCode = appRelease.getVersionCode();
+		final String versionName = appRelease.getVersionName();
+
+		if (lastVersionItemSeen == null) {
+			onVersionChanged(null, versionCode, null, versionName, appRelease);
+		} else {
+			int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
+			Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
+			lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
+			if (!(versionCode == lastSeenVersionCode) || !versionName.equals(lastSeenVersionNameVersion.getVersion())) {
+				onVersionChanged(lastVersionItemSeen.getVersionCode(), versionCode, lastVersionItemSeen.getVersionName(), versionName, appRelease);
+			}
+		}
 	}
 
 	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
@@ -1097,7 +1102,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 	//endregion
 
-  /** Ends current user session */
+	/**
+	 * Ends current user session
+	 */
 	public static void logout() {
 		getInstance().getComponentRegistry()
 			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {
