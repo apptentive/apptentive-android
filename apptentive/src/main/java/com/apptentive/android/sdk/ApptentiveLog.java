@@ -31,7 +31,7 @@ public class ApptentiveLog {
 				}
 			}
 			// add thread name if logging of the UI-thread
-			if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			if (Looper.getMainLooper() != null && Looper.getMainLooper().getThread() != Thread.currentThread()) {
 				message = String.format("[%s] %s", Thread.currentThread().getName(), message);
 			}
 			android.util.Log.println(level.getLevel(), TAG, message);
