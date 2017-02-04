@@ -154,7 +154,7 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	private ApptentiveInternal(Context context) {
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
-		appRelease = AppReleaseManager.generateCurrentAppRelease(context);
+		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 	}
 
 	public static boolean isApptentiveRegistered() {

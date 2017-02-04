@@ -19,7 +19,7 @@ import com.apptentive.android.sdk.util.Util;
 
 public class AppReleaseManager {
 
-	public static AppRelease generateCurrentAppRelease(Context context) {
+	public static AppRelease generateCurrentAppRelease(Context context, ApptentiveInternal apptentiveInternal) {
 
 		AppRelease appRelease = new AppRelease();
 
@@ -49,7 +49,7 @@ public class AppReleaseManager {
 		appRelease.setAppStore(Util.getInstallerPackageName(context));
 		appRelease.setDebug(isAppDebuggable);
 		appRelease.setIdentifier(appPackageName);
-		appRelease.setInheritStyle(ApptentiveInternal.getInstance().isAppUsingAppCompatTheme());
+		appRelease.setInheritStyle(apptentiveInternal.isAppUsingAppCompatTheme());
 		appRelease.setOverrideStyle(themeOverrideResId != 0);
 		appRelease.setTargetSdkVersion(String.valueOf(targetSdkVersion));
 		appRelease.setType("android");
