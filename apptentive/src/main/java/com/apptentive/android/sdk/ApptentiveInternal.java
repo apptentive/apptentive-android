@@ -73,6 +73,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_FETCH_CONVERSATION_TOKEN;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_INSTANCE_CREATED;
 import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 /**
@@ -224,7 +227,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
 					isApptentiveInitialized.set(true);
-					if (!sApptentiveInternal.init()) {
+
+					final boolean successful = sApptentiveInternal.init();
+					dispatchDebugEvent(EVT_INSTANCE_CREATED, successful);
+
+					if (!successful) {
 						ApptentiveLog.e("Apptentive init() failed");
 					}
 				}
@@ -1079,6 +1086,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	private synchronized void scheduleConversationCreation() {
+		dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
 		backgroundQueue.dispatchAsyncOnce(createConversationTask);
 	}
 
