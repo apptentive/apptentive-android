@@ -77,6 +77,11 @@ public class ApptentiveLog {
 		doLog(Level.DEBUG, throwable, message, args);
 	}
 
+	public static void i(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.INFO, null, message, args);
+		}
+	}
 	public static void i(String message, Object... args){
 		doLog(Level.INFO, null, message, args);
 	}

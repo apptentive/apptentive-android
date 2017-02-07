@@ -41,6 +41,8 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.network.HttpJsonRequest;
+import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
@@ -74,9 +76,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_FETCH_CONVERSATION_TOKEN;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_INSTANCE_CREATED;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.debug.Tester.*;
+import static com.apptentive.android.sdk.debug.TesterEvent.*;
 import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 /**
@@ -544,7 +546,7 @@ public class ApptentiveInternal implements DataChangedListener {
 				messageManager.init();
 			}
 		} else {
-			scheduleConversationCreation();
+			fetchConversationToken();
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
@@ -691,37 +693,34 @@ public class ApptentiveInternal implements DataChangedListener {
 		config.save();
 	}
 
-	private boolean fetchConversationToken() {
-		try {
-			if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-				ApptentiveLog.i("Fetching Configuration token task started.");
+	private void fetchConversationToken() {
+		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
+			ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+			dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
 
-				// Try to fetch a new one from the server.
-				ConversationTokenRequest request = new ConversationTokenRequest();
+			// Try to fetch a new one from the server.
+			ConversationTokenRequest request = new ConversationTokenRequest();
 
-				// Send the Device and Sdk now, so they are available on the server from the start.
-				Device device = DeviceManager.generateNewDevice(appContext);
-				Sdk sdk = SdkManager.generateCurrentSdk();
+			// Send the Device and Sdk now, so they are available on the server from the start.
+			final Device device = DeviceManager.generateNewDevice(appContext);
+			final Sdk sdk = SdkManager.generateCurrentSdk();
 
-				request.setDevice(DeviceManager.getDiffPayload(null, device));
-				request.setSdk(SdkManager.getPayload(sdk));
-				request.setAppRelease(AppReleaseManager.getPayload(appRelease));
+			request.setDevice(DeviceManager.getDiffPayload(null, device));
+			request.setSdk(SdkManager.getPayload(sdk));
+			request.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
-				ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
-				if (response == null) {
-					ApptentiveLog.w("Got null response fetching ConversationToken.");
-					return false;
-				}
-				if (response.isSuccessful()) {
+			apptentiveHttpClient.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
+				@Override
+				public void onFinish(HttpJsonRequest request) {
 					try {
-						JSONObject root = new JSONObject(response.getContent());
+						JSONObject root = request.getResponseObject();
 						String conversationToken = root.getString("token");
-						ApptentiveLog.d("ConversationToken: " + conversationToken);
+						ApptentiveLog.d(CONVERSATION, "ConversationToken: " + conversationToken);
 						String conversationId = root.getString("id");
-						ApptentiveLog.d("New Conversation id: %s", conversationId);
+						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
 						sessionData = new SessionData();
-						sessionData.setDataChangedListener(this);
+						sessionData.setDataChangedListener(ApptentiveInternal.this);
 						if (conversationToken != null && !conversationToken.equals("")) {
 							sessionData.setConversationToken(conversationToken);
 							sessionData.setConversationId(conversationId);
@@ -730,20 +729,27 @@ public class ApptentiveInternal implements DataChangedListener {
 							sessionData.setAppRelease(appRelease);
 						}
 						String personId = root.getString("person_id");
-						ApptentiveLog.d("PersonId: " + personId);
+						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						sessionData.setPersonId(personId);
-						return true;
-					} catch (JSONException e) {
-						ApptentiveLog.e("Error parsing ConversationToken response json.", e);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while handling conversation token");
+					} finally {
+						isConversationTokenFetchPending.set(false);
 					}
 				}
-			} else {
-				ApptentiveLog.v("Fetching Configuration pending");
-			}
-		} finally {
-			isConversationTokenFetchPending.set(false);
+
+				@Override
+				public void onCancel(HttpJsonRequest request) {
+					isConversationTokenFetchPending.set(false);
+				}
+
+				@Override
+				public void onFail(HttpJsonRequest request, String reason) {
+					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
+					isConversationTokenFetchPending.set(false);
+				}
+			});
 		}
-		return false;
 	}
 
 	/**
@@ -1092,11 +1098,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		}
 	}
 
-	private synchronized void scheduleConversationCreation() {
-		dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
-		backgroundQueue.dispatchAsyncOnce(createConversationTask);
-	}
-
 	private final DispatchTask saveSessionTask = new DispatchTask() {
 		@Override
 		protected void execute() {
@@ -1105,13 +1106,6 @@ public class ApptentiveInternal implements DataChangedListener {
 			if (fileSerializer != null) {
 				fileSerializer.serialize(sessionData);
 			}
-		}
-	};
-
-	private final DispatchTask createConversationTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			fetchConversationToken();
 		}
 	};
 
