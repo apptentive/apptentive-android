@@ -24,7 +24,7 @@ public class HttpRequest {
 	/**
 	 * Default connection timeout
 	 */
-	private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 45 * 1000L;
+	private static final long DEFAULT_CONNECT_TIMEOUT_MILLIS = 45 * 1000L;
 
 	/**
 	 * Default read timeout
@@ -74,12 +74,12 @@ public class HttpRequest {
 	/**
 	 * Connection timeout in milliseconds
 	 */
-	private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
+	private long connectTimeout = DEFAULT_CONNECT_TIMEOUT_MILLIS;
 
 	/**
 	 * Read timeout in milliseconds
 	 */
-	private long readTimeoutMillis = DEFAULT_READ_TIMEOUT_MILLIS;
+	private long readTimeout = DEFAULT_READ_TIMEOUT_MILLIS;
 
 	/**
 	 * The status code from an HTTP response message
@@ -173,8 +173,8 @@ public class HttpRequest {
 
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(method.toString());
-			connection.setConnectTimeout((int) connectionTimeoutMillis);
-			connection.setReadTimeout((int) readTimeoutMillis);
+			connection.setConnectTimeout((int) connectTimeout);
+			connection.setReadTimeout((int) readTimeout);
 
 			if (isCancelled()) {
 				return;
@@ -390,6 +390,14 @@ public class HttpRequest {
 		}
 
 		this.method = method;
+	}
+
+	public void setConnectTimeout(long connectTimeout) {
+		this.connectTimeout = connectTimeout;
+	}
+
+	public void setReadTimeout(long readTimeout) {
+		this.readTimeout = readTimeout;
 	}
 
 	public int getId() {
