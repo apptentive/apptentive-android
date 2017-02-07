@@ -21,12 +21,6 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.NETWORK;
  */
 public class HttpRequest {
 
-	public static final String METHOD_GET = "GET";
-
-	public static final String METHOD_POST = "POST";
-
-	public static final String METHOD_PUT = "PUT";
-
 	/**
 	 * Default connection timeout
 	 */
@@ -75,7 +69,7 @@ public class HttpRequest {
 	/**
 	 * Request method (GET, POST, PUT)
 	 */
-	private String method = METHOD_GET;
+	private HttpRequestMethod method = HttpRequestMethod.GET;
 
 	/**
 	 * Connection timeout in milliseconds
@@ -132,8 +126,6 @@ public class HttpRequest {
 
 		this.id = nextRequestId++;
 		this.urlString = urlString;
-		this.method = METHOD_GET;
-		this.connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -150,7 +142,9 @@ public class HttpRequest {
 		}
 	}
 
-	/** Override this method in a subclass to create data from response bytes */
+	/**
+	 * Override this method in a subclass to create data from response bytes
+	 */
 	protected void handleResponse(byte[] responseData) throws IOException {
 	}
 
@@ -178,7 +172,7 @@ public class HttpRequest {
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
 
 			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(method);
+			connection.setRequestMethod(method.toString());
 			connection.setConnectTimeout((int) connectionTimeoutMillis);
 			connection.setReadTimeout((int) readTimeoutMillis);
 
@@ -190,7 +184,7 @@ public class HttpRequest {
 				setupHeaders(connection, httpHeaders);
 			}
 
-			if (METHOD_POST.equals(method) || METHOD_PUT.equals(method)) {
+			if (HttpRequestMethod.POST.equals(method) || HttpRequestMethod.PUT.equals(method)) {
 				connection.setDoInput(true);
 				connection.setDoOutput(true);
 				connection.setUseCaches(false);
@@ -366,7 +360,7 @@ public class HttpRequest {
 	//region Helpers
 
 	private URL createUrl(String baseUrl) throws IOException {
-		if (METHOD_GET.equals(method)) {
+		if (HttpRequestMethod.GET.equals(method)) {
 			if (queryParams != null && queryParams.size() > 0) {
 				String query = StringUtils.createQueryString(queryParams);
 				if (baseUrl.endsWith("/")) {
@@ -389,6 +383,14 @@ public class HttpRequest {
 	//endregion
 
 	//region Getters/Setters
+
+	public void setMethod(HttpRequestMethod method) {
+		if (method == null) {
+			throw new IllegalArgumentException("Method is null");
+		}
+
+		this.method = method;
+	}
 
 	public int getId() {
 		return id;
@@ -414,7 +416,9 @@ public class HttpRequest {
 		return durationMillis;
 	}
 
-	/** Inner exception which caused request to fail */
+	/**
+	 * Inner exception which caused request to fail
+	 */
 	public Exception getThrownException() {
 		return thrownException;
 	}
