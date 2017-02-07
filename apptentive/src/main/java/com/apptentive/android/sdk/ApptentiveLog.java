@@ -51,6 +51,12 @@ public class ApptentiveLog {
 		return logLevel.canLog(level);
 	}
 
+	public static void v(ApptentiveLogTag tag, String message, Object... args) {
+		if (tag.enabled) {
+			doLog(Level.VERBOSE, null, message, args);
+		}
+	}
+
 	public static void v(String message, Object... args){
 		doLog(Level.VERBOSE, null, message, args);
 	}
@@ -78,6 +84,11 @@ public class ApptentiveLog {
 		doLog(Level.INFO, throwable, message, args);
 	}
 
+	public static void w(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.WARN, null, message, args);
+		}
+	}
 	public static void w(String message, Object... args){
 		doLog(Level.WARN, null, message, args);
 	}

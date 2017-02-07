@@ -2,17 +2,19 @@ package com.apptentive.android.sdk.network;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.NETWORK;
 
@@ -82,7 +84,7 @@ public class HttpRequest {
 	private long readTimeout = DEFAULT_READ_TIMEOUT_MILLIS;
 
 	/**
-	 * The status code from an HTTP response message
+	 * The status code from an HTTP response
 	 */
 	private int responseCode;
 
@@ -97,9 +99,14 @@ public class HttpRequest {
 	private byte[] body;
 
 	/**
-	 * Http-response data
+	 * HTTP response content string
 	 */
-	private byte[] responseData;
+	private String responseContent;
+
+	/**
+	 * Map of connection response headers
+	 */
+	private Map<String, String> responseHeaders;
 
 	/**
 	 * Cancelled flag (not thread safe)
@@ -145,7 +152,7 @@ public class HttpRequest {
 	/**
 	 * Override this method in a subclass to create data from response bytes
 	 */
-	protected void handleResponse(byte[] responseData) throws IOException {
+	protected void handleResponse(String response) throws IOException {
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -195,13 +202,12 @@ public class HttpRequest {
 						outputStream = connection.getOutputStream();
 						outputStream.write(body);
 					} finally {
-						if (outputStream != null) {
-							outputStream.close();
-						}
+						Util.ensureClosed(outputStream);
 					}
 				}
 			}
 
+			// send request
 			responseCode = connection.getResponseCode();
 			responseMessage = connection.getResponseMessage();
 
@@ -209,20 +215,28 @@ public class HttpRequest {
 				return;
 			}
 
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				InputStream is = this.connection.getInputStream();
-				responseData = readResponse(is);
+			// get HTTP headers
+			responseHeaders = getResponseHeaders(connection);
 
-				if (isCancelled()) {
-					return;
-				}
-
-				handleResponse(responseData);
-
-				durationMillis = System.currentTimeMillis() - startTimestamp;
+			// TODO: figure out a better way of handling response codes
+			boolean gzipped = isGzipContentEncoding(responseHeaders);
+			if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE) {
+				responseContent = readResponse(connection.getInputStream(), gzipped);
+				ApptentiveLog.v(NETWORK, "Response: %s", responseContent);
 			} else {
-				throw new IOException("Unexpected response code " + responseCode + " for URL " + url);
+				responseContent = readResponse(connection.getErrorStream(), gzipped);
+				ApptentiveLog.w(NETWORK, "Response: %s", responseContent);
 			}
+
+			if (isCancelled()) {
+				return;
+			}
+
+			// optionally handle response data (should be overridden in a sub class)
+			handleResponse(responseContent);
+
+			// calculate total duration
+			durationMillis = System.currentTimeMillis() - startTimestamp;
 		} finally {
 			closeConnection();
 		}
@@ -249,16 +263,36 @@ public class HttpRequest {
 		}
 	}
 
-	private byte[] readResponse(InputStream is) throws IOException {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		int bytesRead;
+	private static Map<String, String> getResponseHeaders(HttpURLConnection connection) {
+		Map<String, String> headers = new HashMap<>();
+		Map<String, List<String>> map = connection.getHeaderFields();
+		for (Entry<String, List<String>> entry : map.entrySet()) {
+			headers.put(entry.getKey(), entry.getValue().toString());
+		}
+		return headers;
+	}
 
-		while ((bytesRead = is.read(buffer)) != -1) {
-			bos.write(buffer, 0, bytesRead);
+	private static boolean isGzipContentEncoding(Map<String, String> responseHeaders) {
+		if (responseHeaders != null) {
+			String contentEncoding = responseHeaders.get("Content-Encoding");
+			return contentEncoding != null && contentEncoding.equalsIgnoreCase("[gzip]");
+		}
+		return false;
+	}
+
+	private static String readResponse(InputStream is, boolean gzipped) throws IOException {
+		if (is == null) {
+			return null;
 		}
 
-		return bos.toByteArray();
+		try {
+			if (gzipped) {
+				is = new GZIPInputStream(is);
+			}
+			return Util.readStringFromInputStream(is, "UTF-8");
+		} finally {
+			Util.ensureClosed(is);
+		}
 	}
 
 	//endregion
@@ -390,10 +424,6 @@ public class HttpRequest {
 
 	public void setListener(Listener<?> listener) {
 		this.listener = listener;
-	}
-
-	public byte[] responseData() {
-		return responseData;
 	}
 
 	public long duration() {
