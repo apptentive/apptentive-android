@@ -3,6 +3,8 @@ package com.apptentive.android.sdk.network;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,6 +123,11 @@ public class HttpRequest {
 	 */
 	private long durationMillis;
 
+	/**
+	 * Optional dispatch queue for listener callbacks
+	 */
+	private DispatchQueue callbackQueue;
+
 	public HttpRequest(String urlString) {
 		if (urlString == null || urlString.length() == 0) {
 			throw new IllegalArgumentException("Invalid URL string '" + urlString + "'");
@@ -137,14 +144,22 @@ public class HttpRequest {
 	private void finishRequest() {
 		try {
 			if (listener != null) {
-				listener.onFinish(this);
+				if (isSuccessful()) {
+					listener.onFinish(this);
+				} else if (isCancelled()) {
+					listener.onCancel(this);
+				} else {
+					listener.onFail(this, thrownException != null ? thrownException.getMessage() : null);
+				}
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in request finish listener");
 		}
 	}
 
-	/** Override this method to create request data on a background thread */
+	/**
+	 * Override this method to create request data on a background thread
+	 */
 	protected byte[] createRequestData() throws IOException {
 		return null;
 	}
@@ -168,7 +183,17 @@ public class HttpRequest {
 			}
 		}
 
-		finishRequest();
+		// use custom callback queue (if any)
+		if (callbackQueue != null) {
+			callbackQueue.dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					finishRequest();
+				}
+			});
+		} else {
+			finishRequest(); // we don't care where the callback is dispatched until it's on a background queue
+		}
 	}
 
 	private void sendRequestSync() throws IOException {
@@ -411,6 +436,10 @@ public class HttpRequest {
 		this.readTimeout = readTimeout;
 	}
 
+	public boolean isSuccessful() {
+		return responseCode >= 200 && responseCode < 300;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -425,6 +454,10 @@ public class HttpRequest {
 
 	public void setListener(Listener<?> listener) {
 		this.listener = listener;
+	}
+
+	public void setCallbackQueue(DispatchQueue callbackQueue) {
+		this.callbackQueue = callbackQueue;
 	}
 
 	public long duration() {
@@ -444,6 +477,28 @@ public class HttpRequest {
 
 	public interface Listener<T> {
 		void onFinish(T request);
+
+		void onCancel(T request);
+
+		void onFail(T request, String reason);
+	}
+
+	public static abstract class Adapter<T> implements Listener<T> {
+
+		@Override
+		public void onFinish(T request) {
+
+		}
+
+		@Override
+		public void onCancel(T request) {
+
+		}
+
+		@Override
+		public void onFail(T request, String reason) {
+
+		}
 	}
 
 	//endregion
