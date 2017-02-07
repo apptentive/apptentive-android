@@ -28,6 +28,8 @@ public class PayloadFactory {
 				return SdkFactory.fromJson(json);
 			case app_release:
 				return AppReleaseFactory.fromJson(json);
+			case sdk_and_app_release:
+				return SdkAndAppReleasePayload.fromJson(json);
 			case person:
 				return PersonFactory.fromJson(json);
 			case survey:

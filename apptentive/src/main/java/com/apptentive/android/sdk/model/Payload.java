@@ -66,12 +66,13 @@ public abstract class Payload extends JSONObject {
 		this.baseType = baseType;
 	}
 
-	public static enum BaseType {
+	public enum BaseType {
 		message,
 		event,
 		device,
 		sdk,
 		app_release,
+		sdk_and_app_release,
 		person,
 		unknown,
 		// Legacy

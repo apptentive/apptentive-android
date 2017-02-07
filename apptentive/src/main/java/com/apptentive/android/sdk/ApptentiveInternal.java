@@ -91,11 +91,11 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	Context appContext;
-	int currentVersionCode;
-	String currentVersionName;
+
+	// We keep a readonly reference to AppRelease object since it won't change at runtime
+	private final AppRelease appRelease;
 
 	boolean appIsInForeground;
-	boolean isAppDebuggable;
 	SharedPreferences globalSharedPrefs;
 	String apiKey;
 	String personId;
@@ -152,8 +152,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
-	private ApptentiveInternal() {
+	private ApptentiveInternal(Context context) {
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
+		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -177,7 +178,7 @@ public class ApptentiveInternal implements DataChangedListener {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
-					sApptentiveInternal = new ApptentiveInternal();
+					sApptentiveInternal = new ApptentiveInternal(context);
 					isApptentiveInitialized.set(false);
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -323,11 +324,11 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	public int getApplicationVersionCode() {
-		return currentVersionCode;
+		return appRelease.getVersionCode();
 	}
 
 	public String getApplicationVersionName() {
-		return currentVersionName;
+		return appRelease.getVersionName();
 	}
 
 	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
@@ -388,15 +389,11 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	public boolean isApptentiveDebuggable() {
-		return isAppDebuggable;
+		return appRelease.isDebug();
 	}
 
 	public String getPersonId() {
 		return personId;
-	}
-
-	public String getAndroidId() {
-		return androidId;
 	}
 
 	public SharedPreferences getGlobalSharedPrefs() {
@@ -405,10 +402,6 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	public void runOnWorkerThread(Runnable r) {
 		cachedExecutor.execute(r);
-	}
-
-	public void scheduleOnWorkerThread(Runnable r) {
-		cachedExecutor.submit(r);
 	}
 
 	public void onAppLaunch(final Context appContext) {
@@ -516,8 +509,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		 * 3. An unreadMessageCountListener() is set up
 		 */
 
-		VersionHistoryItem lastVersionItemSeen = null;
-
 		File internalStorage = appContext.getFilesDir();
 		File sessionDataFile = new File(internalStorage, "apptentive/SessionData.ser");
 		sessionDataFile.getParentFile().mkdirs();
@@ -532,7 +523,6 @@ public class ApptentiveInternal implements DataChangedListener {
 			if (featureEverUsed) {
 				messageManager.init();
 			}
-			lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
 		} else {
 			scheduleConversationCreation();
 		}
@@ -558,23 +548,8 @@ public class ApptentiveInternal implements DataChangedListener {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
+			checkSendVersionChanges();
 
-			isAppDebuggable = appRelease.isDebug();
-			currentVersionCode = appRelease.getVersionCode();
-			currentVersionName = appRelease.getVersionName();
-
-
-			if (lastVersionItemSeen == null) {
-				onVersionChanged(null, currentVersionCode, null, currentVersionName, appRelease);
-			} else {
-				int lastSeenVersionCode = lastVersionItemSeen.getVersionCode();
-				Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
-				lastSeenVersionNameVersion.setVersion(lastVersionItemSeen.getVersionName());
-				if (!(currentVersionCode == lastSeenVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
-					onVersionChanged(lastVersionItemSeen.getVersionCode(), currentVersionCode, lastVersionItemSeen.getVersionName(), currentVersionName, appRelease);
-				}
-			}
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 
 			// Prevent delayed run-time exception if the app upgrades from pre-2.0 and doesn't remove NetworkStateReceiver from manifest
@@ -602,18 +577,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			ApptentiveLog.i("Overriding log level: %s", logLevelOverride);
 			setMinimumLogLevel(ApptentiveLog.Level.parse(logLevelOverride));
 		} else {
-			if (isAppDebuggable) {
+			if (appRelease.isDebug()) {
 				setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
 			}
 		}
-		ApptentiveLog.i("Debug mode enabled? %b", isAppDebuggable);
-
-		// TODO: Move this into a session became active handler.
-		if (sessionData != null) {
-			if (!TextUtils.equals(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION)) {
-				onSdkVersionChanged(sessionData.getLastSeenSdkVersion(), Constants.APPTENTIVE_SDK_VERSION);
-			}
-		}
+		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
 
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
 		if (TextUtils.isEmpty(apiKey) && !TextUtils.isEmpty(manifestApiKey)) {
@@ -623,7 +591,7 @@ public class ApptentiveInternal implements DataChangedListener {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 				"<meta-data android:name=\"apptentive_api_key\"\n" +
 				"           android:value=\"@string/your_apptentive_api_key\"/>";
-			if (isAppDebuggable) {
+			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
 				ApptentiveLog.e(errorMessage);
@@ -638,32 +606,62 @@ public class ApptentiveInternal implements DataChangedListener {
 		return bRet;
 	}
 
-	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
-	private void onVersionChanged(Integer previousVersionCode, Integer currentVersionCode, String previousVersionName, String currentVersionName, AppRelease currentAppRelease) {
-		ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null) {
-			sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
+	private void checkSendVersionChanges() {
+		if (sessionData == null) {
+			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
+			return;
 		}
-		if (previousVersionCode != null) {
-			taskManager.addPayload(AppReleaseManager.getPayload(currentAppRelease));
-			if (sessionData != null) {
-				sessionData.setAppRelease(currentAppRelease);
+
+		boolean appReleaseChanged = false;
+		boolean sdkChanged = false;
+
+		final VersionHistoryItem lastVersionItemSeen = sessionData.getVersionHistory().getLastVersionSeen();
+		final int currentVersionCode = appRelease.getVersionCode();
+		final String currentVersionName = appRelease.getVersionName();
+
+		Integer previousVersionCode = null;
+		String previousVersionName = null;
+
+		if (lastVersionItemSeen == null) {
+			appReleaseChanged = true;
+		}
+		else {
+			previousVersionCode = lastVersionItemSeen.getVersionCode();
+			Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
+
+			previousVersionName = lastVersionItemSeen.getVersionName();
+			lastSeenVersionNameVersion.setVersion(previousVersionName);
+			if (!(currentVersionCode == previousVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
+				appReleaseChanged = true;
 			}
 		}
-		invalidateCaches();
-	}
 
-	// FIXME: Do this kind of thing when a session becomes active instead of at app initialization? Otherwise there is no active session to send the information to.
-	private void onSdkVersionChanged(String lastSeenSdkVersion, String currentSdkVersion) {
-		ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
+		// TODO: Move this into a session became active handler.
+		final String lastSeenSdkVersion = sessionData.getLastSeenSdkVersion();
+		final String currentSdkVersion = Constants.APPTENTIVE_SDK_VERSION;
+		if (!TextUtils.equals(lastSeenSdkVersion, currentSdkVersion)) {
+			sdkChanged = true;
+		}
+
+		if (appReleaseChanged) {
+			ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+			if (sessionData != null) {
+				sessionData.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
+			}
+		}
+
 		Sdk sdk = SdkManager.generateCurrentSdk();
-		taskManager.addPayload(SdkManager.getPayload(sdk));
-		if (sessionData != null) {
+		if (sdkChanged) {
+			ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 			sessionData.setLastSeenSdkVersion(currentSdkVersion);
 			sessionData.setSdk(sdk);
 		}
-		invalidateCaches();
+
+		if (appReleaseChanged || sdkChanged) {
+			taskManager.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
+			invalidateCaches();
+		}
 	}
 
 	/**
@@ -690,7 +688,6 @@ public class ApptentiveInternal implements DataChangedListener {
 				// Send the Device and Sdk now, so they are available on the server from the start.
 				Device device = DeviceManager.generateNewDevice(appContext);
 				Sdk sdk = SdkManager.generateCurrentSdk();
-				AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(appContext);
 
 				request.setDevice(DeviceManager.getDiffPayload(null, device));
 				request.setSdk(SdkManager.getPayload(sdk));
@@ -760,7 +757,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	private void asyncFetchAppConfigurationAndInteractions() {
-		boolean force = isAppDebuggable;
+		boolean force = appRelease.isDebug();
 
 		// Don't get the app configuration unless no pending fetch AND either forced, or the cache has expired.
 		if (isConfigurationFetchPending.compareAndSet(false, true) && (force || Configuration.load().hasConfigurationCacheExpired())) {
@@ -1111,7 +1108,9 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 	//endregion
 
-  /** Ends current user session */
+	/**
+	 * Ends current user session
+	 */
 	public static void logout() {
 		getInstance().getComponentRegistry()
 			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {

@@ -98,6 +98,10 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
+	public static ApptentiveHttpResponse putSdkAndAppRelease(SdkAndAppReleasePayload payload) {
+		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, payload.marshallForSending());
+	}
+
 	public static ApptentiveHttpResponse putPerson(Person person) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
