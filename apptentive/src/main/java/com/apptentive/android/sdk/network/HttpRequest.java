@@ -94,11 +94,6 @@ public class HttpRequest {
 	private String responseMessage;
 
 	/**
-	 * Optional body data
-	 */
-	private byte[] body;
-
-	/**
 	 * HTTP response content string
 	 */
 	private String responseContent;
@@ -149,6 +144,11 @@ public class HttpRequest {
 		}
 	}
 
+	/** Override this method to create request data on a background thread */
+	protected byte[] createRequestData() throws IOException {
+		return null;
+	}
+
 	/**
 	 * Override this method in a subclass to create data from response bytes
 	 */
@@ -196,11 +196,12 @@ public class HttpRequest {
 				connection.setDoOutput(true);
 				connection.setUseCaches(false);
 
-				if (body != null && body.length > 0) {
+				byte[] requestData = createRequestData();
+				if (requestData != null && requestData.length > 0) {
 					OutputStream outputStream = null;
 					try {
 						outputStream = connection.getOutputStream();
-						outputStream.write(body);
+						outputStream.write(requestData);
 					} finally {
 						Util.ensureClosed(outputStream);
 					}
