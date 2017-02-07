@@ -10,7 +10,7 @@ import java.util.List;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 
 /**
- * Class for asynchronous HTTP requests handling
+ * Class for asynchronous HTTP requests handling.
  */
 public class HttpRequestManager {
 	/**
@@ -23,38 +23,26 @@ public class HttpRequestManager {
 	 */
 	private final DispatchQueue networkQueue;
 
-	/**
-	 * Dispatch queue for listener callbacks
-	 */
-	private final DispatchQueue callbackQueue;
-
 	private Listener listener;
 
 	/**
-	 * Creates a request manager with a default concurrent "network" queue. All listener callbacks are
-	 * dispatched on the main queue.
+	 * Creates a request manager with a default concurrent "network" queue.
 	 */
 	public HttpRequestManager() {
-		this(DispatchQueue.createBackgroundQueue("Apptentive Network Queue", DispatchQueueType.Concurrent), DispatchQueue.mainQueue());
+		this(DispatchQueue.createBackgroundQueue("Apptentive Network Queue", DispatchQueueType.Concurrent));
 	}
 
 	/**
-	 * Creates a request manager with custom "network" and "callback" queues
+	 * Creates a request manager with custom network dispatch queue
 	 *
 	 * @param networkQueue  - dispatch queue for blocking network operations
-	 * @param callbackQueue - dispatch queue for listener callbacks
-	 * @throws IllegalArgumentException if any of specified queues is null
+	 * @throws IllegalArgumentException if queue is null
 	 */
-	public HttpRequestManager(DispatchQueue networkQueue, DispatchQueue callbackQueue) {
+	public HttpRequestManager(DispatchQueue networkQueue) {
 		if (networkQueue == null) {
 			throw new IllegalArgumentException("Network queue is null");
 		}
-		if (callbackQueue == null) {
-			throw new IllegalArgumentException("Callback queue is null");
-		}
-
 		this.networkQueue = networkQueue;
-		this.callbackQueue = callbackQueue;
 		this.activeRequests = new ArrayList<>();
 	}
 
@@ -122,36 +110,21 @@ public class HttpRequestManager {
 	//region Listener callbacks
 
 	private void notifyRequestStarted(final HttpRequest request) {
-		callbackQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				if (listener != null) {
-					listener.onRequestStart(HttpRequestManager.this, request);
-				}
+			if (listener != null) {
+				listener.onRequestStart(HttpRequestManager.this, request);
 			}
-		});
 	}
 
 	private void notifyRequestFinished(final HttpRequest request) {
-		callbackQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				if (listener != null) {
-					listener.onRequestFinish(HttpRequestManager.this, request);
-				}
+			if (listener != null) {
+				listener.onRequestFinish(HttpRequestManager.this, request);
 			}
-		});
 	}
 
 	private void notifyCancelledAllRequests() {
-		callbackQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				if (listener != null) {
-					listener.onRequestsCancel(HttpRequestManager.this);
-				}
+			if (listener != null) {
+				listener.onRequestsCancel(HttpRequestManager.this);
 			}
-		});
 	}
 
 	//endregion
