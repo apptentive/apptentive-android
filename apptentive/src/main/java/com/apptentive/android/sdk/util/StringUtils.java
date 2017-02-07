@@ -21,7 +21,9 @@
 
 package com.apptentive.android.sdk.util;
 
+import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A collection of useful string-related functions
@@ -87,5 +89,42 @@ public final class StringUtils {
 			if (++i < list.size()) builder.append(separator);
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Create URL encoded params string from the map of key-value pairs
+	 *
+	 * @throws IllegalArgumentException if map, any key or value appears to be null
+	 */
+	public static String createQueryString(Map<String, Object> params) { // FIXME: unit tests (DO NOT ACCEPT PULL REQUEST IF YOU SEE THIS COMMENT)
+		if (params == null) {
+			throw new IllegalArgumentException("Params are null");
+		}
+
+		StringBuilder result = new StringBuilder();
+		for (Map.Entry<String, Object> e : params.entrySet()) {
+			String key = e.getKey();
+			if (key == null) {
+				throw new IllegalArgumentException("key is null");
+			}
+
+			Object valueObj = e.getValue();
+			if (valueObj == null) {
+				throw new IllegalArgumentException("value is null for key '" + key + "'");
+			}
+
+			String value = valueObj.toString();
+
+			@SuppressWarnings("deprecation")
+			String encodedKey = URLEncoder.encode(key);
+			@SuppressWarnings("deprecation")
+			String encodedValue = URLEncoder.encode(value);
+
+			result.append(result.length() == 0 ? "?" : "&");
+			result.append(encodedKey);
+			result.append("=");
+			result.append(encodedValue);
+		}
+		return result.toString();
 	}
 }
