@@ -62,9 +62,9 @@ public class HttpRequest {
 	private Map<String, Object> queryParams;
 
 	/**
-	 * Request HTTP httpHeaders
+	 * Request HTTP properties (will be added to a connection)
 	 */
-	private Map<String, Object> httpHeaders;
+	private Map<String, Object> requestProperties;
 
 	/**
 	 * Request method (GET, POST, PUT)
@@ -180,8 +180,8 @@ public class HttpRequest {
 				return;
 			}
 
-			if (httpHeaders != null && httpHeaders.size() > 0) {
-				setupHeaders(connection, httpHeaders);
+			if (requestProperties != null && requestProperties.size() > 0) {
+				setupRequestProperties(connection, requestProperties);
 			}
 
 			if (HttpRequestMethod.POST.equals(method) || HttpRequestMethod.PUT.equals(method)) {
@@ -230,12 +230,8 @@ public class HttpRequest {
 
 	//region Connection
 
-	private void setupHeaders(HttpURLConnection connection, Map<String, Object> headers) {
-		if (headers == null) {
-			throw new IllegalArgumentException("Headers are null");
-		}
-
-		Set<Entry<String, Object>> entries = headers.entrySet();
+	private void setupRequestProperties(HttpURLConnection connection, Map<String, Object> properties) {
+		Set<Entry<String, Object>> entries = properties.entrySet();
 		for (Entry<String, Object> e : entries) {
 			String name = e.getKey();
 			Object value = e.getValue();
@@ -321,37 +317,17 @@ public class HttpRequest {
 
 	//endregion
 
-	//region HTTP header
+	//region HTTP request properties
 
 	/**
-	 * Sets HTTP header for request
+	 * Sets HTTP request property
 	 */
-	public void setHttpHeader(String key, Object value) {
+	public void setRequestProperty(String key, Object value) {
 		if (value != null) {
-			if (httpHeaders == null) {
-				httpHeaders = new HashMap<>();
+			if (requestProperties == null) {
+				requestProperties = new HashMap<>();
 			}
-			httpHeaders.put(key, value);
-		}
-	}
-
-	/**
-	 * Sets HTTP headers for request
-	 */
-	public void setHttpHeaders(Map<String, Object> headers) {
-		if (headers != null && headers.size() > 0) {
-			Set<Entry<String, Object>> entries = headers.entrySet();
-			for (Entry<String, Object> e : entries) {
-				String key = e.getKey();
-				if (key == null) {
-					throw new IllegalArgumentException("Can't add httpHeaders to request: map contains a null key");
-				}
-
-				Object value = e.getValue();
-				if (value != null) {
-					setHttpHeader(key, value);
-				}
-			}
+			requestProperties.put(key, value);
 		}
 	}
 
