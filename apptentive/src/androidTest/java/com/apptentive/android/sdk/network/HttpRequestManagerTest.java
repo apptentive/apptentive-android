@@ -3,14 +3,15 @@ package com.apptentive.android.sdk.network;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
+import junit.framework.Assert;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpRequestManagerTest extends TestCaseBase {
 
@@ -44,6 +45,59 @@ public class HttpRequestManagerTest extends TestCaseBase {
 			"failed: 4 Connection error",
 			"failed: 5 Disconnection error"
 		);
+	}
+
+	@Test
+	public void testRequestData() {
+		final String expected = "Some test data with Unicode chars 文字";
+
+		final AtomicBoolean finished = new AtomicBoolean(false);
+
+		HttpRequest request = new MockHttpRequest("request").setResponseData(expected);
+		request.setListener(new HttpRequest.Adapter<HttpRequest>() {
+			@Override
+			public void onFinish(HttpRequest request) {
+				Assert.assertEquals(expected, request.getResponseData());
+				finished.set(true);
+			}
+		});
+		requestManager.startRequest(request);
+		dispatchRequests();
+
+		Assert.assertTrue(finished.get());
+	}
+
+	@Test
+	public void testJsonRequestData() throws JSONException {
+		final JSONObject expected = new JSONObject();
+		expected.put("int", 10);
+		expected.put("string", "value");
+		expected.put("boolean", true);
+		expected.put("float", 3.14f);
+
+		JSONObject inner = new JSONObject();
+		inner.put("key", "value");
+		expected.put("inner", inner);
+
+		final AtomicBoolean finished = new AtomicBoolean(false);
+
+		HttpJsonRequest request = new MockHttpJsonRequest("request", expected).setMockResponseData(expected);
+		request.setListener(new HttpRequest.Adapter<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				Assert.assertEquals(expected, request.getResponseObject());
+				finished.set(true);
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				Assert.fail(reason);
+			}
+		});
+		requestManager.startRequest(request);
+		dispatchRequests();
+
+		Assert.assertTrue(finished.get());
 	}
 
 	//region Helpers

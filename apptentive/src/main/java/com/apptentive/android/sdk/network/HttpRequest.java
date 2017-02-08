@@ -87,7 +87,7 @@ public class HttpRequest {
 	/**
 	 * HTTP response content string
 	 */
-	private String responseContent;
+	private String responseData;
 
 	/**
 	 * Map of connection response headers
@@ -233,12 +233,12 @@ public class HttpRequest {
 			// TODO: figure out a better way of handling response codes
 			boolean gzipped = isGzipContentEncoding(responseHeaders);
 			if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE) {
-				responseContent = readResponse(connection.getInputStream(), gzipped);
-				ApptentiveLog.v(NETWORK, "Response: %s", responseContent);
+				responseData = readResponse(connection.getInputStream(), gzipped);
+				ApptentiveLog.v(NETWORK, "Response: %s", responseData);
 			} else {
 				errorMessage = String.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
-				responseContent = readResponse(connection.getErrorStream(), gzipped);
-				ApptentiveLog.w(NETWORK, "Response: %s", responseContent);
+				responseData = readResponse(connection.getErrorStream(), gzipped);
+				ApptentiveLog.w(NETWORK, "Response: %s", responseData);
 			}
 
 			if (isCancelled()) {
@@ -246,7 +246,7 @@ public class HttpRequest {
 			}
 
 			// optionally handle response data (should be overridden in a sub class)
-			handleResponse(responseContent);
+			handleResponse(responseData);
 		} finally {
 			closeConnection();
 		}
@@ -394,6 +394,10 @@ public class HttpRequest {
 
 	public void setCallbackQueue(DispatchQueue callbackQueue) {
 		this.callbackQueue = callbackQueue;
+	}
+
+	public String getResponseData() {
+		return responseData;
 	}
 
 	/* For unit testing */
