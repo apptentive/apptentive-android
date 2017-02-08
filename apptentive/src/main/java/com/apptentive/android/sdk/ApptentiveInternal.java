@@ -19,7 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -43,6 +42,7 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
+import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
@@ -50,7 +50,6 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
-import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -81,7 +80,6 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 public class ApptentiveInternal implements DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
-	InteractionManager interactionManager;
 	MessageManager messageManager;
 	PayloadSendWorker payloadWorker;
 	ApptentiveTaskManager taskManager;
@@ -185,13 +183,11 @@ public class ApptentiveInternal implements DataChangedListener {
 
 					MessageManager msgManager = new MessageManager();
 					PayloadSendWorker payloadWorker = new PayloadSendWorker();
-					InteractionManager interactionMgr = new InteractionManager();
 					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
 					ApptentiveComponentRegistry componentRegistry = new ApptentiveComponentRegistry();
 
 					sApptentiveInternal.messageManager = msgManager;
 					sApptentiveInternal.payloadWorker = payloadWorker;
-					sApptentiveInternal.interactionManager = interactionMgr;
 					sApptentiveInternal.taskManager = worker;
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.componentRegistry = componentRegistry;
@@ -356,10 +352,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		return messageManager;
 	}
 
-	public InteractionManager getInteractionManager() {
-		return interactionManager;
-	}
-
 	public PayloadSendWorker getPayloadWorker() {
 		return payloadWorker;
 	}
@@ -518,11 +510,14 @@ public class ApptentiveInternal implements DataChangedListener {
 			sessionData.setDataChangedListener(this);
 			ApptentiveLog.d("Restored existing SessionData");
 			ApptentiveLog.v("Restored EventData: %s", sessionData.getEventData());
-			// FIXME: Move this to whereever the sessions first comes online?
+			// FIXME: Move this to wherever the sessions first comes online?
 			boolean featureEverUsed = sessionData != null && sessionData.isMessageCenterFeatureUsed();
 			if (featureEverUsed) {
 				messageManager.init();
 			}
+			sessionData.setInteractionManager(new InteractionManager(sessionData));
+			// TODO: Make a callback like conversationBecameCurrent(), and call this there
+			scheduleInteractionFetch();
 		} else {
 			scheduleConversationCreation();
 		}
@@ -714,10 +709,14 @@ public class ApptentiveInternal implements DataChangedListener {
 							sessionData.setDevice(device);
 							sessionData.setSdk(sdk);
 							sessionData.setAppRelease(appRelease);
+							sessionData.setInteractionManager(new InteractionManager(sessionData));
 						}
 						String personId = root.getString("person_id");
 						ApptentiveLog.d("PersonId: " + personId);
 						sessionData.setPersonId(personId);
+
+						// TODO: Make a callback like sessionBecameCurrent(), and call this there
+						scheduleInteractionFetch();
 						return true;
 					} catch (JSONException e) {
 						ApptentiveLog.e("Error parsing ConversationToken response json.", e);
@@ -753,53 +752,6 @@ public class ApptentiveInternal implements DataChangedListener {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e("Error parsing app configuration from server.", e);
-		}
-	}
-
-	private void asyncFetchAppConfigurationAndInteractions() {
-		boolean force = appRelease.isDebug();
-
-		// Don't get the app configuration unless no pending fetch AND either forced, or the cache has expired.
-		if (isConfigurationFetchPending.compareAndSet(false, true) && (force || Configuration.load().hasConfigurationCacheExpired())) {
-			AsyncTask<Void, Void, Void> fetchConfigurationTask = new AsyncTask<Void, Void, Void>() {
-				// Hold onto the exception from the AsyncTask instance for later handling in UI thread
-				private Exception e = null;
-
-				@Override
-				protected Void doInBackground(Void... params) {
-					try {
-						fetchAppConfiguration();
-					} catch (Exception e) {
-						this.e = e;
-					}
-					return null;
-				}
-
-				@Override
-				protected void onPostExecute(Void v) {
-					// Update pending state on UI thread after finishing the task
-					ApptentiveLog.i("Fetching new Configuration asyncTask finished.");
-					isConfigurationFetchPending.set(false);
-					if (e != null) {
-						ApptentiveLog.w("Unhandled Exception thrown from fetching configuration asyncTask", e);
-						MetricModule.sendError(e, null, null);
-					} else {
-						// Check if need to start another asyncTask to fetch interaction after successfully fetching configuration
-						interactionManager.asyncFetchAndStoreInteractions();
-					}
-				}
-			};
-
-			ApptentiveLog.i("Fetching new Configuration asyncTask scheduled.");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				fetchConfigurationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-			} else {
-				fetchConfigurationTask.execute();
-			}
-		} else {
-			ApptentiveLog.v("Using cached Configuration.");
-			// If configuration hasn't expire, then check if need to start another asyncTask to fetch interaction
-			interactionManager.asyncFetchAndStoreInteractions();
 		}
 	}
 
@@ -1082,6 +1034,23 @@ public class ApptentiveInternal implements DataChangedListener {
 		backgroundQueue.dispatchAsyncOnce(createConversationTask);
 	}
 
+	private synchronized void scheduleInteractionFetch() {
+		if (sessionData != null) {
+			InteractionManager interactionManager = sessionData.getInteractionManager();
+			if (interactionManager != null) {
+				if (interactionManager.isPollForInteractions()) {
+					boolean cacheExpired = sessionData.getInteractionExpiration() > Util.currentTimeSeconds();
+					boolean force = appRelease != null && appRelease.isDebug();
+					if (cacheExpired || force) {
+						backgroundQueue.dispatchAsyncOnce(fetchInteractionsTask);
+					}
+				} else {
+					ApptentiveLog.v("Interaction polling is disabled.");
+				}
+			}
+		}
+	}
+
 	private final DispatchTask saveSessionTask = new DispatchTask() {
 		@Override
 		protected void execute() {
@@ -1097,6 +1066,16 @@ public class ApptentiveInternal implements DataChangedListener {
 		@Override
 		protected void execute() {
 			fetchConversationToken();
+		}
+	};
+
+	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			SessionData sessionData = getSessionData();
+			if (sessionData != null) {
+				sessionData.getInteractionManager().fetchInteractions();
+			}
 		}
 	};
 

@@ -69,7 +69,7 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getSessionData().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
 			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
 			if (sessionData != null) {
@@ -126,7 +126,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getSessionData().getInteractionManager().getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 
