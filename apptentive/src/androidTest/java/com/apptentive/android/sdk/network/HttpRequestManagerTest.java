@@ -129,6 +129,79 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		Assert.assertTrue(finished.get());
 	}
 
+	@Test
+	public void testListener() {
+		requestManager.setListener(new HttpRequestManager.Listener() {
+			@Override
+			public void onRequestStart(HttpRequestManager manager, HttpRequest request) {
+				addResult("start: " + request);
+			}
+
+			@Override
+			public void onRequestFinish(HttpRequestManager manager, HttpRequest request) {
+				if (request.isSuccessful()) {
+					addResult("finish: " + request);
+				} else if (request.isCancelled()) {
+					addResult("cancel: " + request);
+				} else {
+					addResult("fail: " + request);
+				}
+			}
+
+			@Override
+			public void onRequestsCancel(HttpRequestManager manager) {
+				addResult("cancel all");
+			}
+		});
+
+		// start requests and let them finish
+		requestManager.startRequest(new MockHttpRequest("1"));
+		requestManager.startRequest(new MockHttpRequest("2").setMockResponseCode(500));
+		requestManager.startRequest(new MockHttpRequest("3").setThrowsExceptionOnConnect(true));
+		dispatchRequests();
+
+		assertResult(
+			"start: 1",
+			"start: 2",
+			"start: 3",
+			"finish: 1",
+			"fail: 2",
+			"fail: 3"
+		);
+
+		// start requests and cancel some
+		requestManager.startRequest(new MockHttpRequest("4"));
+		requestManager.startRequest(new MockHttpRequest("5")).cancel();
+		requestManager.startRequest(new MockHttpRequest("6"));
+		dispatchRequests();
+
+		assertResult(
+			"start: 4",
+			"start: 5",
+			"start: 6",
+			"finish: 4",
+			"cancel: 5",
+			"finish: 6"
+		);
+
+		// start requests and cancel them all
+		requestManager.startRequest(new MockHttpRequest("4"));
+		requestManager.startRequest(new MockHttpRequest("5"));
+		requestManager.startRequest(new MockHttpRequest("6"));
+		requestManager.cancelAll();
+		dispatchRequests();
+
+		assertResult(
+			"start: 4",
+			"start: 5",
+			"start: 6",
+			"cancel all",
+			"cancel: 4",
+			"cancel: 5",
+			"cancel: 6"
+		);
+	}
+
 	//region Helpers
 
 	private void startRequest(HttpRequest request) {

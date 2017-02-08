@@ -51,7 +51,7 @@ public class HttpRequestManager {
 	/**
 	 * Starts network request on the network queue (method returns immediately)
 	 */
-	public synchronized void startRequest(final HttpRequest request) {
+	public synchronized HttpRequest startRequest(final HttpRequest request) {
 		if (request == null) {
 			throw new IllegalArgumentException("Request is null");
 		}
@@ -70,6 +70,8 @@ public class HttpRequestManager {
 		});
 
 		notifyRequestStarted(request);
+
+		return request;
 	}
 
 	/**
@@ -81,9 +83,8 @@ public class HttpRequestManager {
 			for (HttpRequest request : temp) {
 				request.cancel();
 			}
-			activeRequests.clear();
-			notifyCancelledAllRequests();
 		}
+		notifyCancelledAllRequests();
 	}
 
 	/**
