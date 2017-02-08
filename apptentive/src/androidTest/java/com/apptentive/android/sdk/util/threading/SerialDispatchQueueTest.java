@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.util.threading;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.apptentive.android.sdk.test.InstrumentationBaseTestCase;
+import com.apptentive.android.sdk.TestCaseBase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class SerialDispatchQueueTest extends InstrumentationBaseTestCase {
+public class SerialDispatchQueueTest extends TestCaseBase {
 
 	private DispatchQueue dispatchQueue;
 
