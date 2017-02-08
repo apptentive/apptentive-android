@@ -69,6 +69,11 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Test
 	public void testJsonRequestData() throws JSONException {
+		final JSONObject requestObject = new JSONObject();
+		requestObject.put("key1", "value1");
+		requestObject.put("key2", "value2");
+		requestObject.put("key3", "value3");
+
 		final JSONObject expected = new JSONObject();
 		expected.put("int", 10);
 		expected.put("string", "value");
@@ -81,17 +86,41 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 		final AtomicBoolean finished = new AtomicBoolean(false);
 
-		HttpJsonRequest request = new MockHttpJsonRequest("request", expected).setMockResponseData(expected);
+		HttpJsonRequest request = new MockHttpJsonRequest("request", requestObject).setMockResponseData(expected);
 		request.setListener(new HttpRequest.Adapter<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
-				Assert.assertEquals(expected, request.getResponseObject());
+				Assert.assertEquals(expected.toString(), request.getResponseObject().toString());
 				finished.set(true);
 			}
 
 			@Override
 			public void onFail(HttpJsonRequest request, String reason) {
 				Assert.fail(reason);
+			}
+		});
+		requestManager.startRequest(request);
+		dispatchRequests();
+
+		Assert.assertTrue(finished.get());
+	}
+
+	@Test
+	public void testJsonRequestCorruptedData() throws JSONException {
+		final JSONObject requestObject = new JSONObject();
+		requestObject.put("key1", "value1");
+		requestObject.put("key2", "value2");
+		requestObject.put("key3", "value3");
+
+		String invalidJson = "{ key1 : value key2 : value2 }";
+
+		final AtomicBoolean finished = new AtomicBoolean(false);
+
+		HttpJsonRequest request = new MockHttpJsonRequest("request", requestObject).setMockResponseData(invalidJson);
+		request.setListener(new HttpRequest.Adapter<HttpJsonRequest>() {
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				finished.set(true);
 			}
 		});
 		requestManager.startRequest(request);

@@ -1,8 +1,10 @@
 package com.apptentive.android.sdk.network;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -60,6 +62,11 @@ class MockHttpURLConnection extends HttpURLConnection {
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError(e);
 		}
+	}
+
+	@Override
+	public OutputStream getOutputStream() throws IOException {
+		return new ByteArrayOutputStream();
 	}
 
 	@Override
