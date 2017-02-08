@@ -85,11 +85,6 @@ public class HttpRequest {
 	private int responseCode;
 
 	/**
-	 * The status message from an HTTP response
-	 */
-	private String responseMessage;
-
-	/**
 	 * HTTP response content string
 	 */
 	private String responseContent;
@@ -105,9 +100,9 @@ public class HttpRequest {
 	private boolean cancelled;
 
 	/**
-	 * Inner exception thrown on a background thread
+	 * Error message for the failed request
 	 */
-	private Exception thrownException;
+	private String errorMessage;
 
 	@SuppressWarnings("rawtypes")
 	private Listener listener;
@@ -138,7 +133,7 @@ public class HttpRequest {
 				} else if (isCancelled()) {
 					listener.onCancel(this);
 				} else {
-					listener.onFail(this, thrownException != null ? thrownException.getMessage() : null);
+					listener.onFail(this, errorMessage);
 				}
 			}
 		} catch (Exception e) {
@@ -168,7 +163,8 @@ public class HttpRequest {
 		try {
 			sendRequestSync();
 		} catch (Exception e) {
-			thrownException = e;
+			responseCode = -1; // indicates failure
+			errorMessage = e.getMessage();
 			if (!isCancelled()) {
 				ApptentiveLog.e(e, "Unable to perform request");
 			}
@@ -189,12 +185,12 @@ public class HttpRequest {
 		}
 	}
 
-	private void sendRequestSync() throws IOException {
+	protected void sendRequestSync() throws IOException {
 		try {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
 
-			connection = (HttpURLConnection) url.openConnection();
+			connection = openConnection(url);
 			connection.setRequestMethod(method.toString());
 			connection.setConnectTimeout((int) connectTimeout);
 			connection.setReadTimeout((int) readTimeout);
@@ -226,7 +222,6 @@ public class HttpRequest {
 
 			// send request
 			responseCode = connection.getResponseCode();
-			responseMessage = connection.getResponseMessage();
 
 			if (isCancelled()) {
 				return;
@@ -241,6 +236,7 @@ public class HttpRequest {
 				responseContent = readResponse(connection.getInputStream(), gzipped);
 				ApptentiveLog.v(NETWORK, "Response: %s", responseContent);
 			} else {
+				errorMessage = String.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseContent = readResponse(connection.getErrorStream(), gzipped);
 				ApptentiveLog.w(NETWORK, "Response: %s", responseContent);
 			}
@@ -268,6 +264,11 @@ public class HttpRequest {
 				connection.setRequestProperty(name, value.toString());
 			}
 		}
+	}
+
+	/* This method can be overridden in a subclass for customizing or mocking the connection */
+	protected HttpURLConnection openConnection(URL url) throws IOException {
+		return (HttpURLConnection) url.openConnection();
 	}
 
 	private void closeConnection() {
@@ -395,11 +396,9 @@ public class HttpRequest {
 		this.callbackQueue = callbackQueue;
 	}
 
-	/**
-	 * Inner exception which caused request to fail
-	 */
-	public Exception getThrownException() {
-		return thrownException;
+	/* For unit testing */
+	protected void setResponseCode(int code) {
+		responseCode = code;
 	}
 
 	//endregion
@@ -414,7 +413,7 @@ public class HttpRequest {
 		void onFail(T request, String reason);
 	}
 
-	public static abstract class Adapter<T> implements Listener<T> {
+	public static class Adapter<T> implements Listener<T> {
 
 		@Override
 		public void onFinish(T request) {
