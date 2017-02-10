@@ -4,23 +4,22 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.test;
+package com.apptentive.android.sdk;
 
 import android.os.SystemClock;
 
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-/**
- * Created by alementuev on 2/2/17.
- */
+public class TestCaseBase {
 
-public class InstrumentationBaseTestCase {
 	private List<String> result = new ArrayList<>();
+	private MockDispatchQueue dispatchQueue;
 
 	//region Results
 
@@ -40,6 +39,18 @@ public class InstrumentationBaseTestCase {
 
 		result.clear();
 	}
+	//endregion
+
+	//region Dispatch Queue
+
+	protected void overrideMainQueue(boolean runImmediately) {
+		dispatchQueue = MockDispatchQueue.overrideMainQueue(runImmediately);
+	}
+
+	protected void dispatchTasks() {
+		dispatchQueue.dispatchTasks();
+	}
+
 	//endregion
 
 	//region Helpers

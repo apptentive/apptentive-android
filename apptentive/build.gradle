@@ -41,6 +41,15 @@ android {
         abortOnError false
     }
 
+    sourceSets {
+        test {
+            java.srcDirs = ['src/test/java', 'src/testCommon/java']
+        }
+        androidTest {
+            java.srcDirs = ['src/androidTest/java', 'src/testCommon/java']
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7

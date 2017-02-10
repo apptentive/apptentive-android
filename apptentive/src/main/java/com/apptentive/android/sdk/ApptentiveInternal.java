@@ -26,6 +26,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
@@ -40,9 +41,12 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.network.HttpJsonRequest;
+import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
+import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
@@ -50,7 +54,6 @@ import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SessionData;
-import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -73,6 +76,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.debug.Tester.*;
+import static com.apptentive.android.sdk.debug.TesterEvent.*;
 import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 /**
@@ -81,23 +87,24 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 public class ApptentiveInternal implements DataChangedListener {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
-	InteractionManager interactionManager;
-	MessageManager messageManager;
-	PayloadSendWorker payloadWorker;
-	ApptentiveTaskManager taskManager;
+	private final InteractionManager interactionManager;
+	private final MessageManager messageManager;
+	private final PayloadSendWorker payloadWorker;
+	private final ApptentiveTaskManager taskManager;
 
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
-	ApptentiveComponentRegistry componentRegistry;
+	private final ApptentiveComponentRegistry componentRegistry;
+	private final ApptentiveHttpClient apptentiveHttpClient;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
-	Context appContext;
+	private final Context appContext;
 
 	// We keep a readonly reference to AppRelease object since it won't change at runtime
 	private final AppRelease appRelease;
 
 	boolean appIsInForeground;
-	SharedPreferences globalSharedPrefs;
-	String apiKey;
+	private final SharedPreferences globalSharedPrefs;
+	private final String apiKey;
 	String personId;
 	String androidId;
 	String appPackageName;
@@ -125,7 +132,7 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
 
-	ExecutorService cachedExecutor;
+	private final ExecutorService cachedExecutor;
 
 	// Holds reference to the current foreground activity of the host app
 	private WeakReference<Activity> currentTaskStackTopActivity;
@@ -152,9 +159,22 @@ public class ApptentiveInternal implements DataChangedListener {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
-	private ApptentiveInternal(Context context) {
+	private ApptentiveInternal(Context context, String apiKey) {
+		this.apiKey = apiKey;
+
+		appContext = context.getApplicationContext();
+
+		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
+		componentRegistry = new ApptentiveComponentRegistry();
+		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
+
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
+		messageManager = new MessageManager();
+		payloadWorker = new PayloadSendWorker();
+		interactionManager = new InteractionManager();
+		taskManager = new ApptentiveTaskManager(appContext);
+		cachedExecutor = Executors.newCachedThreadPool();
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -174,32 +194,46 @@ public class ApptentiveInternal implements DataChangedListener {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal createInstance(Context context, final String apptentiveApiKey) {
+	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey) {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
-					sApptentiveInternal = new ApptentiveInternal(context);
+
+					// trim spaces
+					apptentiveApiKey = Util.trim(apptentiveApiKey);
+
+					// if API key is not defined - try loading from AndroidManifest.xml
+					if (TextUtils.isEmpty(apptentiveApiKey)) {
+						apptentiveApiKey = resolveManifestApiKey(context);
+					}
+
+					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey);
 					isApptentiveInitialized.set(false);
-					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-					MessageManager msgManager = new MessageManager();
-					PayloadSendWorker payloadWorker = new PayloadSendWorker();
-					InteractionManager interactionMgr = new InteractionManager();
-					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
-					ApptentiveComponentRegistry componentRegistry = new ApptentiveComponentRegistry();
-
-					sApptentiveInternal.messageManager = msgManager;
-					sApptentiveInternal.payloadWorker = payloadWorker;
-					sApptentiveInternal.interactionManager = interactionMgr;
-					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
-					sApptentiveInternal.componentRegistry = componentRegistry;
-					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
 				}
 			}
 		}
 		return sApptentiveInternal;
+	}
+
+	/**
+	 * Helper method for resolving API key from AndroidManifest.xml
+	 *
+	 * @return null if API key is missing or exception is thrown
+	 */
+	private static String resolveManifestApiKey(Context context) {
+		try {
+			String appPackageName = context.getPackageName();
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
+			Bundle metaData = packageInfo.applicationInfo.metaData;
+			if (metaData != null) {
+				return Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY));
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
+		}
+
+		return null;
 	}
 
 	/**
@@ -224,7 +258,11 @@ public class ApptentiveInternal implements DataChangedListener {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
 					isApptentiveInitialized.set(true);
-					if (!sApptentiveInternal.init()) {
+
+					final boolean successful = sApptentiveInternal.init();
+					dispatchDebugEvent(EVT_INSTANCE_CREATED, successful);
+
+					if (!successful) {
 						ApptentiveLog.e("Apptentive init() failed");
 					}
 				}
@@ -244,21 +282,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		isApptentiveInitialized.set(false);
 	}
 
-	/**
-	 * Use this method to set or clear the internal app context (pass in null)
-	 * Note: designed to be used for unit testing only
-	 *
-	 * @param appContext the new application context to be set to
-	 */
-	public static void setApplicationContext(Context appContext) {
-		synchronized (ApptentiveInternal.class) {
-			ApptentiveInternal internal = ApptentiveInternal.getInstance();
-			if (internal != null) {
-				internal.appContext = appContext;
-			}
-		}
-	}
-
 	/* Called by {@link #Apptentive.register()} to register global lifecycle
 	 * callbacks, only if the callback hasn't been set yet.
 	 */
@@ -273,7 +296,6 @@ public class ApptentiveInternal implements DataChangedListener {
 			}
 		}
 	}
-
 
 	/*
 	 * Set default theme whom Apptentive UI will inherit theme attributes from. Apptentive will only
@@ -524,14 +546,13 @@ public class ApptentiveInternal implements DataChangedListener {
 				messageManager.init();
 			}
 		} else {
-			scheduleConversationCreation();
+			fetchConversationToken();
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
 		boolean apptentiveDebug = false;
 		String logLevelOverride = null;
-		String manifestApiKey = null;
 		try {
 			appPackageName = appContext.getPackageName();
 			PackageManager packageManager = appContext.getPackageManager();
@@ -540,7 +561,6 @@ public class ApptentiveInternal implements DataChangedListener {
 
 			Bundle metaData = ai.metaData;
 			if (metaData != null) {
-				manifestApiKey = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_API_KEY));
 				logLevelOverride = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL));
 				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
 			}
@@ -584,9 +604,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
 
 		// The apiKey can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(apiKey) && !TextUtils.isEmpty(manifestApiKey)) {
-			apiKey = manifestApiKey;
-		}
 		if (TextUtils.isEmpty(apiKey) || apiKey.contains(Constants.EXAMPLE_API_KEY_VALUE)) {
 			String errorMessage = "The Apptentive API Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 				"<meta-data android:name=\"apptentive_api_key\"\n" +
@@ -624,8 +641,7 @@ public class ApptentiveInternal implements DataChangedListener {
 
 		if (lastVersionItemSeen == null) {
 			appReleaseChanged = true;
-		}
-		else {
+		} else {
 			previousVersionCode = lastVersionItemSeen.getVersionCode();
 			Apptentive.Version lastSeenVersionNameVersion = new Apptentive.Version();
 
@@ -677,37 +693,34 @@ public class ApptentiveInternal implements DataChangedListener {
 		config.save();
 	}
 
-	private boolean fetchConversationToken() {
-		try {
-			if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-				ApptentiveLog.i("Fetching Configuration token task started.");
+	private void fetchConversationToken() {
+		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
+			ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+			dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
 
-				// Try to fetch a new one from the server.
-				ConversationTokenRequest request = new ConversationTokenRequest();
+			// Try to fetch a new one from the server.
+			ConversationTokenRequest request = new ConversationTokenRequest();
 
-				// Send the Device and Sdk now, so they are available on the server from the start.
-				Device device = DeviceManager.generateNewDevice(appContext);
-				Sdk sdk = SdkManager.generateCurrentSdk();
+			// Send the Device and Sdk now, so they are available on the server from the start.
+			final Device device = DeviceManager.generateNewDevice(appContext);
+			final Sdk sdk = SdkManager.generateCurrentSdk();
 
-				request.setDevice(DeviceManager.getDiffPayload(null, device));
-				request.setSdk(SdkManager.getPayload(sdk));
-				request.setAppRelease(AppReleaseManager.getPayload(appRelease));
+			request.setDevice(DeviceManager.getDiffPayload(null, device));
+			request.setSdk(SdkManager.getPayload(sdk));
+			request.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
-				ApptentiveHttpResponse response = ApptentiveClient.getConversationToken(request);
-				if (response == null) {
-					ApptentiveLog.w("Got null response fetching ConversationToken.");
-					return false;
-				}
-				if (response.isSuccessful()) {
+			apptentiveHttpClient.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
+				@Override
+				public void onFinish(HttpJsonRequest request) {
 					try {
-						JSONObject root = new JSONObject(response.getContent());
+						JSONObject root = request.getResponseObject();
 						String conversationToken = root.getString("token");
-						ApptentiveLog.d("ConversationToken: " + conversationToken);
+						ApptentiveLog.d(CONVERSATION, "ConversationToken: " + conversationToken);
 						String conversationId = root.getString("id");
-						ApptentiveLog.d("New Conversation id: %s", conversationId);
+						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
 						sessionData = new SessionData();
-						sessionData.setDataChangedListener(this);
+						sessionData.setDataChangedListener(ApptentiveInternal.this);
 						if (conversationToken != null && !conversationToken.equals("")) {
 							sessionData.setConversationToken(conversationToken);
 							sessionData.setConversationId(conversationId);
@@ -716,20 +729,27 @@ public class ApptentiveInternal implements DataChangedListener {
 							sessionData.setAppRelease(appRelease);
 						}
 						String personId = root.getString("person_id");
-						ApptentiveLog.d("PersonId: " + personId);
+						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						sessionData.setPersonId(personId);
-						return true;
-					} catch (JSONException e) {
-						ApptentiveLog.e("Error parsing ConversationToken response json.", e);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while handling conversation token");
+					} finally {
+						isConversationTokenFetchPending.set(false);
 					}
 				}
-			} else {
-				ApptentiveLog.v("Fetching Configuration pending");
-			}
-		} finally {
-			isConversationTokenFetchPending.set(false);
+
+				@Override
+				public void onCancel(HttpJsonRequest request) {
+					isConversationTokenFetchPending.set(false);
+				}
+
+				@Override
+				public void onFail(HttpJsonRequest request, String reason) {
+					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
+					isConversationTokenFetchPending.set(false);
+				}
+			});
 		}
-		return false;
 	}
 
 	/**
@@ -1078,10 +1098,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		}
 	}
 
-	private synchronized void scheduleConversationCreation() {
-		backgroundQueue.dispatchAsyncOnce(createConversationTask);
-	}
-
 	private final DispatchTask saveSessionTask = new DispatchTask() {
 		@Override
 		protected void execute() {
@@ -1093,12 +1109,18 @@ public class ApptentiveInternal implements DataChangedListener {
 		}
 	};
 
-	private final DispatchTask createConversationTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			fetchConversationToken();
+	//region Helpers
+
+	private String getEndpointBase(SharedPreferences prefs) {
+		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
+		if (url == null) {
+			url = Constants.CONFIG_DEFAULT_SERVER_URL;
+			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
 		}
-	};
+		return url;
+	}
+
+	//endregion
 
 	//region Listeners
 
