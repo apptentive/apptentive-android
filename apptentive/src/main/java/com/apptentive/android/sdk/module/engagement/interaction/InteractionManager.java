@@ -33,6 +33,12 @@ public class InteractionManager {
 	// boolean to prevent multiple fetching threads
 	private AtomicBoolean isFetchPending = new AtomicBoolean(false);
 
+	private SessionData sessionData;
+
+	public InteractionManager(SessionData sessionData) {
+		this.sessionData = sessionData;
+	}
+
 	public interface InteractionUpdateListener {
 		void onInteractionUpdated(boolean successful);
 	}
@@ -62,95 +68,59 @@ public class InteractionManager {
 		return null;
 	}
 
-	public void asyncFetchAndStoreInteractions() {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
-			return;
-		}
-		if (!isPollForInteractions()) {
-			ApptentiveLog.v("Interaction polling is disabled.");
-			return;
-		}
+	// TODO: Refactor this class to dispatch to its own queue.
+	public void fetchInteractions() {
+		ApptentiveLog.v("Fetching Interactions");
+		if (sessionData != null) {
+			InteractionManager interactionManager = sessionData.getInteractionManager();
+			if (interactionManager != null) {
+				ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
-		boolean cacheExpired = sessionData.isMessageCenterFeatureUsed();
-		boolean force = ApptentiveInternal.getInstance().isApptentiveDebuggable();
-		// Check isFetchPending to only allow one asyncTask at a time when fetching interaction
-		if (isFetchPending.compareAndSet(false, true) && (force || cacheExpired)) {
-			AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
-				// Hold onto the exception from the AsyncTask instance for later handling in UI thread
-				private Exception e = null;
+				// TODO: Move this to global config
+				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+				boolean updateSuccessful = true;
 
-				@Override
-				protected Boolean doInBackground(Void... params) {
+				// We weren't able to connect to the internet.
+				if (response.isException()) {
+					prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
+					updateSuccessful = false;
+				}
+				// We got a server error.
+				else if (!response.isSuccessful()) {
+					prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
+					updateSuccessful = false;
+				}
+
+				if (updateSuccessful) {
+					String interactionsPayloadString = response.getContent();
+
+					// Store new integration cache expiration.
+					String cacheControl = response.getHeaders().get("Cache-Control");
+					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+					if (cacheSeconds == null) {
+						cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+					}
+					sessionData.setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
 					try {
-						return fetchAndStoreInteractions();
-					} catch (Exception e) {
-						this.e = e;
-					}
-					return false;
-				}
-
-				@Override
-				protected void onPostExecute(Boolean successful) {
-					isFetchPending.set(false);
-					if (e == null) {
-						ApptentiveLog.d("Fetching new Interactions asyncTask finished. Successful? %b", successful);
-						// Update pending state on UI thread after finishing the task
-						ApptentiveInternal.getInstance().notifyInteractionUpdated(successful);
-					} else {
-						ApptentiveLog.w("Unhandled Exception thrown from fetching new Interactions asyncTask", e);
-						MetricModule.sendError(e, null, null);
-					}
-				}
-			};
-
-			ApptentiveLog.i("Fetching new Interactions asyncTask scheduled");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-			} else {
-				task.execute();
+						InteractionManifest payload = new InteractionManifest(interactionsPayloadString);
+						Interactions interactions = payload.getInteractions();
+						Targets targets = payload.getTargets();
+						if (interactions != null && targets != null) {
+							sessionData.setTargets(targets.toString());
+							sessionData.setInteractions(interactions.toString());
+						} else {
+							ApptentiveLog.e("Unable to save interactionManifest.");
+						}
+					} catch (JSONException e) {
+						ApptentiveLog.w("Invalid InteractionManifest received.");
+					}					}
+				ApptentiveLog.d("Fetching new Interactions asyncTask finished. Successful? %b", updateSuccessful);
+				// Update pending state on UI thread after finishing the task
+				ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
 			}
 		} else {
-			ApptentiveLog.v("Using cached Interactions.");
+			ApptentiveLog.v("Cancelled Interaction fetch due to null SessionData.");
 		}
-	}
-
-	// This method will be run from a worker thread created by asyncTask
-	private boolean fetchAndStoreInteractions() {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
-			return false;
-		}
-		ApptentiveLog.i("Fetching new Interactions asyncTask started");
-		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
-
-		// We weren't able to connect to the internet.
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		boolean updateSuccessful = true;
-		if (response.isException()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
-			updateSuccessful = false;
-		}
-		// We got a server error.
-		else if (!response.isSuccessful()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
-			updateSuccessful = false;
-		}
-
-		if (updateSuccessful) {
-			String interactionsPayloadString = response.getContent();
-
-			// Store new integration cache expiration.
-			String cacheControl = response.getHeaders().get("Cache-Control");
-			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if (cacheSeconds == null) {
-				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
-			}
-			sessionData.setInteractionExpiration(System.currentTimeMillis() + (cacheSeconds * 1000));
-			storeInteractionManifest(interactionsPayloadString);
-		}
-
-		return updateSuccessful;
 	}
 
 	/**
