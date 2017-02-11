@@ -23,25 +23,32 @@ public class ConversationManager {
 	private final DispatchQueue operationQueue;
 
 	/**
+	 * A basic directory for storing conversation-related data.
+	 */
+	private final File storageDir;
+
+	/**
 	 * Current state of conversation metadata.
 	 */
 	private ConversationMetadata conversationMetadata;
 
-	public ConversationManager(DispatchQueue operationQueue) {
+	public ConversationManager(DispatchQueue operationQueue, File storageDir) {
 		if (operationQueue == null) {
 			throw new IllegalArgumentException("Operation queue is null");
 		}
+
 		this.operationQueue = operationQueue;
+		this.storageDir = storageDir;
 	}
 
 	/**
-	 * Loads current conversation asynchronously.
+	 * Attempts to load an active conversation asynchronously.
 	 */
-	public void loadCurrentConversation(Callback callback) {
+	public void loadActiveConversation(Callback callback) {
 		loadConversation(new Filter() {
 			@Override
 			public boolean accept(ConversationMetadataItem metadata) {
-				return false;
+				return metadata.isActive();
 			}
 		}, callback);
 	}
