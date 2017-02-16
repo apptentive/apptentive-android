@@ -101,6 +101,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	boolean appIsInForeground;
 	SharedPreferences globalSharedPrefs;
 	String apiKey;
+	String serverUrl;
 	String personId;
 	String androidId;
 	String appPackageName;
@@ -177,12 +178,16 @@ public class ApptentiveInternal implements DataChangedListener {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal createInstance(Context context, final String apptentiveApiKey) {
+	public static ApptentiveInternal createInstance(Context context, final String apptentiveApiKey, final String serverUrl) {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
 					sApptentiveInternal = new ApptentiveInternal(context);
 					isApptentiveInitialized.set(false);
+
+					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
+					sApptentiveInternal.serverUrl = serverUrl;
+
 					sApptentiveInternal.appContext = context.getApplicationContext();
 					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
@@ -198,7 +203,6 @@ public class ApptentiveInternal implements DataChangedListener {
 					sApptentiveInternal.taskManager = worker;
 					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
 					sApptentiveInternal.componentRegistry = componentRegistry;
-					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
 				}
 			}
 		}
@@ -212,7 +216,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
 	 */
 	public static ApptentiveInternal getInstance(Context context) {
-		return createInstance((context == null) ? null : context, null);
+		return createInstance((context == null) ? null : context, null, null);
 	}
 
 	/**
@@ -389,6 +393,13 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	public String getApptentiveApiKey() {
 		return apiKey;
+	}
+
+	public String getServerUrl() {
+		if (serverUrl == null) {
+			return Constants.CONFIG_DEFAULT_SERVER_URL;
+		}
+		return serverUrl;
 	}
 
 	public String getDefaultAppDisplayName() {

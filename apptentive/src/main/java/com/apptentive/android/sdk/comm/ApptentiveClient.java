@@ -402,7 +402,7 @@ public class ApptentiveClient {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String url = prefs.getString(Constants.PREF_KEY_SERVER_URL, null);
 		if (url == null) {
-			url = Constants.CONFIG_DEFAULT_SERVER_URL;
+			url = ApptentiveInternal.getInstance().getServerUrl();
 			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
 		}
 		return url;
