@@ -159,15 +159,16 @@ public class ApptentiveInternal implements DataChangedListener {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
-	private ApptentiveInternal(Context context, String apiKey) {
+	private ApptentiveInternal(Context context, String apiKey, String serverUrl) {
 		this.apiKey = apiKey;
+		this.serverUrl = serverUrl;
 
 		appContext = context.getApplicationContext();
 
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		componentRegistry = new ApptentiveComponentRegistry();
-		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
+		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, serverUrl);
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 		messageManager = new MessageManager();
@@ -206,9 +207,8 @@ public class ApptentiveInternal implements DataChangedListener {
 						apptentiveApiKey = resolveManifestApiKey(context);
 					}
 
-					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey);
+					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey, serverUrl);
 					isApptentiveInitialized.set(false);
-					sApptentiveInternal.serverUrl = serverUrl;
 				}
 			}
 		}
