@@ -104,6 +104,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	boolean appIsInForeground;
 	private final SharedPreferences globalSharedPrefs;
 	private final String apiKey;
+	String serverUrl;
 	String personId;
 	String androidId;
 	String appPackageName;
@@ -192,7 +193,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey) {
+	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey, final String serverUrl)  {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
@@ -207,25 +208,7 @@ public class ApptentiveInternal implements DataChangedListener {
 
 					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey);
 					isApptentiveInitialized.set(false);
-/*
-<<<<<<< HEAD
-=======
-					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-					MessageManager msgManager = new MessageManager();
-					PayloadSendWorker payloadWorker = new PayloadSendWorker();
-					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
-					ApptentiveComponentRegistry componentRegistry = new ApptentiveComponentRegistry();
-
-					sApptentiveInternal.messageManager = msgManager;
-					sApptentiveInternal.payloadWorker = payloadWorker;
-					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
-					sApptentiveInternal.componentRegistry = componentRegistry;
-					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
->>>>>>> feature/fetch_interactions
-*/
+					sApptentiveInternal.serverUrl = serverUrl;
 				}
 			}
 		}
@@ -260,7 +243,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
 	 */
 	public static ApptentiveInternal getInstance(Context context) {
-		return createInstance((context == null) ? null : context, null);
+		return createInstance((context == null) ? null : context, null, null);
 	}
 
 	/**
@@ -417,6 +400,13 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	public String getApptentiveApiKey() {
 		return apiKey;
+	}
+
+	public String getServerUrl() {
+		if (serverUrl == null) {
+			return Constants.CONFIG_DEFAULT_SERVER_URL;
+		}
+		return serverUrl;
 	}
 
 	public String getDefaultAppDisplayName() {
