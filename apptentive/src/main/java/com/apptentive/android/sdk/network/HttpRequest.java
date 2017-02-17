@@ -349,7 +349,29 @@ public class HttpRequest {
 	//region String representation
 
 	public String toString() {
-		return urlString;
+		try {
+			return String.format(
+					"\n" +
+							"Request:\n" +
+							"\t%s %s\n" +
+							"\t%s\n" +
+							"\t%s\n" +
+							"Response:\n" +
+							"\t%d\n" +
+							"\t%s\n" +
+							"\t%s",
+				/* Request */
+					method.name(), urlString,
+					requestProperties,
+					new String(createRequestData()),
+				/* Response */
+					responseCode,
+					responseData,
+					responseHeaders);
+		} catch (IOException e) {
+			ApptentiveLog.e("", e);
+		}
+		return null;
 	}
 
 	//endregion

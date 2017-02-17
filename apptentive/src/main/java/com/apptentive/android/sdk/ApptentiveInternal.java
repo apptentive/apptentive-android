@@ -549,6 +549,9 @@ public class ApptentiveInternal implements DataChangedListener {
 				messageManager.init();
 			}
 			sessionData.setInteractionManager(new InteractionManager(sessionData));
+
+			dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE);
+
 			// TODO: Make a callback like conversationBecameCurrent(), and call this there
 			scheduleInteractionFetch();
 		} else {
@@ -719,6 +722,7 @@ public class ApptentiveInternal implements DataChangedListener {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
 					try {
+						ApptentiveLog.v(CONVERSATION, request.toString());
 						JSONObject root = request.getResponseObject();
 						String conversationToken = root.getString("token");
 						ApptentiveLog.d(CONVERSATION, "ConversationToken: " + conversationToken);
@@ -738,6 +742,8 @@ public class ApptentiveInternal implements DataChangedListener {
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						sessionData.setPersonId(personId);
+
+						dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE);
 
 						// TODO: Make a callback like sessionBecameCurrent(), and call this there
 						scheduleInteractionFetch();
