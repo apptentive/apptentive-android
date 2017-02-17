@@ -9,9 +9,9 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.storage.EventStore;
 
-/**
- * @author Sky Kelsey
- */
+import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_APPTENTIVE_EVENT;
+
 public class EventManager {
 
 	private static EventStore getEventStore() {
@@ -19,6 +19,7 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Event event) {
+		dispatchDebugEvent(EVT_APPTENTIVE_EVENT, event.getEventLabel());
 		getEventStore().addPayload(event);
 	}
 }

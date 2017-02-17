@@ -37,6 +37,12 @@ public class Tester {
 		}
 	}
 
+	public static void dispatchDebugEvent(String name, Object arg) {
+		if (isListeningForDebugEvents()) {
+			notifyEvent(name, arg);
+		}
+	}
+
 	public static void dispatchDebugEvent(String name, boolean arg) {
 		if (isListeningForDebugEvents()) {
 			notifyEvent(name, arg);
