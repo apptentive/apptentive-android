@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.storage;
 
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+
 public class SessionData implements Saveable, DataChangedListener {
 
 	private static final long serialVersionUID = 1L;
@@ -32,7 +34,10 @@ public class SessionData implements Saveable, DataChangedListener {
 	private String messageCenterPendingAttachments;
 	private String targets;
 	private String interactions;
-	private long interactionExpiration;
+	private double interactionExpiration;
+
+	// TODO: Maybe move this up to a wrapping Conversation class?
+	private transient InteractionManager interactionManager;
 
 	public SessionData() {
 		this.device = new Device();
@@ -278,15 +283,23 @@ public class SessionData implements Saveable, DataChangedListener {
 		}
 	}
 
-	public long getInteractionExpiration() {
+	public double getInteractionExpiration() {
 		return interactionExpiration;
 	}
 
-	public void setInteractionExpiration(long interactionExpiration) {
+	public void setInteractionExpiration(double interactionExpiration) {
 		if (this.interactionExpiration != interactionExpiration) {
 			this.interactionExpiration = interactionExpiration;
 			notifyDataChanged();
 		}
+	}
+
+	public InteractionManager getInteractionManager() {
+		return interactionManager;
+	}
+
+	public void setInteractionManager(InteractionManager interactionManager) {
+		this.interactionManager = interactionManager;
 	}
 
 	//endregion

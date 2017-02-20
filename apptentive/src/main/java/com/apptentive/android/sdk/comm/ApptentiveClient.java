@@ -51,10 +51,6 @@ public class ApptentiveClient {
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
-	public static ApptentiveHttpResponse getConversationToken(ConversationTokenRequest conversationTokenRequest) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getApptentiveApiKey(), ENDPOINT_CONVERSATION, Method.POST, conversationTokenRequest.toString());
-	}
-
 	public static ApptentiveHttpResponse getAppConfiguration() {
 		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONFIGURATION, Method.GET, null);
 	}

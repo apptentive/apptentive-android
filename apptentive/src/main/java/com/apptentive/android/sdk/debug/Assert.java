@@ -77,6 +77,27 @@ public class Assert {
 	}
 
 	/**
+	 * Asserts that an object is null
+	 */
+	public static void assertNull(Object object) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that an object is null
+	 */
+	public static void assertNull(Object object, String message) {
+		// FIXME: implement me
+	}
+
+	/**
+	 * Asserts that an object is null
+	 */
+	public static void assertNull(Object object, String format, Object... args) {
+		// FIXME: implement me
+	}
+
+	/**
 	 * Asserts that an object isn't null
 	 */
 	public static void assertNotNull(Object object) {
