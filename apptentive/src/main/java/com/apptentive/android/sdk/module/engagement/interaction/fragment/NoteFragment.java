@@ -26,7 +26,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.conversation.SessionData;
 
 import org.json.JSONException;
 import org.json.JSONObject;

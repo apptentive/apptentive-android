@@ -4,11 +4,19 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.storage;
+package com.apptentive.android.sdk.conversation;
 
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.storage.AppRelease;
+import com.apptentive.android.sdk.storage.DataChangedListener;
+import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.EventData;
+import com.apptentive.android.sdk.storage.Person;
+import com.apptentive.android.sdk.storage.Saveable;
+import com.apptentive.android.sdk.storage.Sdk;
+import com.apptentive.android.sdk.storage.VersionHistory;
 
 public class SessionData implements Saveable, DataChangedListener {
 

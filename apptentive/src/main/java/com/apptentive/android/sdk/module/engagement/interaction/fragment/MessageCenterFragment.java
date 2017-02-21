@@ -57,7 +57,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.AttachmentPreviewDia
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;

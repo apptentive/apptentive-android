@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -29,7 +28,7 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListIt
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONArray;

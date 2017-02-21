@@ -7,8 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -18,8 +16,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
-import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 

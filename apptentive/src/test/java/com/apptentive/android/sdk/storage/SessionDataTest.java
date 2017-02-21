@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Before;
