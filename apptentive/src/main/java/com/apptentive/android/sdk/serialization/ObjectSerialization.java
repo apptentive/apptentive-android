@@ -40,6 +40,7 @@ public class ObjectSerialization {
 
 			try {
 				Constructor<T> constructor = cls.getDeclaredConstructor(DataInput.class);
+				constructor.setAccessible(true);
 				return constructor.newInstance(in);
 			} catch (Exception e) {
 				throw new IOException("Unable to instantiate class: " + cls, e);

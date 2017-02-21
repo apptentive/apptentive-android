@@ -184,12 +184,12 @@ public class ConversationManager implements DataChangedListener {
 						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
 						if (StringUtils.isNullOrEmpty(conversationToken)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch convesation: missing 'token'");
+							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
 							return;
 						}
 
 						if (StringUtils.isNullOrEmpty(conversationId)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch convesation: missing 'id'");
+							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
 							return;
 						}
 

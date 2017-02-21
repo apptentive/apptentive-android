@@ -146,7 +146,7 @@ public class Conversation implements Saveable, DataChangedListener {
 		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
 	}
 
-	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
+	private final transient DispatchTask fetchInteractionsTask = new DispatchTask() {
 		@Override
 		protected void execute() {
 			fetchInteractions();

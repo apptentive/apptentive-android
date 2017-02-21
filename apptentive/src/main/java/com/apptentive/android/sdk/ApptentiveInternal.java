@@ -527,6 +527,8 @@ public class ApptentiveInternal {
 
 		long start = System.currentTimeMillis();
 		boolean conversationLoaded = conversationManager.loadActiveConversation();
+		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? " not" : "", System.currentTimeMillis() - start);
+
 		if (conversationLoaded) {
 			Conversation activeConversation = conversationManager.getActiveConversation();
 			boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
@@ -534,8 +536,6 @@ public class ApptentiveInternal {
 				messageManager.init();
 			}
 		}
-
-		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? " not" : "", System.currentTimeMillis() - start);
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
