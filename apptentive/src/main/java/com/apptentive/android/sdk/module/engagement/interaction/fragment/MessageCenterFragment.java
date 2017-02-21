@@ -42,6 +42,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -57,7 +58,6 @@ import com.apptentive.android.sdk.module.messagecenter.view.AttachmentPreviewDia
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
-import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -434,9 +434,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		// Retrieve any saved attachments
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null && sessionData.getMessageCenterPendingAttachments() != null) {
-			String pendingAttachmentsString = sessionData.getMessageCenterPendingAttachments();
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation != null && conversation.getMessageCenterPendingAttachments() != null) {
+			String pendingAttachmentsString = conversation.getMessageCenterPendingAttachments();
 			JSONArray savedAttachmentsJsonArray = null;
 			try {
 				savedAttachmentsJsonArray = new JSONArray(pendingAttachmentsString);
@@ -461,7 +461,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 			}
 			// Stored pending attachments have been restored, remove it from the persistent storage
-			sessionData.setMessageCenterPendingAttachments(null);
+			conversation.setMessageCenterPendingAttachments(null);
 		}
 		updateMessageSentStates();
 	}
@@ -743,7 +743,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		this.composer = composer;
 		this.composerEditText = composerEditText;
 
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			if (this.composerEditText != null) {
@@ -751,18 +751,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			composingViewSavedState = null;
 			// Stored pending composing text has been restored from the saved state, so it's not needed here anymore
-			if (sessionData != null) {
-				sessionData.setMessageCenterPendingMessage(null);
+			if (conversation != null) {
+				conversation.setMessageCenterPendingMessage(null);
 			}
 		}
 		// Restore composing text
-		else if (sessionData != null && !TextUtils.isEmpty(sessionData.getMessageCenterPendingMessage())) {
-			String messageText = sessionData.getMessageCenterPendingMessage();
+		else if (conversation != null && !TextUtils.isEmpty(conversation.getMessageCenterPendingMessage())) {
+			String messageText = conversation.getMessageCenterPendingMessage();
 			if (messageText != null && this.composerEditText != null) {
 				this.composerEditText.setText(messageText);
 			}
 			// Stored pending composing text has been restored, remove it from the persistent storage
-			sessionData.setMessageCenterPendingMessage(null);
+			conversation.setMessageCenterPendingMessage(null);
 		}
 
 		setAttachmentsInComposer(pendingAttachments);
@@ -991,19 +991,19 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setWhoCardAsPreviouslyDisplayed() {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return;
 		}
-		sessionData.setMessageCenterWhoCardPreviouslyDisplayed(true);
+		conversation.setMessageCenterWhoCardPreviouslyDisplayed(true);
 	}
 
 	private boolean wasWhoCardAsPreviouslyDisplayed() {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return false;
 		}
-		return sessionData.isMessageCenterWhoCardPreviouslyDisplayed();
+		return conversation.isMessageCenterWhoCardPreviouslyDisplayed();
 	}
 
 	// Retrieve the content from the composing area
@@ -1016,14 +1016,14 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return;
 		}
 		if (content != null) {
-			sessionData.setMessageCenterPendingMessage(content.toString().trim());
+			conversation.setMessageCenterPendingMessage(content.toString().trim());
 		} else {
-			sessionData.setMessageCenterPendingMessage(null);
+			conversation.setMessageCenterPendingMessage(null);
 		}
 		JSONArray pendingAttachmentsJsonArray = new JSONArray();
 		// Save pending attachment
@@ -1032,9 +1032,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 
 		if (pendingAttachmentsJsonArray.length() > 0) {
-			sessionData.setMessageCenterPendingAttachments(pendingAttachmentsJsonArray.toString());
+			conversation.setMessageCenterPendingAttachments(pendingAttachmentsJsonArray.toString());
 		} else {
-			sessionData.setMessageCenterPendingAttachments(null);
+			conversation.setMessageCenterPendingAttachments(null);
 		}
 		editor.apply();
 	}
@@ -1043,10 +1043,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * will clear the pending composing message previously saved in shared preference
 	 */
 	public void clearPendingComposingMessage() {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null) {
-			sessionData.setMessageCenterPendingMessage(null);
-			sessionData.setMessageCenterPendingAttachments(null);
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation != null) {
+			conversation.setMessageCenterPendingMessage(null);
+			conversation.setMessageCenterPendingAttachments(null);
 		}
 	}
 

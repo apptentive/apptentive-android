@@ -52,7 +52,7 @@ public class ApptentiveClient {
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
 	public static ApptentiveHttpResponse getAppConfiguration() {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONFIGURATION, Method.GET, null);
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONFIGURATION, Method.GET, null);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ApptentiveClient {
 	 */
 	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
 		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), uri, Method.GET, null);
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse postMessage(ApptentiveMessage apptentiveMessage) {
@@ -70,7 +70,7 @@ public class ApptentiveClient {
 			case CompoundMessage: {
 				CompoundMessage compoundMessage = (CompoundMessage) apptentiveMessage;
 				List<StoredFile> associatedFiles = compoundMessage.getAssociatedFiles();
-				return performMultipartFilePost(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
+				return performMultipartFilePost(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_MESSAGES, apptentiveMessage.marshallForSending(), associatedFiles);
 			}
 			case unknown:
 				break;
@@ -79,36 +79,36 @@ public class ApptentiveClient {
 	}
 
 	public static ApptentiveHttpResponse postEvent(Event event) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putDevice(Device device) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putSdkAndAppRelease(SdkAndAppReleasePayload payload) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, payload.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, payload.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse putPerson(Person person) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), endpoint, Method.POST, survey.marshallForSending());
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), endpoint, Method.POST, survey.marshallForSending());
 	}
 
 	public static ApptentiveHttpResponse getInteractions() {
-		return performHttpRequest(ApptentiveInternal.getInstance().getSessionData().getConversationToken(), ENDPOINT_INTERACTIONS, Method.GET, null);
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
 
 	/**

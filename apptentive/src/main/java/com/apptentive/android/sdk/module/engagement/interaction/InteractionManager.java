@@ -12,11 +12,11 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
-import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -30,10 +30,10 @@ public class InteractionManager {
 	// boolean to prevent multiple fetching threads
 	private AtomicBoolean isFetchPending = new AtomicBoolean(false);
 
-	private SessionData sessionData;
+	private Conversation conversation;
 
-	public InteractionManager(SessionData sessionData) {
-		this.sessionData = sessionData;
+	public InteractionManager(Conversation conversation) {
+		this.conversation = conversation;
 	}
 
 	public interface InteractionUpdateListener {
@@ -42,17 +42,17 @@ public class InteractionManager {
 
 	public Interaction getApplicableInteraction(String eventLabel) {
 
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return null;
 		}
-		String targetsString = sessionData.getTargets();
+		String targetsString = conversation.getTargets();
 		if (targetsString != null) {
 			try {
-				Targets targets = new Targets(sessionData.getTargets());
+				Targets targets = new Targets(conversation.getTargets());
 				String interactionId = targets.getApplicableInteraction(eventLabel);
 				if (interactionId != null) {
-					String interactionsString = sessionData.getInteractions();
+					String interactionsString = conversation.getInteractions();
 					if (interactionsString != null) {
 						Interactions interactions = new Interactions(interactionsString);
 						return interactions.getInteraction(interactionId);
@@ -68,8 +68,8 @@ public class InteractionManager {
 	// TODO: Refactor this class to dispatch to its own queue.
 	public void fetchInteractions() {
 		ApptentiveLog.v("Fetching Interactions");
-		if (sessionData != null) {
-			InteractionManager interactionManager = sessionData.getInteractionManager();
+		if (conversation != null) {
+			InteractionManager interactionManager = conversation.getInteractionManager();
 			if (interactionManager != null) {
 				ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
@@ -97,14 +97,14 @@ public class InteractionManager {
 					if (cacheSeconds == null) {
 						cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
 					}
-					sessionData.setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
+					conversation.setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
 					try {
 						InteractionManifest payload = new InteractionManifest(interactionsPayloadString);
 						Interactions interactions = payload.getInteractions();
 						Targets targets = payload.getTargets();
 						if (interactions != null && targets != null) {
-							sessionData.setTargets(targets.toString());
-							sessionData.setInteractions(interactions.toString());
+							conversation.setTargets(targets.toString());
+							conversation.setInteractions(interactions.toString());
 						} else {
 							ApptentiveLog.e("Unable to save interactionManifest.");
 						}
@@ -116,7 +116,7 @@ public class InteractionManager {
 				ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
 			}
 		} else {
-			ApptentiveLog.v("Cancelled Interaction fetch due to null SessionData.");
+			ApptentiveLog.v("Cancelled Interaction fetch due to null Conversation.");
 		}
 	}
 
@@ -124,8 +124,8 @@ public class InteractionManager {
 	 * Made public for testing. There is no other reason to use this method directly.
 	 */
 	public void storeInteractionManifest(String interactionManifest) {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return;
 		}
 		try {
@@ -133,8 +133,8 @@ public class InteractionManager {
 			Interactions interactions = payload.getInteractions();
 			Targets targets = payload.getTargets();
 			if (interactions != null && targets != null) {
-				sessionData.setTargets(targets.toString());
-				sessionData.setInteractions(interactions.toString());
+				conversation.setTargets(targets.toString());
+				conversation.setInteractions(interactions.toString());
 			} else {
 				ApptentiveLog.e("Unable to save interactionManifest.");
 			}

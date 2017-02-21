@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
 
-public class SessionData implements Saveable, DataChangedListener {
+public class Conversation implements Saveable, DataChangedListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,7 +47,7 @@ public class SessionData implements Saveable, DataChangedListener {
 	// TODO: Maybe move this up to a wrapping Conversation class?
 	private transient InteractionManager interactionManager;
 
-	public SessionData() {
+	public Conversation() {
 		this.device = new Device();
 		this.person = new Person();
 		this.sdk = new Sdk();

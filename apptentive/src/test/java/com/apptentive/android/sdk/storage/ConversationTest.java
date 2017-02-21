@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import android.text.TextUtils;
 
-import com.apptentive.android.sdk.conversation.SessionData;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Before;
@@ -33,7 +33,7 @@ import static org.mockito.Matchers.any;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
-public class SessionDataTest {
+public class ConversationTest {
 
 	@Before
 	public void setup() {
@@ -49,7 +49,7 @@ public class SessionDataTest {
 
 	@Test
 	public void testSerialization() {
-		SessionData expected = new SessionData();
+		Conversation expected = new Conversation();
 		expected.setConversationId("jvnuveanesndndnadldbj");
 		expected.setConversationToken("watgsiovncsagjmcneiusdolnfcs");
 		expected.setPersonId("sijngmkmvewsnblkfmsd");
@@ -83,7 +83,7 @@ public class SessionDataTest {
 			bais = new ByteArrayInputStream(baos.toByteArray());
 			ois = new ObjectInputStream(bais);
 
-			SessionData result = (SessionData) ois.readObject();
+			Conversation result = (Conversation) ois.readObject();
 			assertEquals(expected.getConversationId(), result.getConversationId());
 			assertEquals(expected.getConversationToken(), result.getConversationToken());
 			assertEquals(expected.getPersonId(), result.getPersonId());
@@ -120,212 +120,212 @@ public class SessionDataTest {
 			}
 		};
 
-		SessionData sessionData = new SessionData();
-		sessionData.setDataChangedListener(listener);
+		Conversation conversation = new Conversation();
+		conversation.setDataChangedListener(listener);
 		assertFalse(listenerFired);
 
-		sessionData.setConversationToken("foo");
+		conversation.setConversationToken("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setConversationId("foo");
+		conversation.setConversationId("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setPersonId("foo");
+		conversation.setPersonId("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setPersonEmail("foo");
+		conversation.setPersonEmail("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setPersonName("foo");
+		conversation.setPersonName("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setLastSeenSdkVersion("foo");
+		conversation.setLastSeenSdkVersion("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setMessageCenterFeatureUsed(true);
+		conversation.setMessageCenterFeatureUsed(true);
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setMessageCenterWhoCardPreviouslyDisplayed(true);
+		conversation.setMessageCenterWhoCardPreviouslyDisplayed(true);
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setMessageCenterPendingMessage("foo");
+		conversation.setMessageCenterPendingMessage("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setMessageCenterPendingAttachments("foo");
+		conversation.setMessageCenterPendingAttachments("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setInteractions("foo");
+		conversation.setInteractions("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setTargets("foo");
+		conversation.setTargets("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setInteractionExpiration(1000L);
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-
-		sessionData.getDevice().getCustomData().put("foo", "bar");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().getCustomData().remove("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.setDevice(new Device());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().getCustomData().put("foo", "bar");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().getIntegrationConfig().setAmazonAwsSns(new IntegrationConfigItem());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().setIntegrationConfig(new IntegrationConfig());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().getIntegrationConfig().setAmazonAwsSns(new IntegrationConfigItem());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().setOsApiLevel(5);
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getDevice().setUuid("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.setLastSentDevice(new Device());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getLastSentDevice().setUuid("foo");
+		conversation.setInteractionExpiration(1000L);
 		assertTrue(listenerFired);
 		listenerFired = false;
 
 
-		sessionData.setPerson(new Person());
+		conversation.getDevice().getCustomData().put("foo", "bar");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setId("foo");
+		conversation.getDevice().getCustomData().remove("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setEmail("foo");
+		conversation.setDevice(new Device());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setName("foo");
+		conversation.getDevice().getCustomData().put("foo", "bar");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setFacebookId("foo");
+		conversation.getDevice().getIntegrationConfig().setAmazonAwsSns(new IntegrationConfigItem());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setPhoneNumber("foo");
+		conversation.getDevice().setIntegrationConfig(new IntegrationConfig());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setStreet("foo");
+		conversation.getDevice().getIntegrationConfig().setAmazonAwsSns(new IntegrationConfigItem());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setCity("foo");
+		conversation.getDevice().setOsApiLevel(5);
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setZip("foo");
+		conversation.getDevice().setUuid("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setCountry("foo");
+		conversation.setLastSentDevice(new Device());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getPerson().setBirthday("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getPerson().setCustomData(new CustomData());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getPerson().getCustomData().put("foo", "bar");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getPerson().getCustomData().remove("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.setLastSentPerson(new Person());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getLastSentPerson().setId("foo");
+		conversation.getLastSentDevice().setUuid("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
 
-		sessionData.setSdk(new Sdk());
+		conversation.setPerson(new Person());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setAppRelease(new AppRelease());
+		conversation.getPerson().setId("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setEmail("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setName("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setFacebookId("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setPhoneNumber("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setStreet("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setCity("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setZip("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setCountry("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setBirthday("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().setCustomData(new CustomData());
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().getCustomData().put("foo", "bar");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getPerson().getCustomData().remove("foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.setLastSentPerson(new Person());
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getLastSentPerson().setId("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
 
-		sessionData.getVersionHistory().updateVersionHistory(100D, 1, "1");
+		conversation.setSdk(new Sdk());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setVersionHistory(new VersionHistory());
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		sessionData.getVersionHistory().updateVersionHistory(100D, 1, "1");
+		conversation.setAppRelease(new AppRelease());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
 
-		sessionData.getEventData().storeEventForCurrentAppVersion(100D, 10, "1.0", "foo");
+		conversation.getVersionHistory().updateVersionHistory(100D, 1, "1");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getEventData().storeInteractionForCurrentAppVersion(100D, 10, "1.0", "foo");
+		conversation.setVersionHistory(new VersionHistory());
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.setEventData(new EventData());
+		conversation.getVersionHistory().updateVersionHistory(100D, 1, "1");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getEventData().storeEventForCurrentAppVersion(100D, 10, "1.0", "foo");
+
+		conversation.getEventData().storeEventForCurrentAppVersion(100D, 10, "1.0", "foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-		sessionData.getEventData().storeInteractionForCurrentAppVersion(100D, 10, "1.0", "foo");
+		conversation.getEventData().storeInteractionForCurrentAppVersion(100D, 10, "1.0", "foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.setEventData(new EventData());
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getEventData().storeEventForCurrentAppVersion(100D, 10, "1.0", "foo");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		conversation.getEventData().storeInteractionForCurrentAppVersion(100D, 10, "1.0", "foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 	}

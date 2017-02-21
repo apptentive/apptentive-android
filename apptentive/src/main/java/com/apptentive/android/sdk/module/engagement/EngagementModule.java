@@ -19,7 +19,7 @@ import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
-import com.apptentive.android.sdk.conversation.SessionData;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -54,11 +54,11 @@ public class EngagementModule {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			ApptentiveLog.d("engage(%s)", eventLabel);
 
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
-				sessionData.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
+				conversation.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
 				EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
 				return doEngage(context, eventLabel);
 			}
@@ -69,13 +69,13 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getSessionData().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getInteractionManager().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
-				sessionData.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
+				conversation.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
 			}
 			launchInteraction(context, interaction);
 			return true;
@@ -126,7 +126,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getSessionData().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getInteractionManager().getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 

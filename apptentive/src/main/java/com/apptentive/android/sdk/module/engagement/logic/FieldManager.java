@@ -10,10 +10,10 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.BuildConfig;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.Person;
-import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -31,8 +31,8 @@ public class FieldManager {
 	}
 
 	public static Object doGetValue(String query) {
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData == null) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
 			return null;
 		}
 		query = query.trim();
@@ -80,9 +80,9 @@ public class FieldManager {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
 					case version_code:
-						return sessionData.getVersionHistory().isUpdateForVersionCode();
+						return conversation.getVersionHistory().isUpdateForVersionCode();
 					case version_name:
-						return sessionData.getVersionHistory().isUpdateForVersionName();
+						return conversation.getVersionHistory().isUpdateForVersionName();
 					default:
 						break;
 				}
@@ -92,11 +92,11 @@ public class FieldManager {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
 				switch (subQuery) {
 					case total:
-						return sessionData.getVersionHistory().getTimeAtInstallTotal();
+						return conversation.getVersionHistory().getTimeAtInstallTotal();
 					case version_code:
-						return sessionData.getVersionHistory().getTimeAtInstallForCurrentVersionCode();
+						return conversation.getVersionHistory().getTimeAtInstallForCurrentVersionCode();
 					case version_name:
-						return sessionData.getVersionHistory().getTimeAtInstallForCurrentVersionName();
+						return conversation.getVersionHistory().getTimeAtInstallForCurrentVersionName();
 				}
 				return new Apptentive.DateTime(Util.currentTimeSeconds());
 			}
@@ -108,13 +108,13 @@ public class FieldManager {
 						QueryPart queryPart2 = QueryPart.parse(tokens[3]);
 						switch (queryPart2) {
 							case total: // Get total for all versions of the app.
-								return new BigDecimal(sessionData.getEventData().getInteractionCountTotal(interactionId));
+								return new BigDecimal(conversation.getEventData().getInteractionCountTotal(interactionId));
 							case version_code:
 								Integer appVersionCode = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
-								return new BigDecimal(sessionData.getEventData().getInteractionCountForVersionCode(interactionId, appVersionCode));
+								return new BigDecimal(conversation.getEventData().getInteractionCountForVersionCode(interactionId, appVersionCode));
 							case version_name:
 								String appVersionName = Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext());
-								return new BigDecimal(sessionData.getEventData().getInteractionCountForVersionName(interactionId, appVersionName));
+								return new BigDecimal(conversation.getEventData().getInteractionCountForVersionName(interactionId, appVersionName));
 							default:
 								break;
 						}
@@ -123,7 +123,7 @@ public class FieldManager {
 						QueryPart queryPart3 = QueryPart.parse(tokens[3]);
 						switch (queryPart3) {
 							case total:
-								Double lastInvoke = sessionData.getEventData().getTimeOfLastInteractionInvocation(interactionId);
+								Double lastInvoke = conversation.getEventData().getTimeOfLastInteractionInvocation(interactionId);
 								if (lastInvoke != null) {
 									return new Apptentive.DateTime(lastInvoke);
 								}
@@ -143,13 +143,13 @@ public class FieldManager {
 						QueryPart queryPart2 = QueryPart.parse(tokens[3]);
 						switch (queryPart2) {
 							case total: // Get total for all versions of the app.
-								return new BigDecimal(sessionData.getEventData().getEventCountTotal(eventLabel));
+								return new BigDecimal(conversation.getEventData().getEventCountTotal(eventLabel));
 							case version_code:
 								Integer appVersionCode = Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext());
-								return new BigDecimal(sessionData.getEventData().getEventCountForVersionCode(eventLabel, appVersionCode));
+								return new BigDecimal(conversation.getEventData().getEventCountForVersionCode(eventLabel, appVersionCode));
 							case version_name:
 								String appVersionName = Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext());
-								return new BigDecimal(sessionData.getEventData().getEventCountForVersionName(eventLabel, appVersionName));
+								return new BigDecimal(conversation.getEventData().getEventCountForVersionName(eventLabel, appVersionName));
 							default:
 								break;
 						}
@@ -158,7 +158,7 @@ public class FieldManager {
 						QueryPart queryPart3 = QueryPart.parse(tokens[3]);
 						switch (queryPart3) {
 							case total:
-								Double lastInvoke = sessionData.getEventData().getTimeOfLastEventInvocation(eventLabel);
+								Double lastInvoke = conversation.getEventData().getTimeOfLastEventInvocation(eventLabel);
 								if (lastInvoke != null) {
 									return new Apptentive.DateTime(lastInvoke);
 								}
@@ -172,7 +172,7 @@ public class FieldManager {
 			}
 			case person: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Person person = sessionData.getPerson();
+				Person person = conversation.getPerson();
 				if (person == null) {
 					return null;
 				}
@@ -194,7 +194,7 @@ public class FieldManager {
 			}
 			case device: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
-				Device device = sessionData.getDevice();
+				Device device = conversation.getDevice();
 				if (device == null) {
 					return null;
 				}

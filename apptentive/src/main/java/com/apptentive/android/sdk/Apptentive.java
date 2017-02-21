@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
@@ -30,7 +31,6 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
-import com.apptentive.android.sdk.conversation.SessionData;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -77,10 +77,10 @@ public class Apptentive {
 	 */
 	public static void setPersonEmail(String email) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				sessionData.setPersonEmail(email);
+				conversation.setPersonEmail(email);
 			}
 		}
 	}
@@ -93,9 +93,9 @@ public class Apptentive {
 	 */
 	public static String getPersonEmail() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				return sessionData.getPersonEmail();
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				return conversation.getPersonEmail();
 			}
 		}
 		return null;
@@ -112,10 +112,10 @@ public class Apptentive {
 	 */
 	public static void setPersonName(String name) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				sessionData.setPersonName(name);
+				conversation.setPersonName(name);
 			}
 		}
 	}
@@ -128,9 +128,9 @@ public class Apptentive {
 	 */
 	public static String getPersonName() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				return sessionData.getPersonName();
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				return conversation.getPersonName();
 			}
 		}
 		return null;
@@ -149,9 +149,9 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -166,9 +166,9 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -183,27 +183,27 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, version);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, version);
 			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, dateTime);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, dateTime);
 			}
 		}
 	}
@@ -215,9 +215,9 @@ public class Apptentive {
 	 */
 	public static void removeCustomDeviceData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().remove(key);
 			}
 		}
 	}
@@ -235,9 +235,9 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -252,9 +252,9 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -269,27 +269,27 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, version);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, version);
 			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().remove(key);
 			}
 		}
 	}
@@ -301,9 +301,9 @@ public class Apptentive {
 	 */
 	public static void removeCustomPersonData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().remove(key);
 			}
 		}
 	}
@@ -375,9 +375,9 @@ public class Apptentive {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return;
 		}
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null) {
-			IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getSessionData().getDevice().getIntegrationConfig();
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation != null) {
+			IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getConversation().getDevice().getIntegrationConfig();
 			IntegrationConfigItem item = new IntegrationConfigItem();
 			item.put(INTEGRATION_PUSH_TOKEN, token);
 			switch (pushProvider) {
