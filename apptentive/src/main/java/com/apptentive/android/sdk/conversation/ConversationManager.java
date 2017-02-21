@@ -1,11 +1,16 @@
 package com.apptentive.android.sdk.conversation;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.serialization.ObjectSerialization;
+import com.apptentive.android.sdk.storage.DataChangedListener;
+import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 
 /**
  * Class responsible for managing conversations.
@@ -16,7 +21,10 @@ import java.io.IOException;
  *   - Migrating legacy conversation data.
  * </pre>
  */
-public class ConversationManager {
+public class ConversationManager implements DataChangedListener {
+
+	protected static final String CONVERSATION_METADATA_PATH = "conversation-v1.meta";
+
 	/**
 	 * Private serial dispatch queue for background operations
 	 */
@@ -32,6 +40,8 @@ public class ConversationManager {
 	 */
 	private ConversationMetadata conversationMetadata;
 
+	private Conversation activeConversation;
+
 	public ConversationManager(DispatchQueue operationQueue, File storageDir) {
 		if (operationQueue == null) {
 			throw new IllegalArgumentException("Operation queue is null");
@@ -42,78 +52,124 @@ public class ConversationManager {
 	}
 
 	/**
-	 * Attempts to load an active conversation asynchronously.
+	 * Attempts to load an active conversation. Returns <code>false</code> if active conversation is
+	 * missing or cannnot be loaded
 	 */
-	public void loadActiveConversation(Callback callback) {
-		loadConversation(new Filter() {
-			@Override
-			public boolean accept(ConversationMetadataItem metadata) {
-				return metadata.isActive();
+	public boolean loadActiveConversation() {
+		try {
+			// resolving metadata
+			conversationMetadata = resolveMetadata();
+
+			// attempt to load existing conversation
+			activeConversation = loadActiveConversationGuarded();
+			if (activeConversation != null) {
+				activeConversation.setDataChangedListener(this);
+				return true;
 			}
-		}, callback);
+
+			// no conversation - fetch one
+			fetchConversation();
+
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while loading active conversation");
+		}
+
+		return false;
 	}
 
-	/**
-	 * Helper method for async conversation loading with specified filter.
-	 */
-	private void loadConversation(final Filter filter, final Callback callback) {
-		operationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				Conversation conversation = null;
-				String errorMessage = null;
-				try {
-					conversation = loadConversationSync(filter);
-				} catch (Exception e) {
-					errorMessage = e.getMessage();
-				}
+	private void fetchConversation() {
+		
+	}
 
-				if (callback != null) {
-					callback.onFinishLoading(conversation, errorMessage);
-				}
+	private Conversation loadActiveConversationGuarded() throws IOException {
+		// if the user was logged in previously - we should have an active conversation
+		ApptentiveLog.v(CONVERSATION, "Loading active conversation...");
+		final ConversationMetadataItem activeItem = conversationMetadata.findItem(new ConversationMetadata.Filter() {
+			@Override
+			public boolean accept(ConversationMetadataItem item) {
+				return item.isActive();
 			}
 		});
-	}
-
-	/**
-	 * Loads selected conversation on a background queue
-	 */
-	private Conversation loadConversationSync(Filter filter) throws IOException {
-		if (conversationMetadata == null) {
-			conversationMetadata = ObjectSerialization.deserialize(new File(""), ConversationMetadata.class);
+		if (activeItem != null) {
+			return loadConversation(activeItem);
 		}
 
-		ConversationMetadataItem matchingItem = null;
-		for (ConversationMetadataItem item : conversationMetadata.getItems()) {
-			if (filter.accept(item)) {
-				matchingItem = item;
+		// if no user was logged in previously - we might have a default conversation
+		ApptentiveLog.v(CONVERSATION, "Loading default conversation...");
+		final ConversationMetadataItem defaultItem = conversationMetadata.findItem(new ConversationMetadata.Filter() {
+			@Override
+			public boolean accept(ConversationMetadataItem item) {
+				return item.isDefault();
 			}
+		});
+		if (defaultItem != null) {
+			return loadConversation(defaultItem);
 		}
 
-		if (matchingItem == null) {
-			return null;
-		}
-
+		// TODO: check for legacy conversations
+		ApptentiveLog.v(CONVERSATION, "Can't load conversation");
 		return null;
 	}
 
-	/**
-	 * Callback listener interface
-	 */
-	public interface Callback {
-		/**
-		 * Called when conversation loading is finished.
-		 *
-		 * @param conversation - null if loading failed
-		 * @param errorMessage - error description in case if loading failed (null is succeed)
-		 */
-		void onFinishLoading(Conversation conversation, String errorMessage);
+	private Conversation loadConversation(ConversationMetadataItem item) {
+		// TODO: use same serialization logic across the project
+		File file = new File(item.filename);
+		FileSerializer serializer = new FileSerializer(file);
+		return (Conversation) serializer.deserialize();
 	}
 
-	/**
-	 * Interface which encapsulates conversation metadata filtering (visitor pattern)
-	 */
-	interface Filter {
-		boolean accept(ConversationMetadataItem item);
+	//region Metadata
+
+	private ConversationMetadata resolveMetadata() {
+		try {
+			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			if (metaFile.exists()) {
+				ApptentiveLog.v(CONVERSATION, "Loading meta file: " + metaFile);
+				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
+			} else {
+				ApptentiveLog.v(CONVERSATION, "Meta file does not exist: " + metaFile);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while loading conversation metadata");
+		}
+
+		return new ConversationMetadata();
 	}
+
+	//endregion
+
+	//region DataChangedListener
+
+	@Override
+	public void onDataChanged() {
+		boolean scheduled = operationQueue.dispatchAsyncOnce(saveSessionTask, 100L);
+		if (scheduled) {
+			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
+		} else {
+			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
+		}
+	}
+
+	//endregion
+
+	//region Dispatch Tasks
+
+	private final DispatchTask saveSessionTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+//			ApptentiveLog.d("Saving Conversation");
+//			ApptentiveLog.v("EventData: %s", conversation.getEventData().toString());
+//			if (fileSerializer != null) {
+//				fileSerializer.serialize(conversation);
+//			}
+
+			throw new RuntimeException("Implement me");
+		}
+	};
+
+	//endregion
+
+	//region Listener
+	//endregion
+
 }

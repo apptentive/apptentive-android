@@ -46,10 +46,31 @@ class ConversationMetadata implements SerializableObject {
 
 	//endregion
 
+	//region Filtering
+
+	public ConversationMetadataItem findItem(Filter filter) {
+		for (ConversationMetadataItem item : items) {
+			if (filter.accept(item)) {
+				return item;
+			}
+		}
+		return null;
+	}
+
+	//endregion
+
 	//region Getters/Setters
 
 	public List<ConversationMetadataItem> getItems() {
 		return items;
+	}
+
+	//endregion
+
+	//region Filter
+
+	public interface Filter {
+		boolean accept(ConversationMetadataItem item);
 	}
 
 	//endregion
