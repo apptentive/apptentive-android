@@ -846,4 +846,18 @@ public class Util {
 		}
 		return Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 	}
+	/**
+	 * Returns and internal storage directory
+	 */
+	public static File getInternalDir(Context context, String path, boolean createIfNecessary) {
+		File filesDir = context.getFilesDir();
+		File internalDir = new File(filesDir, path);
+		if (!internalDir.exists() && createIfNecessary) {
+			boolean succeed = internalDir.mkdirs();
+			if (!succeed) {
+				ApptentiveLog.w("Unable to create internal directory: %s", internalDir);
+			}
+		}
+		return internalDir;
+	}
 }

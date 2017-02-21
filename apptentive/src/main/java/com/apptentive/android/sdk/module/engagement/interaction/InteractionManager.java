@@ -10,15 +10,11 @@ import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
-import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
@@ -39,62 +35,6 @@ public class InteractionManager {
 
 	public interface InteractionUpdateListener {
 		void onInteractionUpdated(boolean successful);
-	}
-
-
-	// TODO: Refactor this class to dispatch to its own queue.
-	public void fetchInteractions() {
-		ApptentiveLog.v("Fetching Interactions");
-		if (conversation != null) {
-			InteractionManager interactionManager = conversation.getInteractionManager();
-			if (interactionManager != null) {
-				ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
-
-				// TODO: Move this to global config
-				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-				boolean updateSuccessful = true;
-
-				// We weren't able to connect to the internet.
-				if (response.isException()) {
-					prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
-					updateSuccessful = false;
-				}
-				// We got a server error.
-				else if (!response.isSuccessful()) {
-					prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
-					updateSuccessful = false;
-				}
-
-				if (updateSuccessful) {
-					String interactionsPayloadString = response.getContent();
-
-					// Store new integration cache expiration.
-					String cacheControl = response.getHeaders().get("Cache-Control");
-					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-					if (cacheSeconds == null) {
-						cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
-					}
-					conversation.setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
-					try {
-						InteractionManifest payload = new InteractionManifest(interactionsPayloadString);
-						Interactions interactions = payload.getInteractions();
-						Targets targets = payload.getTargets();
-						if (interactions != null && targets != null) {
-							conversation.setTargets(targets.toString());
-							conversation.setInteractions(interactions.toString());
-						} else {
-							ApptentiveLog.e("Unable to save interactionManifest.");
-						}
-					} catch (JSONException e) {
-						ApptentiveLog.w("Invalid InteractionManifest received.");
-					}					}
-				ApptentiveLog.d("Fetching new Interactions asyncTask finished. Successful? %b", updateSuccessful);
-				// Update pending state on UI thread after finishing the task
-				ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-			}
-		} else {
-			ApptentiveLog.v("Cancelled Interaction fetch due to null Conversation.");
-		}
 	}
 
 	/**

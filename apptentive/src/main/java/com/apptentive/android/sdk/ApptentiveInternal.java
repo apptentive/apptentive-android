@@ -28,10 +28,10 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -41,15 +41,9 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.network.HttpJsonRequest;
-import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
-import com.apptentive.android.sdk.storage.DataChangedListener;
-import com.apptentive.android.sdk.storage.Device;
-import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
@@ -59,12 +53,10 @@ import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchQueueType;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,10 +75,9 @@ import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegist
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal implements DataChangedListener {
+public class ApptentiveInternal {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
-	private InteractionManager interactionManager;
 	private final MessageManager messageManager;
 	private final PayloadSendWorker payloadWorker;
 	private final ApptentiveTaskManager taskManager;
@@ -94,6 +85,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 	private final ApptentiveComponentRegistry componentRegistry;
 	private final ApptentiveHttpClient apptentiveHttpClient;
+	private final ConversationManager conversationManager;
 
 	// These variables are initialized in Apptentive.register(), and so they are freely thereafter. If they are unexpectedly null, then if means the host app did not register Apptentive.
 	private final Context appContext;
@@ -107,8 +99,6 @@ public class ApptentiveInternal implements DataChangedListener {
 	String personId;
 	String androidId;
 	String appPackageName;
-	Conversation conversation;
-	private FileSerializer fileSerializer;
 
 	// private background serial dispatch queue for internal SDK tasks
 	private final DispatchQueue backgroundQueue;
@@ -122,8 +112,8 @@ public class ApptentiveInternal implements DataChangedListener {
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
 	// booleans to prevent starting multiple fetching asyncTasks simultaneously
-	AtomicBoolean isConversationTokenFetchPending = new AtomicBoolean(false);
-	AtomicBoolean isConfigurationFetchPending = new AtomicBoolean(false);
+
+	AtomicBoolean isConfigurationFetchPending = new AtomicBoolean(false); // TODO: remove me!
 
 	IRatingProvider ratingProvider;
 	Map<String, String> ratingProviderArgs;
@@ -167,6 +157,7 @@ public class ApptentiveInternal implements DataChangedListener {
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		componentRegistry = new ApptentiveComponentRegistry();
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
+		conversationManager = new ConversationManager(appContext, backgroundQueue, Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 		messageManager = new MessageManager();
@@ -207,25 +198,6 @@ public class ApptentiveInternal implements DataChangedListener {
 
 					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey);
 					isApptentiveInitialized.set(false);
-/*
-<<<<<<< HEAD
-=======
-					sApptentiveInternal.appContext = context.getApplicationContext();
-					sApptentiveInternal.globalSharedPrefs = sApptentiveInternal.appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-					MessageManager msgManager = new MessageManager();
-					PayloadSendWorker payloadWorker = new PayloadSendWorker();
-					ApptentiveTaskManager worker = new ApptentiveTaskManager(sApptentiveInternal.appContext);
-					ApptentiveComponentRegistry componentRegistry = new ApptentiveComponentRegistry();
-
-					sApptentiveInternal.messageManager = msgManager;
-					sApptentiveInternal.payloadWorker = payloadWorker;
-					sApptentiveInternal.taskManager = worker;
-					sApptentiveInternal.cachedExecutor = Executors.newCachedThreadPool();
-					sApptentiveInternal.componentRegistry = componentRegistry;
-					sApptentiveInternal.apiKey = Util.trim(apptentiveApiKey);
->>>>>>> feature/fetch_interactions
-*/
 				}
 			}
 		}
@@ -412,7 +384,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	public Conversation getConversation() {
-		return conversation;
+		return conversationManager.getActiveConversation();
 	}
 
 	public String getApptentiveApiKey() {
@@ -435,6 +407,15 @@ public class ApptentiveInternal implements DataChangedListener {
 		return globalSharedPrefs;
 	}
 
+	// FIXME: remove app release from this class
+	public AppRelease getAppRelease() {
+		return appRelease;
+	}
+
+	public ApptentiveHttpClient getApptentiveHttpClient() {
+		return apptentiveHttpClient;
+	}
+
 	public void runOnWorkerThread(Runnable r) {
 		cachedExecutor.execute(r);
 	}
@@ -450,7 +431,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	public void onActivityStarted(Activity activity) {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
-			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
+			currentTaskStackTopActivity = new WeakReference<>(activity);
 			messageManager.setCurrentForegroundActivity(activity);
 		}
 	}
@@ -458,7 +439,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	public void onActivityResumed(Activity activity) {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
-			currentTaskStackTopActivity = new WeakReference<Activity>(activity);
+			currentTaskStackTopActivity = new WeakReference<>(activity);
 			messageManager.setCurrentForegroundActivity(activity);
 		}
 
@@ -544,26 +525,9 @@ public class ApptentiveInternal implements DataChangedListener {
 		 * 3. An unreadMessageCountListener() is set up
 		 */
 
-		File internalStorage = appContext.getFilesDir();
-		File sessionDataFile = new File(internalStorage, "apptentive/Conversation.ser");
-		sessionDataFile.getParentFile().mkdirs();
-		fileSerializer = new FileSerializer(sessionDataFile);
-		conversation = (Conversation) fileSerializer.deserialize();
-		if (conversation != null) {
-			conversation.setDataChangedListener(this);
-			ApptentiveLog.d("Restored existing Conversation");
-			ApptentiveLog.v("Restored EventData: %s", conversation.getEventData());
-			// FIXME: Move this to wherever the sessions first comes online?
-			boolean featureEverUsed = conversation != null && conversation.isMessageCenterFeatureUsed();
-			if (featureEverUsed) {
-				messageManager.init();
-			}
-			conversation.setInteractionManager(new InteractionManager(conversation));
-			// TODO: Make a callback like conversationBecameCurrent(), and call this there
-			scheduleInteractionFetch();
-		} else {
-			fetchConversationToken();
-		}
+		long start = System.currentTimeMillis();
+		boolean conversationLoaded = conversationManager.loadActiveConversation();
+		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? " not" : "", System.currentTimeMillis() - start);
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
@@ -640,6 +604,7 @@ public class ApptentiveInternal implements DataChangedListener {
 	}
 
 	private void checkSendVersionChanges() {
+		final Conversation conversation = getConversation();
 		if (conversation == null) {
 			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
 			return;
@@ -677,10 +642,7 @@ public class ApptentiveInternal implements DataChangedListener {
 
 		if (appReleaseChanged) {
 			ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
-			}
+			conversation.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
 		}
 
 		Sdk sdk = SdkManager.generateCurrentSdk();
@@ -707,69 +669,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();
-	}
-
-	private void fetchConversationToken() {
-		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-			ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
-			dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
-
-			// Try to fetch a new one from the server.
-			ConversationTokenRequest request = new ConversationTokenRequest();
-
-			// Send the Device and Sdk now, so they are available on the server from the start.
-			final Device device = DeviceManager.generateNewDevice(appContext);
-			final Sdk sdk = SdkManager.generateCurrentSdk();
-
-			request.setDevice(DeviceManager.getDiffPayload(null, device));
-			request.setSdk(SdkManager.getPayload(sdk));
-			request.setAppRelease(AppReleaseManager.getPayload(appRelease));
-
-			apptentiveHttpClient.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
-				@Override
-				public void onFinish(HttpJsonRequest request) {
-					try {
-						JSONObject root = request.getResponseObject();
-						String conversationToken = root.getString("token");
-						ApptentiveLog.d(CONVERSATION, "ConversationToken: " + conversationToken);
-						String conversationId = root.getString("id");
-						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
-
-						conversation = new Conversation();
-						conversation.setDataChangedListener(ApptentiveInternal.this);
-						if (conversationToken != null && !conversationToken.equals("")) {
-							conversation.setConversationToken(conversationToken);
-							conversation.setConversationId(conversationId);
-							conversation.setDevice(device);
-							conversation.setSdk(sdk);
-							conversation.setAppRelease(appRelease);
-							conversation.setInteractionManager(new InteractionManager(conversation));
-						}
-						String personId = root.getString("person_id");
-						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
-						conversation.setPersonId(personId);
-
-						// TODO: Make a callback like sessionBecameCurrent(), and call this there
-						scheduleInteractionFetch();
-					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception while handling conversation token");
-					} finally {
-						isConversationTokenFetchPending.set(false);
-					}
-				}
-
-				@Override
-				public void onCancel(HttpJsonRequest request) {
-					isConversationTokenFetchPending.set(false);
-				}
-
-				@Override
-				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
-					isConversationTokenFetchPending.set(false);
-				}
-			});
-		}
 	}
 
 	/**
@@ -813,14 +712,14 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	public void putRatingProviderArg(String key, String value) {
 		if (ratingProviderArgs == null) {
-			ratingProviderArgs = new HashMap<String, String>();
+			ratingProviderArgs = new HashMap<>();
 		}
 		ratingProviderArgs.put(key, value);
 	}
 
 	public void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
 		if (onSurveyFinishedListener != null) {
-			this.onSurveyFinishedListener = new WeakReference<OnSurveyFinishedListener>(onSurveyFinishedListener);
+			this.onSurveyFinishedListener = new WeakReference<>(onSurveyFinishedListener);
 		} else {
 			this.onSurveyFinishedListener = null;
 		}
@@ -1062,42 +961,23 @@ public class ApptentiveInternal implements DataChangedListener {
 
 	// Multi-tenancy work
 
-	private synchronized void scheduleSessionDataSave() {
-		boolean scheduled = backgroundQueue.dispatchAsyncOnce(saveSessionTask, 100L);
-		if (scheduled) {
-			ApptentiveLog.d("Scheduling Conversation save.");
-		} else {
-			ApptentiveLog.d("Conversation save already scheduled.");
-		}
-	}
-
 	private synchronized void scheduleInteractionFetch() {
-		if (conversation != null) {
-			InteractionManager interactionManager = conversation.getInteractionManager();
-			if (interactionManager != null) {
-				if (interactionManager.isPollForInteractions()) {
-					boolean cacheExpired = conversation.getInteractionExpiration() > Util.currentTimeSeconds();
-					boolean force = appRelease != null && appRelease.isDebug();
-					if (cacheExpired || force) {
-						backgroundQueue.dispatchAsyncOnce(fetchInteractionsTask);
-					}
-				} else {
-					ApptentiveLog.v("Interaction polling is disabled.");
-				}
-			}
-		}
+//		if (conversation != null) {
+//			InteractionManager interactionManager = conversation.getInteractionManager();
+//			if (interactionManager != null) {
+//				if (interactionManager.isPollForInteractions()) {
+//					boolean cacheExpired = conversation.getInteractionExpiration() > Util.currentTimeSeconds();
+//					boolean force = appRelease != null && appRelease.isDebug();
+//					if (cacheExpired || force) {
+//						backgroundQueue.dispatchAsyncOnce(fetchInteractionsTask);
+//					}
+//				} else {
+//					ApptentiveLog.v("Interaction polling is disabled.");
+//				}
+//			}
+//		}
+		throw new RuntimeException("Remove me");
 	}
-
-	private final DispatchTask saveSessionTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			ApptentiveLog.d("Saving Conversation");
-			ApptentiveLog.v("EventData: %s", conversation.getEventData().toString());
-			if (fileSerializer != null) {
-				fileSerializer.serialize(conversation);
-			}
-		}
-	};
 
 	//region Helpers
 
@@ -1110,24 +990,6 @@ public class ApptentiveInternal implements DataChangedListener {
 		return url;
 	}
 
-	//endregion
-
-	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			Conversation conversation = getConversation();
-			if (conversation != null) {
-				conversation.getInteractionManager().fetchInteractions();
-			}
-		}
-	};
-
-	//region Listeners
-
-	@Override
-	public void onDataChanged() {
-		scheduleSessionDataSave();
-	}
 	//endregion
 
 	/**

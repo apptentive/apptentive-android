@@ -101,6 +101,11 @@ public class ApptentiveLog {
 		doLog(Level.WARN, throwable, message, args);
 	}
 
+	public static void e(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.ERROR, null, message, args);
+		}
+	}
 	public static void e(String message, Object... args){
 		doLog(Level.ERROR, null, message, args);
 	}

@@ -6,12 +6,16 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.comm.ApptentiveClient;
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.storage.AppRelease;
@@ -22,8 +26,13 @@ import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
+import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
 public class Conversation implements Saveable, DataChangedListener {
 
@@ -87,6 +96,62 @@ public class Conversation implements Saveable, DataChangedListener {
 		}
 		return null;
 	}
+
+	void fetchInteractions() {
+		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
+		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
+
+		// TODO: Move this to global config
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		boolean updateSuccessful = true;
+
+		// We weren't able to connect to the internet.
+		if (response.isException()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
+			updateSuccessful = false;
+		}
+		// We got a server error.
+		else if (!response.isSuccessful()) {
+			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
+			updateSuccessful = false;
+		}
+
+		if (updateSuccessful) {
+			String interactionsPayloadString = response.getContent();
+
+			// Store new integration cache expiration.
+			String cacheControl = response.getHeaders().get("Cache-Control");
+			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+			if (cacheSeconds == null) {
+				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+			}
+			setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
+			try {
+				InteractionManifest payload = new InteractionManifest(interactionsPayloadString);
+				Interactions interactions = payload.getInteractions();
+				Targets targets = payload.getTargets();
+				if (interactions != null && targets != null) {
+					setTargets(targets.toString());
+					setInteractions(interactions.toString());
+				} else {
+					ApptentiveLog.e(CONVERSATION, "Unable to save interactionManifest.");
+				}
+			} catch (JSONException e) {
+				ApptentiveLog.e(e, "Invalid InteractionManifest received.");
+			}
+		}
+		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions asyncTask finished. Successful? %b", updateSuccessful);
+
+		// Update pending state on UI thread after finishing the task
+		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
+	}
+
+	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			fetchInteractions();
+		}
+	};
 
 	//endregion
 
@@ -343,6 +408,13 @@ public class Conversation implements Saveable, DataChangedListener {
 
 	public void setInteractionManager(InteractionManager interactionManager) {
 		this.interactionManager = interactionManager;
+	}
+
+	/**
+	 * Returns a filename unique to the convesation for persistant storage
+	 */
+	String getFilename() {
+		return String.format("conversation-%s.bin", conversationId);
 	}
 
 	//endregion
