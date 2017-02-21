@@ -24,6 +24,7 @@ import org.json.JSONException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** Determining wheather interaction should be fetched and performing the fetch */
 public class InteractionManager {
 
 	private Boolean pollForInteractions;
@@ -40,30 +41,6 @@ public class InteractionManager {
 		void onInteractionUpdated(boolean successful);
 	}
 
-	public Interaction getApplicableInteraction(String eventLabel) {
-
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-		if (conversation == null) {
-			return null;
-		}
-		String targetsString = conversation.getTargets();
-		if (targetsString != null) {
-			try {
-				Targets targets = new Targets(conversation.getTargets());
-				String interactionId = targets.getApplicableInteraction(eventLabel);
-				if (interactionId != null) {
-					String interactionsString = conversation.getInteractions();
-					if (interactionsString != null) {
-						Interactions interactions = new Interactions(interactionsString);
-						return interactions.getInteraction(interactionId);
-					}
-				}
-			} catch (JSONException e) {
-				ApptentiveLog.e("");
-			}
-		}
-		return null;
-	}
 
 	// TODO: Refactor this class to dispatch to its own queue.
 	public void fetchInteractions() {

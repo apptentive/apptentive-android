@@ -69,7 +69,7 @@ public class EngagementModule {
 	}
 
 	public static boolean doEngage(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getApplicableInteraction(eventLabel);
 		if (interaction != null) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
@@ -126,7 +126,7 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getInteractionManager().getApplicableInteraction(eventLabel);
+		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 

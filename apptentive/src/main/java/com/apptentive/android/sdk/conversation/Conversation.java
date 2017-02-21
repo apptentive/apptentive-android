@@ -8,7 +8,12 @@ package com.apptentive.android.sdk.conversation;
 
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
@@ -17,6 +22,8 @@ import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
+
+import org.json.JSONException;
 
 public class Conversation implements Saveable, DataChangedListener {
 
@@ -55,6 +62,34 @@ public class Conversation implements Saveable, DataChangedListener {
 		this.eventData = new EventData();
 		this.versionHistory = new VersionHistory();
 	}
+
+	//region Interactions
+
+	/**
+	 * Returns an Interaction for <code>eventLabel</code> if there is one that can be displayed.
+	 */
+	public Interaction getApplicableInteraction(String eventLabel) {
+		String targetsString = getTargets();
+		if (targetsString != null) {
+			try {
+				Targets targets = new Targets(getTargets());
+				String interactionId = targets.getApplicableInteraction(eventLabel);
+				if (interactionId != null) {
+					String interactionsString = getInteractions();
+					if (interactionsString != null) {
+						Interactions interactions = new Interactions(interactionsString);
+						return interactions.getInteraction(interactionId);
+					}
+				}
+			} catch (JSONException e) {
+				ApptentiveLog.e(e, "Exception while getting applicable interaction: %s", eventLabel);
+			}
+		}
+		return null;
+	}
+
+	//endregion
+
 
 	//region Listeners
 	private transient DataChangedListener listener;
