@@ -60,7 +60,7 @@ public class ConversationManager {
 		operationQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
-				Conversation conversation = null;
+				SessionData conversation = null;
 				String errorMessage = null;
 				try {
 					conversation = loadConversationSync(filter);
@@ -78,7 +78,7 @@ public class ConversationManager {
 	/**
 	 * Loads selected conversation on a background queue
 	 */
-	private Conversation loadConversationSync(Filter filter) throws IOException {
+	private SessionData loadConversationSync(Filter filter) throws IOException {
 		if (conversationMetadata == null) {
 			conversationMetadata = ObjectSerialization.deserialize(new File(""), ConversationMetadata.class);
 		}
@@ -107,7 +107,7 @@ public class ConversationManager {
 		 * @param conversation - null if loading failed
 		 * @param errorMessage - error description in case if loading failed (null is succeed)
 		 */
-		void onFinishLoading(Conversation conversation, String errorMessage);
+		void onFinishLoading(SessionData conversation, String errorMessage);
 	}
 
 	/**
