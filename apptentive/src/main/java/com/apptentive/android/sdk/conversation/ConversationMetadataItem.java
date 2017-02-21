@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,22 +32,33 @@ class ConversationMetadataItem implements SerializableObject {
 	public static byte CONVERSATION_STATE_INACTIVE = 3;
 
 	byte state = CONVERSATION_STATE_UNDEFINED;
-	String userId;
+	String conversationId;
 	String filename;
-	String keyId;
+
+	public ConversationMetadataItem(String conversationId, String filename)
+	{
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(filename)) {
+			throw new IllegalArgumentException("Filename is null or empty");
+		}
+
+		this.conversationId = conversationId;
+		this.filename = filename;
+	}
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
-		userId = in.readUTF();
+		conversationId = in.readUTF();
 		filename = in.readUTF();
-		keyId = in.readUTF();
 		state = in.readByte();
 	}
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
-		out.writeUTF(userId);
+		out.writeUTF(conversationId);
 		out.writeUTF(filename);
-		out.writeUTF(keyId);
 		out.writeByte(state);
 	}
 

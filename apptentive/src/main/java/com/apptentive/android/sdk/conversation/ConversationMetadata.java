@@ -1,12 +1,15 @@
 package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.apptentive.android.sdk.conversation.ConversationMetadataItem.*;
 
 /**
  * Class which represents all conversation entries stored on the disk
@@ -41,6 +44,30 @@ class ConversationMetadata implements SerializableObject {
 		out.write(items.size());
 		for (int i = 0; i < items.size(); ++i) {
 			items.get(i).writeExternal(out);
+		}
+	}
+
+	//endregion
+
+	//region Conversatiosn
+
+	// TODO: replace it with notifications so that the active conversation can send out events and clean itself up.
+	public void setActiveConversation(final Conversation conversation)
+	{
+		// clear 'active' state
+		boolean found = false;
+		for (ConversationMetadataItem item : items) {
+			if (StringUtils.equal(conversation.getConversationId(), item.conversationId)) {
+				found = true;
+				item.state = CONVERSATION_STATE_ACTIVE;
+			} else if (item.state == CONVERSATION_STATE_ACTIVE) {
+				item.state = CONVERSATION_STATE_INACTIVE;
+			}
+		}
+
+		// add a new item if it was not found
+		if (!found) {
+			items.add(new ConversationMetadataItem(conversation.getConversationId(), conversation.getFilename()));
 		}
 	}
 

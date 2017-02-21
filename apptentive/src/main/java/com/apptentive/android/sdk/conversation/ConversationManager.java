@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -93,12 +94,6 @@ public class ConversationManager implements DataChangedListener {
 			activeConversation = loadActiveConversationGuarded();
 			if (activeConversation != null) {
 				activeConversation.setDataChangedListener(this);
-
-				boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
-				if (featureEverUsed) {
-					// messageManager.init(); // // FIXME: 2/21/17 init message messenger
-				}
-
 				return true;
 			}
 
@@ -188,15 +183,24 @@ public class ConversationManager implements DataChangedListener {
 						String conversationId = root.getString("id");
 						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
+						if (StringUtils.isNullOrEmpty(conversationToken)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch convesation: missing 'token'");
+							return;
+						}
+
+						if (StringUtils.isNullOrEmpty(conversationId)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch convesation: missing 'id'");
+							return;
+						}
+
 						// create new conversation
 						Conversation conversation = new Conversation();
-						if (conversationToken != null && !conversationToken.equals("")) { // FIXME: handle "unhappy" path
-							conversation.setConversationToken(conversationToken);
-							conversation.setConversationId(conversationId);
-							conversation.setDevice(device);
-							conversation.setSdk(sdk);
-							conversation.setAppRelease(appRelease);
-						}
+						conversation.setConversationToken(conversationToken);
+						conversation.setConversationId(conversationId);
+						conversation.setDevice(device);
+						conversation.setSdk(sdk);
+						conversation.setAppRelease(appRelease);
+
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
@@ -234,7 +238,8 @@ public class ConversationManager implements DataChangedListener {
 
 	private synchronized void setActiveConversation(Conversation conversation) {
 		activeConversation = conversation;
-		throw new RuntimeException("Implement me: update metadata");
+		conversationMetadata.setActiveConversation(conversation);
+		saveMetadata();
 	}
 
 	//endregion
@@ -288,6 +293,15 @@ public class ConversationManager implements DataChangedListener {
 		}
 
 		return new ConversationMetadata();
+	}
+
+	private void saveMetadata() {
+		try {
+			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			ObjectSerialization.serialize(metaFile, conversationMetadata);
+		} catch (Exception e) {
+			ApptentiveLog.e(CONVERSATION, "Exception while saving metadata");
+		}
 	}
 
 	//endregion
