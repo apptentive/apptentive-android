@@ -67,7 +67,9 @@ class ConversationMetadata implements SerializableObject {
 
 		// add a new item if it was not found
 		if (!found) {
-			items.add(new ConversationMetadataItem(conversation.getConversationId(), conversation.getFilename()));
+			final ConversationMetadataItem item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFilename());
+			item.state = CONVERSATION_STATE_ACTIVE;
+			items.add(item);
 		}
 	}
 

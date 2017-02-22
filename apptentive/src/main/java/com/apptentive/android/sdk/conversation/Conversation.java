@@ -97,7 +97,10 @@ public class Conversation implements Saveable, DataChangedListener {
 		return null;
 	}
 
-	void fetchInteractions() {
+	/**
+	 * Fetches interaction synchronously. Returns <code>true</code> if succeed.
+	 */
+	boolean fetchInteractions() {
 		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
@@ -144,6 +147,8 @@ public class Conversation implements Saveable, DataChangedListener {
 
 		// Update pending state on UI thread after finishing the task
 		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
+
+		return updateSuccessful;
 	}
 
 	private final transient DispatchTask fetchInteractionsTask = new DispatchTask() {

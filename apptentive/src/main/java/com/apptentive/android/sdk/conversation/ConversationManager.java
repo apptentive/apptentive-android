@@ -92,6 +92,8 @@ public class ConversationManager implements DataChangedListener {
 
 			// attempt to load existing conversation
 			activeConversation = loadActiveConversationGuarded();
+			dispatchDebugEvent(EVT_CONVERSATION_LOAD_ACTIVE, activeConversation != null);
+
 			if (activeConversation != null) {
 				activeConversation.setDataChangedListener(this);
 				return true;
@@ -139,7 +141,7 @@ public class ConversationManager implements DataChangedListener {
 
 	private Conversation loadConversation(ConversationMetadataItem item) {
 		// TODO: use same serialization logic across the project
-		File file = new File(item.filename);
+		File file = new File(storageDir, item.filename);
 		FileSerializer serializer = new FileSerializer(file);
 		return (Conversation) serializer.deserialize();
 	}
@@ -151,7 +153,6 @@ public class ConversationManager implements DataChangedListener {
 	private void fetchConversationToken() {
 		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
 			ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
-			dispatchDebugEvent(EVT_FETCH_CONVERSATION_TOKEN);
 
 			final Context context = getContext();
 			if (context == null) {
@@ -213,24 +214,29 @@ public class ConversationManager implements DataChangedListener {
 						setActiveConversation(conversation);
 
 						// fetch interactions
-						conversation.fetchInteractions();
+						boolean fetchSucceed = conversation.fetchInteractions();
+						dispatchDebugEvent(EVT_INTERACTION_FETCH, fetchSucceed);
 
+						// TODO: create listener and notify other parts of SDK about new conversation
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
 					} finally {
 						isConversationTokenFetchPending.set(false);
+						dispatchDebugEvent(EVT_CONVERSATION_CREATE, activeConversation != null);
 					}
 				}
 
 				@Override
 				public void onCancel(HttpJsonRequest request) {
 					isConversationTokenFetchPending.set(false);
+					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 				}
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
 					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
 					isConversationTokenFetchPending.set(false);
+					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 				}
 			});
 		}
@@ -284,7 +290,9 @@ public class ConversationManager implements DataChangedListener {
 			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
 			if (metaFile.exists()) {
 				ApptentiveLog.v(CONVERSATION, "Loading meta file: " + metaFile);
-				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
+				final ConversationMetadata metadata = ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
+				dispatchDebugEvent(EVT_CONVERSATION_METADATA_LOAD, true);
+				return metadata;
 			} else {
 				ApptentiveLog.v(CONVERSATION, "Meta file does not exist: " + metaFile);
 			}
@@ -292,6 +300,7 @@ public class ConversationManager implements DataChangedListener {
 			ApptentiveLog.e(e, "Exception while loading conversation metadata");
 		}
 
+		dispatchDebugEvent(EVT_CONVERSATION_METADATA_LOAD, false);
 		return new ConversationMetadata();
 	}
 
