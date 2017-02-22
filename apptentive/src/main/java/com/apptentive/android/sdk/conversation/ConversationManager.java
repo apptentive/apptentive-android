@@ -96,6 +96,7 @@ public class ConversationManager implements DataChangedListener {
 
 			if (activeConversation != null) {
 				activeConversation.setDataChangedListener(this);
+				notifyConversationBecameActive();
 				return true;
 			}
 
@@ -216,6 +217,8 @@ public class ConversationManager implements DataChangedListener {
 						setActiveConversation(conversation);
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
+						notifyConversationBecameActive();
+
 						// fetch interactions
 						boolean fetchSucceed = conversation.fetchInteractions();
 						dispatchDebugEvent(EVT_INTERACTION_FETCH, fetchSucceed);
@@ -243,6 +246,10 @@ public class ConversationManager implements DataChangedListener {
 				}
 			});
 		}
+	}
+
+	private void notifyConversationBecameActive() {
+		
 	}
 
 	private synchronized void setActiveConversation(Conversation conversation) {

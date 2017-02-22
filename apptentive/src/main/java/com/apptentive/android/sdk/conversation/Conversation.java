@@ -151,15 +151,7 @@ public class Conversation implements Saveable, DataChangedListener {
 		return updateSuccessful;
 	}
 
-	private final transient DispatchTask fetchInteractionsTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			fetchInteractions();
-		}
-	};
-
 	//endregion
-
 
 	//region Listeners
 	private transient DataChangedListener listener;
