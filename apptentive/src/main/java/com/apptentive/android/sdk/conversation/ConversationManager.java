@@ -186,11 +186,13 @@ public class ConversationManager implements DataChangedListener {
 
 						if (StringUtils.isNullOrEmpty(conversationToken)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
+							dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 							return;
 						}
 
 						if (StringUtils.isNullOrEmpty(conversationId)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
+							dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 							return;
 						}
 
@@ -212,6 +214,7 @@ public class ConversationManager implements DataChangedListener {
 
 						// update active conversation
 						setActiveConversation(conversation);
+						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
 						// fetch interactions
 						boolean fetchSucceed = conversation.fetchInteractions();
@@ -220,9 +223,9 @@ public class ConversationManager implements DataChangedListener {
 						// TODO: create listener and notify other parts of SDK about new conversation
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
+						dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 					} finally {
 						isConversationTokenFetchPending.set(false);
-						dispatchDebugEvent(EVT_CONVERSATION_CREATE, activeConversation != null);
 					}
 				}
 
