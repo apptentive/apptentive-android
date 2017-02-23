@@ -18,7 +18,7 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 	private static final boolean STRONG_REFERENCE = false;
 
 	@Test
-	public void testAddNotifyObservers() {
+	public void testAddObservers() {
 		ApptentiveNotificationObserverList list = new ApptentiveNotificationObserverList();
 
 		Observer o1 = new Observer("observer1");
@@ -39,7 +39,29 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 	}
 
 	@Test
-	public void testAddNotifyObserversWithLostReferences() {
+	public void testRemoveObservers() {
+		ApptentiveNotificationObserverList list = new ApptentiveNotificationObserverList();
+
+		Observer o1 = new Observer("observer1");
+		Observer o2 = new Observer("observer2");
+
+		list.addObserver(o1, WEAK_REFERENCE);
+		list.addObserver(o2, STRONG_REFERENCE);
+
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult("observer1", "observer2");
+
+		list.removeObserver(o1);
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult("observer2");
+
+		list.removeObserver(o2);
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult();
+	}
+
+	@Test
+	public void testWeakReferences() {
 		ApptentiveNotificationObserverList list = new ApptentiveNotificationObserverList();
 
 		// begin of the scope
@@ -69,6 +91,36 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 		assertResult("observer3", "observer4");
 	}
 
+	@Test
+	public void testConcurrentModification() {
+		final ApptentiveNotificationObserverList list = new ApptentiveNotificationObserverList();
+
+		final Observer o1 = new Observer("observer1");
+		final Observer o2 = new Observer("observer2");
+
+		list.addObserver(new ApptentiveNotificationObserver() {
+			@Override
+			public void onReceiveNotification(ApptentiveNotification notification) {
+				list.removeObserver(o1);
+				addResult("anonymous-observer1");
+			}
+		}, STRONG_REFERENCE);
+		list.addObserver(o1, WEAK_REFERENCE);
+		list.addObserver(new ApptentiveNotificationObserver() {
+			@Override
+			public void onReceiveNotification(ApptentiveNotification notification) {
+				list.removeObserver(o2);
+				addResult("anonymous-observer2");
+			}
+		}, STRONG_REFERENCE);
+		list.addObserver(o2, STRONG_REFERENCE);
+
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult("anonymous-observer1", "observer1", "anonymous-observer2", "observer2");
+
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult("anonymous-observer1", "anonymous-observer2");
+	}
 
 	private class Observer implements ApptentiveNotificationObserver {
 
