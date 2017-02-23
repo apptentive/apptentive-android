@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk;
 
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.IllegalFormatException;
@@ -29,6 +30,10 @@ public class ApptentiveLog {
 					level = Level.ERROR;
 				}
 			}
+			// add thread name if logging of the UI-thread
+			if (Looper.getMainLooper() != null && Looper.getMainLooper().getThread() != Thread.currentThread()) {
+				message = String.format("[%s] %s", Thread.currentThread().getName(), message);
+			}
 			android.util.Log.println(level.getLevel(), TAG, message);
 			if(throwable != null){
 				if(throwable.getMessage() != null){
@@ -46,11 +51,23 @@ public class ApptentiveLog {
 		return logLevel.canLog(level);
 	}
 
+	public static void v(ApptentiveLogTag tag, String message, Object... args) {
+		if (tag.enabled) {
+			doLog(Level.VERBOSE, null, message, args);
+		}
+	}
+
 	public static void v(String message, Object... args){
 		doLog(Level.VERBOSE, null, message, args);
 	}
 	public static void v(String message, Throwable throwable, Object... args){
 		doLog(Level.VERBOSE, throwable, message, args);
+	}
+
+	public static void d(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.DEBUG, null, message, args);
+		}
 	}
 
 	public static void d(String message, Object... args){
@@ -60,6 +77,11 @@ public class ApptentiveLog {
 		doLog(Level.DEBUG, throwable, message, args);
 	}
 
+	public static void i(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.INFO, null, message, args);
+		}
+	}
 	public static void i(String message, Object... args){
 		doLog(Level.INFO, null, message, args);
 	}
@@ -67,6 +89,11 @@ public class ApptentiveLog {
 		doLog(Level.INFO, throwable, message, args);
 	}
 
+	public static void w(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.WARN, null, message, args);
+		}
+	}
 	public static void w(String message, Object... args){
 		doLog(Level.WARN, null, message, args);
 	}
@@ -80,6 +107,9 @@ public class ApptentiveLog {
 	public static void e(String message, Throwable throwable, Object... args){
 		doLog(Level.ERROR, throwable, message, args);
 	}
+	public static void e(Throwable throwable, String message, Object... args){
+		doLog(Level.ERROR, throwable, message, args);
+	}
 
 	public static void a(String message, Object... args){
 		doLog(Level.ASSERT, null, message, args);
@@ -88,7 +118,7 @@ public class ApptentiveLog {
 		doLog(Level.ASSERT, throwable, message, args);
 	}
 
-	public static enum Level {
+	public enum Level {
 		VERBOSE(Log.VERBOSE),
 		DEBUG(Log.DEBUG),
 		INFO(Log.INFO),
