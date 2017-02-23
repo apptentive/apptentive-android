@@ -122,6 +122,27 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 		assertResult("anonymous-observer1", "anonymous-observer2");
 	}
 
+	@Test
+	public void testThrowingException() {
+		final ApptentiveNotificationObserverList list = new ApptentiveNotificationObserverList();
+
+		final Observer o1 = new Observer("observer1");
+		final Observer o2 = new Observer("observer2");
+
+		list.addObserver(o1, STRONG_REFERENCE);
+		list.addObserver(new ApptentiveNotificationObserver() {
+			@Override
+			public void onReceiveNotification(ApptentiveNotification notification) {
+				addResult("error");
+				throw new RuntimeException("Error");
+			}
+		}, STRONG_REFERENCE);
+		list.addObserver(o2, STRONG_REFERENCE);
+
+		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
+		assertResult("observer1", "error", "observer2");
+	}
+
 	private class Observer implements ApptentiveNotificationObserver {
 
 		private final String name;
