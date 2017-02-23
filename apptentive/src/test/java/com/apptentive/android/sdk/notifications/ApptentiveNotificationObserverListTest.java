@@ -11,6 +11,7 @@ import com.apptentive.android.sdk.TestCaseBase;
 import org.junit.Test;
 
 import java.util.HashMap;
+import static org.junit.Assert.*;
 
 public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
@@ -26,13 +27,16 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 		list.addObserver(o1, WEAK_REFERENCE);
 		list.addObserver(o2, STRONG_REFERENCE);
+		assertEquals(2, list.size());
 
 		// trying to add duplicates
 		list.addObserver(o1, WEAK_REFERENCE);
 		list.addObserver(o1, STRONG_REFERENCE);
+		assertEquals(2, list.size());
 
 		list.addObserver(o2, WEAK_REFERENCE);
 		list.addObserver(o2, STRONG_REFERENCE);
+		assertEquals(2, list.size());
 
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("observer1", "observer2");
@@ -50,14 +54,18 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("observer1", "observer2");
+		assertEquals(2, list.size());
 
 		list.removeObserver(o1);
+		assertEquals(1, list.size());
+
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("observer2");
 
 		list.removeObserver(o2);
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult();
+		assertEquals(0, list.size());
 	}
 
 	@Test
@@ -79,6 +87,7 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 			list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 			assertResult("observer1", "observer3", "observer4");
+			assertEquals(3, list.size());
 
 			o1 = o4 = null; // this step is necessary for a proper GC
 		}
@@ -89,6 +98,7 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("observer3", "observer4");
+		assertEquals(2, list.size());
 	}
 
 	@Test
@@ -117,9 +127,11 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("anonymous-observer1", "observer1", "anonymous-observer2", "observer2");
+		assertEquals(2, list.size());
 
 		list.notifyObservers(new ApptentiveNotification("notification", new HashMap<String, Object>()));
 		assertResult("anonymous-observer1", "anonymous-observer2");
+		assertEquals(2, list.size());
 	}
 
 	@Test

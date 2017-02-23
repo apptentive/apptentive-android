@@ -14,15 +14,13 @@ import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-
 public class ApptentiveNotificationCenterTest extends TestCaseBase {
 
 	private ApptentiveNotificationCenter notificationCenter;
 
 	@Before
 	public void setUp() throws Exception {
-		notificationCenter = new ApptentiveNotificationCenter(new MockDispatchQueue(true));
+		notificationCenter = new ApptentiveNotificationCenter(new MockDispatchQueue(true), new MockDispatchQueue(true));
 	}
 
 	private static final boolean WEAK_REFERENCE = true;
@@ -64,8 +62,11 @@ public class ApptentiveNotificationCenterTest extends TestCaseBase {
 		assertResult();
 
 		// remove the rest
-		notificationCenter.removeObserver(o2);
-		notificationCenter.removeObserver(o3);
+		notificationCenter.removeObserver("notification2", o2); // hit & miss
+		notificationCenter.removeObserver("notification1", o3); // hit & miss
+
+		notificationCenter.removeObserver("notification1", o2);
+		notificationCenter.removeObserver("notification2", o3);
 
 		notificationCenter.postNotification("notification1", ObjectUtils.toMap("key1", "value1"));
 		assertResult();
@@ -75,7 +76,7 @@ public class ApptentiveNotificationCenterTest extends TestCaseBase {
 
 		notificationCenter.postNotification("notification3");
 		assertResult();
-		
+
 		// add back
 		notificationCenter.addObserver("notification1", o1, WEAK_REFERENCE);
 		notificationCenter.addObserver("notification1", o2, STRONG_REFERENCE);
