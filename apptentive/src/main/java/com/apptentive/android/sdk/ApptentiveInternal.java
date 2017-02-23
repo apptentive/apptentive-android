@@ -296,6 +296,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 *
 	 * @return true it the app is using an AppCompat theme
 	 */
 	public boolean isAppUsingAppCompatTheme() {
@@ -1168,6 +1169,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
+	 *
 	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
@@ -1176,5 +1178,11 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Dismisses any currently-visible interactions. This method is for internal use and is subject to change.
+	 */
+	public static void dismissAllInteractions() {
 	}
 }
