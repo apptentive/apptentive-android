@@ -408,6 +408,11 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
+		if (notification.getName().equals(ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+			if (!isFinishing()) {
+				finish();
+			}
+		}
 	}
 
 	//endregion

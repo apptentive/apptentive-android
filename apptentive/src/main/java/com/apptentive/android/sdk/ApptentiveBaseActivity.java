@@ -8,6 +8,8 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 
+import static com.apptentive.android.sdk.ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
+
 /** A base class for any SDK activity */
 public class ApptentiveBaseActivity extends AppCompatActivity implements ApptentiveNotificationObserver {
 
@@ -30,7 +32,7 @@ public class ApptentiveBaseActivity extends AppCompatActivity implements Apptent
 	//region Notifications
 
 	private void registerNotifications() {
-		ApptentiveNotificationCenter.defaultCenter().addObserver("", this);
+		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS, this);
 	}
 
 	private void unregisterNotification() {
