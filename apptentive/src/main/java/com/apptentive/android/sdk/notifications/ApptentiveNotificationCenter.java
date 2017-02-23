@@ -31,11 +31,15 @@ public class ApptentiveNotificationCenter {
 	//region Observers
 
 	public void addObserver(final String notification, final ApptentiveNotificationObserver observer) {
+		addObserver(notification, observer, false);
+	}
+
+	public void addObserver(final String notification, final ApptentiveNotificationObserver observer, final boolean useWeakReference) {
 		operationQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
 				final ApptentiveNotificationObserverList list = resolveObserverList(notification);
-				list.addObserver(observer);
+				list.addObserver(observer, useWeakReference);
 			}
 		});
 	}
