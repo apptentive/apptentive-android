@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import com.apptentive.android.sdk.ApptentiveLog;
 
 
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.NavigateToLinkInteraction;
 import com.apptentive.android.sdk.util.Util;
@@ -88,7 +89,7 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		return false;
 	}
 

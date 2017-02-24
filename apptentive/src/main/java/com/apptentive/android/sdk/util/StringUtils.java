@@ -21,6 +21,10 @@
 
 package com.apptentive.android.sdk.util;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 
@@ -114,5 +118,19 @@ public final class StringUtils {
 	 */
 	public static boolean isNullOrEmpty(String str) {
 		return str == null || str.length() == 0;
+	}
+
+	/**
+	 * Creates a simple json string from key and value
+	 */
+	public static String asJson(String key, Object value) {
+		try {
+			JSONObject json = new JSONObject();
+			json.put(key, value);
+			return json.toString();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while creating json-string { %s:%s }", key, value);
+			return null;
+		}
 	}
 }

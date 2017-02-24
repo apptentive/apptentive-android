@@ -200,7 +200,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				exitActivity(false);
+				exitActivity(ApptentiveViewExitType.MENU_ITEM);
 				return true;
 
 			default:
@@ -211,10 +211,10 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	/**
 	 * Helper to clean up the Activity, whether it is exited through the toolbar back button, or the hardware back button.
 	 */
-	private void exitActivity(boolean hardwareBackButtonWasPressed) {
+	private void exitActivity(ApptentiveViewExitType exitType) {
 		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 		if (currentFragment != null && currentFragment.isVisible()) {
-			if (currentFragment.onBackPressed(hardwareBackButtonWasPressed)) {
+			if (currentFragment.onFragmentExit(exitType)) {
 				return;
 			}
 
@@ -229,7 +229,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	}
 
 	public void onBackPressed() {
-		exitActivity(true);
+		exitActivity(ApptentiveViewExitType.BACK_BUTTON);
 	}
 
 	@Override
@@ -410,7 +410,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.getName().equals(ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
 			if (!isFinishing()) {
-				finish();
+				exitActivity(ApptentiveViewExitType.NOTIFICATION);
 			}
 		}
 	}
