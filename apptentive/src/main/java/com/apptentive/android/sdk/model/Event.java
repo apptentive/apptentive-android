@@ -85,6 +85,10 @@ public class Event extends ConversationItem {
 		}
 	}
 
+	public String getEventLabel() {
+		return optString(KEY_LABEL, null);
+	}
+
 	private JSONObject generateCustomDataJson(Map<String, Object> customData) {
 		JSONObject ret = new JSONObject();
 		for (String key : customData.keySet()) {

@@ -96,6 +96,7 @@ public class ApptentiveInternal {
 	boolean appIsInForeground;
 	private final SharedPreferences globalSharedPrefs;
 	private final String apiKey;
+	String serverUrl;
 	String personId;
 	String androidId;
 	String appPackageName;
@@ -148,8 +149,9 @@ public class ApptentiveInternal {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
-	private ApptentiveInternal(Context context, String apiKey) {
+	private ApptentiveInternal(Context context, String apiKey, String serverUrl) {
 		this.apiKey = apiKey;
+		this.serverUrl = serverUrl;
 
 		appContext = context.getApplicationContext();
 
@@ -183,7 +185,7 @@ public class ApptentiveInternal {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey) {
+	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey, final String serverUrl)  {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
@@ -196,7 +198,7 @@ public class ApptentiveInternal {
 						apptentiveApiKey = resolveManifestApiKey(context);
 					}
 
-					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey);
+					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey, serverUrl);
 					isApptentiveInitialized.set(false);
 				}
 			}
@@ -232,7 +234,7 @@ public class ApptentiveInternal {
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
 	 */
 	public static ApptentiveInternal getInstance(Context context) {
-		return createInstance((context == null) ? null : context, null);
+		return createInstance((context == null) ? null : context, null, null);
 	}
 
 	/**
@@ -391,6 +393,13 @@ public class ApptentiveInternal {
 		return apiKey;
 	}
 
+	public String getServerUrl() {
+		if (serverUrl == null) {
+			return Constants.CONFIG_DEFAULT_SERVER_URL;
+		}
+		return serverUrl;
+	}
+
 	public String getDefaultAppDisplayName() {
 		return defaultAppDisplayName;
 	}
@@ -535,6 +544,7 @@ public class ApptentiveInternal {
 			if (featureEverUsed) {
 				messageManager.init();
 			}
+			activeConversation.setInteractionManager(new InteractionManager(activeConversation));
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
@@ -965,26 +975,6 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
-	}
-
-	// Multi-tenancy work
-
-	private synchronized void scheduleInteractionFetch() {
-//		if (conversation != null) {
-//			InteractionManager interactionManager = conversation.getInteractionManager();
-//			if (interactionManager != null) {
-//				if (interactionManager.isPollForInteractions()) {
-//					boolean cacheExpired = conversation.getInteractionExpiration() > Util.currentTimeSeconds();
-//					boolean force = appRelease != null && appRelease.isDebug();
-//					if (cacheExpired || force) {
-//						backgroundQueue.dispatchAsyncOnce(fetchInteractionsTask);
-//					}
-//				} else {
-//					ApptentiveLog.v("Interaction polling is disabled.");
-//				}
-//			}
-//		}
-		throw new RuntimeException("Remove me");
 	}
 
 	//region Helpers

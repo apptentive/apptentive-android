@@ -218,12 +218,6 @@ public class ConversationManager implements DataChangedListener {
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
 						notifyConversationBecameActive();
-
-						// fetch interactions
-						boolean fetchSucceed = conversation.fetchInteractions();
-						dispatchDebugEvent(EVT_INTERACTION_FETCH, fetchSucceed);
-
-						// TODO: create listener and notify other parts of SDK about new conversation
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
@@ -249,7 +243,9 @@ public class ConversationManager implements DataChangedListener {
 	}
 
 	private void notifyConversationBecameActive() {
-		
+		dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE);
+		boolean fetchSucceed = activeConversation.fetchInteractions();
+		dispatchDebugEvent(EVT_INTERACTION_FETCH, fetchSucceed);
 	}
 
 	private synchronized void setActiveConversation(Conversation conversation) {
