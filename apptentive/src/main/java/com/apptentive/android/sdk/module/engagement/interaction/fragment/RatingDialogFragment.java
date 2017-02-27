@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.RatingDialogInteraction;
@@ -89,8 +90,8 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
-		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL);
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 }

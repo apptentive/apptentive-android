@@ -40,6 +40,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -505,7 +506,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		super.onSaveInstanceState(outState);
 	}
 
-	public boolean onBackPressed(boolean hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		savePendingComposingMessage();
 		ApptentiveViewActivity hostingActivity = (ApptentiveViewActivity) hostingActivityRef.get();
 		if (hostingActivity != null) {
@@ -514,10 +515,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				myFrag.dismiss();
 			}
 			cleanup();
-			if (hardwareButton) {
+			if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
 			} else {
-				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE);
+				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE, exitTypeToDataJson(exitType));
 			}
 		}
 		return false;

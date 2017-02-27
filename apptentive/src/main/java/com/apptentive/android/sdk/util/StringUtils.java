@@ -21,6 +21,10 @@
 
 package com.apptentive.android.sdk.util;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
+import org.json.JSONObject;
+
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,25 @@ public final class StringUtils {
 	 */
 	public static String toString(Object value) {
 		return value != null ? value.toString() : "null";
+	}
+
+	/**
+	 * Transforms dictionary to string
+	 */
+	public static String toString(Map<?, ?> map) {
+		if (map == null) return null;
+
+		StringBuilder result = new StringBuilder();
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
+			if (result.length() > 0) result.append(", ");
+			result.append("'");
+			result.append(entry.getKey());
+			result.append("':'");
+			result.append(entry.getValue());
+			result.append("'");
+		}
+
+		return result.toString();
 	}
 
 	/**
@@ -126,5 +149,26 @@ public final class StringUtils {
 			result.append(encodedValue);
 		}
 		return result.toString();
+	}
+
+	/**
+	 * Checks is string is null or empty
+	 */
+	public static boolean isNullOrEmpty(String str) {
+		return str == null || str.length() == 0;
+	}
+
+	/**
+	 * Creates a simple json string from key and value
+	 */
+	public static String asJson(String key, Object value) {
+		try {
+			JSONObject json = new JSONObject();
+			json.put(key, value);
+			return json.toString();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while creating json-string { %s:%s }", key, value);
+			return null;
+		}
 	}
 }
