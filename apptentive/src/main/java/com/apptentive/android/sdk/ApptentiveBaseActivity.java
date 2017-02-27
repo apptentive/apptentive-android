@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import static com.apptentive.android.sdk.ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 
 /** A base class for any SDK activity */
-public class ApptentiveBaseActivity extends AppCompatActivity implements ApptentiveNotificationObserver {
+public abstract class ApptentiveBaseActivity extends AppCompatActivity implements ApptentiveNotificationObserver {
 
 	//region Activity life cycle
 
