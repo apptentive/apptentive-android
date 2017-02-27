@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -93,15 +94,14 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 		return root;
 	}
 
-	public boolean onBackPressed(boolean hardwareButton) {
-		if (hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
 		} else {
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
+			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		}
 		return false;
 	}
-
 
 	@Override
 	protected void sendLaunchEvent(Activity activity) {

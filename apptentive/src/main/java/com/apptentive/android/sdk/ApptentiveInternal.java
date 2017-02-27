@@ -30,7 +30,6 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
-import com.apptentive.android.sdk.listeners.OnUserLogOutListener;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -42,6 +41,7 @@ import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppRelease;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
@@ -50,7 +50,6 @@ import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 
@@ -70,12 +69,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.debug.Tester.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
-import static com.apptentive.android.sdk.util.registry.ApptentiveComponentRegistry.ComponentNotifier;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
 public class ApptentiveInternal {
+
+	/**
+	 * Sent if user requested to close all interactions.
+	 */
+	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	private final MessageManager messageManager;
@@ -83,7 +86,6 @@ public class ApptentiveInternal {
 	private final ApptentiveTaskManager taskManager;
 
 	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
-	private final ApptentiveComponentRegistry componentRegistry;
 	private final ApptentiveHttpClient apptentiveHttpClient;
 	private final ConversationManager conversationManager;
 
@@ -157,7 +159,6 @@ public class ApptentiveInternal {
 
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
-		componentRegistry = new ApptentiveComponentRegistry();
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
 		conversationManager = new ConversationManager(appContext, backgroundQueue, Util.getInternalDir(appContext, "conversations", true));
 
@@ -346,10 +347,6 @@ public class ApptentiveInternal {
 
 	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
 		return lifecycleCallbacks;
-	}
-
-	public ApptentiveComponentRegistry getComponentRegistry() {
-		return componentRegistry;
 	}
 
 	/* Get the foreground activity from the current application, i.e. at the top of the task
@@ -991,15 +988,9 @@ public class ApptentiveInternal {
 	//endregion
 
 	/**
-	 * Ends current user session
+	 * Dismisses any currently-visible interactions. This method is for internal use and is subject to change.
 	 */
-	public static void logout() {
-		getInstance().getComponentRegistry()
-			.notifyComponents(new ComponentNotifier<OnUserLogOutListener>(OnUserLogOutListener.class) {
-				@Override
-				public void onComponentNotify(OnUserLogOutListener component) {
-					component.onUserLogOut();
-				}
-			});
+	public static void dismissAllInteractions() {
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS);
 	}
 }

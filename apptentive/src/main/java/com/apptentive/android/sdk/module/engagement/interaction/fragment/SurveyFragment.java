@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.apptentive.android.sdk.ApptentiveInternal;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.SurveyResponse;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -267,11 +268,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
-		if (hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
 		} else {
-			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE);
+			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE, exitTypeToDataJson(exitType));
 		}
 		return false;
 	}

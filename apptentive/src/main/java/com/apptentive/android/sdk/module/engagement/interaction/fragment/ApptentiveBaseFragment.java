@@ -34,11 +34,13 @@ import android.widget.FrameLayout;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import java.lang.reflect.Field;
@@ -409,10 +411,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	/**
 	 * Delegates the hardware or software back button press to the Interaction Fragment.
-	 * @param hardwareButton True if the Hardware back button was pressed. False if the software back button was pressed.
 	 * @return
 	 */
-	public boolean onBackPressed(boolean hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		List fragments = getRetainedChildFragmentManager().getFragments();
 
 		if (fragments != null) {
@@ -433,6 +434,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}
 
 		return false;
+	}
+
+	protected String exitTypeToDataJson(ApptentiveViewExitType exitType) {
+		return exitType.isShouldAddToEngage() ? StringUtils.asJson("cause", exitType.getName()) : null;
 	}
 
 	@TargetApi(21)
