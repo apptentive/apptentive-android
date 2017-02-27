@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -82,8 +83,8 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	}
 
 
-	public boolean onBackPressed(boolean hardwareBackButtonWasPressed) {
-		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, null, null, (ExtendedData[]) null);
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		return false;
 	}
 
