@@ -8,7 +8,7 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 
-import static com.apptentive.android.sdk.ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 
 /** A base class for any SDK activity */
 public abstract class ApptentiveBaseActivity extends AppCompatActivity implements ApptentiveNotificationObserver {

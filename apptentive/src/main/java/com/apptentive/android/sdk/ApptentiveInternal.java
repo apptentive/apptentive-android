@@ -49,6 +49,7 @@ import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchQueueType;
@@ -67,6 +68,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Tester.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
@@ -74,11 +76,6 @@ import static com.apptentive.android.sdk.debug.TesterEvent.*;
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
 public class ApptentiveInternal {
-
-	/**
-	 * Sent if user requested to close all interactions.
-	 */
-	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	private final MessageManager messageManager;
@@ -104,7 +101,7 @@ public class ApptentiveInternal {
 	String appPackageName;
 
 	// private background serial dispatch queue for internal SDK tasks
-	private final DispatchQueue backgroundQueue;
+	private final DispatchQueue backgroundQueue; // TODO: replace with a global concurrent queue?
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
@@ -160,7 +157,7 @@ public class ApptentiveInternal {
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
-		conversationManager = new ConversationManager(appContext, backgroundQueue, Util.getInternalDir(appContext, "conversations", true));
+		conversationManager = new ConversationManager(appContext, DispatchQueue.backgroundQueue(), Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 		messageManager = new MessageManager();
@@ -439,6 +436,10 @@ public class ApptentiveInternal {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<>(activity);
 			messageManager.setCurrentForegroundActivity(activity);
+
+			// Fire a notification
+			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STARTED,
+				ObjectUtils.toMap(NOTIFICATION_ACTIVITY_STARTED_KEY_ACTIVITY_CLASS, activity.getClass()));
 		}
 	}
 

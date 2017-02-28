@@ -7,6 +7,9 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
+import com.apptentive.android.sdk.notifications.ApptentiveNotification;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.serialization.ObjectSerialization;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
@@ -28,6 +31,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
@@ -65,7 +69,7 @@ public class ConversationManager implements DataChangedListener {
 
 	private final AtomicBoolean isConversationTokenFetchPending = new AtomicBoolean(false);
 
-	public ConversationManager(Context context, DispatchQueue operationQueue, File storageDir) {
+	public ConversationManager(Context context, final DispatchQueue operationQueue, File storageDir) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
@@ -77,6 +81,15 @@ public class ConversationManager implements DataChangedListener {
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
 		this.operationQueue = operationQueue;
 		this.storageDir = storageDir;
+
+		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_ACTIVITY_STARTED,
+			new ApptentiveNotificationObserver() {
+				@Override
+				public void onReceiveNotification(ApptentiveNotification notification) {
+					ApptentiveLog.v(CONVERSATION, "Activity 'start' notification received. Trying to fetch interactions...");
+					operationQueue.dispatchAsyncOnce(checkFetchInteractionsTask);
+				}
+			});
 	}
 
 	//region Conversations
@@ -146,6 +159,29 @@ public class ConversationManager implements DataChangedListener {
 		FileSerializer serializer = new FileSerializer(file);
 		return (Conversation) serializer.deserialize();
 	}
+
+	//endregion
+
+	//region Interactions
+
+	private final DispatchTask checkFetchInteractionsTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			ApptentiveLog.v(CONVERSATION, "Checking fetch interactions...");
+
+			if (activeConversation != null) {
+				Context context = getContext();
+				if (context == null) {
+					ApptentiveLog.w(CONVERSATION, "Unable to check fetch interactions: context is lost");
+					return;
+				}
+
+				activeConversation.checkFetchInteractions(context);
+			} else {
+				ApptentiveLog.d(CONVERSATION, "Unable to check interaction fetch: active conversation is missing");
+			}
+		}
+	};
 
 	//endregion
 
@@ -244,8 +280,7 @@ public class ConversationManager implements DataChangedListener {
 
 	private void notifyConversationBecameActive() {
 		dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE);
-		boolean fetchSucceed = activeConversation.fetchInteractions();
-		dispatchDebugEvent(EVT_INTERACTION_FETCH, fetchSucceed);
+		operationQueue.dispatchAsyncOnce(checkFetchInteractionsTask);
 	}
 
 	private synchronized void setActiveConversation(Conversation conversation) {

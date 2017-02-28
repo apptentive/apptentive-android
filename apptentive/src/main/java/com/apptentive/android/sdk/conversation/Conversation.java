@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
@@ -27,8 +28,8 @@ import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 
@@ -95,6 +96,19 @@ public class Conversation implements Saveable, DataChangedListener {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Attempts to fetch interactions synchronously. Returns <code>true</code> is successful.
+	 */
+	boolean checkFetchInteractions(Context context) {
+		boolean cacheExpired = getInteractionExpiration() > Util.currentTimeSeconds();
+		if (cacheExpired || RuntimeUtils.isAppDebuggable(context)) {
+			return fetchInteractions();
+		}
+
+		ApptentiveLog.v(CONVERSATION, "Interaction cache is still valid");
+		return false;
 	}
 
 	/**

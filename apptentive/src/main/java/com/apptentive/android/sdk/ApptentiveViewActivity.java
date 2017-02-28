@@ -39,6 +39,8 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+
 
 public class ApptentiveViewActivity extends ApptentiveBaseActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 	private static final String FRAGMENT_TAG = "fragmentTag";
@@ -407,7 +409,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.getName().equals(ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+		if (notification.getName().equals(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
 			if (!isFinishing()) {
 				exitActivity(ApptentiveViewExitType.NOTIFICATION);
 			}
