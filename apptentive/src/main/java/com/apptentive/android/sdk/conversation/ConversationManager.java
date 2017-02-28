@@ -175,8 +175,8 @@ public class ConversationManager implements DataChangedListener {
 					ApptentiveLog.w(CONVERSATION, "Unable to check fetch interactions: context is lost");
 					return;
 				}
-
-				activeConversation.checkFetchInteractions(context);
+				boolean interactionsWereFetched = activeConversation.checkFetchInteractions(context);
+				dispatchDebugEvent(EVT_INTERACTION_FETCH, interactionsWereFetched);
 			} else {
 				ApptentiveLog.d(CONVERSATION, "Unable to check interaction fetch: active conversation is missing");
 			}
