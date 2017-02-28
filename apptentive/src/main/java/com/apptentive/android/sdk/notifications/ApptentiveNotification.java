@@ -43,6 +43,6 @@ public class ApptentiveNotification {
 
 	@Override
 	public String toString() {
-		return String.format("[%s] name=%s userInfo=%s", name, StringUtils.toString(userInfo));
+		return String.format("name=%s userInfo={%s}", name, StringUtils.toString(userInfo));
 	}
 }

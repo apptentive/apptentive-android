@@ -1,9 +1,14 @@
 package com.apptentive.android.sdk;
 
 public enum ApptentiveLogTag {
-	NETWORK,
-	CONVERSATION,
-	TESTER_COMMANDS;
+	NETWORK(true),
+	CONVERSATION(true),
+	NOTIFICATIONS(true),
+	TESTER_COMMANDS(false);
 
-	public boolean enabled = true;
+	ApptentiveLogTag(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean enabled;
 }

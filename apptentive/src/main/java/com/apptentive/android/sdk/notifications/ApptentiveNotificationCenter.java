@@ -6,12 +6,15 @@
 
 package com.apptentive.android.sdk.notifications;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
 /**
  * An {@link ApptentiveNotificationCenter} object (or simply, notification center) provides a
@@ -130,6 +133,7 @@ public class ApptentiveNotificationCenter {
 	 * Posts a given notification to the receiver.
 	 */
 	public void postNotification(final ApptentiveNotification notification) {
+		ApptentiveLog.v(NOTIFICATIONS, "Post notification: %s", notification);
 		operationQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
