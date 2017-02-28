@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -163,7 +164,7 @@ public class ConversationManager implements DataChangedListener {
 	/** Ends active conversation (user logs out, etc) */
 	public synchronized boolean endActiveConversation() {
 		if (activeConversation != null) {
-			setActiveConversation(null);
+			setActiveConversation((Conversation) null);
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_BECAME_INACTIVE);
 			return true;
 		}
@@ -289,8 +290,36 @@ public class ConversationManager implements DataChangedListener {
 	}
 
 	private void notifyConversationBecameActive() {
-		dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE);
+		dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE); // TODO: remove debug event and listen to the notification instead
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_BECAME_ACTIVE,
+			ObjectUtils.toMap(NOTIFICATION_CONVERSATION_BECAME_ACTIVE_KEY_CONVERSATION, activeConversation));
 		operationQueue.dispatchAsyncOnce(checkFetchInteractionsTask);
+	}
+
+	/* For testing purposes */
+	public synchronized boolean setActiveConversation(final String conversationId) {
+		final ConversationMetadataItem item = conversationMetadata.findItem(new ConversationMetadata.Filter() {
+			@Override
+			public boolean accept(ConversationMetadataItem item) {
+				return item.conversationId.equals(conversationId);
+			}
+		});
+
+		if (item == null) {
+			ApptentiveLog.w(CONVERSATION, "Conversation not found: %s", conversationId);
+			return false;
+		}
+
+		final Conversation conversation = loadConversation(item);
+		if (conversation == null) {
+			ApptentiveLog.w(CONVERSATION, "Conversation not loaded: %s", conversationId);
+			return false;
+		}
+
+		setActiveConversation(conversation);
+
+		notifyConversationBecameActive();
+		return true;
 	}
 
 	private synchronized void setActiveConversation(Conversation conversation) {

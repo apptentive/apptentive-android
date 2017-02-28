@@ -9,7 +9,13 @@ package com.apptentive.android.sdk;
 public class ApptentiveNotifications {
 
 	/**
-	 * Sent if conversation becomes inactive (user logs out, etc
+	 * Sent when conversation becomes active (user logs out, etc)
+	 */
+	public static final String NOTIFICATION_CONVERSATION_BECAME_ACTIVE = "CONVERSATION_BECAME_ACTIVE"; // { conversation : Conversation }
+	public static final String NOTIFICATION_CONVERSATION_BECAME_ACTIVE_KEY_CONVERSATION = "conversation";
+
+	/**
+	 * Sent when conversation becomes inactive (user logs out, etc)
 	 */
 	public static final String NOTIFICATION_CONVERSATION_BECAME_INACTIVE = "CONVERSATION_BECAME_INACTIVE";
 
