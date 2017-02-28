@@ -75,7 +75,7 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 		} else {
 			for (ConversationMetadataItem item : items) {
 				if (item.state == CONVERSATION_STATE_ACTIVE) {
-					item.state = CONVERSATION_STATE_ACTIVE;
+					item.state = CONVERSATION_STATE_INACTIVE;
 				}
 			}
 		}
