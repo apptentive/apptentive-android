@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * A light weight representation of the conversation object stored on the disk.
  */
-class ConversationMetadataItem implements SerializableObject {
+public class ConversationMetadataItem implements SerializableObject {
 	/**
 	 * Conversation state is not known
 	 */
@@ -60,6 +60,10 @@ class ConversationMetadataItem implements SerializableObject {
 		out.writeUTF(conversationId);
 		out.writeUTF(filename);
 		out.writeByte(state);
+	}
+
+	public String getConversationId() {
+		return conversationId;
 	}
 
 	public boolean isActive() {

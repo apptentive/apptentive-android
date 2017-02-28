@@ -33,6 +33,10 @@ public class ApptentiveNotification {
 		return name;
 	}
 
+	public boolean hasName(String name) {
+		return StringUtils.equal(this.name, name);
+	}
+
 	public Map<String, Object> getUserInfo() {
 		return userInfo;
 	}

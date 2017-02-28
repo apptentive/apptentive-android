@@ -371,6 +371,10 @@ public class ApptentiveInternal {
 		return taskManager;
 	}
 
+	public ConversationManager getConversationManager() {
+		return conversationManager;
+	}
+
 	public Resources.Theme getApptentiveToolbarTheme() {
 		return apptentiveToolbarTheme;
 	}

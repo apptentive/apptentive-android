@@ -409,9 +409,10 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.getName().equals(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS) ||
+			  notification.hasName(NOTIFICATION_CONVERSATION_BECAME_INACTIVE)) {
 			if (!isFinishing()) {
-				exitActivity(ApptentiveViewExitType.NOTIFICATION);
+				exitActivity(ApptentiveViewExitType.NOTIFICATION); // TODO: different exit types for different notifications?
 			}
 		}
 	}

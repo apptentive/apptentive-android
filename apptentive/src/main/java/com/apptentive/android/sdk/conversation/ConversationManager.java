@@ -160,6 +160,16 @@ public class ConversationManager implements DataChangedListener {
 		return (Conversation) serializer.deserialize();
 	}
 
+	/** Ends active conversation (user logs out, etc) */
+	public synchronized boolean endActiveConversation() {
+		if (activeConversation != null) {
+			setActiveConversation(null);
+			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_BECAME_INACTIVE);
+			return true;
+		}
+		return false;
+	}
+
 	//endregion
 
 	//region Interactions
@@ -347,8 +357,10 @@ public class ConversationManager implements DataChangedListener {
 
 	private void saveMetadata() {
 		try {
+			long start = System.currentTimeMillis();
 			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
 			ObjectSerialization.serialize(metaFile, conversationMetadata);
+			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, "Exception while saving metadata");
 		}
@@ -369,6 +381,10 @@ public class ConversationManager implements DataChangedListener {
 
 	public Conversation getActiveConversation() {
 		return activeConversation;
+	}
+
+	public ConversationMetadata getConversationMetadata() {
+		return conversationMetadata;
 	}
 
 	private Context getContext() {
