@@ -33,6 +33,7 @@ public abstract class ApptentiveBaseActivity extends AppCompatActivity implement
 
 	protected void registerNotifications() {
 		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS, this);
+		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_BECAME_INACTIVE, this);
 	}
 
 	protected void unregisterNotification() {
