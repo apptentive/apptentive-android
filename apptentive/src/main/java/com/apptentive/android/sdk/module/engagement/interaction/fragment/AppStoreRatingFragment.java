@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 
@@ -88,7 +89,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		return false;
 	}
 

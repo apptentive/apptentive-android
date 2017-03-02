@@ -1,5 +1,11 @@
 This document tracks changes to the API between versions.
 
+# 3.4.1
+
+| Added Methods|
+| ------------------ |
+| public static void dismissAllInteractions() |
+
 # 3.3.0
 
 Read the [Migrating to 3.3.0](migrating_to_3.3.0.md) guide.

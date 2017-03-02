@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
@@ -71,8 +72,8 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
-		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL);
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 
