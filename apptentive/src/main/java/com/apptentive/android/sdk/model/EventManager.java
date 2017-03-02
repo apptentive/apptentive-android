@@ -10,7 +10,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.storage.EventStore;
 
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_APPTENTIVE_EVENT;
+import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
 public class EventManager {
 
@@ -19,7 +19,7 @@ public class EventManager {
 	}
 
 	public static void sendEvent(Event event) {
-		dispatchDebugEvent(EVT_APPTENTIVE_EVENT, event.getEventLabel());
+		dispatchDebugEvent(EVT_APPTENTIVE_EVENT, EVT_APPTENTIVE_EVENT_KEY_EVENT_LABEL, event.getEventLabel());
 		getEventStore().addPayload(event);
 	}
 }

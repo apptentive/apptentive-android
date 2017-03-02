@@ -1,6 +1,9 @@
 package com.apptentive.android.sdk.debug;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.ObjectUtils;
+
+import java.util.Map;
 
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
@@ -33,19 +36,19 @@ public class Tester {
 
 	public static void dispatchDebugEvent(String name) {
 		if (isListeningForDebugEvents()) {
-			notifyEvent(name);
+			notifyEvent(name, null);
 		}
 	}
 
-	public static void dispatchDebugEvent(String name, Object arg) {
+	public static void dispatchDebugEvent(String name, boolean successful) {
 		if (isListeningForDebugEvents()) {
-			notifyEvent(name, arg);
+			notifyEvent(name, ObjectUtils.toMap("successful", successful));
 		}
 	}
 
-	public static void dispatchDebugEvent(String name, boolean arg) {
+	public static void dispatchDebugEvent(String name, String key, Object value) {
 		if (isListeningForDebugEvents()) {
-			notifyEvent(name, arg);
+			notifyEvent(name, ObjectUtils.toMap(key, value));
 		}
 	}
 
@@ -59,13 +62,16 @@ public class Tester {
 					stackTrace.append('\n');
 				}
 			}
-			notifyEvent(EVT_EXCEPTION, e.getClass().getName(), e.getMessage(), stackTrace.toString());
+			notifyEvent(EVT_EXCEPTION, ObjectUtils.toMap(
+				"class,", e.getClass().getName(),
+				"message", e.getMessage(),
+				"stacktrace", stackTrace.toString()));
 		}
 	}
 
-	private static void notifyEvent(String name, Object... args) {
+	private static void notifyEvent(String name, Map<String, Object> userInfo) {
 		try {
-			instance.listener.onDebugEvent(name, args);
+			instance.listener.onDebugEvent(name, userInfo);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error while dispatching debug event: %s", name);
 		}
