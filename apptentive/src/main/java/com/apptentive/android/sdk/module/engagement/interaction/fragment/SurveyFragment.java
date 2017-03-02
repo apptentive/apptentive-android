@@ -271,8 +271,10 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
+		} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
+			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL, exitTypeToDataJson(exitType));
 		} else {
-			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE, exitTypeToDataJson(exitType));
+			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE);
 		}
 		return false;
 	}

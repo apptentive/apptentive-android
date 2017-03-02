@@ -97,8 +97,10 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
+		} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
+			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		} else {
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
+			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
 		}
 		return false;
 	}
