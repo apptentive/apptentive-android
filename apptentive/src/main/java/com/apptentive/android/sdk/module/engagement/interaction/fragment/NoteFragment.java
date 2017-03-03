@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.ApptentiveInternal;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -166,8 +167,8 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
-		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL);
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 }

@@ -46,6 +46,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.DeviceManager;
@@ -74,6 +75,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
 public class ApptentiveInternal {
+
+	/**
+	 * Sent if user requested to close all interactions.
+	 */
+	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	InteractionManager interactionManager;
@@ -296,6 +302,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Must be called after {@link ApptentiveInternal#setApplicationDefaultTheme(int)}
+	 *
 	 * @return true it the app is using an AppCompat theme
 	 */
 	public boolean isAppUsingAppCompatTheme() {
@@ -1168,6 +1175,7 @@ public class ApptentiveInternal {
 
 	/**
 	 * Checks to see if Apptentive was properly registered, and logs a message if not.
+	 *
 	 * @return true if properly registered, else false.
 	 */
 	public static boolean checkRegistered() {
@@ -1176,5 +1184,12 @@ public class ApptentiveInternal {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Dismisses any currently-visible interactions. This method is for internal use and is subject to change.
+	 */
+	public static void dismissAllInteractions() {
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS);
 	}
 }

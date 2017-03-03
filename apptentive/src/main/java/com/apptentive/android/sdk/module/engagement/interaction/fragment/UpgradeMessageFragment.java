@@ -20,6 +20,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
@@ -64,8 +65,8 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 	}
 
 	@Override
-	public boolean onBackPressed(boolean hardwareButton) {
-		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_DISMISS);
+	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
+		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_DISMISS, exitTypeToDataJson(exitType));
 		return false;
 	}
 

@@ -24,7 +24,6 @@ import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,11 +35,12 @@ import com.apptentive.android.sdk.model.FragmentFactory;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 
-public class ApptentiveViewActivity extends AppCompatActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
+public class ApptentiveViewActivity extends ApptentiveBaseActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener{
 
 	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
@@ -55,6 +55,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	private View decorView;
 	private View contentView;
 
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -199,7 +200,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				exitActivity(false);
+				exitActivity(ApptentiveViewExitType.MENU_ITEM);
 				return true;
 
 			default:
@@ -210,10 +211,10 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	/**
 	 * Helper to clean up the Activity, whether it is exited through the toolbar back button, or the hardware back button.
 	 */
-	private void exitActivity(boolean hardwareBackButtonWasPressed) {
+	private void exitActivity(ApptentiveViewExitType exitType) {
 		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 		if (currentFragment != null && currentFragment.isVisible()) {
-			if (currentFragment.onBackPressed(hardwareBackButtonWasPressed)) {
+			if (currentFragment.onFragmentExit(exitType)) {
 				return;
 			}
 
@@ -228,7 +229,7 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 	}
 
 	public void onBackPressed() {
-		exitActivity(true);
+		exitActivity(ApptentiveViewExitType.BACK_BUTTON);
 	}
 
 	@Override
@@ -402,4 +403,17 @@ public class ApptentiveViewActivity extends AppCompatActivity implements Apptent
 			getWindow().setStatusBarColor(Util.alphaMixColors(statusBarDefaultColor, overlayColor));
 		}
 	}
+
+	//region ApptentiveNotificationObserver
+
+	@Override
+	public void onReceiveNotification(ApptentiveNotification notification) {
+		if (notification.getName().equals(ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+			if (!isFinishing()) {
+				exitActivity(ApptentiveViewExitType.NOTIFICATION);
+			}
+		}
+	}
+
+	//endregion
 }

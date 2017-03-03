@@ -1,3 +1,9 @@
+# 2017-03-02 - 3.4.1
+
+#### Improvements
+
+* Added an internal method `Apptentive.dismissAllInteraction()` for closing Apptentive UI.
+
 # 2016-12-07 - 3.4.0
 
 #### Improvements
@@ -10,7 +16,7 @@
 
 * Fixed a bug where the Profile Card in Message Center wouldn't let a user focus the email field.
 * Fixed a bug where the Survey "thank you" message text was the wrong color.
- 
+
 # 2016-10-21 - 3.3.0
 
 #### Improvements
