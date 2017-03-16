@@ -61,6 +61,22 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 	}
 
 	@Test
+	public void testAssertNull() throws Exception {
+		AssertEx.assertNull(null);
+		AssertEx.assertNull("foo");
+		AssertEx.assertNull(null);
+		AssertEx.assertNull("foo", "assertNull(Object,String)");
+		AssertEx.assertNull(null, "", new Object());
+		AssertEx.assertNull("foo", "assertNull(Object,String,Object...)");
+
+		assertResult(
+			"Expected 'null' but was 'foo'",
+			"assertNull(Object,String)",
+			"assertNull(Object,String,Object...)"
+		);
+	}
+
+	@Test
 	public void testAssertEquals() throws Exception {
 		AssertEx.assertEquals("foo", "foo");
 		AssertEx.assertEquals("foo", "bar");
