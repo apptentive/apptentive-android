@@ -30,6 +30,11 @@ public class CustomData extends HashMap<String, Object> implements Saveable {
 			listener.onDataChanged();
 		}
 	}
+
+	@Override
+	public void onDeserialize() {
+	}
+
 	//endregion
 
 

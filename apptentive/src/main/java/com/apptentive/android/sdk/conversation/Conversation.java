@@ -80,6 +80,10 @@ public class Conversation implements Saveable, DataChangedListener {
 	// TODO: describe why we don't serialize state
 	private transient ConversationState state = ConversationState.UNDEFINED;
 
+	// we keep references to the tasks in order to dispatch them only once
+	private transient DispatchTask fetchInteractionsTask;
+	private transient DispatchTask saveConversationTask;
+
 	public Conversation() {
 		this.device = new Device();
 		this.person = new Person();
@@ -87,6 +91,35 @@ public class Conversation implements Saveable, DataChangedListener {
 		this.appRelease = new AppRelease();
 		this.eventData = new EventData();
 		this.versionHistory = new VersionHistory();
+
+		// transient fields might not get properly initialized upon de-serialization
+		initDispatchTasks();
+	}
+
+	private void initDispatchTasks() {
+		fetchInteractionsTask = new DispatchTask() {
+			@Override
+			protected void execute() {
+				final boolean updateSuccessful = fetchInteractionsSync();
+
+				// Update pending state on UI thread after finishing the task
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						if (hasActiveState()) {
+							ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
+							dispatchDebugEvent(EVT_INTERACTION_FETCH, updateSuccessful);
+						}
+					}
+				});
+			}
+		};
+		saveConversationTask = new DispatchTask() {
+			@Override
+			protected void execute() {
+				save();
+			}
+		};
 	}
 
 	//region Interactions
@@ -175,34 +208,9 @@ public class Conversation implements Saveable, DataChangedListener {
 		return updateSuccessful;
 	}
 
-	private transient final DispatchTask fetchInteractionsTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			final boolean updateSuccessful = fetchInteractionsSync();
-
-			// Update pending state on UI thread after finishing the task
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-				@Override
-				protected void execute() {
-					if (hasActiveState()) {
-						ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-						dispatchDebugEvent(EVT_INTERACTION_FETCH, updateSuccessful);
-					}
-				}
-			});
-		}
-	};
-
 	//endregion
 
 	//region Saving
-
-	private final transient DispatchTask saveConversationTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			save();
-		}
-	};
 
 	/**
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
@@ -254,9 +262,15 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	@Override
+	public void onDeserialize() {
+		initDispatchTasks();
+	}
+
+	@Override
 	public void onDataChanged() {
 		notifyDataChanged();
 	}
+
 	//endregion
 
 	//region Getters & Setters

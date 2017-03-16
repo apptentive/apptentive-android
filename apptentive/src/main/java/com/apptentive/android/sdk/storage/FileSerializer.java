@@ -48,7 +48,9 @@ public class FileSerializer implements Serializer {
 		try {
 			fis = new FileInputStream(file);
 			ois = new ObjectInputStream(fis);
-			return ois.readObject();
+			Saveable object = (Saveable) ois.readObject();
+			object.onDeserialize();
+			return object;
 		} catch (Exception e) {
 			throw new SerializerException(e);
 		} finally {
