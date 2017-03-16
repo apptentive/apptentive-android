@@ -45,6 +45,33 @@ public class Assert {
 		}
 	}
 
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition) {
+		if (imp != null && condition) {
+			imp.assertFailed("Expected 'false' but was 'true'");
+		}
+	}
+
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition, String message) {
+		if (imp != null && condition) {
+			imp.assertFailed(message);
+		}
+	}
+
+	/**
+	 * Asserts that condition is <code>false</code>
+	 */
+	public static void assertFalse(boolean condition, String format, Object... args) {
+		if (imp != null && condition) {
+			imp.assertFailed(StringUtils.format(format, args));
+		}
+	}
+
 	//endregion
 
 	//region Nullability

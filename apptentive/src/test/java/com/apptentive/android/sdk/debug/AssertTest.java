@@ -45,6 +45,22 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 	}
 
 	@Test
+	public void testAssertFalse() throws Exception {
+		AssertEx.assertFalse(false);
+		AssertEx.assertFalse(true);
+		AssertEx.assertFalse(false, "");
+		AssertEx.assertFalse(true, "assertFalse(boolean,String)");
+		AssertEx.assertFalse(false, "", new Object());
+		AssertEx.assertFalse(true, "assertFalse(boolean,String,Object...)");
+
+		assertResult(
+			"Expected 'false' but was 'true'",
+			"assertFalse(boolean,String)",
+			"assertFalse(boolean,String,Object...)"
+		);
+	}
+
+	@Test
 	public void testAssertNotNull() throws Exception {
 		AssertEx.assertNotNull(new Object());
 		AssertEx.assertNotNull(null);
