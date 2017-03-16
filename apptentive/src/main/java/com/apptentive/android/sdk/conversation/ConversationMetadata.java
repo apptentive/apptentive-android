@@ -49,15 +49,8 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 
 	//region Items
 
-	public void setItem(Conversation conversation)
-	{
-		ConversationMetadataItem item = findItem(conversation);
-		if (item == null) {
-			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFile());
-			items.add(item);
-		}
-
-		item.state = conversation.getState();
+	void addItem(ConversationMetadataItem item) {
+		items.add(item);
 	}
 
 	ConversationMetadataItem findItem(final ConversationState state) {

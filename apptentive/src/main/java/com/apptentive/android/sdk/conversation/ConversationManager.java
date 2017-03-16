@@ -6,6 +6,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -112,7 +113,7 @@ public class ConversationManager {
 			conversationMetadata = resolveMetadata();
 
 			// attempt to load existing conversation
-			activeConversation = loadActiveConversationGuarded(context);
+			activeConversation = loadActiveConversationGuarded();
 			dispatchDebugEvent(EVT_CONVERSATION_LOAD_ACTIVE, activeConversation != null);
 
 			if (activeConversation != null) {
@@ -127,7 +128,7 @@ public class ConversationManager {
 		return false;
 	}
 
-	private Conversation loadActiveConversationGuarded(Context context) throws IOException, SerializerException {
+	private Conversation loadActiveConversationGuarded() throws IOException, SerializerException {
 		// we're going to scan metadata in attempt to find existing conversations
 		ConversationMetadataItem item;
 
@@ -183,8 +184,7 @@ public class ConversationManager {
 		if (activeConversation != null) {
 			activeConversation.setState(LOGGED_OUT);
 			handleConversationStateChange(activeConversation);
-
-			setActiveConversation((Conversation) null);
+			activeConversation = null;
 			return true;
 		}
 		return false;
@@ -294,6 +294,8 @@ public class ConversationManager {
 		if (conversation != null && conversation.hasActiveState()) {
 			conversation.fetchInteractions(getContext());
 		}
+
+		updateMetadataItems(conversation);
 	}
 
 	/* For testing purposes */
@@ -316,26 +318,30 @@ public class ConversationManager {
 			return false;
 		}
 
-		setActiveConversation(conversation);
-
-		throw new RuntimeException("Implement me");
+		handleConversationStateChange(conversation);
+		return true;
 	}
 
-	private synchronized void setActiveConversation(final Conversation conversation) {
-		// do we have a 'logged-in' conversation already?
-		if (activeConversation != null && activeConversation.hasState(LOGGED_IN)) {
-			activeConversation.setState(LOGGED_OUT); // mark it as 'logged-out'
-			conversationMetadata.setItem(activeConversation); // and update metadata
+	private void updateMetadataItems(Conversation conversation) {
+
+		// if the conversation is 'logged-in' we should not have any other 'logged-in' items in metadata
+		if (conversation.hasState(LOGGED_IN)) {
+			for (ConversationMetadataItem item : conversationMetadata) {
+				if (item.state.equals(LOGGED_IN)) {
+					item.state = LOGGED_OUT;
+				}
+			}
 		}
 
-		// set new active conversation
-		activeConversation = conversation;
-
-		// update metadata (if necessary)
-		if (activeConversation != null) {
-			conversationMetadata.setItem(activeConversation);
+		// update the state of the corresponding item
+		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
+		if (item == null) {
+			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFile());
+			conversationMetadata.addItem(item);
 		}
+		item.state = conversation.getState();
 
+		// apply changes
 		saveMetadata();
 	}
 
