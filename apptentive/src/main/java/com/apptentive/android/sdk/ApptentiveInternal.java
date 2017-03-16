@@ -538,7 +538,7 @@ public class ApptentiveInternal {
 
 		long start = System.currentTimeMillis();
 		boolean conversationLoaded = conversationManager.loadActiveConversation(getApplicationContext());
-		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? " not" : "", System.currentTimeMillis() - start);
+		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? "" : " not", System.currentTimeMillis() - start);
 
 		if (conversationLoaded) {
 			Conversation activeConversation = conversationManager.getActiveConversation();
