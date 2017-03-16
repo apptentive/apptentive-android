@@ -41,6 +41,10 @@ public class EventData implements Saveable {
 		}
 	}
 
+	@Override
+	public void onDeserialize() {
+	}
+
 	//endregion
 
 

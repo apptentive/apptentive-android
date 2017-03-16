@@ -18,7 +18,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -31,6 +30,8 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.FragmentFactory;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
@@ -81,8 +82,8 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
 				if (fragmentType == Constants.FragmentTypes.INTERACTION ||
-						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
-						fragmentType == Constants.FragmentTypes.ABOUT) {
+					fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
+					fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					if (newFragment == null) {
 						newFragment = FragmentFactory.createFragmentInstance(bundle);
@@ -127,14 +128,14 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			actionBar.setDisplayHomeAsUpEnabled(true);
 			int navIconResId = newFragment.getToolbarNavigationIconResourceId(getTheme());
 			// Check if fragment may show an alternative navigation icon
-			if ( navIconResId != 0) {
+			if (navIconResId != 0) {
 				/* In order for the alternative icon has the same color used by toolbar icon,
 				 * need to apply the same color in toolbar theme
 				 * By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
 				 */
 				final Drawable alternateUpArrow = ResourcesCompat.getDrawable(getResources(),
-					  navIconResId,
-					  getTheme());
+					navIconResId,
+					getTheme());
 
 				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
 				alternateUpArrow.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
@@ -273,7 +274,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	}
 
 	private void applyApptentiveTheme(boolean isModalInteraction) {
-    // Update the activity theme to reflect current attributes
+		// Update the activity theme to reflect current attributes
 		try {
 			ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
 
@@ -409,11 +410,24 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS) ||
-			  notification.hasName(NOTIFICATION_CONVERSATION_BECAME_INACTIVE)) {
-			if (!isFinishing()) {
-				exitActivity(ApptentiveViewExitType.NOTIFICATION); // TODO: different exit types for different notifications?
+		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+			dismissActivity();
+		} else if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
+			final Conversation conversation = notification.getUserInfo(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION, Conversation.class);
+			Assert.assertNotNull(conversation, "Conversation expected to be not null");
+			if (conversation != null && !conversation.hasActiveState()) {
+				dismissActivity();
 			}
+		}
+	}
+
+	//endregion
+
+	//region Helpers
+
+	private void dismissActivity() {
+		if (!isFinishing()) {
+			exitActivity(ApptentiveViewExitType.NOTIFICATION); // TODO: different exit types for different notifications?
 		}
 	}
 

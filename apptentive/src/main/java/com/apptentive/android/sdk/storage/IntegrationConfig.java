@@ -27,6 +27,7 @@ public class IntegrationConfig implements Saveable {
 
 
 	//region Listeners
+
 	@Override
 	public void setDataChangedListener(DataChangedListener listener) {
 		this.listener = listener;
@@ -38,6 +39,11 @@ public class IntegrationConfig implements Saveable {
 			listener.onDataChanged();
 		}
 	}
+
+	@Override
+	public void onDeserialize() {
+	}
+
 	//endregion
 
 	//region Getters & Setters

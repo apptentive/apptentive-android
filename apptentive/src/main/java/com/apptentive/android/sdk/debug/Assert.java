@@ -22,6 +22,7 @@
 package com.apptentive.android.sdk.debug;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A set of assertion methods useful for writing 'runtime' tests. These methods can be used directly:
@@ -118,68 +119,8 @@ public class Assert {
 		// FIXME: implement me
 	}
 
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual) {
+	/** Asserts that <code>expected</code> is equal to <code>actual</code> */
+	public static void assertEquals(Object expected, Object Object, String format, Object... args) {
 		// FIXME: implement me
-	}
-
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual, String message) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection isRegistered an object
-	 */
-	public static void assertContains(Collection<?> collection, Object object) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection isRegistered an object
-	 */
-	public static void assertContains(Collection<?> collection, Object object, String message) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection isRegistered an object
-	 */
-	public static void assertContains(Collection<?> collection, Object object, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection doesn't contain an object
-	 */
-	public static void assertNotContains(Collection<?> collection, Object object) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection doesn't contain an object
-	 */
-	public static void assertNotContains(Collection<?> collection, Object object, String message) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection doesn't contain an object
-	 */
-	public static void assertNotContains(Collection<?> collection, Object object, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that code is executed on the main thread */
-	public static void assertMainThread() {
-	}
-
-	/** Asserts that code is not executed on the main thread */
-	public static void assertNotMainThread() {
 	}
 }

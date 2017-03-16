@@ -157,7 +157,7 @@ public class ApptentiveInternal {
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
-		conversationManager = new ConversationManager(appContext, DispatchQueue.backgroundQueue(), Util.getInternalDir(appContext, "conversations", true));
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
 		messageManager = new MessageManager();
@@ -537,8 +537,8 @@ public class ApptentiveInternal {
 		 */
 
 		long start = System.currentTimeMillis();
-		boolean conversationLoaded = conversationManager.loadActiveConversation();
-		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? " not" : "", System.currentTimeMillis() - start);
+		boolean conversationLoaded = conversationManager.loadActiveConversation(getApplicationContext());
+		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? "" : " not", System.currentTimeMillis() - start);
 
 		if (conversationLoaded) {
 			Conversation activeConversation = conversationManager.getActiveConversation();
