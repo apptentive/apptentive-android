@@ -60,6 +60,13 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 		);
 	}
 
+	@Test
+	public void testAssertEquals() throws Exception {
+		AssertEx.assertEquals("foo", "foo");
+		AssertEx.assertEquals("foo", "bar");
+		assertResult("Expected 'foo' but was 'bar'");
+	}
+
 	@Override
 	public void assertFailed(String message) {
 		addResult(message);

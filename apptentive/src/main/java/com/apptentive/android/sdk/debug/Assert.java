@@ -1,5 +1,6 @@
 package com.apptentive.android.sdk.debug;
 
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
 /**
@@ -66,6 +67,12 @@ public class Assert {
 	public static void assertNotNull(Object object, String format, Object... args) {
 		if (imp != null && object == null) {
 			imp.assertFailed(String.format(format, args));
+		}
+	}
+
+	public static void assertEquals(Object expected, Object actual) {
+		if (imp != null && !ObjectUtils.equal(expected, actual)) {
+			imp.assertFailed(StringUtils.format("Expected '%s' but was '%s'", expected, actual));
 		}
 	}
 
