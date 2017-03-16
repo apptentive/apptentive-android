@@ -324,6 +324,11 @@ public class ConversationManager {
 
 	private void updateMetadataItems(Conversation conversation) {
 
+		if (conversation.hasState(ANONYMOUS_PENDING)) {
+			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is anonymous and pending");
+			return;
+		}
+
 		// if the conversation is 'logged-in' we should not have any other 'logged-in' items in metadata
 		if (conversation.hasState(LOGGED_IN)) {
 			for (ConversationMetadataItem item : conversationMetadata) {
