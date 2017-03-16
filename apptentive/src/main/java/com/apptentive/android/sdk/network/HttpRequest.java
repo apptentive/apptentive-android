@@ -17,7 +17,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.NETWORK;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.debug.Assert.*;
 
 /**
  * Class representing async HTTP request
@@ -35,9 +36,19 @@ public class HttpRequest {
 	private static final long DEFAULT_READ_TIMEOUT_MILLIS = 45 * 1000L;
 
 	/**
+	 * Default retry policy (used if a custom one is not specified)
+	 */
+	private static final HttpRequestRetryPolicy DEFAULT_RETRY_POLICY = new HttpRequestRetryPolicy();
+
+	/**
 	 * Id-number of the next request
 	 */
 	private static int nextRequestId;
+
+	/**
+	 * Parent request manager
+	 */
+	HttpRequestManager requestManager;
 
 	/**
 	 * Url-connection for network communications
@@ -104,6 +115,21 @@ public class HttpRequest {
 	 */
 	private String errorMessage;
 
+	/**
+	 * Retry policy for this request
+	 */
+	private HttpRequestRetryPolicy retryPolicy = DEFAULT_RETRY_POLICY;
+
+	/**
+	 * How many times request was retried
+	 */
+	private int retryCount;
+
+	/**
+	 * Flag indicating if the request is currently retrying
+	 */
+	boolean retrying;
+
 	@SuppressWarnings("rawtypes")
 	private Listener listener;
 
@@ -157,7 +183,7 @@ public class HttpRequest {
 	////////////////////////////////////////////////////////////////
 	// Request async task
 
-	void dispatchSync() {
+	void dispatchSync(DispatchQueue networkQueue) {
 		long requestStartTime = System.currentTimeMillis();
 
 		try {
@@ -171,6 +197,11 @@ public class HttpRequest {
 		}
 
 		ApptentiveLog.d(NETWORK, "Request finished in %d ms", System.currentTimeMillis() - requestStartTime);
+
+		// attempt a retry if request failed
+		if (isFailed() && retryRequest(networkQueue, responseCode)) {
+			return;
+		}
 
 		// use custom callback queue (if any)
 		if (callbackQueue != null) {
@@ -251,6 +282,42 @@ public class HttpRequest {
 			closeConnection();
 		}
 	}
+
+	//region Retry
+
+	private final DispatchTask retryDispatchTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			assertTrue(retrying);
+			retrying = false;
+
+			assertNotNull(requestManager);
+			requestManager.dispatchRequest(HttpRequest.this);
+		}
+	};
+
+	private boolean retryRequest(DispatchQueue networkQueue, int responseCode) {
+		final int maxRetryCount = retryPolicy.getMaxRetryCount();
+		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryCount >= maxRetryCount) {
+			ApptentiveLog.v(NETWORK, "Request maximum retry limit reached (%d)", maxRetryCount);
+			return false;
+		}
+
+		if (!retryPolicy.shouldRetryRequest(responseCode)) {
+			ApptentiveLog.v(NETWORK, "Retry policy declined request retry");
+			return false;
+		}
+
+		++retryCount;
+
+		assertFalse(retrying);
+		retrying = true;
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis());
+
+		return true;
+	}
+
+	//endregion
 
 	//region Connection
 
@@ -351,23 +418,23 @@ public class HttpRequest {
 	public String toString() {
 		try {
 			return String.format(
-					"\n" +
-							"Request:\n" +
-							"\t%s %s\n" +
-							"\t%s\n" +
-							"\t%s\n" +
-							"Response:\n" +
-							"\t%d\n" +
-							"\t%s\n" +
-							"\t%s",
+				"\n" +
+					"Request:\n" +
+					"\t%s %s\n" +
+					"\t%s\n" +
+					"\t%s\n" +
+					"Response:\n" +
+					"\t%d\n" +
+					"\t%s\n" +
+					"\t%s",
 				/* Request */
-					method.name(), urlString,
-					requestProperties,
-					new String(createRequestData()),
+				method.name(), urlString,
+				requestProperties,
+				new String(createRequestData()),
 				/* Response */
-					responseCode,
-					responseData,
-					responseHeaders);
+				responseCode,
+				responseData,
+				responseHeaders);
 		} catch (IOException e) {
 			ApptentiveLog.e("", e);
 		}
@@ -396,6 +463,10 @@ public class HttpRequest {
 
 	public boolean isSuccessful() {
 		return responseCode >= 200 && responseCode < 300;
+	}
+
+	public boolean isFailed() {
+		return !isSuccessful() && !isCancelled();
 	}
 
 	public int getId() {

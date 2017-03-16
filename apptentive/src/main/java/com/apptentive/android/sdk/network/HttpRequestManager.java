@@ -7,7 +7,7 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.apptentive.android.sdk.debug.Assert.assertTrue;
+import static com.apptentive.android.sdk.debug.Assert.*;
 
 /**
  * Class for asynchronous HTTP requests handling.
@@ -57,21 +57,26 @@ public class HttpRequestManager {
 		}
 
 		registerRequest(request);
+		dispatchRequest(request);
+		notifyRequestStarted(request);
 
+		return request;
+	}
+
+	/** Handles request synchronously */
+	void dispatchRequest(final HttpRequest request) {
 		networkQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
 				try {
-					request.dispatchSync();
+					request.dispatchSync(networkQueue);
 				} finally {
-					unregisterRequest(request);
+					if (!request.retrying) {
+						unregisterRequest(request);
+					}
 				}
 			}
 		});
-
-		notifyRequestStarted(request);
-
-		return request;
 	}
 
 	/**
@@ -91,6 +96,8 @@ public class HttpRequestManager {
 	 * Register active request
 	 */
 	synchronized void registerRequest(HttpRequest request) {
+		assertNull(request.requestManager);
+		request.requestManager = this;
 		activeRequests.add(request);
 	}
 
@@ -102,6 +109,7 @@ public class HttpRequestManager {
 		assertTrue(removed, "Attempted to unregister missing request: %s", request);
 
 		if (removed) {
+			request.requestManager = null;
 			notifyRequestFinished(request);
 		}
 	}
