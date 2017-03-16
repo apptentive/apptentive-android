@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -13,28 +15,34 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.serialization.ObjectSerialization;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
-import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
+import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.*;
-import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
+import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS_PENDING;
+import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_IN;
+import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_OUT;
+import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
-import static com.apptentive.android.sdk.debug.TesterEvent.*;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_CREATE;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_LOAD_ACTIVE;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_METADATA_LOAD;
 
 /**
  * Class responsible for managing conversations.
@@ -45,16 +53,11 @@ import static com.apptentive.android.sdk.debug.TesterEvent.*;
  *   - Migrating legacy conversation data.
  * </pre>
  */
-public class ConversationManager implements DataChangedListener {
+public class ConversationManager {
 
 	protected static final String CONVERSATION_METADATA_PATH = "conversation-v1.meta";
 
 	private final WeakReference<Context> contextRef;
-
-	/**
-	 * Private serial dispatch queue for background operations
-	 */
-	private final DispatchQueue operationQueue;
 
 	/**
 	 * A basic directory for storing conversation-related data.
@@ -68,27 +71,27 @@ public class ConversationManager implements DataChangedListener {
 
 	private Conversation activeConversation;
 
-	private final AtomicBoolean isConversationTokenFetchPending = new AtomicBoolean(false);
-
-	public ConversationManager(Context context, final DispatchQueue operationQueue, File storageDir) {
+	public ConversationManager(Context context, File storageDir) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
-		if (operationQueue == null) {
-			throw new IllegalArgumentException("Operation queue is null");
-		}
-
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
-		this.operationQueue = operationQueue;
 		this.storageDir = storageDir;
 
 		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_ACTIVITY_STARTED,
 			new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
-					ApptentiveLog.v(CONVERSATION, "Activity 'start' notification received. Trying to fetch interactions...");
-					operationQueue.dispatchAsyncOnce(checkFetchInteractionsTask);
+					if (activeConversation != null && activeConversation.hasActiveState()) {
+						ApptentiveLog.v(CONVERSATION, "Activity 'start' notification received. Trying to fetch interactions...");
+						final Context context = getContext();
+						if (context != null) {
+							activeConversation.fetchInteractions(context);
+						} else {
+							ApptentiveLog.w(CONVERSATION, "Can't fetch conversation interactions: context is lost");
+						}
+					}
 				}
 			});
 	}
@@ -97,25 +100,25 @@ public class ConversationManager implements DataChangedListener {
 
 	/**
 	 * Attempts to load an active conversation. Returns <code>false</code> if active conversation is
-	 * missing or cannnot be loaded
+	 * missing or cannot be loaded
 	 */
-	public boolean loadActiveConversation() {
+	public boolean loadActiveConversation(Context context) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
 		try {
 			// resolving metadata
 			conversationMetadata = resolveMetadata();
 
 			// attempt to load existing conversation
-			activeConversation = loadActiveConversationGuarded();
+			activeConversation = loadActiveConversationGuarded(context);
 			dispatchDebugEvent(EVT_CONVERSATION_LOAD_ACTIVE, activeConversation != null);
 
 			if (activeConversation != null) {
-				activeConversation.setDataChangedListener(this);
-				notifyConversationBecameActive();
+				handleConversationStateChange(activeConversation);
 				return true;
 			}
-
-			// no conversation - fetch one
-			fetchConversationToken();
 
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while loading active conversation");
@@ -124,48 +127,64 @@ public class ConversationManager implements DataChangedListener {
 		return false;
 	}
 
-	private Conversation loadActiveConversationGuarded() throws IOException {
+	private Conversation loadActiveConversationGuarded(Context context) throws IOException, SerializerException {
+		// we're going to scan metadata in attempt to find existing conversations
+		ConversationMetadataItem item;
+
 		// if the user was logged in previously - we should have an active conversation
-		ApptentiveLog.v(CONVERSATION, "Loading active conversation...");
-		final ConversationMetadataItem activeItem = conversationMetadata.findItem(new ConversationMetadata.Filter() {
-			@Override
-			public boolean accept(ConversationMetadataItem item) {
-				return item.isActive();
-			}
-		});
-		if (activeItem != null) {
-			return loadConversation(activeItem);
+		item = conversationMetadata.findItem(LOGGED_IN);
+		if (item != null) {
+			ApptentiveLog.v(CONVERSATION, "Loading logged-in conversation...");
+			return loadConversation(item);
 		}
 
-		// if no user was logged in previously - we might have a default conversation
-		ApptentiveLog.v(CONVERSATION, "Loading default conversation...");
-		final ConversationMetadataItem defaultItem = conversationMetadata.findItem(new ConversationMetadata.Filter() {
-			@Override
-			public boolean accept(ConversationMetadataItem item) {
-				return item.isDefault();
-			}
-		});
-		if (defaultItem != null) {
-			return loadConversation(defaultItem);
+		// if no users were logged in previously - we might have an anonymous conversation
+		item = conversationMetadata.findItem(ANONYMOUS);
+		if (item != null) {
+			ApptentiveLog.v(CONVERSATION, "Loading anonymous conversation...");
+			return loadConversation(item);
 		}
 
-		// TODO: check for legacy conversations
-		ApptentiveLog.v(CONVERSATION, "Can't load conversation");
-		return null;
+		// check if we have a 'pending' anonymous conversation
+		item = conversationMetadata.findItem(ANONYMOUS_PENDING);
+		if (item != null) {
+			final Conversation conversation = loadConversation(item);
+			fetchConversationToken(conversation);
+			return conversation;
+		}
+
+		// seems like we only have 'logged-out' conversations
+		if (conversationMetadata.hasItems()) {
+			ApptentiveLog.v(CONVERSATION, "Can't load conversation: only 'logged-out' conversations available");
+			return null;
+		}
+
+		// no conversation available: create a new one
+		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
+		Conversation anonymousConversation = new Conversation();
+		anonymousConversation.setState(ANONYMOUS_PENDING);
+		fetchConversationToken(anonymousConversation);
+		return anonymousConversation;
 	}
 
-	private Conversation loadConversation(ConversationMetadataItem item) {
+	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
-		File file = new File(storageDir, item.filename);
-		FileSerializer serializer = new FileSerializer(file);
-		return (Conversation) serializer.deserialize();
+		FileSerializer serializer = new FileSerializer(item.file);
+		final Conversation conversation = (Conversation) serializer.deserialize();
+		conversation.setState(item.getState()); // set the state same as the item's state
+		conversation.setFile(item.file);
+		return conversation;
 	}
 
-	/** Ends active conversation (user logs out, etc) */
+	/**
+	 * Ends active conversation (user logs out, etc)
+	 */
 	public synchronized boolean endActiveConversation() {
 		if (activeConversation != null) {
+			activeConversation.setState(LOGGED_OUT);
+			handleConversationStateChange(activeConversation);
+
 			setActiveConversation((Conversation) null);
-			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_BECAME_INACTIVE);
 			return true;
 		}
 		return false;
@@ -173,56 +192,31 @@ public class ConversationManager implements DataChangedListener {
 
 	//endregion
 
-	//region Interactions
+	//region Conversation Token Fetching
 
-	private final DispatchTask checkFetchInteractionsTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			ApptentiveLog.v(CONVERSATION, "Checking fetch interactions...");
+	private void fetchConversationToken(final Conversation conversation) {
+		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
 
-			if (activeConversation != null) {
-				Context context = getContext();
-				if (context == null) {
-					ApptentiveLog.w(CONVERSATION, "Unable to check fetch interactions: context is lost");
-					return;
-				}
-				boolean interactionsWereFetched = activeConversation.checkFetchInteractions(context);
-				dispatchDebugEvent(EVT_INTERACTION_FETCH, interactionsWereFetched);
-			} else {
-				ApptentiveLog.d(CONVERSATION, "Unable to check interaction fetch: active conversation is missing");
-			}
+		final Context context = getContext();
+		if (context == null) {
+			ApptentiveLog.w(CONVERSATION, "Unable to fetch conversation token: context reference is lost");
+			return;
 		}
-	};
 
-	//endregion
+		// Try to fetch a new one from the server.
+		ConversationTokenRequest request = new ConversationTokenRequest();
 
-	//region Conversation fetching
+		// Send the Device and Sdk now, so they are available on the server from the start.
+		final Device device = DeviceManager.generateNewDevice(context);
+		final Sdk sdk = SdkManager.generateCurrentSdk();
+		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 
-	private void fetchConversationToken() {
-		if (isConversationTokenFetchPending.compareAndSet(false, true)) {
-			ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+		request.setDevice(DeviceManager.getDiffPayload(null, device));
+		request.setSdk(SdkManager.getPayload(sdk));
+		request.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
-			final Context context = getContext();
-			if (context == null) {
-				ApptentiveLog.w(CONVERSATION, "Unable to fetch convesation token: context reference is lost");
-				isConversationTokenFetchPending.set(false);
-				return;
-			}
-
-			// Try to fetch a new one from the server.
-			ConversationTokenRequest request = new ConversationTokenRequest();
-
-			// Send the Device and Sdk now, so they are available on the server from the start.
-			final Device device = DeviceManager.generateNewDevice(context);
-			final Sdk sdk = SdkManager.generateCurrentSdk();
-			final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
-
-			request.setDevice(DeviceManager.getDiffPayload(null, device));
-			request.setSdk(SdkManager.getPayload(sdk));
-			request.setAppRelease(AppReleaseManager.getPayload(appRelease));
-
-			ApptentiveInternal.getInstance().getApptentiveHttpClient()
-				.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
+		ApptentiveInternal.getInstance().getApptentiveHttpClient()
+			.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
 					try {
@@ -244,8 +238,8 @@ public class ConversationManager implements DataChangedListener {
 							return;
 						}
 
-						// create new conversation
-						Conversation conversation = new Conversation();
+						// set conversation data
+						conversation.setState(ANONYMOUS);
 						conversation.setConversationToken(conversationToken);
 						conversation.setConversationId(conversationId);
 						conversation.setDevice(device);
@@ -255,50 +249,56 @@ public class ConversationManager implements DataChangedListener {
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
-						conversation.setDataChangedListener(ConversationManager.this);
+						conversation.setFile(getConversationFile(conversation));
 
-						// write conversation to the dist
-						saveConversation(conversation);
+						// write conversation to the disk (sync operation)
+						conversation.save();
 
-						// update active conversation
-						setActiveConversation(conversation);
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
-						notifyConversationBecameActive();
+						handleConversationStateChange(conversation);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
-					} finally {
-						isConversationTokenFetchPending.set(false);
 					}
 				}
 
 				@Override
 				public void onCancel(HttpJsonRequest request) {
-					isConversationTokenFetchPending.set(false);
 					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 				}
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
 					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
-					isConversationTokenFetchPending.set(false);
 					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
 				}
 			});
+	}
+
+	private File getConversationFile(Conversation conversation) {
+		return new File(storageDir, conversation.getConversationId() + ".bin");
+	}
+
+	//endregion
+
+	//region Conversation fetching
+
+	private void handleConversationStateChange(Conversation conversation) {
+		Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+				ObjectUtils.toMap(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION, conversation));
+
+		if (conversation != null && conversation.hasActiveState()) {
+			conversation.fetchInteractions(getContext());
 		}
 	}
 
-	private void notifyConversationBecameActive() {
-		dispatchDebugEvent(EVT_CONVERSATION_BECAME_ACTIVE); // TODO: remove debug event and listen to the notification instead
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_BECAME_ACTIVE,
-			ObjectUtils.toMap(NOTIFICATION_CONVERSATION_BECAME_ACTIVE_KEY_CONVERSATION, activeConversation));
-		operationQueue.dispatchAsyncOnce(checkFetchInteractionsTask);
-	}
-
 	/* For testing purposes */
-	public synchronized boolean setActiveConversation(final String conversationId) {
-		final ConversationMetadataItem item = conversationMetadata.findItem(new ConversationMetadata.Filter() {
+	public synchronized boolean setActiveConversation(final String conversationId) throws SerializerException {
+		final ConversationMetadataItem item = conversationMetadata.findItem(new Filter() {
 			@Override
 			public boolean accept(ConversationMetadataItem item) {
 				return item.conversationId.equals(conversationId);
@@ -318,47 +318,25 @@ public class ConversationManager implements DataChangedListener {
 
 		setActiveConversation(conversation);
 
-		notifyConversationBecameActive();
-		return true;
+		throw new RuntimeException("Implement me");
 	}
 
-	private synchronized void setActiveConversation(Conversation conversation) {
+	private synchronized void setActiveConversation(final Conversation conversation) {
+		// do we have a 'logged-in' conversation already?
+		if (activeConversation != null && activeConversation.hasState(LOGGED_IN)) {
+			activeConversation.setState(LOGGED_OUT); // mark it as 'logged-out'
+			conversationMetadata.setItem(activeConversation); // and update metadata
+		}
+
+		// set new active conversation
 		activeConversation = conversation;
-		conversationMetadata.setActiveConversation(conversation);
+
+		// update metadata (if necessary)
+		if (activeConversation != null) {
+			conversationMetadata.setItem(activeConversation);
+		}
+
 		saveMetadata();
-	}
-
-	//endregion
-
-	//region Serialization
-
-	private void scheduleConversationSave() {
-		boolean scheduled = operationQueue.dispatchAsyncOnce(saveSessionTask, 100L);
-		if (scheduled) {
-			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
-		} else {
-			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
-		}
-	}
-
-	private final DispatchTask saveSessionTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			if (activeConversation != null) {
-				saveConversation(activeConversation);
-			} else {
-				ApptentiveLog.w(CONVERSATION, "Can't save conversation: active conversation is missing");
-			}
-		}
-	};
-
-	private void saveConversation(Conversation conversation) {
-		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
-		ApptentiveLog.v(CONVERSATION, "EventData: %s", conversation.getEventData().toString()); // TODO: remove
-
-		File conversationFile = new File(storageDir, conversation.getFilename());
-		FileSerializer serializer = new FileSerializer(conversationFile);
-		serializer.serialize(conversation);
 	}
 
 	//endregion
@@ -393,15 +371,6 @@ public class ConversationManager implements DataChangedListener {
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, "Exception while saving metadata");
 		}
-	}
-
-	//endregion
-
-	//region DataChangedListener
-
-	@Override
-	public void onDataChanged() {
-		scheduleConversationSave();
 	}
 
 	//endregion

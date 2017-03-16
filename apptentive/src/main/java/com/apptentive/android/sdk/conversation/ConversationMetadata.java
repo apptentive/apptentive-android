@@ -1,7 +1,6 @@
 package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
-import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -9,8 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static com.apptentive.android.sdk.conversation.ConversationMetadataItem.*;
 
 /**
  * Class which represents all conversation entries stored on the disk
@@ -50,42 +47,38 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 
 	//endregion
 
-	//region Conversation
+	//region Items
 
-	// TODO: replace it with notifications so that the active conversation can send out events and clean itself up.
-	void setActiveConversation(final Conversation conversation) {
-		if (conversation != null) {
-			// clear 'active' state
-			boolean found = false;
-			for (ConversationMetadataItem item : items) {
-				if (StringUtils.equal(conversation.getConversationId(), item.conversationId)) {
-					found = true;
-					item.state = CONVERSATION_STATE_ACTIVE;
-				} else if (item.state == CONVERSATION_STATE_ACTIVE) {
-					item.state = CONVERSATION_STATE_INACTIVE;
-				}
-			}
-
-			// add a new item if it was not found
-			if (!found) {
-				final ConversationMetadataItem item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFilename());
-				item.state = CONVERSATION_STATE_ACTIVE;
-				items.add(item);
-			}
-		} else {
-			for (ConversationMetadataItem item : items) {
-				if (item.state == CONVERSATION_STATE_ACTIVE) {
-					item.state = CONVERSATION_STATE_INACTIVE;
-				}
-			}
+	public void setItem(Conversation conversation)
+	{
+		ConversationMetadataItem item = findItem(conversation);
+		if (item == null) {
+			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFile());
+			items.add(item);
 		}
+
+		item.state = conversation.getState();
 	}
 
-	//endregion
+	ConversationMetadataItem findItem(final ConversationState state) {
+		return findItem(new Filter() {
+			@Override
+			public boolean accept(ConversationMetadataItem item) {
+				return state.equals(item.state);
+			}
+		});
+	}
 
-	//region Filtering
+	ConversationMetadataItem findItem(final Conversation conversation) {
+		return findItem(new Filter() {
+			@Override
+			public boolean accept(ConversationMetadataItem item) {
+				return item.conversationId.equals(conversation.getConversationId());
+			}
+		});
+	}
 
-	public ConversationMetadataItem findItem(Filter filter) {
+	ConversationMetadataItem findItem(Filter filter) {
 		for (ConversationMetadataItem item : items) {
 			if (filter.accept(item)) {
 				return item;
@@ -106,6 +99,10 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 	//endregion
 
 	//region Getters/Setters
+
+	public boolean hasItems() {
+		return items.size() > 0;
+	}
 
 	public List<ConversationMetadataItem> getItems() {
 		return items;

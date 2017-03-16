@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.notifications;
 
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.Map;
@@ -35,6 +36,10 @@ public class ApptentiveNotification {
 
 	public boolean hasName(String name) {
 		return StringUtils.equal(this.name, name);
+	}
+
+	public <T> T getUserInfo(String key, Class<? extends T> valueClass) {
+		return userInfo != null ? ObjectUtils.as(userInfo.get(key), valueClass) : null;
 	}
 
 	public Map<String, Object> getUserInfo() {

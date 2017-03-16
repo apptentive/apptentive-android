@@ -62,6 +62,7 @@ public class ApptentiveHttpClient {
 		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
 		setupRequestDefaults(request);
 		request.setMethod(HttpRequestMethod.POST);
+		request.setRequestProperty("Content-Type", "application/json");
 		return request;
 	}
 

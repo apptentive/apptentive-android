@@ -42,13 +42,19 @@ public class Tester {
 
 	public static void dispatchDebugEvent(String name, boolean successful) {
 		if (isListeningForDebugEvents()) {
-			notifyEvent(name, ObjectUtils.toMap("successful", successful));
+			notifyEvent(name, ObjectUtils.toMap(EVT_KEY_SUCCESSFUL, successful));
 		}
 	}
 
 	public static void dispatchDebugEvent(String name, String key, Object value) {
 		if (isListeningForDebugEvents()) {
 			notifyEvent(name, ObjectUtils.toMap(key, value));
+		}
+	}
+
+	public static void dispatchDebugEvent(String name, String key1, Object value1, String key2, Object value2) {
+		if (isListeningForDebugEvents()) {
+			notifyEvent(name, ObjectUtils.toMap(key1, value1, key2, value2));
 		}
 	}
 

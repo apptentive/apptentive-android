@@ -6,9 +6,8 @@
 
 package com.apptentive.android.sdk.storage;
 
-public interface Serializer {
-
-	void serialize(Object object) throws SerializerException;
-
-	Object deserialize() throws SerializerException;
+public class SerializerException extends Exception {
+	public SerializerException(Throwable cause) {
+		super(cause);
+	}
 }

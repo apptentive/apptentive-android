@@ -5,72 +5,61 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.File;
 import java.io.IOException;
 
 /**
  * A light weight representation of the conversation object stored on the disk.
  */
 public class ConversationMetadataItem implements SerializableObject {
-	/**
-	 * Conversation state is not known
-	 */
-	public static byte CONVERSATION_STATE_UNDEFINED = 0;
 
 	/**
-	 * No users have logged-in yet (guest mode)
+	 * The state of the target conversation
 	 */
-	public static byte CONVERSATION_STATE_DEFAULT = 1;
+	ConversationState state = ConversationState.UNDEFINED;
 
 	/**
-	 * The conversation belongs to the currently logged-in user.
+	 * Conversation ID which was received from the backend
 	 */
-	public static byte CONVERSATION_STATE_ACTIVE = 2;
+	final String conversationId;
 
 	/**
-	 * The conversation belongs to a logged-out user.
+	 * Storage filename for conversation serialized data
 	 */
-	public static byte CONVERSATION_STATE_INACTIVE = 3;
+	final File file;
 
-	byte state = CONVERSATION_STATE_UNDEFINED;
-	String conversationId;
-	String filename;
-
-	public ConversationMetadataItem(String conversationId, String filename)
+	public ConversationMetadataItem(String conversationId, File file)
 	{
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
 
-		if (StringUtils.isNullOrEmpty(filename)) {
-			throw new IllegalArgumentException("Filename is null or empty");
+		if (file == null) {
+			throw new IllegalArgumentException("File is null");
 		}
 
 		this.conversationId = conversationId;
-		this.filename = filename;
+		this.file = file;
 	}
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
 		conversationId = in.readUTF();
-		filename = in.readUTF();
-		state = in.readByte();
+		file = new File(in.readUTF());
+		state = ConversationState.valueOf(in.readByte());
 	}
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
 		out.writeUTF(conversationId);
-		out.writeUTF(filename);
-		out.writeByte(state);
+		out.writeUTF(file.getAbsolutePath());
+		out.writeByte(state.ordinal());
 	}
 
 	public String getConversationId() {
 		return conversationId;
 	}
 
-	public boolean isActive() {
-		return state == CONVERSATION_STATE_ACTIVE;
-	}
-
-	public boolean isDefault() {
-		return state == CONVERSATION_STATE_DEFAULT;
+	public ConversationState getState() {
+		return state;
 	}
 }

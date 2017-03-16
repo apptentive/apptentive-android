@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.EventData;
+import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
@@ -30,10 +31,17 @@ import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import java.io.File;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
+import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_INTERACTION_FETCH;
 
 public class Conversation implements Saveable, DataChangedListener {
 
@@ -61,8 +69,16 @@ public class Conversation implements Saveable, DataChangedListener {
 	private String interactions;
 	private double interactionExpiration;
 
+	/**
+	 * File which represents this conversation on the disk
+	 */
+	private transient File file;
+
 	// TODO: Maybe move this up to a wrapping Conversation class?
 	private transient InteractionManager interactionManager;
+
+	// TODO: describe why we don't serialize state
+	private transient ConversationState state = ConversationState.UNDEFINED;
 
 	public Conversation() {
 		this.device = new Device();
@@ -98,13 +114,10 @@ public class Conversation implements Saveable, DataChangedListener {
 		return null;
 	}
 
-	/**
-	 * Attempts to fetch interactions synchronously. Returns <code>true</code> is successful.
-	 */
-	boolean checkFetchInteractions(Context context) {
+	boolean fetchInteractions(Context context) {
 		boolean cacheExpired = getInteractionExpiration() > Util.currentTimeSeconds();
 		if (cacheExpired || RuntimeUtils.isAppDebuggable(context)) {
-			return fetchInteractions();
+			return DispatchQueue.backgroundQueue().dispatchAsyncOnce(fetchInteractionsTask); // do not allow multiple fetches at the same time
 		}
 
 		ApptentiveLog.v(CONVERSATION, "Interaction cache is still valid");
@@ -114,7 +127,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	/**
 	 * Fetches interaction synchronously. Returns <code>true</code> if succeed.
 	 */
-	boolean fetchInteractions() {
+	private boolean fetchInteractionsSync() {
 		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions();
 
@@ -159,20 +172,67 @@ public class Conversation implements Saveable, DataChangedListener {
 		}
 		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions asyncTask finished. Successful? %b", updateSuccessful);
 
-		// Update pending state on UI thread after finishing the task
-		ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-
 		return updateSuccessful;
+	}
+
+	private transient final DispatchTask fetchInteractionsTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			final boolean updateSuccessful = fetchInteractionsSync();
+
+			// Update pending state on UI thread after finishing the task
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					if (hasActiveState()) {
+						ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
+						dispatchDebugEvent(EVT_INTERACTION_FETCH, updateSuccessful);
+					}
+				}
+			});
+		}
+	};
+
+	//endregion
+
+	//region Saving
+
+	private final transient DispatchTask saveConversationTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			save();
+		}
+	};
+
+	/**
+	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
+	 * if succeed.
+	 */
+	synchronized boolean save() {
+		if (file == null) {
+			ApptentiveLog.e(CONVERSATION, "Unable to save conversation: destination file not specified");
+			return false;
+		}
+
+		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
+		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
+
+		try {
+			FileSerializer serializer = new FileSerializer(file);
+			serializer.serialize(this);
+			return true;
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Unable to save conversation");
+			return false;
+		}
 	}
 
 	//endregion
 
 	//region Listeners
-	private transient DataChangedListener listener;
 
 	@Override
 	public void setDataChangedListener(DataChangedListener listener) {
-		this.listener = listener;
 		device.setDataChangedListener(this);
 		person.setDataChangedListener(this);
 		eventData.setDataChangedListener(this);
@@ -181,8 +241,15 @@ public class Conversation implements Saveable, DataChangedListener {
 
 	@Override
 	public void notifyDataChanged() {
-		if (listener != null) {
-			listener.onDataChanged();
+		if (hasFile()) {
+			boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
+			if (scheduled) {
+				ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
+			} else {
+				ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
+			}
+		} else {
+			ApptentiveLog.v(CONVERSATION, "Can't save conversation data: storage file is not specified");
 		}
 	}
 
@@ -193,6 +260,41 @@ public class Conversation implements Saveable, DataChangedListener {
 	//endregion
 
 	//region Getters & Setters
+
+	public ConversationState getState() {
+		return state;
+	}
+
+	public void setState(ConversationState state) {
+		// TODO: check if state transition would make sense (for example you should not be able to move from 'logged' state to 'anonymous', etc.)
+		this.state = state;
+	}
+
+	/**
+	 * Returns <code>true</code> if conversation is in the given state
+	 */
+	public boolean hasState(ConversationState s) {
+		return state.equals(s);
+	}
+
+	/**
+	 * Returns <code>true</code> if conversation is in one of the given states
+	 */
+	public boolean hasState(ConversationState... states) {
+		for (ConversationState s : states) {
+			if (s.equals(state)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if conversation is in "active" state (after receiving server response)
+	 */
+	public boolean hasActiveState() {
+		return hasState(ConversationState.LOGGED_IN, ANONYMOUS);
+	}
 
 	public String getConversationToken() {
 		return conversationToken;
@@ -421,11 +523,16 @@ public class Conversation implements Saveable, DataChangedListener {
 		this.interactionManager = interactionManager;
 	}
 
-	/**
-	 * Returns a filename unique to the convesation for persistant storage
-	 */
-	String getFilename() {
-		return String.format("conversation-%s.bin", conversationId);
+	synchronized boolean hasFile() {
+		return file != null;
+	}
+
+	synchronized File getFile() {
+		return file;
+	}
+
+	synchronized void setFile(File file) {
+		this.file = file;
 	}
 
 	//endregion
