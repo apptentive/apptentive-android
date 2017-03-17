@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.network;
 
 import com.apptentive.android.sdk.TestCaseBase;
+import com.apptentive.android.sdk.network.MockHttpURLConnection.AbstractResponseHandler;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
 import junit.framework.Assert;
@@ -206,7 +207,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 	}
 
 	@Test
-	public void testRetry() {
+	public void testFailedRetry() {
 		HttpRequestRetryPolicy retryPolicy = new HttpRequestRetryPolicy() {
 			@Override
 			protected boolean shouldRetryRequest(int responseCode) {
@@ -231,6 +232,44 @@ public class HttpRequestManagerTest extends TestCaseBase {
 			"retried: 1",
 			"retried: 1",
 			"failed: 1 Unexpected response code: 500 (Internal Server Error)"
+		);
+	}
+
+	@Test
+	public void testSuccessfulRetry() {
+		HttpRequestRetryPolicy retryPolicy = new HttpRequestRetryPolicy() {
+			@Override
+			protected boolean shouldRetryRequest(int responseCode) {
+				return responseCode == 500;
+			}
+		};
+		retryPolicy.setMaxRetryCount(3);
+		retryPolicy.setRetryTimeoutMillis(0);
+
+		// fail this request twice and then finish successfully
+		startRequest(new MockHttpRequest("1").setMockResponseHandler(new AbstractResponseHandler() {
+			int requestAttempts = 0;
+
+			@Override
+			public int getResponseCode() {
+				return requestAttempts++ < 2 ? 500 : 200;
+			}
+		}).setRetryPolicy(retryPolicy));
+
+		startRequest(new MockHttpRequest("2").setMockResponseCode(400).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("3").setMockResponseCode(204).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("4").setThrowsExceptionOnConnect(true).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("5").setThrowsExceptionOnDisconnect(true).setRetryPolicy(retryPolicy));
+		dispatchRequests();
+
+		assertResult(
+			"failed: 2 Unexpected response code: 400 (Bad Request)",
+			"finished: 3",
+			"failed: 4 Connection error",
+			"failed: 5 Disconnection error",
+			"retried: 1",
+			"retried: 1",
+			"finished: 1"
 		);
 	}
 

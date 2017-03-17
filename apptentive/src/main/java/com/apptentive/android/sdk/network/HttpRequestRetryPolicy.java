@@ -20,8 +20,22 @@ public class HttpRequestRetryPolicy {
 	 */
 	private long retryTimeoutMillis = DEFAULT_RETRY_TIMEOUT_MILLIS;
 
+	/**
+	 * Returns <code>true</code> is request should be retried.
+	 *
+	 * @param responseCode - HTTP response code for the request
+	 */
 	protected boolean shouldRetryRequest(int responseCode) {
 		return false; // TODO: decide based on response code
+	}
+
+	/**
+	 * Returns the delay in millis for the next retry
+	 *
+	 * @param retryCount - number of retries attempted already
+	 */
+	protected long getRetryTimeoutMillis(int retryCount) {
+		return retryTimeoutMillis;
 	}
 
 	public int getMaxRetryCount() {
@@ -30,10 +44,6 @@ public class HttpRequestRetryPolicy {
 
 	public void setMaxRetryCount(int maxRetryCount) {
 		this.maxRetryCount = maxRetryCount;
-	}
-
-	public long getRetryTimeoutMillis() {
-		return retryTimeoutMillis;
 	}
 
 	public void setRetryTimeoutMillis(long retryTimeoutMillis) {

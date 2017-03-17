@@ -311,7 +311,7 @@ public class HttpRequest {
 		++retryCount;
 
 		retrying = true;
-		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis());
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryCount));
 
 		return true;
 	}
