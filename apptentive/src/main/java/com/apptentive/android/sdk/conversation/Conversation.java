@@ -93,6 +93,7 @@ public class Conversation implements Saveable, DataChangedListener {
 		this.versionHistory = new VersionHistory();
 
 		// transient fields might not get properly initialized upon de-serialization
+		setDataChangedListener(this);
 		initDispatchTasks();
 	}
 
@@ -263,6 +264,7 @@ public class Conversation implements Saveable, DataChangedListener {
 
 	@Override
 	public void onDeserialize() {
+		setDataChangedListener(this);
 		initDispatchTasks();
 	}
 
