@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -30,6 +29,7 @@ import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.RuntimeUtils;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -84,6 +84,8 @@ public class Conversation implements Saveable, DataChangedListener {
 	private transient DispatchTask fetchInteractionsTask;
 	private transient DispatchTask saveConversationTask;
 
+	private transient DataChangedListener listener;
+
 	public Conversation() {
 		this.device = new Device();
 		this.person = new Person();
@@ -93,7 +95,11 @@ public class Conversation implements Saveable, DataChangedListener {
 		this.versionHistory = new VersionHistory();
 
 		// transient fields might not get properly initialized upon de-serialization
-		setDataChangedListener(this);
+		initTransientFields();
+	}
+
+	private void initTransientFields() {
+		initDataChangeListeners();
 		initDispatchTasks();
 	}
 
@@ -240,12 +246,16 @@ public class Conversation implements Saveable, DataChangedListener {
 
 	//region Listeners
 
-	@Override
-	public void setDataChangedListener(DataChangedListener listener) {
+	private void initDataChangeListeners() {
 		device.setDataChangedListener(this);
 		person.setDataChangedListener(this);
 		eventData.setDataChangedListener(this);
 		versionHistory.setDataChangedListener(this);
+	}
+
+	@Override
+	public void setDataChangedListener(DataChangedListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -260,12 +270,15 @@ public class Conversation implements Saveable, DataChangedListener {
 		} else {
 			ApptentiveLog.v(CONVERSATION, "Can't save conversation data: storage file is not specified");
 		}
+
+		if (listener != null) {
+			listener.onDataChanged();
+		}
 	}
 
 	@Override
 	public void onDeserialize() {
-		setDataChangedListener(this);
-		initDispatchTasks();
+		initTransientFields();
 	}
 
 	@Override
@@ -317,7 +330,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setConversationToken(String conversationToken) {
-		if (!TextUtils.equals(this.conversationToken, conversationToken)) {
+		if (!StringUtils.equal(this.conversationToken, conversationToken)) {
 			this.conversationToken = conversationToken;
 			notifyDataChanged();
 		}
@@ -328,7 +341,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setConversationId(String conversationId) {
-		if (!TextUtils.equals(this.conversationId, conversationId)) {
+		if (!StringUtils.equal(this.conversationId, conversationId)) {
 			this.conversationId = conversationId;
 			notifyDataChanged();
 		}
@@ -339,7 +352,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setPersonId(String personId) {
-		if (!TextUtils.equals(this.personId, personId)) {
+		if (!StringUtils.equal(this.personId, personId)) {
 			this.personId = personId;
 			notifyDataChanged();
 		}
@@ -350,7 +363,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setPersonEmail(String personEmail) {
-		if (!TextUtils.equals(this.personEmail, personEmail)) {
+		if (!StringUtils.equal(this.personEmail, personEmail)) {
 			this.personEmail = personEmail;
 			notifyDataChanged();
 		}
@@ -361,7 +374,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setPersonName(String personName) {
-		if (!TextUtils.equals(this.personName, personName)) {
+		if (!StringUtils.equal(this.personName, personName)) {
 			this.personName = personName;
 			notifyDataChanged();
 		}
@@ -481,7 +494,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setMessageCenterPendingMessage(String messageCenterPendingMessage) {
-		if (!TextUtils.equals(this.messageCenterPendingMessage, messageCenterPendingMessage)) {
+		if (!StringUtils.equal(this.messageCenterPendingMessage, messageCenterPendingMessage)) {
 			this.messageCenterPendingMessage = messageCenterPendingMessage;
 			notifyDataChanged();
 		}
@@ -492,7 +505,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setMessageCenterPendingAttachments(String messageCenterPendingAttachments) {
-		if (!TextUtils.equals(this.messageCenterPendingAttachments, messageCenterPendingAttachments)) {
+		if (!StringUtils.equal(this.messageCenterPendingAttachments, messageCenterPendingAttachments)) {
 			this.messageCenterPendingAttachments = messageCenterPendingAttachments;
 			notifyDataChanged();
 		}
@@ -503,7 +516,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setTargets(String targets) {
-		if (!TextUtils.equals(this.targets, targets)) {
+		if (!StringUtils.equal(this.targets, targets)) {
 			this.targets = targets;
 			notifyDataChanged();
 		}
@@ -514,7 +527,7 @@ public class Conversation implements Saveable, DataChangedListener {
 	}
 
 	public void setInteractions(String interactions) {
-		if (!TextUtils.equals(this.interactions, interactions)) {
+		if (!StringUtils.equal(this.interactions, interactions)) {
 			this.interactions = interactions;
 			notifyDataChanged();
 		}
