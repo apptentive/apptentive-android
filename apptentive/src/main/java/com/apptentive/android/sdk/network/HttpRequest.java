@@ -121,9 +121,9 @@ public class HttpRequest {
 	private HttpRequestRetryPolicy retryPolicy = DEFAULT_RETRY_POLICY;
 
 	/**
-	 * How many times request was retried
+	 * How many times request was retried already
 	 */
-	private int retryCount;
+	private int retryAttemptCount;
 
 	/**
 	 * Flag indicating if the request is currently retrying
@@ -298,7 +298,7 @@ public class HttpRequest {
 
 	private boolean retryRequest(DispatchQueue networkQueue, int responseCode) {
 		final int maxRetryCount = retryPolicy.getMaxRetryCount();
-		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryCount >= maxRetryCount) {
+		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryAttemptCount >= maxRetryCount) {
 			ApptentiveLog.v(NETWORK, "Request maximum retry limit reached (%d)", maxRetryCount);
 			return false;
 		}
@@ -308,10 +308,10 @@ public class HttpRequest {
 			return false;
 		}
 
-		++retryCount;
+		++retryAttemptCount;
 
 		retrying = true;
-		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryCount));
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryAttemptCount));
 
 		return true;
 	}
