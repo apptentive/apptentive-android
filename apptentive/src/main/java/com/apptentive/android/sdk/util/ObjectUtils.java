@@ -49,4 +49,8 @@ public final class ObjectUtils {
 
 		return map;
 	}
+
+	public static boolean equal(Object expected, Object actual) {
+		return expected != null && actual != null && expected.equals(actual);
+	}
 }
