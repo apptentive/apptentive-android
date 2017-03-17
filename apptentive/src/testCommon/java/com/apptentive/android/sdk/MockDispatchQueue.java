@@ -35,10 +35,9 @@ public class MockDispatchQueue extends DispatchQueue {
 	}
 
 	public void dispatchTasks() {
-		for (DispatchTask task : tasks) {
-			task.run();
+		while (tasks.size() > 0) {
+			tasks.poll().run();
 		}
-		tasks.clear();
 	}
 
 	public static MockDispatchQueue overrideMainQueue(boolean runImmediately) {

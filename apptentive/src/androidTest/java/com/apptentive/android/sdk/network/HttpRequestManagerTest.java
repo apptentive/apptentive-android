@@ -23,7 +23,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		super.setUp();
 
 		networkQueue = new MockDispatchQueue(false);
-		requestManager = new HttpRequestManager(networkQueue);
+		requestManager = new MockHttpRequestManager(networkQueue);
 	}
 
 	@After
@@ -205,6 +205,35 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		);
 	}
 
+	@Test
+	public void testRetry() {
+		HttpRequestRetryPolicy retryPolicy = new HttpRequestRetryPolicy() {
+			@Override
+			protected boolean shouldRetryRequest(int responseCode) {
+				return responseCode == 500;
+			}
+		};
+		retryPolicy.setMaxRetryCount(2);
+		retryPolicy.setRetryTimeoutMillis(0);
+
+		startRequest(new MockHttpRequest("1").setMockResponseCode(500).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("2").setMockResponseCode(400).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("3").setMockResponseCode(204).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("4").setThrowsExceptionOnConnect(true).setRetryPolicy(retryPolicy));
+		startRequest(new MockHttpRequest("5").setThrowsExceptionOnDisconnect(true).setRetryPolicy(retryPolicy));
+		dispatchRequests();
+
+		assertResult(
+			"failed: 2 Unexpected response code: 400 (Bad Request)",
+			"finished: 3",
+			"failed: 4 Connection error",
+			"failed: 5 Disconnection error",
+			"retried: 1",
+			"retried: 1",
+			"failed: 1 Unexpected response code: 500 (Internal Server Error)"
+		);
+	}
+
 	//region Helpers
 
 	private void startRequest(HttpRequest request) {
@@ -232,4 +261,20 @@ public class HttpRequestManagerTest extends TestCaseBase {
 	}
 
 	//endregion
+
+	//region Mock HttpRequestManager
+
+	private class MockHttpRequestManager extends HttpRequestManager {
+		MockHttpRequestManager(MockDispatchQueue networkQueue) {
+			super(networkQueue);
+		}
+
+		@Override
+		void dispatchRequest(HttpRequest request) {
+			if (request.retrying) {
+				addResult("retried: " + request);
+			}
+			super.dispatchRequest(request);
+		}
+	}
 }

@@ -18,6 +18,7 @@ class MockHttpURLConnection extends HttpURLConnection {
 		statusLookup = new HashMap<>();
 		statusLookup.put(200, "OK");
 		statusLookup.put(204, "No Content");
+		statusLookup.put(400, "Bad Request");
 		statusLookup.put(500, "Internal Server Error");
 	}
 

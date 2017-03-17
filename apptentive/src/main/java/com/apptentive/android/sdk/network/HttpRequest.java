@@ -221,6 +221,8 @@ public class HttpRequest {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
 
+			retrying = false;
+
 			connection = openConnection(url);
 			connection.setRequestMethod(method.toString());
 			connection.setConnectTimeout((int) connectTimeout);
@@ -289,8 +291,6 @@ public class HttpRequest {
 		@Override
 		protected void execute() {
 			assertTrue(retrying);
-			retrying = false;
-
 			assertNotNull(requestManager);
 			requestManager.dispatchRequest(HttpRequest.this);
 		}
@@ -310,7 +310,6 @@ public class HttpRequest {
 
 		++retryCount;
 
-		assertFalse(retrying);
 		retrying = true;
 		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis());
 
@@ -435,8 +434,8 @@ public class HttpRequest {
 				responseCode,
 				responseData,
 				responseHeaders);
-		} catch (IOException e) {
-			ApptentiveLog.e("", e);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting request string representation");
 		}
 		return null;
 	}
@@ -491,6 +490,14 @@ public class HttpRequest {
 
 	public String getResponseData() {
 		return responseData;
+	}
+
+	public HttpRequest setRetryPolicy(HttpRequestRetryPolicy retryPolicy) {
+		if (retryPolicy == null) {
+			throw new IllegalArgumentException("Retry policy is null");
+		}
+		this.retryPolicy = retryPolicy;
+		return this;
 	}
 
 	/* For unit testing */
