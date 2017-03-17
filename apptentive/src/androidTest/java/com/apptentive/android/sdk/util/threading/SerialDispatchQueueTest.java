@@ -22,12 +22,14 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
+		super.setUp();
 		dispatchQueue = DispatchQueue.createBackgroundQueue("Test Queue", DispatchQueueType.Serial);
 	}
 
 	@After
 	public void tearDown() {
 		dispatchQueue.stop();
+		super.tearDown();
 	}
 
 	@Test
@@ -62,6 +64,7 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 			@Override
 			protected void execute() {
 				sleep(500);
+				dispatchQueue.stop();
 				addResult("task-1");
 			}
 		});
@@ -71,7 +74,6 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 				addResult("task-2");
 			}
 		});
-		dispatchQueue.stop();
 		sleep(1000); // wait for the first task to finish
 
 		assertResult("task-1"); // task-2 should not run

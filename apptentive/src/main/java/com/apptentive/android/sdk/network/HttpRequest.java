@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.network;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -17,7 +18,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.NETWORK;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.debug.Assert.*;
 
 /**
  * Class representing async HTTP request
@@ -35,9 +37,19 @@ public class HttpRequest {
 	private static final long DEFAULT_READ_TIMEOUT_MILLIS = 45 * 1000L;
 
 	/**
+	 * Default retry policy (used if a custom one is not specified)
+	 */
+	private static final HttpRequestRetryPolicy DEFAULT_RETRY_POLICY = new HttpRequestRetryPolicy();
+
+	/**
 	 * Id-number of the next request
 	 */
 	private static int nextRequestId;
+
+	/**
+	 * Parent request manager
+	 */
+	HttpRequestManager requestManager;
 
 	/**
 	 * Url-connection for network communications
@@ -104,6 +116,21 @@ public class HttpRequest {
 	 */
 	private String errorMessage;
 
+	/**
+	 * Retry policy for this request
+	 */
+	private HttpRequestRetryPolicy retryPolicy = DEFAULT_RETRY_POLICY;
+
+	/**
+	 * How many times request was retried already
+	 */
+	private int retryAttemptCount;
+
+	/**
+	 * Flag indicating if the request is currently scheduled for a retry
+	 */
+	boolean retrying;
+
 	@SuppressWarnings("rawtypes")
 	private Listener listener;
 
@@ -157,7 +184,10 @@ public class HttpRequest {
 	////////////////////////////////////////////////////////////////
 	// Request async task
 
-	void dispatchSync() {
+	/**
+	 * Send request synchronously on a background network queue
+	 */
+	void dispatchSync(DispatchQueue networkQueue) {
 		long requestStartTime = System.currentTimeMillis();
 
 		try {
@@ -171,6 +201,11 @@ public class HttpRequest {
 		}
 
 		ApptentiveLog.d(NETWORK, "Request finished in %d ms", System.currentTimeMillis() - requestStartTime);
+
+		// attempt a retry if request failed
+		if (isFailed() && retryRequest(networkQueue, responseCode)) { // we schedule request retry on the same queue as it was originally dispatched
+			return;
+		}
 
 		// use custom callback queue (if any)
 		if (callbackQueue != null) {
@@ -189,6 +224,8 @@ public class HttpRequest {
 		try {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
+
+			retrying = false;
 
 			connection = openConnection(url);
 			connection.setRequestMethod(method.toString());
@@ -236,7 +273,7 @@ public class HttpRequest {
 				responseData = readResponse(connection.getInputStream(), gzipped);
 				ApptentiveLog.v(NETWORK, "Response: %s", responseData);
 			} else {
-				errorMessage = String.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
+				errorMessage = StringUtils.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseData = readResponse(connection.getErrorStream(), gzipped);
 				ApptentiveLog.w(NETWORK, "Response: %s", responseData);
 			}
@@ -251,6 +288,41 @@ public class HttpRequest {
 			closeConnection();
 		}
 	}
+
+	//region Retry
+
+	private final DispatchTask retryDispatchTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			assertTrue(retrying);
+			assertNotNull(requestManager);
+			requestManager.dispatchRequest(HttpRequest.this);
+		}
+	};
+
+	private boolean retryRequest(DispatchQueue networkQueue, int responseCode) {
+		assertFalse(retryDispatchTask.isScheduled());
+
+		final int maxRetryCount = retryPolicy.getMaxRetryCount();
+		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryAttemptCount >= maxRetryCount) {
+			ApptentiveLog.v(NETWORK, "Request maximum retry limit reached (%d)", maxRetryCount);
+			return false;
+		}
+
+		if (!retryPolicy.shouldRetryRequest(responseCode)) {
+			ApptentiveLog.v(NETWORK, "Retry policy declined request retry");
+			return false;
+		}
+
+		++retryAttemptCount;
+
+		retrying = true;
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryAttemptCount));
+
+		return true;
+	}
+
+	//endregion
 
 	//region Connection
 
@@ -351,25 +423,25 @@ public class HttpRequest {
 	public String toString() {
 		try {
 			return String.format(
-					"\n" +
-							"Request:\n" +
-							"\t%s %s\n" +
-							"\t%s\n" +
-							"\t%s\n" +
-							"Response:\n" +
-							"\t%d\n" +
-							"\t%s\n" +
-							"\t%s",
+				"\n" +
+					"Request:\n" +
+					"\t%s %s\n" +
+					"\t%s\n" +
+					"\t%s\n" +
+					"Response:\n" +
+					"\t%d\n" +
+					"\t%s\n" +
+					"\t%s",
 				/* Request */
-					method.name(), urlString,
-					requestProperties,
-					new String(createRequestData()),
+				method.name(), urlString,
+				requestProperties,
+				new String(createRequestData()),
 				/* Response */
-					responseCode,
-					responseData,
-					responseHeaders);
-		} catch (IOException e) {
-			ApptentiveLog.e("", e);
+				responseCode,
+				responseData,
+				responseHeaders);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting request string representation");
 		}
 		return null;
 	}
@@ -398,6 +470,10 @@ public class HttpRequest {
 		return responseCode >= 200 && responseCode < 300;
 	}
 
+	public boolean isFailed() {
+		return !isSuccessful() && !isCancelled();
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -420,6 +496,14 @@ public class HttpRequest {
 
 	public String getResponseData() {
 		return responseData;
+	}
+
+	public HttpRequest setRetryPolicy(HttpRequestRetryPolicy retryPolicy) {
+		if (retryPolicy == null) {
+			throw new IllegalArgumentException("Retry policy is null");
+		}
+		this.retryPolicy = retryPolicy;
+		return this;
 	}
 
 	/* For unit testing */

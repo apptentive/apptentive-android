@@ -33,7 +33,7 @@ class MockHttpJsonRequest extends HttpJsonRequest {
 	}
 
 	public MockHttpJsonRequest setMockResponseData(String responseData) {
-		connection.responseData = responseData;
+		connection.setMockResponseData(responseData);
 		return this;
 	}
 }

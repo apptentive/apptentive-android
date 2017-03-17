@@ -8,6 +8,8 @@ package com.apptentive.android.sdk;
 
 import android.os.SystemClock;
 
+import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.debug.AssertImp;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
@@ -21,6 +23,23 @@ public class TestCaseBase {
 	private List<String> result = new ArrayList<>();
 	private MockDispatchQueue dispatchQueue;
 
+	//region Setup
+
+	protected void setUp() {
+		Assert.setImp(new AssertImp() {
+			@Override
+			public void assertFailed(String message) {
+				throw new AssertionError(message);
+			}
+		});
+	}
+
+	protected void tearDown() {
+		Assert.setImp(null);
+	}
+
+	//endregion
+
 	//region Results
 
 	protected void addResult(String str) {
@@ -28,13 +47,14 @@ public class TestCaseBase {
 	}
 
 	protected void assertResult(String... expected) {
-		assertEquals("\nExpected: " + StringUtils.join(expected) +
-			"\nActual: " + StringUtils.join(result), expected.length, result.size());
+		// Make sure the expected and result sets contain the same number of items
+		if (expected.length != result.size()) {
+			fail(String.format("Expected: [%s], Actual: [%s]", StringUtils.join(expected), StringUtils.join(result)));
+		}
 
+		// Make sure the order and values are the same as well
 		for (int i = 0; i < expected.length; ++i) {
-			assertEquals("\nExpected: " + StringUtils.join(expected) +
-					"\nActual: " + StringUtils.join(result),
-				expected[i], result.get(i));
+			assertEquals(String.format("Expected: [%s], Actual: [%s],", StringUtils.join(expected), StringUtils.join(result)), expected[i], result.get(i));
 		}
 
 		result.clear();

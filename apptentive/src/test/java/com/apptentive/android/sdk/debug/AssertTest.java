@@ -45,6 +45,22 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 	}
 
 	@Test
+	public void testAssertFalse() throws Exception {
+		AssertEx.assertFalse(false);
+		AssertEx.assertFalse(true);
+		AssertEx.assertFalse(false, "");
+		AssertEx.assertFalse(true, "assertFalse(boolean,String)");
+		AssertEx.assertFalse(false, "", new Object());
+		AssertEx.assertFalse(true, "assertFalse(boolean,String,Object...)");
+
+		assertResult(
+			"Expected 'false' but was 'true'",
+			"assertFalse(boolean,String)",
+			"assertFalse(boolean,String,Object...)"
+		);
+	}
+
+	@Test
 	public void testAssertNotNull() throws Exception {
 		AssertEx.assertNotNull(new Object());
 		AssertEx.assertNotNull(null);
@@ -57,6 +73,22 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 			"Not-null expected",
 			"assertNotNull(Object,String)",
 			"assertNotNull(Object,String,Object...)"
+		);
+	}
+
+	@Test
+	public void testAssertNull() throws Exception {
+		AssertEx.assertNull(null);
+		AssertEx.assertNull("foo");
+		AssertEx.assertNull(null);
+		AssertEx.assertNull("foo", "assertNull(Object,String)");
+		AssertEx.assertNull(null, "", new Object());
+		AssertEx.assertNull("foo", "assertNull(Object,String,Object...)");
+
+		assertResult(
+			"Expected 'null' but was 'foo'",
+			"assertNull(Object,String)",
+			"assertNull(Object,String,Object...)"
 		);
 	}
 

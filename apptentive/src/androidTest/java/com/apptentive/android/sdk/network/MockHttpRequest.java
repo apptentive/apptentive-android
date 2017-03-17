@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.network;
 
+import com.apptentive.android.sdk.network.MockHttpURLConnection.ResponseHandler;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,13 +32,18 @@ class MockHttpRequest extends HttpRequest {
 		return this;
 	}
 
+	public MockHttpRequest setMockResponseHandler(ResponseHandler handler) {
+		connection.setMockResponseHandler(handler);
+		return this;
+	}
+
 	public MockHttpRequest setMockResponseCode(int mockResponseCode) {
 		connection.setMockResponseCode(mockResponseCode);
 		return this;
 	}
 
 	public MockHttpRequest setResponseData(String responseData) {
-		connection.responseData = responseData;
+		connection.setMockResponseData(responseData);
 		return this;
 	}
 

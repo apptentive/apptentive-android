@@ -47,22 +47,22 @@ public class ApptentiveHttpClient {
 
 	//region API Requests
 
-	public void getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		HttpJsonRequest request = createJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest);
-		request.setListener(listener);
-		httpRequestManager.startRequest(request);
+	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, listener);
 	}
 
 	//endregion
 
 	//region Helpers
 
-	private HttpJsonRequest createJsonRequest(String uri, JSONObject jsonObject) {
-		String url = createEndpointURL(uri);
+	private HttpJsonRequest startJsonRequest(String endpoint, JSONObject jsonObject, HttpRequest.Listener<HttpJsonRequest> listener) {
+		String url = createEndpointURL(endpoint);
 		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
 		setupRequestDefaults(request);
 		request.setMethod(HttpRequestMethod.POST);
 		request.setRequestProperty("Content-Type", "application/json");
+		request.setListener(listener);
+		httpRequestManager.startRequest(request);
 		return request;
 	}
 

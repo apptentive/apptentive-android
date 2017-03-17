@@ -12,7 +12,9 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -22,6 +24,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -34,6 +37,9 @@ import static org.mockito.Matchers.any;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
 public class ConversationTest {
+
+	@Rule
+	public TemporaryFolder conversationFolder = new TemporaryFolder();
 
 	@Before
 	public void setup() {
@@ -96,7 +102,7 @@ public class ConversationTest {
 			assertEquals(expected.getMessageCenterPendingAttachments(), result.getMessageCenterPendingAttachments());
 			assertEquals(expected.getTargets(), result.getTargets());
 			assertEquals(expected.getInteractions(), result.getInteractions());
-			assertEquals(expected.getInteractionExpiration(), result.getInteractionExpiration());
+			assertEquals(expected.getInteractionExpiration(), result.getInteractionExpiration(), 0.000001);
 
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -108,21 +114,33 @@ public class ConversationTest {
 		}
 	}
 
-	private boolean listenerFired;
+	private boolean listenerFired; // TODO: get rid of this field and make it test "local"
 
 	@Test
-	public void testListeners() {
+	public void testDataChangeListeners() throws Exception {
+		Conversation conversation = new Conversation();
+		testConversationListeners(conversation);
+	}
 
-		DataChangedListener listener = new DataChangedListener() {
+	@Test
+	public void testDataChangeListenersWhenDeserialized() throws Exception {
+		Conversation conversation = new Conversation();
+
+		File conversationFile = new File(conversationFolder.getRoot(), "conversation.bin");
+		new FileSerializer(conversationFile).serialize(conversation);
+
+		conversation = (Conversation) new FileSerializer(conversationFile).deserialize();
+		testConversationListeners(conversation);
+	}
+
+	private void testConversationListeners(Conversation conversation) {
+		conversation.setDataChangedListener(new DataChangedListener() {
 			@Override
 			public void onDataChanged() {
 				listenerFired = true;
 			}
-		};
-
-		Conversation conversation = new Conversation();
-		conversation.setDataChangedListener(listener);
-		assertFalse(listenerFired);
+		});
+		listenerFired = false;
 
 		conversation.setConversationToken("foo");
 		assertTrue(listenerFired);
@@ -307,7 +325,6 @@ public class ConversationTest {
 		conversation.getVersionHistory().updateVersionHistory(100D, 1, "1");
 		assertTrue(listenerFired);
 		listenerFired = false;
-
 
 		conversation.getEventData().storeEventForCurrentAppVersion(100D, 10, "1.0", "foo");
 		assertTrue(listenerFired);
