@@ -26,7 +26,7 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 	}
 
 	@After
-	protected void tearDown() {
+	public void tearDown() {
 		super.tearDown();
 	}
 

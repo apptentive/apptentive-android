@@ -23,7 +23,7 @@ public class DispatchQueueTest extends TestCaseBase {
 	}
 
 	@After
-	protected void tearDown() {
+	public void tearDown() {
 		super.tearDown();
 	}
 

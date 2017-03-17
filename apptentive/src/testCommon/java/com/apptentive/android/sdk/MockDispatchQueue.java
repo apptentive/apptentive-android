@@ -49,7 +49,7 @@ public class MockDispatchQueue extends DispatchQueue {
 	private static void overrideMainQueue(DispatchQueue queue) {
 		try {
 			Class<?> holderClass = DispatchQueue.class.getDeclaredClasses()[0];
-			Field instanceField = holderClass.getDeclaredField("INSTANCE");
+			Field instanceField = holderClass.getDeclaredField("MAIN_QUEUE");
 			instanceField.setAccessible(true);
 
 			Field modifiersField = Field.class.getDeclaredField("modifiers");
