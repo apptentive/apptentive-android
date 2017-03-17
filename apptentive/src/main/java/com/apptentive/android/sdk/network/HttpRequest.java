@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.network;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -126,7 +127,7 @@ public class HttpRequest {
 	private int retryAttemptCount;
 
 	/**
-	 * Flag indicating if the request is currently retrying
+	 * Flag indicating if the request is currently scheduled for a retry
 	 */
 	boolean retrying;
 
@@ -183,6 +184,9 @@ public class HttpRequest {
 	////////////////////////////////////////////////////////////////
 	// Request async task
 
+	/**
+	 * Send request synchronously on a background network queue
+	 */
 	void dispatchSync(DispatchQueue networkQueue) {
 		long requestStartTime = System.currentTimeMillis();
 
@@ -199,7 +203,7 @@ public class HttpRequest {
 		ApptentiveLog.d(NETWORK, "Request finished in %d ms", System.currentTimeMillis() - requestStartTime);
 
 		// attempt a retry if request failed
-		if (isFailed() && retryRequest(networkQueue, responseCode)) {
+		if (isFailed() && retryRequest(networkQueue, responseCode)) { // we schedule request retry on the same queue as it was originally dispatched
 			return;
 		}
 
@@ -269,7 +273,7 @@ public class HttpRequest {
 				responseData = readResponse(connection.getInputStream(), gzipped);
 				ApptentiveLog.v(NETWORK, "Response: %s", responseData);
 			} else {
-				errorMessage = String.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
+				errorMessage = StringUtils.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseData = readResponse(connection.getErrorStream(), gzipped);
 				ApptentiveLog.w(NETWORK, "Response: %s", responseData);
 			}
@@ -297,6 +301,8 @@ public class HttpRequest {
 	};
 
 	private boolean retryRequest(DispatchQueue networkQueue, int responseCode) {
+		assertFalse(retryDispatchTask.isScheduled());
+
 		final int maxRetryCount = retryPolicy.getMaxRetryCount();
 		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryAttemptCount >= maxRetryCount) {
 			ApptentiveLog.v(NETWORK, "Request maximum retry limit reached (%d)", maxRetryCount);

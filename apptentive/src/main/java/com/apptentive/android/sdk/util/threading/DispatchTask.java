@@ -38,7 +38,7 @@ public abstract class DispatchTask implements Runnable {
 		this.scheduled = scheduled;
 	}
 
-	synchronized boolean isScheduled() {
+	public synchronized boolean isScheduled() {
 		return scheduled;
 	}
 }
