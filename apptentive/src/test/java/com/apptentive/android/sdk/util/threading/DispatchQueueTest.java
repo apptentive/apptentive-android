@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.util.threading;
 
 import com.apptentive.android.sdk.TestCaseBase;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +18,13 @@ public class DispatchQueueTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
+		super.setUp();
 		overrideMainQueue(false);
+	}
+
+	@After
+	protected void tearDown() {
+		super.tearDown();
 	}
 
 	@Test

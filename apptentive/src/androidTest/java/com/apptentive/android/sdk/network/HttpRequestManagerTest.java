@@ -20,6 +20,8 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
+		super.setUp();
+
 		networkQueue = new MockDispatchQueue(false);
 		requestManager = new HttpRequestManager(networkQueue);
 	}
@@ -27,6 +29,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 	@After
 	public void tearDown() {
 		requestManager.cancelAll();
+		super.tearDown();
 	}
 
 	@Test
