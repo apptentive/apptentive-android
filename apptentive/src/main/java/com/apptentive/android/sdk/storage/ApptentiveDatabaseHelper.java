@@ -150,6 +150,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		fileDir = context.getFilesDir();
 	}
 
+	//region Create & Upgrade
+
 	/**
 	 * This function is called only for new installs, and onUpgrade is not called in that case. Therefore, you must include the
 	 * latest complete set of DDL here.
@@ -163,25 +165,155 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
 	}
 
-	public void ensureClosed(SQLiteDatabase db) {
-		try {
-			if (db != null) {
-				db.close();
-			}
-		} catch (Exception e) {
-			ApptentiveLog.w("Error closing SQLite database.", e);
+	/**
+	 * This method is called when an app is upgraded. Add alter table statements here for each version in a non-breaking
+	 * switch, so that all the necessary upgrades occur for each older version.
+	 */
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		switch (oldVersion) {
+			case 1:
+				if (newVersion == 2) {
+					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+					migrateToCompoundMessage(db);
+				}
 		}
 	}
 
-	public void ensureClosed(Cursor cursor) {
+	private void migrateToCompoundMessage(SQLiteDatabase db) {
+		Cursor cursor = null;
+		// Migrate legacy stored files to compound message associated files
 		try {
-			if (cursor != null) {
-				cursor.close();
+			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
+			if (cursor.moveToFirst()) {
+				do {
+					String file_nonce = cursor.getString(0);
+					// Stored File id was in the format of "apptentive-file-nonce"
+					String patten = "apptentive-file-";
+					String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
+					ContentValues values = new ContentValues();
+					values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, nonce);
+					// Legacy file was stored in db by name only. Need to get the full path when migrated
+					String localFileName = cursor.getString(3);
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, (new File(fileDir, localFileName).getAbsolutePath()));
+					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
+					// Original file name might not be stored, i.e. sent by API, in which case, local stored file name will be used.
+					String originalFileName = cursor.getString(2);
+					if (TextUtils.isEmpty(originalFileName)) {
+						originalFileName = localFileName;
+					}
+					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, originalFileName);
+					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
+					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
+					db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
+
+				} while (cursor.moveToNext());
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w("Error closing SQLite cursor.", e);
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+		} finally {
+			ensureClosed(cursor);
+		}
+		// Migrate legacy message types to CompoundMessage Type
+		try {
+			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
+			if (cursor.moveToFirst()) {
+				do {
+					String json = cursor.getString(6);
+					JSONObject root = null;
+					boolean bUpdateRecord = false;
+					try {
+						root = new JSONObject(json);
+						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+						switch (type) {
+							case TextMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								bUpdateRecord = true;
+								break;
+							case FileMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
+								bUpdateRecord = true;
+								break;
+							case AutomatedMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
+								bUpdateRecord = true;
+								break;
+							default:
+								break;
+						}
+						if (bUpdateRecord) {
+							String databaseId = cursor.getString(0);
+							ContentValues messageValues = new ContentValues();
+							messageValues.put(MESSAGE_KEY_JSON, root.toString());
+							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
+						}
+					} catch (JSONException e) {
+						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+					}
+				} while (cursor.moveToNext());
+			}
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+		} finally {
+			ensureClosed(cursor);
+		}
+
+		// Migrate all pending payload messages
+		// Migrate legacy message types to CompoundMessage Type
+		try {
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.BaseType.message.name()});
+			if (cursor.moveToFirst()) {
+				do {
+					String json = cursor.getString(2);
+					JSONObject root;
+					boolean bUpdateRecord = false;
+					try {
+						root = new JSONObject(json);
+						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
+						switch (type) {
+							case TextMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								bUpdateRecord = true;
+								break;
+							case FileMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
+								bUpdateRecord = true;
+								break;
+							case AutomatedMessage:
+								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
+								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
+								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
+								bUpdateRecord = true;
+								break;
+							default:
+								break;
+						}
+						if (bUpdateRecord) {
+							String databaseId = cursor.getString(0);
+							ContentValues messageValues = new ContentValues();
+							messageValues.put(PAYLOAD_KEY_JSON, root.toString());
+							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
+						}
+					} catch (JSONException e) {
+						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+					}
+				} while (cursor.moveToNext());
+			}
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+		} finally {
+			ensureClosed(cursor);
 		}
 	}
+
+	//endregion
 
 	//region Payloads
 
@@ -381,157 +513,17 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region Upgrade
+	// region Helpers
 
-	/**
-	 * This method is called when an app is upgraded. Add alter table statements here for each version in a non-breaking
-	 * switch, so that all the necessary upgrades occur for each older version.
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
-		switch (oldVersion) {
-			case 1:
-				if (newVersion == 2) {
-					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
-					migrateToCompoundMessage(db);
-				}
+	private void ensureClosed(Cursor cursor) {
+		try {
+			if (cursor != null) {
+				cursor.close();
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error closing SQLite cursor.", e);
 		}
 	}
-
-	private void migrateToCompoundMessage(SQLiteDatabase db) {
-		Cursor cursor = null;
-		// Migrate legacy stored files to compound message associated files
-		try {
-			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
-			if (cursor.moveToFirst()) {
-				do {
-					String file_nonce = cursor.getString(0);
-					// Stored File id was in the format of "apptentive-file-nonce"
-					String patten = "apptentive-file-";
-					String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
-					ContentValues values = new ContentValues();
-					values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, nonce);
-					// Legacy file was stored in db by name only. Need to get the full path when migrated
-					String localFileName = cursor.getString(3);
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, (new File(fileDir, localFileName).getAbsolutePath()));
-					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
-					// Original file name might not be stored, i.e. sent by API, in which case, local stored file name will be used.
-					String originalFileName = cursor.getString(2);
-					if (TextUtils.isEmpty(originalFileName)) {
-						originalFileName = localFileName;
-					}
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, originalFileName);
-					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
-					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
-					db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
-
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-		// Migrate legacy message types to CompoundMessage Type
-		try {
-			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
-			if (cursor.moveToFirst()) {
-				do {
-					String json = cursor.getString(6);
-					JSONObject root = null;
-					boolean bUpdateRecord = false;
-					try {
-						root = new JSONObject(json);
-						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
-						switch (type) {
-							case TextMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								bUpdateRecord = true;
-								break;
-							case FileMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
-								bUpdateRecord = true;
-								break;
-							case AutomatedMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
-								bUpdateRecord = true;
-								break;
-							default:
-								break;
-						}
-						if (bUpdateRecord) {
-							String databaseId = cursor.getString(0);
-							ContentValues messageValues = new ContentValues();
-							messageValues.put(MESSAGE_KEY_JSON, root.toString());
-							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
-						}
-					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
-					}
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-
-		// Migrate all pending payload messages
-		// Migrate legacy message types to CompoundMessage Type
-		try {
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.BaseType.message.name()});
-			if (cursor.moveToFirst()) {
-				do {
-					String json = cursor.getString(2);
-					JSONObject root;
-					boolean bUpdateRecord = false;
-					try {
-						root = new JSONObject(json);
-						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
-						switch (type) {
-							case TextMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								bUpdateRecord = true;
-								break;
-							case FileMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
-								bUpdateRecord = true;
-								break;
-							case AutomatedMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
-								bUpdateRecord = true;
-								break;
-							default:
-								break;
-						}
-						if (bUpdateRecord) {
-							String databaseId = cursor.getString(0);
-							ContentValues messageValues = new ContentValues();
-							messageValues.put(PAYLOAD_KEY_JSON, root.toString());
-							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
-						}
-					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
-					}
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-	}
-
-	//endregion
 
 	public void reset(Context context) {
 		/**
@@ -540,4 +532,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		 */
 		context.deleteDatabase(DATABASE_NAME);
 	}
+
+	//endregion
 }
