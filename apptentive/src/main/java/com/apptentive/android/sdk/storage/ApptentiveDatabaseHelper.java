@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,7 +16,9 @@ import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadFactory;
+import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
@@ -30,37 +32,38 @@ import java.util.List;
 
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
- *
- * @author Sky Kelsey
  */
 public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
-	// COMMON
 	private static final int DATABASE_VERSION = 2;
 	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
+	private File fileDir; // data dir of the application
 
-	// PAYLOAD
+	//region Payload SQL
+
 	public static final String TABLE_PAYLOAD = "payload";
 	public static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
 	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
 	public static final String PAYLOAD_KEY_JSON = "json";           // 2
 
 	private static final String TABLE_CREATE_PAYLOAD =
-			"CREATE TABLE " + TABLE_PAYLOAD +
-					" (" +
-					PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
-					PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
-					PAYLOAD_KEY_JSON + " TEXT" +
-					");";
+		"CREATE TABLE " + TABLE_PAYLOAD +
+			" (" +
+			PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
+			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
+			PAYLOAD_KEY_JSON + " TEXT" +
+			");";
 
 	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
 
+	//endregion
 
-	// MESSAGE
+	//region Message SQL
+
 	private static final String TABLE_MESSAGE = "message";
 	private static final String MESSAGE_KEY_DB_ID = "_id";                           // 0
 	private static final String MESSAGE_KEY_ID = "id";                               // 1
@@ -71,16 +74,16 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final String MESSAGE_KEY_JSON = "json";                           // 6
 
 	private static final String TABLE_CREATE_MESSAGE =
-			"CREATE TABLE " + TABLE_MESSAGE +
-					" (" +
-					MESSAGE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
-					MESSAGE_KEY_ID + " TEXT, " +
-					MESSAGE_KEY_CLIENT_CREATED_AT + " DOUBLE, " +
-					MESSAGE_KEY_NONCE + " TEXT, " +
-					MESSAGE_KEY_STATE + " TEXT, " +
-					MESSAGE_KEY_READ + " INTEGER, " +
-					MESSAGE_KEY_JSON + " TEXT" +
-					");";
+		"CREATE TABLE " + TABLE_MESSAGE +
+			" (" +
+			MESSAGE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
+			MESSAGE_KEY_ID + " TEXT, " +
+			MESSAGE_KEY_CLIENT_CREATED_AT + " DOUBLE, " +
+			MESSAGE_KEY_NONCE + " TEXT, " +
+			MESSAGE_KEY_STATE + " TEXT, " +
+			MESSAGE_KEY_READ + " INTEGER, " +
+			MESSAGE_KEY_JSON + " TEXT" +
+			");";
 
 	private static final String QUERY_MESSAGE_GET_BY_NONCE = "SELECT * FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_NONCE + " = ?";
 	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
@@ -88,7 +91,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + ApptentiveMessage.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
 	private static final String QUERY_MESSAGE_UNREAD = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_READ + " = " + FALSE + " AND " + MESSAGE_KEY_ID + " NOTNULL";
 
-	// FileStore
+	//endregion
+
+	//region File SQL
+
 	private static final String TABLE_FILESTORE = "file_store";
 	private static final String FILESTORE_KEY_ID = "id";                         // 0
 	private static final String FILESTORE_KEY_MIME_TYPE = "mime_type";           // 1
@@ -96,15 +102,18 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final String FILESTORE_KEY_LOCAL_URL = "local_uri";           // 3
 	private static final String FILESTORE_KEY_APPTENTIVE_URL = "apptentive_uri"; // 4
 	private static final String TABLE_CREATE_FILESTORE =
-			"CREATE TABLE " + TABLE_FILESTORE +
-					" (" +
-					FILESTORE_KEY_ID + " TEXT PRIMARY KEY, " +
-					FILESTORE_KEY_MIME_TYPE + " TEXT, " +
-					FILESTORE_KEY_ORIGINAL_URL + " TEXT, " +
-					FILESTORE_KEY_LOCAL_URL + " TEXT, " +
-					FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
-					");";
+		"CREATE TABLE " + TABLE_FILESTORE +
+			" (" +
+			FILESTORE_KEY_ID + " TEXT PRIMARY KEY, " +
+			FILESTORE_KEY_MIME_TYPE + " TEXT, " +
+			FILESTORE_KEY_ORIGINAL_URL + " TEXT, " +
+			FILESTORE_KEY_LOCAL_URL + " TEXT, " +
+			FILESTORE_KEY_APPTENTIVE_URL + " TEXT" +
+			");";
 
+	//endregion
+
+	//region Compound Message FileStore SQL
 	/* Compound Message FileStore:
 	 * For Compound Messages stored in TABLE_MESSAGE, each associated file will add a row to this table
 	 * using the message's "nonce" key
@@ -119,22 +128,40 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final String COMPOUND_FILESTORE_KEY_CREATION_TIME = "creation_time"; // creation time of the original file
 	// Create the initial table. Use nonce and local cache path as primary key because both sent/received files will have a local cached copy
 	private static final String TABLE_CREATE_COMPOUND_FILESTORE =
-			"CREATE TABLE " + TABLE_COMPOUND_MESSAGE_FILESTORE +
-					" (" +
-					COMPOUND_FILESTORE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
-					COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_MIME_TYPE + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
-					COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG" +
-					");";
+		"CREATE TABLE " + TABLE_COMPOUND_MESSAGE_FILESTORE +
+			" (" +
+			COMPOUND_FILESTORE_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
+			COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " TEXT, " +
+			COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH + " TEXT, " +
+			COMPOUND_FILESTORE_KEY_MIME_TYPE + " TEXT, " +
+			COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI + " TEXT, " +
+			COMPOUND_FILESTORE_KEY_REMOTE_URL + " TEXT, " +
+			COMPOUND_FILESTORE_KEY_CREATION_TIME + " LONG" +
+			");";
 
 	// Query all files associated with a given compound message nonce id
 	private static final String QUERY_MESSAGE_FILES_GET_BY_NONCE = "SELECT * FROM " + TABLE_COMPOUND_MESSAGE_FILESTORE + " WHERE " + COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?";
 
-	private File fileDir; // data dir of the application
+	// endregion
 
+
+	public ApptentiveDatabaseHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		fileDir = context.getFilesDir();
+	}
+
+	/**
+	 * This function is called only for new installs, and onUpgrade is not called in that case. Therefore, you must include the
+	 * latest complete set of DDL here.
+	 */
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		ApptentiveLog.d("ApptentiveDatabase.onCreate(db)");
+		db.execSQL(TABLE_CREATE_PAYLOAD);
+		db.execSQL(TABLE_CREATE_MESSAGE);
+		db.execSQL(TABLE_CREATE_FILESTORE);
+		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+	}
 
 	public void ensureClosed(SQLiteDatabase db) {
 		try {
@@ -156,41 +183,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public ApptentiveDatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		fileDir = context.getFilesDir();
-	}
-
-	/**
-	 * This function is called only for new installs, and onUpgrade is not called in that case. Therefore, you must include the
-	 * latest complete set of DDL here.
-	 */
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		ApptentiveLog.d("ApptentiveDatabase.onCreate(db)");
-		db.execSQL(TABLE_CREATE_PAYLOAD);
-		db.execSQL(TABLE_CREATE_MESSAGE);
-		db.execSQL(TABLE_CREATE_FILESTORE);
-		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
-	}
-
-	/**
-	 * This method is called when an app is upgraded. Add alter table statements here for each version in a non-breaking
-	 * switch, so that all the necessary upgrades occur for each older version.
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
-		switch (oldVersion) {
-			case 1:
-				if (newVersion == 2) {
-					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
-					migrateToCompoundMessage(db);
-				}
-		}
-	}
-
-	// PAYLOAD: This table is used to store all the Payloads we want to send to the server.
+	//region Payloads
 
 	/**
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
@@ -267,7 +260,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	// MessageStore
+	//endregion
+
+	//region Messages
 
 	public synchronized int getUnreadMessageCount() {
 		SQLiteDatabase db = null;
@@ -305,10 +300,105 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	//endregion
 
-	//
-	// File Store
-	//
+	//region Files
+
+	public void deleteAssociatedFiles(String messageNonce) {
+		SQLiteDatabase db = null;
+		try {
+			db = getWritableDatabase();
+			int deleted = db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+			ApptentiveLog.d("Deleted %d stored files.", deleted);
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
+		}
+	}
+
+	public List<StoredFile> getAssociatedFiles(String nonce) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
+		try {
+			db = getReadableDatabase();
+			cursor = db.rawQuery(QUERY_MESSAGE_FILES_GET_BY_NONCE, new String[]{nonce});
+			StoredFile ret;
+			if (cursor.moveToFirst()) {
+				do {
+					ret = new StoredFile();
+					ret.setId(nonce);
+					ret.setLocalFilePath(cursor.getString(2));
+					ret.setMimeType(cursor.getString(3));
+					ret.setSourceUriOrPath(cursor.getString(4));
+					ret.setApptentiveUri(cursor.getString(5));
+					ret.setCreationTime(cursor.getLong(6));
+					associatedFiles.add(ret);
+				} while (cursor.moveToNext());
+			}
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
+		} finally {
+			ensureClosed(cursor);
+		}
+		return associatedFiles.size() > 0 ? associatedFiles : null;
+	}
+
+	/*
+	 * Add a list of associated files to compound message file storage
+	 * Caller of this method should ensure all associated files have the same message nonce
+	 * @param associatedFiles list of associated files
+	 * @return true if succeed
+	 */
+	public boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
+		String messageNonce = associatedFiles.get(0).getId();
+		SQLiteDatabase db = null;
+		long ret = -1;
+		try {
+
+			db = getWritableDatabase();
+			db.beginTransaction();
+			// Always delete existing rows with the same nonce to ensure add/update both work
+			db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
+
+			for (StoredFile file : associatedFiles) {
+				ContentValues values = new ContentValues();
+				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());
+				values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, file.getMimeType());
+				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getSourceUriOrPath());
+				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
+				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
+				ret = db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
+			}
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		} catch (SQLException sqe) {
+			ApptentiveLog.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
+		} finally {
+			return ret != -1;
+		}
+	}
+
+	//endregion
+
+	//region Upgrade
+
+	/**
+	 * This method is called when an app is upgraded. Add alter table statements here for each version in a non-breaking
+	 * switch, so that all the necessary upgrades occur for each older version.
+	 */
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		switch (oldVersion) {
+			case 1:
+				if (newVersion == 2) {
+					db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+					migrateToCompoundMessage(db);
+				}
+		}
+	}
+
 	private void migrateToCompoundMessage(SQLiteDatabase db) {
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
@@ -441,80 +531,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void deleteAssociatedFiles(String messageNonce) {
-		SQLiteDatabase db = null;
-		try {
-			db = getWritableDatabase();
-			int deleted = db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
-			ApptentiveLog.d("Deleted %d stored files.", deleted);
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
-		}
-	}
-
-	public List<StoredFile> getAssociatedFiles(String nonce) {
-		SQLiteDatabase db = null;
-		Cursor cursor = null;
-		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
-		try {
-			db = getReadableDatabase();
-			cursor = db.rawQuery(QUERY_MESSAGE_FILES_GET_BY_NONCE, new String[]{nonce});
-			StoredFile ret;
-			if (cursor.moveToFirst()) {
-				do {
-					ret = new StoredFile();
-					ret.setId(nonce);
-					ret.setLocalFilePath(cursor.getString(2));
-					ret.setMimeType(cursor.getString(3));
-					ret.setSourceUriOrPath(cursor.getString(4));
-					ret.setApptentiveUri(cursor.getString(5));
-					ret.setCreationTime(cursor.getLong(6));
-					associatedFiles.add(ret);
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-		return associatedFiles.size() > 0 ? associatedFiles : null;
-	}
-
-	/*
-	 * Add a list of associated files to compound message file storage
-	 * Caller of this method should ensure all associated files have the same message nonce
-	 * @param associatedFiles list of associated files
-	 * @return true if succeed
-	 */
-	public boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
-		String messageNonce = associatedFiles.get(0).getId();
-		SQLiteDatabase db = null;
-		long ret = -1;
-		try {
-
-			db = getWritableDatabase();
-			db.beginTransaction();
-			// Always delete existing rows with the same nonce to ensure add/update both work
-			db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
-
-			for (StoredFile file : associatedFiles) {
-				ContentValues values = new ContentValues();
-				values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, file.getId());
-				values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, file.getLocalFilePath());
-				values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, file.getMimeType());
-				values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, file.getSourceUriOrPath());
-				values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, file.getApptentiveUri());
-				values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, file.getCreationTime());
-				ret = db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
-			}
-			db.setTransactionSuccessful();
-			db.endTransaction();
-		} catch (SQLException sqe) {
-			ApptentiveLog.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
-		} finally {
-			return ret != -1;
-		}
-	}
+	//endregion
 
 	public void reset(Context context) {
 		/**
@@ -523,5 +540,4 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		 */
 		context.deleteDatabase(DATABASE_NAME);
 	}
-
 }
