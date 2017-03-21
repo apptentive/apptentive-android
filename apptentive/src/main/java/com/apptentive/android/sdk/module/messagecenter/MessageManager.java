@@ -105,35 +105,26 @@ public class MessageManager {
 	 */
 	public void startMessagePreFetchTask() {
 		// Defer message polling thread creation, if not created yet and host app receives a new message push
-		init();
-		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
-			private Exception e = null;
 
+		init();
+
+		final boolean updateMC = isMessageCenterInForeground();
+		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
 			@Override
-			protected Void doInBackground(Object... params) {
-				boolean updateMC = (Boolean) params[0];
+			protected void execute() {
 				try {
 					fetchAndStoreMessages(updateMC, false);
-				} catch (Exception e) {
-					this.e = e;
-				}
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void v) {
-				if (e != null) {
-					ApptentiveLog.w("Unhandled Exception thrown from fetching new message asyncTask", e);
-					MetricModule.sendError(e, null, null);
+				} catch (final Exception e) {
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							ApptentiveLog.w("Unhandled Exception thrown from fetching new message task", e);
+							MetricModule.sendError(e, null, null);
+						}
+					});
 				}
 			}
-		};
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, isMessageCenterInForeground());
-		} else {
-			task.execute(isMessageCenterInForeground());
-		}
+		});
 	}
 
 	/**
@@ -196,8 +187,7 @@ public class MessageManager {
 			}
 
 			// Send message to notify host app, such as unread message badge
-			DispatchQueue.mainQueue()
-					.dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
+			DispatchQueue.mainQueue().dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
 
 			return incomingUnreadMessages > 0;
 		}
