@@ -30,6 +30,8 @@ import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +53,6 @@ public class MessageManager {
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
-	private static final int UI_THREAD_MESSAGE_ON_UNREAD_HOST = 1;
 	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
 	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
 
@@ -72,6 +73,13 @@ public class MessageManager {
 	private MessagePollingWorker pollingWorker;
 
 
+	private final MessageCountDispatchTask unreadHostNotifierTask = new MessageCountDispatchTask() {
+		@Override
+		protected void execute() {
+			notifyHostUnreadMessagesListeners(getMessageCount());
+		}
+	};
+
 	public MessageManager() {
 
 	}
@@ -83,9 +91,6 @@ public class MessageManager {
 				@Override
 				public void handleMessage(android.os.Message msg) {
 					switch (msg.what) {
-						case UI_THREAD_MESSAGE_ON_UNREAD_HOST:
-							notifyHostUnreadMessagesListeners(msg.arg1);
-							break;
 						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
 							// Notify internal listeners such as Message Center
 							CompoundMessage msgToAdd = (CompoundMessage) msg.obj;
@@ -210,9 +215,8 @@ public class MessageManager {
 				}
 			}
 			// Send message to notify host app, such as unread message badge
-			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(), 0);
-			uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
-			msg.sendToTarget();
+			DispatchQueue.mainQueue()
+					.dispatchAsyncOnce(unreadHostNotifierTask.setMessageCount(getUnreadMessageCount()));
 
 			return incomingUnreadMessages > 0;
 		}
@@ -395,7 +399,7 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			internalNewMessagesListeners.add(new WeakReference<OnNewIncomingMessagesListener>(newlistener));
+			internalNewMessagesListeners.add(new WeakReference<>(newlistener));
 		}
 	}
 
@@ -416,7 +420,7 @@ public class MessageManager {
 	public void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
 		clearHostUnreadMessagesListeners();
 		if (listener != null) {
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(listener));
+			hostUnreadMessagesListeners.add(new WeakReference<>(listener));
 		}
 	}
 
@@ -433,7 +437,7 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newListener));
+			hostUnreadMessagesListeners.add(new WeakReference<>(newListener));
 		}
 	}
 
@@ -510,4 +514,22 @@ public class MessageManager {
 			pollingWorker.appWentToBackground();
 		}
 	}
+
+	//region Message Dispatch Task
+
+	private abstract static class MessageCountDispatchTask extends DispatchTask
+	{
+		private int messageCount;
+
+		public MessageCountDispatchTask setMessageCount(int messageCount) {
+			this.messageCount = messageCount;
+			return this;
+		}
+
+		protected int getMessageCount() {
+			return messageCount;
+		}
+	}
+
+	//endregion
 }
