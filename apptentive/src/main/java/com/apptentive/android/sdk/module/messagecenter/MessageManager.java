@@ -57,19 +57,20 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
+	private final MessageStore messageStore;
+
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
 
 	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
 	private final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<>();
 
-
 	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
 	 * Use WeakReference to prevent memory leak
 	 */
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<>();
 
-	AtomicBoolean appInForeground = new AtomicBoolean(false);
+	private final AtomicBoolean appInForeground = new AtomicBoolean(false);
 	private final MessagePollingWorker pollingWorker;
 
 	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {
@@ -86,8 +87,13 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	};
 
-	public MessageManager() {
-		pollingWorker = new MessagePollingWorker(this);
+	public MessageManager(MessageStore messageStore) {
+		if (messageStore == null) {
+			throw new IllegalArgumentException("Message store is null");
+		}
+
+		this.messageStore = messageStore;
+		this.pollingWorker = new MessagePollingWorker(this);
 		// conversation.setMessageCenterFeatureUsed(true); FIXME: figure out what to do with this call
 	}
 
@@ -130,7 +136,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		// Fetch the messages.
 		List<ApptentiveMessage> messagesToSave = null;
 		try {
-			Future<String> future = getMessageStore().getLastReceivedMessageId();
+			Future<String> future = messageStore.getLastReceivedMessageId();
 			messagesToSave = fetchMessages(future.get());
 		} catch (Exception e) {
 			ApptentiveLog.e("Error retrieving last received message id from worker thread");
@@ -162,7 +168,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 					});
 				}
 			}
-			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
+			messageStore.addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the foreground activity is not already message center activity
 				if (!isMessageCenterForeground && showToast) {
@@ -181,7 +187,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	public List<MessageCenterListItem> getMessageCenterListItems() {
 		List<MessageCenterListItem> messagesToShow = new ArrayList<>();
 		try {
-			List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages().get();
+			List<ApptentiveMessage> messagesAll = messageStore.getAllMessages().get();
 			// Do not display hidden messages on Message Center
 			for (ApptentiveMessage message : messagesAll) {
 				if (!message.isHidden()) {
@@ -196,7 +202,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	public void sendMessage(ApptentiveMessage apptentiveMessage) {
-		getMessageStore().addOrUpdateMessages(apptentiveMessage);
+		messageStore.addOrUpdateMessages(apptentiveMessage);
 		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(apptentiveMessage);
 	}
 
@@ -205,7 +211,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	 */
 	public void deleteAllMessages(Context context) {
 		ApptentiveLog.d("Deleting all messages.");
-		getMessageStore().deleteAllMessages();
+		messageStore.deleteAllMessages();
 	}
 
 	private List<ApptentiveMessage> fetchMessages(String afterId) {
@@ -228,7 +234,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	public void updateMessage(ApptentiveMessage apptentiveMessage) {
-		getMessageStore().updateMessage(apptentiveMessage);
+		messageStore.updateMessage(apptentiveMessage);
 	}
 
 	private List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
@@ -266,7 +272,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		if (response.isRejectedPermanently() || response.isBadPayload()) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
-				getMessageStore().updateMessage(apptentiveMessage);
+				messageStore.updateMessage(apptentiveMessage);
 				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 					afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
 				}
@@ -284,7 +290,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
 				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
-				getMessageStore().deleteMessage(apptentiveMessage.getNonce());
+				messageStore.deleteMessage(apptentiveMessage.getNonce());
 				return;
 			}
 			try {
@@ -297,7 +303,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			} catch (JSONException e) {
 				ApptentiveLog.e("Error parsing sent apptentiveMessage response.", e);
 			}
-			getMessageStore().updateMessage(apptentiveMessage);
+			messageStore.updateMessage(apptentiveMessage);
 
 			if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
 				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
@@ -305,14 +311,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	}
 
-	private MessageStore getMessageStore() {
-		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
-	}
-
 	public int getUnreadMessageCount() {
 		int msgCount = 0;
 		try {
-			msgCount = getMessageStore().getUnreadMessageCount().get();
+			msgCount = messageStore.getUnreadMessageCount().get();
 		} catch (Exception e) {
 			ApptentiveLog.e("Error getting unread messages count in worker thread");
 		}

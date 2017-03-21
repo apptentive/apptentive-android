@@ -32,6 +32,7 @@ import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
@@ -91,7 +92,9 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public Conversation() {
 		data = new ConversationData();
-		messageManager = new MessageManager();
+
+		final DispatchQueue messageStoreQueue = DispatchQueue.createBackgroundQueue("Message Store", DispatchQueueType.Concurrent);
+		messageManager = new MessageManager(new DefaultMessageStore(messageStoreQueue));
 	}
 
 	//region Interactions
