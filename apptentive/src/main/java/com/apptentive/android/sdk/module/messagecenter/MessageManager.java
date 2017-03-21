@@ -53,7 +53,6 @@ public class MessageManager {
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
-	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
 	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
 
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
@@ -91,12 +90,6 @@ public class MessageManager {
 				@Override
 				public void handleMessage(android.os.Message msg) {
 					switch (msg.what) {
-						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
-							// Notify internal listeners such as Message Center
-							CompoundMessage msgToAdd = (CompoundMessage) msg.obj;
-							notifyInternalNewMessagesListeners(msgToAdd);
-							break;
-						}
 						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
 							CompoundMessage msgToShow = (CompoundMessage) msg.obj;
 							showUnreadMessageToastNotification(msgToShow);
@@ -188,7 +181,7 @@ public class MessageManager {
 			// Also get the count of incoming unread messages.
 			int incomingUnreadMessages = 0;
 			// Mark messages from server where sender is the app user as read.
-			for (ApptentiveMessage apptentiveMessage : messagesToSave) {
+			for (final ApptentiveMessage apptentiveMessage : messagesToSave) {
 				if (apptentiveMessage.isOutgoingMessage()) {
 					apptentiveMessage.setRead(true);
 				} else {
@@ -198,9 +191,14 @@ public class MessageManager {
 						}
 					}
 					incomingUnreadMessages++;
+
 					// for every new message received, notify Message Center
-					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, apptentiveMessage);
-					msg.sendToTarget();
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							notifyInternalNewMessagesListeners((CompoundMessage) apptentiveMessage);
+						}
+					});
 				}
 			}
 			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
