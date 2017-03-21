@@ -12,16 +12,33 @@ public class ApptentiveNotifications {
 	 * Sent when conversation state changes (user logs out, etc)
 	 */
 	public static final String NOTIFICATION_CONVERSATION_STATE_DID_CHANGE = "CONVERSATION_STATE_DID_CHANGE"; // { conversation : Conversation }
-	public static final String NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION = "conversation";
 
 	/**
 	 * Sent if a new activity is started.
 	 */
-	public static final String NOTIFICATION_ACTIVITY_STARTED = "NOTIFICATION_ACTIVITY_STARTED"; // { activityClass : Class<? extend Activity> }
-	public static final String NOTIFICATION_ACTIVITY_STARTED_KEY_ACTIVITY_CLASS = "activityClass";
+	public static final String NOTIFICATION_ACTIVITY_STARTED = "NOTIFICATION_ACTIVITY_STARTED"; // { activity : Activity }
+
+	/**
+	 * Sent if activity is resumed.
+	 */
+	public static final String NOTIFICATION_ACTIVITY_RESUMED = "NOTIFICATION_ACTIVITY_RESUMED"; // { activity : Activity }
+
+	/**
+	 * Sent if app enter foreground
+	 */
+	public static final String NOTIFICATION_APP_ENTER_FOREGROUND = "NOTIFICATION_APP_ENTER_FOREGROUND";
+
+	/**
+	 * Sent if app enter background
+	 */
+	public static final String NOTIFICATION_APP_ENTER_BACKGROUND = "NOTIFICATION_APP_ENTER_BACKGROUND";
 
 	/**
 	 * Sent if user requested to close all interactions.
 	 */
 	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
+
+	// keys
+	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
+	public static final String NOTIFICATION_KEY_CONVERSATION = "conversation";
 }

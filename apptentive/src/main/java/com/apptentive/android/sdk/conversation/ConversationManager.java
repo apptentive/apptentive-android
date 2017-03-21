@@ -6,7 +6,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -34,7 +33,7 @@ import java.lang.ref.WeakReference;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS_PENDING;
 import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_IN;
@@ -289,7 +288,7 @@ public class ConversationManager {
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
-				ObjectUtils.toMap(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION, conversation));
+				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 		if (conversation != null && conversation.hasActiveState()) {
 			conversation.fetchInteractions(getContext());

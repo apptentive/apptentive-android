@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.notifications;
 
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -36,6 +37,12 @@ public class ApptentiveNotification {
 
 	public boolean hasName(String name) {
 		return StringUtils.equal(this.name, name);
+	}
+
+	public <T> T getRequiredUserInfo(String key, Class<? extends T> valueClass) {
+		final T userInfo = getUserInfo(key, valueClass);
+		Assert.assertNotNull(userInfo, "Missing required user info '%s' for '%s' notification", key, name);
+		return userInfo;
 	}
 
 	public <T> T getUserInfo(String key, Class<? extends T> valueClass) {
