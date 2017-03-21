@@ -4,6 +4,7 @@ public enum ApptentiveLogTag {
 	NETWORK(true),
 	CONVERSATION(true),
 	NOTIFICATIONS(true),
+	MESSAGES(true),
 	TESTER_COMMANDS(false);
 
 	ApptentiveLogTag(boolean enabled) {

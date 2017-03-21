@@ -299,7 +299,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		}
 	}
 
-	public static enum State {
+	public enum State {
 		sending, // The item is either being sent, or is queued for sending.
 		sent,    // The item has been posted to the server successfully.
 		saved,   // The item has been returned from the server during a fetch.
