@@ -65,7 +65,6 @@ public class MessageManager {
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
 
 	AtomicBoolean appInForeground = new AtomicBoolean(false);
-	private Handler uiHandler;
 	private MessagePollingWorker pollingWorker;
 
 	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {
@@ -88,22 +87,6 @@ public class MessageManager {
 
 	// init() will start polling worker.
 	public void init() {
-		if (uiHandler == null) {
-			uiHandler = new Handler(Looper.getMainLooper()) {
-				@Override
-				public void handleMessage(android.os.Message msg) {
-					switch (msg.what) {
-						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
-							CompoundMessage msgToShow = (CompoundMessage) msg.obj;
-							showUnreadMessageToastNotification(msgToShow);
-							break;
-						}
-						default:
-							super.handleMessage(msg);
-					}
-				}
-			};
-		}
 		if (pollingWorker == null) {
 			pollingWorker = new MessagePollingWorker(this);
 			/* Set SharePreference to indicate Message Center feature is desired. It will always be checked
