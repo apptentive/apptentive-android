@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -53,8 +52,6 @@ public class MessageManager {
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
-	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
-
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
 
 	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
@@ -71,11 +68,17 @@ public class MessageManager {
 	private Handler uiHandler;
 	private MessagePollingWorker pollingWorker;
 
-
-	private final MessageCountDispatchTask unreadHostNotifierTask = new MessageCountDispatchTask() {
+	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {
 		@Override
-		protected void execute() {
-			notifyHostUnreadMessagesListeners(getMessageCount());
+		protected void execute(CompoundMessage message) {
+			showUnreadMessageToastNotification(message);
+		}
+	};
+
+	private final MessageCountDispatchTask hostMessageNotifierTask = new MessageCountDispatchTask() {
+		@Override
+		protected void execute(int messageCount) {
+			notifyHostUnreadMessagesListeners(messageCount);
 		}
 	};
 
@@ -202,19 +205,16 @@ public class MessageManager {
 				}
 			}
 			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
-			Message msg;
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the foreground activity is not already message center activity
 				if (!isMessageCenterForeground && showToast) {
-					msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
-					// Only show the latest new message on toast
-					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
-					msg.sendToTarget();
+					DispatchQueue.mainQueue().dispatchAsyncOnce(toastMessageNotifierTask.setMessage(messageOnToast));
 				}
 			}
+
 			// Send message to notify host app, such as unread message badge
 			DispatchQueue.mainQueue()
-					.dispatchAsyncOnce(unreadHostNotifierTask.setMessageCount(getUnreadMessageCount()));
+					.dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
 
 			return incomingUnreadMessages > 0;
 		}
@@ -515,17 +515,41 @@ public class MessageManager {
 
 	//region Message Dispatch Task
 
+	private abstract static class MessageDispatchTask extends DispatchTask
+	{
+		private CompoundMessage message;
+
+		protected abstract void execute(CompoundMessage message);
+
+		@Override
+		protected void execute() {
+			try {
+				execute(message);
+			} finally {
+				message = null;
+			}
+		}
+
+		MessageDispatchTask setMessage(CompoundMessage message) {
+			this.message = message;
+			return this;
+		}
+	}
+
 	private abstract static class MessageCountDispatchTask extends DispatchTask
 	{
 		private int messageCount;
 
-		public MessageCountDispatchTask setMessageCount(int messageCount) {
-			this.messageCount = messageCount;
-			return this;
+		protected abstract void execute(int messageCount);
+
+		@Override
+		protected void execute() {
+			execute(messageCount);
 		}
 
-		protected int getMessageCount() {
-			return messageCount;
+		MessageCountDispatchTask setMessageCount(int messageCount) {
+			this.messageCount = messageCount;
+			return this;
 		}
 	}
 
