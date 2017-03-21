@@ -136,8 +136,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		// Fetch the messages.
 		List<ApptentiveMessage> messagesToSave = null;
 		try {
-			Future<String> future = messageStore.getLastReceivedMessageId();
-			messagesToSave = fetchMessages(future.get());
+			String lastMessageId = messageStore.getLastReceivedMessageId();
+			messagesToSave = fetchMessages(lastMessageId);
 		} catch (Exception e) {
 			ApptentiveLog.e("Error retrieving last received message id from worker thread");
 		}
@@ -187,7 +187,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	public List<MessageCenterListItem> getMessageCenterListItems() {
 		List<MessageCenterListItem> messagesToShow = new ArrayList<>();
 		try {
-			List<ApptentiveMessage> messagesAll = messageStore.getAllMessages().get();
+			List<ApptentiveMessage> messagesAll = messageStore.getAllMessages();
 			// Do not display hidden messages on Message Center
 			for (ApptentiveMessage message : messagesAll) {
 				if (!message.isHidden()) {
@@ -314,7 +314,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	public int getUnreadMessageCount() {
 		int msgCount = 0;
 		try {
-			msgCount = messageStore.getUnreadMessageCount().get();
+			msgCount = messageStore.getUnreadMessageCount();
 		} catch (Exception e) {
 			ApptentiveLog.e("Error getting unread messages count in worker thread");
 		}

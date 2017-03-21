@@ -92,9 +92,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public Conversation() {
 		data = new ConversationData();
-
-		final DispatchQueue messageStoreQueue = DispatchQueue.createBackgroundQueue("Message Store", DispatchQueueType.Concurrent);
-		messageManager = new MessageManager(new FileMessageStore(messageStoreQueue));
+		messageManager = new MessageManager(new FileMessageStore());
 	}
 
 	//region Interactions

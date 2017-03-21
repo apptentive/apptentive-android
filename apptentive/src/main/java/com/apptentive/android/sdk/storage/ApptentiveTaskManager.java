@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-public class ApptentiveTaskManager implements PayloadStore, EventStore, MessageStore {
+public class ApptentiveTaskManager implements PayloadStore, EventStore {
 
 	private ApptentiveDatabaseHelper dbHelper;
 	private ThreadPoolExecutor singleThreadExecutor;
@@ -100,77 +100,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, MessageS
 			@Override
 			public Payload call() throws Exception {
 				return dbHelper.getOldestUnsentPayload();
-			}
-		});
-	}
-
-	@Override
-	public void addOrUpdateMessages(final ApptentiveMessage... apptentiveMessages) {
-		singleThreadExecutor.execute(new Runnable() {
-			@Override
-			public void run() {
-				dbHelper.addOrUpdateMessages(apptentiveMessages);
-			}
-		});
-	}
-
-	@Override
-	public void updateMessage(final ApptentiveMessage apptentiveMessage) {
-		singleThreadExecutor.execute(new Runnable() {
-			@Override
-			public void run() {
-				dbHelper.updateMessage(apptentiveMessage);
-			}
-		});
-	}
-
-	@Override
-	public Future<List<ApptentiveMessage>> getAllMessages() throws Exception {
-		return singleThreadExecutor.submit(new Callable<List<ApptentiveMessage>>() {
-			@Override
-			public List<ApptentiveMessage> call() throws Exception {
-				List<ApptentiveMessage> result = dbHelper.getAllMessages();
-				return result;
-			}
-		});
-	}
-
-	@Override
-	public Future<String> getLastReceivedMessageId() throws Exception {
-		return singleThreadExecutor.submit(new Callable<String>() {
-			@Override
-			public String call() throws Exception {
-				return dbHelper.getLastReceivedMessageId();
-			}
-		});
-	}
-
-	@Override
-	public Future<Integer> getUnreadMessageCount() throws Exception {
-		return singleThreadExecutor.submit(new Callable<Integer>() {
-			@Override
-			public Integer call() throws Exception {
-				return dbHelper.getUnreadMessageCount();
-			}
-		});
-	}
-
-	@Override
-	public void deleteAllMessages() {
-		singleThreadExecutor.execute(new Runnable() {
-			@Override
-			public void run() {
-				dbHelper.deleteAllMessages();
-			}
-		});
-	}
-
-	@Override
-	public void deleteMessage(final String nonce) {
-		singleThreadExecutor.execute(new Runnable() {
-			@Override
-			public void run() {
-				dbHelper.deleteMessage(nonce);
 			}
 		});
 	}
