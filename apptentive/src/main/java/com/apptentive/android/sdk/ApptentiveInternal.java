@@ -100,9 +100,6 @@ public class ApptentiveInternal {
 	String androidId;
 	String appPackageName;
 
-	// private background serial dispatch queue for internal SDK tasks
-	private final DispatchQueue backgroundQueue; // TODO: replace with a global concurrent queue?
-
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
 
@@ -112,8 +109,6 @@ public class ApptentiveInternal {
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
 	// booleans to prevent starting multiple fetching asyncTasks simultaneously
-
-	AtomicBoolean isConfigurationFetchPending = new AtomicBoolean(false); // TODO: remove me!
 
 	IRatingProvider ratingProvider;
 	Map<String, String> ratingProviderArgs;
@@ -155,7 +150,6 @@ public class ApptentiveInternal {
 		appContext = context.getApplicationContext();
 
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
