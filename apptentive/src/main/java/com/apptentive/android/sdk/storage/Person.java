@@ -45,10 +45,6 @@ public class Person implements Saveable, DataChangedListener {
 	}
 
 	@Override
-	public void onDeserialize() {
-	}
-
-	@Override
 	public void onDataChanged() {
 		notifyDataChanged();
 	}

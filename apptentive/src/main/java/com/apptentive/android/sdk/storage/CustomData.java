@@ -31,10 +31,6 @@ public class CustomData extends HashMap<String, Object> implements Saveable {
 		}
 	}
 
-	@Override
-	public void onDeserialize() {
-	}
-
 	//endregion
 
 

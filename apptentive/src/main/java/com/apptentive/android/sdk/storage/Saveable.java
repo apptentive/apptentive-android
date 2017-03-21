@@ -12,5 +12,4 @@ import java.io.Serializable;
 public interface Saveable extends Serializable {
 	void setDataChangedListener(DataChangedListener listener);
 	void notifyDataChanged();
-	void onDeserialize();
 }

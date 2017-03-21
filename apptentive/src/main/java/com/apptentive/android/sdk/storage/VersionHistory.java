@@ -43,10 +43,6 @@ public class VersionHistory implements Saveable {
 		}
 	}
 
-	@Override
-	public void onDeserialize() {
-	}
-
 	//endregion
 
 	public void updateVersionHistory(double timestamp, Integer newVersionCode, String newVersionName) {
