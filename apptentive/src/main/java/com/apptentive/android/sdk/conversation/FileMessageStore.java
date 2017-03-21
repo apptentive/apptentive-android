@@ -14,11 +14,11 @@ import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import java.util.List;
 import java.util.concurrent.Future;
 
-class DefaultMessageStore implements MessageStore {
+class FileMessageStore implements MessageStore {
 
 	private final DispatchQueue operationQueue;
 
-	public DefaultMessageStore(DispatchQueue operationQueue) {
+	public FileMessageStore(DispatchQueue operationQueue) {
 		if (operationQueue == null) {
 			throw new IllegalArgumentException("Operation queue is null");
 		}
