@@ -169,10 +169,11 @@ public class ConversationManager {
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
-		FileSerializer serializer = new FileSerializer(item.file);
+		FileSerializer serializer = new FileSerializer(item.dataFile);
 		final Conversation conversation = (Conversation) serializer.deserialize();
 		conversation.setState(item.getState()); // set the state same as the item's state
-		conversation.setFile(item.file);
+		conversation.setDataFile(item.dataFile); // at this point we can save conversation data to the disk
+		conversation.setMessagesFile(item.messagesFile); // at this point we can save messages to the disk
 		return conversation;
 	}
 
@@ -248,7 +249,8 @@ public class ConversationManager {
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
-						conversation.setFile(getConversationFile(conversation));
+						conversation.setDataFile(getConversationDataFile(conversation));  // at this point we can save conversation data to the disk
+						conversation.setMessagesFile(getConversationMessagesFile(conversation)); // at this point we can save messages to the disk
 
 						// write conversation to the disk (sync operation)
 						conversation.save();
@@ -275,8 +277,12 @@ public class ConversationManager {
 			});
 	}
 
-	private File getConversationFile(Conversation conversation) {
-		return new File(storageDir, conversation.getConversationId() + ".bin");
+	private File getConversationDataFile(Conversation conversation) {
+		return new File(storageDir, conversation.getConversationId() + "-conversation.bin");
+	}
+
+	private File getConversationMessagesFile(Conversation conversation) {
+		return new File(storageDir, conversation.getConversationId() + "-messages.bin");
 	}
 
 	//endregion
@@ -340,7 +346,7 @@ public class ConversationManager {
 		// update the state of the corresponding item
 		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
 		if (item == null) {
-			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFile());
+			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getDataFile(), conversation.getMessagesFile());
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();

@@ -32,14 +32,18 @@ class FileMessageStore implements MessageStore {
 	 */
 	private static final byte VERSION = 1;
 
-	private final File file;
+	private File file;
 	private final List<MessageEntry> messageEntries;
 	private boolean shouldFetchFromFile;
 
 	FileMessageStore(File file) {
+		this();
 		this.file = file;
-		this.messageEntries = new ArrayList<>(); // we need a random access
 		this.shouldFetchFromFile = true; // we would lazily read it from a file later
+	}
+
+	FileMessageStore() {
+		this.messageEntries = new ArrayList<>(); // we need a random access
 	}
 
 	//region MessageStore
@@ -199,6 +203,11 @@ class FileMessageStore implements MessageStore {
 	}
 
 	private synchronized void writeToFile() {
+		Assert.assertFalse(file != null, "File is not specified");
+		if (file == null) {
+			return;
+		}
+
 		try {
 			writeToFileGuarded();
 		} catch (Exception e) {
@@ -238,6 +247,20 @@ class FileMessageStore implements MessageStore {
 		}
 		return null;
 	}
+
+	//endregion
+
+	//region Properties
+
+	public synchronized void setFile(File file) {
+		if (file == null) {
+			throw new IllegalArgumentException("File is null");
+		}
+
+		this.file = file;
+		shouldFetchFromFile = true;
+	}
+
 
 	//endregion
 

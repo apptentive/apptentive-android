@@ -51,9 +51,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private ConversationData data;
 
 	/**
-	 * File which represents this conversation on the disk
+	 * File which represents serialized conversation data on the disk
 	 */
-	private File file;
+	private File dataFile;
+
+	/**
+	 * File which represents serialized messages data on the disk
+	 */
+	private File messagesFile;
 
 	// TODO: remove this class
 	private InteractionManager interactionManager;
@@ -61,6 +66,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private ConversationState state = ConversationState.UNDEFINED;
 
 	private final MessageManager messageManager;
+	private final FileMessageStore messageStore;
 
 	// we keep references to the tasks in order to dispatch them only once
 	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
@@ -91,7 +97,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public Conversation() {
 		data = new ConversationData();
-		messageManager = new MessageManager(new FileMessageStore(new File(""))); // FIXME: figure out a filename
+		messageStore = new FileMessageStore(); // create a store in a "detached" state (we can't save anything until dest file is specified)
+		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
 	//region Interactions
@@ -189,7 +196,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * if succeed.
 	 */
 	synchronized boolean save() {
-		if (file == null) {
+		if (dataFile == null) {
 			ApptentiveLog.e(CONVERSATION, "Unable to save conversation: destination file not specified");
 			return false;
 		}
@@ -198,7 +205,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
 		try {
-			FileSerializer serializer = new FileSerializer(file);
+			FileSerializer serializer = new FileSerializer(dataFile);
 			serializer.serialize(this);
 			return true;
 		} catch (Exception e) {
@@ -213,7 +220,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	@Override
 	public void onDataChanged() {
-		if (hasFile()) {
+		if (hasDataFile()) {
 			boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
 			if (scheduled) {
 				ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
@@ -453,16 +460,35 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.interactionManager = interactionManager;
 	}
 
-	synchronized boolean hasFile() {
-		return file != null;
+	private synchronized boolean hasDataFile() {
+		return dataFile != null;
 	}
 
-	synchronized File getFile() {
-		return file;
+	synchronized File getDataFile() {
+		return dataFile;
 	}
 
-	synchronized void setFile(File file) {
-		this.file = file;
+	synchronized void setDataFile(File dataFile) {
+		if (dataFile == null) {
+			throw new IllegalArgumentException("Data file is null");
+		}
+		this.dataFile = dataFile;
+	}
+
+	synchronized boolean hasMessagesFile() {
+		return messagesFile != null;
+	}
+
+	synchronized File getMessagesFile() {
+		return messagesFile;
+	}
+
+	synchronized void setMessagesFile(File messagesFile) {
+		if (messagesFile == null) {
+			throw new IllegalArgumentException("Messages file is null");
+		}
+		this.messagesFile = messagesFile;
+		messageStore.setFile(messagesFile); // now we can save/load messages
 	}
 
 	//endregion

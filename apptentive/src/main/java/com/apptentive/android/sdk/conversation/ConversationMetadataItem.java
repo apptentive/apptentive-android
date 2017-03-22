@@ -26,32 +26,44 @@ public class ConversationMetadataItem implements SerializableObject {
 	/**
 	 * Storage filename for conversation serialized data
 	 */
-	final File file;
+	final File dataFile;
 
-	public ConversationMetadataItem(String conversationId, File file)
+	/**
+	 * Storage filename for conversation serialized messages
+	 */
+	final File messagesFile;
+
+	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile)
 	{
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
 
-		if (file == null) {
-			throw new IllegalArgumentException("File is null");
+		if (dataFile == null) {
+			throw new IllegalArgumentException("Data file is null");
+		}
+
+		if (messagesFile == null) {
+			throw new IllegalArgumentException("Messages file is null");
 		}
 
 		this.conversationId = conversationId;
-		this.file = file;
+		this.dataFile = dataFile;
+		this.messagesFile = messagesFile;
 	}
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
 		conversationId = in.readUTF();
-		file = new File(in.readUTF());
+		dataFile = new File(in.readUTF());
+		messagesFile = new File(in.readUTF());
 		state = ConversationState.valueOf(in.readByte());
 	}
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
 		out.writeUTF(conversationId);
-		out.writeUTF(file.getAbsolutePath());
+		out.writeUTF(dataFile.getAbsolutePath());
+		out.writeUTF(messagesFile.getAbsolutePath());
 		out.writeByte(state.ordinal());
 	}
 
