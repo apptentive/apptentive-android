@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage.State;
-import static junit.framework.Assert.assertEquals;
 
 public class FileMessageStoreTest extends TestCaseBase {
 	private static final boolean READ = true;
@@ -50,11 +49,14 @@ public class FileMessageStoreTest extends TestCaseBase {
 	@Test
 	public void testAddingAndLoadingMessages() throws Exception {
 		File file = getTempFile();
+
+		// create a few messages and add them to the store
 		FileMessageStore store = new FileMessageStore(file);
 		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
 		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
 		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
 
+		// reload store and check saved messages
 		store = new FileMessageStore(file);
 		addResult(store.getAllMessages());
 
@@ -62,11 +64,49 @@ public class FileMessageStoreTest extends TestCaseBase {
 			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
 			"{'nonce':'2','client_created_at':'20','state':'sent','read':'false'}",
 			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
+
+		// reload the store again and add another message
+		store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("4", State.sent, UNREAD, 40.0));
+		addResult(store.getAllMessages());
+
+		assertResult(
+			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
+			"{'nonce':'2','client_created_at':'20','state':'sent','read':'false'}",
+			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}",
+			"{'nonce':'4','client_created_at':'40','state':'sent','read':'false'}");
 	}
 
 	@Test
 	public void updateMessage() throws Exception {
 
+		File file = getTempFile();
+
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+
+		// reload the store and change a single message
+		store = new FileMessageStore(file);
+		store.updateMessage(createMessage("2", State.saved, READ, 40.0));
+		addResult(store.getAllMessages());
+
+		assertResult(
+			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
+			"{'nonce':'2','client_created_at':'40','state':'saved','read':'true'}",
+			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
+
+
+		// reload the store and check the stored messages
+		store = new FileMessageStore(file);
+		addResult(store.getAllMessages());
+
+		assertResult(
+			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
+			"{'nonce':'2','client_created_at':'40','state':'saved','read':'true'}",
+			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
 	}
 
 	@Test
@@ -105,7 +145,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 	}
 
 	private File getTempFile() throws IOException {
-		return tempFolder.newFile("data.bin");
+		return tempFolder.newFile();
 	}
 
 	private void addResult(List<ApptentiveMessage> messages) throws JSONException {
