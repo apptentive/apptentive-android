@@ -6,12 +6,6 @@
 
 package com.apptentive.android.sdk;
 
-import android.content.Context;
-
-/**
- * Created by alementuev on 3/22/17.
- */
-
 public class ApptentiveInternalMock extends ApptentiveInternal {
 	public ApptentiveInternalMock() {
 	}
