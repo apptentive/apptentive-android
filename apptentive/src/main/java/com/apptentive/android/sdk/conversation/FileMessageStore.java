@@ -67,6 +67,7 @@ class FileMessageStore implements MessageStore {
 				entry.state = apptentiveMessage.getState().name();
 				entry.isRead = apptentiveMessage.isRead();
 				entry.json = apptentiveMessage.toString();
+				messageEntries.add(entry);
 			}
 		}
 
@@ -169,8 +170,10 @@ class FileMessageStore implements MessageStore {
 	private synchronized void readFromFile() {
 		messageEntries.clear();
 		try {
-			List<MessageEntry> entries = readFromFileGuarded();
-			messageEntries.addAll(entries);
+			if (file.exists()) {
+				List<MessageEntry> entries = readFromFileGuarded();
+				messageEntries.addAll(entries);
+			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while reading entries");
 		}

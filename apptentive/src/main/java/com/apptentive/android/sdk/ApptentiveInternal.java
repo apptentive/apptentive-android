@@ -140,6 +140,19 @@ public class ApptentiveInternal {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
+	// for unit testing
+	protected ApptentiveInternal() {
+		payloadWorker = null;
+		taskManager = null;
+		globalSharedPrefs = null;
+		apiKey = null;
+		apptentiveHttpClient = null;
+		conversationManager = null;
+		appContext = null;
+		appRelease = null;
+		cachedExecutor = null;
+	}
+
 	private ApptentiveInternal(Context context, String apiKey, String serverUrl) {
 		this.apiKey = apiKey;
 		this.serverUrl = serverUrl;
@@ -256,9 +269,9 @@ public class ApptentiveInternal {
 	 *
 	 * @param instance the internal instance to be set to
 	 */
-	public static void setInstance(ApptentiveInternal instance) {
+	public static void setInstance(ApptentiveInternal instance, boolean initialized) {
 		sApptentiveInternal = instance;
-		isApptentiveInitialized.set(false);
+		isApptentiveInitialized.set(initialized);
 	}
 
 	/* Called by {@link #Apptentive.register()} to register global lifecycle
