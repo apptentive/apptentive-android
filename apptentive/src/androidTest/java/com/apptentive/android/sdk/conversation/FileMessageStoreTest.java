@@ -25,8 +25,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import static com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage.State;
+import static junit.framework.Assert.assertEquals;
 
 public class FileMessageStoreTest extends TestCaseBase {
 	private static final boolean READ = true;
@@ -110,23 +112,69 @@ public class FileMessageStoreTest extends TestCaseBase {
 	}
 
 	@Test
-	public void getAllMessages() throws Exception {
-
-	}
-
-	@Test
 	public void getLastReceivedMessageId() throws Exception {
-
 	}
 
 	@Test
 	public void getUnreadMessageCount() throws Exception {
+		File file = getTempFile();
 
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+		store.addOrUpdateMessages(createMessage("4", State.sending, UNREAD, 40.0));
+
+		assertEquals(2, store.getUnreadMessageCount());
+
+		// reload store and check saved messages
+		store = new FileMessageStore(file);
+		assertEquals(2, store.getUnreadMessageCount());
 	}
 
 	@Test
 	public void deleteAllMessages() throws Exception {
+		File file = getTempFile();
 
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+		store.addOrUpdateMessages(createMessage("4", State.sending, UNREAD, 40.0));
+
+		// delete all messages
+		store.deleteAllMessages();
+
+		// check stored messages
+		addResult(store.getAllMessages());
+		assertResult();
+
+		// reload the store and check for messages
+		store = new FileMessageStore(file);
+		addResult(store.getAllMessages());
+		assertResult();
+	}
+
+	@Test
+	public void deleteAllMessagesAfterReload() throws Exception {
+		File file = getTempFile();
+
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+		store.addOrUpdateMessages(createMessage("4", State.sending, UNREAD, 40.0));
+
+		// delete all messages
+		store.deleteAllMessages();
+
+		// reload the store and check for messages
+		store = new FileMessageStore(file);
+		addResult(store.getAllMessages());
+		assertResult();
 	}
 
 	@Test
@@ -139,6 +187,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 		object.put("nonce", nonce);
 		object.put("client_created_at", clientCreatedAt);
 		CompoundMessage message = new CompoundMessage(object.toString(), true);
+		message.setId(UUID.randomUUID().toString());
 		message.setState(state);
 		message.setRead(read);
 		return message;
@@ -159,6 +208,9 @@ public class FileMessageStoreTest extends TestCaseBase {
 		final Iterator<String> keys = message.keys();
 		while (keys.hasNext()) {
 			String key = keys.next();
+			if (key.equals("id")) { // 'id' is randomly generated each time (so don't test it)
+				continue;
+			}
 			result += StringUtils.format("'%s':'%s',", key, message.get(key));
 		}
 
