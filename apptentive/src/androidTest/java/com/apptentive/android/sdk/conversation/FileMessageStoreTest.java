@@ -46,6 +46,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 	@After
 	public void tearDown() {
 		super.tearDown();
+		ApptentiveInternal.setInstance(null, false);
 	}
 
 	@Test
@@ -113,6 +114,20 @@ public class FileMessageStoreTest extends TestCaseBase {
 
 	@Test
 	public void getLastReceivedMessageId() throws Exception {
+		File file = getTempFile();
+
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.saved, READ, 10.0, "111"));
+		store.addOrUpdateMessages(createMessage("2", State.saved, UNREAD, 20.0, "222"));
+		store.addOrUpdateMessages(createMessage("3", State.sending, READ, 30.0, "333"));
+		store.addOrUpdateMessages(createMessage("4", State.sent, UNREAD, 40.0, "444"));
+
+		assertEquals("222", store.getLastReceivedMessageId());
+
+		// reload the store and check again
+		store = new FileMessageStore(file);
+		assertEquals("222", store.getLastReceivedMessageId());
 	}
 
 	@Test
@@ -179,15 +194,70 @@ public class FileMessageStoreTest extends TestCaseBase {
 
 	@Test
 	public void deleteMessage() throws Exception {
+		File file = getTempFile();
 
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+		store.addOrUpdateMessages(createMessage("4", State.sending, UNREAD, 40.0));
+
+		store.deleteMessage("2");
+		store.deleteMessage("4");
+
+		addResult(store.getAllMessages());
+
+		assertResult(
+			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
+			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
+	}
+
+	@Test
+	public void deleteMessageAndReload() throws Exception {
+		File file = getTempFile();
+
+		// create a few messages and add them to the store
+		FileMessageStore store = new FileMessageStore(file);
+		store.addOrUpdateMessages(createMessage("1", State.sending, READ, 10.0));
+		store.addOrUpdateMessages(createMessage("2", State.sent, UNREAD, 20.0));
+		store.addOrUpdateMessages(createMessage("3", State.saved, READ, 30.0));
+		store.addOrUpdateMessages(createMessage("4", State.sending, UNREAD, 40.0));
+
+		store.deleteMessage("2");
+		store.deleteMessage("4");
+
+		// reload store
+		store = new FileMessageStore(file);
+		addResult(store.getAllMessages());
+
+		assertResult(
+			"{'nonce':'1','client_created_at':'10','state':'sending','read':'true'}",
+			"{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
+
+		// delete more
+		store.deleteMessage("1");
+		addResult(store.getAllMessages());
+
+		assertResult("{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
+
+		// reload store
+		store = new FileMessageStore(file);
+		addResult(store.getAllMessages());
+
+		assertResult("{'nonce':'3','client_created_at':'30','state':'saved','read':'true'}");
 	}
 
 	private ApptentiveMessage createMessage(String nonce, State state, boolean read, double clientCreatedAt) throws JSONException {
+		return createMessage(nonce, state, read, clientCreatedAt, UUID.randomUUID().toString());
+	}
+
+	private ApptentiveMessage createMessage(String nonce, State state, boolean read, double clientCreatedAt, String id) throws JSONException {
 		JSONObject object = new JSONObject();
 		object.put("nonce", nonce);
 		object.put("client_created_at", clientCreatedAt);
 		CompoundMessage message = new CompoundMessage(object.toString(), true);
-		message.setId(UUID.randomUUID().toString());
+		message.setId(id);
 		message.setState(state);
 		message.setRead(read);
 		return message;
