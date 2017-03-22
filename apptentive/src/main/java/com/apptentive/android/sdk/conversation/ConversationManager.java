@@ -17,7 +17,6 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -169,11 +168,11 @@ public class ConversationManager {
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
-		FileSerializer serializer = new FileSerializer(item.dataFile);
-		final Conversation conversation = (Conversation) serializer.deserialize();
-		conversation.setState(item.getState()); // set the state same as the item's state
+		final Conversation conversation = new Conversation();
 		conversation.setDataFile(item.dataFile); // at this point we can save conversation data to the disk
+		conversation.loadData();
 		conversation.setMessagesFile(item.messagesFile); // at this point we can save messages to the disk
+		conversation.setState(item.getState()); // set the state same as the item's state
 		return conversation;
 	}
 
@@ -253,7 +252,7 @@ public class ConversationManager {
 						conversation.setMessagesFile(getConversationMessagesFile(conversation)); // at this point we can save messages to the disk
 
 						// write conversation to the disk (sync operation)
-						conversation.save();
+						conversation.saveData();
 
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 

@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Sdk;
+import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Destroyable;
@@ -91,7 +92,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private final DispatchTask saveConversationTask = new DispatchTask() {
 		@Override
 		protected void execute() {
-			save();
+			saveData();
 		}
 	};
 
@@ -195,7 +196,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
 	 * if succeed.
 	 */
-	synchronized boolean save() {
+	synchronized boolean saveData() {
 		if (dataFile == null) {
 			ApptentiveLog.e(CONVERSATION, "Unable to save conversation: destination file not specified");
 			return false;
@@ -206,12 +207,18 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		try {
 			FileSerializer serializer = new FileSerializer(dataFile);
-			serializer.serialize(this);
+			serializer.serialize(data);
 			return true;
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Unable to save conversation");
 			return false;
 		}
+	}
+
+	synchronized void loadData() throws SerializerException {
+		ApptentiveLog.d(CONVERSATION, "Loading conversation data");
+		FileSerializer serializer = new FileSerializer(dataFile);
+		data = (ConversationData) serializer.deserialize();
 	}
 
 	//endregion
