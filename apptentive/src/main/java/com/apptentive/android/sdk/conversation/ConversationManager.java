@@ -22,6 +22,7 @@ import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONObject;
 
@@ -160,7 +161,9 @@ public class ConversationManager {
 
 		// no conversation available: create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
-		Conversation anonymousConversation = new Conversation();
+		File dataFile = new File(storageDir, Util.generateRandomFilename());
+		File messagesFile = new File(storageDir, Util.generateRandomFilename());
+		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
 		anonymousConversation.setState(ANONYMOUS_PENDING);
 		fetchConversationToken(anonymousConversation);
 		return anonymousConversation;
@@ -168,10 +171,8 @@ public class ConversationManager {
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
-		final Conversation conversation = new Conversation();
-		conversation.setDataFile(item.dataFile); // at this point we can save conversation data to the disk
-		conversation.loadData();
-		conversation.setMessagesFile(item.messagesFile); // at this point we can save messages to the disk
+		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
+		conversation.loadConversationData();
 		conversation.setState(item.getState()); // set the state same as the item's state
 		return conversation;
 	}
@@ -248,11 +249,9 @@ public class ConversationManager {
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
-						conversation.setDataFile(getConversationDataFile(conversation));  // at this point we can save conversation data to the disk
-						conversation.setMessagesFile(getConversationMessagesFile(conversation)); // at this point we can save messages to the disk
 
 						// write conversation to the disk (sync operation)
-						conversation.saveData();
+						conversation.saveConversationData();
 
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
@@ -345,7 +344,7 @@ public class ConversationManager {
 		// update the state of the corresponding item
 		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
 		if (item == null) {
-			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getDataFile(), conversation.getMessagesFile());
+			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();

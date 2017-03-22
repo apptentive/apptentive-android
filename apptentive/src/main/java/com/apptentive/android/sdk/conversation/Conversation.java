@@ -49,17 +49,17 @@ public class Conversation implements DataChangedListener, Destroyable {
 	/**
 	 * Conversation data for this class to manage
 	 */
-	private ConversationData data;
+	private ConversationData conversationData;
 
 	/**
 	 * File which represents serialized conversation data on the disk
 	 */
-	private File dataFile;
+	private final File conversationDataFile;
 
 	/**
 	 * File which represents serialized messages data on the disk
 	 */
-	private File messagesFile;
+	private final File conversationMessagesFile;
 
 	// TODO: remove this class
 	private InteractionManager interactionManager;
@@ -67,7 +67,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private ConversationState state = ConversationState.UNDEFINED;
 
 	private final MessageManager messageManager;
-	private final FileMessageStore messageStore;
 
 	// we keep references to the tasks in order to dispatch them only once
 	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
@@ -92,13 +91,27 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private final DispatchTask saveConversationTask = new DispatchTask() {
 		@Override
 		protected void execute() {
-			saveData();
+			try {
+				saveConversationData();
+			} catch (Exception e) {
+				ApptentiveLog.e(e, "Exception while saving conversation data");
+			}
 		}
 	};
 
-	public Conversation() {
-		data = new ConversationData();
-		messageStore = new FileMessageStore(); // create a store in a "detached" state (we can't save anything until dest file is specified)
+	public Conversation(File conversationDataFile, File conversationMessagesFile) {
+		if (conversationDataFile == null) {
+			throw new IllegalArgumentException("Data file is null");
+		}
+		if (conversationMessagesFile == null) {
+			throw new IllegalArgumentException("Messages file is null");
+		}
+
+		this.conversationDataFile = conversationDataFile;
+		this.conversationMessagesFile = conversationMessagesFile;
+
+		conversationData = new ConversationData();
+		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
@@ -183,7 +196,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 				ApptentiveLog.e(e, "Invalid InteractionManifest received.");
 			}
 		}
-		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions asyncTask finished. Successful? %b", updateSuccessful);
+		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished. Successful: %b", updateSuccessful);
 
 		return updateSuccessful;
 	}
@@ -196,29 +209,18 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
 	 * if succeed.
 	 */
-	synchronized boolean saveData() {
-		if (dataFile == null) {
-			ApptentiveLog.e(CONVERSATION, "Unable to save conversation: destination file not specified");
-			return false;
-		}
-
+	synchronized void saveConversationData() throws SerializerException {
 		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
-		try {
-			FileSerializer serializer = new FileSerializer(dataFile);
-			serializer.serialize(data);
-			return true;
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Unable to save conversation");
-			return false;
-		}
+		FileSerializer serializer = new FileSerializer(conversationDataFile);
+		serializer.serialize(conversationData);
 	}
 
-	synchronized void loadData() throws SerializerException {
+	synchronized void loadConversationData() throws SerializerException {
 		ApptentiveLog.d(CONVERSATION, "Loading conversation data");
-		FileSerializer serializer = new FileSerializer(dataFile);
-		data = (ConversationData) serializer.deserialize();
+		FileSerializer serializer = new FileSerializer(conversationDataFile);
+		conversationData = (ConversationData) serializer.deserialize();
 	}
 
 	//endregion
@@ -227,15 +229,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	@Override
 	public void onDataChanged() {
-		if (hasDataFile()) {
-			boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
-			if (scheduled) {
-				ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
-			} else {
-				ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
-			}
+		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
+		if (scheduled) {
+			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
 		} else {
-			ApptentiveLog.v(CONVERSATION, "Can't save conversation data: storage file is not specified");
+			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
 		}
 	}
 
@@ -288,171 +286,171 @@ public class Conversation implements DataChangedListener, Destroyable {
 	}
 
 	public String getConversationToken() {
-		return data.getConversationToken();
+		return conversationData.getConversationToken();
 	}
 
 	public void setConversationToken(String conversationToken) {
-		data.setConversationToken(conversationToken);
+		conversationData.setConversationToken(conversationToken);
 	}
 
 	public String getConversationId() {
-		return data.getConversationId();
+		return conversationData.getConversationId();
 	}
 
 	public void setConversationId(String conversationId) {
-		data.setConversationId(conversationId);
+		conversationData.setConversationId(conversationId);
 	}
 
 	public String getPersonId() {
-		return data.getPersonId();
+		return conversationData.getPersonId();
 	}
 
 	public void setPersonId(String personId) {
-		data.setPersonId(personId);
+		conversationData.setPersonId(personId);
 	}
 
 	public String getPersonEmail() {
-		return data.getPersonEmail();
+		return conversationData.getPersonEmail();
 	}
 
 	public void setPersonEmail(String personEmail) {
-		data.setPersonEmail(personEmail);
+		conversationData.setPersonEmail(personEmail);
 	}
 
 	public String getPersonName() {
-		return data.getPersonName();
+		return conversationData.getPersonName();
 	}
 
 	public void setPersonName(String personName) {
-		data.setPersonName(personName);
+		conversationData.setPersonName(personName);
 	}
 
 	public Device getDevice() {
-		return data.getDevice();
+		return conversationData.getDevice();
 	}
 
 	public void setDevice(Device device) {
-		data.setDevice(device);
+		conversationData.setDevice(device);
 	}
 
 	public Device getLastSentDevice() {
-		return data.getLastSentDevice();
+		return conversationData.getLastSentDevice();
 	}
 
 	public void setLastSentDevice(Device lastSentDevice) {
-		data.setLastSentDevice(lastSentDevice);
+		conversationData.setLastSentDevice(lastSentDevice);
 	}
 
 	public Person getPerson() {
-		return data.getPerson();
+		return conversationData.getPerson();
 	}
 
 	public void setPerson(Person person) {
-		data.setPerson(person);
+		conversationData.setPerson(person);
 	}
 
 	public Person getLastSentPerson() {
-		return data.getLastSentPerson();
+		return conversationData.getLastSentPerson();
 	}
 
 	public void setLastSentPerson(Person lastSentPerson) {
-		data.setLastSentPerson(lastSentPerson);
+		conversationData.setLastSentPerson(lastSentPerson);
 	}
 
 	public Sdk getSdk() {
-		return data.getSdk();
+		return conversationData.getSdk();
 	}
 
 	public void setSdk(Sdk sdk) {
-		data.setSdk(sdk);
+		conversationData.setSdk(sdk);
 	}
 
 	public AppRelease getAppRelease() {
-		return data.getAppRelease();
+		return conversationData.getAppRelease();
 	}
 
 	public void setAppRelease(AppRelease appRelease) {
-		data.setAppRelease(appRelease);
+		conversationData.setAppRelease(appRelease);
 	}
 
 	public EventData getEventData() {
-		return data.getEventData();
+		return conversationData.getEventData();
 	}
 
 	public void setEventData(EventData eventData) {
-		data.setEventData(eventData);
+		conversationData.setEventData(eventData);
 	}
 
 	public String getLastSeenSdkVersion() {
-		return data.getLastSeenSdkVersion();
+		return conversationData.getLastSeenSdkVersion();
 	}
 
 	public void setLastSeenSdkVersion(String lastSeenSdkVersion) {
-		data.setLastSeenSdkVersion(lastSeenSdkVersion);
+		conversationData.setLastSeenSdkVersion(lastSeenSdkVersion);
 	}
 
 	public VersionHistory getVersionHistory() {
-		return data.getVersionHistory();
+		return conversationData.getVersionHistory();
 	}
 
 	public void setVersionHistory(VersionHistory versionHistory) {
-		data.setVersionHistory(versionHistory);
+		conversationData.setVersionHistory(versionHistory);
 	}
 
 	public boolean isMessageCenterFeatureUsed() {
-		return data.isMessageCenterFeatureUsed();
+		return conversationData.isMessageCenterFeatureUsed();
 	}
 
 	public void setMessageCenterFeatureUsed(boolean messageCenterFeatureUsed) {
-		data.setMessageCenterFeatureUsed(messageCenterFeatureUsed);
+		conversationData.setMessageCenterFeatureUsed(messageCenterFeatureUsed);
 	}
 
 	public boolean isMessageCenterWhoCardPreviouslyDisplayed() {
-		return data.isMessageCenterWhoCardPreviouslyDisplayed();
+		return conversationData.isMessageCenterWhoCardPreviouslyDisplayed();
 	}
 
 	public void setMessageCenterWhoCardPreviouslyDisplayed(boolean messageCenterWhoCardPreviouslyDisplayed) {
-		data.setMessageCenterWhoCardPreviouslyDisplayed(messageCenterWhoCardPreviouslyDisplayed);
+		conversationData.setMessageCenterWhoCardPreviouslyDisplayed(messageCenterWhoCardPreviouslyDisplayed);
 	}
 
 	public String getMessageCenterPendingMessage() {
-		return data.getMessageCenterPendingMessage();
+		return conversationData.getMessageCenterPendingMessage();
 	}
 
 	public void setMessageCenterPendingMessage(String messageCenterPendingMessage) {
-		data.setMessageCenterPendingMessage(messageCenterPendingMessage);
+		conversationData.setMessageCenterPendingMessage(messageCenterPendingMessage);
 	}
 
 	public String getMessageCenterPendingAttachments() {
-		return data.getMessageCenterPendingAttachments();
+		return conversationData.getMessageCenterPendingAttachments();
 	}
 
 	public void setMessageCenterPendingAttachments(String messageCenterPendingAttachments) {
-		data.setMessageCenterPendingAttachments(messageCenterPendingAttachments);
+		conversationData.setMessageCenterPendingAttachments(messageCenterPendingAttachments);
 	}
 
 	public String getTargets() {
-		return data.getTargets();
+		return conversationData.getTargets();
 	}
 
 	public void setTargets(String targets) {
-		data.setTargets(targets);
+		conversationData.setTargets(targets);
 	}
 
 	public String getInteractions() {
-		return data.getInteractions();
+		return conversationData.getInteractions();
 	}
 
 	public void setInteractions(String interactions) {
-		data.setInteractions(interactions);
+		conversationData.setInteractions(interactions);
 	}
 
 	public double getInteractionExpiration() {
-		return data.getInteractionExpiration();
+		return conversationData.getInteractionExpiration();
 	}
 
 	public void setInteractionExpiration(double interactionExpiration) {
-		data.setInteractionExpiration(interactionExpiration);
+		conversationData.setInteractionExpiration(interactionExpiration);
 	}
 
 	public MessageManager getMessageManager() {
@@ -467,35 +465,12 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.interactionManager = interactionManager;
 	}
 
-	private synchronized boolean hasDataFile() {
-		return dataFile != null;
+	synchronized File getConversationDataFile() {
+		return conversationDataFile;
 	}
 
-	synchronized File getDataFile() {
-		return dataFile;
-	}
-
-	synchronized void setDataFile(File dataFile) {
-		if (dataFile == null) {
-			throw new IllegalArgumentException("Data file is null");
-		}
-		this.dataFile = dataFile;
-	}
-
-	synchronized boolean hasMessagesFile() {
-		return messagesFile != null;
-	}
-
-	synchronized File getMessagesFile() {
-		return messagesFile;
-	}
-
-	synchronized void setMessagesFile(File messagesFile) {
-		if (messagesFile == null) {
-			throw new IllegalArgumentException("Messages file is null");
-		}
-		this.messagesFile = messagesFile;
-		messageStore.setFile(messagesFile); // now we can save/load messages
+	synchronized File getConversationMessagesFile() {
+		return conversationMessagesFile;
 	}
 
 	//endregion

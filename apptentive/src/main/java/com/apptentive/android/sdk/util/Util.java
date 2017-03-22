@@ -520,6 +520,10 @@ public class Util {
 		return null;
 	}
 
+	public static String generateRandomFilename() {
+		return UUID.randomUUID().toString();
+	}
+
 	/*
 	 * Generate cached file name use md5 from image originalPath and image created time
 	 */
