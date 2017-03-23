@@ -8,12 +8,10 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 
-import com.apptentive.android.sdk.ApptentiveNotifications;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
@@ -154,7 +152,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.hasName(ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
+		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
 			if (conversation.hasActiveState()) {

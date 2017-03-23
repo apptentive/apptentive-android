@@ -172,7 +172,6 @@ public class ApptentiveInternal {
 		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
-		application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -211,6 +210,7 @@ public class ApptentiveInternal {
 				try {
 					sApptentiveInternal = new ApptentiveInternal(application, apptentiveApiKey, serverUrl);
 					sApptentiveInternal.start(); // TODO: check the result of this call
+					application.registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
 				}

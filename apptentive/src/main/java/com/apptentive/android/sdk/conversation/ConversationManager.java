@@ -291,7 +291,7 @@ public class ConversationManager {
 		Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
 
 		ApptentiveNotificationCenter.defaultCenter()
-			.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+			.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
 				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 		if (conversation != null && conversation.hasActiveState()) {
