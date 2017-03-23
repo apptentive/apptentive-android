@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,9 +8,15 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 
+import com.apptentive.android.sdk.ApptentiveNotifications;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.notifications.ApptentiveNotification;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -19,11 +25,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 
-public class ApptentiveTaskManager implements PayloadStore, EventStore {
+public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver {
 
 	private ApptentiveDatabaseHelper dbHelper;
 	private ThreadPoolExecutor singleThreadExecutor;
+
+	// Set when receiving an ApptentiveNotification
+	private String currentConversationId;
 
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
@@ -43,6 +55,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore {
 
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
+
+		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
 	}
 
 
@@ -67,6 +81,9 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore {
 	 * a new message is added.
 	 */
 	public void addPayload(final Payload... payloads) {
+		for (Payload payload : payloads) {
+			payload.setConversationId(currentConversationId);
+		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -135,4 +152,16 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore {
 		dbHelper.reset(context);
 	}
 
+	@Override
+	public void onReceiveNotification(ApptentiveNotification notification) {
+		if (notification.hasName(ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
+			Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
+			Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+			if (conversation.hasActiveState()) {
+				currentConversationId = conversation.getConversationId();
+			} else {
+				currentConversationId = null;
+			}
+		}
+	}
 }
