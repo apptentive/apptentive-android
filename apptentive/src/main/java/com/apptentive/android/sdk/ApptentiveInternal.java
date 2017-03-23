@@ -50,6 +50,7 @@ import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.ObjectUtils;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -63,23 +64,24 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.*;
-import static com.apptentive.android.sdk.ApptentiveNotifications.*;
-import static com.apptentive.android.sdk.debug.Tester.*;
-import static com.apptentive.android.sdk.debug.TesterEvent.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
 public class ApptentiveInternal {
 
-	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
 	private final PayloadSendWorker payloadWorker;
 	private final ApptentiveTaskManager taskManager;
 
-	ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
+	private final ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 	private final ApptentiveHttpClient apptentiveHttpClient;
 	private final ConversationManager conversationManager;
 
@@ -89,29 +91,29 @@ public class ApptentiveInternal {
 	// We keep a readonly reference to AppRelease object since it won't change at runtime
 	private final AppRelease appRelease;
 
-	boolean appIsInForeground;
+	private boolean appIsInForeground;
 	private final SharedPreferences globalSharedPrefs;
 	private final String apiKey;
-	String serverUrl;
-	String personId;
-	String androidId;
-	String appPackageName;
+	private String serverUrl;
+	private String personId;
+	private String androidId; // FIXME: remove this field (never used)
+	private String appPackageName;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
-	Resources.Theme apptentiveToolbarTheme;
+	private Resources.Theme apptentiveToolbarTheme;
 
 	// app default appcompat theme res id, if specified in app AndroidManifest
-	int appDefaultAppCompatThemeId;
+	private int appDefaultAppCompatThemeId;
 
-	int statusBarColorDefault;
-	String defaultAppDisplayName = "this app";
+	private int statusBarColorDefault;
+	private String defaultAppDisplayName = "this app";
 	// booleans to prevent starting multiple fetching asyncTasks simultaneously
 
-	IRatingProvider ratingProvider;
-	Map<String, String> ratingProviderArgs;
-	WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
+	private IRatingProvider ratingProvider;
+	private Map<String, String> ratingProviderArgs;
+	private WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
-	final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
+	private final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
 
 	private final ExecutorService cachedExecutor;
 
@@ -121,9 +123,9 @@ public class ApptentiveInternal {
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
 
-	public static final String PUSH_ACTION = "action";
+	private static final String PUSH_ACTION = "action";
 
-	public enum PushAction {
+	private enum PushAction {
 		pmc,       // Present Message Center.
 		unknown;   // Anything unknown will not be handled.
 
@@ -151,22 +153,26 @@ public class ApptentiveInternal {
 		appContext = null;
 		appRelease = null;
 		cachedExecutor = null;
+		lifecycleCallbacks = null;
 	}
 
-	private ApptentiveInternal(Context context, String apiKey, String serverUrl) {
+	private ApptentiveInternal(Application application, String apiKey, String serverUrl) {
 		this.apiKey = apiKey;
 		this.serverUrl = serverUrl;
 
-		appContext = context.getApplicationContext();
+		appContext = application.getApplicationContext();
 
-		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
-		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
+		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		payloadWorker = new PayloadSendWorker();
 		taskManager = new ApptentiveTaskManager(appContext);
 		cachedExecutor = Executors.newCachedThreadPool();
+
+		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
+		application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -183,28 +189,35 @@ public class ApptentiveInternal {
 	 * service, or receiver in the hosting app's process, the initialization of Apptentive is deferred to the first time
 	 * {@link #getInstance()} is called.
 	 *
-	 * @param context the context of the app that is creating the instance
-	 * @return An non-null instance of the Apptentive SDK
+	 * @param application the context of the app that is creating the instance
 	 */
-	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey, final String serverUrl) {
-		if (sApptentiveInternal == null) {
-			synchronized (ApptentiveInternal.class) {
-				if (sApptentiveInternal == null && context != null) {
+	static void createInstance(Application application, String apptentiveApiKey, final String serverUrl) {
+		if (application == null) {
+			throw new IllegalArgumentException("Application is null");
+		}
 
-					// trim spaces
-					apptentiveApiKey = Util.trim(apptentiveApiKey);
+		synchronized (ApptentiveInternal.class) {
+			if (sApptentiveInternal == null) {
 
-					// if API key is not defined - try loading from AndroidManifest.xml
-					if (TextUtils.isEmpty(apptentiveApiKey)) {
-						apptentiveApiKey = resolveManifestApiKey(context);
-					}
+				// trim spaces
+				apptentiveApiKey = Util.trim(apptentiveApiKey);
 
-					sApptentiveInternal = new ApptentiveInternal(context, apptentiveApiKey, serverUrl);
-					isApptentiveInitialized.set(false);
+				// if API key is not defined - try loading from AndroidManifest.xml
+				if (StringUtils.isNullOrEmpty(apptentiveApiKey)) {
+					apptentiveApiKey = resolveManifestApiKey(application);
+					// TODO: check if apptentive key is still empty
 				}
+
+				try {
+					sApptentiveInternal = new ApptentiveInternal(application, apptentiveApiKey, serverUrl);
+					sApptentiveInternal.start(); // TODO: check the result of this call
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
+				}
+			} else {
+				ApptentiveLog.w("Apptentive instance is already initialized");
 			}
 		}
-		return sApptentiveInternal;
 	}
 
 	/**
@@ -230,37 +243,14 @@ public class ApptentiveInternal {
 
 	/**
 	 * Retrieve the existing instance of the Apptentive class. If {@link Apptentive#register(Application)} is
-	 * not called prior to this, it will only return null if context is null
-	 *
-	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or a new instance if context is not null
-	 */
-	public static ApptentiveInternal getInstance(Context context) {
-		return createInstance((context == null) ? null : context, null, null);
-	}
-
-	/**
-	 * Retrieve the existing instance of the Apptentive class. If {@link Apptentive#register(Application)} is
 	 * not called prior to this, it will return null; Otherwise, it will return the singleton instance initialized.
 	 *
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or null
 	 */
 	public static ApptentiveInternal getInstance() {
-		// Lazy initialization, only once for each application launch when getInstance() is called for the 1st time
-		if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
-			synchronized (ApptentiveInternal.class) {
-				if (sApptentiveInternal != null && !isApptentiveInitialized.get()) {
-					isApptentiveInitialized.set(true);
-
-					final boolean successful = sApptentiveInternal.init();
-					dispatchDebugEvent(EVT_INSTANCE_CREATED, successful);
-
-					if (!successful) {
-						ApptentiveLog.e("Apptentive init() failed");
-					}
-				}
-			}
+		synchronized (ApptentiveInternal.class) {
+			return sApptentiveInternal;
 		}
-		return sApptentiveInternal;
 	}
 
 	/**
@@ -269,24 +259,8 @@ public class ApptentiveInternal {
 	 *
 	 * @param instance the internal instance to be set to
 	 */
-	public static void setInstance(ApptentiveInternal instance, boolean initialized) {
+	public static void setInstance(ApptentiveInternal instance) {
 		sApptentiveInternal = instance;
-		isApptentiveInitialized.set(initialized);
-	}
-
-	/* Called by {@link #Apptentive.register()} to register global lifecycle
-	 * callbacks, only if the callback hasn't been set yet.
-	 */
-	static void setLifeCycleCallback() {
-		if (sApptentiveInternal != null && sApptentiveInternal.lifecycleCallbacks == null) {
-			synchronized (ApptentiveInternal.class) {
-				if (sApptentiveInternal != null && sApptentiveInternal.lifecycleCallbacks == null &&
-					sApptentiveInternal.appContext instanceof Application) {
-					sApptentiveInternal.lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
-					((Application) sApptentiveInternal.appContext).registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
-				}
-			}
-		}
 	}
 
 	/*
@@ -295,7 +269,7 @@ public class ApptentiveInternal {
 	 * @param themeResId : resource id of the theme style definition, such as R.style.MyAppTheme
 	 * @return true if the theme is set for inheritance successfully.
 	 */
-	public boolean setApplicationDefaultTheme(int themeResId) {
+	private boolean setApplicationDefaultTheme(int themeResId) {
 		try {
 			if (themeResId != 0) {
 				// If passed theme res id does not exist, an exception would be thrown and caught
@@ -383,7 +357,7 @@ public class ApptentiveInternal {
 		return apptentiveToolbarTheme;
 	}
 
-	public int getDefaultStatusBarColor() {
+	int getDefaultStatusBarColor() {
 		return statusBarColorDefault;
 	}
 
@@ -535,7 +509,7 @@ public class ApptentiveInternal {
 		apptentiveToolbarTheme.applyStyle(toolbarThemeId, true);
 	}
 
-	public boolean init() {
+	private boolean start() {
 		boolean bRet = true;
 		/* If Message Center feature has never been used before, don't initialize message polling thread.
 		 * Message Center feature will be seen as used, if one of the following conditions has been met:
@@ -731,7 +705,7 @@ public class ApptentiveInternal {
 		return ratingProvider;
 	}
 
-	public void setRatingProvider(IRatingProvider ratingProvider) {
+	void setRatingProvider(IRatingProvider ratingProvider) {
 		this.ratingProvider = ratingProvider;
 	}
 
@@ -739,14 +713,14 @@ public class ApptentiveInternal {
 		return ratingProviderArgs;
 	}
 
-	public void putRatingProviderArg(String key, String value) {
+	void putRatingProviderArg(String key, String value) {
 		if (ratingProviderArgs == null) {
 			ratingProviderArgs = new HashMap<>();
 		}
 		ratingProviderArgs.put(key, value);
 	}
 
-	public void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
+	void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
 		if (onSurveyFinishedListener != null) {
 			this.onSurveyFinishedListener = new WeakReference<>(onSurveyFinishedListener);
 		} else {
@@ -769,7 +743,7 @@ public class ApptentiveInternal {
 	/**
 	 * Pass in a log level to override the default, which is {@link ApptentiveLog.Level#INFO}
 	 */
-	public void setMinimumLogLevel(ApptentiveLog.Level level) {
+	private void setMinimumLogLevel(ApptentiveLog.Level level) {
 		ApptentiveLog.overrideLogLevel(level);
 	}
 
