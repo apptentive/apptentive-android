@@ -30,12 +30,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
+
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
  */
 public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
@@ -47,18 +49,21 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
 	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
 	public static final String PAYLOAD_KEY_JSON = "json";           // 2
+	private static final String PAYLOAD_KEY_CONVERSATION_ID = "conversation_id"; // 3
 
 	private static final String TABLE_CREATE_PAYLOAD =
 		"CREATE TABLE " + TABLE_PAYLOAD +
 			" (" +
 			PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
 			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
-			PAYLOAD_KEY_JSON + " TEXT" +
+			PAYLOAD_KEY_JSON + " TEXT," +
+			PAYLOAD_KEY_CONVERSATION_ID + " TEXT" +
 			");";
 
 	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
 
 	//endregion
 
@@ -174,12 +179,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
-				db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
 				upgradeVersion1to2(db);
+			case 2:
+				upgradeVersion2to3(db);
 		}
 	}
 
 	private void upgradeVersion1to2(SQLiteDatabase db) {
+		ApptentiveLog.i(DATABASE, "Upgrading Database from v1 to v2");
+		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
 		try {
@@ -311,6 +319,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	private void upgradeVersion2to3(SQLiteDatabase db) {
+		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
+		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD);
+	}
+
 	//endregion
 
 	//region Payloads
@@ -328,6 +341,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				ContentValues values = new ContentValues();
 				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
+				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
 				db.insert(TABLE_PAYLOAD, null, values);
 			}
 			db.setTransactionSuccessful();
@@ -376,9 +390,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				long databaseId = Long.parseLong(cursor.getString(0));
 				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
+				String conversationId = cursor.getString(3);
 				payload = PayloadFactory.fromJson(json, baseType);
 				if (payload != null) {
 					payload.setDatabaseId(databaseId);
+					payload.setConversationId(conversationId);
 				}
 			}
 			return payload;
