@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,14 +11,12 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
 public abstract class Payload extends JSONObject {
 
-	// These two are not stored in the JSON, only the DB.
+	// These three are not stored in the JSON, only the DB.
 	private Long databaseId;
 	private BaseType baseType;
+	private String conversationId;
 
 	public Payload() {
 		initBaseType();
@@ -27,6 +25,11 @@ public abstract class Payload extends JSONObject {
 	public Payload(String json) throws JSONException {
 		super(json);
 		initBaseType();
+	}
+
+	public Payload(String json, String conversationId) throws JSONException {
+		this(json);
+		this.conversationId = conversationId;
 	}
 
 	/**
@@ -64,6 +67,14 @@ public abstract class Payload extends JSONObject {
 
 	protected void setBaseType(BaseType baseType) {
 		this.baseType = baseType;
+	}
+
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
 	}
 
 	public enum BaseType {

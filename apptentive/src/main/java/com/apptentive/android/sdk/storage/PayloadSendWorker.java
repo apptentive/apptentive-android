@@ -142,6 +142,7 @@ public class PayloadSendWorker {
 						break;
 					}
 					ApptentiveLog.d("Got a payload to send: %s:%d", payload.getBaseType(), payload.getDatabaseId());
+					ApptentiveLog.v("Payload Conversation ID: %s", payload.getConversationId());
 
 					ApptentiveHttpResponse response = null;
 
