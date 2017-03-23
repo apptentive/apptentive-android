@@ -55,12 +55,12 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			appEnteredForeground();
 		}
 
-		ApptentiveInternal.getInstance().onActivityStarted(activity);
+		ApptentiveInternal.getInstance().onActivityStarted(activity); // TODO: post a notification here
 	}
 
 	@Override
 	public void onActivityResumed(Activity activity) {
-		ApptentiveInternal.getInstance().onActivityResumed(activity);
+		ApptentiveInternal.getInstance().onActivityResumed(activity);  // TODO: post a notification here
 	}
 
 	@Override
@@ -123,16 +123,16 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	private void appEnteredBackground() {
 		ApptentiveLog.d("App went to background.");
-		ApptentiveInternal.getInstance().onAppEnterBackground();
+		ApptentiveInternal.getInstance().onAppEnterBackground();  // TODO: post a notification here
 		// Mark entering background as app exit
 		appExited(ApptentiveInternal.getInstance().getApplicationContext());
 	}
 
 	private void appLaunched(Context appContext) {
-		ApptentiveInternal.getInstance().onAppLaunch(appContext);
+		ApptentiveInternal.getInstance().onAppLaunch(appContext);  // TODO: post a notification here
 	}
 
 	private void appExited(Context appContext) {
-		ApptentiveInternal.getInstance().onAppExit(appContext);
+		ApptentiveInternal.getInstance().onAppExit(appContext);  // TODO: post a notification here
 	}
 }

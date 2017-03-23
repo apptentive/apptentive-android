@@ -40,13 +40,13 @@ public class FileMessageStoreTest extends TestCaseBase {
 	@Before
 	public void setUp() {
 		super.setUp();
-		ApptentiveInternal.setInstance(new ApptentiveInternalMock(), true);
+		ApptentiveInternal.setInstance(new ApptentiveInternalMock());
 	}
 
 	@After
 	public void tearDown() {
 		super.tearDown();
-		ApptentiveInternal.setInstance(null, false);
+		ApptentiveInternal.setInstance(null);
 	}
 
 	@Test
