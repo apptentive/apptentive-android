@@ -413,7 +413,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
 			dismissActivity();
 		} else if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
-			final Conversation conversation = notification.getUserInfo(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION, Conversation.class);
+			final Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			Assert.assertNotNull(conversation, "Conversation expected to be not null");
 			if (conversation != null && !conversation.hasActiveState()) {
 				dismissActivity();

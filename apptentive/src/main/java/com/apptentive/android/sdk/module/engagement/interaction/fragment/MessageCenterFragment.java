@@ -325,7 +325,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		ApptentiveInternal.getInstance().getMessageManager().resumeSending();
 
 		/* imagePickerStillOpen was set true when the picker intent was launched. If user had picked an image,
-		 * it woud have been set to false. Otherwise, it indicates the user tried to attach an image but
+		 * it would have been set to false. Otherwise, it indicates the user tried to attach an image but
 		 * abandoned the image picker without picking anything
 		 */
 		if (imagePickerStillOpen) {

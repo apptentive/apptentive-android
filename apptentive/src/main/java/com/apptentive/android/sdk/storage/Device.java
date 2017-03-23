@@ -60,10 +60,6 @@ public class Device implements Saveable, DataChangedListener {
 	}
 
 	@Override
-	public void onDeserialize() {
-	}
-
-	@Override
 	public void onDataChanged() {
 		notifyDataChanged();
 	}

@@ -15,17 +15,17 @@ import java.util.concurrent.Future;
 /**
  * @author Sky Kelsey
  */
-public interface MessageStore extends PayloadStore {
+public interface MessageStore {
 
 	void addOrUpdateMessages(ApptentiveMessage... apptentiveMessage);
 
 	void updateMessage(ApptentiveMessage apptentiveMessage);
 
-	Future<List<ApptentiveMessage>> getAllMessages() throws Exception;
+	List<ApptentiveMessage> getAllMessages() throws Exception;
 
-	Future<String> getLastReceivedMessageId() throws Exception;
+	String getLastReceivedMessageId() throws Exception;
 
-	Future<Integer> getUnreadMessageCount() throws Exception;
+	int getUnreadMessageCount() throws Exception;
 
 	void deleteAllMessages();
 

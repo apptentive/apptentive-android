@@ -40,8 +40,8 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.PayloadSendWorker;
@@ -51,8 +51,6 @@ import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +76,6 @@ import static com.apptentive.android.sdk.debug.TesterEvent.*;
 public class ApptentiveInternal {
 
 	static AtomicBoolean isApptentiveInitialized = new AtomicBoolean(false);
-	private final MessageManager messageManager;
 	private final PayloadSendWorker payloadWorker;
 	private final ApptentiveTaskManager taskManager;
 
@@ -100,9 +97,6 @@ public class ApptentiveInternal {
 	String androidId;
 	String appPackageName;
 
-	// private background serial dispatch queue for internal SDK tasks
-	private final DispatchQueue backgroundQueue; // TODO: replace with a global concurrent queue?
-
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	Resources.Theme apptentiveToolbarTheme;
 
@@ -112,8 +106,6 @@ public class ApptentiveInternal {
 	int statusBarColorDefault;
 	String defaultAppDisplayName = "this app";
 	// booleans to prevent starting multiple fetching asyncTasks simultaneously
-
-	AtomicBoolean isConfigurationFetchPending = new AtomicBoolean(false); // TODO: remove me!
 
 	IRatingProvider ratingProvider;
 	Map<String, String> ratingProviderArgs;
@@ -148,6 +140,19 @@ public class ApptentiveInternal {
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
+	// for unit testing
+	protected ApptentiveInternal() {
+		payloadWorker = null;
+		taskManager = null;
+		globalSharedPrefs = null;
+		apiKey = null;
+		apptentiveHttpClient = null;
+		conversationManager = null;
+		appContext = null;
+		appRelease = null;
+		cachedExecutor = null;
+	}
+
 	private ApptentiveInternal(Context context, String apiKey, String serverUrl) {
 		this.apiKey = apiKey;
 		this.serverUrl = serverUrl;
@@ -155,12 +160,10 @@ public class ApptentiveInternal {
 		appContext = context.getApplicationContext();
 
 		globalSharedPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		backgroundQueue = DispatchQueue.createBackgroundQueue("Apptentive Serial Queue", DispatchQueueType.Serial);
 		apptentiveHttpClient = new ApptentiveHttpClient(apiKey, getEndpointBase(globalSharedPrefs));
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(context, this);
-		messageManager = new MessageManager();
 		payloadWorker = new PayloadSendWorker();
 		taskManager = new ApptentiveTaskManager(appContext);
 		cachedExecutor = Executors.newCachedThreadPool();
@@ -183,7 +186,7 @@ public class ApptentiveInternal {
 	 * @param context the context of the app that is creating the instance
 	 * @return An non-null instance of the Apptentive SDK
 	 */
-	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey, final String serverUrl)  {
+	public static ApptentiveInternal createInstance(Context context, String apptentiveApiKey, final String serverUrl) {
 		if (sApptentiveInternal == null) {
 			synchronized (ApptentiveInternal.class) {
 				if (sApptentiveInternal == null && context != null) {
@@ -266,9 +269,9 @@ public class ApptentiveInternal {
 	 *
 	 * @param instance the internal instance to be set to
 	 */
-	public static void setInstance(ApptentiveInternal instance) {
+	public static void setInstance(ApptentiveInternal instance, boolean initialized) {
 		sApptentiveInternal = instance;
-		isApptentiveInitialized.set(false);
+		isApptentiveInitialized.set(initialized);
 	}
 
 	/* Called by {@link #Apptentive.register()} to register global lifecycle
@@ -360,7 +363,8 @@ public class ApptentiveInternal {
 	}
 
 	public MessageManager getMessageManager() {
-		return messageManager;
+		final Conversation conversation = getConversation();
+		return conversation != null ? conversation.getMessageManager() : null;
 	}
 
 	public PayloadSendWorker getPayloadWorker() {
@@ -439,11 +443,10 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<>(activity);
-			messageManager.setCurrentForegroundActivity(activity);
 
-			// Fire a notification
+			// Post a notification
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STARTED,
-				ObjectUtils.toMap(NOTIFICATION_ACTIVITY_STARTED_KEY_ACTIVITY_CLASS, activity.getClass()));
+				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
 		}
 	}
 
@@ -451,23 +454,28 @@ public class ApptentiveInternal {
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<>(activity);
-			messageManager.setCurrentForegroundActivity(activity);
-		}
 
+			// Post a notification
+			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_RESUMED,
+				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
+		}
 	}
 
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
 		payloadWorker.appWentToForeground();
-		messageManager.appWentToForeground();
+
+		// Post a notification
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_FOREGROUND);
 	}
 
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
 		currentTaskStackTopActivity = null;
-		messageManager.setCurrentForegroundActivity(null);
 		payloadWorker.appWentToBackground();
-		messageManager.appWentToBackground();
+
+		// Post a notification
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_BACKGROUND);
 	}
 
 	/* Apply Apptentive styling layers to the theme to be used by interaction. The layers include
@@ -542,10 +550,11 @@ public class ApptentiveInternal {
 
 		if (conversationLoaded) {
 			Conversation activeConversation = conversationManager.getActiveConversation();
-			boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
-			if (featureEverUsed) {
-				messageManager.init();
-			}
+			// FIXME: don't accept the pull request before this one is resolved
+			// boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
+			// if (featureEverUsed) {
+			// 	messageManager.init();
+			// }
 			activeConversation.setInteractionManager(new InteractionManager(activeConversation));
 		}
 

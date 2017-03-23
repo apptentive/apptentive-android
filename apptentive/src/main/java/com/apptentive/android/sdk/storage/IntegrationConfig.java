@@ -40,10 +40,6 @@ public class IntegrationConfig implements Saveable {
 		}
 	}
 
-	@Override
-	public void onDeserialize() {
-	}
-
 	//endregion
 
 	//region Getters & Setters

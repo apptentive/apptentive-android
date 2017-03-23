@@ -6,7 +6,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -18,12 +17,12 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONObject;
 
@@ -34,7 +33,7 @@ import java.lang.ref.WeakReference;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS_PENDING;
 import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_IN;
@@ -162,7 +161,9 @@ public class ConversationManager {
 
 		// no conversation available: create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
-		Conversation anonymousConversation = new Conversation();
+		File dataFile = new File(storageDir, Util.generateRandomFilename());
+		File messagesFile = new File(storageDir, Util.generateRandomFilename());
+		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
 		anonymousConversation.setState(ANONYMOUS_PENDING);
 		fetchConversationToken(anonymousConversation);
 		return anonymousConversation;
@@ -170,10 +171,9 @@ public class ConversationManager {
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
-		FileSerializer serializer = new FileSerializer(item.file);
-		final Conversation conversation = (Conversation) serializer.deserialize();
+		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
+		conversation.loadConversationData();
 		conversation.setState(item.getState()); // set the state same as the item's state
-		conversation.setFile(item.file);
 		return conversation;
 	}
 
@@ -249,10 +249,9 @@ public class ConversationManager {
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
-						conversation.setFile(getConversationFile(conversation));
 
 						// write conversation to the disk (sync operation)
-						conversation.save();
+						conversation.saveConversationData();
 
 						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
 
@@ -276,8 +275,12 @@ public class ConversationManager {
 			});
 	}
 
-	private File getConversationFile(Conversation conversation) {
-		return new File(storageDir, conversation.getConversationId() + ".bin");
+	private File getConversationDataFile(Conversation conversation) {
+		return new File(storageDir, conversation.getConversationId() + "-conversation.bin");
+	}
+
+	private File getConversationMessagesFile(Conversation conversation) {
+		return new File(storageDir, conversation.getConversationId() + "-messages.bin");
 	}
 
 	//endregion
@@ -289,7 +292,7 @@ public class ConversationManager {
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
-				ObjectUtils.toMap(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE_KEY_CONVERSATION, conversation));
+				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 		if (conversation != null && conversation.hasActiveState()) {
 			conversation.fetchInteractions(getContext());
@@ -341,7 +344,7 @@ public class ConversationManager {
 		// update the state of the corresponding item
 		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
 		if (item == null) {
-			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getFile());
+			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
