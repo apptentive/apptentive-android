@@ -24,12 +24,12 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.3'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 25
         // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName project.version
