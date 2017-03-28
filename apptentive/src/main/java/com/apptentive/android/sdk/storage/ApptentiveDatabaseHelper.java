@@ -21,7 +21,7 @@ import com.apptentive.android.sdk.model.PayloadFactory;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +60,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PAYLOAD_KEY_CONVERSATION_ID + " TEXT" +
 			");";
 
-	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
+	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_CONVERSATION_ID + " IS NOT NULL ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
+	public static final String QUERY_UPDATE_MISSING_CONVERSATION_IDS = StringUtils.format("UPDATE %s SET %s = ? WHERE %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_CONVERSATION_ID);
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
 	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
@@ -401,6 +402,24 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
 			return null;
+		} finally {
+			ensureClosed(cursor);
+		}
+	}
+
+	public void updateMissingConversationIds(String conversationId) {
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
+		}
+
+		Cursor cursor = null;
+		try {
+			SQLiteDatabase db = getWritableDatabase();
+			cursor = db.rawQuery(QUERY_UPDATE_MISSING_CONVERSATION_IDS, new String[] { conversationId });
+			cursor.moveToFirst(); // we need to move a cursor in order to update database
+			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
+		} catch (SQLException e) {
+			ApptentiveLog.e(e, "Exception while updating missing conversation ids");
 		} finally {
 			ensureClosed(cursor);
 		}

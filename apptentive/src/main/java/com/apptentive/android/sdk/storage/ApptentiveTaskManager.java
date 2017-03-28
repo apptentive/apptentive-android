@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.storage;
 import android.content.Context;
 
 import com.apptentive.android.sdk.conversation.Conversation;
-import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
@@ -23,9 +22,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
-import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.conversation.ConversationState.*;
+import static com.apptentive.android.sdk.debug.Assert.*;
 
 public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver {
 
@@ -154,9 +153,23 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
-			Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+			assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
 			if (conversation.hasActiveState()) {
+				assertNotNull(conversation.getConversationId());
 				currentConversationId = conversation.getConversationId();
+
+				// when the Conversation ID comes back from the server, we need to update
+				// the payloads that may have already been enqueued so
+				// that they each have the Conversation ID.
+				if (conversation.hasState(ANONYMOUS)) {
+					singleThreadExecutor.execute(new Runnable() {
+						@Override
+						public void run() {
+							dbHelper.updateMissingConversationIds(currentConversationId);
+						}
+					});
+				}
+
 			} else {
 				currentConversationId = null;
 			}
