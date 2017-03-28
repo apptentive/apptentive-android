@@ -63,6 +63,7 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 		dispatchQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
+				dispatchQueue.stop();
 				sleep(500);
 				dispatchQueue.stop();
 				addResult("task-1");
