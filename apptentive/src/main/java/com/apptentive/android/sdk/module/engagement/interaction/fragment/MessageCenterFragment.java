@@ -517,6 +517,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			cleanup();
 			if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
 				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+			} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
+				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
 			} else {
 				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE, exitTypeToDataJson(exitType));
 			}
