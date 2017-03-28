@@ -52,6 +52,13 @@ public class SdkAndAppReleasePayload extends Payload {
 		super();
 		sdk = new com.apptentive.android.sdk.model.Sdk();
 		appRelease = new com.apptentive.android.sdk.model.AppRelease();
+
+		try {
+			put("sdk", sdk);
+			put("app_release", appRelease);
+		} catch (JSONException e) {
+			throw new IllegalStateException(e); // that should not happen but we can't ignore that
+		}
 	}
 
 	//region Inheritance
