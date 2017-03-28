@@ -61,6 +61,7 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 		dispatchQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
+				dispatchQueue.stop();
 				sleep(500);
 				addResult("task-1");
 			}
@@ -71,7 +72,6 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 				addResult("task-2");
 			}
 		});
-		dispatchQueue.stop();
 		sleep(1000); // wait for the first task to finish
 
 		assertResult("task-1"); // task-2 should not run
