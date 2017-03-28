@@ -27,27 +27,8 @@ import org.json.JSONException;
  */
 public class SdkAndAppReleasePayload extends Payload {
 
-	//region Sdk payload keys
-	private static final String KEY_VERSION = "version";
-	private static final String KEY_PROGRAMMING_LANGUAGE = "programming_language";
-	private static final String KEY_AUTHOR_NAME = "author_name";
-	private static final String KEY_AUTHOR_EMAIL = "author_email";
-	private static final String KEY_PLATFORM = "platform";
-	private static final String KEY_DISTRIBUTION = "distribution";
-	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
-	//endregion
-
-	//region AppRelease keys
-	private static final String KEY_TYPE = "type";
-	private static final String KEY_VERSION_NAME = "version_name";
-	private static final String KEY_VERSION_CODE = "version_code";
-	private static final String KEY_IDENTIFIER = "identifier";
-	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
-	private static final String KEY_APP_STORE = "app_store";
-	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
-	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
-	private static final String KEY_DEBUG = "debug";
-	//endregion
+	private final com.apptentive.android.sdk.model.Sdk sdk;
+	private final com.apptentive.android.sdk.model.AppRelease appRelease;
 
 	public static SdkAndAppReleasePayload fromJson(String json) {
 		try {
@@ -60,12 +41,24 @@ public class SdkAndAppReleasePayload extends Payload {
 		return null;
 	}
 
-	public SdkAndAppReleasePayload(String json) throws JSONException {
+	private SdkAndAppReleasePayload(String json) throws JSONException {
 		super(json);
+
+		sdk = new com.apptentive.android.sdk.model.Sdk(getJSONObject("sdk").toString());
+		appRelease = new com.apptentive.android.sdk.model.AppRelease(getJSONObject("app_release").toString());
 	}
 
 	public SdkAndAppReleasePayload() {
 		super();
+		sdk = new com.apptentive.android.sdk.model.Sdk();
+		appRelease = new com.apptentive.android.sdk.model.AppRelease();
+
+		try {
+			put("sdk", sdk);
+			put("app_release", appRelease);
+		} catch (JSONException e) {
+			throw new IllegalStateException(e); // that should not happen but we can't ignore that
+		}
 	}
 
 	//region Inheritance
@@ -76,266 +69,135 @@ public class SdkAndAppReleasePayload extends Payload {
 
 	//region Sdk getters/setters
 	public String getVersion() {
-		try {
-			if(!isNull(KEY_VERSION)) {
-				return getString(KEY_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getVersion();
 	}
 
 	public void setVersion(String version) {
-		try {
-			put(KEY_VERSION, version);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_VERSION);
-		}
+		sdk.setVersion(version);
 	}
 
 	public String getProgrammingLanguage() {
-		try {
-			if(!isNull(KEY_PROGRAMMING_LANGUAGE)) {
-				return getString(KEY_PROGRAMMING_LANGUAGE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getProgrammingLanguage();
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
-		try {
-			put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
-		}
+		sdk.setProgrammingLanguage(programmingLanguage);
 	}
 
 	public String getAuthorName() {
-		try {
-			if(!isNull(KEY_AUTHOR_NAME)) {
-				return getString(KEY_AUTHOR_NAME);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getAuthorName();
 	}
 
 	public void setAuthorName(String authorName) {
-		try {
-			put(KEY_AUTHOR_NAME, authorName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_NAME);
-		}
+		sdk.setAuthorName(authorName);
 	}
 
 	public String getAuthorEmail() {
-		try {
-			if(!isNull(KEY_AUTHOR_EMAIL)) {
-				return getString(KEY_AUTHOR_EMAIL);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getAuthorEmail();
 	}
 
 	public void setAuthorEmail(String authorEmail) {
-		try {
-			put(KEY_AUTHOR_EMAIL, authorEmail);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
-		}
+		sdk.setAuthorEmail(authorEmail);
 	}
 
 	public String getPlatform() {
-		try {
-			if(!isNull(KEY_PLATFORM)) {
-				return getString(KEY_PLATFORM);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getPlatform();
 	}
 
 	public void setPlatform(String platform) {
-		try {
-			put(KEY_PLATFORM, platform);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PLATFORM);
-		}
+		sdk.setPlatform(platform);
 	}
 
 	public String getDistribution() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION)) {
-				return getString(KEY_DISTRIBUTION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getDistribution();
 	}
 
 	public void setDistribution(String distribution) {
-		try {
-			put(KEY_DISTRIBUTION, distribution);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
-		}
+		sdk.setDistribution(distribution);
 	}
 
 	public String getDistributionVersion() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION_VERSION)) {
-				return getString(KEY_DISTRIBUTION_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return sdk.getDistributionVersion();
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
-		try {
-			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
-		}
+		sdk.setDistributionVersion(distributionVersion);
 	}
 	//endregion
 
 	//region AppRelease getters/setters
 	public String getType() {
-		if (!isNull(KEY_TYPE)) {
-			return optString(KEY_TYPE, null);
-		}
-		return null;
+		return appRelease.getType();
 	}
 
 	public void setType(String type) {
-		try {
-			put(KEY_TYPE, type);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TYPE);
-		}
+		appRelease.setType(type);
 	}
 
 	public String getVersionName() {
-		if (!isNull(KEY_VERSION_NAME)) {
-			return optString(KEY_VERSION_NAME, null);
-		}
-		return null;
+		return appRelease.getVersionName();
 	}
 
 	public void setVersionName(String versionName) {
-		try {
-			put(KEY_VERSION_NAME, versionName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_NAME);
-		}
+		appRelease.setVersionName(versionName);
 	}
 
 	public int getVersionCode() {
-		if (!isNull(KEY_VERSION_CODE)) {
-			return optInt(KEY_VERSION_CODE, -1);
-		}
-		return -1;
+		return appRelease.getVersionCode();
 	}
 
 	public void setVersionCode(int versionCode) {
-		try {
-			put(KEY_VERSION_CODE, versionCode);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_CODE);
-		}
+		appRelease.setVersionCode(versionCode);
 	}
 
 	public String getIdentifier() {
-		if (!isNull(KEY_IDENTIFIER)) {
-			return optString(KEY_IDENTIFIER, null);
-		}
-		return null;
+		return appRelease.getIdentifier();
 	}
 
 	public void setIdentifier(String identifier) {
-		try {
-			put(KEY_IDENTIFIER, identifier);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
-		}
+		appRelease.setIdentifier(identifier);
 	}
 
 	public String getTargetSdkVersion() {
-		if (!isNull(KEY_TARGET_SDK_VERSION)) {
-			return optString(KEY_TARGET_SDK_VERSION);
-		}
-		return null;
+		return appRelease.getTargetSdkVersion();
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
-		try {
-			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
-		}
+		appRelease.setTargetSdkVersion(targetSdkVersion);
 	}
 
 	public String getAppStore() {
-		if (!isNull(KEY_APP_STORE)) {
-			return optString(KEY_APP_STORE, null);
-		}
-		return null;
+		return appRelease.getAppStore();
 	}
 
 	public void setAppStore(String appStore) {
-		try {
-			put(KEY_APP_STORE, appStore);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_APP_STORE);
-		}
+		appRelease.setAppStore(appStore);
 	}
 
 	// Flag for whether the apptentive is inheriting styles from the host app
 	public boolean getInheritStyle() {
-		return optBoolean(KEY_STYLE_INHERIT);
+		return appRelease.getInheritStyle();
 	}
 
 	public void setInheritStyle(boolean inheritStyle) {
-		try {
-			put(KEY_STYLE_INHERIT, inheritStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
-		}
+		appRelease.setInheritStyle(inheritStyle);
 	}
 
 	// Flag for whether the app is overriding any Apptentive Styles
 	public boolean getOverrideStyle() {
-		return optBoolean(KEY_STYLE_OVERRIDE);
+		return appRelease.getOverrideStyle();
 	}
 
 	public void setOverrideStyle(boolean overrideStyle) {
-		try {
-			put(KEY_STYLE_OVERRIDE, overrideStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
-		}
+		appRelease.setOverrideStyle(overrideStyle);
 	}
 
 	public boolean getDebug() {
-		return optBoolean(KEY_DEBUG);
+		return appRelease.getDebug();
 	}
 
 	public void setDebug(boolean debug) {
-		try {
-			put(KEY_DEBUG, debug);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_DEBUG);
-		}
+		appRelease.setDebug(debug);
 	}
 
 	public static AppRelease generateCurrentAppRelease(Context context) {
