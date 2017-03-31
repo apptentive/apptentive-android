@@ -193,6 +193,7 @@ public class ConversationManager {
 
 	private void fetchConversationToken(final Conversation conversation) {
 		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
 
 		final Context context = getContext();
 		if (context == null) {
@@ -225,13 +226,13 @@ public class ConversationManager {
 
 						if (StringUtils.isNullOrEmpty(conversationToken)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
-							dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, false);
+							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
 						if (StringUtils.isNullOrEmpty(conversationId)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
-							dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, false);
+							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
@@ -250,24 +251,24 @@ public class ConversationManager {
 						// write conversation to the disk (sync operation)
 						conversation.saveConversationData();
 
-						dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, true);
+						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
-						dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, false);
+						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 					}
 				}
 
 				@Override
 				public void onCancel(HttpJsonRequest request) {
-					dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, false);
+					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
 					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
-					dispatchDebugEvent(EVT_CONVERSATION_FETCH_TOKEN, false);
+					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 			});
 	}
