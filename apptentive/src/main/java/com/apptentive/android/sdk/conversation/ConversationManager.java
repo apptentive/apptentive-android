@@ -279,6 +279,12 @@ public class ConversationManager {
 	private void handleConversationStateChange(Conversation conversation) {
 		Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
 
+		if (conversation != null) {
+			dispatchDebugEvent(EVT_CONVERSATION_STATE_CHANGE,
+				"conversation_state", conversation.getState().toString(),
+				"conversation_identifier", conversation.getConversationId());
+		}
+
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
 				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
