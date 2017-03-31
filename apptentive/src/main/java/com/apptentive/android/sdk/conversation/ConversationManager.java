@@ -41,7 +41,7 @@ import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_O
 import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_CREATE;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_LOAD_ACTIVE;
+import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_LOAD;
 import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_METADATA_LOAD;
 
 /**
@@ -113,9 +113,13 @@ public class ConversationManager {
 
 			// attempt to load existing conversation
 			activeConversation = loadActiveConversationGuarded();
-			dispatchDebugEvent(EVT_CONVERSATION_LOAD_ACTIVE, activeConversation != null);
 
 			if (activeConversation != null) {
+				dispatchDebugEvent(EVT_CONVERSATION_LOAD,
+					"successful", Boolean.TRUE,
+					"conversation_state", activeConversation.getState().toString(),
+					"conversation_identifier", activeConversation.getConversationId());
+
 				handleConversationStateChange(activeConversation);
 				return true;
 			}
@@ -124,6 +128,7 @@ public class ConversationManager {
 			ApptentiveLog.e(e, "Exception while loading active conversation");
 		}
 
+		dispatchDebugEvent(EVT_CONVERSATION_LOAD, "successful", Boolean.FALSE);
 		return false;
 	}
 

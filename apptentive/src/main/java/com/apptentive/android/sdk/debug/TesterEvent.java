@@ -2,7 +2,7 @@ package com.apptentive.android.sdk.debug;
 
 public class TesterEvent {
 
-	public static final String EVT_CONVERSATION_LOAD_ACTIVE = "conversation_load_active"; // { successful:boolean }
+	public static final String EVT_CONVERSATION_LOAD = "conversation_load"; // { successful:boolean, conversation_state:String, conversation_identifier:String }
 	public static final String EVT_CONVERSATION_CREATE = "conversation_create";  // { successful:boolean, state:String }
 	public static final String EVT_CONVERSATION_METADATA_LOAD = "conversation_metadata_load"; // { successful:boolean }
 	public static final String EVT_INTERACTION_FETCH = "interaction_fetch"; // { successful:boolean }
