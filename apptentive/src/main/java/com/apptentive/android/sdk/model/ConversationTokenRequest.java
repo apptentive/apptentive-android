@@ -41,7 +41,7 @@ public class ConversationTokenRequest extends JSONObject {
 		}
 	}
 
-	public void setAppRelease(AppRelease appRelease) {
+	public void setAppRelease(AppReleasePayload appRelease) {
 		try {
 			put(appRelease.getBaseType().name(), appRelease);
 		} catch (JSONException e) {

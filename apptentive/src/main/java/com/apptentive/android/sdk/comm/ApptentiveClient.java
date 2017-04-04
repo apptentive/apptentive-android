@@ -90,7 +90,7 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putAppRelease(AppRelease appRelease) {
+	public static ApptentiveHttpResponse putAppRelease(AppReleasePayload appRelease) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
 	}
 

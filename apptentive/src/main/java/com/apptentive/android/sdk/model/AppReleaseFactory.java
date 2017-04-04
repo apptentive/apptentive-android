@@ -11,9 +11,9 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 
 public class AppReleaseFactory {
-	public static AppRelease fromJson(String json) {
+	public static AppReleasePayload fromJson(String json) {
 		try {
-			return new AppRelease(json);
+			return new AppReleasePayload(json);
 		} catch (JSONException e) {
 			ApptentiveLog.v("Error parsing json as AppRelease: %s", e, json);
 		} catch (IllegalArgumentException e) {

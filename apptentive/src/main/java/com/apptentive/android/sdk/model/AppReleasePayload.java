@@ -18,7 +18,7 @@ import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
-public class AppRelease extends Payload {
+public class AppReleasePayload extends Payload {
 
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION_NAME = "version_name";
@@ -30,11 +30,11 @@ public class AppRelease extends Payload {
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 	private static final String KEY_DEBUG = "debug";
 
-	public AppRelease(String json) throws JSONException {
+	public AppReleasePayload(String json) throws JSONException {
 		super(json);
 	}
 
-	public AppRelease() {
+	public AppReleasePayload() {
 		super();
 	}
 
@@ -170,9 +170,9 @@ public class AppRelease extends Payload {
 		}
 	}
 
-	public static AppRelease generateCurrentAppRelease(Context context) {
+	public static AppReleasePayload generateCurrentAppRelease(Context context) {
 
-		AppRelease appRelease = new AppRelease();
+		AppReleasePayload appRelease = new AppReleasePayload();
 
 		String appPackageName = context.getPackageName();
 		PackageManager packageManager = context.getPackageManager();

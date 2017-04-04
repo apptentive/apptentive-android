@@ -19,16 +19,16 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 /**
- * A combined payload of {@link SdkPayload} and {@link AppRelease} payloads.
+ * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
  *
  * This class effectively contains the source code from both {@link SdkPayload}
- * and {@link AppRelease} payloads (which still kept for backward compatibility
+ * and {@link AppReleasePayload} payloads (which still kept for backward compatibility
  * purposes).
  */
 public class SdkAndAppReleasePayload extends Payload {
 
 	private final SdkPayload sdk;
-	private final com.apptentive.android.sdk.model.AppRelease appRelease;
+	private final AppReleasePayload appRelease;
 
 	public static SdkAndAppReleasePayload fromJson(String json) {
 		try {
@@ -45,13 +45,13 @@ public class SdkAndAppReleasePayload extends Payload {
 		super(json);
 
 		sdk = new SdkPayload(getJSONObject("sdk").toString());
-		appRelease = new com.apptentive.android.sdk.model.AppRelease(getJSONObject("app_release").toString());
+		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());
 	}
 
 	public SdkAndAppReleasePayload() {
 		super();
 		sdk = new SdkPayload();
-		appRelease = new com.apptentive.android.sdk.model.AppRelease();
+		appRelease = new AppReleasePayload();
 
 		try {
 			put("sdk", sdk);
@@ -200,9 +200,9 @@ public class SdkAndAppReleasePayload extends Payload {
 		appRelease.setDebug(debug);
 	}
 
-	public static AppRelease generateCurrentAppRelease(Context context) {
+	public static AppReleasePayload generateCurrentAppRelease(Context context) {
 
-		AppRelease appRelease = new AppRelease();
+		AppReleasePayload appRelease = new AppReleasePayload();
 
 		String appPackageName = context.getPackageName();
 		PackageManager packageManager = context.getPackageManager();
