@@ -30,27 +30,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
-import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
-import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS_PENDING;
-import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_IN;
-import static com.apptentive.android.sdk.conversation.ConversationState.LOGGED_OUT;
-import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_CREATE;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_LOAD_ACTIVE;
-import static com.apptentive.android.sdk.debug.TesterEvent.EVT_CONVERSATION_METADATA_LOAD;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.conversation.ConversationState.*;
+import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
 /**
  * Class responsible for managing conversations.
  * <pre>
  *   - Saving/Loading conversations from/to files.
  *   - Switching conversations when users login/logout.
- *   - Creating default conversation.
- *   - Migrating legacy conversation data.
+ *   - Creating anonymous conversation.
  * </pre>
  */
 public class ConversationManager {
@@ -113,9 +105,13 @@ public class ConversationManager {
 
 			// attempt to load existing conversation
 			activeConversation = loadActiveConversationGuarded();
-			dispatchDebugEvent(EVT_CONVERSATION_LOAD_ACTIVE, activeConversation != null);
 
 			if (activeConversation != null) {
+				dispatchDebugEvent(EVT_CONVERSATION_LOAD,
+					"successful", Boolean.TRUE,
+					"conversation_state", activeConversation.getState().toString(),
+					"conversation_identifier", activeConversation.getConversationId());
+
 				handleConversationStateChange(activeConversation);
 				return true;
 			}
@@ -124,6 +120,7 @@ public class ConversationManager {
 			ApptentiveLog.e(e, "Exception while loading active conversation");
 		}
 
+		dispatchDebugEvent(EVT_CONVERSATION_LOAD, "successful", Boolean.FALSE);
 		return false;
 	}
 
@@ -196,6 +193,7 @@ public class ConversationManager {
 
 	private void fetchConversationToken(final Conversation conversation) {
 		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
 
 		final Context context = getContext();
 		if (context == null) {
@@ -228,13 +226,13 @@ public class ConversationManager {
 
 						if (StringUtils.isNullOrEmpty(conversationToken)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
-							dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
+							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
 						if (StringUtils.isNullOrEmpty(conversationId)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
-							dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
+							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
@@ -253,34 +251,26 @@ public class ConversationManager {
 						// write conversation to the disk (sync operation)
 						conversation.saveConversationData();
 
-						dispatchDebugEvent(EVT_CONVERSATION_CREATE, true);
+						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling conversation token");
-						dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
+						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 					}
 				}
 
 				@Override
 				public void onCancel(HttpJsonRequest request) {
-					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
+					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
 					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
-					dispatchDebugEvent(EVT_CONVERSATION_CREATE, false);
+					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 			});
-	}
-
-	private File getConversationDataFile(Conversation conversation) {
-		return new File(storageDir, conversation.getConversationId() + "-conversation.bin");
-	}
-
-	private File getConversationMessagesFile(Conversation conversation) {
-		return new File(storageDir, conversation.getConversationId() + "-messages.bin");
 	}
 
 	//endregion
@@ -289,6 +279,12 @@ public class ConversationManager {
 
 	private void handleConversationStateChange(Conversation conversation) {
 		Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+
+		if (conversation != null) {
+			dispatchDebugEvent(EVT_CONVERSATION_STATE_CHANGE,
+				"conversation_state", conversation.getState().toString(),
+				"conversation_identifier", conversation.getConversationId());
+		}
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,

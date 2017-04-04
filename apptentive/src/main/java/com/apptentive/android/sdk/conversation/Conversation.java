@@ -73,6 +73,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		@Override
 		protected void execute() {
 			final boolean updateSuccessful = fetchInteractionsSync();
+			dispatchDebugEvent(EVT_CONVERSATION_FETCH_INTERACTIONS, updateSuccessful);
 
 			// Update pending state on UI thread after finishing the task
 			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
@@ -80,7 +81,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 				protected void execute() {
 					if (hasActiveState()) {
 						ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-						dispatchDebugEvent(EVT_INTERACTION_FETCH, updateSuccessful);
 					}
 				}
 			});

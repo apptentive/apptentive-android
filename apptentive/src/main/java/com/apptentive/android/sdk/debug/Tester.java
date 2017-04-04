@@ -58,6 +58,12 @@ public class Tester {
 		}
 	}
 
+	public static void dispatchDebugEvent(String name, String key1, Object value1, String key2, Object value2, String key3, Object value3) {
+		if (isListeningForDebugEvents()) {
+			notifyEvent(name, ObjectUtils.toMap(key1, value1, key2, value2, key3, value3));
+		}
+	}
+
 	public static void dispatchException(Throwable e) {
 		if (isListeningForDebugEvents() && e != null) {
 			StringBuilder stackTrace = new StringBuilder();

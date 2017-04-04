@@ -5,7 +5,8 @@ public enum ApptentiveLogTag {
 	CONVERSATION(true),
 	NOTIFICATIONS(true),
 	MESSAGES(true),
-	DATABASE(true);
+	DATABASE(true),
+	TESTER_COMMANDS(true);
 
 	ApptentiveLogTag(boolean enabled) {
 		this.enabled = enabled;
