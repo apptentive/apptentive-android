@@ -14,9 +14,9 @@ import org.json.JSONException;
  * @author Sky Kelsey
  */
 public class PersonFactory {
-	public static Person fromJson(String json) {
+	public static PersonPayload fromJson(String json) {
 		try {
-			return new Person(json);
+			return new PersonPayload(json);
 		} catch (JSONException e) {
 			ApptentiveLog.v("Error parsing json as Person: %s", e, json);
 		} catch (IllegalArgumentException e) {

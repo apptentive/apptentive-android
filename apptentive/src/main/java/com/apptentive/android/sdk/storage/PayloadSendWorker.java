@@ -172,10 +172,10 @@ public class PayloadSendWorker {
 							response = ApptentiveClient.putAppRelease((AppReleasePayload) payload);
 							break;
 						case sdk_and_app_release:
-							response = ApptentiveClient.putSdkAndAppRelease((com.apptentive.android.sdk.model.SdkAndAppReleasePayload) payload);
+							response = ApptentiveClient.putSdkAndAppRelease((SdkAndAppReleasePayload) payload);
 							break;
 						case person:
-							response = ApptentiveClient.putPerson((com.apptentive.android.sdk.model.Person) payload);
+							response = ApptentiveClient.putPerson((PersonPayload) payload);
 							break;
 						case survey:
 							response = ApptentiveClient.postSurvey((SurveyResponse) payload);

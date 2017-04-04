@@ -33,11 +33,11 @@ public class ConversationTokenRequest extends JSONObject {
 		}
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(PersonPayload person) {
 		try {
-			put(Person.KEY, person);
+			put(PersonPayload.KEY, person);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Person.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
 		}
 	}
 

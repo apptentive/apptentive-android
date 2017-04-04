@@ -98,7 +98,7 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, payload.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putPerson(Person person) {
+	public static ApptentiveHttpResponse putPerson(PersonPayload person) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
