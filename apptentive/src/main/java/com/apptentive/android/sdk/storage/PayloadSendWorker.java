@@ -159,7 +159,7 @@ public class PayloadSendWorker {
 							}
 							break;
 						case event:
-							response = ApptentiveClient.postEvent((Event) payload);
+							response = ApptentiveClient.postEvent((EventPayload) payload);
 							break;
 						case device:
 							response = ApptentiveClient.putDevice((DevicePayload) payload);

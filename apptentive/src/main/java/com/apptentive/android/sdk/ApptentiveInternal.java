@@ -31,7 +31,7 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -406,11 +406,11 @@ public class ApptentiveInternal {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		EngagementModule.engageInternal(appContext, Event.EventLabel.app__launch.getLabelName());
+		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 	}
 
 	public void onAppExit(final Context appContext) {
-		EngagementModule.engageInternal(appContext, Event.EventLabel.app__exit.getLabelName());
+		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onActivityStarted(Activity activity) {

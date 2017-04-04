@@ -78,7 +78,7 @@ public class ApptentiveClient {
 		return new ApptentiveHttpResponse();
 	}
 
-	public static ApptentiveHttpResponse postEvent(Event event) {
+	public static ApptentiveHttpResponse postEvent(EventPayload event) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 

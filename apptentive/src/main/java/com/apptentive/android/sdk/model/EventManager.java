@@ -18,7 +18,7 @@ public class EventManager {
 		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
 	}
 
-	public static void sendEvent(Event event) {
+	public static void sendEvent(EventPayload event) {
 		dispatchDebugEvent(EVT_APPTENTIVE_EVENT, EVT_APPTENTIVE_EVENT_KEY_EVENT_LABEL, event.getEventLabel());
 		getEventStore().addPayload(event);
 	}

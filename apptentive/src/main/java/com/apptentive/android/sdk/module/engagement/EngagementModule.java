@@ -13,7 +13,7 @@ import android.content.Intent;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
-import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -59,7 +59,7 @@ public class EngagementModule {
 				String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 				int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 				conversation.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
-				EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
+				EventManager.sendEvent(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
 				return doEngage(context, eventLabel);
 			}
 		} catch (Exception e) {
