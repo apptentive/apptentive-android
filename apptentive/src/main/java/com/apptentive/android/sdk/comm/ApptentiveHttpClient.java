@@ -1,6 +1,13 @@
 package com.apptentive.android.sdk.comm;
 
+import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
+import com.apptentive.android.sdk.model.DevicePayload;
+import com.apptentive.android.sdk.model.EventPayload;
+import com.apptentive.android.sdk.model.PersonPayload;
+import com.apptentive.android.sdk.model.SdkAndAppReleasePayload;
+import com.apptentive.android.sdk.model.SdkPayload;
+import com.apptentive.android.sdk.model.SurveyResponsePayload;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
@@ -24,6 +31,10 @@ public class ApptentiveHttpClient {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
+	private static final String ENDPOINT_EVENTS = "/events";
+	private static final String ENDPOINT_DEVICES = "/devices";
+	private static final String ENDPOINT_PEOPLE = "/people";
+	private static final String ENDPOINT_SURVEYS_POST = "/surveys/%s/respond";
 
 	private final String oauthToken;
 	private final String serverURL;
@@ -48,18 +59,47 @@ public class ApptentiveHttpClient {
 	//region API Requests
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, listener);
+		return startJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST, listener);
+	}
+
+	public HttpJsonRequest sendEvent(EventPayload event, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_EVENTS, event, HttpRequestMethod.POST, listener);
+	}
+
+	public HttpJsonRequest sendDevice(DevicePayload device, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_DEVICES, device, HttpRequestMethod.PUT, listener);
+	}
+
+	public HttpJsonRequest sendSdk(SdkPayload sdk, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_CONVERSATION, sdk, HttpRequestMethod.PUT, listener);
+	}
+
+	public HttpJsonRequest sendAppRelease(AppReleasePayload appRelease, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_CONVERSATION, appRelease, HttpRequestMethod.PUT, listener);
+	}
+
+	public HttpJsonRequest sendSdkAndAppRelease(SdkAndAppReleasePayload payload, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT, listener);
+	}
+
+	public HttpJsonRequest sendPerson(PersonPayload person, HttpRequest.Listener<HttpJsonRequest> listener) {
+		return startJsonRequest(ENDPOINT_PEOPLE, person, HttpRequestMethod.PUT, listener);
+	}
+
+	public HttpJsonRequest sendSurvey(SurveyResponsePayload survey, HttpRequest.Listener<HttpJsonRequest> listener) {
+		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
+		return startJsonRequest(endpoint, survey, HttpRequestMethod.POST, listener);
 	}
 
 	//endregion
 
 	//region Helpers
 
-	private HttpJsonRequest startJsonRequest(String endpoint, JSONObject jsonObject, HttpRequest.Listener<HttpJsonRequest> listener) {
+	private HttpJsonRequest startJsonRequest(String endpoint, JSONObject jsonObject, HttpRequestMethod method, HttpRequest.Listener<HttpJsonRequest> listener) {
 		String url = createEndpointURL(endpoint);
 		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
 		setupRequestDefaults(request);
-		request.setMethod(HttpRequestMethod.POST);
+		request.setMethod(method);
 		request.setRequestProperty("Content-Type", "application/json");
 		request.setListener(listener);
 		httpRequestManager.startRequest(request);

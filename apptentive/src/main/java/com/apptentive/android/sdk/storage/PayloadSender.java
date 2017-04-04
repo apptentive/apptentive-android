@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
