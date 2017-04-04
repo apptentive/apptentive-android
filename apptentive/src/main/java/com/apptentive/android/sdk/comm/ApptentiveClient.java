@@ -82,7 +82,7 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putDevice(Device device) {
+	public static ApptentiveHttpResponse putDevice(DevicePayload device) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 

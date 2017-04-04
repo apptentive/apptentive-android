@@ -13,7 +13,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class Device extends Payload {
+public class DevicePayload extends Payload {
 
 	public static final String KEY = "device";
 
@@ -44,11 +44,11 @@ public class Device extends Payload {
 	private static final String KEY_INTEGRATION_CONFIG = "integration_config";
 
 
-	public Device() {
+	public DevicePayload() {
 		super();
 	}
 
-	public Device(String json) throws JSONException {
+	public DevicePayload(String json) throws JSONException {
 		super(json);
 	}
 

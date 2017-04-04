@@ -162,7 +162,7 @@ public class PayloadSendWorker {
 							response = ApptentiveClient.postEvent((Event) payload);
 							break;
 						case device:
-							response = ApptentiveClient.putDevice((com.apptentive.android.sdk.model.Device) payload);
+							response = ApptentiveClient.putDevice((DevicePayload) payload);
 							DeviceManager.onSentDeviceInfo();
 							break;
 						case sdk:

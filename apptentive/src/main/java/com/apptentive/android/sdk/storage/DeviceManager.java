@@ -11,6 +11,7 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -66,12 +67,12 @@ public class DeviceManager {
 	public static void onSentDeviceInfo() {
 	}
 
-	public static com.apptentive.android.sdk.model.Device getDiffPayload(com.apptentive.android.sdk.storage.Device oldDevice, com.apptentive.android.sdk.storage.Device newDevice) {
+	public static DevicePayload getDiffPayload(com.apptentive.android.sdk.storage.Device oldDevice, com.apptentive.android.sdk.storage.Device newDevice) {
 		if (newDevice == null) {
 			return null;
 		}
 
-		com.apptentive.android.sdk.model.Device ret = new com.apptentive.android.sdk.model.Device();
+		DevicePayload ret = new DevicePayload();
 
 		if (oldDevice == null || !oldDevice.getUuid().equals(newDevice.getUuid())) {
 			ret.setUuid(newDevice.getUuid());

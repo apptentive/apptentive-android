@@ -17,11 +17,11 @@ public class ConversationTokenRequest extends JSONObject {
 	public ConversationTokenRequest() {
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(DevicePayload device) {
 		try {
-			put(Device.KEY, device);
+			put(DevicePayload.KEY, device);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Device.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
 		}
 	}
 
