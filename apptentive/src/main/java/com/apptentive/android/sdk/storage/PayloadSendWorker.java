@@ -86,10 +86,6 @@ public class PayloadSendWorker {
 		}
 	}
 
-	private PayloadStore getPayloadStore() {
-		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
-	}
-
 	private class PayloadSendRunnable implements Runnable {
 
 		public PayloadSendRunnable() {

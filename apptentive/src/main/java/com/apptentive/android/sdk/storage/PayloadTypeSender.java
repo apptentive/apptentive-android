@@ -6,5 +6,9 @@
 
 package com.apptentive.android.sdk.storage;
 
-public interface PayloadDataSource {
+import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.model.Payload;
+
+interface PayloadTypeSender<T extends Payload> {
+	ApptentiveHttpResponse sendPayload(T payload);
 }
