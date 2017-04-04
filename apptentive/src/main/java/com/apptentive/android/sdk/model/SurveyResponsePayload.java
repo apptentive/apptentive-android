@@ -14,17 +14,17 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class SurveyResponse extends ConversationItem {
+public class SurveyResponsePayload extends ConversationItem {
 
 	private static final String KEY_SURVEY_ID = "id";
 
 	private static final String KEY_SURVEY_ANSWERS = "answers";
 
-	public SurveyResponse(String json) throws JSONException {
+	public SurveyResponsePayload(String json) throws JSONException {
 		super(json);
 	}
 
-	public SurveyResponse(SurveyInteraction definition, Map<String, Object> answers) {
+	public SurveyResponsePayload(SurveyInteraction definition, Map<String, Object> answers) {
 		super();
 
 		try {

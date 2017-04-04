@@ -102,7 +102,7 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse postSurvey(SurveyResponse survey) {
+	public static ApptentiveHttpResponse postSurvey(SurveyResponsePayload survey) {
 		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), endpoint, Method.POST, survey.marshallForSending());
 	}

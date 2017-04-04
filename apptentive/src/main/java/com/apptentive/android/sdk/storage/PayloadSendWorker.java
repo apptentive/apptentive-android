@@ -178,7 +178,7 @@ public class PayloadSendWorker {
 							response = ApptentiveClient.putPerson((PersonPayload) payload);
 							break;
 						case survey:
-							response = ApptentiveClient.postSurvey((SurveyResponse) payload);
+							response = ApptentiveClient.postSurvey((SurveyResponsePayload) payload);
 							break;
 						default:
 							ApptentiveLog.e("Didn't send unknown Payload BaseType: " + payload.getBaseType());
