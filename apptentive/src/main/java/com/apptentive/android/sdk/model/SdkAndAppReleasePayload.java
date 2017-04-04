@@ -19,15 +19,15 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 
 /**
- * A combined payload of {@link Sdk} and {@link AppRelease} payloads.
+ * A combined payload of {@link SdkPayload} and {@link AppRelease} payloads.
  *
- * This class effectively contains the source code from both {@link Sdk}
+ * This class effectively contains the source code from both {@link SdkPayload}
  * and {@link AppRelease} payloads (which still kept for backward compatibility
  * purposes).
  */
 public class SdkAndAppReleasePayload extends Payload {
 
-	private final com.apptentive.android.sdk.model.Sdk sdk;
+	private final SdkPayload sdk;
 	private final com.apptentive.android.sdk.model.AppRelease appRelease;
 
 	public static SdkAndAppReleasePayload fromJson(String json) {
@@ -44,13 +44,13 @@ public class SdkAndAppReleasePayload extends Payload {
 	private SdkAndAppReleasePayload(String json) throws JSONException {
 		super(json);
 
-		sdk = new com.apptentive.android.sdk.model.Sdk(getJSONObject("sdk").toString());
+		sdk = new SdkPayload(getJSONObject("sdk").toString());
 		appRelease = new com.apptentive.android.sdk.model.AppRelease(getJSONObject("app_release").toString());
 	}
 
 	public SdkAndAppReleasePayload() {
 		super();
-		sdk = new com.apptentive.android.sdk.model.Sdk();
+		sdk = new SdkPayload();
 		appRelease = new com.apptentive.android.sdk.model.AppRelease();
 
 		try {

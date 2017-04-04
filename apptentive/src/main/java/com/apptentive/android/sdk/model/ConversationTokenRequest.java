@@ -25,11 +25,11 @@ public class ConversationTokenRequest extends JSONObject {
 		}
 	}
 
-	public void setSdk(Sdk sdk) {
+	public void setSdk(SdkPayload sdk) {
 		try {
-			put(Sdk.KEY, sdk);
+			put(SdkPayload.KEY, sdk);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
 		}
 	}
 

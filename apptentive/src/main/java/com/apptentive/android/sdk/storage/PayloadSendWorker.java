@@ -166,7 +166,7 @@ public class PayloadSendWorker {
 							DeviceManager.onSentDeviceInfo();
 							break;
 						case sdk:
-							response = ApptentiveClient.putSdk((com.apptentive.android.sdk.model.Sdk) payload);
+							response = ApptentiveClient.putSdk((SdkPayload) payload);
 							break;
 						case app_release:
 							response = ApptentiveClient.putAppRelease((com.apptentive.android.sdk.model.AppRelease) payload);

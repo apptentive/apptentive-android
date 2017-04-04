@@ -12,7 +12,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class Sdk extends Payload {
+public class SdkPayload extends Payload {
 
 	public static final String KEY = "sdk";
 
@@ -24,11 +24,11 @@ public class Sdk extends Payload {
 	private static final String KEY_DISTRIBUTION = "distribution";
 	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
 
-	public Sdk(String json) throws JSONException {
+	public SdkPayload(String json) throws JSONException {
 		super(json);
 	}
 
-	public Sdk() {
+	public SdkPayload() {
 		super();
 	}
 

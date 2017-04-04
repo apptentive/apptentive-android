@@ -86,7 +86,7 @@ public class ApptentiveClient {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
 	}
 
-	public static ApptentiveHttpResponse putSdk(Sdk sdk) {
+	public static ApptentiveHttpResponse putSdk(SdkPayload sdk) {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
 	}
 
