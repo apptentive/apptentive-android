@@ -48,14 +48,14 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 			@Override
 			protected boolean shouldRetryRequest(int responseCode) {
 				return !(appInBackground || responseCode >= 400 && responseCode < 500);
-
 			}
 		};
 		requestRetryPolicy.setRetryTimeoutMillis(RETRY_TIMEOUT);
 		requestRetryPolicy.setMaxRetryCount(RETRY_MAX_COUNT);
 
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this);
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
 	}
 
 	//region Payloads

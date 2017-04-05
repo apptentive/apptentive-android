@@ -71,8 +71,8 @@ public class ConversationManager {
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
 		this.storageDir = storageDir;
 
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_ACTIVITY_STARTED,
-			new ApptentiveNotificationObserver() {
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_ACTIVITY_STARTED, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					if (activeConversation != null && activeConversation.hasActiveState()) {
