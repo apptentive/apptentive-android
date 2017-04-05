@@ -16,8 +16,6 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.util.Destroyable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
@@ -34,10 +32,10 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 
 	private final PayloadRequestSender requestSender;
 	private final HttpRequestRetryPolicy requestRetryPolicy;
-	private final AtomicBoolean busy;
 
 	private Listener listener;
 	private boolean appInBackground;
+	private boolean sendingFlag; // this variable is only accessed in a synchronized context
 
 	PayloadSender(PayloadRequestSender requestSender) {
 		if (requestSender == null) {
@@ -56,25 +54,23 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 		requestRetryPolicy.setRetryTimeoutMillis(RETRY_TIMEOUT);
 		requestRetryPolicy.setMaxRetryCount(RETRY_MAX_COUNT);
 
-		busy = new AtomicBoolean();
-
 		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this);
 		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
 	}
 
 	//region Payloads
 
-	boolean sendPayload(final Payload payload) {
+	synchronized boolean sendPayload(final Payload payload) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
 
 		// we don't allow concurrent payload sending
-		if (isBusy()) {
+		if (isSendingPayload()) {
 			return false;
 		}
 
-		setBusy(true);
+		sendingFlag = true;
 
 		try {
 			sendPayloadRequest(payload);
@@ -85,7 +81,7 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 		return true;
 	}
 
-	private void sendPayloadRequest(final Payload payload) {
+	private synchronized void sendPayloadRequest(final Payload payload) {
 		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
 
 		ApptentiveNotificationCenter.defaultCenter()
@@ -114,8 +110,8 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 
 	//region Listener notification
 
-	private void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
-		setBusy(false);
+	private synchronized void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
+		sendingFlag = false;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_PAYLOAD_DID_SEND,
@@ -169,12 +165,8 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 
 	//region Getters/Setters
 
-	boolean isBusy() {
-		return busy.get();
-	}
-
-	private void setBusy(boolean value) {
-		busy.set(value);
+	synchronized boolean isSendingPayload() {
+		return sendingFlag;
 	}
 
 	public void setListener(Listener listener) {

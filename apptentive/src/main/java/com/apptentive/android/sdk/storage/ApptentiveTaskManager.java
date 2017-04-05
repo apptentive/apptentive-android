@@ -188,7 +188,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		if (payloadSender.isBusy()) {
+		if (payloadSender.isSendingPayload()) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: payload sender is busy");
 			return;
 		}
