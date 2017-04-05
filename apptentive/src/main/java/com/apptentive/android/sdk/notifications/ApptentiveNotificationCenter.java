@@ -53,8 +53,9 @@ public class ApptentiveNotificationCenter {
 	/**
 	 * Adds an entry to the receiver’s dispatch table with an observer using strong reference.
 	 */
-	public synchronized void addObserver(String notification, ApptentiveNotificationObserver observer) {
+	public synchronized ApptentiveNotificationCenter addObserver(String notification, ApptentiveNotificationObserver observer) {
 		addObserver(notification, observer, false);
+		return this;
 	}
 
 	/**
