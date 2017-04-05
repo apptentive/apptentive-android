@@ -21,6 +21,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_SEND;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 	private static final long RETRY_TIMEOUT = 5000;
@@ -82,22 +88,25 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 	private void sendPayloadRequest(final Payload payload) {
 		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
 
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_PAYLOAD_WILL_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpJsonRequest>() {
-				@Override
-				public void onFinish(HttpJsonRequest request) {
-					handleFinishSendingPayload(payload, false, null);
-				}
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				handleFinishSendingPayload(payload, false, null);
+			}
 
-				@Override
-				public void onCancel(HttpJsonRequest request) {
-					handleFinishSendingPayload(payload, true, null);
-				}
+			@Override
+			public void onCancel(HttpJsonRequest request) {
+				handleFinishSendingPayload(payload, true, null);
+			}
 
-				@Override
-				public void onFail(HttpJsonRequest request, String reason) {
-					handleFinishSendingPayload(payload, false, reason);
-				}
-			});
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				handleFinishSendingPayload(payload, false, reason);
+			}
+		});
 		payloadRequest.setRetryPolicy(requestRetryPolicy);
 	}
 
@@ -107,6 +116,11 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 
 	private void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
 		setBusy(false);
+
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_PAYLOAD_DID_SEND,
+				NOTIFICATION_KEY_PAYLOAD, payload,
+				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null ? TRUE : FALSE);
 
 		try {
 			if (listener != null) {

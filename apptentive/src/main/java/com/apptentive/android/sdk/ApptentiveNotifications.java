@@ -49,6 +49,8 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
 	// keys
+	public static final String NOTIFICATION_KEY_SUCCESSFUL = "successful";
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
 	public static final String NOTIFICATION_KEY_CONVERSATION = "conversation";
+	public static final String NOTIFICATION_KEY_PAYLOAD = "payload";
 }

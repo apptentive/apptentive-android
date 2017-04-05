@@ -153,8 +153,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
 		if (cancelled) {
 			ApptentiveLog.v(PAYLOADS, "Payload sending was cancelled: %s", payload);
-		} else if (errorMessage != null) {
-			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s", payload);
+			return; // don't remove cancelled payloads from the queue
+		}
+
+		if (errorMessage != null) {
+			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
 		} else {
 			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
 		}

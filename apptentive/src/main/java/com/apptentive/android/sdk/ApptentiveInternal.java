@@ -48,7 +48,6 @@ import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
@@ -412,7 +411,7 @@ public class ApptentiveInternal {
 
 			// Post a notification
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STARTED,
-				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
+				NOTIFICATION_KEY_ACTIVITY, activity);
 		}
 	}
 
@@ -423,7 +422,7 @@ public class ApptentiveInternal {
 
 			// Post a notification
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_RESUMED,
-				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
+				NOTIFICATION_KEY_ACTIVITY, activity);
 		}
 	}
 
