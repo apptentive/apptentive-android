@@ -347,11 +347,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
-
-			PayloadSendWorker worker = ApptentiveInternal.getInstance().getPayloadWorker();
-			if (worker != null) {
-				worker.setCanRunPayloadThread(true);
-			}
 		} catch (SQLException sqe) {
 			ApptentiveLog.e("addPayload EXCEPTION: " + sqe.getMessage());
 		}
